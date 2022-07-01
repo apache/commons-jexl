@@ -19,8 +19,11 @@ package org.apache.commons.jexl3;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
+
+import org.apache.commons.jexl3.internal.Debugger;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -34,6 +37,30 @@ public class ForEachTest extends JexlTestCase {
     /** create a named test */
     public ForEachTest() {
         super("ForEachTest");
+    }
+
+    @Test public void testForLoop0b0() {
+        String src = "(l)->{ for(let x = 0, y = 0; x < 4; ++x) l.add(x) }";
+        JexlEngine jexl = new JexlBuilder().safe(false).create();
+        JexlScript script = jexl.createScript(src);
+        List<Integer> l = new ArrayList<>();
+        Object result = script.execute(null, l);
+        Assert.assertNotNull(result);
+        Assert.assertEquals(Arrays.asList(0, 1, 2, 3), l);
+        String resrc = toString(script);
+        Assert.assertEquals(src, resrc);
+    }
+
+    @Test public void testForLoop0a() {
+        String src = "(l)->{ for(let x = 0; x < 4; ++x) { l.add(x); } }";
+        JexlEngine jexl = new JexlBuilder().safe(false).create();
+        JexlScript script = jexl.createScript(src);
+        List<Integer> l = new ArrayList<>();
+        Object result = script.execute(null, l);
+        Assert.assertNotNull(result);
+        Assert.assertEquals(Arrays.asList(0, 1, 2, 3), l);
+        String resrc = toString(script);
+        Assert.assertEquals(src, resrc);
     }
 
     @Test

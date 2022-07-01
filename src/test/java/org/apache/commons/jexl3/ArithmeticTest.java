@@ -33,8 +33,10 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.MathContext;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -382,6 +384,143 @@ public class ArithmeticTest extends JexlTestCase {
             asserter.assertExpression("+aBigInteger", new BigInteger("7"));
             asserter.assertExpression("+aBigDecimal", new BigDecimal("8.8"));
         }
+    }
+
+    @Test
+    public void testMinusMinusPrefix() throws Exception {
+        asserter.setVariable("aByte", new Byte((byte) 2));
+        asserter.setVariable("aShort", new Short((short) 3));
+        asserter.setVariable("anInteger", new Integer(4));
+        asserter.setVariable("aLong", new Long(5));
+        asserter.setVariable("aFloat", new Float(6.6));
+        asserter.setVariable("aDouble", new Double(7.7));
+        asserter.setVariable("aBigInteger", new BigInteger("8"));
+        asserter.setVariable("aBigDecimal", new BigDecimal("9.9"));
+        asserter.setVariable("aString", "forty-two");
+
+        asserter.assertExpression("--aByte", new Byte((byte) 1));
+        asserter.assertExpression("--aShort", new Short((short) 2));
+        asserter.assertExpression("--anInteger", new Integer(3));
+        asserter.assertExpression("--aLong", new Long(4));
+        asserter.assertExpression("--aFloat", new Float(5.6));
+        asserter.assertExpression("--aDouble", new Double(6.7));
+        asserter.assertExpression("--aBigInteger", new BigInteger("7"));
+        asserter.assertExpression("--aBigDecimal", new BigDecimal("8.9"));
+
+        asserter.failExpression("aString--", "--", String::contains);
+    }
+
+    @Test
+    public void testMinusMinusPostfix() throws Exception {
+        asserter.setVariable("aByte", new Byte((byte) 2));
+        asserter.setVariable("aShort", new Short((short) 3));
+        asserter.setVariable("anInteger", new Integer(4));
+        asserter.setVariable("aLong", new Long(5));
+        asserter.setVariable("aFloat", new Float(6.6));
+        asserter.setVariable("aDouble", new Double(7.7));
+        asserter.setVariable("aBigInteger", new BigInteger("8"));
+        asserter.setVariable("aBigDecimal", new BigDecimal("9.9"));
+        asserter.setVariable("aString", "forty-two");
+
+        asserter.assertExpression("aByte--",new Byte((byte) 2));
+        asserter.assertExpression("aShort--", new Short((short) 3));
+        asserter.assertExpression("anInteger--", new Integer(4));
+        asserter.assertExpression("aLong--", new Long(5));
+        asserter.assertExpression("aFloat--", new Float(6.6));
+        asserter.assertExpression("aDouble--", new Double(7.7));
+        asserter.assertExpression("aBigInteger--", new BigInteger("8"));
+        asserter.assertExpression("aBigDecimal--", new BigDecimal("9.9"));
+
+        asserter.assertExpression("aByte", new Byte((byte) 1));
+        asserter.assertExpression("aShort", new Short((short) 2));
+        asserter.assertExpression("anInteger", new Integer(3));
+        asserter.assertExpression("aLong", new Long(4));
+        asserter.assertExpression("aFloat", new Float(5.6));
+        asserter.assertExpression("aDouble", new Double(6.7));
+        asserter.assertExpression("aBigInteger", new BigInteger("7"));
+        asserter.assertExpression("aBigDecimal", new BigDecimal("8.9"));
+
+        asserter.failExpression("aString--", "--", String::contains);
+    }
+
+    @Test
+    public void testPlusPlusPrefix() throws Exception {
+        asserter.setVariable("aByte", new Byte((byte) 0));
+        asserter.setVariable("aShort", new Short((short) 1));
+        asserter.setVariable("anInteger", new Integer(2));
+        asserter.setVariable("aLong", new Long(3));
+        asserter.setVariable("aFloat", new Float(4.4));
+        asserter.setVariable("aDouble", new Double(5.5));
+        asserter.setVariable("aBigInteger", new BigInteger("6"));
+        asserter.setVariable("aBigDecimal", new BigDecimal("7.7"));
+        asserter.setVariable("aString", "forty-two");
+
+        asserter.assertExpression("++aByte", new Byte((byte) 1));
+        asserter.assertExpression("++aShort", new Short((short) 2));
+        asserter.assertExpression("++anInteger", new Integer(3));
+        asserter.assertExpression("++aLong", new Long(4));
+        asserter.assertExpression("++aFloat", new Float(5.4));
+        asserter.assertExpression("++aDouble", new Double(6.5));
+        asserter.assertExpression("++aBigInteger", new BigInteger("7"));
+        asserter.assertExpression("++aBigDecimal", new BigDecimal("8.7"));
+
+        asserter.failExpression("++aString", "++", String::contains);
+    }
+
+    @Test
+    public void testPlusPlusPostfix() throws Exception {
+        asserter.setVariable("aByte", new Byte((byte) 0));
+        asserter.setVariable("aShort", new Short((short) 1));
+        asserter.setVariable("anInteger", new Integer(2));
+        asserter.setVariable("aLong", new Long(3));
+        asserter.setVariable("aFloat", new Float(4.4));
+        asserter.setVariable("aDouble", new Double(5.5));
+        asserter.setVariable("aBigInteger", new BigInteger("6"));
+        asserter.setVariable("aBigDecimal", new BigDecimal("7.7"));
+        asserter.setVariable("aString", "forty-two");
+
+        asserter.assertExpression("aByte++", new Byte((byte) 0));
+        asserter.assertExpression("aShort++", new Short((short) 1));
+        asserter.assertExpression("anInteger++", new Integer(2));
+        asserter.assertExpression("aLong++", new Long(3));
+        asserter.assertExpression("aFloat++", new Float(4.4));
+        asserter.assertExpression("aDouble++", new Double(5.5));
+        asserter.assertExpression("aBigInteger++", new BigInteger("6"));
+        asserter.assertExpression("aBigDecimal++", new BigDecimal("7.7"));
+
+        asserter.assertExpression("aByte", new Byte((byte) 1));
+        asserter.assertExpression("aShort", new Short((short) 2));
+        asserter.assertExpression("anInteger", new Integer(3));
+        asserter.assertExpression("aLong", new Long(4));
+        asserter.assertExpression("aFloat", new Float(5.4));
+        asserter.assertExpression("aDouble", new Double(6.5));
+        asserter.assertExpression("aBigInteger", new BigInteger("7"));
+        asserter.assertExpression("aBigDecimal", new BigDecimal("8.7"));
+
+        asserter.failExpression("aString++", "++", String::contains);
+    }
+
+    @Test
+    public void testNarrowBig() throws Exception {
+        List<String> ls = Arrays.asList("zero", "one", "two");
+        asserter.setVariable("list",ls);
+        asserter.setVariable("aBigDecimal", new BigDecimal("1"));
+        asserter.setVariable("aBigInteger", new BigDecimal("1"));
+        asserter.assertExpression("list.get(aBigDecimal)", "one");
+        asserter.assertExpression("list.get(aBigInteger)", "one");
+    }
+
+    @Test
+    public void testNarrowBigDecimal() throws Exception {
+        asserter.setVariable("bi420", BigInteger.valueOf(420));
+        asserter.setVariable("bi10", BigInteger.valueOf(10));
+        asserter.setVariable("bd420", new BigDecimal("420"));
+        asserter.setVariable("bd10", new BigDecimal("10"));
+        asserter.assertExpression("420 / bi10", 42);
+        asserter.assertExpression("420l / bi10", 42L);
+        asserter.assertExpression("bi420 / 420", 1);
+        asserter.assertExpression("bi420 / 420l", 1L);
+        asserter.assertExpression("bd420 / 10", new BigDecimal("42"));
     }
 
     /**

@@ -285,9 +285,11 @@ TOKEN_MGR_DECLS : {
 <*> TOKEN :
 {
   < STRING_LITERAL:
-    "\"" (~["\"","\\","\n","\r","\u2028","\u2029"] | "\\" ~["\n","\r","\u2028","\u2029"])* "\""
+    "\"" (~["\"","\\","\n","\r","\t","\f","\b","\u2028","\u2029"]
+          | "\\" ~["\n","\r","\t","\f","\b","\u2028","\u2029"])* "\""
   |
-    "'" (~["'","\\","\n","\r","\u2028","\u2029"] | "\\" ~["\n","\r","\u2028","\u2029"])* "'"
+    "'" (~["'","\\","\n","\r","\t","\f","\b","\u2028","\u2029"]
+         | "\\" ~["\n","\r","\t","\f","\b","\u2028","\u2029"])* "'"
   > { popDot(); } /* Revert state to default if was DOT_ID. */
 }
 
@@ -301,7 +303,7 @@ TOKEN_MGR_DECLS : {
 <*> TOKEN :
 {
   < REGEX_LITERAL:
-    "~" "/" (~["/","\n","\r","\u2028","\u2029"] | "\\" "/" )* "/"
+    "~" "/" (~["/","\n","\r","\t","\f","\b","\u2028","\u2029"] | "\\" "/" )* "/"
   > { popDot(); } /* Revert state to default if was DOT_ID. */
 }
 
@@ -466,11 +468,11 @@ void ForEachVar() #Reference : {}
 
 void Var() #void : {}
 {
-    <VAR> DefineVar() (<COMMA> DefineVar())*
+    (<VAR> DefineVar() (<COMMA> DefineVar())*) #DefineVars(>1)
     |
-    <LET> DefineLet() (<COMMA> DefineLet())*
+    (<LET> DefineLet() (<COMMA> DefineLet())*) #DefineVars(>1)
     |
-    <CONST> DefineConst() (<COMMA> DefineConst())*
+    (<CONST> DefineConst() (<COMMA> DefineConst())*) #DefineVars(>1)
 }
 
  void DefineVar() #void : {}

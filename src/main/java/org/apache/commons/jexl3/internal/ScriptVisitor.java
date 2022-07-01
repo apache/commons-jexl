@@ -21,7 +21,7 @@ import org.apache.commons.jexl3.JexlScript;
 import org.apache.commons.jexl3.parser.*;
 
 /**
- * Fully abstract to avoid public interface exposition.
+ * Concrete visitor base, used for feature and operator controllers.
  */
 public class ScriptVisitor extends ParserVisitor {
     /**
@@ -113,6 +113,11 @@ public class ScriptVisitor extends ParserVisitor {
 
     @Override
     protected Object visit(final ASTVar node, final Object data) {
+        return visitNode(node, data);
+    }
+
+    @Override
+    protected Object visit(final ASTDefineVars node, final Object data) {
         return visitNode(node, data);
     }
 

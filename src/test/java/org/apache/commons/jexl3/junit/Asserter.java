@@ -18,8 +18,10 @@ package org.apache.commons.jexl3.junit;
 
 import java.lang.reflect.Array;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.BiPredicate;
 
 
 import org.apache.commons.jexl3.JexlEvalContext;
@@ -99,8 +101,11 @@ public class Asserter extends Assert {
             final JexlArithmetic jexla = engine.getArithmetic();
             Assert.assertEquals("expression: " + expression, 0,
                     ((BigDecimal) expected).compareTo(jexla.toBigDecimal(value)));
-        }
-        if (expected != null && value != null) {
+        } else if (expected instanceof BigInteger) {
+            final JexlArithmetic jexla = engine.getArithmetic();
+            Assert.assertEquals("expression: " + expression, 0,
+                    ((BigInteger) expected).compareTo(jexla.toBigInteger(value)));
+        } else if (expected != null && value != null) {
             if (expected.getClass().isArray() && value.getClass().isArray()) {
                 final int esz = Array.getLength(expected);
                 final int vsz = Array.getLength(value);
@@ -130,12 +135,15 @@ public class Asserter extends Assert {
      * @throws Exception if the expression did not fail or the exception did not match the expected pattern
      */
     public void failExpression(final String expression, final String matchException) throws Exception {
+         failExpression(expression, matchException, String::matches);
+    }
+    public void failExpression(final String expression, final String matchException, BiPredicate<String,String> predicate) throws Exception {
         try {
             final JexlScript exp = engine.createScript(expression);
             exp.execute(context);
             fail("expression: " + expression);
         } catch (final JexlException xjexl) {
-            if (matchException != null && !xjexl.getMessage().matches(matchException)) {
+            if (matchException != null && !predicate.test(xjexl.getMessage(), matchException)) {
                 fail("expression: " + expression + ", expected: " + matchException + ", got " + xjexl.getMessage());
             }
         }

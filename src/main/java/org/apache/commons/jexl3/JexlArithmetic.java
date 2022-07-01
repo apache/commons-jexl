@@ -534,7 +534,7 @@ public class JexlArithmetic {
     }
 
     /**
-     * Given a Number, return back the value attempting to narrow it to a target class.
+     * Given a Number, return the value attempting to narrow it to a target class.
      *
      * @param original the original number
      * @param narrow   the attempted target class
@@ -613,14 +613,14 @@ public class JexlArithmetic {
      * if either arguments is a Long, no narrowing to Integer will occur
      * </p>
      *
-     * @param lhs  the left hand side operand that lead to the bigi result
-     * @param rhs  the right hand side operand that lead to the bigi result
+     * @param lhs  the left-hand side operand that lead to the bigi result
+     * @param rhs  the right-hand side operand that lead to the bigi result
      * @param bigi the BigInteger to narrow
      * @return an Integer or Long if narrowing is possible, the original BigInteger otherwise
      */
     protected Number narrowBigInteger(final Object lhs, final Object rhs, final BigInteger bigi) {
         //coerce to long if possible
-        if (!(lhs instanceof BigInteger || rhs instanceof BigInteger)
+        if ((isNumberable(lhs) || isNumberable(rhs))
                 && bigi.compareTo(BIGI_LONG_MAX_VALUE) <= 0
                 && bigi.compareTo(BIGI_LONG_MIN_VALUE) >= 0) {
             // coerce to int if possible
@@ -637,13 +637,13 @@ public class JexlArithmetic {
     }
 
     /**
-     * Given a BigDecimal, attempt to narrow it to an Integer or Long if it fits if
+     * Given a BigDecimal, attempt to narrow it to an Integer or Long if it fits and
      * one of the arguments is a numberable.
      *
-     * @param lhs  the left hand side operand that lead to the bigd result
-     * @param rhs  the right hand side operand that lead to the bigd result
+     * @param lhs  the left-hand side operand that lead to the bigd result
+     * @param rhs  the right-hand side operand that lead to the bigd result
      * @param bigd the BigDecimal to narrow
-     * @return an Integer or Long if narrowing is possible, the original BigInteger otherwise
+     * @return an Integer or Long if narrowing is possible, the original BigDecimal otherwise
      */
     protected Number narrowBigDecimal(final Object lhs, final Object rhs, final BigDecimal bigd) {
         if (isNumberable(lhs) || isNumberable(rhs)) {
@@ -755,19 +755,21 @@ public class JexlArithmetic {
             return ((Long) val) + incr;
         }
         if (val instanceof BigDecimal) {
-            return ((BigDecimal) val).add(BigDecimal.valueOf(incr));
+            BigDecimal bd = (BigDecimal) val;
+            return bd.add(BigDecimal.valueOf(incr), this.mathContext);
         }
         if (val instanceof BigInteger) {
-            return ((BigInteger) val).add(BigInteger.valueOf(incr));
+            BigInteger bi = (BigInteger) val;
+            return bi.add(BigInteger.valueOf(incr));
         }
         if (val instanceof Float) {
             return ((Float) val) + incr;
         }
         if (val instanceof Short) {
-            return (short) ((Short) val) + incr;
+            return (short) (((Short) val) + incr);
         }
         if (val instanceof Byte) {
-            return (byte) ((Byte) val) + incr;
+            return (byte) (((Byte) val) + incr);
         }
         throw new ArithmeticException("Object "+(incr < 0? "decrement":"increment")+":(" + val + ")");
     }
@@ -1046,6 +1048,7 @@ public class JexlArithmetic {
     /**
      * Negates a value (unary minus for numbers).
      *
+     * @see #isNegateStable()
      * @param val the value to negate
      * @return the negated value
      */
@@ -1092,7 +1095,6 @@ public class JexlArithmetic {
      * <p>This is used to determine whether negate results on number literals can be cached.
      * If the result on calling negate with the same constant argument may change between calls,
      * which means the function is not deterministic, this method must return false.
-     * @see #isNegateStable()
      * @return true if negate is idempotent, false otherwise
      */
     public boolean isNegateStable() {
@@ -1676,7 +1678,7 @@ public class JexlArithmetic {
      */
     private double parseDouble(String arg) throws ArithmeticException {
         try {
-            return arg.isEmpty()? Double.NaN : Double.parseDouble((String) arg);
+            return arg.isEmpty()? Double.NaN : Double.parseDouble(arg);
         } catch(NumberFormatException xformat) {
             throw new ArithmeticException("Double coercion: ("+ arg +")");
         }
@@ -1862,8 +1864,7 @@ public class JexlArithmetic {
             return parseDouble((String) val);
         }
         if (val instanceof Character) {
-            final int i = ((Character) val);
-            return i;
+            return ((Character) val);
         }
         throw new ArithmeticException("Double coercion: "
                 + val.getClass().getName() + ":(" + val + ")");

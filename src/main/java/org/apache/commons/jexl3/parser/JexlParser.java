@@ -237,7 +237,7 @@ public abstract class JexlParser extends StringParser {
     }
 
     /**
-     * Gets the lexical unit currently used by this parser.
+     * Gets the lexical unit used by this parser.
      * @return the named register map
      */
     protected LexicalUnit getUnit() {
@@ -399,7 +399,7 @@ public abstract class JexlParser extends StringParser {
         if (scope == null) {
             scope = new Scope(null);
         }
-        final int symbol = scope.declareVariable(name, true, true);
+        final int symbol = scope.declareVariable(name);
         variable.setSymbol(symbol, name);
         variable.setLexical(true);
         if (scope.isCapturedSymbol(symbol)) {
@@ -433,7 +433,7 @@ public abstract class JexlParser extends StringParser {
         if (scope == null) {
             scope = new Scope(null);
         }
-        final int symbol = scope.declareVariable(name, lexical, constant);
+        final int symbol = scope.declareVariable(name);
         variable.setSymbol(symbol, name);
         variable.setLexical(lexical);
         variable.setConstant(constant);
@@ -701,7 +701,6 @@ public abstract class JexlParser extends StringParser {
     protected void throwParsingException(final Token parsed) {
         JexlInfo xinfo  = null;
         String msg = "unrecoverable state";
-        JexlException.Parsing xparse = null;
         Token token = parsed;
         if (token == null) {
             token = this.getToken(0);

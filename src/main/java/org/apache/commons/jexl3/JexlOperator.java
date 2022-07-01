@@ -28,13 +28,21 @@ package org.apache.commons.jexl3;
  * <p>The default JexlArithmetic implements generic versions of these methods using Object as arguments.
  * You can use your own derived JexlArithmetic that override and/or overload those operator methods.
  * Note that these are overloads by convention, not actual Java overloads.
- * The following rules apply to operator methods:</p>
+ * The following rules apply to all operator methods:</p>
  * <ul>
  * <li>Operator methods should be public</li>
  * <li>Operators return type should be respected when primitive (int, boolean,...)</li>
  * <li>Operators may be overloaded multiple times with different signatures</li>
  * <li>Operators may return JexlEngine.TRY_AGAIN to fallback on default JEXL implementation</li>
  * </ul>
+ *
+ * For side effect operators, operators that modify the left-hand size value (+=, -=, etc), the user implemented
+ * overload methods may return:
+ * <ul>
+ *     <li>JexlEngine.TRY_FAIL to let the default fallback behavior be executed.</li>
+ *     <li>Any other value will be used as the new value to be assigned to the left-hand-side.</li>
+ * </ul>
+ * Note that side effect operators always return the left-hand side value (with an exception for postfix ++ and --).
  *
  * @since 3.0
  */
@@ -44,7 +52,7 @@ public enum JexlOperator {
      * Add operator.
      * <br><strong>Syntax:</strong> <code>x + y</code>
      * <br><strong>Method:</strong> <code>T add(L x, R y);</code>.
-     * @see JexlArithmetic#add
+     * @see JexlArithmetic#add(Object, Object)
      */
     ADD("+", "add", 2),
 
@@ -52,7 +60,7 @@ public enum JexlOperator {
      * Subtract operator.
      * <br><strong>Syntax:</strong> <code>x - y</code>
      * <br><strong>Method:</strong> <code>T subtract(L x, R y);</code>.
-     * @see JexlArithmetic#subtract
+     * @see JexlArithmetic#subtract(Object, Object)
      */
     SUBTRACT("-", "subtract", 2),
 
@@ -60,7 +68,7 @@ public enum JexlOperator {
      * Multiply operator.
      * <br><strong>Syntax:</strong> <code>x * y</code>
      * <br><strong>Method:</strong> <code>T multiply(L x, R y);</code>.
-     * @see JexlArithmetic#multiply
+     * @see JexlArithmetic#multiply(Object, Object)
      */
     MULTIPLY("*", "multiply", 2),
 
@@ -68,7 +76,7 @@ public enum JexlOperator {
      * Divide operator.
      * <br><strong>Syntax:</strong> <code>x / y</code>
      * <br><strong>Method:</strong> <code>T divide(L x, R y);</code>.
-     * @see JexlArithmetic#divide
+     * @see JexlArithmetic#divide(Object, Object)
      */
     DIVIDE("/", "divide", 2),
 
@@ -76,7 +84,7 @@ public enum JexlOperator {
      * Modulo operator.
      * <br><strong>Syntax:</strong> <code>x % y</code>
      * <br><strong>Method:</strong> <code>T mod(L x, R y);</code>.
-     * @see JexlArithmetic#mod
+     * @see JexlArithmetic#mod(Object, Object)
      */
     MOD("%", "mod", 2),
 
@@ -84,7 +92,7 @@ public enum JexlOperator {
      * Bitwise-and operator.
      * <br><strong>Syntax:</strong> <code>x &amp; y</code>
      * <br><strong>Method:</strong> <code>T and(L x, R y);</code>.
-     * @see JexlArithmetic#and
+     * @see JexlArithmetic#and(Object, Object)
      */
     AND("&", "and", 2),
 
@@ -92,7 +100,7 @@ public enum JexlOperator {
      * Bitwise-or operator.
      * <br><strong>Syntax:</strong> <code>x | y</code>
      * <br><strong>Method:</strong> <code>T or(L x, R y);</code>.
-     * @see JexlArithmetic#or
+     * @see JexlArithmetic#or(Object, Object)
      */
     OR("|", "or", 2),
 
@@ -100,7 +108,7 @@ public enum JexlOperator {
      * Bitwise-xor operator.
      * <br><strong>Syntax:</strong> <code>x ^ y</code>
      * <br><strong>Method:</strong> <code>T xor(L x, R y);</code>.
-     * @see JexlArithmetic#xor
+     * @see JexlArithmetic#xor(Object, Object)
      */
     XOR("^", "xor", 2),
 
@@ -132,7 +140,7 @@ public enum JexlOperator {
      * Equals operator.
      * <br><strong>Syntax:</strong> <code>x == y</code>
      * <br><strong>Method:</strong> <code>boolean equals(L x, R y);</code>.
-     * @see JexlArithmetic#equals
+     * @see JexlArithmetic#equals(Object, Object)
      */
     EQ("==", "equals", 2),
 
@@ -140,7 +148,7 @@ public enum JexlOperator {
      * Less-than operator.
      * <br><strong>Syntax:</strong> <code>x &lt; y</code>
      * <br><strong>Method:</strong> <code>boolean lessThan(L x, R y);</code>.
-     * @see JexlArithmetic#lessThan
+     * @see JexlArithmetic#lessThan(Object, Object)
      */
     LT("<", "lessThan", 2),
 
@@ -148,7 +156,7 @@ public enum JexlOperator {
      * Less-than-or-equal operator.
      * <br><strong>Syntax:</strong> <code>x &lt;= y</code>
      * <br><strong>Method:</strong> <code>boolean lessThanOrEqual(L x, R y);</code>.
-     * @see JexlArithmetic#lessThanOrEqual
+     * @see JexlArithmetic#lessThanOrEqual(Object, Object)
      */
     LTE("<=", "lessThanOrEqual", 2),
 
@@ -156,7 +164,7 @@ public enum JexlOperator {
      * Greater-than operator.
      * <br><strong>Syntax:</strong> <code>x &gt; y</code>
      * <br><strong>Method:</strong> <code>boolean greaterThan(L x, R y);</code>.
-     * @see JexlArithmetic#greaterThan
+     * @see JexlArithmetic#greaterThan(Object, Object)
      */
     GT(">", "greaterThan", 2),
 
@@ -164,7 +172,7 @@ public enum JexlOperator {
      * Greater-than-or-equal operator.
      * <br><strong>Syntax:</strong> <code>x &gt;= y</code>
      * <br><strong>Method:</strong> <code>boolean greaterThanOrEqual(L x, R y);</code>.
-     * @see JexlArithmetic#greaterThanOrEqual
+     * @see JexlArithmetic#greaterThanOrEqual(Object, Object)
      */
     GTE(">=", "greaterThanOrEqual", 2),
 
@@ -172,7 +180,7 @@ public enum JexlOperator {
      * Contains operator.
      * <br><strong>Syntax:</strong> <code>x =~ y</code>
      * <br><strong>Method:</strong> <code>boolean contains(L x, R y);</code>.
-     * @see JexlArithmetic#contains
+     * @see JexlArithmetic#contains(Object, Object)
      */
     CONTAINS("=~", "contains", 2),
 
@@ -180,7 +188,7 @@ public enum JexlOperator {
      * Starts-with operator.
      * <br><strong>Syntax:</strong> <code>x =^ y</code>
      * <br><strong>Method:</strong> <code>boolean startsWith(L x, R y);</code>.
-     * @see JexlArithmetic#startsWith
+     * @see JexlArithmetic#startsWith(Object, Object)
      */
     STARTSWITH("=^", "startsWith", 2),
 
@@ -188,7 +196,7 @@ public enum JexlOperator {
      * Ends-with operator.
      * <br><strong>Syntax:</strong> <code>x =$ y</code>
      * <br><strong>Method:</strong> <code>boolean endsWith(L x, R y);</code>.
-     * @see JexlArithmetic#endsWith
+     * @see JexlArithmetic#endsWith(Object, Object)
      */
     ENDSWITH("=$", "endsWith", 2),
 
@@ -196,7 +204,7 @@ public enum JexlOperator {
      * Not operator.
      * <br><strong>Syntax:</strong> <code>!x</code>
      * <br><strong>Method:</strong> <code>T not(L x);</code>.
-     * @see JexlArithmetic#not
+     * @see JexlArithmetic#not(Object)
      */
     NOT("!", "not", 1),
 
@@ -204,7 +212,7 @@ public enum JexlOperator {
      * Complement operator.
      * <br><strong>Syntax:</strong> <code>~x</code>
      * <br><strong>Method:</strong> <code>T complement(L x);</code>.
-     * @see JexlArithmetic#complement
+     * @see JexlArithmetic#complement(Object)
      */
     COMPLEMENT("~", "complement", 1),
 
@@ -212,7 +220,7 @@ public enum JexlOperator {
      * Negate operator.
      * <br><strong>Syntax:</strong> <code>-x</code>
      * <br><strong>Method:</strong> <code>T negate(L x);</code>.
-     * @see JexlArithmetic#negate
+     * @see JexlArithmetic#negate(Object)
      */
     NEGATE("-", "negate", 1),
 
@@ -220,7 +228,7 @@ public enum JexlOperator {
      * Positivize operator.
      * <br><strong>Syntax:</strong> <code>+x</code>
      * <br><strong>Method:</strong> <code>T positivize(L x);</code>.
-     * @see JexlArithmetic#positivize
+     * @see JexlArithmetic#positivize(Object)
      */
     POSITIVIZE("+", "positivize", 1),
 
@@ -228,7 +236,7 @@ public enum JexlOperator {
      * Empty operator.
      * <br><strong>Syntax:</strong> <code>empty x</code> or <code>empty(x)</code>
      * <br><strong>Method:</strong> <code>boolean empty(L x);</code>.
-     * @see JexlArithmetic#empty
+     * @see JexlArithmetic#empty(Object)
      */
     EMPTY("empty", "empty", 1),
 
@@ -236,7 +244,7 @@ public enum JexlOperator {
      * Size operator.
      * <br><strong>Syntax:</strong> <code>size x</code> or <code>size(x)</code>
      * <br><strong>Method:</strong> <code>int size(L x);</code>.
-     * @see JexlArithmetic#size
+     * @see JexlArithmetic#size(Object)
      */
     SIZE("size", "size", 1),
 
@@ -319,15 +327,15 @@ public enum JexlOperator {
 
     /**
      * Increment pseudo-operator.
-     * <br>No syntax, used as helper for <code>++</code>.
-     * @see JexlArithmetic#increment
+     * <br>No syntax, used as helper for the prefix and postfix versions of <code>++</code>.
+     * @see JexlArithmetic#increment(Object)
      */
     INCREMENT("+1", "increment", 1),
 
     /**
      * Decrement pseudo-operator.
-     * <br>No syntax, used as helper for <code>--</code>.
-     * @see JexlArithmetic#decrement
+     * <br>No syntax, used as helper for the prefix and postfix versions of <code>--</code>.
+     * @see JexlArithmetic#decrement(Object)
      */
     DECREMENT("-1", "decrement", 1),
 
@@ -336,28 +344,28 @@ public enum JexlOperator {
      * <br><strong>Syntax:</strong> <code>++x</code>
      * <br><strong>Method:</strong> <code>T incrementAndGet(L x);</code>.
      */
-    INCREMENT_AND_GET("++.", "incrementAndGet", INCREMENT),
+    INCREMENT_AND_GET("++.", "incrementAndGet", INCREMENT, 1),
 
     /**
      * Postfix ++, increments and returns the value before incrementing.
      * <br><strong>Syntax:</strong> <code>x++</code>
      * <br><strong>Method:</strong> <code>T getAndIncrement(L x);</code>.
      */
-    GET_AND_INCREMENT(".++", "getAndIncrement", INCREMENT),
+    GET_AND_INCREMENT(".++", "getAndIncrement", INCREMENT, 1),
 
     /**
      * Prefix --, decrements and returns the value after decrementing.
      * <br><strong>Syntax:</strong> <code>--x</code>
      * <br><strong>Method:</strong> <code>T decrementAndGet(L x);</code>.
      */
-    DECREMENT_AND_GET("--.", "decrementAndGet", DECREMENT),
+    DECREMENT_AND_GET("--.", "decrementAndGet", DECREMENT, 1),
 
     /**
      * Postfix --, decrements and returns the value before decrementing.
      * <br><strong>Syntax:</strong> <code>x--</code>
      * <br><strong>Method:</strong> <code>T getAndDecrement(L x);</code>.
      */
-    GET_AND_DECREMENT(".--", "getAndDecrement", DECREMENT),
+    GET_AND_DECREMENT(".--", "getAndDecrement", DECREMENT, 1),
 
     /**
      * Marker for side effect.
@@ -431,23 +439,32 @@ public enum JexlOperator {
      * @param argc the number of parameters for the method
      */
     JexlOperator(final String o, final String m, final int argc) {
-        this.operator = o;
-        this.methodName = m;
-        this.arity = argc;
-        this.base = null;
+        this(o, m, null, argc);
     }
 
     /**
-     * Creates a side-effect operator.
+     * Creates a side effect operator with arity == 2.
      *
      * @param o the operator name
      * @param m the method name associated to this operator in a JexlArithmetic
      * @param b the base operator, ie + for +=
      */
     JexlOperator(final String o, final String m, final JexlOperator b) {
+        this(o, m, b, 2);
+    }
+
+    /**
+     * Creates a side effect operator.
+     *
+     * @param o the operator name
+     * @param m the method name associated to this operator in a JexlArithmetic
+     * @param b the base operator, ie + for +=
+     * @param a the operator arity
+     */
+    JexlOperator(final String o, final String m, final JexlOperator b, final int a) {
         this.operator = o;
         this.methodName = m;
-        this.arity = 2;
+        this.arity = a;
         this.base = b;
     }
 

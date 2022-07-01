@@ -16,8 +16,6 @@
  */
 package org.apache.commons.jexl3.parser;
 
-import org.apache.commons.jexl3.JexlOperator;
-
 /**
  * Fully abstract to avoid public interface exposition.
  */
@@ -63,6 +61,8 @@ public abstract class ParserVisitor {
     protected abstract Object visit(ASTAssignment node, Object data);
 
     protected abstract Object visit(ASTVar node, Object data);
+
+    protected abstract Object visit(ASTDefineVars node, Object data);
 
     protected abstract Object visit(ASTReference node, Object data);
 
@@ -194,13 +194,13 @@ public abstract class ParserVisitor {
 
     protected abstract Object visit(ASTSetShiftRightUnsignedNode node, final Object data);
 
-    protected abstract Object visit(final ASTGetDecrementNode node, final Object data);
+    protected abstract Object visit(ASTGetDecrementNode node, final Object data);
 
-    protected abstract Object visit(final ASTGetIncrementNode node, final Object data);
+    protected abstract Object visit(ASTGetIncrementNode node, final Object data);
 
-    protected abstract Object visit(final ASTDecrementGetNode node, final Object data);
+    protected abstract Object visit(ASTDecrementGetNode node, final Object data);
 
-    protected abstract Object visit(final ASTIncrementGetNode node, final Object data);
+    protected abstract Object visit(ASTIncrementGetNode node, final Object data);
 
     protected abstract Object visit(ASTJxltLiteral node, Object data);
 

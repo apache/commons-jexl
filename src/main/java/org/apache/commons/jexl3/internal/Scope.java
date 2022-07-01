@@ -84,7 +84,7 @@ public final class Scope {
     public Scope(final Scope scope, final String... parameters) {
         if (parameters != null) {
             parms = parameters.length;
-            namedVariables = new LinkedHashMap<String, Integer>();
+            namedVariables = new LinkedHashMap<>();
             for (int p = 0; p < parms; ++p) {
                 namedVariables.put(parameters[p], p);
             }
@@ -140,10 +140,10 @@ public final class Scope {
             final Integer pr = parent.getSymbol(name, true);
             if (pr != null) {
                 if (capturedVariables == null) {
-                    capturedVariables = new LinkedHashMap<Integer, Integer>();
+                    capturedVariables = new LinkedHashMap<>();
                 }
                 if (namedVariables == null) {
-                    namedVariables = new LinkedHashMap<String, Integer>();
+                    namedVariables = new LinkedHashMap<>();
                 }
                 register = namedVariables.size();
                 namedVariables.put(name, register);
@@ -193,7 +193,7 @@ public final class Scope {
      */
     public int declareParameter(final String name) {
         if (namedVariables == null) {
-            namedVariables = new LinkedHashMap<String, Integer>();
+            namedVariables = new LinkedHashMap<>();
         } else if (vars > 0) {
             throw new IllegalStateException("cant declare parameters after variables");
         }
@@ -214,9 +214,9 @@ public final class Scope {
      * @param name the variable name
      * @return the register index storing this variable
      */
-    public int declareVariable(final String name, boolean lexical, boolean constant) {
+    public int declareVariable(final String name) {
         if (namedVariables == null) {
-            namedVariables = new LinkedHashMap<String, Integer>();
+            namedVariables = new LinkedHashMap<>();
         }
         Integer register = namedVariables.get(name);
         if (register == null) {
@@ -228,7 +228,7 @@ public final class Scope {
                 final Integer pr = parent.getSymbol(name, true);
                 if (pr != null) {
                     if (capturedVariables == null) {
-                        capturedVariables = new LinkedHashMap<Integer, Integer>();
+                        capturedVariables = new LinkedHashMap<>();
                     }
                     capturedVariables.put(register, pr);
                 }
@@ -285,7 +285,7 @@ public final class Scope {
      */
     public String[] getCapturedVariables() {
         if (capturedVariables != null) {
-            final List<String> captured = new ArrayList<String>(vars);
+            final List<String> captured = new ArrayList<>(vars);
             for (final Map.Entry<String, Integer> entry : namedVariables.entrySet()) {
                 final int symnum = entry.getValue();
                 if (symnum >= parms && capturedVariables.containsKey(symnum)) {
@@ -293,7 +293,7 @@ public final class Scope {
                 }
             }
             if (!captured.isEmpty()) {
-                return captured.toArray(new String[captured.size()]);
+                return captured.toArray(new String[0]);
             }
         }
         return EMPTY_STRS;
@@ -328,7 +328,7 @@ public final class Scope {
      * @param bound number of known bound parameters (curry)
      * @return the parameter names
      */
-    protected String[] getParameters(final int bound) {
+     String[] getParameters(final int bound) {
         final int unbound = parms - bound;
         if ((namedVariables == null) || (unbound <= 0)) {
             return EMPTY_STRS;
@@ -352,14 +352,14 @@ public final class Scope {
         if ((namedVariables == null) || (vars <= 0)) {
             return EMPTY_STRS;
         }
-        final List<String> locals = new ArrayList<String>(vars);
+        final List<String> locals = new ArrayList<>(vars);
         for (final Map.Entry<String, Integer> entry : namedVariables.entrySet()) {
             final int symnum = entry.getValue();
             if (symnum >= parms && (capturedVariables == null || !capturedVariables.containsKey(symnum))) {
                 locals.add(entry.getKey());
             }
         }
-        return locals.toArray(new String[locals.size()]);
+        return locals.toArray(new String[0]);
     }
 
 }

@@ -19,6 +19,7 @@ package org.apache.commons.jexl3.internal;
 
 import java.util.Iterator;
 import java.util.concurrent.Callable;
+import java.util.function.Consumer;
 
 import org.apache.commons.jexl3.JexlArithmetic;
 import org.apache.commons.jexl3.JexlContext;
@@ -173,6 +174,7 @@ public class Interpreter extends InterpreterBase {
     public Object getAttribute(final Object object, final Object attribute) {
         return getAttribute(object, attribute, null);
     }
+
     /**
      * Sets an attribute of an object.
      *
@@ -627,7 +629,7 @@ public class Interpreter extends InterpreterBase {
         return node.getLoopForm() == 0 ? forIterator(node, data) : forLoop(node, data);
     }
 
-    protected Object forIterator(final ASTForeachStatement node, final Object data) {
+    private Object forIterator(final ASTForeachStatement node, final Object data) {
         Object result = null;
         /* first objectNode is the loop variable */
         final ASTReference loopReference = (ASTReference) node.jjtGetChild(0);
@@ -704,7 +706,7 @@ public class Interpreter extends InterpreterBase {
         return result;
     }
 
-    protected Object forLoop(final ASTForeachStatement node, final Object data) {
+    private Object forLoop(final ASTForeachStatement node, final Object data) {
         Object result = null;
         int nc;
         int form = node.getLoopForm();
@@ -733,22 +735,24 @@ public class Interpreter extends InterpreterBase {
             }
             // initialize after eventual creation of local lexical frame
             init.jjtAccept(this, data);
-            nc = 1;
+            // other inits
+            for (JexlNode moreAssignment = node.jjtGetChild(nc);
+                 moreAssignment instanceof ASTAssignment;
+                 moreAssignment = node.jjtGetChild(++nc)) {
+                moreAssignment.jjtAccept(this, data);
+            }
         } else {
             locals = null;
             nc = 0;
         }
-        Object forEach = null;
         try {
             // the loop condition
             final JexlNode predicate = (form & 2) != 0? node.jjtGetChild(nc++) : null;
             // the loop step
             final JexlNode step = (form & 4) != 0? node.jjtGetChild(nc++) : null;
             // last child is body
-            final JexlNode statement = (form & 8) != 0 ? node.jjtGetChild(nc++) : null;
-            // get an iterator for the collection/array etc via the introspector.
-            final Iterator<?> itemsIterator = null;
-            int cnt = 0;
+            final JexlNode statement = (form & 8) != 0 ? node.jjtGetChild(nc) : null;
+            // while(predicate())...
             while (predicate == null || arithmetic.toBoolean(predicate.jjtAccept(this, data))) {
                 cancelCheck(node);
                 // the body
@@ -768,8 +772,6 @@ public class Interpreter extends InterpreterBase {
                 }
             }
         } finally {
-            //  closeable iterator handling
-            closeIfSupported(forEach);
             // restore lexical frame
             if (locals != null) {
                 block = block.pop();
@@ -1369,15 +1371,6 @@ public class Interpreter extends InterpreterBase {
     }
 
     /**
-     * Helper for postfix assignment operators.
-     * @param operator the operator
-     * @return true if operator is a postfix operator (x++, y--)
-     */
-    private static boolean isPostfix(JexlOperator operator) {
-        return operator == JexlOperator.GET_AND_INCREMENT || operator == JexlOperator.GET_AND_DECREMENT;
-    }
-
-    /**
      * Executes an assignment with an optional side-effect operator.
      * @param node     the node
      * @param assignop the assignment operator or null if simply assignment
@@ -1388,9 +1381,9 @@ public class Interpreter extends InterpreterBase {
         cancelCheck(node);
         // left contains the reference to assign to
         final JexlNode left = node.jjtGetChild(0);
-        ASTIdentifier var = null;
+        final ASTIdentifier var;
         Object object = null;
-        int symbol = -1;
+        final int symbol;
         // check var decl with assign is ok
         if (left instanceof ASTIdentifier) {
             var = (ASTIdentifier) left;
@@ -1404,50 +1397,54 @@ public class Interpreter extends InterpreterBase {
                     return undefinedVariable(var, var.getName());
                 }
             }
+        } else {
+            var = null;
+            symbol = -1;
         }
         boolean antish = options.isAntish();
         // 0: determine initial object & property:
         final int last = left.jjtGetNumChildren() - 1;
         // right is the value expression to assign
-        Object right = node.jjtGetNumChildren() < 2? null: node.jjtGetChild(1).jjtAccept(this, data);
-        // previous value for postfix assignment operators (x++, x--)
-        Object actual = null;
+       final  Object right = node.jjtGetNumChildren() < 2? null: node.jjtGetChild(1).jjtAccept(this, data);
+        // actual value to return, right in most cases
+        Object actual = right;
         // a (var?) v = ... expression
         if (var != null) {
             if (symbol >= 0) {
                 // check we are not assigning a symbol itself
                 if (last < 0) {
-                    if (assignop != null) {
-                        final Object self = actual = getVariable(frame, block, var);
-                        right = operators.tryAssignOverload(node, assignop, self, right);
-                        if (right == JexlOperator.ASSIGN) {
-                            return self;
+                    if (assignop == null) {
+                        // make the closure accessible to itself, ie capture the currently set variable after frame creation
+                        if (right instanceof Closure) {
+                            ((Closure) right).setCaptured(symbol, right);
                         }
+                        frame.set(symbol, right);
+                    } else {
+                        // go through potential overload
+                        final Object self = getVariable(frame, block, var);
+                        final Consumer<Object> f = r -> frame.set(symbol, r);
+                        actual = operators.tryAssignOverload(node, assignop, f, self, right);
                     }
-                    frame.set(symbol, right);
-                    // make the closure accessible to itself, ie capture the currently set variable after frame creation
-                    if (right instanceof Closure) {
-                        ((Closure) right).setCaptured(symbol, right);
-                    }
-                    return isPostfix(assignop)? actual : right; // 1
+                    return actual; // 1
                 }
                 object = getVariable(frame, block, var);
                 // top level is a symbol, can not be an antish var
                 antish = false;
             } else {
                 // check we are not assigning direct global
+                final String name = var.getName();
                 if (last < 0) {
-                    if (assignop != null) {
-                        final Object self = actual = context.get(var.getName());
-                        right = operators.tryAssignOverload(node, assignop, self, right);
-                        if (right == JexlOperator.ASSIGN) {
-                            return self;
-                        }
+                    if (assignop == null) {
+                        setContextVariable(node, name, right);
+                    } else {
+                        // go through potential overload
+                        final Object self = context.get(name);
+                        final Consumer<Object> f = r ->  setContextVariable(node, name, r);
+                        actual = operators.tryAssignOverload(node, assignop, f, self, right);
                     }
-                    setContextVariable(node, var.getName(), right);
-                    return isPostfix(assignop)? actual : right; // 2
+                    return actual; // 2
                 }
-                object = context.get(var.getName());
+                object = context.get(name);
                 // top level accesses object, can not be an antish var
                 if (object != null) {
                     antish = false;
@@ -1510,19 +1507,18 @@ public class Interpreter extends InterpreterBase {
         if (propertyId != null) {
             // deal with creating/assignining antish variable
             if (antish && ant != null && object == null && !propertyId.isSafe() && !propertyId.isExpression()) {
-                if (last > 0) {
-                    ant.append('.');
-                }
+                ant.append('.');
                 ant.append(propertyId.getName());
-                if (assignop != null) {
+                final String name = ant.toString();
+                if (assignop == null) {
+                    setContextVariable(propertyNode, name, right);
+                } else {
                     final Object self = actual = context.get(ant.toString());
-                    right = operators.tryAssignOverload(node, assignop, self, right);
-                    if (right == JexlOperator.ASSIGN) {
-                        return self;
-                    }
+                    final JexlNode pnode = propertyNode;
+                    final Consumer<Object> assign = r -> setContextVariable(pnode, name, r);
+                    actual = operators.tryAssignOverload(node, assignop, assign, self, right);
                 }
-                setContextVariable(propertyNode, ant.toString(), right);
-                return isPostfix(assignop)? actual : right; // 3
+                return actual; // 3
             }
             // property of an object ?
             property = evalIdentifier(propertyId);
@@ -1546,15 +1542,26 @@ public class Interpreter extends InterpreterBase {
             return unsolvableProperty(objectNode, "<null>.<?>", true, null);
         }
         // 3: one before last, assign
-        if (assignop != null) {
-            final Object self = actual = getAttribute(object, property, propertyNode);
-            right = operators.tryAssignOverload(node, assignop, self, right);
-            if (right == JexlOperator.ASSIGN) {
-                return self;
-            }
+        if (assignop == null) {
+            setAttribute(object, property, right, propertyNode);
+        } else {
+            final Object self = getAttribute(object, property, propertyNode);
+            final Object o = object;
+            final JexlNode n = propertyNode;
+            final Consumer<Object> assign = r ->  setAttribute(o, property, r, n);
+            actual = operators.tryAssignOverload(node, assignop, assign, self, right);
         }
-        setAttribute(object, property, right, propertyNode);
-        return isPostfix(assignop)? actual : right; // 4
+        return actual;
+    }
+
+    @Override
+    protected Object visit(final ASTDefineVars node, final Object data) {
+        final int argc = node.jjtGetNumChildren();
+        Object result = null;
+        for (int i = 0; i < argc; i++) {
+            result = node.jjtGetChild(i).jjtAccept(this, data);
+        }
+        return result;
     }
 
     @Override
@@ -1756,7 +1763,7 @@ public class Interpreter extends InterpreterBase {
                         return call.eval(mCALL);
                     }
                     // functor is a var, may be method is a global one ?
-                    if (isavar && target == context) {
+                    if (isavar) {
                         if (call.isContextMethod(methodName, argv)) {
                             return call.eval(methodName);
                         }
@@ -1824,8 +1831,8 @@ public class Interpreter extends InterpreterBase {
                 }
             }
             boolean narrow = false;
-            JexlMethod ctor = null;
             Funcall funcall = null;
+            JexlMethod ctor;
             while (true) {
                 // try as stated
                 ctor = uberspect.getConstructor(target, argv);

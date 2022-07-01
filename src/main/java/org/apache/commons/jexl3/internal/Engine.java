@@ -74,7 +74,7 @@ public class Engine extends JexlEngine {
      */
     private static final class UberspectHolder {
         /** The default uberspector that handles all introspection patterns. */
-        private static final Uberspect UBERSPECT =
+        static final Uberspect UBERSPECT =
                 new Uberspect(LogFactory.getLog(JexlEngine.class),
                         JexlUberspect.JEXL_STRATEGY,
                         JexlPermissions.parse());

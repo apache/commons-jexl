@@ -16,7 +16,6 @@
  */
 package org.apache.commons.jexl3.internal;
 
-import java.lang.reflect.Method;
 import org.apache.commons.jexl3.JexlArithmetic;
 import org.apache.commons.jexl3.JexlEngine;
 import org.apache.commons.jexl3.JexlException;
@@ -25,6 +24,9 @@ import org.apache.commons.jexl3.internal.introspection.MethodExecutor;
 import org.apache.commons.jexl3.introspection.JexlMethod;
 import org.apache.commons.jexl3.introspection.JexlUberspect;
 import org.apache.commons.jexl3.parser.JexlNode;
+
+import java.lang.reflect.Method;
+import java.util.function.Consumer;
 
 /**
  * Helper class to deal with operator overloading and specifics.
@@ -95,7 +97,7 @@ public class Operators {
      * @param args     the arguments
      * @return the result of the operator evaluation or TRY_FAILED
      */
-    protected Object tryOverload(final JexlNode node, final JexlOperator operator, final Object... args) {
+    protected Object tryOverload(final JexlNode node, final JexlOperator operator, Object... args) {
         if (operators != null && operators.overloads(operator)) {
             final JexlArithmetic arithmetic = interpreter.arithmetic;
             final boolean cache = interpreter.cache;
@@ -113,16 +115,37 @@ public class Operators {
                 final JexlMethod vm = operators.getOperator(operator, args);
                 if (vm != null && !isArithmetic(vm)) {
                     final Object result = vm.invoke(arithmetic, args);
-                    if (cache) {
+                    if (cache && !vm.tryFailed(result)) {
                         node.jjtSetValue(vm);
                     }
                     return result;
                 }
             } catch (final Exception xany) {
-                return interpreter.operatorError(node, operator, xany);
+                // ignore return if lenient, will return try_failed
+                interpreter.operatorError(node, operator, xany);
             }
         }
         return JexlEngine.TRY_FAILED;
+    }
+
+    /**
+     * Helper for postfix assignment operators.
+     * @param operator the operator
+     * @return true if operator is a postfix operator (x++, y--)
+     */
+    private static boolean isPostfix(JexlOperator operator) {
+        return operator == JexlOperator.GET_AND_INCREMENT || operator == JexlOperator.GET_AND_DECREMENT;
+    }
+
+    /**
+     * Tidy arguments based on operator arity.
+     * <p>The interpreter may add a null to the arguments of operator expecting only one parameter.</p>
+     * @param operator the operator
+     * @param args the arguements (as seen by the interpreter)
+     * @return the tidied arguments
+     */
+    private Object[] arguments(JexlOperator operator, Object...args) {
+        return operator.getArity() == 1 && args.length > 1 ? new Object[]{args[0]} : args;
     }
 
     /**
@@ -139,72 +162,91 @@ public class Operators {
      *         JexlEngine.TRY_FAILED if no operation was performed,
      *         the value to use as the side effect argument otherwise
      */
-    protected Object tryAssignOverload(final JexlNode node, final JexlOperator operator, final Object...args) {
+    protected Object tryAssignOverload(final JexlNode node,
+                                       final JexlOperator operator,
+                                       final Consumer<Object> assignFun,
+                                       final Object...args) {
         final JexlArithmetic arithmetic = interpreter.arithmetic;
         if (args.length < operator.getArity()) {
             return JexlEngine.TRY_FAILED;
         }
-        // try to call overload with side effect
-        Object result = tryOverload(node, operator, args);
-        if (result != JexlEngine.TRY_FAILED) {
-            return result;
-        }
-        // call base operator
-        final JexlOperator base = operator.getBaseOperator();
-        if (base == null) {
-            throw new IllegalArgumentException("must be called with a side-effect operator");
-        }
-        if (operators != null && operators.overloads(base)) {
-            // in case there is an overload on the base operator
-            try {
-                final JexlMethod vm = operators.getOperator(base, args);
-                if (vm != null) {
-                    result = vm.invoke(arithmetic, args);
-                    if (result != JexlEngine.TRY_FAILED) {
-                        return result;
-                    }
+        Object result;
+        try {
+        // if some overloads exist...
+        if (operators != null) {
+            // try to call overload with side effect; the object is modified
+            result = tryOverload(node, operator, arguments(operator, args));
+            if (result != JexlEngine.TRY_FAILED) {
+                return result; // 1
+            }
+            // try to call base overload (ie + for +=)
+            final JexlOperator base = operator.getBaseOperator();
+            if (base != null && operators.overloads(base)) {
+                result = tryOverload(node, base, arguments(base, args));
+                if (result != JexlEngine.TRY_FAILED) {
+                    assignFun.accept(result);
+                    return isPostfix(operator) ? args[0] : result; // 2
                 }
-            } catch (final Exception xany) {
-                interpreter.operatorError(node, base, xany);
             }
         }
         // base eval
-        try {
-            switch (operator) {
-                case SELF_ADD:
-                    return arithmetic.add(args[0], args[1]);
-                case SELF_SUBTRACT:
-                    return arithmetic.subtract(args[0], args[1]);
-                case SELF_MULTIPLY:
-                    return arithmetic.multiply(args[0], args[1]);
-                case SELF_DIVIDE:
-                    return arithmetic.divide(args[0], args[1]);
-                case SELF_MOD:
-                    return arithmetic.mod(args[0], args[1]);
-                case SELF_AND:
-                    return arithmetic.and(args[0], args[1]);
-                case SELF_OR:
-                    return arithmetic.or(args[0], args[1]);
-                case SELF_XOR:
-                    return arithmetic.xor(args[0], args[1]);
-                case SELF_SHIFTLEFT:
-                    return arithmetic.shiftLeft(args[0], args[1]);
-                case SELF_SHIFTRIGHT:
-                    return arithmetic.shiftRight(args[0], args[1]);
-                case SELF_SHIFTRIGHTU:
-                    return arithmetic.shiftRightUnsigned(args[0], args[1]);
-                case INCREMENT_AND_GET:
-                case GET_AND_INCREMENT:
-                    return arithmetic.increment(args[0]);
-                case DECREMENT_AND_GET:
-                case GET_AND_DECREMENT:
-                    return arithmetic.decrement(args[0]);
-                default:
-                    // unexpected, new operator added?
-                    throw new UnsupportedOperationException(operator.getOperatorSymbol());
+        switch (operator) {
+            case SELF_ADD:
+                result = arithmetic.add(args[0], args[1]);
+                break;
+            case SELF_SUBTRACT:
+                result = arithmetic.subtract(args[0], args[1]);
+                break;
+            case SELF_MULTIPLY:
+                result = arithmetic.multiply(args[0], args[1]);
+                break;
+            case SELF_DIVIDE:
+                result = arithmetic.divide(args[0], args[1]);
+                break;
+            case SELF_MOD:
+                result = arithmetic.mod(args[0], args[1]);
+                break;
+            case SELF_AND:
+                result = arithmetic.and(args[0], args[1]);
+                break;
+            case SELF_OR:
+                result = arithmetic.or(args[0], args[1]);
+                break;
+            case SELF_XOR:
+                result = arithmetic.xor(args[0], args[1]);
+                break;
+            case SELF_SHIFTLEFT:
+                result = arithmetic.shiftLeft(args[0], args[1]);
+                break;
+            case SELF_SHIFTRIGHT:
+                result = arithmetic.shiftRight(args[0], args[1]);
+                break;
+            case SELF_SHIFTRIGHTU:
+                result = arithmetic.shiftRightUnsigned(args[0], args[1]);
+                break;
+            case INCREMENT_AND_GET:
+                result = arithmetic.increment(args[0]);
+                break;
+            case DECREMENT_AND_GET:
+                result = arithmetic.decrement(args[0]);
+                break;
+            case GET_AND_INCREMENT:
+                result = args[0];
+                assignFun.accept(arithmetic.increment(result));
+                return result; // 3
+            case GET_AND_DECREMENT: {
+                result = args[0];
+                assignFun.accept(arithmetic.decrement(result));
+                return result; // 4
             }
+            default:
+                // unexpected, new operator added?
+                throw new UnsupportedOperationException(operator.getOperatorSymbol());
+            }
+            assignFun.accept(result);
+            return result; // 5
         } catch (final Exception xany) {
-            interpreter.operatorError(node, base, xany);
+            interpreter.operatorError(node, operator, xany);
         }
         return JexlEngine.TRY_FAILED;
     }

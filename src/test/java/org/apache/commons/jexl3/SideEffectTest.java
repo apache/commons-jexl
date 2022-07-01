@@ -23,12 +23,16 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Collections;
+import java.util.concurrent.atomic.AtomicInteger;
 
+import org.apache.commons.jexl3.internal.introspection.NoJexlTest;
+import org.apache.commons.jexl3.jexl342.OptionalArithmetic;
 import org.apache.commons.jexl3.junit.Asserter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 
@@ -363,69 +367,156 @@ public class SideEffectTest extends JexlTestCase {
         Object result;
         script = jexl.createScript("(x, y)->{ x += y }");
         result = script.execute(jc, 3115, 15);
-        Assert.assertEquals(3115 + 15,  result);
+        Assert.assertEquals(3115 + 15, result);
         final Var v0 = new Var(3115);
         result = script.execute(jc, v0, new Var(15));
         Assert.assertEquals(result, v0);
-        Assert.assertEquals(3115 + 15,  v0.value);
+        Assert.assertEquals(3115 + 15, v0.value);
 
         script = jexl.createScript("(x, y)->{ x -= y}");
         result = script.execute(jc, 3115, 15);
-        Assert.assertEquals(3115 - 15,  result);
+        Assert.assertEquals(3115 - 15, result);
         final Var v1 = new Var(3115);
         result = script.execute(jc, v1, new Var(15));
         Assert.assertNotEquals(result, v1); // not a real side effect
-        Assert.assertEquals(3115 - 15,  ((Var) result).value);
+        Assert.assertEquals(3115 - 15, ((Var) result).value);
 
         script = jexl.createScript("(x, y)->{ x *= y }");
         result = script.execute(jc, 3115, 15);
-        Assert.assertEquals(3115 * 15,  result);
+        Assert.assertEquals(3115 * 15, result);
         final Var v2 = new Var(3115);
         result = script.execute(jc, v2, new Var(15));
         Assert.assertEquals(result, v2);
-        Assert.assertEquals(3115 * 15,  v2.value);
+        Assert.assertEquals(3115 * 15, v2.value);
 
         script = jexl.createScript("(x, y)->{ x /= y }");
         result = script.execute(jc, 3115, 15);
-        Assert.assertEquals(3115 / 15,  result);
+        Assert.assertEquals(3115 / 15, result);
         final Var v3 = new Var(3115);
         result = script.execute(jc, v3, new Var(15));
         Assert.assertEquals(result, v3);
-        Assert.assertEquals(3115 / 15,  v3.value);
+        Assert.assertEquals(3115 / 15, v3.value);
 
         script = jexl.createScript("(x, y)->{ x %= y }");
         result = script.execute(jc, 3115, 15);
-        Assert.assertEquals(3115 % 15,  result);
+        Assert.assertEquals(3115 % 15, result);
         final Var v4 = new Var(3115);
         result = script.execute(jc, v4, new Var(15));
         Assert.assertEquals(result, v4);
-        Assert.assertEquals(3115 % 15,  v4.value);
+        Assert.assertEquals(3115 % 15, v4.value);
 
         script = jexl.createScript("(x, y)->{ x &= y }");
         result = script.execute(jc, 3115, 15);
-        Assert.assertEquals(3115L & 15,  result);
+        Assert.assertEquals(3115L & 15, result);
         final Var v5 = new Var(3115);
         result = script.execute(jc, v5, new Var(15));
         Assert.assertEquals(result, v5);
-        Assert.assertEquals(3115 & 15,  v5.value);
+        Assert.assertEquals(3115 & 15, v5.value);
 
         script = jexl.createScript("(x, y)->{ x |= y }");
         result = script.execute(jc, 3115, 15);
-        Assert.assertEquals(3115L | 15,  result);
+        Assert.assertEquals(3115L | 15, result);
         final Var v6 = new Var(3115);
         result = script.execute(jc, v6, new Var(15));
         Assert.assertEquals(result, v6);
-        Assert.assertEquals(3115L | 15,  v6.value);
+        Assert.assertEquals(3115L | 15, v6.value);
 
         script = jexl.createScript("(x, y)->{ x ^= y }");
         result = script.execute(jc, 3115, 15);
-        Assert.assertEquals(3115L ^ 15,  result);
+        Assert.assertEquals(3115L ^ 15, result);
         final Var v7 = new Var(3115);
         result = script.execute(jc, v7, new Var(15));
         Assert.assertEquals(result, v7);
-        Assert.assertEquals(3115L ^ 15,  v7.value);
+        Assert.assertEquals(3115L ^ 15, v7.value);
+
+        script = jexl.createScript("(x, y)->{ x >>>= y }");
+        result = script.execute(jc, 234453115, 5);
+        Assert.assertEquals(234453115L >>> 5, result);
+        final Var v8 = new Var(234453115);
+        result = script.execute(jc, v8, 5);
+        Assert.assertEquals(result, v8);
+        Assert.assertEquals(234453115L >>> 5, v8.value);
+
+        script = jexl.createScript("(x, y)->{ x >>= y }");
+        result = script.execute(jc, 435566788L, 7);
+        Assert.assertEquals(435566788L >> 7, result);
+        final Var v9 = new Var(435566788);
+        result = script.execute(jc, v9, 7);
+        Assert.assertEquals(result, v9);
+        Assert.assertEquals(435566788L >> 7, v9.value);
+
+        script = jexl.createScript("(x, y)->{ x <<= y }");
+        result = script.execute(jc, 3115, 2);
+        Assert.assertEquals(3115L << 2, result);
+        final Var v10 = new Var(3115);
+        result = script.execute(jc, v10, 2);
+        Assert.assertEquals(result, v10);
+        Assert.assertEquals(3115L << 2, v10.value);
     }
 
+
+    @Test
+    public void testIncrementSelf() throws Exception {
+        final JexlEngine jexl = new JexlBuilder().cache(64).arithmetic(new SelfArithmetic(false)).create();
+        final JexlContext jc = null;
+        runSelfIncrement(jexl, jc);
+        runSelfIncrement(jexl, jc);
+    }
+
+    @Test
+    public void testIncrementSelfNoCache() throws Exception {
+        final JexlEngine jexl = new JexlBuilder().cache(0).arithmetic(new SelfArithmetic(false)).create();
+        final JexlContext jc = null;
+        runSelfIncrement(jexl, jc);
+    }
+
+    protected void runSelfIncrement(final JexlEngine jexl, final JexlContext jc) {
+        JexlScript script = jexl.createScript("x -> [+x, +(x++), +x]");
+        final Var v11 = new Var(3115);
+        final AtomicInteger i11 = new AtomicInteger(3115);
+        for(Object v : Arrays.asList(v11, i11)) {
+            Object result = script.execute(jc, v);
+            Assert.assertTrue(result instanceof int[]);
+            int[] r = (int[]) result;
+            Assert.assertEquals(3115, r[0]);
+            Assert.assertEquals(3115, r[1]);
+            Assert.assertEquals(3116, r[2]);
+        }
+
+        script = jexl.createScript("x -> [+x, +(++x), +x]");
+        final Var v12 = new Var(3189);
+        final AtomicInteger i12 = new AtomicInteger(3189);
+        for(Object v : Arrays.asList(v12, i12)) {
+            Object result = script.execute(jc, v);
+            Assert.assertTrue(result instanceof int[]);
+            int[] r = (int[]) result;
+            Assert.assertEquals(3189, r[0]);
+            Assert.assertEquals(3190, r[1]);
+            Assert.assertEquals(3190, r[2]);
+        }
+
+        script = jexl.createScript("x -> [+x, +(x--), +x]");
+        final Var v13 = new Var(3115);
+        for(Object v : Arrays.asList(v13)) {
+            Object result = script.execute(jc, v13);
+            Assert.assertTrue(result instanceof int[]);
+            int[] r = (int[]) result;
+            Assert.assertEquals(3115, r[0]);
+            Assert.assertEquals(3115, r[1]);
+            Assert.assertEquals(3114, r[2]);
+        }
+
+        script = jexl.createScript("x -> [+x, +(--x), +x]");
+        final Var v14 = new Var(3189);
+        for(Object v : Arrays.asList(v14)) {
+            Object result = script.execute(jc, v);
+            Assert.assertTrue(result instanceof int[]);
+            int[] r = (int[]) result;
+            Assert.assertEquals(3189, r[0]);
+            Assert.assertEquals(3188, r[1]);
+            Assert.assertEquals(3188, r[2]);
+        }
+    }
 
     @Test
     public void testOverrideGetSet() throws Exception {
@@ -456,14 +547,13 @@ public class SideEffectTest extends JexlTestCase {
             value = v;
         }
 
-        @Override
-        public String toString() {
+        @Override public String toString() {
             return Integer.toString(value);
         }
     }
 
     // an arithmetic that performs side effects
-    public static class SelfArithmetic extends JexlArithmetic {
+    public static class SelfArithmetic extends OptionalArithmetic {
         public SelfArithmetic(final boolean strict) {
             super(strict);
         }
@@ -484,9 +574,9 @@ public class SideEffectTest extends JexlTestCase {
             return "VALUE".equals(property)? var.value = v : JexlEngine.TRY_FAILED;
         }
 
-        public JexlOperator selfAdd(final Var lhs, final Var rhs) {
+        public Var selfAdd(final Var lhs, final Var rhs) {
             lhs.value += rhs.value;
-            return JexlOperator.ASSIGN;
+            return lhs;
         }
 
         // for kicks, this one does not side effect but overloads nevertheless
@@ -494,46 +584,97 @@ public class SideEffectTest extends JexlTestCase {
             return new Var(lhs.value - rhs.value);
         }
 
-        public JexlOperator selfDivide(final Var lhs, final Var rhs) {
+        public Var selfDivide(final Var lhs, final Var rhs) {
             lhs.value /= rhs.value;
-            return JexlOperator.ASSIGN;
+            return lhs;
         }
 
-        public JexlOperator selfMultiply(final Var lhs, final Var rhs) {
+        public Var selfMultiply(final Var lhs, final Var rhs) {
             lhs.value *= rhs.value;
-            return JexlOperator.ASSIGN;
+            return lhs;
         }
 
-        public JexlOperator selfMod(final Var lhs, final Var rhs) {
+        public Var selfMod(final Var lhs, final Var rhs) {
             lhs.value %= rhs.value;
-            return JexlOperator.ASSIGN;
+            return lhs;
         }
 
         public Var and(final Var lhs, final Var rhs) {
             return new Var(lhs.value & rhs.value);
         }
 
-        public JexlOperator selfAnd(final Var lhs, final Var rhs) {
+        public Var selfAnd(final Var lhs, final Var rhs) {
             lhs.value &= rhs.value;
-            return JexlOperator.ASSIGN;
+            return lhs;
         }
 
         public Var or(final Var lhs, final Var rhs) {
             return new Var(lhs.value | rhs.value);
         }
 
-        public JexlOperator selfOr(final Var lhs, final Var rhs) {
+        public Var selfOr(final Var lhs, final Var rhs) {
             lhs.value |= rhs.value;
-            return JexlOperator.ASSIGN;
+            return lhs;
         }
 
         public Var xor(final Var lhs, final Var rhs) {
             return new Var(lhs.value ^ rhs.value);
         }
 
-        public JexlOperator selfXor(final Var lhs, final Var rhs) {
+        public Var selfXor(final Var lhs, final Var rhs) {
             lhs.value ^= rhs.value;
-            return JexlOperator.ASSIGN;
+            return lhs;
+        }
+
+        public Var shiftLeft(final Var lhs, final int rhs) {
+            return new Var(lhs.value << rhs);
+        }
+
+        public Var selfShiftLeft(final Var lhs, final int rhs) {
+            lhs.value <<= rhs;
+            return lhs;
+        }
+
+        public Var shiftRight(final Var lhs, final int rhs) {
+            return new Var(lhs.value >> rhs);
+        }
+
+        public Var selfShiftRight(final Var lhs, final int rhs) {
+            lhs.value >>= rhs;
+            return lhs;
+        }
+
+        public Var shiftRightUnsigned(final Var lhs, final int rhs) {
+            return new Var(lhs.value >>> rhs);
+        }
+
+        public Var selfShiftRightUnsigned(final Var lhs, final int rhs) {
+            lhs.value >>>= rhs;
+            return lhs;
+        }
+
+        public int increment(final Var lhs) {
+            return lhs.value + 1;
+        }
+
+        public int decrement(final Var lhs) {
+            return lhs.value - 1;
+        }
+
+        public int incrementAndGet(AtomicInteger i) {
+            return i.incrementAndGet();
+        }
+
+        public int getAndIncrement(AtomicInteger i) {
+            return i.getAndIncrement();
+        }
+
+        public int positivize(Var n) {
+            return n.value;
+        }
+
+        public int positivize(Number n) {
+            return n.intValue();
         }
     }
 
@@ -545,14 +686,14 @@ public class SideEffectTest extends JexlTestCase {
             super(astrict);
         }
 
-        public JexlOperator selfAdd(final Collection<String> c, final String item) throws IOException {
+        public Object selfAdd(final Collection<String> c, final String item) throws IOException {
             c.add(item);
-            return JexlOperator.ASSIGN;
+            return c;
         }
 
-        public JexlOperator selfAdd(final Appendable c, final String item) throws IOException {
+        public Object selfAdd(final Appendable c, final String item) throws IOException {
             c.append(item);
-            return JexlOperator.ASSIGN;
+            return c;
         }
 
         @Override
@@ -572,7 +713,7 @@ public class SideEffectTest extends JexlTestCase {
             }
             if (c instanceof Appendable) {
                 ((Appendable) c).append(item);
-                return JexlOperator.ASSIGN;
+                return c;
             }
             return JexlEngine.TRY_FAILED;
         }

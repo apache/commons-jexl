@@ -520,7 +520,7 @@ public class LexicalTest {
         final JexlEngine jexl = new JexlBuilder().strict(true).create();
         final JexlScript script = jexl.createScript("let x = 32; (()->{ for(let x : null) { let c = 0; { return x; } } } )(); ");
         Assert.assertNotNull(script);
-        String dbg = script.getParsedText();
+        String dbg = JexlTestCase.toString(script);
         String src = script.getSourceText();
         Assert.assertTrue(JexlTestCase.equalsIgnoreWhiteSpace(src, dbg));
     }

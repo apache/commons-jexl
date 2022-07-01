@@ -20,6 +20,7 @@ package org.apache.commons.jexl3;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 
+import org.apache.commons.jexl3.internal.Debugger;
 import org.apache.commons.jexl3.internal.OptionsContext;
 import org.apache.commons.jexl3.internal.Util;
 import org.apache.commons.jexl3.internal.introspection.Uberspect;
@@ -123,6 +124,12 @@ public class JexlTestCase {
 
     public String simpleWhitespace(String arg) {
         return arg.trim().replaceAll("\\s+", " ");
+    }
+
+    public static String toString(JexlScript script) {
+        Debugger d = new Debugger().lineFeed("").indentation(0);
+        d.debug(script);
+        return  d.toString();
     }
 
     /**
