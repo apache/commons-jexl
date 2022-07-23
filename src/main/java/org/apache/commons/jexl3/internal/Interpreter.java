@@ -1177,7 +1177,7 @@ public class Interpreter extends InterpreterBase {
         JexlNode objectNode = null;
         JexlNode ptyNode = null;
         StringBuilder ant = null;
-        boolean antish = !(parent instanceof ASTReference);
+        boolean antish = !(parent instanceof ASTReference) && options.isAntish();
         int v = 1;
         main:
         for (int c = 0; c < numChildren; c++) {
@@ -1229,11 +1229,6 @@ public class Interpreter extends InterpreterBase {
                     }
                     final ASTIdentifier afirst = (ASTIdentifier) first;
                     ant = new StringBuilder(afirst.getName());
-                    // skip the else...*
-                    // *... and continue
-                    if (!options.isAntish()) {
-                        antish = false;
-                    }
                     continue;
                     // skip the first node case since it was trialed in jjtAccept above and returned null
                 }
@@ -1256,7 +1251,7 @@ public class Interpreter extends InterpreterBase {
                 object = context.get(ant.toString());
             } else if (c != numChildren - 1) {
                 // only the last one may be null
-                ptyNode = objectNode;
+                ptyNode = c == 0 && numChildren > 1 ? node.jjtGetChild(1) : objectNode;
                 break; //
             }
         }

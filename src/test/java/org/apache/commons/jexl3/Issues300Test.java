@@ -16,6 +16,11 @@
  */
 package org.apache.commons.jexl3;
 
+import org.apache.commons.jexl3.internal.Engine32;
+import org.apache.commons.jexl3.internal.OptionsContext;
+import org.junit.Assert;
+import org.junit.Test;
+
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -26,11 +31,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.jexl3.internal.Engine32;
-import org.apache.commons.jexl3.internal.OptionsContext;
-import org.junit.Assert;
 import static org.junit.Assert.assertEquals;
-import org.junit.Test;
 
 /**
  * Test cases for reported issue between JEXL-300 and JEXL-399.
@@ -814,4 +815,41 @@ public class Issues300Test {
             Assert.assertEquals("phone", xvar.getVariable());
         }
     }
+
+    public static class TestObject374 {
+        private String name;
+        private TestObject374 nested = null;
+        public String getName() {
+            return name;
+        }
+        public void setName(String pName) {
+            this.name = pName;
+        }
+        public TestObject374 getNested() {
+            return nested;
+        }
+        public void setNested(TestObject374 pNested) {
+            nested = pNested;
+        }
+    }
+
+    @Test
+    public void test374() {
+        JexlEngine engine = new JexlBuilder().cache(512).strict(true).silent(false).antish(false).safe(false).create();
+        // Create expression to evaluate 'name'
+        JexlExpression expr = engine.createExpression("nested.name");
+        // Create an object with getter for name
+        TestObject374 myObject = new TestObject374();
+        myObject.setName("John");
+        JexlContext context = new ObjectContext<TestObject374>(engine, myObject);
+        // Expect an exception because nested is null, so we are doing null.name
+        try {
+            Object result = expr.evaluate(context);
+            Assert.fail("An exception expected, but got: " + result);
+        } catch (JexlException ex) {
+            // Expected
+            //ex.printStackTrace();
+        }
+    }
+
 }

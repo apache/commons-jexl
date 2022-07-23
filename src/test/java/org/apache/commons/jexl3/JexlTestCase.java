@@ -34,7 +34,7 @@ import org.junit.Assert;
  * Eases the implementation of main methods to debug.
  */
 public class JexlTestCase {
-    // The default options: all tests where engine must lexicality is
+    // The default options: all tests where engine lexicality is
     // important can be identified by the builder  calling lexical(...).
     static {
         JexlOptions.setDefaultFlags("-safe", "+lexical");
@@ -48,7 +48,7 @@ public class JexlTestCase {
     protected final JexlEngine JEXL;
 
     public JexlTestCase(final String name) {
-        this(name, new JexlBuilder().cache(128).create());
+        this(name, new JexlBuilder().permissions(null).cache(128).create());
     }
 
     protected JexlTestCase(final String name, final JexlEngine jexl) {
