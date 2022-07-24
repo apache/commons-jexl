@@ -18,6 +18,7 @@ package org.apache.commons.jexl3;
 
 import org.apache.commons.jexl3.internal.Engine32;
 import org.apache.commons.jexl3.internal.OptionsContext;
+import org.apache.commons.jexl3.introspection.JexlSandbox;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -850,6 +851,27 @@ public class Issues300Test {
             // Expected
             //ex.printStackTrace();
         }
+    }
+
+    @Test
+    public void test375() {
+        JexlSandbox jexlSandbox = new JexlSandbox(false);
+        jexlSandbox.allow(Type375.class.getName());
+        JexlEngine engine = new JexlBuilder().sandbox(jexlSandbox).create();
+
+        JexlContext context = new MapContext();
+        context.set("Type", Type375.class);
+
+        Object result = engine.createScript("Type.valueOf('DOMICILE')").execute(context);
+        Assert.assertEquals(Type375.DOMICILE, result);
+
+        result = engine.createScript("Type.DOMICILE").execute(context);
+        Assert.assertEquals(Type375.DOMICILE, result);
+    }
+
+    public enum Type375 {
+        DELIVERY_ADDRESS,
+        DOMICILE
     }
 
 }

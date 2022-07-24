@@ -24,6 +24,7 @@ import org.apache.commons.jexl3.introspection.JexlPropertySet;
 import org.apache.commons.jexl3.introspection.JexlSandbox;
 import org.apache.commons.jexl3.introspection.JexlUberspect;
 
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -119,16 +120,17 @@ public final class SandboxUberspect implements JexlUberspect {
                                           final Object obj,
                                           final Object identifier) {
         if (obj != null) {
+            final Class<?> clazz = obj instanceof Class<?>? (Class<?>) obj : obj.getClass();
             if (identifier != null) {
                 final String property = identifier.toString();
-                final String actual = sandbox.read(obj.getClass(), property);
+                final String actual = sandbox.read(clazz, property);
                 if (actual != null) {
                     // no transformation, strict equality: use identifier before string conversion
                     final Object pty = eq(actual, property) ? identifier : actual;
                     return uberspect.getPropertyGet(resolvers, obj, pty);
                 }
             } else {
-                final String actual = sandbox.read(obj.getClass(), null);
+                final String actual = sandbox.read(clazz, null);
                 if (actual != JexlSandbox.NULL) {
                      return uberspect.getPropertyGet(resolvers, obj, null);
                 }
@@ -148,16 +150,17 @@ public final class SandboxUberspect implements JexlUberspect {
                                           final Object identifier,
                                           final Object arg) {
         if (obj != null) {
+            final Class<?> clazz = obj instanceof Class<?>? (Class<?>) obj : obj.getClass();
             if (identifier != null) {
                 final String property = identifier.toString();
-                final String actual = sandbox.write(obj.getClass(), property);
+                final String actual = sandbox.write(clazz, property);
                 if (actual != null) {
                     // no transformation, strict equality: use identifier before string conversion
                     final Object pty = eq(actual, property) ? identifier : actual;
                     return uberspect.getPropertySet(resolvers, obj, pty, arg);
                 }
             } else {
-                final String actual = sandbox.write(obj.getClass(), null);
+                final String actual = sandbox.write(clazz, null);
                 if (actual != JexlSandbox.NULL) {
                     return uberspect.getPropertySet(resolvers, obj, null, arg);
                 }
