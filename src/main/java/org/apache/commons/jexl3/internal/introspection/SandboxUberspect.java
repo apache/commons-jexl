@@ -24,7 +24,6 @@ import org.apache.commons.jexl3.introspection.JexlPropertySet;
 import org.apache.commons.jexl3.introspection.JexlSandbox;
 import org.apache.commons.jexl3.introspection.JexlUberspect;
 
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
