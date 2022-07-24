@@ -110,7 +110,7 @@ final class ClassMap {
             }
             @Override
             public Set<Entry<MethodKey, Method>> entrySet() {
-                return null;
+                return Collections.emptySet();
             }
             @Override public Method get(Object name) {
                 return CACHE_MISS;
@@ -221,11 +221,7 @@ final class ClassMap {
                 if (methodList != null) {
                     cacheEntry = methodKey.getMostSpecificMethod(methodList);
                 }
-                if (cacheEntry == null) {
-                    byKey.put(methodKey, CACHE_MISS);
-                } else {
-                    byKey.put(methodKey, cacheEntry);
-                }
+                byKey.put(methodKey, cacheEntry == null? CACHE_MISS : cacheEntry);
             } catch (final MethodKey.AmbiguousException ae) {
                 // that's a miss :-)
                 byKey.put(methodKey, CACHE_MISS);
@@ -248,7 +244,7 @@ final class ClassMap {
      */
     private static void create(final ClassMap cache, final JexlPermissions permissions, Class<?> clazz, final Log log) {
         //
-        // Build a list of all elements in the class hierarchy. This one is bottom-first (i.e. we start
+        // Build a list of all elements in the class hierarchy. This one is bottom-first; we start
         // with the actual declaring class and its interfaces and then move up (superclass etc.) until we
         // hit java.lang.Object. That is important because it will give us the methods of the declaring class
         // which might in turn be abstract further up the tree.
@@ -256,7 +252,7 @@ final class ClassMap {
         // We also ignore all SecurityExceptions that might happen due to SecurityManager restrictions.
         //
         for (Class<?> classToReflect = clazz; classToReflect != null; classToReflect = classToReflect.getSuperclass()) {
-            if (Modifier.isPublic(classToReflect.getModifiers())) {
+            if (Modifier.isPublic(classToReflect.getModifiers()) && ClassTool.isExported(classToReflect)) {
                 populateWithClass(cache, permissions, classToReflect, log);
             }
             final Class<?>[] interfaces = classToReflect.getInterfaces();

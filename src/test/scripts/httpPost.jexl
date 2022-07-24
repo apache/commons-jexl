@@ -1,0 +1,53 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+//-------------------------------------------------------------------
+// send a POST Request
+//-------------------------------------------------------------------
+
+var httpPostRequest = (sURL, jsonData) -> {
+  var url = new("java.net.URL", sURL);
+  var con = url.openConnection();
+  con.setRequestMethod("POST");
+  con.setRequestProperty("Accept", "application/json");
+
+  // send data
+  if ( jsonData != null ) {
+    con.setRequestProperty("Content-Type", "application/json; utf-8");
+    con.setDoOutput(true);
+
+    var outputStream = con.getOutputStream();
+    var input = jsonData.getBytes("utf-8");
+    outputStream.write(input, 0, size(input));
+  }
+
+  // read response
+  var responseCode = con.getResponseCode();
+  var inputStream = null;
+  inputStream =  con.getInputStream();
+  var response = new("java.lang.StringBuffer");
+  if (inputStream != null) {
+    var in = new("java.io.BufferedReader", new("java.io.InputStreamReader", inputStream));
+    var inputLine = "";
+    while ((inputLine = in.readLine()) != null) {
+      response.append(inputLine);
+    }
+    in.close();
+  }
+  response.toString();
+}
+
+httpPostRequest("https://jsonplaceholder.typicode.com/posts");

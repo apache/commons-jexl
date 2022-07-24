@@ -69,7 +69,7 @@ public class Uberspect implements JexlUberspect {
     /**
      * The map from arithmetic classes to overloaded operator sets.
      * <p>
-     * This keeps track of which operator methods are overloaded per JexlArithemtic classes
+     * This map keeps track of which operator methods are overloaded per JexlArithmetic classes
      * allowing a fail fast test during interpretation by avoiding seeking a method when there is none.
      */
     private final Map<Class<? extends JexlArithmetic>, Set<JexlOperator>> operatorMap;
