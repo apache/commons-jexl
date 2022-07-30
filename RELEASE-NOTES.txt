@@ -35,12 +35,16 @@ with the @NoJexl annotation on source code. This is achieved through a crude but
 a security manager that controls what JEXL can introspect and thus expose to scripts.
 Used in conjunction with options (JexlOptions) and features (JexlFeatures), the permissions (JexlPermissions)
 allow fine-tuning the scripting integration into any project.
+JEXL 3.3 also adds some syntactic (ECMAScript) features (let, const, =>, for, ...) to further reduce
+the skill set required to write scripts.
 
 New Features in 3.3:
 ====================
 * JEXL-373:     Add support for prefix/postfix increment/decrement operators
 * JEXL-372:     Add support for 'standard' for loop
 * JEXL-369:     Add 'let' and 'const' variable declarations
+* JEXL-367:     Named function and fat-arrow (=>) lambda syntax
+* JEXL-366:     Fail to evaluate string and number comparison
 * JEXL-365:     Lambda expressions
 * JEXL-363:     Allow retrieving captured variables in script
 * JEXL-360:     Add missing bitshift operators ( >>, >>>, <<)
@@ -49,8 +53,12 @@ New Features in 3.3:
 
 Bugs Fixed in 3.3:
 ==================
+* JEXL-376:     Introspector captures methods on non-exported classes (modules, java9+)
+* JEXL-375:     Cannot access enums by their name when using sandbox
+* JEXL-374:     No exception if dereferencing null object using safe(false) and antish(false)
 * JEXL-371:     Override of a protected method with public visibility is not callable
 * JEXL-370:     Cannot check if variable is defined using ObjectContext if the value is null
+* JEXL-368:     Namespace functor resolution is not cached
 * JEXL-364:     Evaluator options not propagated in closures
 * JEXL-362:     JexlInfo position reporting is off
 * JEXL-361:     Null may be used as operand silently even in arithmetic strict(true) mode

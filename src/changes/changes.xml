@@ -27,12 +27,66 @@
     <body>
         <release version="3.3" date="YYYY-MM-DD">
             <!-- ADD -->
-            <action dev="henrib" type="add" issue="JEXL-357" >
+            <action dev="henrib" type="add" issue="JEXL-373" due-to="Dmitri Blinov">
+                Add support for prefix/postfix increment/decrement operators
+            </action>
+            <action dev="henrib" type="add" issue="JEXL-372" due-to="Dmitri Blinov">
+                Add support for 'standard' for loop
+            </action>
+            <action dev="henrib" type="add" issue="JEXL-369" due-to="Dmitri Blinov">
+            Add 'let' and 'const' variable declarations
+            </action>
+            <action dev="henrib" type="add" issue="JEXL-367" due-to="Hussachai Puripunpinyo">
+                Named function and fat-arrow (=>) lambda syntax
+            </action>
+            <action dev="henrib" type="add" issue="JEXL-366" due-to="Hussachai Puripunpinyo">
+            Fail to evaluate string and number comparison
+            </action>
+            <action dev="henrib" type="add" issue="JEXL-365" due-to="Dmitri Blinov">
+                Lambda expressions
+            </action>
+            <action dev="henrib" type="add" issue="JEXL-363">
+                Allow retrieving captured variables in script
+            </action>
+            <action dev="henrib" type="add" issue="JEXL-360"  due-to="Ian Hawkins">
+                Add missing bitshift operators (&lt;&lt;, &gt;&gt;&gt;, &gt;&gt;)
+            </action>
+            <action dev="henrib" type="add" issue="JEXL-359">
+                Allow per-operator arithmetic handling of null arguments
+            </action>
+            <action dev="henrib" type="add" issue="JEXL-357">
                 Configure accessible packages/classes/methods/fields
             </action>
             <!--  FIX -->
+            <action dev="henrib" type="fix" issue="JEXL-376">
+                Introspector captures methods on non-exported classes (modules, java9+)
+            </action>
+            <action dev="henrib" type="fix" issue="JEXL-375" due-to="Jan Klicka">
+                Cannot access enums by their name when using sandbox
+            </action>
+            <action dev="henrib" type="fix" issue="JEXL-374" due-to="Alex Hutton">
+                No exception if dereferencing null object using safe(false) and antish(false)
+            </action>
             <action dev="henrib" type="fix" issue="JEXL-371">
                 Override of a protected method with public visibility is not callable
+            </action>
+            <action dev="henrib" type="fix" issue="JEXL-370" due-to="Alex Hutton">
+                Cannot check if variable is defined using ObjectContext if the value is null
+            </action>
+            <action dev="henrib" type="add" issue="JEXL-368">
+                Namespace functor resolution is not cached
+            </action>
+            <action dev="henrib" type="fix" issue="JEXL-364">
+                Evaluator options not propagated in closures
+            </action>
+            <action dev="henrib" type="fix" issue="JEXL-362">
+                JexlInfo position reporting is off
+            </action>
+            <action dev="henrib" type="fix" issue="JEXL-361">
+                Null may be used as operand silently even in arithmetic strict(true) mode
+            </action>
+            <action dev="henrib" type="fix" issue="JEXL-358">
+                JexlScript.curry(...) resulting scripts don't evaluate correctly
             </action>
             <action dev="henrib" type="fix" issue="JEXL-354"  due-to="William Price">
                 #pragma does not handle negative integer or real literals
