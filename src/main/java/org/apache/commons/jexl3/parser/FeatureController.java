@@ -254,4 +254,23 @@ public class FeatureController extends ScriptVisitor {
         return controlSideEffect(node, data);
     }
 
+    @Override
+    protected Object visit(ASTGetDecrementNode node, Object data) {
+        return controlSideEffect(node, data);
+    }
+
+    @Override
+    protected Object visit(ASTGetIncrementNode node, Object data) {
+        return controlSideEffect(node, data);
+    }
+
+    @Override
+    protected Object visit(ASTDecrementGetNode node, Object data) {
+        return controlSideEffect(node, data);
+    }
+
+    @Override
+    protected Object visit(ASTIncrementGetNode node, Object data) {
+        return controlSideEffect(node, data);
+    }
 }
