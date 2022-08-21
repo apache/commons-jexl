@@ -916,9 +916,18 @@ void FunctionCall() #void : {}
     LOOKAHEAD(<IDENTIFIER> <LPAREN>) Identifier(true) Arguments() #FunctionNode(2)
 }
 
+void QualifiedIdentifier() #QualifiedIdentifier : {
+    LinkedList<String> lstr = new LinkedList<String>();
+}
+{
+    pragmaKey(lstr) { jjtThis.setName(stringify(lstr));}
+}
+
 void Constructor() #ConstructorNode : {}
 {
-  <NEW> <LPAREN> Expression() ( <COMMA> Expression() )* <RPAREN>
+  LOOKAHEAD(2) <NEW> <LPAREN> Expression() ( <COMMA> Expression() )* <RPAREN>
+  |
+  <NEW> QualifiedIdentifier()  <LPAREN> [ Expression() ( <COMMA> Expression() )* ] <RPAREN>
 }
 
 void Parameter() #void :

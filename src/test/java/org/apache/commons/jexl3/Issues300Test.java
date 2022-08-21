@@ -874,4 +874,14 @@ public class Issues300Test {
         DOMICILE
     }
 
+
+    @Test
+    public void test377() {
+        String text = "function add(x, y) { x + y } add(a, b)";
+        JexlEngine jexl = new JexlBuilder().safe(true).create();
+        JexlScript script = jexl.createScript(text, "a", "b");
+        Object result = script.execute(null, 20, 22);
+        Assert.assertEquals(42, result);
+    }
+
 }

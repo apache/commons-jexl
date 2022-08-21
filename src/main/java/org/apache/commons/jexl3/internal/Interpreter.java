@@ -1125,6 +1125,19 @@ public class Interpreter extends InterpreterBase {
         return object;
     }
 
+    @Override
+    protected Object visit(final ASTQualifiedIdentifier node, final Object data) {
+        String name = node.getName();
+        if (context instanceof JexlContext.ClassNameResolver) {
+            JexlContext.ClassNameResolver resolver = (JexlContext.ClassNameResolver) context;
+            String fqcn = resolver.resolveClassName(name);
+            if (fqcn != null) {
+                return fqcn;
+            }
+        }
+        return name;
+    }
+
     /**
      * Evaluates an access identifier based on the 2 main implementations;
      * static (name or numbered identifier) or dynamic (jxlt).

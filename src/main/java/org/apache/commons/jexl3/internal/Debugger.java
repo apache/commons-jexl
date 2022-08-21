@@ -1021,6 +1021,12 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     }
 
     @Override
+    protected Object visit(ASTQualifiedIdentifier node, Object data) {
+        String img = node.getName();
+        return this.check(node, img, data);
+    }
+
+    @Override
     protected Object visit(ASTStringLiteral node, Object data) {
         String img = StringParser.escapeString(node.getLiteral(), '\'');
         return this.check(node, img, data);

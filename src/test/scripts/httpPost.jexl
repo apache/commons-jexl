@@ -17,37 +17,36 @@
 //-------------------------------------------------------------------
 // send a POST Request
 //-------------------------------------------------------------------
+#pragma jexl.import  java.net
+#pragma jexl.import  java.io
+{
+    "execute" : (sURL, jsonData) -> {
+        let url = new URL(sURL);
+        let con = url.openConnection();
+        con.setRequestMethod("POST");
+        con.setRequestProperty("Accept", "application/json");
 
-var httpPostRequest = (sURL, jsonData) -> {
-  var url = new("java.net.URL", sURL);
-  var con = url.openConnection();
-  con.setRequestMethod("POST");
-  con.setRequestProperty("Accept", "application/json");
+        // send data
+        if (jsonData != null) {
+            con.setRequestProperty("Content-Type", "application/json; utf-8");
+            con.setDoOutput(true);
+            let outputStream = con.getOutputStream();
+            let input = jsonData.getBytes("utf-8");
+            outputStream.write(input, 0, size(input));
+        }
 
-  // send data
-  if ( jsonData != null ) {
-    con.setRequestProperty("Content-Type", "application/json; utf-8");
-    con.setDoOutput(true);
-
-    var outputStream = con.getOutputStream();
-    var input = jsonData.getBytes("utf-8");
-    outputStream.write(input, 0, size(input));
-  }
-
-  // read response
-  var responseCode = con.getResponseCode();
-  var inputStream = null;
-  inputStream =  con.getInputStream();
-  var response = new("java.lang.StringBuffer");
-  if (inputStream != null) {
-    var in = new("java.io.BufferedReader", new("java.io.InputStreamReader", inputStream));
-    var inputLine = "";
-    while ((inputLine = in.readLine()) != null) {
-      response.append(inputLine);
+        // read response
+        let responseCode = con.getResponseCode();
+        let inputStream = con.getInputStream();
+        let response = new StringBuffer();
+        if (inputStream != null) {
+            let in = new BufferedReader(new InputStreamReader(inputStream));
+            var inputLine = "";
+            while ((inputLine = in.readLine()) != null) {
+                response.append(inputLine);
+            }
+            in.close();
+        }
+        response.toString();
     }
-    in.close();
-  }
-  response.toString();
 }
-
-httpPostRequest("https://jsonplaceholder.typicode.com/posts");

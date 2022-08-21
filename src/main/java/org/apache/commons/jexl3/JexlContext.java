@@ -91,6 +91,19 @@ public interface JexlContext {
     }
 
     /**
+     * A marker interface that solves a simple class name into a fully-qualified one.
+     * @since 3.3
+     */
+    interface ClassNameResolver {
+        /**
+         * Resolves a class name.
+         * @param name the simple class name
+         * @return the fully qualified class name
+         */
+        String resolveClassName(String name);
+    }
+
+    /**
      * A marker interface of the JexlContext, NamespaceFunctor allows creating an instance
      * to delegate namespace methods calls to.
      *

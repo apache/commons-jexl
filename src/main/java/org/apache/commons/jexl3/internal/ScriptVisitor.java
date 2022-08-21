@@ -472,4 +472,9 @@ public class ScriptVisitor extends ParserVisitor {
     protected Object visit(final ASTAnnotatedStatement node, final Object data) {
         return visitNode(node, data);
     }
+
+    @Override
+    protected Object visit(final ASTQualifiedIdentifier node, final Object data) {
+        return visitNode(node, data);
+    }
 }

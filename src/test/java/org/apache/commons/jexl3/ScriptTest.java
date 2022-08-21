@@ -16,16 +16,27 @@
  */
 package org.apache.commons.jexl3;
 
+import com.sun.net.httpserver.HttpExchange;
+import com.sun.net.httpserver.HttpHandler;
+import com.sun.net.httpserver.HttpServer;
+import org.apache.commons.jexl3.internal.introspection.SimpleClassNameSolver;
+import org.junit.Assert;
+import org.junit.Test;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
+import java.net.InetSocketAddress;
 import java.net.URL;
-
-import org.junit.Assert;
-import org.junit.Test;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.function.Function;
 
 /**
  * Tests for JexlScript
@@ -83,26 +94,81 @@ public class ScriptTest extends JexlTestCase {
         Assert.assertEquals("getText is wrong", code, s.getSourceText());
     }
 
+    static class ImportContext extends MapContext implements JexlContext.ClassNameResolver, JexlContext.PragmaProcessor {
+        private final SimpleClassNameSolver solver;
+        ImportContext(SimpleClassNameSolver parent) {
+            solver = new SimpleClassNameSolver(parent);
+        }
+
+        @Override
+        public String resolveClassName(String name) {
+            return name.indexOf('.') < 0 ? solver.getQualifiedName(name) : name;
+        }
+
+        @Override
+        public void processPragma(String key, Object value) {
+            processPragma(null, key, value);
+        }
+
+        @Override
+        public void processPragma(JexlOptions opts, String key, Object value) {
+            if ("jexl.import".equals(key)) {
+                if (value instanceof Collection<?>) {
+                    for(Object pkg : ((Collection<?>) value)) {
+                        solver.addPackages(Collections.singletonList(pkg.toString()));
+                    }
+                } else {
+                    solver.addPackages(Collections.singletonList(value.toString()));
+                }
+            }
+        }
+    }
+
     @Test
     public void testScriptJsonFromFileJexl() {
-        final File testScript = new File(TEST_JSON);
-        final JexlScript s = JEXL.createScript(testScript);
-        final JexlContext jc = new MapContext();
-        jc.set("httpr", new HttpPostRequest());
-        Object result = s.execute(jc);
-        Assert.assertNotNull(result);
-        Assert.assertEquals("{  \"id\": 101}", result);
+        SimpleClassNameSolver baseSolver = new SimpleClassNameSolver(null, Arrays.asList("java.lang"));
+        HttpServer server = null;
+        try {
+            final String response = "{  \"id\": 101}";
+            server = createJsonServer(h -> response);
+            final File httprFile = new File(TEST_JSON);
+            final JexlScript httprScript = JEXL.createScript(httprFile);
+            final JexlContext jc = new ImportContext(baseSolver);
+            Object httpr = httprScript.execute(jc);
+            final JexlScript s = JEXL.createScript("(httpr,url)->httpr.execute(url, null)");
+            //jc.set("httpr", new HttpPostRequest());
+            Object result = s.execute(jc, httpr, "http://localhost:8001/test");
+            Assert.assertNotNull(result);
+            Assert.assertEquals(response, result);
+        } catch(IOException xio) {
+            Assert.fail(xio.getMessage());
+        } finally {
+            if (server != null) {
+                server.stop(0);
+            }
+        }
     }
 
     @Test
     public void testScriptJsonFromFileJava() {
-        final String testScript ="httpr.execute('https://jsonplaceholder.typicode.com/posts', null)";
-        final JexlScript s = JEXL.createScript(testScript);
-        final JexlContext jc = new MapContext();
-        jc.set("httpr", new HttpPostRequest());
-        Object result = s.execute(jc);
-        Assert.assertNotNull(result);
-        Assert.assertEquals("{  \"id\": 101}", result);
+        HttpServer server = null;
+        try {
+            final String response = "{  \"id\": 101}";
+            server = createJsonServer(h -> response);
+            final String testScript = "httpr.execute('http://localhost:8001/test', null)";
+            final JexlScript s = JEXL.createScript(testScript);
+            final JexlContext jc = new MapContext();
+            jc.set("httpr", new HttpPostRequest());
+            Object result = s.execute(jc);
+            Assert.assertNotNull(result);
+            Assert.assertEquals(response, result);
+        } catch(IOException xio) {
+            Assert.fail(xio.getMessage());
+        } finally {
+            if (server != null) {
+                server.stop(0);
+            }
+        }
     }
 
     /**
@@ -151,6 +217,35 @@ public class ScriptTest extends JexlTestCase {
         return response.toString();
     }
 
+    /**
+     * Creates a simple local http server.
+     * <p>Only handles POST request on /test</p>
+     * @return the server
+     * @throws IOException
+     */
+    static HttpServer createJsonServer(final Function<HttpExchange, String> responder) throws IOException {
+        HttpServer server = HttpServer.create(new InetSocketAddress("localhost", 8001), 0);
+        ThreadPoolExecutor threadPoolExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(1);
+        server.createContext("/test", new HttpHandler() {
+            @Override
+            public void handle(HttpExchange httpExchange) throws IOException {
+                if ("POST".equals(httpExchange.getRequestMethod())) {
+                    OutputStream outputStream = httpExchange.getResponseBody();
+                    String json = responder.apply(httpExchange);
+                    httpExchange.sendResponseHeaders(200, json.length());
+                    outputStream.write(json.toString().getBytes());
+                    outputStream.flush();
+                    outputStream.close();
+                } else {
+                    // error
+                    httpExchange.sendResponseHeaders(500, 0);
+                }
+            }
+        });
+        server.setExecutor(threadPoolExecutor);
+        server.start();
+        return server;
+    }
 
     @Test
     public void testScriptFromFile() {

@@ -30,6 +30,7 @@ import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.Deque;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
@@ -517,7 +518,18 @@ public abstract class JexlParser extends StringParser {
                 namespaces.add(nsname);
             }
         }
-        pragmas.put(key, value);
+        Object previous = pragmas.put(key, value);
+        if (previous != null) {
+            Set<Object> values;
+            if (previous instanceof Set<?>) {
+                values = (Set<Object>) previous;
+            } else {
+                values = new LinkedHashSet<Object>();
+                pragmas.put(key, values);
+                values.add(previous);
+            }
+            values.add(value);
+        }
     }
 
     /**

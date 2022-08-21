@@ -30,8 +30,9 @@ class ClassTool {
     private static final MethodHandle GET_PKGNAME;
     /** The Module.isExported(String packageName) method. */
     private static final MethodHandle IS_EXPORTED;
+
     static {
-        final MethodHandles.Lookup LOOKUP= MethodHandles.lookup();
+        final MethodHandles.Lookup LOOKUP = MethodHandles.lookup();
         MethodHandle getModule = null;
         MethodHandle getPackageName = null;
         MethodHandle isExported = null;
@@ -64,11 +65,12 @@ class ClassTool {
      * </code>
      * This is required since some classes and methods may not be exported thus not callable through
      * reflection.
+     *
      * @param declarator the class
      * @return true if class is exported or no module support exists
      */
     static boolean isExported(Class<?> declarator) {
-        if (IS_EXPORTED != null)  {
+        if (IS_EXPORTED != null) {
             try {
                 final Object module = GET_MODULE.invoke(declarator);
                 if (module != null) {
@@ -84,6 +86,7 @@ class ClassTool {
 
     /**
      * Gets the package name of a class (class.getPackage() may return null).
+     *
      * @param clz the class
      * @return the class package name
      */
@@ -94,13 +97,13 @@ class ClassTool {
             if (GET_PKGNAME != null) {
                 try {
                     return (String) GET_PKGNAME.invoke(clz);
-                } catch(Throwable xany) {
+                } catch (Throwable xany) {
                     return "";
                 }
             }
             // remove array
             Class<?> clazz = clz;
-            while(clazz.isArray()) {
+            while (clazz.isArray()) {
                 clazz = clazz.getComponentType();
             }
             // mimic getPackageName()
@@ -109,7 +112,7 @@ class ClassTool {
             }
             // remove enclosing
             Class<?> walk = clazz.getEnclosingClass();
-            while(walk != null) {
+            while (walk != null) {
                 clazz = walk;
                 walk = walk.getEnclosingClass();
             }
