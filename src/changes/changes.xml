@@ -27,6 +27,9 @@
     <body>
         <release version="3.3" date="YYYY-MM-DD">
             <!-- ADD -->
+            <action dev="henrib" type="add" issue="JEXL-379">
+                Allow new to use class identifier
+            </action>
             <action dev="henrib" type="add" issue="JEXL-373" due-to="Dmitri Blinov">
                 Add support for prefix/postfix increment/decrement operators
             </action>
@@ -58,6 +61,9 @@
                 Configure accessible packages/classes/methods/fields
             </action>
             <!--  FIX -->
+            <action dev="henrib" type="fix" issue="JEXL-378" due-to="Hussachai Puripunpinyo">
+                Incremental operator and decremental operator do not honor the side-effect flag
+            </action>
             <action dev="henrib" type="fix" issue="JEXL-376">
                 Introspector captures methods on non-exported classes (modules, java9+)
             </action>
