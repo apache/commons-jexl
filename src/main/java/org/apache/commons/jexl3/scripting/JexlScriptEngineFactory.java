@@ -59,7 +59,7 @@ public class JexlScriptEngineFactory implements ScriptEngineFactory {
 
     @Override
     public String getLanguageVersion() {
-        return "3.2"; // TODO this should be derived from the actual version
+        return "3.3"; // this should be derived from the actual version
     }
 
     @Override
