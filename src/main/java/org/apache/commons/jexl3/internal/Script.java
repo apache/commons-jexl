@@ -141,8 +141,7 @@ public class Script implements JexlScript, JexlExpression {
     @Override
     public String getParsedText(final int indent) {
         final Debugger debug = new Debugger();
-        debug.setIndentation(indent);
-        debug.debug(script, false);
+        debug.outputPragmas(true).indentation(indent).debug(script, false);
         return debug.toString();
     }
 

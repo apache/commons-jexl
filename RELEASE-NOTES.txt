@@ -40,6 +40,7 @@ the skill set required to write scripts.
 
 New Features in 3.3:
 ====================
+* JEXL-380:     Multiple values per pragma key
 * JEXL-379:     Allow new to use class identifier
 * JEXL-373:     Add support for prefix/postfix increment/decrement operators
 * JEXL-372:     Add support for 'standard' for loop

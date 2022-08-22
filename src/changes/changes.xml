@@ -27,6 +27,9 @@
     <body>
         <release version="3.3" date="YYYY-MM-DD">
             <!-- ADD -->
+            <action dev="henrib" type="add" issue="JEXL-380">
+                Multiple values per pragma key
+            </action>
             <action dev="henrib" type="add" issue="JEXL-379">
                 Allow new to use class identifier
             </action>

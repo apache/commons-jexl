@@ -20,6 +20,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 
 import org.junit.Assert;
@@ -41,8 +42,7 @@ public class PragmaTest extends JexlTestCase {
      */
     @Test
     @SuppressWarnings("AssertEqualsBetweenInconvertibleTypes")
-    public void testPragmas() throws Exception {
-        final JexlContext jc = new MapContext();
+    public void testPragmas() {
         final JexlScript script = JEXL.createScript("#pragma one 1\n#pragma the.very.hard 'truth'\n2;");
         Assert.assertNotNull(script);
         final Map<String, Object> pragmas = script.getPragmas();
@@ -53,8 +53,7 @@ public class PragmaTest extends JexlTestCase {
 
     @Test
     @SuppressWarnings("AssertEqualsBetweenInconvertibleTypes")
-    public void testJxltPragmas() throws Exception {
-        final JexlContext jc = new MapContext();
+    public void testJxltPragmas() {
         final JxltEngine engine = new JexlBuilder().create().createJxltEngine();
         final JxltEngine.Template tscript = engine.createTemplate("$$ #pragma one 1\n$$ #pragma the.very.hard 'truth'\n2;");
         Assert.assertNotNull(tscript);
@@ -83,6 +82,10 @@ public class PragmaTest extends JexlTestCase {
             }
         }
 
+        /**
+         * Sleeps, called through scripts.
+         * @param ms time to sleep in ms
+         */
         public void sleep(final long ms) {
             try {
                 Thread.sleep(ms);
@@ -94,7 +97,7 @@ public class PragmaTest extends JexlTestCase {
 
     @Test
     @SuppressWarnings("AssertEqualsBetweenInconvertibleTypes")
-    public void testSafePragma() throws Exception {
+    public void testSafePragma() {
         SafeContext jc = new SafeContext();
         jc.set("foo", null);
         final JexlScript script = JEXL.createScript("#pragma jexl.safe true\nfoo.bar;");
@@ -105,7 +108,7 @@ public class PragmaTest extends JexlTestCase {
         jc = new SafeContext();
         jc.set("foo", null);
         try {
-            result = script.execute(jc);
+            script.execute(jc);
             Assert.fail("should have thrown");
         } catch (final JexlException xvar) {
             // ok, expected
@@ -137,9 +140,29 @@ public class PragmaTest extends JexlTestCase {
     }
 
     @Test
+    public void testNamespacePragmaValueSet() {
+        String src =
+                "#pragma jexl.import java.util\n"+
+                "#pragma jexl.import java.io\n"+
+                "#pragma jexl.import java.net\n"+
+                "42";
+        final JexlScript script = JEXL.createScript(src);
+        Map<String, Object> pragmas = script.getPragmas();
+        Object importz = pragmas.get("jexl.import");
+        Assert.assertTrue(importz instanceof Set<?>);
+        Set<String> importzz = (Set<String>) importz;
+        Assert.assertTrue(importzz.contains("java.util"));
+        Assert.assertTrue(importzz.contains("java.io"));
+        Assert.assertTrue(importzz.contains("java.net"));
+        Assert.assertEquals(3, importzz.size());
+        String parsed = script.getParsedText();
+        Assert.assertEquals(src, parsed);
+    }
+
+    @Test
     @SuppressWarnings("AssertEqualsBetweenInconvertibleTypes")
-    public void testStaticNamespacePragma() throws Exception {
-        final SafeContext jc = new SafeContext();
+    public void testStaticNamespacePragma() {
+        final JexlContext jc = new SafeContext();
         final JexlScript script = JEXL.createScript(
                 "#pragma jexl.namespace.sleeper " + StaticSleeper.class.getName() + "\n"
                 + "sleeper:sleep(100);"
@@ -150,10 +173,10 @@ public class PragmaTest extends JexlTestCase {
 
     @Test
     @SuppressWarnings("AssertEqualsBetweenInconvertibleTypes")
-    public void testStatictNamespacePragmaCtl() throws Exception {
+    public void testStatictNamespacePragmaCtl() {
         final Map<String, Object> ns = Collections.singletonMap("sleeper", StaticSleeper.class.getName());
         final JexlEngine jexl = new JexlBuilder().namespaces(ns).create();
-        final SafeContext jc = new SafeContext();
+        final JexlContext jc = new SafeContext();
         final JexlScript script = jexl.createScript(
                 "sleeper:sleep(100);"
                 + "42");
@@ -163,22 +186,25 @@ public class PragmaTest extends JexlTestCase {
 
     @Test
     @SuppressWarnings("AssertEqualsBetweenInconvertibleTypes")
-    public void testNamespacePragma() throws Exception {
-        final SafeContext jc = new SafeContext();
-        final JexlScript script = JEXL.createScript(
+    public void testNamespacePragma() {
+        final JexlContext jc = new SafeContext();
+        final String src =
                 "#pragma jexl.namespace.sleeper " + Sleeper.class.getName() + "\n"
-                + "sleeper:sleep(100);"
-                + "42");
+                        + "sleeper:sleep(100);\n"
+                        + "42;\n";
+        final JexlScript script = JEXL.createScript(src);
         final Object result = script.execute(jc);
         Assert.assertEquals(42, result);
+        String parsed = script.getParsedText();
+        Assert.assertEquals(src, parsed);
     }
 
     @Test
     @SuppressWarnings("AssertEqualsBetweenInconvertibleTypes")
-    public void testNamespacePragmaCtl() throws Exception {
+    public void testNamespacePragmaCtl() {
         final Map<String, Object> ns = Collections.singletonMap("sleeper", Sleeper.class.getName());
         final JexlEngine jexl = new JexlBuilder().namespaces(ns).create();
-        final SafeContext jc = new SafeContext();
+        final JexlContext jc = new SafeContext();
         final JexlScript script = jexl.createScript(
                 "sleeper:sleep(100);"
                 + "42");
@@ -186,23 +212,23 @@ public class PragmaTest extends JexlTestCase {
         Assert.assertEquals(42, result);
     }
 
-    @Test public void test354() throws Exception {
+    @Test public void test354() {
         Map<String, Number> values = new TreeMap<>();
         values.put("1", 1);
         values.put("+1", 1);
         values.put("-1", -1);
-        values.put("1l", 1l);
-        values.put("+1l", 1l);
-        values.put("-1l", -1l);
+        values.put("1l", 1L);
+        values.put("+1l", 1L);
+        values.put("-1l", -1L);
         values.put("10h", BigInteger.valueOf(10));
         values.put("-11h", BigInteger.valueOf(-11));
         values.put("+12h", BigInteger.valueOf(12));
         values.put("0xa", 0xa);
         values.put("+0xa", 0xa);
         values.put("-0xa", -0xa);
-        values.put("0xacl", 0xacl);
-        values.put("+0xadl", 0xadl);
-        values.put("-0xafl", -0xafl);
+        values.put("0xacl", 0xacL);
+        values.put("+0xadl", 0xadL);
+        values.put("-0xafl", -0xafL);
         values.put("1d", 1d);
         values.put("-1d", -1d);
         values.put("+1d", 1d);

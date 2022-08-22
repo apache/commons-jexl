@@ -23,6 +23,9 @@ import org.apache.commons.jexl3.JexlInfo;
 import org.apache.commons.jexl3.JexlScript;
 import org.apache.commons.jexl3.parser.*;
 
+import java.util.Collections;
+import java.util.Map;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 /**
@@ -52,6 +55,8 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     protected String arrow = "->";
     /** EOL. */
     protected String lf = "\n";
+    /** Pragmas out. */
+    protected boolean outputPragmas = false;
 
     /**
      * Creates a Debugger.
@@ -205,6 +210,16 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     @Override
     public int end() {
         return end;
+    }
+
+    /**
+     * Lets the debugger write out pragmas if any.
+     * @param flag turn on or off
+     * @return this debugger instance
+     */
+    public Debugger outputPragmas(boolean flag) {
+        this.outputPragmas = flag;
+        return this;
     }
 
     /**
@@ -773,8 +788,34 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
         return lambda.jjtGetNumChildren() == 1 && !isStatement(lambda.jjtGetChild(0));
     }
 
+    /**
+     * Stringifies the pragmas.
+     * @param builder where to stringify
+     * @param pragmas the pragmas, may be null
+     */
+    private static void writePragmas(StringBuilder builder, Map<String, Object> pragmas) {
+        if (pragmas != null) {
+            for (Map.Entry<String, Object> pragma : pragmas.entrySet()) {
+                String key = pragma.getKey();
+                Object value = pragma.getValue();
+                Set<Object> values = value instanceof Set ? (Set) value : Collections.singleton(value);
+                for (Object pragmaValue : values) {
+                    builder.append("#pragma ");
+                    builder.append(key);
+                    builder.append(' ');
+                    builder.append(pragmaValue.toString());
+                    builder.append('\n');
+                }
+            }
+        }
+
+    }
+
     @Override
     protected Object visit(final ASTJexlScript node, Object arg) {
+        if (outputPragmas) {
+            writePragmas(builder, node.getPragmas());
+        }
         Object data = arg;
         boolean named = false;
         // if lambda, produce parameters

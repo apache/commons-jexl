@@ -522,12 +522,16 @@ public abstract class JexlParser extends StringParser {
         if (previous != null) {
             Set<Object> values;
             if (previous instanceof Set<?>) {
+                // reinsert previous value which was the set
                 values = (Set<Object>) previous;
+                pragmas.put(key, values);
             } else {
+                // create a new set as value
                 values = new LinkedHashSet<Object>();
                 pragmas.put(key, values);
                 values.add(previous);
             }
+            // add the new value to the set of values
             values.add(value);
         }
     }
