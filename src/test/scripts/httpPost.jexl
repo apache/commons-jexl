@@ -28,7 +28,7 @@
 
         // send data
         if (jsonData != null) {
-            con.setRequestProperty("Content-Type", "application/json; utf-8");
+            con.setRequestProperty("Content-Type", "application/json");
             con.setDoOutput(true);
             let outputStream = con.getOutputStream();
             let input = jsonData.getBytes("utf-8");

@@ -194,7 +194,7 @@ public class ScriptTest extends JexlTestCase {
         con.setRequestProperty("Accept", "application/json");
         // send data
         if ( jsonData != null ) {
-            con.setRequestProperty("Content-Type", "application/json; utf-8");
+            con.setRequestProperty("Content-Type", "application/json");
             con.setDoOutput(true);
 
             OutputStream outputStream = con.getOutputStream();
