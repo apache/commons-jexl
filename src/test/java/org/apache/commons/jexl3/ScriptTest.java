@@ -137,7 +137,8 @@ public class ScriptTest extends JexlTestCase {
             Object httpr = httprScript.execute(jc);
             final JexlScript s = JEXL.createScript("(httpr,url)->httpr.execute(url, null)");
             //jc.set("httpr", new HttpPostRequest());
-            Object result = s.execute(jc, httpr, "http://localhost:8001/test");
+            String url = "http:/"+server.getAddress().toString()+"/test";
+            Object result = s.execute(jc, httpr,url);
             Assert.assertNotNull(result);
             Assert.assertEquals(response, result);
         } catch(IOException xio) {
@@ -155,7 +156,8 @@ public class ScriptTest extends JexlTestCase {
         try {
             final String response = "{  \"id\": 101}";
             server = createJsonServer(h -> response);
-            final String testScript = "httpr.execute('http://localhost:8001/test', null)";
+            String url = "http:/"+server.getAddress().toString()+"/test";
+            final String testScript = "httpr.execute('"+url+"', null)";
             final JexlScript s = JEXL.createScript(testScript);
             final JexlContext jc = new MapContext();
             jc.set("httpr", new HttpPostRequest());
@@ -224,7 +226,18 @@ public class ScriptTest extends JexlTestCase {
      * @throws IOException
      */
     static HttpServer createJsonServer(final Function<HttpExchange, String> responder) throws IOException {
-        HttpServer server = HttpServer.create(new InetSocketAddress("localhost", 8001), 0);
+        HttpServer server  = null;
+        IOException xlatest = null;
+        for(int port = 8001; server == null && port < 8127; ++port) {
+            try {
+                server = HttpServer.create(new InetSocketAddress("localhost", port), 0);
+            } catch(java.net.BindException xbind) {
+                xlatest = xbind;
+            }
+        }
+        if (server == null) {
+            throw xlatest;
+        }
         ThreadPoolExecutor threadPoolExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(1);
         server.createContext("/test", new HttpHandler() {
             @Override
