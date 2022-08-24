@@ -23,6 +23,8 @@ import org.apache.commons.jexl3.introspection.JexlSandbox;
 import org.apache.commons.jexl3.introspection.JexlUberspect;
 import org.apache.commons.logging.Log;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Map;
 import java.nio.charset.Charset;
 
@@ -522,6 +524,33 @@ public class JexlBuilder {
      */
     public Map<String, Object> namespaces() {
         return options.getNamespaces();
+    }
+
+    /**
+     * Gets the optional set of imported packages.
+     * @return the set of imports, may be empty, not null
+     */
+    public Collection<String> imports() {
+        return options.getImports();
+    }
+
+    /**
+     * Sets the optional set of imports.
+     * @param imports the imported packages
+     * @return this builder
+     */
+    public JexlBuilder imports(final Collection<String> imports) {
+        options.setImports(imports);
+        return this;
+    }
+
+    /**
+     * Sets the optional set of imports.
+     * @param imports the imported packages
+     * @return this builder
+     */
+    public JexlBuilder imports(final String... imports) {
+        return imports(Arrays.asList(imports));
     }
 
     /**

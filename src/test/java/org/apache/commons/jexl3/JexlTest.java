@@ -817,4 +817,14 @@ public class JexlTest extends JexlTestCase {
         final Object actual = e.evaluate(jc);
         Assert.assertEquals(expression, expected, actual);
     }
+
+    @Test
+    public void testNewImports() throws Exception {
+        final JexlEngine jexl = new JexlBuilder().imports("not a package", "java.lang", "java.util").create();
+        JexlExpression expr;
+        Object result;
+        expr = jexl.createExpression("new LinkedList([1,2,3,...])");
+        result = expr.evaluate(null);
+        Assert.assertTrue(result instanceof LinkedList);
+    }
 }

@@ -1666,6 +1666,8 @@ public class ArithmeticTest extends JexlTestCase {
         Object x;
         x = JEXL.createScript("new('java.lang.Long', 4294967296)").execute(null);
         Assert.assertEquals(4294967296L, ((Long) x).longValue());
+        x = JEXL.createScript("new Long(4294967296)").execute(null);
+        Assert.assertEquals(4294967296L, ((Long) x).longValue());
         x = JEXL.createScript("new('java.lang.Long', '4294967296')").execute(null);
         Assert.assertEquals(4294967296L, ((Long) x).longValue());
         x = JEXL.createScript("4294967296l").execute(null);

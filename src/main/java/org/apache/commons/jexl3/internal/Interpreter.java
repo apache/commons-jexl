@@ -1128,9 +1128,15 @@ public class Interpreter extends InterpreterBase {
     @Override
     protected Object visit(final ASTQualifiedIdentifier node, final Object data) {
         String name = node.getName();
+        // try with local solver
+        String fqcn = fqcnSolver.resolveClassName(name);
+        if (fqcn != null) {
+            return fqcn;
+        }
+        // context may be solving class name ?
         if (context instanceof JexlContext.ClassNameResolver) {
             JexlContext.ClassNameResolver resolver = (JexlContext.ClassNameResolver) context;
-            String fqcn = resolver.resolveClassName(name);
+            fqcn = resolver.resolveClassName(name);
             if (fqcn != null) {
                 return fqcn;
             }

@@ -18,8 +18,10 @@
 package org.apache.commons.jexl3;
 
 import java.math.MathContext;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
+
 import org.apache.commons.jexl3.internal.Engine;
 
 /**
@@ -72,6 +74,8 @@ public final class JexlOptions {
     private int flags = DEFAULT;
     /** The namespaces .*/
     private Map<String, Object> namespaces = Collections.emptyMap();
+    /** The imports. */
+    private Collection<String> imports = Collections.emptySet();
 
     /**
      * Sets the value of a flag in a mask.
@@ -390,6 +394,7 @@ public final class JexlOptions {
         strictArithmetic = src.strictArithmetic;
         flags = src.flags;
         namespaces = src.namespaces;
+        imports = src.imports;
         return this;
     }
 
@@ -407,6 +412,22 @@ public final class JexlOptions {
      */
     public void setNamespaces(final Map<String, Object> ns) {
         this.namespaces = ns == null? Collections.emptyMap() : ns;
+    }
+
+    /**
+     * Gets the optional set of imported packages.
+     * @return the set of imports, may be empty, not null
+     */
+    public Collection<String> getImports() {
+        return imports;
+    }
+
+    /**
+     * Sets the optional set of imports.
+     * @param imports the imported packages
+     */
+    public void setImports(final Collection<String> imports) {
+        this.imports = imports == null? Collections.emptySet() : imports;
     }
 
     /**

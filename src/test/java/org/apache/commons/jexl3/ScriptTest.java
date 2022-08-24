@@ -19,7 +19,6 @@ package org.apache.commons.jexl3;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
-import org.apache.commons.jexl3.internal.introspection.SimpleClassNameSolver;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -31,9 +30,6 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
 import java.net.URL;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.function.Function;
@@ -94,46 +90,16 @@ public class ScriptTest extends JexlTestCase {
         Assert.assertEquals("getText is wrong", code, s.getSourceText());
     }
 
-    static class ImportContext extends MapContext implements JexlContext.ClassNameResolver, JexlContext.PragmaProcessor {
-        private final SimpleClassNameSolver solver;
-        ImportContext(SimpleClassNameSolver parent) {
-            solver = new SimpleClassNameSolver(parent);
-        }
-
-        @Override
-        public String resolveClassName(String name) {
-            return name.indexOf('.') < 0 ? solver.getQualifiedName(name) : name;
-        }
-
-        @Override
-        public void processPragma(String key, Object value) {
-            processPragma(null, key, value);
-        }
-
-        @Override
-        public void processPragma(JexlOptions opts, String key, Object value) {
-            if ("jexl.import".equals(key)) {
-                if (value instanceof Collection<?>) {
-                    for(Object pkg : ((Collection<?>) value)) {
-                        solver.addPackages(Collections.singletonList(pkg.toString()));
-                    }
-                } else {
-                    solver.addPackages(Collections.singletonList(value.toString()));
-                }
-            }
-        }
-    }
 
     @Test
     public void testScriptJsonFromFileJexl() {
-        SimpleClassNameSolver baseSolver = new SimpleClassNameSolver(null, Arrays.asList("java.lang"));
         HttpServer server = null;
         try {
             final String response = "{  \"id\": 101}";
             server = createJsonServer(h -> response);
             final File httprFile = new File(TEST_JSON);
             final JexlScript httprScript = JEXL.createScript(httprFile);
-            final JexlContext jc = new ImportContext(baseSolver);
+            final JexlContext jc = new MapContext();
             Object httpr = httprScript.execute(jc);
             final JexlScript s = JEXL.createScript("(httpr,url)->httpr.execute(url, null)");
             //jc.set("httpr", new HttpPostRequest());

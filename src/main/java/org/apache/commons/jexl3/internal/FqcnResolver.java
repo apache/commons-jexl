@@ -14,71 +14,101 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.commons.jexl3.internal.introspection;
+package org.apache.commons.jexl3.internal;
 
-import java.util.Collection;
+import org.apache.commons.jexl3.JexlContext;
+import org.apache.commons.jexl3.introspection.JexlUberspect;
+
 import java.util.HashMap;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
- * Helper solving a simple class name into a fully-qualified class name using packages.
+ * Helper resolving a simple class name into a fully-qualified class name (hence FqcnResolver) using
+ * package names as roots of import.
+ * <p>This only keeps names of classes to avoid any class loading/reloading/permissions issue.</p>
  */
-public class SimpleClassNameSolver {
+ class FqcnResolver implements JexlContext.ClassNameResolver {
     /**
      * The class loader.
      */
-    private final ClassLoader loader;
+    private final JexlUberspect uberspect;
     /**
      * A lock for RW concurrent ops.
      */
     private final ReadWriteLock lock = new ReentrantReadWriteLock();
     /**
-     * The set of packages to be used as import.
+     * The set of packages to be used as import roots.
      */
     private final Set<String> imports = new LinkedHashSet<>();
     /**
-     * The set of solved fqcns based on imports.
+     * The map of solved fqcns based on imports keyed on (simple) name,
+     * valued as fully-qualified class name.
      */
     private final Map<String, String> fqcns = new HashMap<>();
     /**
      * Optional parent solver.
      */
-    private final SimpleClassNameSolver parent;
+    private final FqcnResolver parent;
+
+    /**
+     * Adds a collection of packages as import root, checks the names are one of a package.
+     * @param names the package names
+     */
+    private void importCheck(Iterable<String> names) {
+        if (names != null) {
+            names.forEach(this::importCheck);
+        }
+    }
+
+    /**
+     * Adds a package as import root, checks the name if one of a package.
+     * @param name the package name
+     */
+    private void importCheck(String name) {
+        // check the package name actually points to a package to avoid clutter
+        if (name != null && Package.getPackage(name) != null) {
+            imports.add(name);
+        }
+    }
+
+    @Override
+    public String resolveClassName(String name) {
+        return getQualifiedName(name);
+    }
 
     /**
      * Creates a class name solver.
      *
-     * @param loader   the optional class loader
+     * @param uber   the optional class loader
      * @param packages the optional package names
      */
-    public SimpleClassNameSolver(ClassLoader loader, List<String> packages) {
-        this.loader = loader == null ? SimpleClassNameSolver.class.getClassLoader() : loader;
-        if (packages != null) {
-            imports.addAll(packages);
-        }
+    FqcnResolver(JexlUberspect uber, Iterable<String> packages) {
+        this.uberspect = uber;
         this.parent = null;
+        importCheck(packages);
     }
 
     /**
      * Creates a class name solver.
+     *
      * @param solver the parent solver
      * @throws NullPointerException if parent solver is null
      */
-    public SimpleClassNameSolver(SimpleClassNameSolver solver) {
+    FqcnResolver(FqcnResolver solver) {
         if (solver == null) {
             throw new NullPointerException("parent solver can not be null");
         }
         this.parent = solver;
-        this.loader = solver.loader;
+        this.uberspect = solver.uberspect;
     }
 
     /**
      * Checks is a package is imported by this solver of one of its ascendants.
+     *
      * @param pkg the package name
      * @return true if an import exists for this package, false otherwise
      */
@@ -95,27 +125,25 @@ public class SimpleClassNameSolver {
     }
 
     /**
-     * Adds a list of packages as solving roots.
+     * Imports a list of packages as solving roots.
      *
      * @param packages the packages
+     * @return this solver
      */
-    public void addPackages(Collection<String> packages) {
+    FqcnResolver importPackages(Iterable<String> packages) {
         if (packages != null) {
             lock.writeLock().lock();
             try {
                 if (parent == null) {
-                    imports.addAll(packages);
+                    importCheck(packages);
                 } else {
-                    for(String pkg : packages) {
-                        if (!parent.isImporting(pkg)) {
-                            imports.add(pkg);
-                        }
-                    }
+                    packages.forEach(pkg ->{ if (!parent.isImporting(pkg)) { importCheck(pkg); }});
                 }
             } finally {
                 lock.writeLock().unlock();
             }
         }
+        return this;
     }
 
     /**
@@ -124,7 +152,7 @@ public class SimpleClassNameSolver {
      * @param name the simple name
      * @return the fqcn
      */
-    public String getQualifiedName(String name) {
+    String getQualifiedName(String name) {
         String fqcn;
         if (parent != null && (fqcn = parent.getQualifiedName(name)) != null) {
             return  fqcn;
@@ -136,19 +164,25 @@ public class SimpleClassNameSolver {
             lock.readLock().unlock();
         }
         if (fqcn == null) {
-            Class<?> clazz;
+            final ClassLoader loader = uberspect.getClassLoader();
             for (String pkg : imports) {
+                Class<?> clazz;
                 try {
                     clazz = loader.loadClass(pkg + "." + name);
+                } catch (ClassNotFoundException e) {
+                    // not in this package
+                    continue;
+                }
+                // solved it, insert in map and return
+                if (clazz != null) {
+                    fqcn = clazz.getName();
                     lock.writeLock().lock();
                     try {
-                        fqcns.put(name, fqcn = clazz.getName());
-                        break;
+                        fqcns.put(name, fqcn);
                     } finally {
                         lock.writeLock().unlock();
                     }
-                } catch (ClassNotFoundException e) {
-                    // nope
+                    break;
                 }
             }
         }

@@ -43,8 +43,6 @@ import org.apache.commons.jexl3.parser.ASTStringLiteral;
 import org.apache.commons.jexl3.parser.JexlNode;
 import org.apache.commons.jexl3.parser.Parser;
 import org.apache.commons.jexl3.parser.StringProvider;
-
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -91,6 +89,10 @@ public class Engine extends JexlEngine {
      */
     protected static final String PRAGMA_JEXLNS = "jexl.namespace.";
     /**
+     * The prefix of an import pragma.
+     */
+    protected static final String PRAGMA_IMPORT = "jexl.import";
+    /**
      * The Log to which all JexlEngine messages will be logged.
      */
     protected final Log logger;
@@ -106,6 +108,10 @@ public class Engine extends JexlEngine {
      * The map of 'prefix:function' to object implementing the namespaces.
      */
     protected final Map<String, Object> functions;
+    /**
+     * The default class name resolver.
+     */
+    protected final FqcnResolver classNameSolver;
     /**
      * The maximum stack height.
      */
@@ -217,6 +223,7 @@ public class Engine extends JexlEngine {
         options.setMathScale(arithmetic.getMathScale());
         options.setStrictArithmetic(arithmetic.isStrict());
         this.functions = conf.namespaces() == null ? Collections.emptyMap() : conf.namespaces();
+        this.classNameSolver = new FqcnResolver(uberspect, conf.imports());
         // parsing & features:
         final JexlFeatures features = conf.features() == null? DEFAULT_FEATURES : conf.features();
         Predicate<String> nsTest = features.namespaceTest();
@@ -421,10 +428,11 @@ public class Engine extends JexlEngine {
         if (pragmas != null && !pragmas.isEmpty()) {
             final JexlContext.PragmaProcessor processor =
                     context instanceof JexlContext.PragmaProcessor
-                    ? (JexlContext.PragmaProcessor) context
-                    : null;
+                            ? (JexlContext.PragmaProcessor) context
+                            : null;
             Map<String, Object> ns = null;
-            for(final Map.Entry<String, Object> pragma : pragmas.entrySet()) {
+            Set<String> is = null;
+            for (final Map.Entry<String, Object> pragma : pragmas.entrySet()) {
                 final String key = pragma.getKey();
                 final Object value = pragma.getValue();
                 if (value instanceof String) {
@@ -447,6 +455,19 @@ public class Engine extends JexlEngine {
                             }
                         }
                     }
+                } else if (PRAGMA_IMPORT.equals(key)) {
+                    // jexl.import, may use a set
+                    Set<?> values = value instanceof Set<?>
+                            ? (Set<?>) value
+                            : Collections.singleton(value);
+                    for (Object o : values) {
+                        if (o instanceof String) {
+                            if (is == null) {
+                                is = new LinkedHashSet<>();
+                            }
+                            is.add(o.toString());
+                        }
+                    }
                 }
                 if (processor != null) {
                     processor.processPragma(opts, key, value);
@@ -454,6 +475,9 @@ public class Engine extends JexlEngine {
             }
             if (ns != null) {
                 opts.setNamespaces(ns);
+            }
+            if (is != null) {
+                opts.setImports(is);
             }
         }
     }

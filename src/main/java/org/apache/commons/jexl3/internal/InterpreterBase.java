@@ -17,6 +17,7 @@
 package org.apache.commons.jexl3.internal;
 
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -73,6 +74,8 @@ public abstract class InterpreterBase extends ParserVisitor {
     protected static final Object[] EMPTY_PARAMS = new Object[0];
     /** The namespace resolver. */
     protected final JexlContext.NamespaceResolver ns;
+    /** The class name resolver. */
+    protected final JexlContext.ClassNameResolver fqcnSolver;
     /** The operators evaluation delegate. */
     protected final Operators operators;
     /** The map of 'prefix:function' to object resolving as namespaces. */
@@ -114,6 +117,11 @@ public abstract class InterpreterBase extends ParserVisitor {
         this.functions = ons.isEmpty()? jexl.functions : ons;
         this.functors = null;
         this.operators = new Operators(this);
+        // the import package facility
+        Collection<String> imports = options.getImports();
+        this.fqcnSolver = imports.isEmpty()
+                ? engine.classNameSolver
+                : new FqcnResolver(engine.classNameSolver).importPackages(imports);
     }
 
     /**
@@ -134,6 +142,7 @@ public abstract class InterpreterBase extends ParserVisitor {
         cancelled = ii.cancelled;
         functions = ii.functions;
         functors = ii.functors;
+        fqcnSolver = ii.fqcnSolver;
     }
 
     /**
@@ -198,7 +207,7 @@ public abstract class InterpreterBase extends ParserVisitor {
             final Object cached = cacheable ? nsNode.jjtGetValue() : null;
             // we know the class is used as namespace of static methods, no functor
             if (cached instanceof Class<?>) {
-                return (Class<?>) cached;
+                return cached;
             }
             // attempt to reuse last cached constructor
             if (cached instanceof JexlContext.NamespaceFunctor) {
@@ -584,9 +593,7 @@ public abstract class InterpreterBase extends ParserVisitor {
      */
     protected String stringifyProperty(final JexlNode node) {
         if (node instanceof ASTArrayAccess) {
-            return "["
-                    + stringifyPropertyValue(node.jjtGetChild(0))
-                    + "]";
+            return "[" + stringifyPropertyValue(node.jjtGetChild(0)) + "]";
         }
         if (node instanceof ASTMethodNode) {
             return stringifyPropertyValue(node.jjtGetChild(0));
