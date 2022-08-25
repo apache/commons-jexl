@@ -435,12 +435,27 @@ public class Engine extends JexlEngine {
             for (final Map.Entry<String, Object> pragma : pragmas.entrySet()) {
                 final String key = pragma.getKey();
                 final Object value = pragma.getValue();
-                if (value instanceof String) {
-                    if (PRAGMA_OPTIONS.equals(key)) {
+                if (PRAGMA_OPTIONS.equals(key)) {
+                    if (value instanceof String) {
                         // jexl.options
                         final String[] vs = value.toString().split(" ");
                         opts.setFlags(vs);
-                    } else if (key.startsWith(PRAGMA_JEXLNS)) {
+                    }
+                }  else if (PRAGMA_IMPORT.equals(key)) {
+                    // jexl.import, may use a set
+                    Set<?> values = value instanceof Set<?>
+                            ? (Set<?>) value
+                            : Collections.singleton(value);
+                    for (Object o : values) {
+                        if (o instanceof String) {
+                            if (is == null) {
+                                is = new LinkedHashSet<>();
+                            }
+                            is.add(o.toString());
+                        }
+                    }
+                } else if (key.startsWith(PRAGMA_JEXLNS)) {
+                    if (value instanceof String) {
                         // jexl.namespace.***
                         final String nsname = key.substring(PRAGMA_JEXLNS.length());
                         if (nsname != null && !nsname.isEmpty()) {
@@ -453,19 +468,6 @@ public class Engine extends JexlEngine {
                             } catch (final ClassNotFoundException e) {
                                 ns.put(nsname, nsclass);
                             }
-                        }
-                    }
-                } else if (PRAGMA_IMPORT.equals(key)) {
-                    // jexl.import, may use a set
-                    Set<?> values = value instanceof Set<?>
-                            ? (Set<?>) value
-                            : Collections.singleton(value);
-                    for (Object o : values) {
-                        if (o instanceof String) {
-                            if (is == null) {
-                                is = new LinkedHashSet<>();
-                            }
-                            is.add(o.toString());
                         }
                     }
                 }

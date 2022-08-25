@@ -884,4 +884,17 @@ public class Issues300Test {
         Assert.assertEquals(42, result);
     }
 
+    @Test
+    public void test379a() {
+        final String src =
+                "#pragma jexl.import java.util\n"+
+                "const map = new LinkedHashMap({0 : 'zero'});";
+        JexlEngine jexl = new JexlBuilder().safe(true).create();
+        JexlScript script = jexl.createScript(src);
+        Assert.assertNotNull(script);
+        Object result = script.execute(null);
+        Assert.assertNotNull(result);
+        Assert.assertTrue(result instanceof LinkedHashMap);
+        Assert.assertEquals(1, ((Map) result).size());
+    }
 }
