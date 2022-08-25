@@ -390,7 +390,7 @@ void FunctionStatement() #JexlLambda : {}
 
 void ExpressionStatement() #void : {}
 {
-    Expression() (LOOKAHEAD(1) Expression() #Ambiguous(1))* (LOOKAHEAD(1) <SEMICOL>)?
+    Expression() (LOOKAHEAD(Expression()) Expression() #Ambiguous(1))* (LOOKAHEAD(1) <SEMICOL>)?
 }
 
 
