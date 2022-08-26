@@ -897,4 +897,18 @@ public class Issues300Test {
         Assert.assertTrue(result instanceof LinkedHashMap);
         Assert.assertEquals(1, ((Map) result).size());
     }
+
+    @Test
+    public void test373b() {
+        final String src = "var i = ++1";
+        JexlEngine jexl = new JexlBuilder().safe(true).create();
+        JexlInfo info = new JexlInfo("badscript", 0, 0);
+        try {
+            JexlScript script = jexl.createScript(info, src);
+            Assert.fail("should not parse");
+        } catch(JexlException.Parsing xparse) {
+            String msg = xparse.getMessage();
+            Assert.assertTrue(msg.contains("badscript"));
+        }
+    }
 }

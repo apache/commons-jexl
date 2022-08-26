@@ -21,9 +21,8 @@ import java.util.BitSet;
 /**
  * The set of symbols declared in a lexical scope.
  * <p>The symbol identifiers are determined by the functional scope.</p>
- * <p>We use 3 bits per symbol; bit 0 sets the actual symbol as lexical (let),
- * bit 1 as a const, bit 2 as a defined (valued) const.
- * There are actually only 4 used states: 0, 1, 3, 7</p>
+ * <p>We use 2 bits per symbol; bit 0 sets the actual symbol as lexical (let), bit 1 as a const.
+ * There are actually only 4 used states: 0, 1, 3</p>
  */
 public class LexicalScope {
     /**
@@ -35,6 +34,11 @@ public class LexicalScope {
      * Declared, const, defined.
      */
     protected static final int BITS_PER_SYMBOL = 2;
+    /**
+     * Bitmask for symbols.
+     * Declared, const, defined.
+     */
+    protected static final long SYMBOL_MASK = (1L << BITS_PER_SYMBOL) - 1; // 3, as 1+2, 2 bits
     /**
      * Number of symbols.
      */
@@ -170,15 +174,15 @@ public class LexicalScope {
             long clean = symbols;
             while (clean != 0L) {
                 final int s = Long.numberOfTrailingZeros(clean);
-                // call clean for symbol definition (7 as a mask for 3 bits,1+2+4)
-                clean &= ~(7L << s);
+                // call clean for symbol definition (3 as a mask for 2 bits,1+2)
+                clean &= ~(SYMBOL_MASK << s);
                 cleanSymbol.accept(s >> BITS_PER_SYMBOL);
             }
         }
         symbols = 0L;
         if (moreSymbols != null) {
             if (cleanSymbol != null) {
-                // step over const and definition (3 bits per symbol)
+                // step by bits per symbol
                 for (int s = moreSymbols.nextSetBit(0); s != -1; s = moreSymbols.nextSetBit(s + BITS_PER_SYMBOL)) {
                     cleanSymbol.accept(s + LONGBITS);
                 }

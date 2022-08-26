@@ -629,14 +629,19 @@ public abstract class JexlParser extends StringParser {
         } else if (ASSIGN_NODES.contains(node.getClass())) {
             final JexlNode lv = node.jjtGetChild(0);
             if (!lv.isLeftValue()) {
-                throw new JexlException.Assignment(lv.jexlInfo(), null).clean();
+                JexlInfo xinfo = lv.jexlInfo();
+                xinfo = info.at(xinfo.getLine(), xinfo.getColumn());
+                final String msg = readSourceLine(source, xinfo.getLine());
+                throw new JexlException.Assignment(xinfo, msg).clean();
             }
             if (lv instanceof ASTIdentifier && !(lv instanceof ASTVar)) {
                 ASTIdentifier var = (ASTIdentifier) lv;
                 int symbol = var.getSymbol();
                 boolean isconst = symbol >= 0 && block != null && block.isConstant(symbol);
-                if (isconst) { // if not a declaration...
-                    throw new JexlException.Parsing(var.jexlInfo(), var.getName() +": const assignment.").clean();
+                if (isconst) { // if constant, fail...
+                    JexlInfo xinfo = lv.jexlInfo();
+                    xinfo = info.at(xinfo.getLine(), xinfo.getColumn());
+                    throw new JexlException.Assignment(xinfo, var.getName()).clean();
                 }
             }
         }

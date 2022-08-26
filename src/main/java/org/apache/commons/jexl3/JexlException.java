@@ -446,7 +446,7 @@ public class JexlException extends RuntimeException {
     }
 
     /**
-     * Thrown when parsing fails due to an invalid assigment.
+     * Thrown when parsing fails due to an invalid assignment.
      *
      * @since 3.0
      */
