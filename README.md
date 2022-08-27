@@ -47,6 +47,7 @@ Apache Commons JEXL
 [![Coverage Status](https://coveralls.io/repos/apache/commons-jexl/badge.svg)](https://coveralls.io/r/apache/commons-jexl)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.apache.commons/commons-jexl3/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.apache.commons/commons-jexl3/)
 [![Javadocs](https://javadoc.io/badge/org.apache.commons/commons-jexl3/3.2.svg)](https://javadoc.io/doc/org.apache.commons/commons-jexl3/3.2)
+[![CodeQL](https://github.com/apache/commons-jexl/workflows/CodeQL/badge.svg)](https://github.com/apache/commons-jexl/actions/workflows/codeql-analysis.yml?query=workflow%3ACodeQL)
 
 The Apache Commons JEXL library is an implementation of a Java-symbiotic Expression Language.
 
