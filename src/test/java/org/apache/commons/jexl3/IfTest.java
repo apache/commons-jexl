@@ -204,7 +204,7 @@ public class IfTest extends JexlTestCase {
 
     /**
      * Ternary operator condition undefined or null evaluates to false
-     * independantly of engine flags.
+     * independently of engine flags.
      * @throws Exception
      */
     @Test
