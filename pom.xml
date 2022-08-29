@@ -57,7 +57,7 @@
         <commons.rat.version>0.14</commons.rat.version>
         <commons.japicmp.version>0.15.7</commons.japicmp.version>
         <commons.pmd.version>3.18.0</commons.pmd.version>
-        <commons.pmd-impl.version>6.46.0</commons.pmd-impl.version>
+        <commons.pmd-impl.version>6.48.0</commons.pmd-impl.version>
         <commons.spotbugs.version>4.7.1.1</commons.spotbugs.version>
 
         <!-- override of Jacoco properties defined in CP52 -->
@@ -100,6 +100,7 @@
                 <jdk>1.8</jdk>
             </activation>
             <properties>
+                <commons.pmd.version>3.17.0</commons.pmd.version>
                 <checkstyle.version>9.3</checkstyle.version>
             </properties>
         </profile>
