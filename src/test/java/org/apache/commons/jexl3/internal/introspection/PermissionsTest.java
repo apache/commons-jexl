@@ -16,6 +16,7 @@
  */
 package org.apache.commons.jexl3.internal.introspection;
 
+import org.apache.commons.jexl3.JexlArithmetic;
 import org.apache.commons.jexl3.JexlBuilder;
 import org.apache.commons.jexl3.JexlContext;
 import org.apache.commons.jexl3.JexlEngine;
@@ -371,5 +372,34 @@ public class PermissionsTest {
         context.set("a", a);
         Object result = script.execute(context, a);
         Assert.assertNotNull(result);
+    }
+
+    public class I33Arithmetic extends JexlArithmetic {
+        public I33Arithmetic(boolean astrict) {
+            super(astrict);
+        }
+
+        /**
+         * Same name signature as default private method.
+         * @param s the string
+         * @return a double, NaN if fail
+         */
+        public double parseDouble(String s) {
+            try {
+                return Double.parseDouble(s);
+            } catch (NumberFormatException nfe) {
+                return Double.NaN;
+            }
+        }
+    }
+
+    @Test public void testPrivateOverload1() throws Exception {
+        String src = "parseDouble(\"PHM1\".substring(3)).intValue()";
+        JexlArithmetic jexla = new I33Arithmetic(true);
+        JexlEngine jexl = new JexlBuilder().safe(false).arithmetic(jexla).create();
+        JexlScript script = jexl.createScript(src);
+        Assert.assertNotNull(script);
+        Object result = script.execute(null);
+        Assert.assertEquals(1, result);
     }
 }

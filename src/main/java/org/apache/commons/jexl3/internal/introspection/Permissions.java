@@ -367,11 +367,6 @@ public class Permissions implements JexlPermissions {
      * @return true if denied, false otherwise
      */
     private boolean deny(Method method) {
-        // private are denied
-        int modifiers = method.getModifiers();
-        if (Modifier.isPrivate(modifiers)) {
-            return true;
-        }
         // is method annotated with nojexl ?
         final NoJexl nojexl = method.getAnnotation(NoJexl.class);
         if (nojexl != null) {
