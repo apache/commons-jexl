@@ -22,8 +22,10 @@ import org.apache.commons.jexl3.introspection.JexlSandbox;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.io.File;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -911,4 +913,13 @@ public class Issues300Test {
             Assert.assertTrue(msg.contains("badscript"));
         }
     }
+
+    @Test
+    public void testBackslashTee() throws Exception {
+        JexlEngine jexl = new JexlBuilder().safe(false).create();
+        String src = "\"}.</br>Cela inclut :</br>-\tQu?il n?y a plus de questions en cours</br>-\"";
+        final JexlScript s = jexl.createScript(src);
+        Assert.assertNotNull(s);
+    }
+
 }
