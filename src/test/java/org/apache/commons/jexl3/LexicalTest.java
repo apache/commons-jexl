@@ -401,6 +401,14 @@ public class LexicalTest {
             Assert.assertTrue(scope.hasSymbol(i));
             Assert.assertFalse(scope.hasSymbol(i + 1));
         }
+        for(int i = 0; i < 128; i += 2) {
+            Assert.assertTrue(scope.addConstant(i));
+            Assert.assertFalse(scope.addConstant(i));
+        }
+        for(int i = 0; i < 128; i += 2) {
+            Assert.assertTrue(scope.hasSymbol(i));
+            Assert.assertFalse(scope.hasSymbol(i + 1));
+        }
     }
 
     @Test
