@@ -20,6 +20,7 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.BitSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -389,26 +390,40 @@ public class LexicalTest {
         Assert.assertEquals(42, result);
     }
 
-
     @Test
     public void testScopeFrame() {
         final LexicalScope scope = new LexicalScope();
-        for(int i = 0; i < 128; i += 2) {
+        runTestScope(scope, 0, 128, 2);
+        runTestScope(scope, 33, 55, 1);
+        runTestScope(scope, 15, 99, 3);
+        runTestScope(scope, 3, 123, 5);
+    }
+
+    void runTestScope(final LexicalScope scope, final int init, final int count, final int step) {
+        int size = (count - init) / step;
+        for(int i = init; i < count; i += step) {
             Assert.assertTrue(scope.addSymbol(i));
+            if ((i % (step + 1)) == 1) {
+                Assert.assertTrue(scope.addConstant(i));
+            }
             Assert.assertFalse(scope.addSymbol(i));
         }
-        for(int i = 0; i < 128; i += 2) {
+        for(int i = init; i < count; i += step) {
             Assert.assertTrue(scope.hasSymbol(i));
-            Assert.assertFalse(scope.hasSymbol(i + 1));
+            for(int s = 1; s < step; ++s) {
+                Assert.assertFalse(scope.hasSymbol(i + s));
+            }
+            if ((i % (step + 1)) == 1) {
+                Assert.assertTrue(scope.isConstant(i));
+            }
         }
-        for(int i = 0; i < 128; i += 2) {
-            Assert.assertTrue(scope.addConstant(i));
-            Assert.assertFalse(scope.addConstant(i));
+        Assert.assertEquals(size, scope.getSymbolCount());
+        BitSet collect = new BitSet();
+        scope.clearSymbols(b -> collect.set(b));
+        for(int i = init; i < count; i += step) {
+            Assert.assertTrue("missing " + i, collect.get(i));
         }
-        for(int i = 0; i < 128; i += 2) {
-            Assert.assertTrue(scope.hasSymbol(i));
-            Assert.assertFalse(scope.hasSymbol(i + 1));
-        }
+        Assert.assertEquals(0, scope.getSymbolCount());
     }
 
     @Test

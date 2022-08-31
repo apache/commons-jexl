@@ -28,20 +28,18 @@ public class LexicalScope {
     /**
      * Number of bits in a long.
      */
-    protected static final int LONGBITS = 64;
+    protected static final int BITS_PER_LONG = 64;
     /**
      * Bits per symbol.
      * let (b + 0) + const (b + 1).
      */
     protected static final int BITS_PER_SYMBOL = 2;
     /**
-     * Bits per symbol.
-     * Declared, const, defined.
+     * From a symbol number to a starting symbol bit number.
      */
-    protected static final int SYMBOL_SHIFT = 1;
+    protected static final int SYMBOL_SHIFT = BITS_PER_SYMBOL - 1;
     /**
      * Bitmask for symbols.
-     * Declared, const, defined.
      */
     protected static final long SYMBOL_MASK = (1L << (BITS_PER_SYMBOL - 1)) - 1; // 3, as 1+2, 2 bits
     /**
@@ -53,10 +51,9 @@ public class LexicalScope {
      */
     protected long symbols = 0L;
     /**
-     * Symbols after 64.
+     * Symbols after bit 64 (aka symbol 32 when 2 bits per symbol).
      */
     protected BitSet moreSymbols = null;
-
 
     /**
      * Create a scope.
@@ -68,10 +65,10 @@ public class LexicalScope {
      * Frame copy ctor base.
      */
     protected LexicalScope(LexicalScope other) {
-        BitSet ms;
-        symbols = other.symbols;
-        ms = other.moreSymbols;
-        moreSymbols = ms != null ? (BitSet) ms.clone() : null;
+        this.symbols = other.symbols;
+        BitSet otherMoreSymbols = other.moreSymbols;
+        this.moreSymbols = otherMoreSymbols != null ? (BitSet) otherMoreSymbols.clone() : null;
+        this.count = other.count;
     }
 
     /**
@@ -79,7 +76,7 @@ public class LexicalScope {
      *
      * @return the set of more symbols
      */
-    private BitSet moreSymbols() {
+    private BitSet moreBits() {
         if (moreSymbols == null) {
             moreSymbols = new BitSet();
         }
@@ -92,10 +89,10 @@ public class LexicalScope {
      * @return true if set
      */
     private boolean isSet(final int bit) {
-        if (bit < LONGBITS) {
+        if (bit < BITS_PER_LONG) {
             return (symbols & (1L << bit)) != 0L;
         }
-        return moreSymbols != null && moreSymbols.get(bit - LONGBITS);
+        return moreSymbols != null && moreSymbols.get(bit - BITS_PER_LONG);
     }
 
     /**
@@ -104,18 +101,18 @@ public class LexicalScope {
      * @return true if it was actually set, false if it was set before
      */
     private boolean set(final int bit) {
-        if (bit < LONGBITS) {
+        if (bit < BITS_PER_LONG) {
             if ((symbols & (1L << bit)) != 0L) {
                 return false;
             }
             symbols |= (1L << bit);
         } else {
-            final int s = bit - LONGBITS;
-            final BitSet ms = moreSymbols();
-            if (ms.get(s)) {
+            final int bit64 = bit - BITS_PER_LONG;
+            final BitSet ms = moreBits();
+            if (ms.get(bit64)) {
                 return false;
             }
-            ms.set(s, true);
+            ms.set(bit64, true);
         }
         return true;
     }
@@ -166,7 +163,7 @@ public class LexicalScope {
     public boolean addConstant(final int symbol) {
         final int letb = (symbol << SYMBOL_SHIFT) ;
         if (!isSet(letb)) {
-            throw new IllegalStateException("symbol not declared before const " + symbol);
+            throw new IllegalStateException("const not declared as symbol " + symbol);
         }
         final int bit = (symbol << SYMBOL_SHIFT) | 1;
         return set(bit);
@@ -182,25 +179,24 @@ public class LexicalScope {
         if (cleanSymbol != null) {
             long clean = symbols;
             while (clean != 0L) {
-                final int s = Long.numberOfTrailingZeros(clean);
+                final int bit = Long.numberOfTrailingZeros(clean);
+                final int s = bit >> SYMBOL_SHIFT;
+                cleanSymbol.accept(s);
                 // call clean for symbol definition (3 as a mask for 2 bits,1+2)
-                clean &= ~(SYMBOL_MASK << s);
-                cleanSymbol.accept(s >> SYMBOL_SHIFT);
+                clean &= ~(SYMBOL_MASK << bit);
+            }
+            // step by bits per symbol
+            int bit = moreSymbols != null ? moreSymbols.nextSetBit(0) : -1;
+            while (bit >= 0) {
+                final int s = (bit + BITS_PER_LONG) >> SYMBOL_SHIFT;
+                cleanSymbol.accept(s);
+                bit = moreSymbols.nextSetBit(bit + BITS_PER_SYMBOL);
             }
         }
+        // internal cleansing
         symbols = 0L;
+        count = 0;
         if (moreSymbols != null) {
-            if (cleanSymbol != null) {
-                // step by bits per symbol
-                for (int s = moreSymbols.nextSetBit(0);
-                     s != -1;
-                     s = moreSymbols.nextSetBit(s + BITS_PER_SYMBOL)) {
-                    // skip const bit indicator
-                    if ((s & 1) == 0) {
-                        cleanSymbol.accept((s >> SYMBOL_SHIFT) + LONGBITS);
-                    }
-                }
-            }
             moreSymbols.clear();
         }
     }
