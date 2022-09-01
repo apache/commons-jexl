@@ -45,7 +45,7 @@ Apache Commons JEXL
 
 [![Build Status](https://travis-ci.org/apache/commons-jexl.svg)](https://travis-ci.org/apache/commons-jexl)
 [![Coverage Status](https://codecov.io/gh/apache/commons-jexl/branch/master/graph/badge.svg)](https://app.codecov.io/gh/apache/commons-jexl)
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.apache.commons/commons-jexl3/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.apache.commons/commons-jexl3/)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.apache.commons/commons-jexl3/badge.svg?gav=true)](https://maven-badges.herokuapp.com/maven-central/org.apache.commons/commons-jexl3/?gav=true)
 [![Javadocs](https://javadoc.io/badge/org.apache.commons/commons-jexl3/3.2.svg)](https://javadoc.io/doc/org.apache.commons/commons-jexl3/3.2)
 [![CodeQL](https://github.com/apache/commons-jexl/workflows/CodeQL/badge.svg)](https://github.com/apache/commons-jexl/actions/workflows/codeql-analysis.yml?query=workflow%3ACodeQL)
 
