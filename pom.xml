@@ -56,7 +56,7 @@
         <japicmp.skip>false</japicmp.skip>
         <commons.rat.version>0.14</commons.rat.version>
         <commons.japicmp.version>0.16.0</commons.japicmp.version>
-        <commons.pmd.version>3.18.0</commons.pmd.version>
+        <commons.pmd.version>3.19.0</commons.pmd.version>
         <commons.pmd-impl.version>6.48.0</commons.pmd-impl.version>
         <commons.spotbugs.version>4.7.1.1</commons.spotbugs.version>
 
