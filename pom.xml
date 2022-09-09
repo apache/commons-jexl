@@ -58,7 +58,7 @@
         <commons.japicmp.version>0.16.0</commons.japicmp.version>
         <commons.pmd.version>3.18.0</commons.pmd.version>
         <commons.pmd-impl.version>6.48.0</commons.pmd-impl.version>
-        <commons.spotbugs.version>4.7.1.1</commons.spotbugs.version>
+        <commons.spotbugs.version>4.7.2.0</commons.spotbugs.version>
 
         <!-- override of Jacoco properties defined in CP52 -->
         <commons.jacoco.version>0.8.8</commons.jacoco.version>
