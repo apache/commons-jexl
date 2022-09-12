@@ -564,28 +564,6 @@ public abstract class InterpreterBase extends ParserVisitor {
     }
 
     /**
-     * Checks whether a reference child node holds a local variable reference.
-     * @param node  the reference node
-     * @param which the child we are checking
-     * @return true if child is local variable, false otherwise
-     */
-    protected boolean isLocalVariable(final ASTReference node, final int which) {
-        return (node.jjtGetNumChildren() > which
-                && node.jjtGetChild(which) instanceof ASTIdentifier
-                && ((ASTIdentifier) node.jjtGetChild(which)).getSymbol() >= 0);
-    }
-
-    /**
-     * Checks whether a reference child node holds a function call.
-     * @param node  the reference node
-     * @return true if child is function call, false otherwise
-     */
-    protected boolean isFunctionCall(final ASTReference node) {
-        return (node.jjtGetNumChildren() > 0
-                && node.jjtGetChild(0) instanceof ASTFunctionNode);
-    }
-
-    /**
      * Pretty-prints a failing property (de)reference.
      * <p>Used by calls to unsolvableProperty(...).</p>
      * @param node the property node

@@ -136,17 +136,24 @@
                         <p>Although pragmas are statements, they are <em>not</em> evaluated at runtime; they are constants
                             associated to the script after parsing. It is expected that user code accesses the pragma map from
                             scripts to alter some functions behavior.</p>
-                        <p>The are two built-in pragmas:</p>
+                        <p>The are 3 built-in pragmas:</p>
                         <p>
                             <b>jexl.options</b> overrides the evaluation options using the option-flags syntax.
                             <code>#pragma jexl.options "+strict -safe +lexical +lexicalShade"</code> will let the script run with
-                            the options strict being true, safe false, lexical true and lexical-shade true.</p>
-
+                            the options strict being true, safe false, lexical true and lexical-shade true.
+                        </p>
                         <p>
                             <b>jexl.namespace.<i>ns_prefix</i></b> declares a namespace valid for the script
                             execution lifetime, the value being the fully-qualified namespace class-name.
                             <code>#pragma jexl.namespace.str java.lang.String</code> declare 'str' as the namespace using
                             the String class.
+                        </p>
+                        <p>
+                            <b>jexl.import</b> works in conjunction with the 'new' operator.
+                            It declares the packages that a <code>new ClassIdentifier(...)</code> will visit - in
+                            declaration order - to resolve the class name into a fully-qualified class-name.
+                            <code>#pragma jexl.import java.net</code> will allow executing <code> let url = new URL("https://commons.apache.org");</code>,
+                            the URL class name being solved as the java.net.URL fully-qualified class-name.
                         </p>
                     </td>
                 </tr>
@@ -216,6 +223,7 @@
                             <li><code>var fun = (x, y) -> { x + y }</code></li>
                             <li><code>var fun = (let x, let y) -> { x + y }</code></li>
                             <li><code>const fun = (const x, const y) -> { x + y }</code></li>
+                            <li><code>function fun(const x, const y) { x + y }</code></li>
                         </ul>
                         If the function has only one argument the parentheses may be omitted
                         <code>var fun = x -> { x * x }</code>.
@@ -539,6 +547,10 @@
                             as arguments to the constructor for the class considered.</p>
                         <p>In case of multiple constructors, JEXL will make the best effort to find
                             the most appropriate non ambiguous constructor to call.</p>
+                        <p>
+                        Alternatively, using <code>#pragma jexl.import java.lang</code>code>, one can use the
+                        following syntax: <code>new Double(10)</code>.
+                        </p>
                     </td>
                 </tr>
                 <tr>
@@ -987,17 +999,23 @@
                     <td>for</td>
                     <td>
                         <p>Loop through items of an Array, Collection, Map, Iterator or Enumeration, e.g.
+                        <code>for (let item : list) {
+                            x = x + item;
+                            }</code>
+                        Where <code>list</code> is a context variable pointing to any iterable structure.
+                        </p>
+                        <p>The following syntax using a context variable is also supported:
                         <code>for (item : list) {
                             x = x + item;
                             }</code>
-                        Where <code>item</code> is a context variable.</p>
-                        <p>The following syntax is also supported:
-                        <code>for (var item : list) {
-                            x = x + item;
-                            }</code>
+                        Note that the loop variable <code>item</code> is accessible after loop evaluation</p>
+                        <p>Finally, the conventional syntax using a local variable, initial value, loop condition and
+                            loop step is supported.
+                            <code>for (let i = 0; i &lt; size(list); ++i) {
+                                x = x + list[i];
+                                }</code>
 
-                        Where <code>item</code> is a local variable.</p>
-                        <p>Note that the loop variable <code>item</code> is accessible after loop evaluation</p>
+                            Where <code>item</code> is a local variable pointing to an array-like structure.</p>
                         <p>The JEXL 1.1 syntax using <code>foreach(item in list)</code> is now <strong>unsupported</strong>.</p>
                     </td>
                 </tr>
