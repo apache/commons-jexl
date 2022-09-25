@@ -58,6 +58,7 @@
         <commons.pmd.version>3.19.0</commons.pmd.version>
         <commons.pmd-impl.version>6.48.0</commons.pmd-impl.version>
         <commons.spotbugs.version>4.7.2.0</commons.spotbugs.version>
+        <commons.junit.version>5.9.1</commons.junit.version>
 
         <!-- override of Jacoco properties defined in CP52 -->
         <commons.jacoco.version>0.8.8</commons.jacoco.version>
@@ -130,9 +131,8 @@
             <version>1.2</version>
         </dependency>
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.13.2</version>
+            <groupId>org.junit.vintage</groupId>
+            <artifactId>junit-vintage-engine</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>

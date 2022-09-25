@@ -125,6 +125,9 @@
             <action dev="ggregory" type="update" due-to="Dependabot">
                 Bump commons-parent from 53 to 54 #121.
             </action>
+            <action dev="ggregory" type="update" due-to="Gary Gregory">
+                Bump junit from 4.13.2 to 5.9.1 Vintage.
+            </action>
         </release>
         <release version="3.2.1" date="2021-06-25">
             <action dev="henrib" type="fix" issue="JEXL-352" due-to="Øyvind Horneland">
