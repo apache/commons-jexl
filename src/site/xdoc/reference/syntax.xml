@@ -136,11 +136,11 @@
                         <p>Although pragmas are statements, they are <em>not</em> evaluated at runtime; they are constants
                             associated to the script after parsing. It is expected that user code accesses the pragma map from
                             scripts to alter some functions behavior.</p>
-                        <p>The are 3 built-in pragmas:</p>
+                        <p>There are 3 built-in pragmas:</p>
                         <p>
                             <b>jexl.options</b> overrides the evaluation options using the option-flags syntax.
                             <code>#pragma jexl.options "+strict -safe +lexical +lexicalShade"</code> will let the script run with
-                            the options strict being true, safe false, lexical true and lexical-shade true.
+                            the options strict being true, safe false, lexical true and lexical shade true.
                         </p>
                         <p>
                             <b>jexl.namespace.<i>ns_prefix</i></b> declares a namespace valid for the script
@@ -261,8 +261,7 @@
                         by using either square brackets or a dotted numeral, e.g.
                         <code>foo.bar</code> will access the <code>bar</code> property
                         of the <code>foo</code> Object.
-                        <code>arr1[0]</code> will access the first element of the
-                        of the <code>arr1</code> array.</p>
+                        <code>arr1[0]</code> will access the first element of the <code>arr1</code> array.</p>
                         <p>The safe-access operator <code>foo?.bar</code> shortcuts any null or non-existent references
                         along the navigation path, allowing a safe-navigation free of errors. In the previous expression,
                         if 'foo' is null, the whole expression will evaluate as null. This is an efficient shortcut
@@ -1015,7 +1014,7 @@
                                 x = x + list[i];
                                 }</code>
 
-                            Where <code>item</code> is a local variable pointing to an array-like structure.</p>
+                            Where <code>list</code> is a local variable pointing to an array-like structure.</p>
                         <p>The JEXL 1.1 syntax using <code>foreach(item in list)</code> is now <strong>unsupported</strong>.</p>
                     </td>
                 </tr>
