@@ -19,7 +19,7 @@
 <differences>
     <!-- 3.2 differences: Jexl{Engine, Script, Uberspect} are not used as user implementation contracts
     but only as JEXL API contracts. Adding new methods or final modifier to those is very unlikely to have
-    any impact on actual binary compatiblity.An equivalent set of changes occured on 3.1 without complaints. -->
+    any impact on actual binary compatiblity.An equivalent set of changes occurred on 3.1 without complaints. -->
     <difference>
         <className>org/apache/commons/jexl3/JexlEngine</className>
         <differenceType>7014</differenceType> <!-- final method on abstract class not meant for the user to derive -->
