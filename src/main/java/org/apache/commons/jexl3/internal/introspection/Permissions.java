@@ -225,9 +225,9 @@ public class Permissions implements JexlPermissions {
     }
 
     /**
-     * The default singleton.
+     * The no-restriction introspection permission singleton.
      */
-    public static final Permissions DEFAULT = new Permissions();
+    public static final Permissions UNRESTRICTED = new Permissions();
 
     /**
      * @return the packages

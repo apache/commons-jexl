@@ -17,17 +17,12 @@
 package org.apache.commons.jexl3.internal.introspection;
 
 import org.apache.commons.jexl3.annotations.NoJexl;
-import org.apache.commons.jexl3.introspection.JexlPermissions;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * Checks the CacheMap.MethodKey implementation
@@ -88,7 +83,7 @@ public class NoJexlTest {
 
     @Test
     public void testNoJexlPermissions() throws Exception {
-        Permissions p = Permissions.DEFAULT;
+        Permissions p = Permissions.UNRESTRICTED;
         Assert.assertFalse(p.allow((Field) null));
         Assert.assertFalse(p.allow((Package) null));
         Assert.assertFalse(p.allow((Method) null));

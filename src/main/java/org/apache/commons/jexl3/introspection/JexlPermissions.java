@@ -46,6 +46,7 @@ import java.lang.reflect.Method;
  * @since 3.3
  */
 public interface JexlPermissions {
+
     /**
      * Checks whether a package allows JEXL introspection.
      * <p>If the package disallows JEXL introspection, none of its classes or interfaces are visible
@@ -165,7 +166,74 @@ public interface JexlPermissions {
      * @since 3.3
      */
     static JexlPermissions parse(String... src) {
-        return src == null || src.length == 0? Permissions.DEFAULT : new PermissionsParser().parse(src);
+        return src == null || src.length == 0? Permissions.UNRESTRICTED : new PermissionsParser().parse(src);
     }
 
+    /**
+     * The unrestricted permissions.
+     * <p>This enables any public class, method, constructor or field to be visible to JEXL and used in scripts.</p>
+     * @since 3.3
+     */
+    public static final JexlPermissions UNRESTRICTED = Permissions.UNRESTRICTED;
+    /**
+     * A restricted singleton.
+     * <p>The RESTRICTED set is built using the following allowed packages and denied packages/classes.</p>
+     * <p>Of particular importance are the restrictions on the {@link System},
+     * {@link Runtime}, {@link ProcessBuilder}, {@link Class} and those on {@link java.net}, {@link java.net},
+     * {@link java.io} and {@link java.lang.reflect} that should provide a decent level of isolation between the scripts
+     * and its host.
+     * </p>
+     * <p>
+     * As a simple guide, any line that ends with &quot;.*&quot; is allowing a package, any other is
+     * denying a package, class or method.
+     * </p>
+     * <ul>
+     * <li>java.nio.*</li>
+     * <li>java.io.*</li>
+     * <li>java.lang.*</li>
+     * <li>java.math.*</li>
+     * <li>java.text.*</li>
+     * <li>java.util.*</li>
+     * <li>org.w3c.dom.*</li>
+     * <li>org.apache.commons.jexl3.*</li>
+     *
+     * <li>org.apache.commons.jexl3 { JexlBuilder {} }</li>
+     * <li>org.apache.commons.jexl3.internal { Engine {} }</li>
+     * <li>java.lang { Runtime {} System {} ProcessBuilder {} Class {} }</li>
+     * <li>java.lang.annotation {}</li>
+     * <li>java.lang.instrument {}</li>
+     * <li>java.lang.invoke {}</li>
+     * <li>java.lang.management {}</li>
+     * <li>java.lang.ref {}</li>
+     * <li>java.lang.reflect {}</li>
+     * <li>java.net {}</li>
+     * <li>java.io { File { } }</li>
+     * <li>java.nio { Path { } Paths { } Files { } }</li>
+     * <li>java.rmi {}</li>
+     * </ul>
+     */
+    public static final JexlPermissions RESTRICTED = JexlPermissions.parse(
+            "# Restricted Uberspect Permissions",
+            "java.nio.*",
+            "java.io.*",
+            "java.lang.*",
+            "java.math.*",
+            "java.text.*",
+            "java.util.*",
+            "org.w3c.dom.*",
+            "org.apache.commons.jexl3.*",
+            "org.apache.commons.jexl3 { JexlBuilder {} }",
+            "org.apache.commons.jexl3.internal { Engine {} }",
+            "java.lang { Runtime {} System {} ProcessBuilder {} Class {} }",
+            "java.lang.annotation {}",
+            "java.lang.instrument {}",
+            "java.lang.invoke {}",
+            "java.lang.management {}",
+            "java.lang.ref {}",
+            "java.lang.reflect {}",
+            "java.net {}",
+            "java.io { File { } }",
+            "java.nio { Path { } Paths { } Files { } }",
+            "java.rmi"
+    );
 }

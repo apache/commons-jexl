@@ -31,6 +31,8 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.junit.Assert.assertEquals;
 
@@ -929,4 +931,61 @@ public class Issues300Test {
         Assert.assertEquals("'\\b\\t\\f'", parsed);
     }
 
+    /**
+     * Mock driver.
+     */
+    public static class Driver0930 {
+        private String name;
+        Driver0930(String n) {
+            name = n;
+        }
+        public String getAttributeName() {
+            return name;
+        }
+    }
+
+    public static class Context0930 extends MapContext {
+        /**
+         * This allows using a JEXL lmabda as a filter.
+         * @param stream the stream
+         * @param filter the lambda to use as filter
+         * @return the filtered stream
+         */
+        public Stream<?> filter(Stream<?> stream, JexlScript filter) {
+            return stream.filter(x -> Boolean.TRUE.equals(filter.execute(this, x)));
+        }
+    }
+
+    @Test
+    public void testStackOvflw20220930() {
+        // fill some drivers in a list
+        List<Driver0930> values = new ArrayList<>();
+        for(int i = 0; i < 8; ++i) {
+            values.add(new Driver0930("drvr" + Integer.toOctalString(i)));
+        }
+        for(int i = 0; i < 4; ++i) {
+            values.add(new Driver0930("favorite" + Integer.toOctalString(i)));
+        }
+        // Use a context that can filter and that exposes Collectors
+        JexlEngine jexl = new JexlBuilder().safe(false).create();
+        JexlContext context = new Context0930();
+        context.set("values", values);
+        context.set("Collectors", Collectors.class);
+        // The script with a JEXL 3.2 (lambda function) and 3.3 syntax (lambda expression)
+        String src32 = "values.stream().filter((driver) ->{ driver.attributeName =^ 'favorite' }).collect(Collectors.toList())";
+        String src33 = "values.stream().filter(driver -> driver.attributeName =^ 'favorite').collect(Collectors.toList())";
+        for(String src : Arrays.asList(src32, src33)) {
+            JexlExpression s = jexl.createExpression(src);
+            Assert.assertNotNull(s);
+
+            Object r = s.evaluate(context);
+            Assert.assertNotNull(r);
+            // got a filtered list of 4 drivers whose attribute name starts with 'favorite'
+            List<Driver0930> l = (List<Driver0930>) r;
+            Assert.assertEquals(4, l.size());
+            for (Driver0930 d : l) {
+                Assert.assertTrue(d.getAttributeName().startsWith("favorite"));
+            }
+        }
+    }
 }
