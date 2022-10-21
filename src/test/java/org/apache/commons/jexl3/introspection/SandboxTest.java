@@ -349,7 +349,12 @@ public class SandboxTest extends JexlTestCase {
         // can not create a new file
         sandbox.block(java.io.File.class.getName()).execute("");
 
-        final JexlEngine sjexl = new JexlBuilder().sandbox(sandbox).safe(false).strict(true).create();
+        final JexlEngine sjexl = new JexlBuilder()
+                .permissions(JexlPermissions.UNRESTRICTED)
+                .sandbox(sandbox)
+                .safe(false)
+                .strict(true)
+                .create();
 
         String expr;
         JexlScript script;

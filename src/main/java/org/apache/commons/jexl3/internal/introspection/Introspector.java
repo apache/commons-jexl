@@ -94,7 +94,7 @@ public final class Introspector {
      * @param cloader the class loader
      */
     public Introspector(final Log log, final ClassLoader cloader) {
-        this(log, cloader, Permissions.DEFAULT);
+        this(log, cloader, null);
     }
 
     /**
@@ -106,7 +106,7 @@ public final class Introspector {
     public Introspector(final Log log, final ClassLoader cloader, final JexlPermissions perms) {
         this.logger = log;
         this.loader = cloader;
-        this.permissions = perms;
+        this.permissions = perms == null? Permissions.RESTRICTED : perms;
     }
 
     /**
