@@ -29,6 +29,7 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
+import org.apache.commons.jexl3.JexlException;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -83,12 +84,16 @@ public class JexlScriptEngineTest {
         final Integer initialValue = 123;
         Assert.assertEquals(initialValue,engine.eval("123"));
         Assert.assertEquals(initialValue,engine.eval("0;123"));// multiple statements
-        final long time1 = System.currentTimeMillis();
-        final Long time2 = (Long) engine.eval(
-             "sys=context.class.forName(\"java.lang.System\");"
-            +"now=sys.currentTimeMillis();"
+        try {
+            final Long time2 = (Long) engine.eval(
+                    "sys=context.class.forName(\"java.lang.System\");"
+                            + "now=sys.currentTimeMillis();"
             );
-        Assert.assertTrue("Must take some time to process this",time1 <= time2);
+            Assert.fail("default engine no longer accesses System classes");
+        } catch(ScriptException xscript) {
+            JexlException.Method xjexl = (JexlException.Method) xscript.getCause();
+            Assert.assertEquals("forName", xjexl.getMethod());
+        }
         engine.put("value", initialValue);
         Assert.assertEquals(initialValue,engine.get("value"));
         final Integer newValue = 124;

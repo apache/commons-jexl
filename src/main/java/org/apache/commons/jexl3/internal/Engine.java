@@ -248,7 +248,7 @@ public class Engine extends JexlEngine {
      * <p>This is lazily initialized to avoid building a default instance if there
      * is no use for it. The main reason for not using the default Uberspect instance is to
      * be able to use a (low level) introspector created with a given logger
-     * instead of the default one.</p>
+     * instead of the default one and even more so for with a different (restricted) set of permissions.</p>
      * @param logger the logger to use for the underlying Uberspect
      * @param strategy the property resolver strategy
      * @param permissions the introspection permissions
@@ -261,7 +261,7 @@ public class Engine extends JexlEngine {
             final JexlPermissions permissions) {
         if ((logger == null || logger.equals(LogFactory.getLog(JexlEngine.class)))
             && (strategy == null || strategy == JexlUberspect.JEXL_STRATEGY)
-            && permissions == null || permissions == Permissions.DEFAULT) {
+            && (permissions == null || permissions == JexlPermissions.UNRESTRICTED)) {
             return UberspectHolder.UBERSPECT;
         }
         return new Uberspect(logger, strategy, permissions);

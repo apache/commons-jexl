@@ -31,25 +31,31 @@ import java.nio.charset.Charset;
 /**
  * Configures and builds a JexlEngine.
  *
- * <p>The builder allow fine-tuning an engine instance behavior according to various control needs.</p>
- *
- * <p>Broad configurations elements are controlled through the features ({@link JexlFeatures}) that can restrict JEXL
+ * <p>
+ *     The builder allow fine-tuning an engine instance behavior according to various control needs.
+ *     Check <em>{@link #JexlBuilder()}</em> for permission impacts starting with <em>JEXL 3.3</em>.
+ * </p><p>
+ *     Broad configurations elements are controlled through the features ({@link JexlFeatures}) that can restrict JEXL
  *  syntax - for instance, only expressions with no-side effects - and permissions ({@link JexlPermissions}) that control
- *  the visible set of objects - for instance, avoiding access to any object in java.rmi.* -. </p>
- *
- * <p>Fine error control and runtime-overridable behaviors are implemented through options ({@link JexlOptions}). Most
+ *  the visible set of objects - for instance, avoiding access to any object in java.rmi.* -.
+ *  </p><p>
+ *     Fine error control and runtime-overridable behaviors are implemented through options ({@link JexlOptions}). Most
  * common flags accessible from the builder are reflected in its options ({@link #options()}).
- * <p>The <code>silent</code> flag tells the engine what to do with the error; when true, errors are logged as
- * warning, when false, they throw {@link JexlException} exceptions.</p>
- * <p>The <code>strict</code> flag tells the engine when and if null as operand is considered an error. The <code>safe</code>
+ * </p><p>
+ *     The <code>silent</code> flag tells the engine what to do with the error; when true, errors are logged as
+ * warning, when false, they throw {@link JexlException} exceptions.
+ * </p><p>
+ *     The <code>strict</code> flag tells the engine when and if null as operand is considered an error. The <code>safe</code>
  * flog determines if safe-navigation is used. Safe-navigation allows an  evaluation shortcut and return null in expressions
- * that attempts dereferencing null, typically a method call or accessing a property.</p>
- * <p>The <code>lexical</code> and <code>lexicalShade</code> flags can be used to enforce a lexical scope for
+ * that attempts dereferencing null, typically a method call or accessing a property.
+ * </p><p>
+ *     The <code>lexical</code> and <code>lexicalShade</code> flags can be used to enforce a lexical scope for
  * variables and parameters. The <code>lexicalShade</code> can be used to further ensure no global variable can be
  * used with the same name as a local one even after it goes out of scope. The corresponding feature flags should be
- * preferred since they will detect violations at parsing time. (see {@link JexlFeatures})</p>
- *
- * <p>The following rules apply on silent and strict flags:</p>
+ * preferred since they will detect violations at parsing time. (see {@link JexlFeatures})
+ * </p><p>
+ *     The following rules apply on silent and strict flags:
+ * </p>
  * <ul>
  * <li>When "silent" &amp; "not-strict":
  * <p> 0 &amp; null should be indicators of "default" values so that even in an case of error,
@@ -86,7 +92,7 @@ public class JexlBuilder {
     private JexlUberspect.ResolverStrategy strategy = null;
 
     /** The set of permissions. */
-    private JexlPermissions permissions = null;
+    private JexlPermissions permissions = JexlPermissions.RESTRICTED;
 
     /** The sandbox. */
     private JexlSandbox sandbox = null;
@@ -126,6 +132,32 @@ public class JexlBuilder {
 
     /** The features. */
     private JexlFeatures features = null;
+
+    /**
+     * Default constructor.
+     * <p>
+     * As of JEXL 3.3, to reduce the security risks inherent to JEXL&quot;s purpose, the builder will use a set of
+     * restricted permissions as a default to create the JexlEngine instance. This will greatly reduce which classes
+     * and methods are visible to JEXL and usable in scripts using default implicit behaviors.
+     * </p><p>
+     * However, without mitigation, this change will likely break some scripts at runtime, especially those exposing
+     * your own class instances through arguments, contexts or namespaces.
+     * The new default set of allowed packages and denied classes is described by {@link JexlPermissions#RESTRICTED}.
+     * </p><p>
+     * The recommended mitigation if your usage of JEXL is impacted is to first thoroughly review what should be
+     * allowed and exposed to script authors and implement those through a set of {@link JexlPermissions};
+     * those are easily created using {@link JexlPermissions#parse(String...)}.
+     * </p><p>
+     * In the urgent case of a strict 3.2 compatiblity, the simplest and fastest mitigation is to use the 'unrestricted'
+     * set of permissions. The builder must be explicit about it using
+     * <code>new JexlBuilder().permissions({@link JexlPermissions#UNRESTRICTED})</code>.
+     * </p><p>
+     * Note that an explicit call to {@link #uberspect(JexlUberspect)} will supersede this behavior using the
+     * {@link JexlUberspect} provided instance in the {@link JexlEngine}.
+     * </p>
+     * @since 3.3
+     */
+    public JexlBuilder() {}
 
     /**
      * Sets the JexlUberspect instance the engine will use.

@@ -23,6 +23,7 @@ import org.apache.commons.jexl3.internal.Debugger;
 import org.apache.commons.jexl3.internal.introspection.IndexedType;
 import org.apache.commons.jexl3.internal.introspection.Permissions;
 import org.apache.commons.jexl3.internal.introspection.Uberspect;
+import org.apache.commons.jexl3.introspection.JexlPermissions;
 import org.apache.commons.jexl3.introspection.JexlUberspect;
 import org.apache.commons.jexl3.junit.Asserter;
 import org.apache.commons.logging.LogFactory;
@@ -384,7 +385,7 @@ public class PropertyAccessTest extends JexlTestCase {
         x.put(2, "123456789");
         ctx.set("x", x);
         final JexlEngine engine = new JexlBuilder()
-                .uberspect(new Uberspect(null, null, null))
+                .uberspect(new Uberspect(null, null, JexlPermissions.UNRESTRICTED))
                 .strict(true).silent(false).create();
         String stmt = "x.2.class.name";
         JexlScript script = engine.createScript(stmt);
