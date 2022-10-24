@@ -22,6 +22,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Reader;
 import java.io.Writer;
+import java.lang.ref.Reference;
+import java.lang.ref.SoftReference;
 
 import javax.script.AbstractScriptEngine;
 import javax.script.Bindings;
@@ -39,6 +41,7 @@ import org.apache.commons.jexl3.JexlEngine;
 import org.apache.commons.jexl3.JexlException;
 import org.apache.commons.jexl3.JexlScript;
 
+import org.apache.commons.jexl3.introspection.JexlPermissions;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -63,6 +66,59 @@ import org.apache.commons.logging.LogFactory;
  * @since 2.0
  */
 public class JexlScriptEngine extends AbstractScriptEngine implements Compilable {
+    /**
+     * The shared engine instance.
+     * <p>A single soft-reference JEXL engine and JexlUberspect is shared by all instances of JexlScriptEngine.</p>
+     */
+    private static Reference<JexlEngine> ENGINE = null;
+
+    /**
+     * Sets the shared instance used for the script engine.
+     * <p>This should be called early enough to have an effect, ie before any
+     * {@link javax.script.ScriptEngineManager} features.</p>
+     * <p>To restore 3.2 script permeability:</p>
+     * <code>
+     *         JexlScriptEngine.setInstance(new JexlBuilder()
+     *                 .cache(512)
+     *                 .logger(LogFactory.getLog(JexlScriptEngine.class))
+     *                 .permissions(JexlPermissions.UNRESTRICTED)
+     *                 .create());
+     * </code>
+     * <p>Alternatively, setting the default {@link JexlBuilder#setDefaultPermissions(JexlPermissions)} using
+     * {@link org.apache.commons.jexl3.introspection.JexlPermissions#UNRESTRICTED} will also restore JEXL 3.2
+     * behavior.</p>
+     * <code>
+     *     JexlBuilder.setDefaultPermissions(JexlPermissions.UNRESTRICTED);
+     * </code>
+     * @param engine the JexlEngine instance to use
+     * @since 3.3
+     */
+    public static void setInstance(JexlEngine engine) {
+        ENGINE = new SoftReference<>(engine);
+    }
+
+    /**
+     * @return the shared JexlEngine instance, create it if necessary
+     */
+    private static JexlEngine getEngine() {
+        JexlEngine engine = ENGINE != null? ENGINE.get() : null;
+        if (engine == null) {
+            synchronized (JexlScriptEngineFactory.class) {
+                engine = ENGINE != null? ENGINE.get() : null;
+                if (engine == null) {
+                    JexlBuilder builder = new JexlBuilder()
+                            .strict(true)
+                            .safe(false)
+                            .logger(JexlScriptEngine.LOG)
+                            .cache(JexlScriptEngine.CACHE_SIZE);
+                    engine = builder.create();
+                    ENGINE = new SoftReference<>(engine);
+                }
+            }
+        }
+        return engine;
+    }
+
 
     /** The logger. */
     static final Log LOG = LogFactory.getLog(JexlScriptEngine.class);
@@ -197,7 +253,7 @@ public class JexlScriptEngine extends AbstractScriptEngine implements Compilable
             throw new NullPointerException("ScriptEngineFactory must not be null");
         }
         parentFactory = factory;
-        jexlEngine = EngineSingletonHolder.DEFAULT_ENGINE;
+        jexlEngine = getEngine();
         jexlObject = new JexlScriptObject();
     }
 
@@ -307,19 +363,7 @@ public class JexlScriptEngine extends AbstractScriptEngine implements Compilable
         private FactorySingletonHolder() {}
 
         /** The engine factory singleton instance. */
-        static final JexlScriptEngineFactory DEFAULT_FACTORY = new JexlScriptEngineFactory();
-    }
-
-    /**
-     * Holds singleton JexlScriptEngine (IODH).
-     * <p>A single JEXL engine and JexlUberspect is shared by all instances of JexlScriptEngine.</p>
-     */
-    private static class EngineSingletonHolder {
-        /** non instantiable. */
-        private EngineSingletonHolder() {}
-
-        /** The JEXL engine singleton instance. */
-        static final JexlEngine DEFAULT_ENGINE = new JexlBuilder().logger(LOG).cache(CACHE_SIZE).create();
+        private static final JexlScriptEngineFactory DEFAULT_FACTORY = new JexlScriptEngineFactory();
     }
 
     /**
