@@ -204,7 +204,7 @@ public class JexlBuilder {
     }
 
     /**
-     * Sets the JexlUberspect strategy strategy the engine will use.
+     * Sets the JexlUberspect strategy the engine will use.
      * <p>This is ignored if the uberspect has been set.
      *
      * @param rs the strategy
@@ -215,7 +215,7 @@ public class JexlBuilder {
         return this;
     }
 
-    /** @return the strategy strategy */
+    /** @return the JexlUberspect strategy */
     public JexlUberspect.ResolverStrategy strategy() {
         return this.strategy;
     }
