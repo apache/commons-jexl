@@ -81,6 +81,21 @@ import java.nio.charset.Charset;
  *
  */
 public class JexlBuilder {
+    /**
+     * The set of default permissions used when creating a new builder.
+     * <p>Static but modifiable so these default permissions can be changed to a purposeful set.</p>
+     * <p>In JEXL 3.3, these are {@link JexlPermissions#RESTRICTED}.</p>
+     * <p>In JEXL 3.2, these were equivalent to {@link JexlPermissions#UNRESTRICTED}.</p>
+     */
+    private static JexlPermissions PERMISSIONS = JexlPermissions.RESTRICTED;
+
+    /**
+     * Sets the default permissions.
+     * @param permissions the permissions
+     */
+    public static void setDefaultPermissions(JexlPermissions permissions) {
+        PERMISSIONS = permissions == null? JexlPermissions.RESTRICTED : permissions;
+    }
 
     /** The default maximum expression length to hit the expression cache. */
     protected static final int CACHE_THRESHOLD = 64;
@@ -88,11 +103,11 @@ public class JexlBuilder {
     /** The JexlUberspect instance. */
     private JexlUberspect uberspect = null;
 
-    /** The strategy strategy. */
+    /** The {@link JexlUberspect} resolver strategy. */
     private JexlUberspect.ResolverStrategy strategy = null;
 
     /** The set of permissions. */
-    private JexlPermissions permissions = JexlPermissions.RESTRICTED;
+    private JexlPermissions permissions;
 
     /** The sandbox. */
     private JexlSandbox sandbox = null;
@@ -137,7 +152,7 @@ public class JexlBuilder {
      * Default constructor.
      * <p>
      * As of JEXL 3.3, to reduce the security risks inherent to JEXL&quot;s purpose, the builder will use a set of
-     * restricted permissions as a default to create the JexlEngine instance. This will greatly reduce which classes
+     * restricted permissions as a default to create the {@link JexlEngine} instance. This will greatly reduce which classes
      * and methods are visible to JEXL and usable in scripts using default implicit behaviors.
      * </p><p>
      * However, without mitigation, this change will likely break some scripts at runtime, especially those exposing
@@ -148,16 +163,19 @@ public class JexlBuilder {
      * allowed and exposed to script authors and implement those through a set of {@link JexlPermissions};
      * those are easily created using {@link JexlPermissions#parse(String...)}.
      * </p><p>
-     * In the urgent case of a strict 3.2 compatiblity, the simplest and fastest mitigation is to use the 'unrestricted'
-     * set of permissions. The builder must be explicit about it using
-     * <code>new JexlBuilder().permissions({@link JexlPermissions#UNRESTRICTED})</code>.
+     * In the urgent case of a strict 3.2 compatibility, the simplest and fastest mitigation is to use the 'unrestricted'
+     * set of permissions. The builder must be explicit about it either by setting the default permissions with a
+     * statement like <code>JexlBuilder.setDefaultPermissions(JexlPermissions.UNRESTRICTED);</code> or with a more precise
+     * one like <code>new JexlBuilder().permissions({@link JexlPermissions#UNRESTRICTED})</code>.
      * </p><p>
-     * Note that an explicit call to {@link #uberspect(JexlUberspect)} will supersede this behavior using the
-     * {@link JexlUberspect} provided instance in the {@link JexlEngine}.
+     * Note that an explicit call to {@link #uberspect(JexlUberspect)} will supersede any permissions related behavior
+     * by using the {@link JexlUberspect} provided as argument used as-is in the created {@link JexlEngine}.
      * </p>
      * @since 3.3
      */
-    public JexlBuilder() {}
+    public JexlBuilder() {
+        this.permissions = PERMISSIONS;
+    }
 
     /**
      * Sets the JexlUberspect instance the engine will use.
@@ -192,7 +210,7 @@ public class JexlBuilder {
     }
 
     /**
-     * Sets the JexlUberspect strategy strategy the engine will use.
+     * Sets the JexlUberspect strategy the engine will use.
      * <p>This is ignored if the uberspect has been set.
      *
      * @param rs the strategy
@@ -203,7 +221,7 @@ public class JexlBuilder {
         return this;
     }
 
-    /** @return the strategy strategy */
+    /** @return the JexlUberspect strategy */
     public JexlUberspect.ResolverStrategy strategy() {
         return this.strategy;
     }
