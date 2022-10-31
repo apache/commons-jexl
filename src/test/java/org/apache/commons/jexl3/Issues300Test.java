@@ -118,7 +118,29 @@ public class Issues300Test {
         value = e304.evaluate(context);
         assertEquals(42, value);
 
-        final String allkw = "e304.if.else.do.while.new.true.false.null.var.function.empty.size.not.and.or.ne.eq.le.lt.gt.ge";
+        final String[]  keywords = new String[]{
+                "if", "else", "do", "while", "for", "break", "continue", "function", "return", "new", "size", "empty",
+                "var", "let", "const",
+                "null", "true", "false",
+                "not", "div", "mod", "and", "or",
+                "eq", "ne", "lt", "gt", "ge", "le",
+
+        };
+        for(int i = 0; i < keywords.length; ++i) {
+            String pkw = "e304." + keywords[i];
+            map.put(pkw, 42);
+            e304 = jexlEngine.createExpression(pkw);
+            value = e304.evaluate(context);
+            assertEquals(42, value);
+        }
+        for(int i = 0; i < keywords.length; ++i) {
+            String pkw = "e304." + keywords[i] + "." + keywords[keywords.length - 1 - i];
+            map.put(pkw, 42);
+            e304 = jexlEngine.createExpression(pkw);
+            value = e304.evaluate(context);
+            assertEquals(42, value);
+        }
+        final String allkw = "e304." + String.join(".", keywords);
         map.put(allkw, 42);
         e304 = jexlEngine.createExpression(allkw);
         value = e304.evaluate(context);
@@ -888,7 +910,7 @@ public class Issues300Test {
     public void test379a() {
         final String src =
                 "#pragma jexl.import java.util\n"+
-                "const map = new LinkedHashMap({0 : 'zero'});";
+                        "const map = new LinkedHashMap({0 : 'zero'});";
         JexlEngine jexl = new JexlBuilder().safe(true).create();
         JexlScript script = jexl.createScript(src);
         Assert.assertNotNull(script);
