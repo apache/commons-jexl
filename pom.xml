@@ -55,8 +55,7 @@
         <checkstyle.version>10.3.4</checkstyle.version>
         <japicmp.skip>false</japicmp.skip>
         <commons.japicmp.version>0.16.0</commons.japicmp.version>
-        <commons.pmd.version>3.19.0</commons.pmd.version>
-        <commons.pmd-impl.version>6.48.0</commons.pmd-impl.version>
+        <!-- spotbugs 4.7.2 issue #2174 generates lots of garbage during analysis -->
         <commons.spotbugs.version>4.7.2.1</commons.spotbugs.version>
         <commons.junit.version>5.9.1</commons.junit.version>
 
@@ -100,7 +99,6 @@
                 <jdk>1.8</jdk>
             </activation>
             <properties>
-                <commons.pmd.version>3.17.0</commons.pmd.version>
                 <checkstyle.version>9.3</checkstyle.version>
             </properties>
         </profile>
