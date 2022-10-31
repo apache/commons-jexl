@@ -45,7 +45,7 @@ public class ParseException extends Exception implements JavaccError {
      * "expectedTokenSequences", and "tokenImage" set.
      * @param currentToken This is the last token that has been consumed successfully.  If
      * this object has been created due to a parse error, the token
-     * followng this token will (therefore) be the first error token.
+     * following this token will (therefore) be the first error token.
      * @param expectedTokenSequences Each entry in this array is an array of integers.  Each array
      * of integers represents a sequence of tokens (by their ordinal
      * values) that is expected at this point of the parse.
