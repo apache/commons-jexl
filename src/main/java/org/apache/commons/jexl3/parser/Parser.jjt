@@ -121,8 +121,8 @@ TOKEN_MGR_DECLS : {}
 }
 
 <DEFAULT> TOKEN : { /* CONDITIONALS */
-      < _AND :  "and" >  
-    | < _OR: "or" > 
+      < _AND :  "and" >
+    | < _OR: "or" >
 }
 
 <*> TOKEN : { /* COMPARISONS */
@@ -141,12 +141,12 @@ TOKEN_MGR_DECLS : {}
 }
 
 <DEFAULT> TOKEN : { /* COMPARISONS */
-      < EQ : "eq" > 
-    | < NE : "ne" > 
-    | < GT : "gt" > 
-    | < GE : "ge" > 
-    | < LT : "lt" > 
-    | < LE : "le"  > 
+      < EQ : "eq" >
+    | < NE : "ne" >
+    | < GT : "gt" >
+    | < GE : "ge" >
+    | < LT : "lt" >
+    | < LE : "le"  >
 }
 
 <*> TOKEN : { /* OPERATORS */
@@ -162,16 +162,14 @@ TOKEN_MGR_DECLS : {}
     | < rshiftu_assign : ">>>=" >
     | < rshift_assign : ">>=" >
 
-    | < assign : "=" > 
+    | < assign : "=" >
     | < plus : "+" >
     | < plusplus : "++" >
     | < minus : "-" >
     | < minusminus : "--" >
     | < mult : "*" >
     | < div : "/" >
-    | < DIV : "div" > 
     | < mod : "%"  >
-    | < MOD : "mod" > 
     | < not : "!" >
     | < and : "&" >
     | < or : "|" >
@@ -185,36 +183,38 @@ TOKEN_MGR_DECLS : {}
 }
 
 <DEFAULT> TOKEN : { /* OPERATORS */
-      < NOT : "not" > 
+      < NOT : "not" >
+    | < DIV : "div" >
+    | < MOD : "mod" >
 }
 
 <*> TOKEN : /* KEYWORDS */
 {
-      < LAMBDA : "->" > 
-    | < FATARROW : "=>" > 
-    | < RETURN : "return" > 
-    | < BREAK : "break" > 
-    | < CONTINUE : "continue" > 
-    | < PRAGMA : "#pragma" > 
+      < LAMBDA : "->" >
+    | < FATARROW : "=>" >
+    | < PRAGMA : "#pragma" >
 }
 
 <DEFAULT> TOKEN : /* KEYWORDS */
 {
-      < IF : "if" > 
-    | < DO : "do" > 
-    | < NEW : "new" > 
-    | < VAR : "var" > 
-    | < LET : "let" > 
-    | < FOR : "for" > 
-    | < ELSE : "else" > 
+      < IF : "if" >
+    | < ELSE : "else" >
+    | < DO : "do" >
+    | < WHILE : "while" >
+    | < FOR : "for" >
+    | < BREAK : "break" >
+    | < CONTINUE : "continue" >
+    | < FUNCTION : "function" >
+    | < RETURN : "return" >
+    | < NEW : "new" >
     | < SIZE : "size" >
-    | < NULL : "null" > 
-    | < TRUE : "true" > 
-    | < FALSE : "false" > 
-    | < WHILE : "while" > 
-    | < CONST : "const" > 
     | < EMPTY : "empty" >
-    | < FUNCTION : "function" > 
+    | < VAR : "var" >
+    | < LET : "let" >
+    | < CONST : "const" >
+    | < NULL : "null" >
+    | < TRUE : "true" >
+    | < FALSE : "false" >
 }
 
 /***************************************
@@ -246,7 +246,7 @@ TOKEN_MGR_DECLS : {}
   < #ESCAPE: "\\" [" ", "'", "\"", "\\"] >
 }
 
-<DEFAULT> TOKEN : 
+<DEFAULT> TOKEN :
 {
   < REGISTER: "#" (["0"-"9"])+ >
 }
@@ -258,9 +258,9 @@ TOKEN_MGR_DECLS : {}
     | <HEX_LITERAL> (<INT_SFX>)?
     | <OCTAL_LITERAL> (<INT_SFX>)?
  >
-    | <#DECIMAL_LITERAL: ["1"-"9"] (["0"-"9"])*> 
+    | <#DECIMAL_LITERAL: ["1"-"9"] (["0"-"9"])*>
     | <#HEX_LITERAL: "0" ["x","X"] (["0"-"9","a"-"f","A"-"F"])+>
-    | <#OCTAL_LITERAL: "0" (["0"-"7"])*> 
+    | <#OCTAL_LITERAL: "0" (["0"-"7"])*>
     | <#INT_SFX : ["l","L","h","H"]>
 |
 <FLOAT_LITERAL:
@@ -268,7 +268,7 @@ TOKEN_MGR_DECLS : {}
     | (["0"-"9"])+ (".")? (<FLT_SFX>)
     | "." (["0"-"9"])+ (<FLT_SFX>)
     | "#NaN"
-> 
+>
     |  <#EXPONENT: ["e","E"] (["+","-"])? (["0"-"9"])+>
     |  <#FLT_CLS : ["f","F","d","D","b","B"]>
     |  <#FLT_SFX : <EXPONENT> (<FLT_CLS>)? | <FLT_CLS> >
