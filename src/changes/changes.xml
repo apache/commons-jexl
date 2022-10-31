@@ -27,6 +27,9 @@
     <body>
         <release version="3.3" date="YYYY-MM-DD">
             <!-- ADD -->
+            <action dev="Dmitri Blinov" type="add" issue="JEXL-382" due-to="Dmitri Blinov">
+                Simplify grammar and lexical state management
+            </action>
             <action dev="henrib" type="add" issue="JEXL-380">
                 Multiple values per pragma key
             </action>
