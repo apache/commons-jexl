@@ -220,7 +220,7 @@ TOKEN_MGR_DECLS : {}
 /***************************************
  *     Identifier & String tokens
  ***************************************/
-<*> TOKEN :  /* NaN */
+<DEFAULT> TOKEN : /* NaN */
 {
     < NAN_LITERAL : "NaN" >
 }
@@ -574,7 +574,7 @@ void AssignmentExpression() #void : {}
     <rshiftu_assign>  Expression() #SetShiftRightUnsignedNode(2)
   |
     <assign> Expression() #Assignment(2)
-  ) )*
+  ) )?
 }
 
 /***************************************
@@ -590,7 +590,7 @@ void ConditionalExpression() #void : {}
     <ELVIS> Expression() #TernaryNode(2)
   |
     <NULLP> Expression() #NullpNode(2)
-  ) )*
+  ) )?
 }
 
 void ConditionalOrExpression() #void : {}
