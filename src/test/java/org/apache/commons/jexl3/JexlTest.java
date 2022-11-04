@@ -19,6 +19,7 @@ package org.apache.commons.jexl3;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -39,12 +40,17 @@ import org.junit.Test;
  * @since 1.0
  */
 @SuppressWarnings({"UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
-public class JexlTest extends JexlTestCase {
-    protected static final String METHOD_STRING = "Method string";
-    protected static final String GET_METHOD_STRING = "GetMethod string";
+public final class JexlTest extends JexlTestCase {
+    static final String METHOD_STRING = "Method string";
+    static final String GET_METHOD_STRING = "GetMethod string";
 
     public JexlTest() {
-        super("JexlTest");
+        super("JexlTest",
+                new JexlBuilder()
+                        .strict(false)
+                        .imports(Arrays.asList("java.lang","java.math"))
+                        .permissions(null)
+                        .cache(128).create());
     }
 
     /**
@@ -158,7 +164,7 @@ public class JexlTest extends JexlTestCase {
         options.setStrict(false);
         jc.set("string", "");
         jc.set("array", new Object[0]);
-        jc.set("map", new HashMap<Object, Object>());
+        jc.set("map", new HashMap<>());
         jc.set("list", new ArrayList<Object>());
         jc.set("set", (new HashMap<Object, Object>()).keySet());
         jc.set("longstring", "thingthing");

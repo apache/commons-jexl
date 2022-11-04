@@ -379,7 +379,8 @@ public class JexlArithmetic {
      * <p>When an operator is strict, it does <em>not</em> accept null arguments when the arithmetic is strict.
      * If null-safe (ie not-strict), the operator does accept null arguments even if the arithmetic itself is strict.</p>
      * <p>The default implementation considers equal/not-equal operators as null-safe so one can check for null as in
-     * <code>if (myvar == null) {...}</code>. Note that this operator is used for equal and not-equal syntax.</p>
+     * <code>if (myvar == null) {...}</code>. Note that this operator is used for equal and not-equal syntax. The complete
+     * list of operators that are not strict are (==, [], []=, ., .=). </p>
      * <p>An arithmetic refining its strict behavior handling for more operators must declare which by overriding
      * this method.</p>
      * @param operator the operator to check for null-argument(s) handling
@@ -387,7 +388,15 @@ public class JexlArithmetic {
      * for null argument(s)
      */
     public boolean isStrict(JexlOperator operator) {
-        return operator == JexlOperator.EQ? false : isStrict();
+        switch(operator) {
+            case EQ:
+            case ARRAY_GET:
+            case ARRAY_SET:
+            case PROPERTY_GET:
+            case PROPERTY_SET:
+                return false;
+        }
+        return isStrict();
     }
 
     /**
