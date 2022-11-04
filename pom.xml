@@ -52,7 +52,7 @@
         <commons.jira.id>JEXL</commons.jira.id>
         <commons.jira.pid>12310479</commons.jira.pid>
         <checkstyle.plugin.version>3.2.0</checkstyle.plugin.version>
-        <checkstyle.version>10.3.4</checkstyle.version>
+        <checkstyle.version>10.4</checkstyle.version>
         <japicmp.skip>false</japicmp.skip>
         <commons.japicmp.version>0.16.0</commons.japicmp.version>
         <commons.pmd.version>3.19.0</commons.pmd.version>
