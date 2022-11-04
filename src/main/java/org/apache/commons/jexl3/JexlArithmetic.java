@@ -831,7 +831,7 @@ public class JexlArithmetic {
                 }
             }
         }
-        return (left == null? "" : toString(left)).concat(right == null ? "" : toString(right));
+        return toString(left).concat(toString(right));
     }
 
     /**

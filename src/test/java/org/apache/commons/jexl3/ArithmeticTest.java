@@ -879,6 +879,29 @@ public class ArithmeticTest extends JexlTestCase {
         script = jexl.createScript("'1.2' + '1.2' ");
         result = script.execute(null);
         Assert.assertEquals("1.21.2", result);
+
+        script = jexl.createScript("var nullRef = null;\nnullRef + 'rh'");
+        result = script.execute(null);
+        Assert.assertEquals("rh", result);
+
+        script = jexl.createScript("var nullRef = null;\n'lh' + nullRef");
+        result = script.execute(null);
+        Assert.assertEquals("lh", result);
+
+        script = jexl.createScript("nullRef + 'string'");
+        MapContext context = new MapContext();
+        context.set("nullRef", null);
+        result = script.execute(context);
+        Assert.assertEquals("string", result);
+
+        script = jexl.createScript("null + 'rh'");
+        result = script.execute(null);
+        Assert.assertEquals("rh", result);
+
+        script = jexl.createScript("'lh' + null");
+        result = script.execute(null);
+        Assert.assertEquals("lh", result);
+
     }
 
     @Test
@@ -918,6 +941,28 @@ public class ArithmeticTest extends JexlTestCase {
         result = script.execute(null);
         Assert.assertEquals("1.21.2", result);
 
+        Assert.assertThrows(JexlException.Variable.class, () -> {
+            jexl.createScript("var nullRef = null;\nnullRef + 'rh'").execute(null);
+        });
+
+        Assert.assertThrows(JexlException.Variable.class, () -> {
+            jexl.createScript("var nullRef = null;\n'lh' + nullRef").execute(null);
+        });
+
+        Assert.assertThrows(JexlException.Variable.class, () -> {
+            MapContext context = new MapContext();
+            context.set("nullRef", null);
+            jexl.createScript("nullRef + 'string'").execute(context);
+        });
+
+        // Note JexlArithmetic.NullOperand gets wrapped by the generic JexlException.
+        Assert.assertThrows(JexlException.class, () -> {
+            jexl.createScript("null + 'rh'").execute(null);
+        });
+
+        Assert.assertThrows(JexlException.class, () -> {
+            jexl.createScript("lh + null").execute(null);
+        });
     }
 
     @Test
