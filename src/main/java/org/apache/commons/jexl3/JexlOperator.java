@@ -409,7 +409,14 @@ public enum JexlOperator {
      * <br><strong>Method:</strong> <code>Iterator&lt;Object&gt; forEach(R y);</code>.
      * @since 3.1
      */
-    FOR_EACH("for(...)", "forEach", 1);
+    FOR_EACH("for(...)", "forEach", 1),
+
+    /**
+     * Test condition in if, for, while.
+     * <br><strong>Method:</strong> <code>boolean testCondition(R y);</code>.
+     * @since 3.3
+     */
+    CONDITION("?", "testCondition", 1);
 
     /**
      * The operator symbol.
