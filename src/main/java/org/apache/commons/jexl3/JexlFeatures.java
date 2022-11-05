@@ -60,7 +60,7 @@ public final class JexlFeatures {
         "register", "reserved variable", "local variable", "assign/modify",
         "global assign/modify", "array reference", "create instance", "loop", "function",
         "method call", "set/map/array literal", "pragma", "annotation", "script", "lexical", "lexicalShade",
-        "thin-arrow", "fat-arrow"
+        "thin-arrow", "fat-arrow", "namespace pragma"
     };
     /** Registers feature ordinal. */
     private static final int REGISTER = 0;
@@ -98,6 +98,8 @@ public final class JexlFeatures {
     public static final int THIN_ARROW = 16;
     /** Fat-arrow lambda syntax. */
     public static final int FAT_ARROW = 17;
+    /** Allow jexl.namespace pragma syntax. */
+    public static final int NAMESPACE_PRAGMA = 18;
 
     /**
      * Creates an all-features-enabled instance.
@@ -115,7 +117,8 @@ public final class JexlFeatures {
                 | (1L << PRAGMA)
                 | (1L << ANNOTATION)
                 | (1L << SCRIPT)
-                | (1L << THIN_ARROW);
+                | (1L << THIN_ARROW)
+                | (1L << NAMESPACE_PRAGMA);
         reservedNames = Collections.emptySet();
         nameSpaces = TEST_STR_FALSE;
     }

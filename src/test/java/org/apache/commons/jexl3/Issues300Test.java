@@ -1016,17 +1016,11 @@ public class Issues300Test {
             super(astrict);
         }
         @Override
-        public boolean toBoolean(final Object val) {
-            return val == null? false : super.toBoolean(val);
-        }
-        @Override
-        public Object not(final Object val) {
-            return val == null? true : super.not(val);
-        }
-        @Override
         public boolean isStrict(JexlOperator op) {
-            if (JexlOperator.NOT == op) {
-                return false;
+            switch(op) {
+                case NOT:
+                case CONDITION:
+                    return false;
             }
             return super.isStrict(op);
         }
