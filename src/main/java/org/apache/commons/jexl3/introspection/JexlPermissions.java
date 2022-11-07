@@ -223,7 +223,9 @@ public interface JexlPermissions {
             "org.apache.commons.jexl3.*",
             "org.apache.commons.jexl3 { JexlBuilder {} }",
             "org.apache.commons.jexl3.internal { Engine {} }",
-            "java.lang { Runtime {} System {} ProcessBuilder {} Class {} }",
+            "java.lang { Runtime{} System{} ProcessBuilder{} Process{}" +
+                    " RuntimePermission{} SecurityManager{}" +
+                    " Thread{} ThreadGroup{} Class{} }",
             "java.lang.annotation {}",
             "java.lang.instrument {}",
             "java.lang.invoke {}",
@@ -231,7 +233,7 @@ public interface JexlPermissions {
             "java.lang.ref {}",
             "java.lang.reflect {}",
             "java.net {}",
-            "java.io { File { } }",
+            "java.io { File{} FileDescriptor{} }",
             "java.nio { Path { } Paths { } Files { } }",
             "java.rmi"
     );

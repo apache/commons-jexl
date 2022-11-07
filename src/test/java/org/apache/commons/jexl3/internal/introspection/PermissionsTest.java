@@ -26,6 +26,7 @@ import org.apache.commons.jexl3.JexlTestCase;
 import org.apache.commons.jexl3.MapContext;
 import org.apache.commons.jexl3.internal.introspection.nojexlpackage.Invisible;
 import org.apache.commons.jexl3.introspection.JexlPermissions;
+import org.apache.commons.jexl3.introspection.JexlUberspect;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -166,7 +167,7 @@ public class PermissionsTest {
 
     @Test
     public void testParsePermissions0() throws Exception {
-        String src = "java.lang { Runtime { exit(); exec(); } }";
+        String src = "java.lang { Runtime { exit(); exec(); } }\njava.net { URL {} }";
         Permissions p = (Permissions) JexlPermissions.parse(src);
         Map<String, Permissions.NoJexlPackage> nojexlmap = p.getPackages();
         Assert.assertNotNull(nojexlmap);
@@ -178,6 +179,8 @@ public class PermissionsTest {
         Method exec = getMethod(java.lang.Runtime.class,"exec");
         Assert.assertNotNull(exec);
         Assert.assertFalse(p.allow(exec));
+        JexlUberspect uber = new Uberspect(null, null, p);
+        Assert.assertNull(uber.getClassByName("java.net.URL"));
     }
 
     public static class Outer {

@@ -56,6 +56,10 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Predicate;
 
+import static org.apache.commons.jexl3.parser.JexlParser.PRAGMA_IMPORT;
+import static org.apache.commons.jexl3.parser.JexlParser.PRAGMA_JEXLNS;
+import static org.apache.commons.jexl3.parser.JexlParser.PRAGMA_OPTIONS;
+
 /**
  * A JexlEngine implementation.
  * @since 2.0
@@ -79,18 +83,6 @@ public class Engine extends JexlEngine {
         /** Non-instantiable. */
         private UberspectHolder() {}
     }
-    /**
-     * The name of the options pragma.
-     */
-    protected static final String PRAGMA_OPTIONS = "jexl.options";
-    /**
-     * The prefix of a namespace pragma.
-     */
-    protected static final String PRAGMA_JEXLNS = "jexl.namespace.";
-    /**
-     * The prefix of an import pragma.
-     */
-    protected static final String PRAGMA_IMPORT = "jexl.import";
     /**
      * The Log to which all JexlEngine messages will be logged.
      */
@@ -353,7 +345,7 @@ public class Engine extends JexlEngine {
     /**
      * Extracts the engine evaluation options from context if available, the engine
      * options otherwise.
-     * <p>If the context is a options handle and the handled options shared instance flag
+     * <p>If the context is an options handle and the handled options shared instance flag
      * is false, this method creates a copy of the options making them immutable during execution.
      * @param context the context
      * @return the options if any
@@ -457,15 +449,16 @@ public class Engine extends JexlEngine {
                     if (value instanceof String) {
                         // jexl.namespace.***
                         final String nsname = key.substring(PRAGMA_JEXLNS.length());
-                        if (nsname != null && !nsname.isEmpty()) {
+                        if (!nsname.isEmpty()) {
                             if (ns == null) {
                                 ns = new HashMap<>(functions);
                             }
                             final String nsclass = value.toString();
-                            try {
-                                ns.put(nsname, uberspect.getClassLoader().loadClass(nsclass));
-                            } catch (final ClassNotFoundException e) {
-                                ns.put(nsname, nsclass);
+                            Class<?> clazz = uberspect.getClassByName(nsclass);
+                            if (clazz == null) {
+                                logger.warn(key + ": unable to find class " + nsclass);
+                            } else {
+                                ns.put(nsname, clazz);
                             }
                         }
                     }

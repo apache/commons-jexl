@@ -51,6 +51,10 @@ public class ReferenceUberspect implements JexlUberspect {
      * The map resolver list strategy.
      */
     private final List<PropertyResolver> mapStrategy;
+    @Override
+    public Class<?> getClassByName(final String className) {
+        return uberspect.getClassByName(className);
+    }
 
     /**
      * Constructor.
