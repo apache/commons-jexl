@@ -250,7 +250,7 @@ TOKEN_MGR_DECLS : {
              case "lt" : matchedToken.kind = LT; break;
              case "le" : matchedToken.kind = LE; break;
              case "gt" : matchedToken.kind = GT; break;
-             case "ge" : matchedToken.kind = GT; break;
+             case "ge" : matchedToken.kind = GE; break;
           }
       }
   }
