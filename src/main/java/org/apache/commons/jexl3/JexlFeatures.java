@@ -60,7 +60,7 @@ public final class JexlFeatures {
         "register", "reserved variable", "local variable", "assign/modify",
         "global assign/modify", "array reference", "create instance", "loop", "function",
         "method call", "set/map/array literal", "pragma", "annotation", "script", "lexical", "lexicalShade",
-        "thin-arrow", "fat-arrow"
+        "thin-arrow", "fat-arrow", "extended relational operator"
     };
     /** Registers feature ordinal. */
     private static final int REGISTER = 0;
@@ -98,6 +98,8 @@ public final class JexlFeatures {
     public static final int THIN_ARROW = 16;
     /** Fat-arrow lambda syntax. */
     public static final int FAT_ARROW = 17;
+    /** Extended relational operator syntax. */
+    public static final int EXT_REL_OPER = 18;
 
     /**
      * Creates an all-features-enabled instance.
@@ -115,7 +117,8 @@ public final class JexlFeatures {
                 | (1L << PRAGMA)
                 | (1L << ANNOTATION)
                 | (1L << SCRIPT)
-                | (1L << THIN_ARROW);
+                | (1L << THIN_ARROW)
+                | (1L << EXT_REL_OPER);
         reservedNames = Collections.emptySet();
         nameSpaces = TEST_STR_FALSE;
     }
@@ -477,6 +480,26 @@ public final class JexlFeatures {
      */
     public boolean supportsFatArrow() {
         return getFeature(FAT_ARROW);
+    }
+
+    /**
+     * Sets whether extended relational operator syntax is enabled.
+     * <p>
+     * When disabled, extended relational operators (eq;ne;le;lt;ge;gt)
+     * will be treated as plain identifiers.
+     * @param flag true to enable, false to disable
+     * @return this features instance
+     */
+    public JexlFeatures extendedRelOper(final boolean flag) {
+        setFeature(EXT_REL_OPER, flag);
+        return this;
+    }
+
+    /**
+     * @return true if extended relational syntax is enabled, false otherwise
+     */
+    public boolean supportsExtendedRelOper() {
+        return getFeature(EXT_REL_OPER);
     }
 
     /**

@@ -56,6 +56,7 @@ public final class Parser extends JexlParser
             source = jexlSrc;
             pragmas = null;
             this.scope = jexlScope;
+            token_source.supportExtRelOper = jexlFeatures.supportsExtendedRelOper();
             ReInit(jexlSrc);
             ASTJexlScript script = jexlFeatures.supportsScript()? JexlScript(jexlScope) : JexlExpression(jexlScope);
             script.jjtSetValue(info.detach());
@@ -79,7 +80,9 @@ public final class Parser extends JexlParser
 
 PARSER_END(Parser)
 
-TOKEN_MGR_DECLS : {}
+TOKEN_MGR_DECLS : {
+    boolean supportExtRelOper = false;
+}
 
 /***************************************
  *     Skip & Number literal tokens
@@ -140,7 +143,7 @@ TOKEN_MGR_DECLS : {}
     | < ene : "!$" > // ends not equal
 }
 
-<DEFAULT> TOKEN : { /* COMPARISONS */
+<NEVER> TOKEN : { /* COMPARISONS */
       < EQ : "eq" >
     | < NE : "ne" >
     | < GT : "gt" >
@@ -237,7 +240,20 @@ TOKEN_MGR_DECLS : {}
 
 <DEFAULT> TOKEN : /* IDENTIFIERS */
 {
-  < IDENTIFIER: <LETTER> (<LETTER>|<DIGIT>|<ESCAPE>)* > { matchedToken.image = StringParser.unescapeIdentifier(matchedToken.image); }
+  < IDENTIFIER: <LETTER> (<LETTER>|<DIGIT>|<ESCAPE>)* > 
+  { 
+      matchedToken.image = StringParser.unescapeIdentifier(matchedToken.image); 
+      if (supportExtRelOper) {
+          switch (matchedToken.image) {
+             case "ne" : matchedToken.kind = NE; break;
+             case "eq" : matchedToken.kind = EQ; break;
+             case "lt" : matchedToken.kind = LT; break;
+             case "le" : matchedToken.kind = LE; break;
+             case "gt" : matchedToken.kind = GT; break;
+             case "ge" : matchedToken.kind = GT; break;
+          }
+      }
+  }
 |
   < #LETTER: [ "a"-"z", "A"-"Z", "_", "$", "@" ] >
 |
