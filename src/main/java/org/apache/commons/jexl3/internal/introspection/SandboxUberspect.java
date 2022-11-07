@@ -69,6 +69,11 @@ public final class SandboxUberspect implements JexlUberspect {
     }
 
     @Override
+    public Class<?> getClassByName(final String className) {
+        return uberspect.getClassByName(className);
+    }
+
+    @Override
     public JexlMethod getConstructor(final Object ctorHandle, final Object... args) {
         final String className;
         if (ctorHandle instanceof Class<?>) {

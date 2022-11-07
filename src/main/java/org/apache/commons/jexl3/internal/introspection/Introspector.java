@@ -62,7 +62,7 @@ public final class Introspector {
     /**
      * the logger.
      */
-    protected final Log logger;
+    private final Log logger;
     /**
      * The class loader used to solve constructors if needed.
      */
@@ -78,15 +78,15 @@ public final class Introspector {
     /**
      * Holds the method maps for the classes we know about, keyed by Class.
      */
-    private final Map<Class<?>, ClassMap> classMethodMaps = new HashMap<Class<?>, ClassMap>();
+    private final Map<Class<?>, ClassMap> classMethodMaps = new HashMap<>();
     /**
      * Holds the map of classes ctors we know about as well as unknown ones.
      */
-    private final Map<MethodKey, Constructor<?>> constructorsMap = new HashMap<MethodKey, Constructor<?>>();
+    private final Map<MethodKey, Constructor<?>> constructorsMap = new HashMap<>();
     /**
      * Holds the set of classes we have introspected.
      */
-    private final Map<String, Class<?>> constructibleClasses = new HashMap<String, Class<?>>();
+    private final Map<String, Class<?>> constructibleClasses = new HashMap<>();
 
     /**
      * Create the introspector.
@@ -116,7 +116,8 @@ public final class Introspector {
      */
     public Class<?> getClassByName(final String className) {
         try {
-            return Class.forName(className, false, loader);
+            Class<?> clazz = Class.forName(className, false, loader);
+            return permissions.allow(clazz)? clazz : null;
         } catch (final ClassNotFoundException xignore) {
             return null;
         }
@@ -279,7 +280,6 @@ public final class Introspector {
                             + cname + "."
                             + key.debugString(), xnotfound);
                 }
-                ctor = null;
             } catch (final MethodKey.AmbiguousException xambiguous) {
                 if (logger != null  && xambiguous.isSevere() &&  logger.isInfoEnabled()) {
                     logger.info("ambiguous constructor invocation: "
