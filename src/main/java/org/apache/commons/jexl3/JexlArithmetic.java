@@ -22,7 +22,6 @@ import org.apache.commons.jexl3.introspection.JexlMethod;
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.MathContext;
@@ -81,9 +80,6 @@ public class JexlArithmetic {
     /** Whether this JexlArithmetic instance behaves in strict or lenient mode. */
     private final boolean strict;
 
-    /** Whether this JexlArithmetic instance allows null as argument to cast methods - toXXX(). */
-    private final boolean strictCast;
-
     /** The big decimal math context. */
     private final MathContext mathContext;
 
@@ -123,17 +119,6 @@ public class JexlArithmetic {
             // ignore
         }
         this.ctor = actor;
-        boolean cast = strict;
-        // if isStrict is not overridden, we are in strict-cast mode
-        if (cast) {
-            try {
-                Method istrict = getClass().getMethod("isStrict", JexlOperator.class);
-                cast = JexlArithmetic.class == istrict.getDeclaringClass();
-            } catch (Exception e) {
-                // ignore
-            }
-        }
-        this.strictCast = cast;
     }
 
     /**
@@ -380,6 +365,388 @@ public class JexlArithmetic {
     }
 
     /**
+     * Coerce to a primitive boolean.
+     * <p>Double.NaN, null, "false" and empty string coerce to false.</p>
+     *
+     * @param val value to coerce
+     * @return the boolean value if coercion is possible, true if value was not null.
+     */
+    public boolean toBoolean(final Object val) {
+        return toBoolean(strict, val);
+    }
+
+    /**
+     * Coerce to a primitive int.
+     * <p>Double.NaN, null and empty string coerce to zero.</p>
+     * <p>Boolean false is 0, true is 1.</p>
+     *
+     * @param val value to coerce
+     * @return the value coerced to int
+     * @throws ArithmeticException if val is null and mode is strict or if coercion is not possible
+     */
+    public int toInteger(final Object val) {
+        return toInteger(strict, val);
+    }
+
+    /**
+     * Coerce to a primitive long.
+     * <p>Double.NaN, null and empty string coerce to zero.</p>
+     * <p>Boolean false is 0, true is 1.</p>
+     *
+     * @param val value to coerce
+     * @return the value coerced to long
+     * @throws ArithmeticException if value is null and mode is strict or if coercion is not possible
+     */
+    public long toLong(final Object val) {
+        return toLong(strict, val);
+    }
+
+    /**
+     * Coerce to a BigInteger.
+     * <p>Double.NaN, null and empty string coerce to zero.</p>
+     * <p>Boolean false is 0, true is 1.</p>
+     *
+     * @param val the object to be coerced.
+     * @return a BigDecimal
+     * @throws ArithmeticException if val is null and mode is strict or if coercion is not possible
+     */
+    public BigInteger toBigInteger(final Object val) {
+        return toBigInteger(strict, val);
+    }
+
+    /**
+     * Coerce to a primitive double.
+     * <p>Double.NaN, null and empty string coerce to zero.</p>
+     * <p>Boolean false is 0, true is 1.</p>
+     *
+     * @param val value to coerce.
+     * @return The double coerced value.
+     * @throws ArithmeticException if val is null and mode is strict or if coercion is not possible
+     */
+    public double toDouble(final Object val) {
+        return toDouble(strict, val);
+    }
+
+    /**
+     * Coerce to a BigDecimal.
+     * <p>Double.NaN, null and empty string coerce to zero.</p>
+     * <p>Boolean false is 0, true is 1.</p>
+     *
+     * @param val the object to be coerced.
+     * @return a BigDecimal.
+     * @throws ArithmeticException if val is null and mode is strict or if coercion is not possible
+     */
+    public BigDecimal toBigDecimal(final Object val) {
+        return toBigDecimal(strict, val);
+    }
+
+    /**
+     * Coerce to a string.
+     * <p>Double.NaN coerce to the empty string.</p>
+     *
+     * @param val value to coerce.
+     * @return The String coerced value.
+     * @throws ArithmeticException if val is null and mode is strict or if coercion is not possible
+     */
+    public String toString(final Object val) {
+        return toString(strict, val);
+    }
+
+    /**
+     * Throws an NullOperand exception if arithmetic is strict-cast.
+     * <p>This method is called by the cast methods ({@link #toBoolean(boolean, Object)},
+     * {@link #toInteger(boolean, Object)}, {@link #toDouble(boolean, Object)},
+     * {@link #toString(boolean, Object)}, {@link #toBigInteger(boolean, Object)},
+     * {@link #toBigDecimal(boolean, Object)}) when they encounter a null argument.</p>
+     *
+     * @param strictCast whether strict cast is required
+     * @throws JexlArithmetic.NullOperand if strict-cast
+     */
+    protected void controlNullOperand(boolean strictCast) {
+        if (strictCast) {
+            throw new NullOperand();
+        }
+    }
+
+    /**
+     * The result of +,/,-,*,% when both operands are null.
+     * @param strictCast whether strict-cast is required
+     * @return Integer(0) if lenient
+     * @throws  JexlArithmetic.NullOperand if strict-cast
+     */
+    protected Object controlNullNullOperands(boolean strictCast) {
+        if (strictCast ) {
+            throw new NullOperand();
+        }
+        return 0;
+    }
+
+    /**
+     * Coerce to a primitive boolean.
+     * <p>Double.NaN, null, "false" and empty string coerce to false.</p>
+     *
+     * @param val value to coerce
+     * @param strict true if the calling operator or casting is strict, false otherwise
+     * @return the boolean value if coercion is possible, true if value was not null.
+     */
+    protected boolean toBoolean(final boolean strict, final Object val) {
+        if (val == null) {
+            controlNullOperand(strict);
+            return false;
+        }
+        if (val instanceof Boolean) {
+            return ((Boolean) val);
+        }
+        if (val instanceof Number) {
+            final double number = toDouble(strict, val);
+            return !Double.isNaN(number) && number != 0.d;
+        }
+        if (val instanceof AtomicBoolean) {
+            return ((AtomicBoolean) val).get();
+        }
+        if (val instanceof String) {
+            final String strval = val.toString();
+            return !strval.isEmpty() && !"false".equals(strval);
+        }
+        // non-null value is true
+        return true;
+    }
+
+    /**
+     * Coerce to a primitive int.
+     * <p>Double.NaN, null and empty string coerce to zero.</p>
+     * <p>Boolean false is 0, true is 1.</p>
+     *
+     * @param strict true if the calling operator or casting is strict, false otherwise
+     * @param val value to coerce
+     * @return the value coerced to int
+     * @throws ArithmeticException if val is null and mode is strict or if coercion is not possible
+     */
+    protected int toInteger(final boolean strict, final Object val) {
+        if (val == null) {
+            controlNullOperand(strict);
+            return 0;
+        }
+        if (val instanceof Double) {
+            final double dval = (Double) val;
+            return Double.isNaN(dval)? 0 : (int) dval;
+        }
+        if (val instanceof Number) {
+            return ((Number) val).intValue();
+        }
+        if (val instanceof String) {
+            return parseInteger((String) val);
+        }
+        if (val instanceof Boolean) {
+            return ((Boolean) val) ? 1 : 0;
+        }
+        if (val instanceof AtomicBoolean) {
+            return ((AtomicBoolean) val).get() ? 1 : 0;
+        }
+        if (val instanceof Character) {
+            return ((Character) val);
+        }
+        throw new ArithmeticException("Integer coercion: "
+                + val.getClass().getName() + ":(" + val + ")");
+    }
+
+    /**
+     * Coerce to a primitive long.
+     * <p>Double.NaN, null and empty string coerce to zero.</p>
+     * <p>Boolean false is 0, true is 1.</p>
+     *
+     * @param strict true if the calling operator or casting is strict, false otherwise
+     * @param val value to coerce
+     * @return the value coerced to long
+     * @throws ArithmeticException if value is null and mode is strict or if coercion is not possible
+     */
+    protected long toLong(final boolean strict, final Object val) {
+        if (val == null) {
+            controlNullOperand(strict);
+            return 0L;
+        }
+        if (val instanceof Double) {
+            final double dval = (Double) val;
+            return Double.isNaN(dval)? 0L : (long) dval;
+        }
+        if (val instanceof Number) {
+            return ((Number) val).longValue();
+        }
+        if (val instanceof String) {
+            return parseLong((String) val);
+        }
+        if (val instanceof Boolean) {
+            return ((Boolean) val) ? 1L : 0L;
+        }
+        if (val instanceof AtomicBoolean) {
+            return ((AtomicBoolean) val).get() ? 1L : 0L;
+        }
+        if (val instanceof Character) {
+            return ((Character) val);
+        }
+        throw new ArithmeticException("Long coercion: "
+                + val.getClass().getName() + ":(" + val + ")");
+    }
+
+    /**
+     * Coerce to a BigInteger.
+     * <p>Double.NaN, null and empty string coerce to zero.</p>
+     * <p>Boolean false is 0, true is 1.</p>
+     *
+     * @param strict true if the calling operator or casting is strict, false otherwise
+     * @param val the object to be coerced.
+     * @return a BigDecimal
+     * @throws ArithmeticException if val is null and mode is strict or if coercion is not possible
+     */
+    protected BigInteger toBigInteger(final boolean strict, final Object val) {
+        if (val == null) {
+            controlNullOperand(strict);
+            return BigInteger.ZERO;
+        }
+        if (val instanceof BigInteger) {
+            return (BigInteger) val;
+        }
+        if (val instanceof Double) {
+            final Double dval = (Double) val;
+            if (Double.isNaN(dval)) {
+                return BigInteger.ZERO;
+            }
+            return BigInteger.valueOf(dval.longValue());
+        }
+        if (val instanceof BigDecimal) {
+            return ((BigDecimal) val).toBigInteger();
+        }
+        if (val instanceof Number) {
+            return BigInteger.valueOf(((Number) val).longValue());
+        }
+        if (val instanceof Boolean) {
+            return BigInteger.valueOf(((Boolean) val) ? 1L : 0L);
+        }
+        if (val instanceof AtomicBoolean) {
+            return BigInteger.valueOf(((AtomicBoolean) val).get() ? 1L : 0L);
+        }
+        if (val instanceof String) {
+            return parseBigInteger((String) val);
+        }
+        if (val instanceof Character) {
+            final int i = ((Character) val);
+            return BigInteger.valueOf(i);
+        }
+        throw new ArithmeticException("BigInteger coercion: "
+                + val.getClass().getName() + ":(" + val + ")");
+    }
+
+    /**
+     * Coerce to a BigDecimal.
+     * <p>Double.NaN, null and empty string coerce to zero.</p>
+     * <p>Boolean false is 0, true is 1.</p>
+     *
+     * @param strict true if the calling operator or casting is strict, false otherwise
+     * @param val the object to be coerced.
+     * @return a BigDecimal.
+     * @throws ArithmeticException if val is null and mode is strict or if coercion is not possible
+     */
+    protected BigDecimal toBigDecimal(final boolean strict, final Object val) {
+        if (val instanceof BigDecimal) {
+            return roundBigDecimal((BigDecimal) val);
+        }
+        if (val == null) {
+            controlNullOperand(strict);
+            return BigDecimal.ZERO;
+        }
+        if (val instanceof Double) {
+            if (Double.isNaN(((Double) val))) {
+                return BigDecimal.ZERO;
+            }
+            return roundBigDecimal(new BigDecimal(val.toString(), getMathContext()));
+        }
+        if (val instanceof Number) {
+            return roundBigDecimal(new BigDecimal(val.toString(), getMathContext()));
+        }
+        if (val instanceof Boolean) {
+            return BigDecimal.valueOf(((Boolean) val) ? 1. : 0.);
+        }
+        if (val instanceof AtomicBoolean) {
+            return BigDecimal.valueOf(((AtomicBoolean) val).get() ? 1L : 0L);
+        }
+        if (val instanceof String) {
+            final String string = (String) val;
+            if ("".equals(string)) {
+                return BigDecimal.ZERO;
+            }
+            return roundBigDecimal(new BigDecimal(string, getMathContext()));
+        }
+        if (val instanceof Character) {
+            final int i = ((Character) val);
+            return new BigDecimal(i);
+        }
+        throw new ArithmeticException("BigDecimal coercion: "
+                + val.getClass().getName() + ":(" + val + ")");
+    }
+
+    /**
+     * Coerce to a primitive double.
+     * <p>Double.NaN, null and empty string coerce to zero.</p>
+     * <p>Boolean false is 0, true is 1.</p>
+     *
+     * @param strict true if the calling operator or casting is strict, false otherwise
+     * @param val value to coerce.
+     * @return The double coerced value.
+     * @throws ArithmeticException if val is null and mode is strict or if coercion is not possible
+     */
+    protected double toDouble(final boolean strict, final Object val) {
+        if (val == null) {
+            controlNullOperand(strict);
+            return 0;
+        }
+        if (val instanceof Double) {
+            return ((Double) val);
+        }
+        if (val instanceof Number) {
+            //The below construct is used rather than ((Number)val).doubleValue() to ensure
+            //equality between comparing new Double( 6.4 / 3 ) and the jexl expression of 6.4 / 3
+            return Double.parseDouble(String.valueOf(val));
+        }
+        if (val instanceof Boolean) {
+            return ((Boolean) val) ? 1. : 0.;
+        }
+        if (val instanceof AtomicBoolean) {
+            return ((AtomicBoolean) val).get() ? 1. : 0.;
+        }
+        if (val instanceof String) {
+            return parseDouble((String) val);
+        }
+        if (val instanceof Character) {
+            return ((Character) val);
+        }
+        throw new ArithmeticException("Double coercion: "
+                + val.getClass().getName() + ":(" + val + ")");
+    }
+
+    /**
+     * Coerce to a string.
+     * <p>Double.NaN coerce to the empty string.</p>
+     *
+     * @param strict true if the calling operator or casting is strict, false otherwise
+     * @param val value to coerce.
+     * @return The String coerced value.
+     * @throws ArithmeticException if val is null and mode is strict or if coercion is not possible
+     */
+    protected String toString(final boolean strict, final Object val) {
+        if (val == null) {
+            controlNullOperand(strict);
+            return "";
+        }
+        if (!(val instanceof Double)) {
+            return val.toString();
+        }
+        final Double dval = (Double) val;
+        if (Double.isNaN(dval)) {
+            return "";
+        }
+        return dval.toString();
+    }
+    /**
      * Checks whether this JexlArithmetic instance
      * strictly considers null as an error when used as operand unexpectedly.
      *
@@ -390,30 +757,14 @@ public class JexlArithmetic {
     }
 
     /**
-     * Checks whether this JexlArithmetic instance
-     * strictly considers null as an error when used as operand of a cast method (toXXX())..
-     *
-     * @return true if strict-cast, false if lenient
-     */
-    public boolean isStrictCast() {
-        return strictCast;
-    }
-
-    /**
      * Checks whether this arithmetic considers a given operator as strict or null-safe.
      * <p>When an operator is strict, it does <em>not</em> accept null arguments when the arithmetic is strict.
      * If null-safe (ie not-strict), the operator does accept null arguments even if the arithmetic itself is strict.</p>
      * <p>The default implementation considers equal/not-equal operators as null-safe so one can check for null as in
      * <code>if (myvar == null) {...}</code>. Note that this operator is used for equal and not-equal syntax. The complete
      * list of operators that are not strict are (==, [], []=, ., .=, empty, size, contains). </p>
-     * <p>
-     *     An arithmetic refining its strict behavior handling for more operators must declare which by overriding
-     * this method.
-     * </p>
-     * <p>
-     *     If this method is overridden, the arithmetic instance is <em>NOT</em> in strict-cast mode. Tp restore the
-     *     strict-cast behavior, override the {@link #isStrictCast()} method/
-     * </p>
+     * <p>An arithmetic refining its strict behavior handling for more operators must declare which by overriding
+     * this method.</p>
      * @param operator the operator to check for null-argument(s) handling
      * @return true if operator considers null arguments as errors, false if operator has appropriate semantics
      * for null argument(s)
@@ -471,25 +822,26 @@ public class JexlArithmetic {
      * The result of +,/,-,*,% when both operands are null.
      *
      * @return Integer(0) if lenient
-     * @throws ArithmeticException if strict-cast
+     * @throws JexlArithmetic.NullOperand if strict
+     * @deprecated 3.3
      */
+    @Deprecated
     protected Object controlNullNullOperands() {
-        if (isStrictCast()) {
+        if (isStrict()) {
             throw new NullOperand();
         }
         return 0;
     }
 
     /**
-     * Throw a NPE if arithmetic is strict-cast.
-     * <p>This method is called by the cast methods ({@link #toBoolean(Object)}, {@link #toInteger(Object)},
-     * {@link #toDouble(Object)}, {@link #toString(Object)}, {@link #toBigInteger(Object)}, {@link #toBigDecimal(Object)})
-     * when they encounter a null argument.</p>
+     * Throws an NullOperand exception if arithmetic is strict-cast.
      *
-     * @throws ArithmeticException if strict
+     * @throws  JexlArithmetic.NullOperand if strict
+     * @deprecated 3.3
      */
+    @Deprecated
     protected void controlNullOperand() {
-        if (isStrictCast()) {
+        if (isStrict()) {
             throw new NullOperand();
         }
     }
@@ -854,22 +1206,23 @@ public class JexlArithmetic {
                     }
                     return narrowLong(left, right, result);
                 }
+                final boolean strictCast = isStrict(JexlOperator.ADD);
                 // if either are bigdecimal use that type
                 if (left instanceof BigDecimal || right instanceof BigDecimal) {
-                    final BigDecimal l = toBigDecimal(left);
-                    final BigDecimal r = toBigDecimal(right);
+                    final BigDecimal l = toBigDecimal(strictCast, left);
+                    final BigDecimal r = toBigDecimal(strictCast, right);
                     final BigDecimal result = l.add(r, getMathContext());
                     return narrowBigDecimal(left, right, result);
                 }
                 // if either are floating point (double or float) use double
                 if (isFloatingPointNumber(left) || isFloatingPointNumber(right)) {
-                    final double l = toDouble(left);
-                    final double r = toDouble(right);
+                    final double l = toDouble(strictCast, left);
+                    final double r = toDouble(strictCast, right);
                     return l + r;
                 }
                 // otherwise treat as (big) integers
-                final BigInteger l = toBigInteger(left);
-                final BigInteger r = toBigInteger(right);
+                final BigInteger l = toBigInteger(strictCast, left);
+                final BigInteger r = toBigInteger(strictCast, right);
                 final BigInteger result = l.add(r);
                 return narrowBigInteger(left, right, result);
             } catch (final ArithmeticException nfe) {
@@ -903,10 +1256,11 @@ public class JexlArithmetic {
             final long result = x  / y;
             return narrowLong(left, right, result);
         }
+        final boolean strictCast = isStrict(JexlOperator.DIVIDE);
         // if either are bigdecimal use that type
         if (left instanceof BigDecimal || right instanceof BigDecimal) {
-            final BigDecimal l = toBigDecimal(left);
-            final BigDecimal r = toBigDecimal(right);
+            final BigDecimal l = toBigDecimal(strictCast, left);
+            final BigDecimal r = toBigDecimal(strictCast, right);
             if (BigDecimal.ZERO.equals(r)) {
                 throw new ArithmeticException("/");
             }
@@ -915,16 +1269,16 @@ public class JexlArithmetic {
         }
         // if either are floating point (double or float) use double
         if (isFloatingPointNumber(left) || isFloatingPointNumber(right)) {
-            final double l = toDouble(left);
-            final double r = toDouble(right);
+            final double l = toDouble(strictCast, left);
+            final double r = toDouble(strictCast, right);
             if (r == 0.0) {
                 throw new ArithmeticException("/");
             }
             return l / r;
         }
         // otherwise treat as integers
-        final BigInteger l = toBigInteger(left);
-        final BigInteger r = toBigInteger(right);
+        final BigInteger l = toBigInteger(strictCast, left);
+        final BigInteger r = toBigInteger(strictCast, right);
         if (BigInteger.ZERO.equals(r)) {
             throw new ArithmeticException("/");
         }
@@ -956,10 +1310,11 @@ public class JexlArithmetic {
             final long result = x % y;
             return narrowLong(left, right,  result);
         }
+        final boolean strictCast = isStrict(JexlOperator.MOD);
         // if either are bigdecimal use that type
         if (left instanceof BigDecimal || right instanceof BigDecimal) {
-            final BigDecimal l = toBigDecimal(left);
-            final BigDecimal r = toBigDecimal(right);
+            final BigDecimal l = toBigDecimal(strictCast, left);
+            final BigDecimal r = toBigDecimal(strictCast, right);
             if (BigDecimal.ZERO.equals(r)) {
                 throw new ArithmeticException("%");
             }
@@ -968,16 +1323,16 @@ public class JexlArithmetic {
         }
         // if either are floating point (double or float) use double
         if (isFloatingPointNumber(left) || isFloatingPointNumber(right)) {
-            final double l = toDouble(left);
-            final double r = toDouble(right);
+            final double l = toDouble(strictCast, left);
+            final double r = toDouble(strictCast, right);
             if (r == 0.0) {
                 throw new ArithmeticException("%");
             }
             return l % r;
         }
         // otherwise treat as integers
-        final BigInteger l = toBigInteger(left);
-        final BigInteger r = toBigInteger(right);
+        final BigInteger l = toBigInteger(strictCast, left);
+        final BigInteger r = toBigInteger(strictCast, right);
         if (BigInteger.ZERO.equals(r)) {
             throw new ArithmeticException("%");
         }
@@ -1026,22 +1381,23 @@ public class JexlArithmetic {
             }
             return narrowLong(left, right, result);
         }
+        final boolean strictCast = isStrict(JexlOperator.MULTIPLY);
         // if either are bigdecimal use that type
         if (left instanceof BigDecimal || right instanceof BigDecimal) {
-            final BigDecimal l = toBigDecimal(left);
-            final BigDecimal r = toBigDecimal(right);
+            final BigDecimal l = toBigDecimal(strictCast, left);
+            final BigDecimal r = toBigDecimal(strictCast, right);
             final BigDecimal result = l.multiply(r, getMathContext());
             return narrowBigDecimal(left, right, result);
         }
         // if either are floating point (double or float) use double
         if (isFloatingPointNumber(left) || isFloatingPointNumber(right)) {
-            final double l = toDouble(left);
-            final double r = toDouble(right);
+            final double l = toDouble(strictCast, left);
+            final double r = toDouble(strictCast, right);
             return l * r;
         }
         // otherwise treat as integers
-        final BigInteger l = toBigInteger(left);
-        final BigInteger r = toBigInteger(right);
+        final BigInteger l = toBigInteger(strictCast, left);
+        final BigInteger r = toBigInteger(strictCast, right);
         final BigInteger result = l.multiply(r);
         return narrowBigInteger(left, right, result);
     }
@@ -1070,22 +1426,23 @@ public class JexlArithmetic {
             }
             return narrowLong(left, right, result);
         }
+        final boolean strictCast = isStrict(JexlOperator.SUBTRACT);
         // if either are bigdecimal use that type
         if (left instanceof BigDecimal || right instanceof BigDecimal) {
-            final BigDecimal l = toBigDecimal(left);
-            final BigDecimal r = toBigDecimal(right);
+            final BigDecimal l = toBigDecimal(strictCast, left);
+            final BigDecimal r = toBigDecimal(strictCast, right);
             final BigDecimal result = l.subtract(r, getMathContext());
             return narrowBigDecimal(left, right, result);
         }
         // if either are floating point (double or float) use double
         if (isFloatingPointNumber(left) || isFloatingPointNumber(right)) {
-            final double l = toDouble(left);
-            final double r = toDouble(right);
+            final double l = toDouble(strictCast, left);
+            final double r = toDouble(strictCast, right);
             return l - r;
         }
         // otherwise treat as integers
-        final BigInteger l = toBigInteger(left);
-        final BigInteger r = toBigInteger(right);
+        final BigInteger l = toBigInteger(strictCast, left);
+        final BigInteger r = toBigInteger(strictCast, right);
         final BigInteger result = l.subtract(r);
         return narrowBigInteger(left, right, result);
     }
@@ -1187,6 +1544,17 @@ public class JexlArithmetic {
      */
     public boolean isPositivizeStable() {
         return true;
+    }
+
+    /**
+     * Test if a condition is true or false.
+     * @param object the object to use as condition
+     * @return true or false
+     * @since 3.3
+     */
+    public boolean testPredicate(final Object object) {
+        final boolean strictCast = isStrict(JexlOperator.CONDITION);
+        return toBoolean(strictCast, object);
     }
 
     /**
@@ -1406,7 +1774,8 @@ public class JexlArithmetic {
      * @return ~val
      */
     public Object complement(final Object val) {
-        final long l = toLong(val);
+        final boolean strictCast = isStrict(JexlOperator.COMPLEMENT);
+        final long l = toLong(strictCast, val);
         return ~l;
     }
 
@@ -1417,7 +1786,8 @@ public class JexlArithmetic {
      * @return !val
      */
     public Object not(final Object val) {
-        return !toBoolean(val);
+        final boolean strictCast = isStrict(JexlOperator.NOT);
+        return !toBoolean(strictCast, val);
     }
 
     /**
@@ -1460,6 +1830,21 @@ public class JexlArithmetic {
     }
 
     /**
+     * @deprecated 3.3
+     */
+    @Deprecated
+    protected int compare(final Object left, final Object right, final String symbol) {
+        JexlOperator operator;
+        try {
+            operator = JexlOperator.valueOf(symbol);
+        } catch(IllegalArgumentException xill) {
+            // ignore
+            operator = JexlOperator.EQ;
+        }
+        return compare(left, right, operator);
+    }
+
+    /**
      * Performs a comparison.
      *
      * @param left     the left operand
@@ -1468,25 +1853,26 @@ public class JexlArithmetic {
      * @return -1 if left &lt; right; +1 if left &gt; right; 0 if left == right
      * @throws ArithmeticException if either left or right is null
      */
-    protected int compare(final Object left, final Object right, final String operator) {
+    protected int compare(final Object left, final Object right, final JexlOperator operator) {
+        final boolean strictCast = isStrict(operator);
         if (left != null && right != null) {
             if (left instanceof BigDecimal || right instanceof BigDecimal) {
-                final BigDecimal l = toBigDecimal(left);
-                final BigDecimal r = toBigDecimal(right);
+                final BigDecimal l = toBigDecimal(strictCast, left);
+                final BigDecimal r = toBigDecimal(strictCast, right);
                 return l.compareTo(r);
             }
             if (left instanceof BigInteger || right instanceof BigInteger) {
                 try {
-                    final BigInteger l = toBigInteger(left);
-                    final BigInteger r = toBigInteger(right);
+                    final BigInteger l = toBigInteger(strictCast, left);
+                    final BigInteger r = toBigInteger(strictCast, right);
                     return l.compareTo(r);
                 } catch(ArithmeticException xconvert) {
                     // ignore it, continue in sequence
                 }
             }
             if (isFloatingPoint(left) || isFloatingPoint(right)) {
-                final double lhs = toDouble(left);
-                final double rhs = toDouble(right);
+                final double lhs = toDouble(strictCast, left);
+                final double rhs = toDouble(strictCast, right);
                 if (Double.isNaN(lhs)) {
                     if (Double.isNaN(rhs)) {
                         return 0;
@@ -1501,8 +1887,8 @@ public class JexlArithmetic {
             }
             if (isNumberable(left) || isNumberable(right)) {
                 try {
-                    final long lhs = toLong(left);
-                    final long rhs = toLong(right);
+                    final long lhs = toLong(strictCast, left);
+                    final long rhs = toLong(strictCast, right);
                     return Long.compare(lhs, rhs);
                 } catch(ArithmeticException xconvert) {
                     // ignore it, continue in sequence
@@ -1511,7 +1897,7 @@ public class JexlArithmetic {
             if (left instanceof String || right instanceof String) {
                 return toString(left).compareTo(toString(right));
             }
-            if ("==".equals(operator)) {
+            if (JexlOperator.EQ == operator) {
                 return left.equals(right) ? 0 : -1;
             }
             if (left instanceof Comparable<?>) {
@@ -1537,10 +1923,11 @@ public class JexlArithmetic {
         if (left == null || right == null) {
             return false;
         }
+        final boolean strictCast = isStrict(JexlOperator.EQ);
         if (left instanceof Boolean || right instanceof Boolean) {
-            return toBoolean(left) == toBoolean(right);
+            return toBoolean(left) == toBoolean(strictCast, right);
         }
-        return compare(left, right, "==") == 0;
+        return compare(left, right, JexlOperator.EQ) == 0;
     }
 
     /**
@@ -1554,7 +1941,7 @@ public class JexlArithmetic {
         if ((left == right) || (left == null) || (right == null)) {
             return false;
         }
-        return compare(left, right, "<") < 0;
+        return compare(left, right, JexlOperator.LT) < 0;
 
     }
 
@@ -1569,7 +1956,7 @@ public class JexlArithmetic {
         if ((left == right) || left == null || right == null) {
             return false;
         }
-        return compare(left, right, ">") > 0;
+        return compare(left, right, JexlOperator.GT) > 0;
     }
 
     /**
@@ -1586,7 +1973,7 @@ public class JexlArithmetic {
         if (left == null || right == null) {
             return false;
         }
-        return compare(left, right, "<=") <= 0;
+        return compare(left, right, JexlOperator.LTE) <= 0;
     }
 
     /**
@@ -1603,114 +1990,8 @@ public class JexlArithmetic {
         if (left == null || right == null) {
             return false;
         }
-        return compare(left, right, ">=") >= 0;
+        return compare(left, right, JexlOperator.GTE) >= 0;
     }
-
-    /**
-     * Coerce to a primitive boolean.
-     * <p>Double.NaN, null, "false" and empty string coerce to false.</p>
-     *
-     * @param val value to coerce
-     * @return the boolean value if coercion is possible, true if value was not null.
-     */
-    public boolean toBoolean(final Object val) {
-        if (val == null) {
-            controlNullOperand();
-            return false;
-        }
-        if (val instanceof Boolean) {
-            return ((Boolean) val);
-        }
-        if (val instanceof Number) {
-            final double number = toDouble(val);
-            return !Double.isNaN(number) && number != 0.d;
-        }
-        if (val instanceof AtomicBoolean) {
-            return ((AtomicBoolean) val).get();
-        }
-        if (val instanceof String) {
-            final String strval = val.toString();
-            return !strval.isEmpty() && !"false".equals(strval);
-        }
-        // non-null value is true
-        return true;
-    }
-
-    /**
-     * Coerce to a primitive int.
-     * <p>Double.NaN, null and empty string coerce to zero.</p>
-     * <p>Boolean false is 0, true is 1.</p>
-     *
-     * @param val value to coerce
-     * @return the value coerced to int
-     * @throws ArithmeticException if val is null and mode is strict or if coercion is not possible
-     */
-    public int toInteger(final Object val) {
-        if (val == null) {
-            controlNullOperand();
-            return 0;
-        }
-        if (val instanceof Double) {
-            final double dval = (Double) val;
-            return Double.isNaN(dval)? 0 : (int) dval;
-        }
-        if (val instanceof Number) {
-            return ((Number) val).intValue();
-        }
-        if (val instanceof String) {
-            return parseInteger((String) val);
-        }
-        if (val instanceof Boolean) {
-            return ((Boolean) val) ? 1 : 0;
-        }
-        if (val instanceof AtomicBoolean) {
-            return ((AtomicBoolean) val).get() ? 1 : 0;
-        }
-        if (val instanceof Character) {
-            return ((Character) val);
-        }
-
-        throw new ArithmeticException("Integer coercion: "
-                + val.getClass().getName() + ":(" + val + ")");
-    }
-
-    /**
-     * Coerce to a primitive long.
-     * <p>Double.NaN, null and empty string coerce to zero.</p>
-     * <p>Boolean false is 0, true is 1.</p>
-     *
-     * @param val value to coerce
-     * @return the value coerced to long
-     * @throws ArithmeticException if value is null and mode is strict or if coercion is not possible
-     */
-    public long toLong(final Object val) {
-        if (val == null) {
-            controlNullOperand();
-            return 0L;
-        }
-        if (val instanceof Double) {
-            final double dval = (Double) val;
-            return Double.isNaN(dval)? 0L : (long) dval;
-        }
-        if (val instanceof Number) {
-            return ((Number) val).longValue();
-        }
-        if (val instanceof String) {
-            return parseLong((String) val);
-        }
-        if (val instanceof Boolean) {
-            return ((Boolean) val) ? 1L : 0L;
-        }
-        if (val instanceof AtomicBoolean) {
-            return ((AtomicBoolean) val).get() ? 1L : 0L;
-        }
-        if (val instanceof Character) {
-            return ((Character) val);
-        }
-        throw new ArithmeticException("Long coercion: "
-                + val.getClass().getName() + ":(" + val + ")");
-    }
-
 
     /**
      * Convert a string to a double.
@@ -1779,161 +2060,6 @@ public class JexlArithmetic {
             // ignore, try harder
         }
         return BigInteger.valueOf(parseLong(arg));
-    }
-
-    /**
-     * Coerce to a BigInteger.
-     * <p>Double.NaN, null and empty string coerce to zero.</p>
-     * <p>Boolean false is 0, true is 1.</p>
-     *
-     * @param val the object to be coerced.
-     * @return a BigDecimal
-     * @throws ArithmeticException if val is null and mode is strict or if coercion is not possible
-     */
-    public BigInteger toBigInteger(final Object val) {
-        if (val == null) {
-            controlNullOperand();
-            return BigInteger.ZERO;
-        }
-        if (val instanceof BigInteger) {
-            return (BigInteger) val;
-        }
-        if (val instanceof Double) {
-            final Double dval = (Double) val;
-            if (Double.isNaN(dval)) {
-                return BigInteger.ZERO;
-            }
-            return BigInteger.valueOf(dval.longValue());
-        }
-        if (val instanceof BigDecimal) {
-            return ((BigDecimal) val).toBigInteger();
-        }
-        if (val instanceof Number) {
-            return BigInteger.valueOf(((Number) val).longValue());
-        }
-        if (val instanceof Boolean) {
-            return BigInteger.valueOf(((Boolean) val) ? 1L : 0L);
-        }
-        if (val instanceof AtomicBoolean) {
-            return BigInteger.valueOf(((AtomicBoolean) val).get() ? 1L : 0L);
-        }
-        if (val instanceof String) {
-            return parseBigInteger((String) val);
-        }
-        if (val instanceof Character) {
-            final int i = ((Character) val);
-            return BigInteger.valueOf(i);
-        }
-        throw new ArithmeticException("BigInteger coercion: "
-                + val.getClass().getName() + ":(" + val + ")");
-    }
-
-    /**
-     * Coerce to a BigDecimal.
-     * <p>Double.NaN, null and empty string coerce to zero.</p>
-     * <p>Boolean false is 0, true is 1.</p>
-     *
-     * @param val the object to be coerced.
-     * @return a BigDecimal.
-     * @throws ArithmeticException if val is null and mode is strict or if coercion is not possible
-     */
-    public BigDecimal toBigDecimal(final Object val) {
-        if (val instanceof BigDecimal) {
-            return roundBigDecimal((BigDecimal) val);
-        }
-        if (val == null) {
-            controlNullOperand();
-            return BigDecimal.ZERO;
-        }
-        if (val instanceof Double) {
-            if (Double.isNaN(((Double) val))) {
-                return BigDecimal.ZERO;
-            }
-            return roundBigDecimal(new BigDecimal(val.toString(), getMathContext()));
-        }
-        if (val instanceof Number) {
-            return roundBigDecimal(new BigDecimal(val.toString(), getMathContext()));
-        }
-        if (val instanceof Boolean) {
-            return BigDecimal.valueOf(((Boolean) val) ? 1. : 0.);
-        }
-        if (val instanceof AtomicBoolean) {
-            return BigDecimal.valueOf(((AtomicBoolean) val).get() ? 1L : 0L);
-        }
-        if (val instanceof String) {
-            final String string = (String) val;
-            if ("".equals(string)) {
-                return BigDecimal.ZERO;
-            }
-            return roundBigDecimal(new BigDecimal(string, getMathContext()));
-        }
-        if (val instanceof Character) {
-            final int i = ((Character) val);
-            return new BigDecimal(i);
-        }
-        throw new ArithmeticException("BigDecimal coercion: "
-                + val.getClass().getName() + ":(" + val + ")");
-    }
-
-    /**
-     * Coerce to a primitive double.
-     * <p>Double.NaN, null and empty string coerce to zero.</p>
-     * <p>Boolean false is 0, true is 1.</p>
-     *
-     * @param val value to coerce.
-     * @return The double coerced value.
-     * @throws ArithmeticException if val is null and mode is strict or if coercion is not possible
-     */
-    public double toDouble(final Object val) {
-        if (val == null) {
-            controlNullOperand();
-            return 0;
-        }
-        if (val instanceof Double) {
-            return ((Double) val);
-        }
-        if (val instanceof Number) {
-            //The below construct is used rather than ((Number)val).doubleValue() to ensure
-            //equality between comparing new Double( 6.4 / 3 ) and the jexl expression of 6.4 / 3
-            return Double.parseDouble(String.valueOf(val));
-        }
-        if (val instanceof Boolean) {
-            return ((Boolean) val) ? 1. : 0.;
-        }
-        if (val instanceof AtomicBoolean) {
-            return ((AtomicBoolean) val).get() ? 1. : 0.;
-        }
-        if (val instanceof String) {
-            return parseDouble((String) val);
-        }
-        if (val instanceof Character) {
-            return ((Character) val);
-        }
-        throw new ArithmeticException("Double coercion: "
-                + val.getClass().getName() + ":(" + val + ")");
-    }
-
-    /**
-     * Coerce to a string.
-     * <p>Double.NaN coerce to the empty string.</p>
-     *
-     * @param val value to coerce.
-     * @return The String coerced value.
-     * @throws ArithmeticException if val is null and mode is strict or if coercion is not possible
-     */
-    public String toString(final Object val) {
-        if (val == null) {
-            controlNullOperand();
-            return "";
-        }
-        if (!(val instanceof Double)) {
-            return val.toString();
-        }
-        final Double dval = (Double) val;
-        if (Double.isNaN(dval)) {
-            return "";
-        }
-        return dval.toString();
     }
 
     /**
