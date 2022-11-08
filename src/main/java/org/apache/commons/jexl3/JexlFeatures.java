@@ -60,7 +60,7 @@ public final class JexlFeatures {
         "register", "reserved variable", "local variable", "assign/modify",
         "global assign/modify", "array reference", "create instance", "loop", "function",
         "method call", "set/map/array literal", "pragma", "annotation", "script", "lexical", "lexicalShade",
-        "thin-arrow", "fat-arrow"
+        "thin-arrow", "fat-arrow", "namespace pragma", "import pragma"
     };
     /** Registers feature ordinal. */
     private static final int REGISTER = 0;
@@ -98,24 +98,35 @@ public final class JexlFeatures {
     public static final int THIN_ARROW = 16;
     /** Fat-arrow lambda syntax. */
     public static final int FAT_ARROW = 17;
+    /** Namespace pragma feature ordinal. */
+    public static final int NS_PRAGMA = 18;
+    /** Import pragma feature ordinal. */
+    public static final int IMPORT_PRAGMA = 19;
+    /**
+     * The default features flag mask.
+     */
+    private static final long DEFAULT_FEATURES =
+            (1L << LOCAL_VAR)
+            | (1L << SIDE_EFFECT)
+            | (1L << SIDE_EFFECT_GLOBAL)
+            | (1L << ARRAY_REF_EXPR)
+            | (1L << NEW_INSTANCE)
+            | (1L << LOOP)
+            | (1L << LAMBDA)
+            | (1L << METHOD_CALL)
+            | (1L << STRUCTURED_LITERAL)
+            | (1L << PRAGMA)
+            | (1L << ANNOTATION)
+            | (1L << SCRIPT)
+            | (1L << THIN_ARROW)
+            | (1L << NS_PRAGMA)
+            | (1L << IMPORT_PRAGMA);
 
     /**
      * Creates an all-features-enabled instance.
      */
     public JexlFeatures() {
-        flags = (1L << LOCAL_VAR)
-                | (1L << SIDE_EFFECT)
-                | (1L << SIDE_EFFECT_GLOBAL)
-                | (1L << ARRAY_REF_EXPR)
-                | (1L << NEW_INSTANCE)
-                | (1L << LOOP)
-                | (1L << LAMBDA)
-                | (1L << METHOD_CALL)
-                | (1L << STRUCTURED_LITERAL)
-                | (1L << PRAGMA)
-                | (1L << ANNOTATION)
-                | (1L << SCRIPT)
-                | (1L << THIN_ARROW);
+        flags = DEFAULT_FEATURES;
         reservedNames = Collections.emptySet();
         nameSpaces = TEST_STR_FALSE;
     }
@@ -489,15 +500,59 @@ public final class JexlFeatures {
      */
     public JexlFeatures pragma(final boolean flag) {
         setFeature(PRAGMA, flag);
+        if (!flag) {
+            setFeature(NS_PRAGMA, false);
+            setFeature(IMPORT_PRAGMA, false);
+        }
         return this;
     }
 
     /**
-     * @return true if pragma are enabled, false otherwise
+     * @return true if namespace pragma are enabled, false otherwise
      */
     public boolean supportsPragma() {
         return getFeature(PRAGMA);
     }
+
+    /**
+     * Sets whether namespace pragma constructs are enabled.
+     * <p>
+     * When disabled, parsing a script/expression using syntactic namespace pragma constructs
+     * (#pragma jexl.namespace....) will throw a parsing exception.
+     * @param flag true to enable, false to disable
+     * @return this features instance
+     */
+    public JexlFeatures namespacePragma(final boolean flag) {
+        setFeature(NS_PRAGMA, flag);
+        return this;
+    }
+
+    /**
+     * @return true if namespace pragma are enabled, false otherwise
+     */
+    public boolean supportsNamespacePragma() {
+        return getFeature(NS_PRAGMA);
+    }
+    /**
+     * Sets whether import pragma constructs are enabled.
+     * <p>
+     * When disabled, parsing a script/expression using syntactic import pragma constructs
+     * (#pragma jexl.import....) will throw a parsing exception.
+     * @param flag true to enable, false to disable
+     * @return this features instance
+     */
+    public JexlFeatures importPragma(final boolean flag) {
+        setFeature(IMPORT_PRAGMA, flag);
+        return this;
+    }
+
+    /**
+     * @return true if import pragma are enabled, false otherwise
+     */
+    public boolean supportsImportPragma() {
+        return getFeature(IMPORT_PRAGMA);
+    }
+
 
     /**
      * Sets whether annotation constructs are enabled.

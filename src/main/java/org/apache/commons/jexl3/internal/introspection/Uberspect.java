@@ -92,7 +92,7 @@ public class Uberspect implements JexlUberspect {
     public Uberspect(final Log runtimeLogger, final JexlUberspect.ResolverStrategy sty, final JexlPermissions perms) {
         logger = runtimeLogger == null? LogFactory.getLog(JexlEngine.class) : runtimeLogger;
         strategy = sty == null? JexlUberspect.JEXL_STRATEGY : sty;
-        permissions = perms == null? Permissions.DEFAULT : perms;
+        permissions = perms == null? Permissions.RESTRICTED : perms;
         ref = new SoftReference<Introspector>(null);
         loader = new SoftReference<ClassLoader>(getClass().getClassLoader());
         operatorMap = new ConcurrentHashMap<Class<? extends JexlArithmetic>, Set<JexlOperator>>();

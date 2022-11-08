@@ -29,7 +29,13 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
+import org.apache.commons.jexl3.JexlBuilder;
+import org.apache.commons.jexl3.JexlException;
+import org.apache.commons.jexl3.introspection.JexlPermissions;
+import org.apache.commons.logging.LogFactory;
+import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 public class JexlScriptEngineTest {
@@ -40,6 +46,16 @@ public class JexlScriptEngineTest {
     private static final List<String> MIMES = Arrays.asList("application/x-jexl",
                                                             "application/x-jexl2",
                                                             "application/x-jexl3");
+
+    @Before
+    public void setUp() {
+    }
+
+    @After
+    public void tearDown() {
+        JexlBuilder.setDefaultPermissions(null);
+        JexlScriptEngine.setInstance(null);
+    }
 
     @Test
     public void testScriptEngineFactory() throws Exception {
@@ -83,12 +99,16 @@ public class JexlScriptEngineTest {
         final Integer initialValue = 123;
         Assert.assertEquals(initialValue,engine.eval("123"));
         Assert.assertEquals(initialValue,engine.eval("0;123"));// multiple statements
-        final long time1 = System.currentTimeMillis();
-        final Long time2 = (Long) engine.eval(
-             "sys=context.class.forName(\"java.lang.System\");"
-            +"now=sys.currentTimeMillis();"
+        try {
+            final Long time2 = (Long) engine.eval(
+                    "sys=context.class.forName(\"java.lang.System\");"
+                            + "now=sys.currentTimeMillis();"
             );
-        Assert.assertTrue("Must take some time to process this",time1 <= time2);
+            Assert.fail("default engine no longer accesses System classes");
+        } catch(ScriptException xscript) {
+            JexlException.Method xjexl = (JexlException.Method) xscript.getCause();
+            Assert.assertEquals("forName", xjexl.getMethod());
+        }
         engine.put("value", initialValue);
         Assert.assertEquals(initialValue,engine.get("value"));
         final Integer newValue = 124;
@@ -101,6 +121,32 @@ public class JexlScriptEngineTest {
         Assert.assertEquals(engine.getContext().getWriter(),engine.eval("JEXL.out"));
         Assert.assertEquals(engine.getContext().getErrorWriter(),engine.eval("JEXL.err"));
         Assert.assertEquals(System.class,engine.eval("JEXL.System"));
+    }
+
+    @Test
+    public void testScriptingInstance0() throws Exception {
+        final ScriptEngineManager manager = new ScriptEngineManager();
+        JexlScriptEngine.setInstance(new JexlBuilder()
+                .cache(512)
+                .logger(LogFactory.getLog(JexlScriptEngine.class))
+                .permissions(JexlPermissions.UNRESTRICTED)
+                .create());
+        final ScriptEngine engine = manager.getEngineByName("jexl3");
+        Long time2 = (Long) engine.eval(
+                "sys=context.class.forName(\"java.lang.System\");"
+                        + "now=sys.currentTimeMillis();");
+        Assert.assertTrue(time2 <= System.currentTimeMillis());
+    }
+
+    @Test
+    public void testScriptingPermissions1() throws Exception {
+        JexlBuilder.setDefaultPermissions(JexlPermissions.UNRESTRICTED);
+        final ScriptEngineManager manager = new ScriptEngineManager();
+        final ScriptEngine engine = manager.getEngineByName("jexl3");
+        Long time2 = (Long) engine.eval(
+                "sys=context.class.forName(\"java.lang.System\");"
+                        + "now=sys.currentTimeMillis();");
+        Assert.assertTrue(time2 <= System.currentTimeMillis());
     }
 
     @Test
