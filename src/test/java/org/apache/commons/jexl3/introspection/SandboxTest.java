@@ -18,7 +18,6 @@ package org.apache.commons.jexl3.introspection;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -33,7 +32,6 @@ import org.apache.commons.jexl3.JexlTestCase;
 import org.apache.commons.jexl3.MapContext;
 import org.apache.commons.jexl3.annotations.NoJexl;
 
-import org.apache.commons.jexl3.internal.introspection.Permissions;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -458,6 +456,34 @@ public class SandboxTest extends JexlTestCase {
         } catch (final JexlException xjm) {
             // ok
             LOGGER.debug(xjm.toString());
+        }
+    }
+
+    public interface SomeInterface {
+        int bar();
+    }
+
+    public static class SomeFoo implements SomeInterface {
+        @Override
+        public int bar() {
+            return 1;
+        }
+    }
+
+    @Test
+    public void testSandboxInheritWithNonInheritedPermission() {
+        final SomeFoo foo = new SomeFoo();
+        final JexlSandbox sandbox = new JexlSandbox(false, true);
+        sandbox.permissions(SomeInterface.class.getName(), false, true, true, true);
+        final JexlEngine sjexl = new JexlBuilder().sandbox(sandbox).safe(false).strict(true).create();
+        final JexlScript someOp = sjexl.createScript("foo.bar()", "foo");
+
+        try {
+            someOp.execute(null, foo);
+            Assert.fail("should not be possible");
+        } catch (final JexlException e) {
+            // ok
+            LOGGER.debug(e.toString());
         }
     }
 
