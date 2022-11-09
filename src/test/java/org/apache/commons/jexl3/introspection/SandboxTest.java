@@ -18,7 +18,6 @@ package org.apache.commons.jexl3.introspection;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -33,7 +32,6 @@ import org.apache.commons.jexl3.JexlTestCase;
 import org.apache.commons.jexl3.MapContext;
 import org.apache.commons.jexl3.annotations.NoJexl;
 
-import org.apache.commons.jexl3.internal.introspection.Permissions;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -465,7 +463,73 @@ public class SandboxTest extends JexlTestCase {
             LOGGER.debug(xjm.toString());
         }
     }
+    public interface SomeInterface {
+        int bar();
+    }
 
+    public static class Foo386 implements SomeInterface {
+        @Override
+        public int bar() {
+            return 42;
+        }
+    }
+    public static class Quux386 extends Foo386 {
+        @Override
+        public int bar() {
+            return -42;
+        }
+    }
+    @Test
+    public void testInheritedPermission0() {
+        final Foo386 foo = new Foo386();
+        final JexlSandbox sandbox = new JexlSandbox(false, true);
+        sandbox.permissions(SomeInterface.class.getName(), true, true, true, true);
+        final JexlEngine sjexl = new JexlBuilder().sandbox(sandbox).safe(false).strict(true).create();
+        final JexlScript someOp = sjexl.createScript("foo.bar()", "foo");
+        Assert.assertEquals(42, someOp.execute(null, foo));
+    }
+
+    @Test
+    public void testNonInheritedPermission0() {
+        final Foo386 foo = new Foo386();
+        final JexlSandbox sandbox = new JexlSandbox(false, true);
+        sandbox.permissions(SomeInterface.class.getName(), false, true, true, true);
+        final JexlEngine sjexl = new JexlBuilder().sandbox(sandbox).safe(false).strict(true).create();
+        final JexlScript someOp = sjexl.createScript("foo.bar()", "foo");
+
+        try {
+            someOp.execute(null, foo);
+            Assert.fail("should not be possible");
+        } catch (final JexlException e) {
+            // ok
+            LOGGER.debug(e.toString());
+        }
+    }
+    @Test
+    public void testInheritedPermission1() {
+        final Quux386 foo = new Quux386();
+        final JexlSandbox sandbox = new JexlSandbox(false, true);
+        sandbox.permissions(Foo386.class.getName(), true, true, true, true);
+        final JexlEngine sjexl = new JexlBuilder().sandbox(sandbox).safe(false).strict(true).create();
+        final JexlScript someOp = sjexl.createScript("foo.bar()", "foo");
+        Assert.assertEquals(-42, someOp.execute(null, foo));
+    }
+    @Test
+    public void testNonInheritedPermission1() {
+        final Quux386 foo = new Quux386();
+        final JexlSandbox sandbox = new JexlSandbox(false, true);
+        sandbox.permissions(Foo386.class.getName(), false, true, true, true);
+        final JexlEngine sjexl = new JexlBuilder().sandbox(sandbox).safe(false).strict(true).create();
+        final JexlScript someOp = sjexl.createScript("foo.bar()", "foo");
+
+        try {
+            someOp.execute(null, foo);
+            Assert.fail("should not be possible");
+        } catch (final JexlException e) {
+            // ok
+            LOGGER.debug(e.toString());
+        }
+    }
     public static class Foo42 {
         public int getFoo() {
             return 42;
