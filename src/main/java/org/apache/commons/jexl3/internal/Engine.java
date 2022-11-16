@@ -25,7 +25,6 @@ import org.apache.commons.jexl3.JexlFeatures;
 import org.apache.commons.jexl3.JexlInfo;
 import org.apache.commons.jexl3.JexlOptions;
 import org.apache.commons.jexl3.JexlScript;
-import org.apache.commons.jexl3.internal.introspection.Permissions;
 import org.apache.commons.jexl3.internal.introspection.SandboxUberspect;
 import org.apache.commons.jexl3.internal.introspection.Uberspect;
 import org.apache.commons.jexl3.introspection.JexlMethod;
@@ -57,6 +56,10 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Predicate;
 
+import static org.apache.commons.jexl3.parser.JexlParser.PRAGMA_IMPORT;
+import static org.apache.commons.jexl3.parser.JexlParser.PRAGMA_JEXLNS;
+import static org.apache.commons.jexl3.parser.JexlParser.PRAGMA_OPTIONS;
+
 /**
  * A JexlEngine implementation.
  * @since 2.0
@@ -80,18 +83,6 @@ public class Engine extends JexlEngine {
         /** Non-instantiable. */
         private UberspectHolder() {}
     }
-    /**
-     * The name of the options pragma.
-     */
-    protected static final String PRAGMA_OPTIONS = "jexl.options";
-    /**
-     * The prefix of a namespace pragma.
-     */
-    protected static final String PRAGMA_JEXLNS = "jexl.namespace.";
-    /**
-     * The prefix of an import pragma.
-     */
-    protected static final String PRAGMA_IMPORT = "jexl.import";
     /**
      * The Log to which all JexlEngine messages will be logged.
      */
@@ -248,7 +239,7 @@ public class Engine extends JexlEngine {
      * <p>This is lazily initialized to avoid building a default instance if there
      * is no use for it. The main reason for not using the default Uberspect instance is to
      * be able to use a (low level) introspector created with a given logger
-     * instead of the default one.</p>
+     * instead of the default one and even more so for with a different (restricted) set of permissions.</p>
      * @param logger the logger to use for the underlying Uberspect
      * @param strategy the property resolver strategy
      * @param permissions the introspection permissions
@@ -261,7 +252,7 @@ public class Engine extends JexlEngine {
             final JexlPermissions permissions) {
         if ((logger == null || logger.equals(LogFactory.getLog(JexlEngine.class)))
             && (strategy == null || strategy == JexlUberspect.JEXL_STRATEGY)
-            && permissions == null || permissions == Permissions.DEFAULT) {
+            && (permissions == null || permissions == JexlPermissions.UNRESTRICTED)) {
             return UberspectHolder.UBERSPECT;
         }
         return new Uberspect(logger, strategy, permissions);
@@ -354,7 +345,7 @@ public class Engine extends JexlEngine {
     /**
      * Extracts the engine evaluation options from context if available, the engine
      * options otherwise.
-     * <p>If the context is a options handle and the handled options shared instance flag
+     * <p>If the context is an options handle and the handled options shared instance flag
      * is false, this method creates a copy of the options making them immutable during execution.
      * @param context the context
      * @return the options if any
@@ -458,15 +449,16 @@ public class Engine extends JexlEngine {
                     if (value instanceof String) {
                         // jexl.namespace.***
                         final String nsname = key.substring(PRAGMA_JEXLNS.length());
-                        if (nsname != null && !nsname.isEmpty()) {
+                        if (!nsname.isEmpty()) {
                             if (ns == null) {
                                 ns = new HashMap<>(functions);
                             }
                             final String nsclass = value.toString();
-                            try {
-                                ns.put(nsname, uberspect.getClassLoader().loadClass(nsclass));
-                            } catch (final ClassNotFoundException e) {
-                                ns.put(nsname, nsclass);
+                            Class<?> clazz = uberspect.getClassByName(nsclass);
+                            if (clazz == null) {
+                                logger.warn(key + ": unable to find class " + nsclass);
+                            } else {
+                                ns.put(nsname, clazz);
                             }
                         }
                     }

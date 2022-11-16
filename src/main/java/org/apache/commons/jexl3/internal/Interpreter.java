@@ -536,6 +536,11 @@ public class Interpreter extends InterpreterBase {
         }
     }
 
+    private boolean testPredicate(JexlNode node, Object condition) {
+        final Object predicate = operators.tryOverload(node, JexlOperator.CONDITION, condition);
+        return  arithmetic.testPredicate(predicate != JexlEngine.TRY_FAILED? predicate : condition);
+    }
+
     @Override
     protected Object visit(final ASTIfStatement node, final Object data) {
         final int n = 0;
@@ -544,8 +549,9 @@ public class Interpreter extends InterpreterBase {
             Object result = null;
             // pairs of { conditions , 'then' statement }
             for(int ifElse = 0; ifElse < (numChildren - 1); ifElse += 2) {
-                final Object condition = node.jjtGetChild(ifElse).jjtAccept(this, null);
-                if (arithmetic.toBoolean(condition)) {
+                final JexlNode testNode = node.jjtGetChild(ifElse);
+                final Object condition = testNode.jjtAccept(this, null);
+                if (testPredicate(testNode, condition)) {
                     // first objectNode is true statement
                     return node.jjtGetChild(ifElse + 1).jjtAccept(this, null);
                 }
@@ -753,7 +759,7 @@ public class Interpreter extends InterpreterBase {
             // last child is body
             final JexlNode statement = (form & 8) != 0 ? node.jjtGetChild(nc) : null;
             // while(predicate())...
-            while (predicate == null || arithmetic.toBoolean(predicate.jjtAccept(this, data))) {
+            while (predicate == null || testPredicate(predicate, predicate.jjtAccept(this, data))) {
                 cancelCheck(node);
                 // the body
                 if (statement != null) {
@@ -785,7 +791,7 @@ public class Interpreter extends InterpreterBase {
         Object result = null;
         /* first objectNode is the condition */
         final JexlNode condition = node.jjtGetChild(0);
-        while (arithmetic.toBoolean(condition.jjtAccept(this, data))) {
+        while (testPredicate(condition, condition.jjtAccept(this, data))) {
             cancelCheck(node);
             if (node.jjtGetNumChildren() > 1) {
                 try {
@@ -819,7 +825,7 @@ public class Interpreter extends InterpreterBase {
                     //continue;
                 }
             }
-        } while (arithmetic.toBoolean(condition.jjtAccept(this, data)));
+        } while (testPredicate(condition, condition.jjtAccept(this, data)));
         return result;
     }
 

@@ -37,7 +37,7 @@ public interface JexlUberspect {
      * Abstracts getting property setter and getter.
      * <p>
      * These are used through 'strategies' to solve properties; a strategy orders a list of resolver types,
-     * and each resolver type is tried in sequence; the first resolver that discovers a non null {s,g}etter
+     * and each resolver type is tried in sequence; the first resolver that discovers a non-null {s,g}etter
      * stops the search.
      *
      * @see JexlResolver
@@ -115,7 +115,7 @@ public interface JexlUberspect {
     /**
      * A resolver types list tailored for POJOs, favors '.' over '[]'.
      */
-    static final List<PropertyResolver> POJO = Collections.unmodifiableList(Arrays.asList(
+    List<PropertyResolver> POJO = Collections.unmodifiableList(Arrays.asList(
             JexlResolver.PROPERTY,
             JexlResolver.MAP,
             JexlResolver.LIST,
@@ -128,7 +128,7 @@ public interface JexlUberspect {
     /**
      * A resolver types list tailored for Maps, favors '[]' over '.'.
      */
-    static final List<PropertyResolver> MAP = Collections.unmodifiableList(Arrays.asList(
+    List<PropertyResolver> MAP = Collections.unmodifiableList(Arrays.asList(
             JexlResolver.MAP,
             JexlResolver.LIST,
             JexlResolver.DUCK,
@@ -165,7 +165,7 @@ public interface JexlUberspect {
      * If the operator is '[]' or if the operator is null and the object is a map, use the MAP list of resolvers;
      * Other cases use the POJO list of resolvers.
      */
-    static final ResolverStrategy JEXL_STRATEGY = (op, obj) -> {
+    ResolverStrategy JEXL_STRATEGY = (op, obj) -> {
         if (op == JexlOperator.ARRAY_GET) {
             return MAP;
         }
@@ -184,7 +184,7 @@ public interface JexlUberspect {
      * <p>If the operator is '[]' or if the object is a map, use the MAP list of resolvers.
      * Otherwise, use the POJO list of resolvers.</p>
      */
-    static final ResolverStrategy MAP_STRATEGY = (op, obj) -> {
+    ResolverStrategy MAP_STRATEGY = (op, obj) -> {
         if (op == JexlOperator.ARRAY_GET) {
             return MAP;
         }
@@ -227,6 +227,20 @@ public interface JexlUberspect {
      * @return the class loader modification count
      */
     int getVersion();
+
+    /**
+     * Seeks a class by name using this uberspect class-loader.
+     * @param className the class name
+     * @return the class instance or null if the class cannot be located by this uberspect class loader or if
+     * permissions deny access to the class
+     */
+    default Class<?> getClassByName(final String className) {
+        try {
+            return Class.forName(className, false, getClassLoader());
+        } catch (ClassNotFoundException xignore) {
+            return null;
+        }
+    }
 
     /**
      * Returns a class constructor.

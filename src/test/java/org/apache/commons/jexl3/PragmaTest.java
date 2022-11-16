@@ -140,7 +140,7 @@ public class PragmaTest extends JexlTestCase {
     }
 
     @Test
-    public void testNamespacePragmaValueSet() {
+    public void testImportPragmaValueSet() {
         String src =
                 "#pragma jexl.import java.util\n"+
                 "#pragma jexl.import java.io\n"+
@@ -159,6 +159,37 @@ public class PragmaTest extends JexlTestCase {
         Assert.assertEquals(src, parsed);
     }
 
+    @Test
+    public void testImportPragmaDisabled() {
+        String src =
+                "#pragma jexl.import java.util\n"+
+                        "#pragma jexl.import java.io\n"+
+                        "#pragma jexl.import java.net\n"+
+                        "42";
+        JexlFeatures features = new JexlFeatures();
+        features.importPragma(false);
+        final JexlEngine jexl = new JexlBuilder().features(features).create();
+        try {
+            final JexlScript script = jexl.createScript(src);
+        } catch(JexlException.Parsing xparse) {
+            Assert.assertTrue(xparse.getMessage().contains("import pragma"));
+        }
+    }
+    @Test
+    public void testNamespacePragmaDisabled() {
+        JexlFeatures features = new JexlFeatures();
+        features.namespacePragma(false);
+        final JexlEngine jexl = new JexlBuilder().features(features).create();
+        try {
+            final JexlScript src = jexl.createScript(
+                    "#pragma jexl.namespace.sleeper " + StaticSleeper.class.getName() + "\n"
+                            + "sleeper:sleep(100);"
+                            + "42");
+            Assert.fail("should have thrown syntax exception");
+        } catch(JexlException.Parsing xparse) {
+            Assert.assertTrue(xparse.getMessage().contains("namespace pragma"));
+        }
+    }
     @Test
     @SuppressWarnings("AssertEqualsBetweenInconvertibleTypes")
     public void testStaticNamespacePragma() {

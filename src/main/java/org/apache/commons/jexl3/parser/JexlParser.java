@@ -490,9 +490,17 @@ public abstract class JexlParser extends StringParser {
     }
 
     /**
+     * The name of the options pragma.
+     */
+    public static final String PRAGMA_OPTIONS = "jexl.options";
+    /**
      * The prefix of a namespace pragma.
      */
-    protected static final String PRAGMA_JEXLNS = "jexl.namespace.";
+    public static final String PRAGMA_JEXLNS = "jexl.namespace.";
+    /**
+     * The import pragma.
+     */
+    public static final String PRAGMA_IMPORT = "jexl.import";
 
     /**
      * Adds a pragma declaration.
@@ -503,12 +511,18 @@ public abstract class JexlParser extends StringParser {
         if (!getFeatures().supportsPragma()) {
             throwFeatureException(JexlFeatures.PRAGMA, getToken(0));
         }
+        if (PRAGMA_IMPORT.equals(key) && !getFeatures().supportsImportPragma()) {
+            throwFeatureException(JexlFeatures.IMPORT_PRAGMA, getToken(0));
+        }
         if (pragmas == null) {
             pragmas = new TreeMap<>();
         }
         // declaring a namespace
         Predicate<String> ns = getFeatures().namespaceTest();
         if (ns != null && key.startsWith(PRAGMA_JEXLNS)) {
+            if (!getFeatures().supportsNamespacePragma()) {
+                throwFeatureException(JexlFeatures.NS_PRAGMA, getToken(0));
+            }
             // jexl.namespace.***
             final String nsname = key.substring(PRAGMA_JEXLNS.length());
             if (!nsname.isEmpty()) {

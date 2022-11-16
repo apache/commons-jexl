@@ -75,6 +75,9 @@ public class PermissionsParser {
      * @return the permissions map
      */
     public Permissions parse(String... srcs) {
+        if (srcs == null || srcs.length == 0) {
+            return Permissions.UNRESTRICTED;
+        }
         packages = new ConcurrentHashMap<>();
         wildcards = new LinkedHashSet<>();
         for(String src : srcs) {

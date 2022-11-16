@@ -648,8 +648,12 @@ public final class JexlSandbox {
                 // find first inherited interface that defines permissions
                 for (final Class<?> inter : clazz.getInterfaces()) {
                     permissions = sandbox.get(inter.getName());
-                    if (permissions != null && permissions.isInheritable()) {
-                        break;
+                    if (permissions != null) {
+                        if (permissions.isInheritable()) {
+                            break;
+                        } else {
+                            permissions = null;
+                        }
                     }
                 }
                 // nothing defined yet, find first superclass that defines permissions
@@ -659,8 +663,12 @@ public final class JexlSandbox {
                     // walk all superclasses
                     while (zuper != null) {
                         permissions = sandbox.get(zuper.getName());
-                        if (permissions != null && permissions.isInheritable()) {
-                            break;
+                        if (permissions != null) {
+                            if (permissions.isInheritable()) {
+                                break;
+                            } else {
+                                permissions = null;
+                            }
                         }
                         zuper = zuper.getSuperclass();
                     }
