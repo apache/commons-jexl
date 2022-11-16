@@ -56,6 +56,8 @@ New Features in 3.3:
 
 Bugs Fixed in 3.3:
 ==================
+* JEXL-386:     Non-inheritable permissions on interfaces are ignored in an inheritable sandbox
+* JEXL-384:     Improve control over JexlArithmetic null argument handling
 * JEXL-378:     Incremental operator and decremental operator do not honor the side-effect flag
 * JEXL-376:     Introspector captures methods on non-exported classes (modules, java9+)
 * JEXL-375:     Cannot access enums by their name when using sandbox

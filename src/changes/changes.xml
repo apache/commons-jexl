@@ -67,6 +67,12 @@
                 Configure accessible packages/classes/methods/fields
             </action>
             <!--  FIX -->
+            <action dev="henrib" type="fix" issue="JEXL-386" dure-to="Song Fuchang">
+                Non-inheritable permissions on interfaces are ignored in an inheritable sandbox
+            </action>
+            <action dev="henrib" type="add" issue="JEXL-384" due-to="Hussachai Puripunpinyo">
+                Improve control over JexlArithmetic null argument handling
+            </action>
             <action dev="henrib" type="fix" issue="JEXL-378" due-to="Hussachai Puripunpinyo">
                 Incremental operator and decremental operator do not honor the side-effect flag
             </action>
