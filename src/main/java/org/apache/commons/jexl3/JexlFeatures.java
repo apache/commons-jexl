@@ -60,7 +60,7 @@ public final class JexlFeatures {
         "register", "reserved variable", "local variable", "assign/modify",
         "global assign/modify", "array reference", "create instance", "loop", "function",
         "method call", "set/map/array literal", "pragma", "annotation", "script", "lexical", "lexicalShade",
-        "thin-arrow", "fat-arrow", "namespace pragma", "import pragma"
+        "thin-arrow", "fat-arrow", "namespace pragma", "import pragma", "comparator names"
     };
     /** Registers feature ordinal. */
     private static final int REGISTER = 0;
@@ -102,6 +102,8 @@ public final class JexlFeatures {
     public static final int NS_PRAGMA = 18;
     /** Import pragma feature ordinal. */
     public static final int IMPORT_PRAGMA = 19;
+    /** Comparator names (legacy) syntax. */
+    public static final int COMPARATOR_NAMES = 20;
     /**
      * The default features flag mask.
      */
@@ -120,7 +122,8 @@ public final class JexlFeatures {
             | (1L << SCRIPT)
             | (1L << THIN_ARROW)
             | (1L << NS_PRAGMA)
-            | (1L << IMPORT_PRAGMA);
+            | (1L << IMPORT_PRAGMA)
+            | (1L << COMPARATOR_NAMES);
 
     /**
      * Creates an all-features-enabled instance.
@@ -457,6 +460,7 @@ public final class JexlFeatures {
      * will throw a parsing exception.
      * @param flag true to enable, false to disable
      * @return this features instance
+     * @since 3.3
      */
     public JexlFeatures thinArrow(final boolean flag) {
         setFeature(THIN_ARROW, flag);
@@ -465,6 +469,7 @@ public final class JexlFeatures {
 
     /**
      * @return true if thin-arrow lambda syntax is enabled, false otherwise
+     * @since 3.3
      */
     public boolean supportsThinArrow() {
         return getFeature(THIN_ARROW);
@@ -477,6 +482,7 @@ public final class JexlFeatures {
      * will throw a parsing exception.
      * @param flag true to enable, false to disable
      * @return this features instance
+     * @since 3.3
      */
     public JexlFeatures fatArrow(final boolean flag) {
         setFeature(FAT_ARROW, flag);
@@ -485,9 +491,32 @@ public final class JexlFeatures {
 
     /**
      * @return true if fat-arrow lambda syntax is enabled, false otherwise
+     * @since 3.3
      */
     public boolean supportsFatArrow() {
         return getFeature(FAT_ARROW);
+    }
+
+    /**
+     * Sets whether the legacy comparison operator names syntax is enabled.
+     * <p>
+     * When disabled, comparison operators names (eq;ne;le;lt;ge;gt)
+     * will be treated as plain identifiers.
+     * @param flag true to enable, false to disable
+     * @return this features instance
+     * @since 3.3
+     */
+    public JexlFeatures comparatorNames(final boolean flag) {
+        setFeature(COMPARATOR_NAMES, flag);
+        return this;
+    }
+
+    /**
+     * @return true if legacy comparison operator names syntax is enabled, false otherwise
+     * @since 3.3
+     */
+    public boolean supportsComparatorNames() {
+        return getFeature(COMPARATOR_NAMES);
     }
 
     /**
@@ -540,6 +569,7 @@ public final class JexlFeatures {
      * (#pragma jexl.import....) will throw a parsing exception.
      * @param flag true to enable, false to disable
      * @return this features instance
+     * @since 3.3
      */
     public JexlFeatures importPragma(final boolean flag) {
         setFeature(IMPORT_PRAGMA, flag);
@@ -548,6 +578,7 @@ public final class JexlFeatures {
 
     /**
      * @return true if import pragma are enabled, false otherwise
+     * @since 3.3
      */
     public boolean supportsImportPragma() {
         return getFeature(IMPORT_PRAGMA);

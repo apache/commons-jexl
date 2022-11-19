@@ -289,4 +289,18 @@ public class FeaturesTest extends JexlTestCase {
         checkFeature(f, scripts);
     }
 
+    @Test
+    public void testNoComparatorNames() throws Exception {
+        final JexlFeatures f = new JexlFeatures().comparatorNames(false);
+        final String[] scripts = new String[]{
+            "1 eq 1",
+            "2 ne 3",
+            "1 lt 2",
+            "3 le 3",
+            "4 gt 2",
+            "3 ge 2"
+        };
+        checkFeature(f, scripts);
+    }
+
 }
