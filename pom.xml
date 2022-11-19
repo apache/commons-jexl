@@ -54,7 +54,7 @@
         <checkstyle.plugin.version>3.2.0</checkstyle.plugin.version>
         <checkstyle.version>10.4</checkstyle.version>
         <japicmp.skip>false</japicmp.skip>
-        <commons.japicmp.version>0.16.0</commons.japicmp.version>
+        <commons.japicmp.version>0.17.1</commons.japicmp.version>
 
         <!-- spotbugs 4.7.2 issue #2174 generates lots of garbage during analysis -->
 
