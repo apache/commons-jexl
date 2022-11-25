@@ -494,7 +494,7 @@ public class VarTest extends JexlTestCase {
             }
             // discard all chars not in identifier
         }
-        return ids.toArray(new String[ids.size()]);
+        return ids.toArray(new String[0]);
     }
 
     @Test

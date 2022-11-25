@@ -108,7 +108,7 @@ public class MethodKeyTest {
                 }
             }
         }
-        KEY_LIST = BY_KEY.keySet().toArray(new MethodKey[BY_KEY.size()]);
+        KEY_LIST = BY_KEY.keySet().toArray(new MethodKey[0]);
     }
 
     /** Builds a string key */
