@@ -197,6 +197,7 @@ public interface JexlContext {
          * @param value the value
          * @deprecated 3.3
          */
+        @Deprecated
         void processPragma(String key, Object value);
 
         /**
