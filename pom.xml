@@ -302,7 +302,7 @@
                 <version>${commons.pmd.version}</version>
                 <configuration>
                     <rulesets>
-                        <ruleset>${project.basedir}/src/main/config/pmd_jexl.xml</ruleset>
+                        <ruleset>${project.basedir}/src/main/config/pmd.xml</ruleset>
                     </rulesets>
                     <excludes>
                         <exclude>org/apache/commons/jexl3/parser/Parser.java</exclude>
