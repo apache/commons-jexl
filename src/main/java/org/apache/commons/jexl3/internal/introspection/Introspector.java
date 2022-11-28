@@ -106,7 +106,7 @@ public final class Introspector {
     public Introspector(final Log log, final ClassLoader cloader, final JexlPermissions perms) {
         this.logger = log;
         this.loader = cloader;
-        this.permissions = perms == null? Permissions.RESTRICTED : perms;
+        this.permissions = perms == null? JexlPermissions.RESTRICTED : perms;
     }
 
     /**

@@ -93,7 +93,7 @@ public abstract class InterpreterBase extends ParserVisitor {
         this.jexl = engine;
         this.logger = jexl.logger;
         this.uberspect = jexl.uberspect;
-        this.context = aContext != null ? aContext : Engine.EMPTY_CONTEXT;
+        this.context = aContext != null ? aContext : JexlEngine.EMPTY_CONTEXT;
         this.cache = engine.cache != null;
         final JexlArithmetic jexla = jexl.arithmetic;
         this.options = opts == null? engine.evalOptions(aContext) : opts;
@@ -106,7 +106,7 @@ public abstract class InterpreterBase extends ParserVisitor {
         if (this.context instanceof JexlContext.NamespaceResolver) {
             ns = ((JexlContext.NamespaceResolver) context);
         } else {
-            ns = Engine.EMPTY_NS;
+            ns = JexlEngine.EMPTY_NS;
         }
         AtomicBoolean acancel = null;
         if (this.context instanceof JexlContext.CancellationHandle) {
