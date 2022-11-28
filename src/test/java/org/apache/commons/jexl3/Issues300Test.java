@@ -536,6 +536,8 @@ public class Issues300Test {
     public void test325() {
         final JexlEngine jexl = new JexlBuilder().safe(false).create();
         final Map<String, Object> map = new HashMap<String, Object>() {
+            private static final long serialVersionUID = 1L;
+
             @Override
             public Object get(final Object key) {
                 return super.get(key == null ? "" : key);
