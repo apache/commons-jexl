@@ -134,6 +134,9 @@
             <action dev="ggregory" type="update" due-to="Dependabot">
                 Bump maven-pmd-plugin from 3.15.0 to 3.16.0 #82.
             </action>
+            <action dev="ggregory" type="update" due-to="Gary Gregory">
+                Bump pmd from 6.48.0 to 6.52.0.
+            </action>
             <action dev="ggregory" type="update" due-to="Dependabot">
                 Bump commons-parent from 53 to 54 #121.
             </action>
