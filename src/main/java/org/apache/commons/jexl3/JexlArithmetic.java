@@ -60,7 +60,9 @@ import static java.lang.StrictMath.floor;
 public class JexlArithmetic {
 
     /** Marker class for null operand exceptions. */
-    public static class NullOperand extends ArithmeticException {}
+    public static class NullOperand extends ArithmeticException {
+
+        private static final long serialVersionUID = 1L;}
 
     /** Double.MAX_VALUE as BigDecimal. */
     protected static final BigDecimal BIGD_DOUBLE_MAX_VALUE = BigDecimal.valueOf(Double.MAX_VALUE);

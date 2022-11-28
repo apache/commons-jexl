@@ -19,6 +19,10 @@ package org.apache.commons.jexl3.parser;
 import org.apache.commons.jexl3.internal.Debugger;
 
 public final class ASTSetLiteral extends JexlNode {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
     /** Whether this set is constant or not. */
     private boolean constant = false;
 

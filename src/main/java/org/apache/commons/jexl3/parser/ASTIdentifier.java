@@ -20,6 +20,10 @@ package org.apache.commons.jexl3.parser;
  * Identifiers, variables, ie symbols.
  */
 public class ASTIdentifier extends JexlNode {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
     protected String name = null;
     protected int symbol = -1;
     protected int flags = 0;

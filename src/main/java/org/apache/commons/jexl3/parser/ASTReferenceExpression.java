@@ -17,6 +17,11 @@
 package org.apache.commons.jexl3.parser;
 
 public final class ASTReferenceExpression extends JexlNode {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
     ASTReferenceExpression(final int id) {
         super(id);
     }

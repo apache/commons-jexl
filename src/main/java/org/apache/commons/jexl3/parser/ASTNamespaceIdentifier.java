@@ -20,6 +20,10 @@ package org.apache.commons.jexl3.parser;
  * Namespace : identifier.
  */
 public class ASTNamespaceIdentifier extends ASTIdentifier {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
     private String namespace;
 
     public ASTNamespaceIdentifier(final int id) {

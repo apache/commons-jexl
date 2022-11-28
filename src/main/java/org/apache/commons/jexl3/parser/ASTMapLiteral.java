@@ -19,6 +19,10 @@ package org.apache.commons.jexl3.parser;
 import org.apache.commons.jexl3.internal.Debugger;
 
 public final class ASTMapLiteral extends JexlNode {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
     /** Whether this array is constant or not. */
     private boolean constant = false;
 

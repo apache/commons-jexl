@@ -17,6 +17,10 @@
 package org.apache.commons.jexl3.parser;
 
 public final class ASTStringLiteral extends JexlNode implements JexlNode.Constant<String> {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
     /** The actual literal value; the inherited 'value' member may host a cached getter. */
     private String literal = null;
 

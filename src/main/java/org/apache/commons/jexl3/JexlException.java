@@ -990,6 +990,11 @@ public class JexlException extends RuntimeException {
      */
     public static class Cancel extends JexlException {
         /**
+         * 
+         */
+        private static final long serialVersionUID = 1L;
+
+        /**
          * Creates a new instance of Cancel.
          *
          * @param node the node where the interruption was detected

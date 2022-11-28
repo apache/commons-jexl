@@ -32,6 +32,10 @@ package org.apache.commons.jexl3.parser;
  * so it can serve as a last evaluation cache even in multi-threaded executions.
  */
 public class SimpleNode implements Node {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
     /** The parent node. */
     private JexlNode parent;
     /** The array of children nodes. */

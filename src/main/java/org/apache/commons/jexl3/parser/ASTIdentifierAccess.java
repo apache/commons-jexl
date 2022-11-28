@@ -21,6 +21,10 @@ package org.apache.commons.jexl3.parser;
  * Identifiers, variables and registers.
  */
 public class ASTIdentifierAccess extends JexlNode {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
     private String name = null;
     private Integer identifier = null;
 

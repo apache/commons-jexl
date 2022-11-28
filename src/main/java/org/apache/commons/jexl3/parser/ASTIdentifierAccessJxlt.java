@@ -23,6 +23,10 @@ import org.apache.commons.jexl3.JxltEngine;
  * x.`expr`.
  */
 public class ASTIdentifierAccessJxlt extends ASTIdentifierAccess {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
     protected JxltEngine.Expression jxltExpr;
 
     ASTIdentifierAccessJxlt(final int id) {

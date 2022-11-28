@@ -18,6 +18,11 @@ package org.apache.commons.jexl3.parser;
 
 public final class ASTAmbiguous extends JexlNode {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
     ASTAmbiguous(final int id) {
         super(id);
     }

@@ -22,6 +22,10 @@ import org.apache.commons.jexl3.internal.Debugger;
  * An array literal.
  */
 public final class ASTArrayLiteral extends JexlNode {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
     /** Whether this array is constant or not. */
     private boolean constant = false;
 
