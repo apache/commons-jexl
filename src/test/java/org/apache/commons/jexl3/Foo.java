@@ -70,7 +70,7 @@ public class Foo {
 
     public List<String> getCheeseList()
     {
-        final ArrayList<String> answer = new ArrayList<String>();
+        final ArrayList<String> answer = new ArrayList<>();
         answer.add("cheddar");
         answer.add("edam");
         answer.add("brie");

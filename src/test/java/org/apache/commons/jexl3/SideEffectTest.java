@@ -709,7 +709,7 @@ public class SideEffectTest extends JexlTestCase {
 
         public Object selfAdd(final Object c, final String item) throws IOException {
             if (c == null) {
-                return new ArrayList<String>(Collections.singletonList(item));
+                return new ArrayList<>(Collections.singletonList(item));
             }
             if (c instanceof Appendable) {
                 ((Appendable) c).append(item);
@@ -737,7 +737,7 @@ public class SideEffectTest extends JexlTestCase {
         final JexlEngine jexl = new JexlBuilder().arithmetic(j246).cache(32).debug(true).logger(log246).create();
         final JexlScript script = jexl.createScript("z += x", "x");
         final MapContext ctx = new MapContext();
-        List<String> z = new ArrayList<String>(1);
+        List<String> z = new ArrayList<>(1);
 
         // no ambiguous, std case
         ctx.set("z", z);
@@ -774,7 +774,7 @@ public class SideEffectTest extends JexlTestCase {
         }
 
         public Object arrayGet(final List<?> list, final Collection<Integer> range) {
-            final List<Object> rl = new ArrayList<Object>(range.size());
+            final List<Object> rl = new ArrayList<>(range.size());
             for(final int i : range) {
                 rl.add(list.get(i));
             }
@@ -792,7 +792,7 @@ public class SideEffectTest extends JexlTestCase {
     @Test
     public void test248() throws Exception {
         final MapContext ctx = new MapContext();
-        final List<Object> foo = new ArrayList<Object>(Arrays.asList(10, 20, 30, 40));
+        final List<Object> foo = new ArrayList<>(Arrays.asList(10, 20, 30, 40));
         ctx.set("foo", foo);
 
         final JexlEngine engine = new JexlBuilder().arithmetic(new Arithmetic248(true)).create();

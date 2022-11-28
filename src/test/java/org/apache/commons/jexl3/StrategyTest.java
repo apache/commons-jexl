@@ -97,7 +97,7 @@ public class StrategyTest extends JexlTestCase {
 
     public void run171(final JexlEngine jexl, final boolean std) throws Exception {
         Object result;
-        final Map<String, Object> i = new HashMap<String, Object>();
+        final Map<String, Object> i = new HashMap<>();
 
         i.put("class", 42);
         result = jexl.createScript("i['class'] ", "i").execute((JexlContext)null, i);

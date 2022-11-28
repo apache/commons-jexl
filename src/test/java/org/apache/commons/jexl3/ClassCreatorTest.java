@@ -186,7 +186,7 @@ public class ClassCreatorTest extends JexlTestCase {
 
     void functorTwo(final Object nstest) throws Exception {
         // create jexl2 with a 'test' namespace
-        final Map<String, Object> ns = new HashMap<String, Object>();
+        final Map<String, Object> ns = new HashMap<>();
         ns.put("test", nstest);
         final JexlEngine jexl2 = new JexlBuilder().namespaces(ns).create();
         final JexlContext ctxt = new MapContext();
@@ -241,7 +241,7 @@ public class ClassCreatorTest extends JexlTestCase {
         jexl.setClassLoader(cctor.getClassLoader());
         cctor.clear();
 
-        final Map<String, Object> ns = new HashMap<String, Object>();
+        final Map<String, Object> ns = new HashMap<>();
         ns.put("test", foo1);
         final JexlEngine jexl2 = new JexlBuilder().namespaces(ns).create();
 
@@ -272,8 +272,8 @@ public class ClassCreatorTest extends JexlTestCase {
         }
         int pass = 0;
         int gced = -1;
-        final ReferenceQueue<Object> queue = new ReferenceQueue<Object>();
-        final List<Reference<?>> stuff = new ArrayList<Reference<?>>();
+        final ReferenceQueue<Object> queue = new ReferenceQueue<>();
+        final List<Reference<?>> stuff = new ArrayList<>();
         // keeping a reference on methods prevent classes from being GCed
 //        List<Object> mm = new ArrayList<Object>();
         final JexlExpression expr = jexl.createExpression("foo.value");

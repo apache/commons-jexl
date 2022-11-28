@@ -299,7 +299,7 @@ public class PropertyAccessTest extends JexlTestCase {
 
     @Test
     public void testStringIdentifier() throws Exception {
-        final Map<String, String> foo = new HashMap<String, String>();
+        final Map<String, String> foo = new HashMap<>();
 
         final JexlContext jc = new MapContext();
         jc.set("foo", foo);
@@ -381,7 +381,7 @@ public class PropertyAccessTest extends JexlTestCase {
     @Test
     public void test250() throws Exception {
         final MapContext ctx = new MapContext();
-        final HashMap<Object, Object> x = new HashMap<Object, Object>();
+        final HashMap<Object, Object> x = new HashMap<>();
         x.put(2, "123456789");
         ctx.set("x", x);
         final JexlEngine engine = new JexlBuilder()
@@ -444,7 +444,7 @@ public class PropertyAccessTest extends JexlTestCase {
     }
 
     public static class Prompt {
-        private final Map<String, PromptValue> values = new HashMap<String, PromptValue>();
+        private final Map<String, PromptValue> values = new HashMap<>();
 
         public Object get(final String name) {
             final PromptValue v = values.get(name);

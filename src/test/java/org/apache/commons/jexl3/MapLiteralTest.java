@@ -46,7 +46,7 @@ public class MapLiteralTest extends JexlTestCase {
         final JexlExpression e = JEXL.createExpression("{ 'foo' : 'bar', 'eat' : 'food' }");
         final JexlContext jc = new MapContext();
 
-        final Map<String, String> expected = new HashMap<String, String>();
+        final Map<String, String> expected = new HashMap<>();
         expected.put("foo", "bar");
         expected.put("eat", "food");
 

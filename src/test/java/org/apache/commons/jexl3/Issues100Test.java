@@ -389,7 +389,7 @@ public class Issues100Test extends JexlTestCase {
         final JexlContext jc = new MapContext();
         JexlScript script;
         Object result;
-        final Map<Integer, Object> foo = new HashMap<Integer, Object>();
+        final Map<Integer, Object> foo = new HashMap<>();
         foo.put(3, 42);
         jc.set("state", foo);
 
@@ -640,7 +640,7 @@ public class Issues100Test extends JexlTestCase {
         }
 
         public List<Integer> asList(final int[] array) {
-            final List<Integer> l = new ArrayList<Integer>(array.length);
+            final List<Integer> l = new ArrayList<>(array.length);
             for (final int i : array) {
                 l.add(i);
             }

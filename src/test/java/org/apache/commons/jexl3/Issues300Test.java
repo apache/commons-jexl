@@ -820,7 +820,7 @@ public class Issues300Test {
     @Test public void test370() {
         Var370 var370 = new Var370();
         JexlEngine jexl = new JexlBuilder().safe(true).create();
-        ObjectContext<Var370> ctxt = new ObjectContext<Var370>(jexl, var370);
+        ObjectContext<Var370> ctxt = new ObjectContext<>(jexl, var370);
         JexlExpression get = jexl.createExpression("name");
         // not null
         var370.setName("John");
@@ -866,7 +866,7 @@ public class Issues300Test {
         // Create an object with getter for name
         TestObject374 myObject = new TestObject374();
         myObject.setName("John");
-        JexlContext context = new ObjectContext<TestObject374>(engine, myObject);
+        JexlContext context = new ObjectContext<>(engine, myObject);
         // Expect an exception because nested is null, so we are doing null.name
         try {
             Object result = expr.evaluate(context);

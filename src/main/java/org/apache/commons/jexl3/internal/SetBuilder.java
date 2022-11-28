@@ -32,7 +32,7 @@ public class SetBuilder implements JexlArithmetic.SetBuilder {
      * @param size the expected set size
      */
     public SetBuilder(final int size) {
-        set = new HashSet<Object>(size);
+        set = new HashSet<>(size);
     }
 
     @Override

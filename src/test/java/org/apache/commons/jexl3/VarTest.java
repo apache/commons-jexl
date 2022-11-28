@@ -167,7 +167,7 @@ public class VarTest extends JexlTestCase {
      * @return the set of variables
      */
     Set<List<String>> mkref(final String[][] refs) {
-        final Set<List<String>> set = new HashSet<List<String>>();
+        final Set<List<String>> set = new HashSet<>();
         for(final String[] ref : refs) {
             set.add(Arrays.asList(ref));
         }
@@ -197,7 +197,7 @@ public class VarTest extends JexlTestCase {
     }
 
     List<String> stringify(final Set<List<String>> sls) {
-        final List<String> ls = new ArrayList<String>();
+        final List<String> ls = new ArrayList<>();
         for(final List<String> l : sls) {
         final StringBuilder strb = new StringBuilder();
         for(final String s : l) {
@@ -426,7 +426,7 @@ public class VarTest extends JexlTestCase {
          * @return the property values
          */
         public List<String> get(final List<String> keys) {
-            final List<String> values = new ArrayList<String>();
+            final List<String> values = new ArrayList<>();
             for(final String key : keys) {
                 final String value = get(key);
                 if (value != null) {
@@ -444,7 +444,7 @@ public class VarTest extends JexlTestCase {
          * @return the alia map
          */
         public Map<String,Object> get(final Map<String,String> map) {
-            final Map<String,Object> values = new LinkedHashMap<String,Object>();
+            final Map<String,Object> values = new LinkedHashMap<>();
             for(final Map.Entry<String,String> entry : map.entrySet()) {
                 final String value = get(entry.getKey());
                 if (value != null) {
@@ -461,7 +461,7 @@ public class VarTest extends JexlTestCase {
      * @return the properties array
      */
     private static String[] readIdentifiers(final String str) {
-        final List<String> ids = new ArrayList<String>();
+        final List<String> ids = new ArrayList<>();
         StringBuilder strb = null;
         String id = null;
         char kind = 0; // array, set or map kind using first char
@@ -616,7 +616,7 @@ public class VarTest extends JexlTestCase {
     @Test
     public void testObjectContext() throws Exception {
         final TheVarContext vars = new TheVarContext();
-        final JexlContext jc = new ObjectContext<TheVarContext>(JEXL, vars);
+        final JexlContext jc = new ObjectContext<>(JEXL, vars);
         try {
             JexlScript script;
             Object result;

@@ -41,7 +41,7 @@ import org.junit.Assert;
  */
 public class Asserter extends Assert {
     /** variables used during asserts. */
-    private final Map<String, Object> variables = new HashMap<String, Object>();
+    private final Map<String, Object> variables = new HashMap<>();
     /** context to use during asserts. */
     private final JexlEvalContext context = new JexlEvalContext(variables);
     /** JEXL engine to use during Asserts. */

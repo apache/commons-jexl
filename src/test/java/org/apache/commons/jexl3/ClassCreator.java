@@ -191,12 +191,12 @@ public class ClassCreator {
     Class<?> compile() throws Exception {
         final String source = packageDir.getPath() + "/" + sourceName;
         final JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
-        final DiagnosticCollector<JavaFileObject> diagnosticsCollector = new DiagnosticCollector<JavaFileObject>();
+        final DiagnosticCollector<JavaFileObject> diagnosticsCollector = new DiagnosticCollector<>();
         final StandardJavaFileManager fileManager = compiler.getStandardFileManager(diagnosticsCollector, null, null);
         final Iterable<? extends JavaFileObject> compilationUnits = fileManager
                 .getJavaFileObjectsFromStrings(Collections.singletonList(source));
 
-        final List<String> options = new ArrayList<String>();
+        final List<String> options = new ArrayList<>();
         options.add("-classpath");
         // only add hbase classes to classpath. This is a little bit tricky: assume
         // the classpath is {hbaseSrc}/target/classes.

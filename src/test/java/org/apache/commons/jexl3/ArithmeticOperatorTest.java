@@ -167,7 +167,7 @@ public class ArithmeticOperatorTest extends JexlTestCase {
         private final Set<Integer> values;
 
         public MatchingContainer(final int[] is) {
-            values = new HashSet<Integer>();
+            values = new HashSet<>();
             for (final int value : is) {
                 values.add(value);
             }
@@ -182,7 +182,7 @@ public class ArithmeticOperatorTest extends JexlTestCase {
         private final SortedSet<Integer> values;
 
         public IterableContainer(final int[] is) {
-            values = new TreeSet<Integer>();
+            values = new TreeSet<>();
             for (final int value : is) {
                 values.add(value);
             }
@@ -235,11 +235,11 @@ public class ArithmeticOperatorTest extends JexlTestCase {
     public void testMatch() throws Exception {
         // check in/not-in on array, list, map, set and duck-type collection
         final int[] ai = {2, 4, 42, 54};
-        final List<Integer> al = new ArrayList<Integer>();
+        final List<Integer> al = new ArrayList<>();
         for (final int i : ai) {
             al.add(i);
         }
-        final Map<Integer, String> am = new HashMap<Integer, String>();
+        final Map<Integer, String> am = new HashMap<>();
         am.put(2, "two");
         am.put(4, "four");
         am.put(42, "forty-two");
@@ -314,7 +314,7 @@ public class ArithmeticOperatorTest extends JexlTestCase {
     @Test
     @SuppressWarnings("unchecked")
     public void testInterval() throws Exception {
-        final Map<String, Object> ns = new HashMap<String, Object>();
+        final Map<String, Object> ns = new HashMap<>();
         ns.put("calc", Aggregate.class);
         final JexlEngine jexl = new JexlBuilder().namespaces(ns).create();
         JexlScript script;
@@ -523,7 +523,7 @@ public class ArithmeticOperatorTest extends JexlTestCase {
 
     @Test
     public void testFormatArithmeticJxlt() throws Exception {
-        final Map<String, Object> ns = new HashMap<String, Object>();
+        final Map<String, Object> ns = new HashMap<>();
         ns.put("calc", Aggregate.class);
         final Calendar cal = Calendar.getInstance(UTC);
         cal.set(1969, Calendar.AUGUST, 20);

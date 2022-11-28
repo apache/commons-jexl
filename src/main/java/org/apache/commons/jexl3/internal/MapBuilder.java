@@ -32,7 +32,7 @@ public class MapBuilder implements JexlArithmetic.MapBuilder {
      * @param size the expected map size
      */
     public MapBuilder(final int size) {
-        map = new HashMap<Object, Object>(size);
+        map = new HashMap<>(size);
     }
 
     @Override

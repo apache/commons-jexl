@@ -55,7 +55,7 @@ public class ExceptionTest extends JexlTestCase {
     public void testWrappedEx() throws Exception {
         final JexlEngine jexl = new Engine();
         final JexlExpression e = jexl.createExpression("npe()");
-        final JexlContext jc = new ObjectContext<ThrowNPE>(jexl, new ThrowNPE());
+        final JexlContext jc = new ObjectContext<>(jexl, new ThrowNPE());
         try {
             e.evaluate(jc);
             Assert.fail("Should have thrown NPE");

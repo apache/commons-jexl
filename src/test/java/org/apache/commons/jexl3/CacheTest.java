@@ -294,7 +294,7 @@ public class CacheTest extends JexlTestCase {
             jexl = jexlCache;
         }
         final java.util.concurrent.ExecutorService execs = java.util.concurrent.Executors.newFixedThreadPool(NTHREADS);
-        final List<Callable<Integer>> tasks = new ArrayList<Callable<Integer>>(NTHREADS);
+        final List<Callable<Integer>> tasks = new ArrayList<>(NTHREADS);
         for (int t = 0; t < NTHREADS; ++t) {
             tasks.add(jexl.newInstance(ctask, loops));
         }
@@ -312,7 +312,7 @@ public class CacheTest extends JexlTestCase {
     public abstract static class Task implements Callable<Integer> {
         final TestCacheArguments args = new TestCacheArguments();
         final int loops;
-        final Map<String, Object> vars = new HashMap<String, Object>();
+        final Map<String, Object> vars = new HashMap<>();
         final JexlEvalContext jc = new JexlEvalContext(vars);
 
         Task(final int loops) {
@@ -451,7 +451,7 @@ public class CacheTest extends JexlTestCase {
         /** The actual test function. */
         private Integer runAssignList() {
             args.value = new Object[]{"foo"};
-            final java.util.ArrayList<String> c1 = new java.util.ArrayList<String>(2);
+            final java.util.ArrayList<String> c1 = new java.util.ArrayList<>(2);
             c1.add("foo");
             c1.add("bar");
             args.ca = new Object[]{
@@ -641,8 +641,8 @@ public class CacheTest extends JexlTestCase {
         if (!cache) {
             jexl.clearCache();
         }
-        final Map<String, Object> vars = new HashMap<String, Object>();
-        final java.util.Map<String, Object> funcs = new java.util.HashMap<String, Object>();
+        final Map<String, Object> vars = new HashMap<>();
+        final java.util.Map<String, Object> funcs = new java.util.HashMap<>();
         final JexlEvalContext jc = new JexlContextNS(vars, funcs);
         final JexlExpression compute2 = jexl.createExpression("cached:COMPUTE(a0, a1)");
         final JexlExpression compute1 = jexl.createExpression("cached:COMPUTE(a0)");

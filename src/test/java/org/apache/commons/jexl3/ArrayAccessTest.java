@@ -66,7 +66,7 @@ public class ArrayAccessTest extends JexlTestCase {
          * test List access
          */
 
-        final List<Integer> l = new ArrayList<Integer>();
+        final List<Integer> l = new ArrayList<>();
         l.add(new Integer(1));
         l.add(new Integer(2));
         l.add(new Integer(3));
@@ -94,7 +94,7 @@ public class ArrayAccessTest extends JexlTestCase {
         /*
          * test map access
          */
-        final Map<String, String> m = new HashMap<String, String>();
+        final Map<String, String> m = new HashMap<>();
         m.put("foo", "bar");
 
         asserter.setVariable("map", m);
@@ -153,8 +153,8 @@ public class ArrayAccessTest extends JexlTestCase {
 
     @Test
     public void testDoubleMaps() throws Exception {
-        final Map<Object, Map<Object, Object>> foo = new HashMap<Object, Map<Object, Object>>();
-        final Map<Object, Object> foo0 = new HashMap<Object, Object>();
+        final Map<Object, Map<Object, Object>> foo = new HashMap<>();
+        final Map<Object, Object> foo0 = new HashMap<>();
         foo.put(0, foo0);
         foo0.put(0, "one");
         foo0.put(1, "two");
@@ -221,7 +221,7 @@ public class ArrayAccessTest extends JexlTestCase {
 
     @Test
     public void testArrayIdentifierParsing() throws Exception {
-        final Map<Object, Number> map = new HashMap<Object, Number>();
+        final Map<Object, Number> map = new HashMap<>();
         map.put("00200", -42.42d);
         map.put(200, 42.42d);
         asserter.setVariable("objects", map);

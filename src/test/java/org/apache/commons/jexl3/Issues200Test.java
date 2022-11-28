@@ -71,7 +71,7 @@ public class Issues200Test extends JexlTestCase {
     @Test
     public void test200() throws Exception {
         final JexlContext jc = new MapContext();
-        final Map<String, Object> funcs = new HashMap<String, Object>();
+        final Map<String, Object> funcs = new HashMap<>();
         final Eval eval = new Eval();
         funcs.put(null, eval);
         final JexlEngine jexl = new JexlBuilder().namespaces(funcs).create();
@@ -164,7 +164,7 @@ public class Issues200Test extends JexlTestCase {
     @Test
     public void test221() throws Exception {
         final JexlEvalContext jc = new JexlEvalContext();
-        final Map<String, Integer> map = new HashMap<String, Integer>();
+        final Map<String, Integer> map = new HashMap<>();
         map.put("one", 1);
         jc.set("map", map);
         final JexlEngine jexl = new JexlBuilder().cache(256).create();
@@ -216,7 +216,7 @@ public class Issues200Test extends JexlTestCase {
     @Test
     public void test224() throws Exception {
         final List<String> a0 = Arrays.asList("one", "two");
-        final Set<String> a1 = new TreeSet<String>(a0);
+        final Set<String> a1 = new TreeSet<>(a0);
         final JexlContext jc = new MapContext();
         final JexlEngine jexl = new JexlBuilder().arithmetic(new JexlArithmetic224(true)).create();
         Object r;
@@ -250,7 +250,7 @@ public class Issues200Test extends JexlTestCase {
 
         final JexlExpression expression = jexl.createExpression("bar()");
         Assert.assertEquals("bar", expression.evaluate(df));
-        final ObjectContext<Object> context = new ObjectContext<Object>(jexl, df);
+        final ObjectContext<Object> context = new ObjectContext<>(jexl, df);
         Assert.assertEquals("bar", expression.evaluate(context));
     }
 
@@ -265,9 +265,9 @@ public class Issues200Test extends JexlTestCase {
 
         pool = Executors.newFixedThreadPool(4);
 
-        final Map<String, Object> m1 = new HashMap<String, Object>();
+        final Map<String, Object> m1 = new HashMap<>();
         m1.put("item", "A");
-        final Map<String, Object> m2 = new HashMap<String, Object>();
+        final Map<String, Object> m2 = new HashMap<>();
         m2.put("item", "B");
 
         handle(pool, script, m1);
@@ -483,7 +483,7 @@ public class Issues200Test extends JexlTestCase {
         static final ThreadLocal<Deque<Iterator266>> TLS_FOREACH = new ThreadLocal<Deque<Iterator266>>() {
             @Override
             public Deque<Iterator266> initialValue() {
-                return new LinkedList<Iterator266>();
+                return new LinkedList<>();
             }
         };
         public Arithmetic266(final boolean strict) {
@@ -526,14 +526,14 @@ public class Issues200Test extends JexlTestCase {
         final JexlEngine jexl = new JexlBuilder().arithmetic(new Arithmetic266(true)).create();
         final JexlContext ctxt = new MapContext();
 
-        final List<Integer> li = new ArrayList<Integer>(Arrays.asList(1, 2, 3, 4, 5 ,6));
+        final List<Integer> li = new ArrayList<>(Arrays.asList(1, 2, 3, 4, 5 ,6));
         ctxt.set("list", li);
         script = jexl.createScript("for (var item : list) { if (item <= 3) remove(); } return size(list)");
         result = script.execute(ctxt);
         Assert.assertEquals(3, result);
         Assert.assertEquals(3, li.size());
 
-        final Map<String, Integer> msi = new HashMap<String, Integer>();
+        final Map<String, Integer> msi = new HashMap<>();
         msi.put("a", 1);
         msi.put("b", 2);
         msi.put("c", 3);
@@ -799,7 +799,7 @@ public class Issues200Test extends JexlTestCase {
 
     @Test
     public void test285() throws Exception {
-        final List<String> out = new ArrayList<String>(6);
+        final List<String> out = new ArrayList<>(6);
         final JexlContext ctxt = new MapContext();
         ctxt.set("$out", out);
         final String src = "for(var b: ['g','h','i']) {\n"
@@ -827,7 +827,7 @@ public class Issues200Test extends JexlTestCase {
 
     @Test
     public void test285a() throws Exception {
-        final List<String> out = new ArrayList<String>(6);
+        final List<String> out = new ArrayList<>(6);
         final JexlContext ctxt = new MapContext();
         ctxt.set("$out", out);
         final String src =
@@ -845,7 +845,7 @@ public class Issues200Test extends JexlTestCase {
 
     @Test
     public void test285b() throws Exception {
-        final List<String> out = new ArrayList<String>(6);
+        final List<String> out = new ArrayList<>(6);
         final JexlContext ctxt = new MapContext();
         ctxt.set("$out", out);
         final String src =

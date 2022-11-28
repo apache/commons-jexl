@@ -392,7 +392,7 @@ public class SandboxTest extends JexlTestCase {
        public void testSandboxInherit0() throws Exception {
         Object result;
         final JexlContext ctxt = null;
-        final List<String> foo = new ArrayList<String>();
+        final List<String> foo = new ArrayList<>();
         final JexlSandbox sandbox = new JexlSandbox(false, true);
         sandbox.allow(java.util.List.class.getName());
 

@@ -93,9 +93,9 @@ public class Uberspect implements JexlUberspect {
         logger = runtimeLogger == null? LogFactory.getLog(JexlEngine.class) : runtimeLogger;
         strategy = sty == null? JexlUberspect.JEXL_STRATEGY : sty;
         permissions = perms == null? Permissions.RESTRICTED : perms;
-        ref = new SoftReference<Introspector>(null);
-        loader = new SoftReference<ClassLoader>(getClass().getClassLoader());
-        operatorMap = new ConcurrentHashMap<Class<? extends JexlArithmetic>, Set<JexlOperator>>();
+        ref = new SoftReference<>(null);
+        loader = new SoftReference<>(getClass().getClassLoader());
+        operatorMap = new ConcurrentHashMap<>();
         version = new AtomicInteger(0);
     }
 
@@ -114,8 +114,8 @@ public class Uberspect implements JexlUberspect {
                 intro = ref.get();
                 if (intro == null) {
                     intro = new Introspector(logger, loader.get(), permissions);
-                    ref = new SoftReference<Introspector>(intro);
-                    loader = new SoftReference<ClassLoader>(intro.getLoader());
+                    ref = new SoftReference<>(intro);
+                    loader = new SoftReference<>(intro.getLoader());
                     version.incrementAndGet();
                 }
             }
@@ -132,9 +132,9 @@ public class Uberspect implements JexlUberspect {
                 intro.setLoader(nloader);
             } else {
                 intro = new Introspector(logger, nloader, permissions);
-                ref = new SoftReference<Introspector>(intro);
+                ref = new SoftReference<>(intro);
             }
-            loader = new SoftReference<ClassLoader>(intro.getLoader());
+            loader = new SoftReference<>(intro.getLoader());
             operatorMap.clear();
             version.incrementAndGet();
         }
@@ -383,7 +383,7 @@ public class Uberspect implements JexlUberspect {
             return ((Map<?, ?>) obj).values().iterator();
         }
         if (obj instanceof Enumeration<?>) {
-            return new EnumerationIterator<Object>((Enumeration<Object>) obj);
+            return new EnumerationIterator<>((Enumeration<Object>) obj);
         }
         if (obj instanceof Iterable<?>) {
             return ((Iterable<?>) obj).iterator();

@@ -83,7 +83,7 @@ public class Util {
      * @return the descendants-and-self list
      */
     protected static ArrayList<JexlNode> flatten(final JexlNode node) {
-        final ArrayList<JexlNode> list = new ArrayList<JexlNode>();
+        final ArrayList<JexlNode> list = new ArrayList<>();
         flatten(list, node);
         return list;
     }

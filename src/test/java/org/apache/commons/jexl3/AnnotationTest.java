@@ -51,7 +51,7 @@ public class AnnotationTest extends JexlTestCase {
 
     public static class AnnotationContext extends MapContext implements JexlContext.AnnotationProcessor {
         private int count = 0;
-        private final Set<String> names = new TreeSet<String>();
+        private final Set<String> names = new TreeSet<>();
 
         @Override
         public Object processAnnotation(final String name, final Object[] args, final Callable<Object> statement) throws Exception {

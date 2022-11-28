@@ -47,7 +47,7 @@ public class ArrayTest {
          */
         final JexlContext jc = new MapContext();
 
-        final List<Object> l = new ArrayList<Object>();
+        final List<Object> l = new ArrayList<>();
         l.add("Hello from location 0");
         final Integer two = 2;
         l.add(two);

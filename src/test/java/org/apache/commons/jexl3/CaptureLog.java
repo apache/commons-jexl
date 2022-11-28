@@ -23,7 +23,7 @@ import org.apache.commons.logging.Log;
  * A log implementation to help control tests results.
  */
 public class CaptureLog implements Log {
-    private final List<Object[]> captured = new ArrayList<Object[]>();
+    private final List<Object[]> captured = new ArrayList<>();
 
     static Object caller() {
         final StackTraceElement[] stack = new Exception().fillInStackTrace().getStackTrace();

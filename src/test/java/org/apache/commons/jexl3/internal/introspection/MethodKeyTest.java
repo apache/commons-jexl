@@ -92,8 +92,8 @@ public class MethodKeyTest {
 
     /* Generate a list of method*(prims*), method(prims*, prims*), method*(prims*,prims*,prims*) */
     static {
-        BY_KEY = new java.util.HashMap< MethodKey, String>();
-        BY_STRING = new java.util.HashMap<String, MethodKey>();
+        BY_KEY = new java.util.HashMap<>();
+        BY_STRING = new java.util.HashMap<>();
         for (final String method : METHODS) {
             for (final Class<?> value : PRIMS) {
                 final Class<?>[] arg0 = {value};

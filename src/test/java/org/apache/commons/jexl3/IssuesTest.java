@@ -46,7 +46,7 @@ public class IssuesTest extends JexlTestCase {
     @Test
     public void test49() throws Exception {
         final JexlEngine jexl = new Engine();
-        final Map<String, Object> vars = new HashMap<String, Object>();
+        final Map<String, Object> vars = new HashMap<>();
         final JexlContext ctxt = new MapContext(vars);
         final String stmt = "a = 'b'; c = 'd';";
         final JexlScript expr = jexl.createScript(stmt);
@@ -384,7 +384,7 @@ public class IssuesTest extends JexlTestCase {
             "fn:replace(\"DOMAIN\\somename\", \"\\\\\", \"\\\\\\\\\")",
             "fn:replace('DOMAIN\\somename', '\\u005c', '\\u005c\\u005c')"
         };
-        final Map<String, Object> funcs = new HashMap<String, Object>();
+        final Map<String, Object> funcs = new HashMap<>();
         funcs.put("fn", new fn98());
         final JexlEngine jexl = new JexlBuilder().namespaces(funcs).create();
         for (final String expr : exprs) {

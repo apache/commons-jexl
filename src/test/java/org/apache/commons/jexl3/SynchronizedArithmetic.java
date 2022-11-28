@@ -123,7 +123,7 @@ public class SynchronizedArithmetic extends JexlArithmetic {
      * Crude monitor replacement...
      */
     static class SafeMonitor extends Monitor {
-         private final Map<Object, Object> monitored = new IdentityHashMap<Object, Object>();
+         private final Map<Object, Object> monitored = new IdentityHashMap<>();
 
         @Override
         protected void monitorEnter(final Object o) {

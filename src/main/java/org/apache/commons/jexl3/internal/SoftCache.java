@@ -111,7 +111,7 @@ public class SoftCache<K, V> {
             Map<K, V> map = ref != null ? ref.get() : null;
             if (map == null) {
                 map = createCache(size);
-                ref = new SoftReference<Map<K, V>>(map);
+                ref = new SoftReference<>(map);
             }
             map.put(key, script);
         } finally {
@@ -134,9 +134,9 @@ public class SoftCache<K, V> {
                 return Collections.emptyList();
             }
             final Set<Map.Entry<K, V>> set = map.entrySet();
-            final List<Map.Entry<K, V>> entries = new ArrayList<Map.Entry<K, V>>(set.size());
+            final List<Map.Entry<K, V>> entries = new ArrayList<>(set.size());
             for (final Map.Entry<K, V> e : set) {
-                entries.add(new SoftCacheEntry<K, V>(e));
+                entries.add(new SoftCacheEntry<>(e));
             }
             return entries;
         } finally {

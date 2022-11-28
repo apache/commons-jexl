@@ -164,7 +164,7 @@ public class DiscoveryTest extends JexlTestCase {
     @Test
     public void testListIntrospection() throws Exception {
         final Uberspect uber = Engine.getUberspect(null, null);
-        final List<Object> list = new ArrayList<Object>();
+        final List<Object> list = new ArrayList<>();
         list.add("LIST");
         list.add("TSIL");
 
@@ -195,7 +195,7 @@ public class DiscoveryTest extends JexlTestCase {
     @Test
     public void testMapIntrospection() throws Exception {
         final Uberspect uber = Engine.getUberspect(null, null);
-        final Map<String, Object> map = new HashMap<String, Object>();
+        final Map<String, Object> map = new HashMap<>();
         map.put("value", "MAP");
         map.put("eulav", "PAM");
 

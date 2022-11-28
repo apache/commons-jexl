@@ -45,7 +45,7 @@ public class ScriptCallableTest extends JexlTestCase {
     @Test
     public void testFuture() throws Exception {
         final JexlScript e = JEXL.createScript("while(true);");
-        final FutureTask<Object> future = new FutureTask<Object>(e.callable(null));
+        final FutureTask<Object> future = new FutureTask<>(e.callable(null));
 
         final ExecutorService executor = Executors.newFixedThreadPool(1);
         executor.submit(future);

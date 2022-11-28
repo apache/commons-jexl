@@ -1149,7 +1149,7 @@ public final class TemplateEngine extends JxltEngine {
      * @return the list of blocks
      */
     protected List<Block> readTemplate(final String prefix, final Reader source) {
-        final ArrayList<Block> blocks = new ArrayList<Block>();
+        final ArrayList<Block> blocks = new ArrayList<>();
         final BufferedReader reader;
         if (source instanceof BufferedReader) {
             reader = (BufferedReader) source;

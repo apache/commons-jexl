@@ -761,7 +761,7 @@ public class LexicalTest {
         }
         final JexlEngine jexl = new JexlBuilder().features(features).create();
         final JexlScript script = jexl.createScript(src);
-        final List<Integer> out = new ArrayList<Integer>(10);
+        final List<Integer> out = new ArrayList<>(10);
         vars.set("$out", out);
         final Object result = script.execute(vars);
         Assert.assertEquals(true, result);
