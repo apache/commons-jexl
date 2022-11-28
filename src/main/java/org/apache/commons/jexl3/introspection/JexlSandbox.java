@@ -651,9 +651,8 @@ public final class JexlSandbox {
                     if (permissions != null) {
                         if (permissions.isInheritable()) {
                             break;
-                        } else {
-                            permissions = null;
                         }
+                        permissions = null;
                     }
                 }
                 // nothing defined yet, find first superclass that defines permissions
@@ -666,9 +665,8 @@ public final class JexlSandbox {
                         if (permissions != null) {
                             if (permissions.isInheritable()) {
                                 break;
-                            } else {
-                                permissions = null;
                             }
+                            permissions = null;
                         }
                         zuper = zuper.getSuperclass();
                     }

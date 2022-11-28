@@ -102,9 +102,8 @@ public class Operators {
                 // check operator only once if it is not strict
                 if (arithmetic.isStrict(operator)) {
                     throw new JexlArithmetic.NullOperand();
-                } else {
-                    break;
                 }
+                break;
             }
         }
     }

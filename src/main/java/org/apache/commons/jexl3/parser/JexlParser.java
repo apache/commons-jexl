@@ -537,12 +537,11 @@ public abstract class JexlParser extends StringParser {
             if (previous instanceof Set<?>) {
                 ((Set<Object>) previous).add(newValue);
                 return previous;
-            } else {
-                Set<Object> values = new LinkedHashSet<>();
-                values.add(previous);
-                values.add(newValue);
-                return values;
             }
+            Set<Object> values = new LinkedHashSet<>();
+            values.add(previous);
+            values.add(newValue);
+            return values;
         });
     }
 

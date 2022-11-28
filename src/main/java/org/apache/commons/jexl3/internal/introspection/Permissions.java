@@ -118,9 +118,8 @@ public class Permissions implements JexlPermissions {
         if (keyb != null) {
             keyb.append(clazz.getSimpleName());
             return keyb.toString();
-        } else {
-            return clazz.getSimpleName();
         }
+        return clazz.getSimpleName();
     }
 
     /**
