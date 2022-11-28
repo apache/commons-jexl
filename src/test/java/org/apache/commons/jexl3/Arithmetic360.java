@@ -40,6 +40,7 @@ public class Arithmetic360 extends JexlArithmetic {
      * @param result the long to narrow
      * @return an Integer if narrowing is possible, the original Long otherwise
      */
+    @Override
     protected Number narrowLong(final Object lhs, final Object rhs, final long result) {
         if (!(lhs instanceof Long || rhs instanceof Long)) {
             final int ir = (int) result;
@@ -112,6 +113,7 @@ public class Arithmetic360 extends JexlArithmetic {
      * @param right the right operator
      * @return left | right
      */
+    @Override
     public Object or(final Object left, final Object right) {
         final Number l = asLongNumber(left);
         final Number r = asLongNumber(right);
@@ -128,6 +130,7 @@ public class Arithmetic360 extends JexlArithmetic {
      * @param right the right operator
      * @return left ^ right
      */
+    @Override
     public Object xor(final Object left, final Object right) {
         final Number l = asLongNumber(left);
         final Number r = asLongNumber(right);
@@ -155,6 +158,7 @@ public class Arithmetic360 extends JexlArithmetic {
      * @param right  right argument
      * @return left &lt;&lt; right.
      */
+    @Override
     public Object shiftLeft(Object left, Object right) {
         if (left == null && right == null) {
             boolean strictCast  = isStrict(JexlOperator.SHIFTLEFT);
@@ -179,6 +183,7 @@ public class Arithmetic360 extends JexlArithmetic {
      * @param right  right argument
      * @return left &gt;&gt; right.
      */
+    @Override
     public Object shiftRight(Object left, Object right) {
         if (left == null && right == null) {
             boolean strictCast  = isStrict(JexlOperator.SHIFTRIGHT);
@@ -203,6 +208,7 @@ public class Arithmetic360 extends JexlArithmetic {
      * @param right  right argument
      * @return left &gt;&gt;&gt; right.
      */
+    @Override
     public Object shiftRightUnsigned(Object left, Object right) {
         if (left == null && right == null) {
             boolean strictCast  = isStrict(JexlOperator.SHIFTRIGHTU);
