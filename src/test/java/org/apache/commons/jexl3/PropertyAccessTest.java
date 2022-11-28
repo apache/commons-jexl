@@ -21,12 +21,9 @@ import java.util.Map;
 
 import org.apache.commons.jexl3.internal.Debugger;
 import org.apache.commons.jexl3.internal.introspection.IndexedType;
-import org.apache.commons.jexl3.internal.introspection.Permissions;
 import org.apache.commons.jexl3.internal.introspection.Uberspect;
 import org.apache.commons.jexl3.introspection.JexlPermissions;
-import org.apache.commons.jexl3.introspection.JexlUberspect;
 import org.apache.commons.jexl3.junit.Asserter;
-import org.apache.commons.logging.LogFactory;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

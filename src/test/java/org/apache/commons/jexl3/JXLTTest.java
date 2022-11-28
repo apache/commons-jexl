@@ -19,10 +19,8 @@ package org.apache.commons.jexl3;
 import org.apache.commons.jexl3.internal.Debugger;
 import org.apache.commons.jexl3.internal.TemplateDebugger;
 import org.apache.commons.jexl3.internal.TemplateInterpreter;
-import org.apache.commons.jexl3.internal.TemplateScript;
 import org.apache.commons.jexl3.internal.introspection.Permissions;
 import org.apache.commons.jexl3.internal.introspection.Uberspect;
-import org.apache.commons.jexl3.introspection.JexlMethod;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -35,8 +33,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Logger;
-
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;

@@ -25,14 +25,12 @@ import java.util.Map;
 import java.util.Collections;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.apache.commons.jexl3.internal.introspection.NoJexlTest;
 import org.apache.commons.jexl3.jexl342.OptionalArithmetic;
 import org.apache.commons.jexl3.junit.Asserter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 
