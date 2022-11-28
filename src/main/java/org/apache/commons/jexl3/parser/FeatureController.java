@@ -24,11 +24,12 @@ import org.apache.commons.jexl3.internal.ScriptVisitor;
  * Controls that a script only uses enabled features.
  */
 public class FeatureController extends ScriptVisitor {
+
     /** The set of features. */
-    private JexlFeatures features = null;
+    private JexlFeatures features;
 
     /**
-     * Creates a features controller .
+     * Creates a features controller.
      */
     public FeatureController(final JexlFeatures features) {
         this.features = features;

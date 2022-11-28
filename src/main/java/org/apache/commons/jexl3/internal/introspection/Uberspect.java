@@ -155,6 +155,7 @@ public class Uberspect implements JexlUberspect {
      * @param className the class name
      * @return the class instance or null if it could not be found
      */
+    @Override
     public final Class<?> getClassByName(final String className) {
         return base().getClassByName(className);
     }

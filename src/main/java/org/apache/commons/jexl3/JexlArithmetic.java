@@ -792,6 +792,8 @@ public class JexlArithmetic {
                 case SIZE:
                 case CONTAINS:
                     return false;
+                default:
+                    return isStrict();
             }
         }
         return isStrict();
@@ -2014,8 +2016,10 @@ public class JexlArithmetic {
     private double parseDouble(String arg) throws ArithmeticException {
         try {
             return arg.isEmpty()? Double.NaN : Double.parseDouble(arg);
-        } catch(NumberFormatException xformat) {
-            throw new ArithmeticException("Double coercion: ("+ arg +")");
+        } catch (NumberFormatException e) {
+            final ArithmeticException arithmeticException = new ArithmeticException("Double coercion: ("+ arg +")");
+            arithmeticException.initCause(e);
+            throw arithmeticException;
         }
     }
 

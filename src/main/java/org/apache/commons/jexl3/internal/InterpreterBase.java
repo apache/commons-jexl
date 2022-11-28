@@ -264,9 +264,9 @@ public abstract class InterpreterBase extends ParserVisitor {
                         if (cacheable) {
                             nsNode.jjtSetValue(namespace);
                         }
-                    } catch (final ClassNotFoundException xignore) {
+                    } catch (final ClassNotFoundException e) {
                         // not a class
-                        throw new JexlException(node, "no such class namespace " + prefix, null);
+                        throw new JexlException(node, "no such class namespace " + prefix, e);
                     }
                 }
             }
