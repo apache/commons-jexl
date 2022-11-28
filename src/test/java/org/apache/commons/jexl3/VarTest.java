@@ -27,12 +27,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
-import org.apache.commons.jexl3.parser.JexlParser;
+
 import org.apache.commons.jexl3.parser.StringParser;
-import org.junit.Assert;
-import org.junit.Test;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.Assert;
+import org.junit.Test;
 
 /**
  * Tests local variables.
