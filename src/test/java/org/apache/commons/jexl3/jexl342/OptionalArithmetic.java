@@ -57,6 +57,10 @@ public class OptionalArithmetic extends JexlArithmetic {
     public Object controlReturn(Object returned) {
         return star(returned);
     }
+    @Override
+    protected boolean isNullOperand(Object val) {
+        return super.isNullOperand(star(val));
+    }
 
     @Override
     public boolean toBoolean(final Object val) {
