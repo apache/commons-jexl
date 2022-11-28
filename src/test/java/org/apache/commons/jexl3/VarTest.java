@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
 import org.apache.commons.jexl3.parser.JexlParser;
+import org.apache.commons.jexl3.parser.StringParser;
 import org.junit.Assert;
 import org.junit.Test;
 import org.apache.commons.logging.Log;
@@ -484,7 +485,7 @@ public class VarTest extends JexlTestCase {
             }
             else if (c == '\'' || c == '"') {
                 strb.append(c);
-                final int l = JexlParser.readString(strb, str, i + 1, c);
+                final int l = StringParser.readString(strb, str, i + 1, c);
                 if (l > 0) {
                     id = strb.substring(1, strb.length() - 1);
                     strb.delete(0, l + 1);
