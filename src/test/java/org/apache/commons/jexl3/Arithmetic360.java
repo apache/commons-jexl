@@ -97,6 +97,7 @@ public class Arithmetic360 extends JexlArithmetic {
      * @param right the right operator
      * @return left &amp; right
      */
+    @Override
     public Object and(final Object left, final Object right) {
         final Number l = asLongNumber(left);
         final Number r = asLongNumber(right);
@@ -146,6 +147,7 @@ public class Arithmetic360 extends JexlArithmetic {
      * @param val the operand
      * @return ~val
      */
+    @Override
     public Object complement(final Object val) {
         final long l = toLong(val);
         return narrowLong(val, ~l);
