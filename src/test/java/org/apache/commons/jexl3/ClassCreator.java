@@ -137,33 +137,33 @@ public class ClassCreator {
     }
 
     void generate(final boolean ftor) throws Exception {
-        final FileWriter aWriter = new FileWriter(new File(packageDir, sourceName), false);
-        aWriter.write("package ");
-        aWriter.write(GEN_PACKAGE);
-        aWriter.write(";\n");
-        if (ftor) {
-            aWriter.write("import "+ JEXL_PACKAGE +".JexlContext;");
-            aWriter.write(";\n");
+        try (final FileWriter writer = new FileWriter(new File(packageDir, sourceName), false)) {
+            writer.write("package ");
+            writer.write(GEN_PACKAGE);
+            writer.write(";\n");
+            if (ftor) {
+                writer.write("import " + JEXL_PACKAGE + ".JexlContext;");
+                writer.write(";\n");
+            }
+            writer.write("public class " + className);
+            writer.write(" {\n");
+            if (ftor) {
+                writer.write("public " + className + "(JexlContext ctxt) {\n");
+                writer.write(ctorBody);
+                writer.write(" }\n");
+            }
+            writer.write("private int value =");
+            writer.write(Integer.toString(seed));
+            writer.write(";\n");
+            writer.write(" public void setValue(int v) {");
+            writer.write(" value = v;");
+            writer.write(" }\n");
+            writer.write(" public int getValue() {");
+            writer.write(" return value;");
+            writer.write(" }\n");
+            writer.write(" }\n");
+            writer.flush();
         }
-        aWriter.write("public class " + className);
-        aWriter.write(" {\n");
-        if (ftor) {
-            aWriter.write("public " + className + "(JexlContext ctxt) {\n");
-            aWriter.write(ctorBody);
-            aWriter.write(" }\n");
-        }
-        aWriter.write("private int value =");
-        aWriter.write(Integer.toString(seed));
-        aWriter.write(";\n");
-        aWriter.write(" public void setValue(int v) {");
-        aWriter.write(" value = v;");
-        aWriter.write(" }\n");
-        aWriter.write(" public int getValue() {");
-        aWriter.write(" return value;");
-        aWriter.write(" }\n");
-        aWriter.write(" }\n");
-        aWriter.flush();
-        aWriter.close();
     }
 
 //    Class<?> compile0() throws Exception {

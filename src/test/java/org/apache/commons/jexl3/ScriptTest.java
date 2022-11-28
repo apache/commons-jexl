@@ -209,12 +209,12 @@ public class ScriptTest extends JexlTestCase {
             @Override
             public void handle(HttpExchange httpExchange) throws IOException {
                 if ("POST".equals(httpExchange.getRequestMethod())) {
-                    OutputStream outputStream = httpExchange.getResponseBody();
-                    String json = responder.apply(httpExchange);
-                    httpExchange.sendResponseHeaders(200, json.length());
-                    outputStream.write(json.toString().getBytes());
-                    outputStream.flush();
-                    outputStream.close();
+                    try (OutputStream outputStream = httpExchange.getResponseBody()) {
+                        String json = responder.apply(httpExchange);
+                        httpExchange.sendResponseHeaders(200, json.length());
+                        outputStream.write(json.toString().getBytes());
+                        outputStream.flush();
+                    }
                 } else {
                     // error
                     httpExchange.sendResponseHeaders(500, 0);
