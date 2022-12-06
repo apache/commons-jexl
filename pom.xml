@@ -55,12 +55,8 @@
         <checkstyle.version>10.5.0</checkstyle.version>
         <japicmp.skip>false</japicmp.skip>
         <commons.japicmp.version>0.17.1</commons.japicmp.version>
-
-        <!-- spotbugs 4.7.2 issue #2174 generates lots of garbage during analysis -->
-
         <commons.pmd.version>3.19.0</commons.pmd.version>
         <commons.pmd-impl.version>6.52.0</commons.pmd-impl.version>
-
         <commons.spotbugs.version>4.7.3.0</commons.spotbugs.version>
         <commons.junit.version>5.9.1</commons.junit.version>
 
@@ -183,6 +179,29 @@
                         </configuration>
                         <goals>
                             <goal>jjtree-javacc</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>3.1.0</version>
+                <executions>
+                    <execution>
+                        <phase>process-sources</phase>
+                        <configuration>
+                            <target>
+                                <!-- change an exception used for signaling to be static -->
+                                <replaceregexp
+                                        file="target/generated-sources/java/org/apache/commons/jexl3/parser/Parser.java"
+                                        byline="true"
+                                        match="private final LookaheadSuccess jj_ls ="
+                                        replace="private static final LookaheadSuccess jj_ls ="/>
+                            </target>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
                         </goals>
                     </execution>
                 </executions>
