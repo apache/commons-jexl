@@ -34,6 +34,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static org.apache.commons.jexl3.internal.Util.debuggerCheck;
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -1149,5 +1150,26 @@ public class Issues300Test {
             ctxt.set("a", null);
             Assert.assertEquals("ABC", s1.execute(ctxt, null));
         }
+    }
+    @Test
+    public void test390() throws Exception {
+        final JexlEngine jexl = new JexlBuilder()
+                .safe(false)
+                .strict(true)
+                .debug(true)
+                .create();
+        JexlScript script = null;
+        String src;
+        src = "if (true) #pragma one 42";
+        try {
+            script = jexl.createScript(src);
+            Assert.fail("should have failed parsing");
+        } catch(JexlException.Parsing xparse) {
+            Assert.assertTrue(xparse.getDetail().contains("pragma"));
+        }
+        src = "if (true) { #pragma one 42 }";
+        script = jexl.createScript(src);
+        Object result = script.execute(null);
+        debuggerCheck(jexl);
     }
 }
