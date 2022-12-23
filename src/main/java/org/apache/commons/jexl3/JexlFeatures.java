@@ -41,8 +41,16 @@ import java.util.function.Predicate;
  * <li>Method calls: calling methods (obj.method(...) or obj['method'](...)); when disabled, leaves function calls
  * - including namespace prefixes - available
  * <li>Structured literals: arrays, lists, maps, sets, ranges
- * <li>Pragmas: #pragma x y
+ * <li>Pragma: pragma construct as in <code>#pragma x y</code>
  * <li>Annotation: @annotation statement;
+ * <li>Thin-arrow: use the thin-arrow, ie <code>-&gt;</code> for lambdas as in <code>x -&gt; x + x</code>
+ * <li>Fat-arrow: use the  fat-arrow, ie <code>=&gt;</code> for lambdas as in <code>x =&gt; x + x</code>
+ * <li>Namespace pragma: whether the <code>#pragma jexl.namespace.ns namespace</code> syntax is allowed</li>
+ * <li>Import pragma: whether the <code>#pragma jexl.import fully.qualified.class.name</code> syntax is allowed</li>
+ * <li>Comparator names: whether the comparator operator names can be used (as in <code>gt</code> for &gt;,
+ * <code>lt</code> for &lt;, ...)</li>
+ * <li>Pragma anywhere: whether pragma, that are <em>not</em> statements and handled before execution begins,
+ * can appear anywhere in the source or before any statements - ie at the beginning of a script.</li>
  * </ul>
  * @since 3.2
  */
@@ -60,7 +68,7 @@ public final class JexlFeatures {
         "register", "reserved variable", "local variable", "assign/modify",
         "global assign/modify", "array reference", "create instance", "loop", "function",
         "method call", "set/map/array literal", "pragma", "annotation", "script", "lexical", "lexicalShade",
-        "thin-arrow", "fat-arrow", "namespace pragma", "import pragma", "comparator names"
+        "thin-arrow", "fat-arrow", "namespace pragma", "import pragma", "comparator names", "pragma anywhere"
     };
     /** Registers feature ordinal. */
     private static final int REGISTER = 0;
@@ -104,6 +112,8 @@ public final class JexlFeatures {
     public static final int IMPORT_PRAGMA = 19;
     /** Comparator names (legacy) syntax. */
     public static final int COMPARATOR_NAMES = 20;
+    /** The pragma anywhere feature ordinal. */
+    public static final int PRAGMA_ANYWHERE = 21;
     /**
      * The default features flag mask.
      */
@@ -123,7 +133,8 @@ public final class JexlFeatures {
             | (1L << THIN_ARROW)
             | (1L << NS_PRAGMA)
             | (1L << IMPORT_PRAGMA)
-            | (1L << COMPARATOR_NAMES);
+            | (1L << COMPARATOR_NAMES)
+            | (1L << PRAGMA_ANYWHERE);
 
     /**
      * Creates an all-features-enabled instance.
@@ -544,12 +555,33 @@ public final class JexlFeatures {
     }
 
     /**
+     * Sets whether pragma constructs can appear anywhere in the code.
+     * <p>
+     * @param flag true to enable, false to disable
+     * @return this features instance
+     * @since 3.3
+     */
+    public JexlFeatures pragmaAnywhere(final boolean flag) {
+        setFeature(PRAGMA_ANYWHERE, flag);
+        return this;
+    }
+
+    /**
+     * @return true if pragma constructs can appear anywhere in the code, false otherwise
+     * @since 3.3
+     */
+    public boolean supportsPragmaAnywhere() {
+        return getFeature(PRAGMA_ANYWHERE);
+    }
+
+    /**
      * Sets whether namespace pragma constructs are enabled.
      * <p>
      * When disabled, parsing a script/expression using syntactic namespace pragma constructs
      * (#pragma jexl.namespace....) will throw a parsing exception.
      * @param flag true to enable, false to disable
      * @return this features instance
+     * @since 3.3
      */
     public JexlFeatures namespacePragma(final boolean flag) {
         setFeature(NS_PRAGMA, flag);
@@ -558,6 +590,7 @@ public final class JexlFeatures {
 
     /**
      * @return true if namespace pragma are enabled, false otherwise
+     * @since 3.3
      */
     public boolean supportsNamespacePragma() {
         return getFeature(NS_PRAGMA);

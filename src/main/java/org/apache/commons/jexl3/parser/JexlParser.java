@@ -202,6 +202,16 @@ public abstract class JexlParser extends StringParser {
     }
 
     /**
+     * Disables pragma feature is pragma-anywhere feature is disabled.
+     */
+    protected void controlPragmaAnywhere() {
+        JexlFeatures features = getFeatures();
+        if (features.supportsPragma() && !features.supportsPragmaAnywhere()) {
+            featureController.setFeatures(new JexlFeatures(featureController.getFeatures()).pragma(false));
+        }
+    }
+
+    /**
      * Gets the frame used by this parser.
      * <p> Since local variables create new symbols, it is important to
      * regain access after parsing to known which / how-many registers are needed. </p>
@@ -508,19 +518,20 @@ public abstract class JexlParser extends StringParser {
      * @param value the pragma value
      */
     protected void declarePragma(final String key, final Object value) {
-        if (!getFeatures().supportsPragma()) {
+        JexlFeatures features = getFeatures();
+        if (!features.supportsPragma()) {
             throwFeatureException(JexlFeatures.PRAGMA, getToken(0));
         }
-        if (PRAGMA_IMPORT.equals(key) && !getFeatures().supportsImportPragma()) {
+        if (PRAGMA_IMPORT.equals(key) && !features.supportsImportPragma()) {
             throwFeatureException(JexlFeatures.IMPORT_PRAGMA, getToken(0));
         }
         if (pragmas == null) {
             pragmas = new TreeMap<>();
         }
         // declaring a namespace
-        Predicate<String> ns = getFeatures().namespaceTest();
+        Predicate<String> ns = features.namespaceTest();
         if (ns != null && key.startsWith(PRAGMA_JEXLNS)) {
-            if (!getFeatures().supportsNamespacePragma()) {
+            if (!features.supportsNamespacePragma()) {
                 throwFeatureException(JexlFeatures.NS_PRAGMA, getToken(0));
             }
             // jexl.namespace.***

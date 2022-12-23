@@ -324,7 +324,7 @@ ASTJexlScript JexlScript(Scope frame) : {
    {
         pushUnit(jjtThis);
    }
-        ( LOOKAHEAD(<PRAGMA>) Pragma() | Statement() )* <EOF>
+        ( LOOKAHEAD(<PRAGMA>) Pragma() | { controlPragmaAnywhere(); } Statement() )* <EOF>
    {
         popUnit(jjtThis);
         return jjtThis.script();
@@ -338,7 +338,7 @@ ASTJexlScript JexlExpression(Scope frame) #JexlScript : {
    {
         pushUnit(jjtThis);
    }
-   ( Pragma() )* ( Expression() )? <EOF>
+   ( Pragma() )* { controlPragmaAnywhere(); } ( Expression() )? <EOF>
    {
         popUnit(jjtThis);
         return jjtThis.script();
