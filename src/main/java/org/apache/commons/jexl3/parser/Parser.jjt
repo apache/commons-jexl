@@ -324,7 +324,7 @@ ASTJexlScript JexlScript(Scope frame) : {
    {
         pushUnit(jjtThis);
    }
-        (Statement())* <EOF>
+        ( LOOKAHEAD(<PRAGMA>) Pragma() | { controlPragmaAnywhere(); } Statement() )* <EOF>
    {
         popUnit(jjtThis);
         return jjtThis.script();
@@ -338,7 +338,7 @@ ASTJexlScript JexlExpression(Scope frame) #JexlScript : {
    {
         pushUnit(jjtThis);
    }
-   ( Expression() )? <EOF>
+   ( Pragma() )* { controlPragmaAnywhere(); } ( Expression() )? <EOF>
    {
         popUnit(jjtThis);
         return jjtThis.script();
@@ -370,7 +370,6 @@ void Statement() #void : {}
 void StatementNoVar() #void : {}
 {
     <SEMICOL>
-    | LOOKAHEAD(<PRAGMA>) Pragma()
     | LOOKAHEAD(<ANNOTATION>) AnnotatedStatement()
     | LOOKAHEAD(<IF>) IfStatement()
     | LOOKAHEAD(<FOR>) ForeachStatement()
@@ -386,7 +385,7 @@ void StatementNoVar() #void : {}
 
 void Block() #Block : {}
 {
-    <LCURLY> { pushUnit(jjtThis); } ( Statement() )* { popUnit(jjtThis); } <RCURLY>
+    <LCURLY> { pushUnit(jjtThis); } ( LOOKAHEAD(<PRAGMA>)  Pragma() | Statement() )* { popUnit(jjtThis); } <RCURLY>
 }
 
 void FunctionStatement() #JexlLambda : {}

@@ -29,7 +29,7 @@ public class FeatureController extends ScriptVisitor {
     private JexlFeatures features;
 
     /**
-     * Creates a features controller.
+     * Creates a feature controller.
      */
     public FeatureController(final JexlFeatures features) {
         this.features = features;

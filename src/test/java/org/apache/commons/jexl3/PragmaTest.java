@@ -158,7 +158,20 @@ public class PragmaTest extends JexlTestCase {
         String parsed = script.getParsedText();
         Assert.assertEquals(src, parsed);
     }
-
+    @Test
+    public void testPragmaOptions1() {
+        final String str = "i; #pragma jexl.options '-strict'\n";
+        final JexlEngine jexl = new JexlBuilder()
+                .features(new JexlFeatures().pragmaAnywhere(false))
+                .strict(true).create();
+        final JexlContext ctxt = new MapContext();
+        try {
+            final JexlScript e = jexl.createScript(str);
+            Assert.fail("i should not be resolved");
+        } catch (final JexlException xany) {
+            Assert.assertNotNull(xany);
+        }
+    }
     @Test
     public void testImportPragmaDisabled() {
         String src =

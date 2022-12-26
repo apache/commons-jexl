@@ -267,6 +267,14 @@ public class FeaturesTest extends JexlTestCase {
         };
         checkFeature(f, scripts);
     }
+    @Test
+    public void testPragmaAnywhere() throws Exception {
+        final JexlFeatures f = new JexlFeatures().pragmaAnywhere(false);
+        final String[] scripts = new String[]{
+                "var x = 3;\n#pragma foo 42",
+        };
+        checkFeature(f, scripts);
+    }
 
     @Test
     public void testMixedFeatures() throws Exception {
