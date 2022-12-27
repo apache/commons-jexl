@@ -368,8 +368,8 @@ public class JexlArithmetic {
 
     /**
      * Checks if an operand is considered null.
-     * @apram val the operand
-     * @erturn true if operand is considered null
+     * @param value the operand
+     * @return true if operand is considered null
      */
     protected boolean isNullOperand(Object value) {
         return value == null;
@@ -384,7 +384,7 @@ public class JexlArithmetic {
      *
      * @param strictCast whether strict cast is required
      * @param defaultValue the default value to return, if not strict
-     * @eeturn the default value is strict is false
+     * @return the default value is strict is false
      * @throws JexlArithmetic.NullOperand if strict-cast
      * @since 3.3
      */
@@ -397,13 +397,13 @@ public class JexlArithmetic {
 
     /**
      * The result of +,/,-,*,% when both operands are null.
-     * @param strictCast whether strict-cast is required
+     * @param operator the actual operator
      * @return Integer(0) if lenient
      * @throws  JexlArithmetic.NullOperand if strict-cast
      * @since 3.3
      */
-    protected Object controlNullNullOperands(boolean strictCast) {
-        if (strictCast ) {
+    protected Object controlNullNullOperands(JexlOperator operator) {
+        if (isStrict(operator)) {
             throw new NullOperand();
         }
         return 0;
@@ -1201,7 +1201,7 @@ public class JexlArithmetic {
      */
     public Object add(final Object left, final Object right) {
         if (left == null && right == null) {
-            return controlNullNullOperands();
+            return controlNullNullOperands(JexlOperator.ADD);
         }
         final boolean strconcat = strict
                             ? left instanceof String || right instanceof String
@@ -1257,7 +1257,7 @@ public class JexlArithmetic {
      */
     public Object divide(final Object left, final Object right) {
         if (left == null && right == null) {
-            return controlNullNullOperands();
+            return controlNullNullOperands(JexlOperator.DIVIDE);
         }
         // if both (non-null) args fit as long
         final Number ln = asLongNumber(left);
@@ -1311,7 +1311,7 @@ public class JexlArithmetic {
      */
     public Object mod(final Object left, final Object right) {
         if (left == null && right == null) {
-            return controlNullNullOperands();
+            return controlNullNullOperands(JexlOperator.MOD);
         }
         // if both (non-null) args fit as long
         final Number ln = asLongNumber(left);
@@ -1381,7 +1381,7 @@ public class JexlArithmetic {
      */
     public Object multiply(final Object left, final Object right) {
         if (left == null && right == null) {
-            return controlNullNullOperands();
+            return controlNullNullOperands(JexlOperator.MULTIPLY);
         }
         // if both (non-null) args fit as int
         final Number ln = asLongNumber(left);
@@ -1426,7 +1426,7 @@ public class JexlArithmetic {
      */
     public Object subtract(final Object left, final Object right) {
         if (left == null && right == null) {
-            return controlNullNullOperands();
+            return controlNullNullOperands(JexlOperator.SUBTRACT);
         }
         // if both (non-null) args fit as long
         final Number ln = asLongNumber(left);
@@ -1574,9 +1574,11 @@ public class JexlArithmetic {
 
     /**
      * Test if left contains right (right matches/in left).
-     * <p>Beware that this method arguments are the opposite of the operator arguments.
-     * 'x in y' means 'y contains x'.</p>
-     *
+     * <p>Beware that this &quot;contains &quot; method arguments order is the opposite of the
+     * &quot;in/matches&quot; operator arguments.
+     * <code>x =~ y</code> means <code>y contains x</code> thus <code>contains(x, y)</code>.</p>
+     * <p>When this method returns null during evaluation, the operator code continues trying to find
+     * one through the uberspect.</p>
      * @param container the container
      * @param value the value
      * @return test result or null if there is no arithmetic solution
@@ -1605,14 +1607,40 @@ public class JexlArithmetic {
             return ((Map<?, ?>) container).containsKey(value);
         }
         // try contains on collection
-        if (container instanceof Collection<?>) {
-            if (value instanceof Collection<?>) {
-                return ((Collection<?>) container).containsAll((Collection<?>) value);
+        return collectionContains(container, value);
+    }
+
+    /**
+     * Checks whether a potential collection contains another.
+     * <p>Made protected to make it easier to override if needed.</p>
+     * @param collection the container which can be a collection or an array (even of primitive)
+     * @param value the value which can be a collection or an array (even of primitive) or a singleton
+     * @return test result or null if there is no arithmetic solution
+     */
+    protected Boolean collectionContains(final Object collection, final Object value) {
+        // convert arrays if needed
+        final Object left = arrayWrap(collection);
+        if (left instanceof Collection<?>) {
+            final Object right = arrayWrap(value);
+            if (right instanceof Collection<?>) {
+                return ((Collection<?>) left).containsAll((Collection<?>) right);
             }
-            // left in right ? <=> right.contains(left) ?
-            return ((Collection<?>) container).contains(value);
+            return ((Collection<?>) left).contains(value);
         }
         return null;
+    }
+
+    /**
+     * Attempts transformation of potential array in an abstract list or leave as is.
+     * <p>An array (as in int[]) is not convenient to call methods so when encountered we turn them into lists</p>
+     * @param container an array or on object
+     * @return an abstract list wrapping the array instance or the initial argument
+     * @see org.apache.commons.jexl3.internal.introspection.ArrayListWrapper
+     */
+    private static Object arrayWrap(final Object container) {
+        return container.getClass().isArray()
+                ? new org.apache.commons.jexl3.internal.introspection.ArrayListWrapper(container)
+                : container;
     }
 
     /**

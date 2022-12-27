@@ -1036,26 +1036,26 @@ public class Issues300Test {
         // local var
         JexlScript s0 = jexl.createScript(src0, "a");
         JexlScript s1 = jexl.createScript(src1, "a");
-        Assert.assertEquals(2, s0.execute(null, null));
-        Assert.assertEquals(1, s1.execute(null, null));
+        Assert.assertEquals(2, s0.execute(null, (Object) null));
+        Assert.assertEquals(1, s1.execute(null, (Object) null));
         // global var undefined
         s0 = jexl.createScript(src0);
         s1 = jexl.createScript(src1);
         try {
-            Assert.assertEquals(2, s0.execute(null, null));
+            Assert.assertEquals(2, s0.execute(null, (Object) null));
         } catch(JexlException.Variable xvar) {
             Assert.assertEquals("a", xvar.getVariable());
         }
         try {
-            Assert.assertEquals(1, s1.execute(null, null));
+            Assert.assertEquals(1, s1.execute(null, (Object) null));
         } catch(JexlException.Variable xvar) {
             Assert.assertEquals("a", xvar.getVariable());
         }
         // global var null
         MapContext ctxt = new MapContext();
         ctxt.set("a", null);
-        Assert.assertEquals(2, s0.execute(ctxt, null));
-        Assert.assertEquals(1, s1.execute(ctxt, null));
+        Assert.assertEquals(2, s0.execute(ctxt, (Object) null));
+        Assert.assertEquals(1, s1.execute(ctxt, (Object) null));
     }
 
     public static class Arithmetic384 extends JexlArithmetic {
@@ -1082,7 +1082,7 @@ public class Issues300Test {
             JexlContext ctxt = new MapContext();
             JexlScript s0 = jexl.createScript(src0);
             try {
-                s0.execute(ctxt, null);
+                s0.execute(ctxt, (Object) null);
                 Assert.fail("null argument should throw");
             } catch (JexlException xvar) {
                 Assert.assertTrue(xvar.toString().contains("+"));
@@ -1093,7 +1093,7 @@ public class Issues300Test {
             JexlContext ctxt = new MapContext();
             JexlScript s1 = jexl.createScript(src1, "a");
             try {
-                s1.execute(ctxt, null);
+                s1.execute(ctxt, (Object) null);
                 Assert.fail("null argument should throw");
             } catch (JexlException.Variable xvar) {
                 Assert.assertEquals("a", xvar.getVariable());
@@ -1101,7 +1101,7 @@ public class Issues300Test {
             // undefined a
             s1 = jexl.createScript(src1);
             try {
-                s1.execute(ctxt, null);
+                s1.execute(ctxt, (Object) null);
                 Assert.fail("null argument should throw");
             } catch (JexlException.Variable xvar) {
                 Assert.assertEquals("a", xvar.getVariable());
@@ -1110,7 +1110,7 @@ public class Issues300Test {
             // null a
             ctxt.set("a", null);
             try {
-                s1.execute(ctxt, null);
+                s1.execute(ctxt, (Object) null);
                 Assert.fail("null argument should throw");
             } catch (JexlException.Variable xvar) {
                 Assert.assertEquals("a", xvar.getVariable());
@@ -1136,11 +1136,11 @@ public class Issues300Test {
         for(String src1 : Arrays.asList("'ABC' + a", "a + 'ABC'")) {
             JexlContext ctxt = new MapContext();
             JexlScript s1 = jexl.createScript(src1, "a");
-            Assert.assertEquals("ABC", s1.execute(ctxt, null));
+            Assert.assertEquals("ABC", s1.execute(ctxt, (Object) null));
             // undefined a
             s1 = jexl.createScript(src1);
             try {
-                s1.execute(ctxt, null);
+                s1.execute(ctxt, (Object) null);
                 Assert.fail("null argument should throw");
             } catch (JexlException.Variable xvar) {
                 Assert.assertEquals("a", xvar.getVariable());
@@ -1148,7 +1148,7 @@ public class Issues300Test {
             }
             // null a
             ctxt.set("a", null);
-            Assert.assertEquals("ABC", s1.execute(ctxt, null));
+            Assert.assertEquals("ABC", s1.execute(ctxt, (Object) null));
         }
     }
     @Test
@@ -1172,4 +1172,5 @@ public class Issues300Test {
         Object result = script.execute(null);
         debuggerCheck(jexl);
     }
+
 }

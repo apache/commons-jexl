@@ -438,6 +438,8 @@ public class Interpreter extends InterpreterBase {
     protected Object visit(final ASTERNode node, final Object data) {
         final Object left = node.jjtGetChild(0).jjtAccept(this, data);
         final Object right = node.jjtGetChild(1).jjtAccept(this, data);
+        // note the arguments inversion between 'in'/'matches' and 'contains'
+        // if x in y then y contains x
         return operators.contains(node, "=~", right, left);
     }
 
@@ -445,6 +447,8 @@ public class Interpreter extends InterpreterBase {
     protected Object visit(final ASTNRNode node, final Object data) {
         final Object left = node.jjtGetChild(0).jjtAccept(this, data);
         final Object right = node.jjtGetChild(1).jjtAccept(this, data);
+        // note the arguments inversion between (not) 'in'/'matches' and  (not) 'contains'
+        // if x not-in y then y not-contains x
         return !operators.contains(node, "!~", right, left);
     }
 

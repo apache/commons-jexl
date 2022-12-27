@@ -163,8 +163,7 @@ public class Arithmetic360 extends JexlArithmetic {
     @Override
     public Object shiftLeft(Object left, Object right) {
         if (left == null && right == null) {
-            boolean strictCast  = isStrict(JexlOperator.SHIFTLEFT);
-            return controlNullNullOperands(strictCast);
+            return controlNullNullOperands(JexlOperator.SHIFTLEFT);
         }
         final int r = toInteger(right);
         Number l = asIntNumber(left);
@@ -188,8 +187,7 @@ public class Arithmetic360 extends JexlArithmetic {
     @Override
     public Object shiftRight(Object left, Object right) {
         if (left == null && right == null) {
-            boolean strictCast  = isStrict(JexlOperator.SHIFTRIGHT);
-            return controlNullNullOperands(strictCast);
+            return controlNullNullOperands(JexlOperator.SHIFTRIGHT);
         }
         final int r = toInteger(right);
         Number l = asIntNumber(left);
@@ -213,8 +211,7 @@ public class Arithmetic360 extends JexlArithmetic {
     @Override
     public Object shiftRightUnsigned(Object left, Object right) {
         if (left == null && right == null) {
-            boolean strictCast  = isStrict(JexlOperator.SHIFTRIGHTU);
-            return controlNullNullOperands(strictCast);
+            return controlNullNullOperands(JexlOperator.SHIFTRIGHTU);
         }
         final int r = toInteger(right);
         Number l = asIntNumber(left);

@@ -27,6 +27,15 @@
     <body>
         <release version="3.3" date="YYYY-MM-DD">
             <!-- ADD -->
+            <action dev="henrib" type="add" issue="JEXL-391">
+                Improve in/=~ operator when arguments are arrays and collections
+            </action>
+            <action dev="henrib" type="add" issue="JEXL-390" due-to="Dmitri Blinov">
+                Pragmas should not be statements
+            </action>
+            <action dev="henrib" type="add" issue="JEXL-389" due-to="Dmitri Blinov">
+                Improve parsing timings
+            </action>
             <action dev="Dmitri Blinov" type="add" issue="JEXL-385" due-to="Dmitri Blinov">
                 Support disabling fortran-style relational operators syntax
             </action>

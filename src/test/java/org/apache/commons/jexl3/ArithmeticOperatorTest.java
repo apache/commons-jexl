@@ -17,6 +17,7 @@
 
 package org.apache.commons.jexl3;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -25,7 +26,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
-import java.util.Collections;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
@@ -94,11 +94,40 @@ public class ArithmeticOperatorTest extends JexlTestCase {
     }
 
     @Test
+    public void test391() throws Exception {
+        // with literals
+        for(String src : Arrays.asList(
+                "2 =~ [1, 2, 3, 4]",
+                "[2, 3] =~ [1, 2, 3, 4]",
+                "[2, 3,...] =~ [1, 2, 3, 4]",
+                "3 =~ [1, 2, 3, 4,...]",
+                "[2, 3] =~ [1, 2, 3, 4,...]",
+                "[2, 3,...] =~ [1, 2, 3, 4,...]")) {
+            asserter.assertExpression(src, Boolean.TRUE);
+        }
+        // with variables
+        int[] ic = new int[]{1, 2,  3, 4};
+        List<Integer> iic = new ArrayList<>();
+        for(int v : ic) { iic.add(v); }
+        int[] iv = new int[]{2, 3};
+        List<Integer> iiv = new ArrayList<>();
+        for(int v : iv) { iiv.add(v); }
+        String src = "(x,y) -> x =~ y ";
+        for(Object v : Arrays.asList(iv, iiv, 2)) {
+            for(Object c : Arrays.asList(ic, iic)) {
+                asserter.assertExpression(src, Boolean.TRUE, v, c);
+            }
+        }
+    }
+
+    @Test
     public void testRegexp2() throws Exception {
         asserter.setVariable("str", "abc456");
         asserter.assertExpression("str =~ ~/.*456/", Boolean.TRUE);
         asserter.assertExpression("str !~ ~/ABC.*/", Boolean.TRUE);
         asserter.assertExpression("str =~ ~/abc\\d{3}/", Boolean.TRUE);
+        // legacy, deprecated
+        asserter.assertExpression("matches(str, ~/.*456/)", Boolean.TRUE);
         asserter.setVariable("str", "4/6");
         asserter.assertExpression("str =~ ~/\\d\\/\\d/", Boolean.TRUE);
     }
@@ -198,7 +227,8 @@ public class ArithmeticOperatorTest extends JexlTestCase {
         }
 
         public boolean contains(final int[] i) {
-            return values.containsAll(Collections.singletonList(i));
+            for(int ii : i) if (!values.contains(ii)) return false;
+            return true;
         }
 
         public boolean startsWith(final int i) {

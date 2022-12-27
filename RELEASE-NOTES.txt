@@ -40,6 +40,9 @@ the skill set required to write scripts.
 
 New Features in 3.3:
 ====================
+* JEXL-391:     Improve in/=~ operator when arguments are arrays and collections
+* JEXL-390:     Pragmas should not be statements
+* JEXL-389:     Improve parsing timings
 * JEXL-385:     Support disabling fortran-style relational operators syntax
 * JEXL-382:     Simplify grammar and lexical state management
 * JEXL-380:     Multiple values per pragma key

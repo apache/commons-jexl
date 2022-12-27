@@ -18,6 +18,7 @@ package org.apache.commons.jexl3.internal.introspection;
 
 import java.lang.reflect.Array;
 import java.util.AbstractList;
+import java.util.Iterator;
 import java.util.RandomAccess;
 
 /**
@@ -83,4 +84,6 @@ public class ArrayListWrapper extends AbstractList<Object> implements RandomAcce
     public boolean contains(final Object o) {
         return indexOf(o) != -1;
     }
+    @Override
+    public Iterator<Object> iterator() { return new ArrayIterator(array); }
 }
