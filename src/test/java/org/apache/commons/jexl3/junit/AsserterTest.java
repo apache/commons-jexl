@@ -23,7 +23,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 /**
- *  Simple testcases
+ *  Simple tests
  *
  *  @since 1.0
  */
