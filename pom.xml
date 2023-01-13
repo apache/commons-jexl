@@ -313,7 +313,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-pmd-plugin</artifactId>
-                <version>${commons.pmd.version}</version>
                 <configuration>
                     <rulesets>
                         <ruleset>${project.basedir}/src/main/config/pmd.xml</ruleset>
