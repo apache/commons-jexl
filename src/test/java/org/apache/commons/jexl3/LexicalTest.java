@@ -738,7 +738,7 @@ public class LexicalTest {
         final JexlFeatures ff2 = runVarLoop(false, src2);
         final JexlFeatures ft2= runVarLoop(true, src2);
 
-        // and check some features features
+        // and check some features
         Assert.assertEquals(ff0, ff1);
         Assert.assertEquals(ft0, ft1);
         Assert.assertNotEquals(ff0, ft0);

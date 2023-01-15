@@ -24,7 +24,7 @@ import java.util.RandomAccess;
 /**
  * A class that wraps an array within an AbstractList.
  * <p>
- * It overrides some methods because introspection uses this class a a marker for wrapped arrays; the declared class
+ * It overrides some methods because introspection uses this class a marker for wrapped arrays; the declared class
  * for these method is thus ArrayListWrapper.
  * The methods are get/set/size/contains and indexOf because it is used by contains.
  * </p>

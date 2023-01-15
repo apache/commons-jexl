@@ -204,7 +204,7 @@ public abstract class JxltEngine {
     }
 
     /**
-     * Creates a a {@link Expression} from an expression string.
+     * Creates a {@link Expression} from an expression string.
      * Uses and fills up the expression cache if any.
      *
      * <p>If the underlying JEXL engine is silent, errors will be logged through its logger as warnings.</p>
@@ -218,7 +218,7 @@ public abstract class JxltEngine {
     }
 
     /**
-     * Creates a a {@link Expression} from an expression string.
+     * Creates a {@link Expression} from an expression string.
      * Uses and fills up the expression cache if any.
      *
      * <p>If the underlying JEXL engine is silent, errors will be logged through its logger as warnings.</p>

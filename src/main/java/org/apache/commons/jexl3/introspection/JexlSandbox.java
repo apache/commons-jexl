@@ -547,7 +547,7 @@ public final class JexlSandbox {
      * @param clazz the class for which these permissions apply
      * @param readFlag whether the readable property list is allow - true - or block - false -
      * @param writeFlag whether the writable property list is allow - true - or block - false -
-     * @param executeFlag whether the executable method list is allow allow - true - or block - false -
+     * @param executeFlag whether the executable method list is allow - true - or block - false -
      * @return the set of permissions
      */
     public Permissions permissions(final String clazz,
@@ -564,7 +564,7 @@ public final class JexlSandbox {
      * @param inhf whether these permissions are inheritable
      * @param readf whether the readable property list is allow - true - or block - false -
      * @param writef whether the writable property list is allow - true - or block - false -
-     * @param execf whether the executable method list is allow allow - true - or block - false -
+     * @param execf whether the executable method list is allow - true - or block - false -
      * @return the set of permissions
      */
     public Permissions permissions(final String clazz,
