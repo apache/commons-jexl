@@ -51,8 +51,6 @@
         <commons.release.3.binary.suffix />
         <commons.jira.id>JEXL</commons.jira.id>
         <commons.jira.pid>12310479</commons.jira.pid>
-        <checkstyle.plugin.version>3.2.1</checkstyle.plugin.version>
-        <checkstyle.version>10.6.0</checkstyle.version>
         <japicmp.skip>false</japicmp.skip>
 
         <!-- override of Jacoco properties defined in CP52 -->
@@ -85,19 +83,6 @@
         <commons.releaseManagerName>Henri Biestro</commons.releaseManagerName>
         <commons.releaseManagerKey>4E066E0459CD109B</commons.releaseManagerKey>
     </properties>
-
-    <!-- Checkstyle 10 is incompatible with jdk 8, keep 9.3 -->
-    <profiles>
-        <profile>
-            <id>jdk8-plugin-fix-version</id>
-            <activation>
-                <jdk>1.8</jdk>
-            </activation>
-            <properties>
-                <checkstyle.version>9.3</checkstyle.version>
-            </properties>
-        </profile>
-    </profiles>
 
     <scm>
         <connection>scm:git:https://gitbox.apache.org/repos/asf/commons-jexl.git</connection>
@@ -243,7 +228,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
-                <version>${checkstyle.plugin.version}</version>
                 <configuration>
                     <configLocation>${basedir}/src/main/config/checkstyle.xml</configLocation>
                     <suppressionsLocation>${basedir}/src/main/config/checkstyle-suppressions.xml</suppressionsLocation>
@@ -253,20 +237,6 @@
                     <!-- Needed to define config_loc for use by Eclipse -->
                     <propertyExpansion>config_loc=${basedir}/src/main/config</propertyExpansion>
                 </configuration>
-                <!-- Update embedded checkstyle to latest -->
-                <dependencies>
-                    <dependency>
-                        <groupId>com.puppycrawl.tools</groupId>
-                        <artifactId>checkstyle</artifactId>
-                        <version>${checkstyle.version}</version>
-                        <exclusions><!-- MCHECKSTYLE-156 -->
-                            <exclusion>
-                                <groupId>com.sun</groupId>
-                                <artifactId>tools</artifactId>
-                            </exclusion>
-                        </exclusions>
-                    </dependency>
-                </dependencies>
             </plugin>
 
             <!-- Allow Spotbugs to be run from command-line. Must agree with config in report section. -->
@@ -386,7 +356,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
-                <version>${checkstyle.plugin.version}</version>
                 <configuration>
                     <configLocation>${basedir}/src/main/config/checkstyle.xml</configLocation>
                     <suppressionsLocation>${basedir}/src/main/config/checkstyle-suppressions.xml</suppressionsLocation>
