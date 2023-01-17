@@ -81,7 +81,7 @@ public class JexlException extends RuntimeException {
      * @param cause the exception causing the error
      * @param trace whether this exception has a stacktrace and can <em>not</em> be suppressed
      */
-    protected JexlException(final JexlNode node, final String msg, final Throwable cause, boolean trace) {
+    protected JexlException(final JexlNode node, final String msg, final Throwable cause, final boolean trace) {
         super(msg != null ? msg : "", unwrap(cause), !trace, trace);
         if (node != null) {
             mark = node;
@@ -236,8 +236,8 @@ public class JexlException extends RuntimeException {
      * @return the message
      */
     protected String detailedMessage() {
-        Class<? extends JexlException> clazz = getClass();
-        String name = clazz == JexlException.class? "JEXL" : clazz.getSimpleName().toLowerCase();
+        final Class<? extends JexlException> clazz = getClass();
+        final String name = clazz == JexlException.class? "JEXL" : clazz.getSimpleName().toLowerCase();
         return name + " error : " + getDetail();
     }
 
@@ -990,7 +990,7 @@ public class JexlException extends RuntimeException {
      */
     public static class Cancel extends JexlException {
         /**
-         * 
+         *
          */
         private static final long serialVersionUID = 1L;
 

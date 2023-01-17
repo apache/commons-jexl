@@ -55,7 +55,7 @@ public final class MethodKey {
     /** The parameters. */
     private final Class<?>[] params;
     /** A marker for empty parameter list. */
-    private static final Class<?>[] NOARGS = new Class<?>[0];
+    private static final Class<?>[] NOARGS = {};
     /** The hash code constants. */
     private static final int HASH = 37;
 
@@ -369,7 +369,7 @@ public final class MethodKey {
      * @return true if compatible, false otherwise
      */
     private static boolean isInvocationConvertible(
-            final Class<?> formal, Class<?> type, final boolean strict, final boolean possibleVarArg) {
+            final Class<?> formal, final Class<?> type, final boolean strict, final boolean possibleVarArg) {
         Class<?> actual = type;
         /* if it is a null, it means the arg was null */
         if (actual == null && !formal.isPrimitive()) {

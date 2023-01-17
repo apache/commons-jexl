@@ -83,11 +83,11 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
      * @param node the node
      * @return the features or null
      */
-    protected JexlFeatures getFeatures(JexlNode node) {
+    protected JexlFeatures getFeatures(final JexlNode node) {
         JexlNode walk = node;
         while(walk != null) {
             if (walk instanceof ASTJexlScript) {
-                ASTJexlScript script = (ASTJexlScript) walk;
+                final ASTJexlScript script = (ASTJexlScript) walk;
                 return script.getFeatures();
             }
             walk = walk.jjtGetParent();
@@ -99,8 +99,8 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
      * Sets the arrow style (fat or thin) depending on features.
      * @param node the node to start seeking features from.
      */
-    protected void setArrowSymbol(JexlNode node) {
-        JexlFeatures features = getFeatures(node);
+    protected void setArrowSymbol(final JexlNode node) {
+        final JexlFeatures features = getFeatures(node);
         if (features != null && features.supportsFatArrow() && !features.supportsThinArrow()) {
             arrow = "=>";
         } else {
@@ -115,7 +115,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
      */
     public boolean debug(final JexlExpression jscript) {
         if (jscript instanceof Script) {
-            Script script = (Script) jscript;
+            final Script script = (Script) jscript;
             return debug(script.script);
         }
         return false;
@@ -128,7 +128,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
      */
     public boolean debug(final JexlScript jscript) {
         if (jscript instanceof Script) {
-            Script script = (Script) jscript;
+            final Script script = (Script) jscript;
             return debug(script.script);
         }
         return false;
@@ -217,7 +217,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
      * @param flag turn on or off
      * @return this debugger instance
      */
-    public Debugger outputPragmas(boolean flag) {
+    public Debugger outputPragmas(final boolean flag) {
         this.outputPragmas = flag;
         return this;
     }
@@ -289,7 +289,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
      * @param child the node
      * @return true if node is a statement
      */
-    private static boolean isStatement(JexlNode child) {
+    private static boolean isStatement(final JexlNode child) {
         return child instanceof ASTJexlScript
                 || child instanceof ASTBlock
                 || child instanceof ASTIfStatement
@@ -304,9 +304,9 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
      * @param cs the string
      * @return true if a semicolumn is the last non-whitespace character
      */
-    private static boolean semicolTerminated(CharSequence cs) {
+    private static boolean semicolTerminated(final CharSequence cs) {
         for(int i = cs.length() - 1; i >= 0; --i) {
-            char c = cs.charAt(i);
+            final char c = cs.charAt(i);
             if (c == ';') {
                 return true;
             }
@@ -784,7 +784,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
         return p;
     }
 
-    private static  boolean isLambdaExpr(ASTJexlLambda lambda) {
+    private static  boolean isLambdaExpr(final ASTJexlLambda lambda) {
         return lambda.jjtGetNumChildren() == 1 && !isStatement(lambda.jjtGetChild(0));
     }
 
@@ -793,13 +793,13 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
      * @param builder where to stringify
      * @param pragmas the pragmas, may be null
      */
-    private static void writePragmas(StringBuilder builder, Map<String, Object> pragmas) {
+    private static void writePragmas(final StringBuilder builder, final Map<String, Object> pragmas) {
         if (pragmas != null) {
-            for (Map.Entry<String, Object> pragma : pragmas.entrySet()) {
-                String key = pragma.getKey();
-                Object value = pragma.getValue();
-                Set<Object> values = value instanceof Set ? (Set) value : Collections.singleton(value);
-                for (Object pragmaValue : values) {
+            for (final Map.Entry<String, Object> pragma : pragmas.entrySet()) {
+                final String key = pragma.getKey();
+                final Object value = pragma.getValue();
+                final Set<Object> values = value instanceof Set ? (Set) value : Collections.singleton(value);
+                for (final Object pragmaValue : values) {
                     builder.append("#pragma ");
                     builder.append(key);
                     builder.append(' ');
@@ -812,7 +812,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     }
 
     @Override
-    protected Object visit(final ASTJexlScript node, Object arg) {
+    protected Object visit(final ASTJexlScript node, final Object arg) {
         if (outputPragmas) {
             writePragmas(builder, node.getPragmas());
         }
@@ -823,13 +823,13 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
             final ASTJexlLambda lambda = (ASTJexlLambda) node;
             final JexlNode parent = node.jjtGetParent();
             // use lambda syntax if not assigned
-            boolean expr = isLambdaExpr(lambda);
+            final boolean expr = isLambdaExpr(lambda);
             named = node.jjtGetChild(0) instanceof ASTVar;
             final boolean assigned = parent instanceof ASTAssignment || named;
             if (assigned && !expr) {
                 builder.append("function");
                 if (named) {
-                    ASTVar avar = (ASTVar) node.jjtGetChild(0);
+                    final ASTVar avar = (ASTVar) node.jjtGetChild(0);
                     builder.append(' ');
                     builder.append(avar.getName());
                 }
@@ -837,14 +837,14 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
             builder.append('(');
             final String[] params = lambda.getParameters();
             if (params != null ) {
-                Scope scope = lambda.getScope();
-                LexicalScope lexicalScope = lambda.getLexicalScope();
+                final Scope scope = lambda.getScope();
+                final LexicalScope lexicalScope = lambda.getLexicalScope();
                 for (int p = 0; p < params.length; ++p) {
                     if (p > 0) {
                         builder.append(", ");
                     }
-                    String param = params[p];
-                    int symbol = scope.getSymbol(param);
+                    final String param = params[p];
+                    final int symbol = scope.getSymbol(param);
                     if (lexicalScope.isConstant(symbol)) {
                         builder.append("const ");
                     } else if (scope.isLexical(symbol)) {
@@ -933,7 +933,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
         final int num = node.jjtGetNumChildren();
         builder.append("new");
         if (num > 0) {
-            JexlNode c0 = node.jjtGetChild(0);
+            final JexlNode c0 = node.jjtGetChild(0);
             boolean first = true;
             if (c0 instanceof ASTQualifiedIdentifier) {
                 builder.append(' ');
@@ -1076,26 +1076,26 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     }
 
     @Override
-    protected Object visit(ASTQualifiedIdentifier node, Object data) {
-        String img = node.getName();
+    protected Object visit(final ASTQualifiedIdentifier node, final Object data) {
+        final String img = node.getName();
         return this.check(node, img, data);
     }
 
     @Override
-    protected Object visit(ASTStringLiteral node, Object data) {
-        String img = StringParser.escapeString(node.getLiteral(), '\'');
+    protected Object visit(final ASTStringLiteral node, final Object data) {
+        final String img = StringParser.escapeString(node.getLiteral(), '\'');
         return this.check(node, img, data);
     }
 
     @Override
-    protected Object visit(ASTJxltLiteral node, Object data) {
-        String img = StringParser.escapeString(node.getLiteral(), '`');
+    protected Object visit(final ASTJxltLiteral node, final Object data) {
+        final String img = StringParser.escapeString(node.getLiteral(), '`');
         return this.check(node, img, data);
     }
 
     @Override
     protected Object visit(final ASTRegexLiteral node, final Object data) {
-        String img = StringParser.escapeString(node.toString(), '/');
+        final String img = StringParser.escapeString(node.toString(), '/');
         return check(node, "~" + img, data);
     }
 
@@ -1160,18 +1160,18 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
             accept(node.jjtGetChild(0), data);
             for (int i = 1; i < num; ++i) {
                 builder.append(", ");
-                JexlNode child = node.jjtGetChild(i);
+                final JexlNode child = node.jjtGetChild(i);
                 if (child instanceof ASTAssignment) {
-                    ASTAssignment assign = (ASTAssignment) child;
-                    int nc = assign.jjtGetNumChildren();
-                    ASTVar var = (ASTVar) assign.jjtGetChild(0);
+                    final ASTAssignment assign = (ASTAssignment) child;
+                    final int nc = assign.jjtGetNumChildren();
+                    final ASTVar var = (ASTVar) assign.jjtGetChild(0);
                     builder.append(var.getName());
                     if (nc > 1) {
                         builder.append(" = ");
                         accept(assign.jjtGetChild(1), data);
                     }
                 } else if (child instanceof ASTVar) {
-                    ASTVar var = (ASTVar) child;
+                    final ASTVar var = (ASTVar) child;
                     builder.append(var.getName());
                 } else {
                     // that's odd

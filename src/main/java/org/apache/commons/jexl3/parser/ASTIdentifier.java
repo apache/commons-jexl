@@ -21,7 +21,7 @@ package org.apache.commons.jexl3.parser;
  */
 public class ASTIdentifier extends JexlNode {
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 1L;
     protected String name = null;

@@ -18,7 +18,7 @@ package org.apache.commons.jexl3.parser;
 
 public final class ASTJxltLiteral extends JexlNode {
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 1L;
     /** The actual literal value; the inherited 'value' member may host a cached template expression. */

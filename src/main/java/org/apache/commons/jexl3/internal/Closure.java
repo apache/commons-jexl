@@ -39,7 +39,7 @@ public class Closure extends Script {
     protected Closure(final Interpreter theCaller, final ASTJexlLambda lambda) {
         super(theCaller.jexl, null, lambda);
         frame = lambda.createFrame(theCaller.frame);
-        JexlOptions callerOptions = theCaller.options;
+        final JexlOptions callerOptions = theCaller.options;
         options = callerOptions != null ? callerOptions.copy() :  null;
     }
 

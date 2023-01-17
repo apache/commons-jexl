@@ -74,18 +74,18 @@ public class PermissionsParser {
      * @param srcs the sources
      * @return the permissions map
      */
-    public Permissions parse(String... srcs) {
+    public Permissions parse(final String... srcs) {
         if (srcs == null || srcs.length == 0) {
             return Permissions.UNRESTRICTED;
         }
         packages = new ConcurrentHashMap<>();
         wildcards = new LinkedHashSet<>();
-        for(String src : srcs) {
+        for(final String src : srcs) {
             this.src = src;
             this.size = src.length();
             readPackages();
         }
-        Permissions permissions = new Permissions(wildcards, packages);
+        final Permissions permissions = new Permissions(wildcards, packages);
         clear();
         return permissions;
     }
@@ -96,7 +96,7 @@ public class PermissionsParser {
      * @param i the offset position
      * @return the error message
      */
-    private String unexpected(char c, int i) {
+    private String unexpected(final char c, final int i) {
         return "unexpected '" + c + "'" + "@" + i;
     }
 
@@ -105,10 +105,10 @@ public class PermissionsParser {
      * @param offset initial position
      * @return position after comment
      */
-    private int readEol(int offset) {
+    private int readEol(final int offset) {
         int i = offset;
         while (i < size) {
-            char c = src.charAt(i);
+            final char c = src.charAt(i);
             if (c == '\n') {
                 break;
             }
@@ -122,10 +122,10 @@ public class PermissionsParser {
      * @param offset initial position
      * @return position after spaces
      */
-    private int readSpaces(int offset) {
+    private int readSpaces(final int offset) {
         int i = offset;
         while (i < size) {
-            char c = src.charAt(i);
+            final char c = src.charAt(i);
             if (!Character.isWhitespace(c)) {
                 break;
             }
@@ -140,7 +140,7 @@ public class PermissionsParser {
      * @param offset the initial reading position
      * @return the position after the identifier
      */
-    private int readIdentifier(StringBuilder id, int offset) {
+    private int readIdentifier(final StringBuilder id, final int offset) {
         return readIdentifier(id, offset, false, false);
     }
 
@@ -152,7 +152,7 @@ public class PermissionsParser {
      * @param star whether stars (*) are allowed
      * @return the position after the identifier
      */
-    private int readIdentifier(StringBuilder id, int offset, boolean dot, boolean star) {
+    private int readIdentifier(final StringBuilder id, final int offset, final boolean dot, final boolean star) {
         int begin = -1;
         boolean starf = star;
         int i = offset;
@@ -190,19 +190,18 @@ public class PermissionsParser {
      * Reads a package permission.
      */
     private void readPackages() {
-        StringBuilder temp = new StringBuilder();
+        final StringBuilder temp = new StringBuilder();
         Permissions.NoJexlPackage njpackage = null;
         int i = 0;
         int j = -1;
         String pname = null;
         while (i < size) {
-            char c = src.charAt(i);
+            final char c = src.charAt(i);
             // if no parsing progress can be made, we are in error
-            if (j < i) {
-                j = i;
-            } else {
+            if (j >= i) {
                 throw new IllegalStateException(unexpected(c, i));
             }
+            j = i;
             // get rid of space
             if (Character.isWhitespace(c)) {
                 i = readSpaces(i + 1);
@@ -215,7 +214,7 @@ public class PermissionsParser {
             }
             // read the package qualified name
             if (pname == null) {
-                int next = readIdentifier(temp, i, true, true);
+                final int next = readIdentifier(temp, i, true, true);
                 if (i != next) {
                     pname = temp.toString();
                     temp.setLength(0);
@@ -235,18 +234,16 @@ public class PermissionsParser {
                     packages.put(pname, njpackage);
                     i += 1;
                 }
-            } else {
-                if (c == '}') {
-                    // empty means whole package
-                    if (njpackage.isEmpty()) {
-                        packages.put(pname, Permissions.NOJEXL_PACKAGE);
-                    }
-                    njpackage = null; // can restart anew
-                    pname = null;
-                    i += 1;
-                } else {
-                    i = readClass(njpackage, null, null, i);
+            } else if (c == '}') {
+                // empty means whole package
+                if (njpackage.isEmpty()) {
+                    packages.put(pname, Permissions.NOJEXL_PACKAGE);
                 }
+                njpackage = null; // can restart anew
+                pname = null;
+                i += 1;
+            } else {
+                i = readClass(njpackage, null, null, i);
             }
         }
     }
@@ -259,8 +256,8 @@ public class PermissionsParser {
      * @param offset the initial parsing position in the source
      * @return the new parsing position
      */
-    private int readClass(Permissions.NoJexlPackage njpackage, String outer, String inner, int offset) {
-        StringBuilder temp = new StringBuilder();
+    private int readClass(final Permissions.NoJexlPackage njpackage, final String outer, final String inner, final int offset) {
+        final StringBuilder temp = new StringBuilder();
         Permissions.NoJexlClass njclass = null;
         String njname = null;
         String identifier = inner;
@@ -268,13 +265,12 @@ public class PermissionsParser {
         int j = -1;
         boolean isMethod = false;
         while(i < size) {
-            char c = src.charAt(i);
+            final char c = src.charAt(i);
             // if no parsing progress can be made, we are in error
-            if (j < i) {
-                j = i;
-            } else {
+            if (j >= i) {
                 throw new IllegalStateException(unexpected(c, i));
             }
+            j = i;
             // get rid of space
             if (Character.isWhitespace(c)) {
                 i = readSpaces(i + 1);
@@ -296,7 +292,7 @@ public class PermissionsParser {
             }
             // read an identifier, the class name
             if (identifier == null) {
-                int next = readIdentifier(temp, i);
+                final int next = readIdentifier(temp, i);
                 if (i != next) {
                     identifier = temp.toString();
                     temp.setLength(0);
@@ -307,15 +303,14 @@ public class PermissionsParser {
             // parse a class:
             if (njclass == null) {
                 // we must have read the class ('identifier {'...)
-                if (identifier != null && c == '{') {
-                    // if we have a class, it has a name
-                    njclass = new Permissions.NoJexlClass();
-                    njname = outer != null ? outer + "$" + identifier : identifier;
-                    njpackage.addNoJexl(njname, njclass);
-                    identifier = null;
-                } else {
+                if ((identifier == null) || (c != '{')) {
                     throw new IllegalStateException(unexpected(c, i));
                 }
+                // if we have a class, it has a name
+                njclass = new Permissions.NoJexlClass();
+                njname = outer != null ? outer + "$" + identifier : identifier;
+                njpackage.addNoJexl(njname, njclass);
+                identifier = null;
             } else if (identifier != null)  {
                 // class member mode
                 if (c == '{') {

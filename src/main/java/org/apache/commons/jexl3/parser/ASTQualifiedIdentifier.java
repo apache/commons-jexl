@@ -21,7 +21,7 @@ package org.apache.commons.jexl3.parser;
  */
 public class ASTQualifiedIdentifier extends JexlNode {
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 1L;
     protected String name = null;
@@ -39,7 +39,7 @@ public class ASTQualifiedIdentifier extends JexlNode {
         return name;
     }
 
-    public void setName(String qualified) {
+    public void setName(final String qualified) {
         this.name = qualified;
     }
 

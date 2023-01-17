@@ -356,7 +356,7 @@ public final class JexlSandbox {
             if (names == null) {
                 return name;
             }
-            String actual = names.get(name);
+            final String actual = names.get(name);
             // if null is not explicitly allowed, explicit null aka NULL
             if (name == null && actual == null && !names.containsKey(null)) {
                 return JexlSandbox.NULL;

@@ -64,9 +64,9 @@ public class LexicalScope {
     /**
      * Frame copy ctor base.
      */
-    protected LexicalScope(LexicalScope other) {
+    protected LexicalScope(final LexicalScope other) {
         this.symbols = other.symbols;
-        BitSet otherMoreSymbols = other.moreSymbols;
+        final BitSet otherMoreSymbols = other.moreSymbols;
         this.moreSymbols = otherMoreSymbols != null ? (BitSet) otherMoreSymbols.clone() : null;
         this.count = other.count;
     }

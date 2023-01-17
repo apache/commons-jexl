@@ -58,7 +58,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
      * Adds a collection of packages as import root, checks the names are one of a package.
      * @param names the package names
      */
-    private void importCheck(Iterable<String> names) {
+    private void importCheck(final Iterable<String> names) {
         if (names != null) {
             names.forEach(this::importCheck);
         }
@@ -68,7 +68,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
      * Adds a package as import root, checks the name if one of a package.
      * @param name the package name
      */
-    private void importCheck(String name) {
+    private void importCheck(final String name) {
         // check the package name actually points to a package to avoid clutter
         if (name != null && Package.getPackage(name) != null) {
             imports.add(name);
@@ -76,7 +76,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
     }
 
     @Override
-    public String resolveClassName(String name) {
+    public String resolveClassName(final String name) {
         return getQualifiedName(name);
     }
 
@@ -86,7 +86,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
      * @param uber   the optional class loader
      * @param packages the optional package names
      */
-    FqcnResolver(JexlUberspect uber, Iterable<String> packages) {
+    FqcnResolver(final JexlUberspect uber, final Iterable<String> packages) {
         this.uberspect = uber;
         this.parent = null;
         importCheck(packages);
@@ -98,7 +98,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
      * @param solver the parent solver
      * @throws NullPointerException if parent solver is null
      */
-    FqcnResolver(FqcnResolver solver) {
+    FqcnResolver(final FqcnResolver solver) {
         if (solver == null) {
             throw new NullPointerException("parent solver can not be null");
         }
@@ -112,7 +112,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
      * @param pkg the package name
      * @return true if an import exists for this package, false otherwise
      */
-    boolean isImporting(String pkg) {
+    boolean isImporting(final String pkg) {
         if (parent != null && parent.isImporting(pkg)) {
             return true;
         }
@@ -130,7 +130,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
      * @param packages the packages
      * @return this solver
      */
-    FqcnResolver importPackages(Iterable<String> packages) {
+    FqcnResolver importPackages(final Iterable<String> packages) {
         if (packages != null) {
             lock.writeLock().lock();
             try {
@@ -152,7 +152,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
      * @param name the simple name
      * @return the fqcn
      */
-    String getQualifiedName(String name) {
+    String getQualifiedName(final String name) {
         String fqcn;
         if (parent != null && (fqcn = parent.getQualifiedName(name)) != null) {
             return  fqcn;
@@ -165,11 +165,11 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
         }
         if (fqcn == null) {
             final ClassLoader loader = uberspect.getClassLoader();
-            for (String pkg : imports) {
+            for (final String pkg : imports) {
                 Class<?> clazz;
                 try {
                     clazz = loader.loadClass(pkg + "." + name);
-                } catch (ClassNotFoundException e) {
+                } catch (final ClassNotFoundException e) {
                     // not in this package
                     continue;
                 }

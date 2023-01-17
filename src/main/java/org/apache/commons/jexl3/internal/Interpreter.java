@@ -540,7 +540,7 @@ public class Interpreter extends InterpreterBase {
         }
     }
 
-    private boolean testPredicate(JexlNode node, Object condition) {
+    private boolean testPredicate(final JexlNode node, final Object condition) {
         final Object predicate = operators.tryOverload(node, JexlOperator.CONDITION, condition);
         return  arithmetic.testPredicate(predicate != JexlEngine.TRY_FAILED? predicate : condition);
     }
@@ -665,7 +665,7 @@ public class Interpreter extends InterpreterBase {
                 return null;
             }
             /* last child node is the statement to execute */
-            int numChildren = node.jjtGetNumChildren();
+            final int numChildren = node.jjtGetNumChildren();
             final JexlNode statement = numChildren >= 3 ? node.jjtGetChild(numChildren - 1) : null;
             // get an iterator for the collection/array etc via the introspector.
             forEach = operators.tryOverload(node, JexlOperator.FOR_EACH, iterableValue);
@@ -719,15 +719,15 @@ public class Interpreter extends InterpreterBase {
     private Object forLoop(final ASTForeachStatement node, final Object data) {
         Object result = null;
         int nc;
-        int form = node.getLoopForm();
+        final int form = node.getLoopForm();
         final LexicalFrame locals;
         /* first child node might be the loop variable */
         if ((form & 1) != 0) {
             nc = 1;
-            JexlNode init = node.jjtGetChild(0);
+            final JexlNode init = node.jjtGetChild(0);
             ASTVar loopVariable = null;
             if (init instanceof ASTAssignment) {
-                JexlNode child = init.jjtGetChild(0);
+                final JexlNode child = init.jjtGetChild(0);
                 if (child instanceof ASTVar) {
                     loopVariable = (ASTVar) child;
                 }
@@ -1076,13 +1076,13 @@ public class Interpreter extends InterpreterBase {
     @Override
     protected Object visit(final ASTJexlScript script, final Object data) {
         if (script instanceof ASTJexlLambda && !((ASTJexlLambda) script).isTopLevel()) {
-            Closure closure = new Closure(this, (ASTJexlLambda) script);
+            final Closure closure = new Closure(this, (ASTJexlLambda) script);
             // if the function is named, assign in the local frame
-            JexlNode child0 = script.jjtGetChild(0);
+            final JexlNode child0 = script.jjtGetChild(0);
             if (child0 instanceof ASTVar) {
-                ASTVar var = (ASTVar) child0;
+                final ASTVar var = (ASTVar) child0;
                 this.visit(var, data);
-                int symbol = var.getSymbol();
+                final int symbol = var.getSymbol();
                 frame.set(symbol, closure);
                 // make the closure accessible to itself, ie capture the currently set variable after frame creation
                 closure.setCaptured(symbol, closure);
@@ -1137,7 +1137,7 @@ public class Interpreter extends InterpreterBase {
 
     @Override
     protected Object visit(final ASTQualifiedIdentifier node, final Object data) {
-        String name = node.getName();
+        final String name = node.getName();
         // try with local solver
         String fqcn = fqcnSolver.resolveClassName(name);
         if (fqcn != null) {
@@ -1145,7 +1145,7 @@ public class Interpreter extends InterpreterBase {
         }
         // context may be solving class name ?
         if (context instanceof JexlContext.ClassNameResolver) {
-            JexlContext.ClassNameResolver resolver = (JexlContext.ClassNameResolver) context;
+            final JexlContext.ClassNameResolver resolver = (JexlContext.ClassNameResolver) context;
             fqcn = resolver.resolveClassName(name);
             if (fqcn != null) {
                 return fqcn;
@@ -1813,7 +1813,7 @@ public class Interpreter extends InterpreterBase {
                 narrow = true;
                 // continue;
             }
-        } catch (JexlException.Method xmethod) {
+        } catch (final JexlException.Method xmethod) {
             // ignore and handle at end; treat as an inner discover that fails
         } catch (final JexlException.TryFailed xany) {
             throw invocationException(node, methodName, xany);

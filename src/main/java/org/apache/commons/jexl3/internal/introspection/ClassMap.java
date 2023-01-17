@@ -112,7 +112,7 @@ final class ClassMap {
             public Set<Entry<MethodKey, Method>> entrySet() {
                 return Collections.emptySet();
             }
-            @Override public Method get(Object name) {
+            @Override public Method get(final Object name) {
                 return CACHE_MISS;
             }
         });
@@ -242,7 +242,7 @@ final class ClassMap {
      * @param clazz          the class to cache
      * @param log            the Log
      */
-    private static void create(final ClassMap cache, final JexlPermissions permissions, Class<?> clazz, final Log log) {
+    private static void create(final ClassMap cache, final JexlPermissions permissions, final Class<?> clazz, final Log log) {
         //
         // Build a list of all elements in the class hierarchy. This one is bottom-first; we start
         // with the actual declaring class and its interfaces and then move up (superclass etc.) until we

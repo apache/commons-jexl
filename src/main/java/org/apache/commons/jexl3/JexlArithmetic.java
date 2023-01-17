@@ -371,7 +371,7 @@ public class JexlArithmetic {
      * @param value the operand
      * @return true if operand is considered null
      */
-    protected boolean isNullOperand(Object value) {
+    protected boolean isNullOperand(final Object value) {
         return value == null;
     }
 
@@ -388,7 +388,7 @@ public class JexlArithmetic {
      * @throws JexlArithmetic.NullOperand if strict-cast
      * @since 3.3
      */
-    protected <T> T controlNullOperand(boolean strictCast, T defaultValue) {
+    protected <T> T controlNullOperand(final boolean strictCast, final T defaultValue) {
         if (strictCast) {
             throw new NullOperand();
         }
@@ -402,7 +402,7 @@ public class JexlArithmetic {
      * @throws  JexlArithmetic.NullOperand if strict-cast
      * @since 3.3
      */
-    protected Object controlNullNullOperands(JexlOperator operator) {
+    protected Object controlNullNullOperands(final JexlOperator operator) {
         if (isStrict(operator)) {
             throw new NullOperand();
         }
@@ -782,7 +782,7 @@ public class JexlArithmetic {
      * @return true if operator considers null arguments as errors, false if operator has appropriate semantics
      * for null argument(s)
      */
-    public boolean isStrict(JexlOperator operator) {
+    public boolean isStrict(final JexlOperator operator) {
         if (operator != null) {
             switch (operator) {
                 case EQ:
@@ -918,7 +918,7 @@ public class JexlArithmetic {
      * @param returned the returned value
      * @return the controlled returned value
      */
-    public Object controlReturn(Object returned) {
+    public Object controlReturn(final Object returned) {
         return returned;
     }
 
@@ -1136,7 +1136,7 @@ public class JexlArithmetic {
      * @param val the argument
      * @return val + 1
      */
-    public Object increment(Object val) {
+    public Object increment(final Object val) {
         return increment(val, 1);
     }
 
@@ -1145,7 +1145,7 @@ public class JexlArithmetic {
      * @param val the argument
      * @return val - 1
      */
-    public Object decrement(Object val) {
+    public Object decrement(final Object val) {
         return increment(val, -1);
     }
 
@@ -1155,7 +1155,7 @@ public class JexlArithmetic {
      * @param incr the value to add
      * @return val + incr
      */
-    protected Object increment(Object val, int incr) {
+    protected Object increment(final Object val, final int incr) {
         if (val == null) {
             return incr;
         }
@@ -1169,11 +1169,11 @@ public class JexlArithmetic {
             return ((Long) val) + incr;
         }
         if (val instanceof BigDecimal) {
-            BigDecimal bd = (BigDecimal) val;
+            final BigDecimal bd = (BigDecimal) val;
             return bd.add(BigDecimal.valueOf(incr), this.mathContext);
         }
         if (val instanceof BigInteger) {
-            BigInteger bi = (BigInteger) val;
+            final BigInteger bi = (BigInteger) val;
             return bi.add(BigInteger.valueOf(incr));
         }
         if (val instanceof Float) {
@@ -1840,7 +1840,7 @@ public class JexlArithmetic {
      * @param right  right argument
      * @return left &lt;&lt; right.
      */
-    public Object shiftLeft(Object left, Object right) {
+    public Object shiftLeft(final Object left, final Object right) {
         final long l = toLong(left);
         final int r = toInteger(right);
         return l << r;
@@ -1853,7 +1853,7 @@ public class JexlArithmetic {
      * @param right  right argument
      * @return left &gt;&gt; right.
      */
-    public Object shiftRight(Object left, Object right) {
+    public Object shiftRight(final Object left, final Object right) {
         final long l = toLong(left);
         final long r = toInteger(right);
         return l >> r;
@@ -1866,7 +1866,7 @@ public class JexlArithmetic {
      * @param right  right argument
      * @return left &gt;&gt;&gt; right.
      */
-    public Object shiftRightUnsigned(Object left, Object right) {
+    public Object shiftRightUnsigned(final Object left, final Object right) {
         final long l = toLong(left);
         final long r = toInteger(right);
         return l >>> r;
@@ -1880,7 +1880,7 @@ public class JexlArithmetic {
         JexlOperator operator;
         try {
             operator = JexlOperator.valueOf(symbol);
-        } catch(IllegalArgumentException xill) {
+        } catch (final IllegalArgumentException xill) {
             // ignore
             operator = JexlOperator.EQ;
         }
@@ -1909,7 +1909,7 @@ public class JexlArithmetic {
                     final BigInteger l = toBigInteger(strictCast, left);
                     final BigInteger r = toBigInteger(strictCast, right);
                     return l.compareTo(r);
-                } catch(ArithmeticException xconvert) {
+                } catch (final ArithmeticException xconvert) {
                     // ignore it, continue in sequence
                 }
             }
@@ -1933,7 +1933,7 @@ public class JexlArithmetic {
                     final long lhs = toLong(strictCast, left);
                     final long rhs = toLong(strictCast, right);
                     return Long.compare(lhs, rhs);
-                } catch(ArithmeticException xconvert) {
+                } catch (final ArithmeticException xconvert) {
                     // ignore it, continue in sequence
                 }
             }
@@ -2043,10 +2043,10 @@ public class JexlArithmetic {
      * @return a double
      * @throws ArithmeticException if the string can not be coerced into a double
      */
-    private double parseDouble(String arg) throws ArithmeticException {
+    private double parseDouble(final String arg) throws ArithmeticException {
         try {
             return arg.isEmpty()? Double.NaN : Double.parseDouble(arg);
-        } catch (NumberFormatException e) {
+        } catch (final NumberFormatException e) {
             final ArithmeticException arithmeticException = new ArithmeticException("Double coercion: ("+ arg +")");
             arithmeticException.initCause(e);
             throw arithmeticException;
@@ -2060,7 +2060,7 @@ public class JexlArithmetic {
      * @return a long
      * @throws ArithmeticException if the string can not be coerced into a long
      */
-    private long parseLong(String arg) throws ArithmeticException {
+    private long parseLong(final String arg) throws ArithmeticException {
         final double d = parseDouble(arg);
         if (Double.isNaN(d)) {
             return 0L;
@@ -2079,10 +2079,10 @@ public class JexlArithmetic {
      * @return an int
      * @throws ArithmeticException if the string can not be coerced into a long
      */
-    private int parseInteger(String arg) throws ArithmeticException {
+    private int parseInteger(final String arg) throws ArithmeticException {
         final long l = parseLong(arg);
         final int i = (int) l;
-        if ((long) i == l) {
+        if (i == l) {
             return i;
         }
         throw new ArithmeticException("Int coercion: ("+ arg +")");
@@ -2095,13 +2095,13 @@ public class JexlArithmetic {
      * @return a big integer
      * @throws ArithmeticException if the string can not be coerced into a big integer
      */
-    private BigInteger parseBigInteger(String arg) throws ArithmeticException {
+    private BigInteger parseBigInteger(final String arg) throws ArithmeticException {
         if (arg.isEmpty()) {
             return BigInteger.ZERO;
         }
         try {
             return new BigInteger(arg);
-        } catch(NumberFormatException xformat) {
+        } catch (final NumberFormatException xformat) {
             // ignore, try harder
         }
         return BigInteger.valueOf(parseLong(arg));

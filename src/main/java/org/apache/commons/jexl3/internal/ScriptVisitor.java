@@ -442,16 +442,16 @@ public class ScriptVisitor extends ParserVisitor {
     }
 
     @Override
-    protected Object visit(ASTGetDecrementNode node, Object data) { return visitNode(node, data); }
+    protected Object visit(final ASTGetDecrementNode node, final Object data) { return visitNode(node, data); }
 
     @Override
-    protected Object visit(ASTGetIncrementNode node, Object data) { return visitNode(node, data); }
+    protected Object visit(final ASTGetIncrementNode node, final Object data) { return visitNode(node, data); }
 
     @Override
-    protected Object visit(ASTDecrementGetNode node, Object data) { return visitNode(node, data); }
+    protected Object visit(final ASTDecrementGetNode node, final Object data) { return visitNode(node, data); }
 
     @Override
-    protected Object visit(ASTIncrementGetNode node, Object data) { return visitNode(node, data); }
+    protected Object visit(final ASTIncrementGetNode node, final Object data) { return visitNode(node, data); }
 
     @Override
     protected Object visit(final ASTSetShiftRightNode node, final Object data) {

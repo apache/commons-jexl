@@ -61,7 +61,7 @@ public class Permissions implements JexlPermissions {
          * Ctor.
          * @param map the map of NoJexl classes
          */
-        NoJexlPackage(Map<String, NoJexlClass> map) {
+        NoJexlPackage(final Map<String, NoJexlClass> map) {
             this.nojexl = map;
         }
 
@@ -75,15 +75,15 @@ public class Permissions implements JexlPermissions {
         boolean isEmpty() { return nojexl.isEmpty(); }
 
         @Override
-        public boolean equals(Object o) {
+        public boolean equals(final Object o) {
             return o == this;
         }
 
-        NoJexlClass getNoJexl(Class<?> clazz) {
+        NoJexlClass getNoJexl(final Class<?> clazz) {
             return nojexl.get(classKey(clazz));
         }
 
-        void addNoJexl(String key, NoJexlClass njc) {
+        void addNoJexl(final String key, final NoJexlClass njc) {
             nojexl.put(key, njc);
         }
     }
@@ -107,7 +107,7 @@ public class Permissions implements JexlPermissions {
      */
     static String classKey(final Class<?> clazz, final StringBuilder strb) {
         StringBuilder keyb = strb;
-        Class<?> outer = clazz.getEnclosingClass();
+        final Class<?> outer = clazz.getEnclosingClass();
         if (outer != null) {
             if (keyb == null) {
                 keyb = new StringBuilder();
@@ -131,7 +131,7 @@ public class Permissions implements JexlPermissions {
         // the NoJexl field names
         protected Set<String> fieldNames;
 
-        NoJexlClass(Set<String> methods, Set<String> fields) {
+        NoJexlClass(final Set<String> methods, final Set<String> fields) {
             methodNames = methods;
             fieldNames = fields;
         }
@@ -142,59 +142,59 @@ public class Permissions implements JexlPermissions {
             this(new HashSet<>(), new HashSet<>());
         }
 
-        boolean deny(Field field) {
+        boolean deny(final Field field) {
             return fieldNames.contains(field.getName());
         }
 
-        boolean deny(Method method) {
+        boolean deny(final Method method) {
             return methodNames.contains(method.getName());
         }
 
-        boolean deny(Constructor<?> method) {
+        boolean deny(final Constructor<?> method) {
             return methodNames.contains(method.getDeclaringClass().getSimpleName());
         }
     }
 
     /** Marker for whole NoJexl class. */
     static final NoJexlClass NOJEXL_CLASS = new NoJexlClass(Collections.emptySet(), Collections.emptySet()) {
-        @Override boolean deny(Field field) {
+        @Override boolean deny(final Field field) {
             return true;
         }
 
-        @Override boolean deny(Method method) {
+        @Override boolean deny(final Method method) {
             return true;
         }
 
-        @Override boolean deny(Constructor<?> method) {
+        @Override boolean deny(final Constructor<?> method) {
             return true;
         }
     };
 
     /** Marker for allowed class. */
     static final NoJexlClass JEXL_CLASS = new NoJexlClass(Collections.emptySet(), Collections.emptySet()) {
-        @Override boolean deny(Field field) {
+        @Override boolean deny(final Field field) {
             return false;
         }
 
-        @Override  boolean deny(Method method) {
+        @Override  boolean deny(final Method method) {
             return false;
         }
 
-        @Override boolean deny(Constructor<?> method) {
+        @Override boolean deny(final Constructor<?> method) {
             return false;
         }
     };
 
     /** Marker for @NoJexl package. */
     static final NoJexlPackage NOJEXL_PACKAGE = new NoJexlPackage(Collections.emptyMap()) {
-        @Override NoJexlClass getNoJexl(Class<?> clazz) {
+        @Override NoJexlClass getNoJexl(final Class<?> clazz) {
             return NOJEXL_CLASS;
         }
     };
 
     /** Marker for fully allowed package. */
     static final NoJexlPackage JEXL_PACKAGE = new NoJexlPackage(Collections.emptyMap()) {
-        @Override NoJexlClass getNoJexl(Class<?> clazz) {
+        @Override NoJexlClass getNoJexl(final Class<?> clazz) {
             return JEXL_CLASS;
         }
     };
@@ -218,7 +218,7 @@ public class Permissions implements JexlPermissions {
      * @param perimeter the allowed wildcard set of packages
      * @param nojexl the NoJexl external map
      */
-    protected Permissions(Set<String> perimeter, Map<String, NoJexlPackage> nojexl) {
+    protected Permissions(final Set<String> perimeter, final Map<String, NoJexlPackage> nojexl) {
         this.allowed = perimeter;
         this.packages = nojexl;
     }
@@ -247,8 +247,8 @@ public class Permissions implements JexlPermissions {
      * @param packageName the package name
      * @return the package constraints instance, not-null.
      */
-    private NoJexlPackage getNoJexlPackage(String packageName) {
-        NoJexlPackage njp = packages.get(packageName);
+    private NoJexlPackage getNoJexlPackage(final String packageName) {
+        final NoJexlPackage njp = packages.get(packageName);
         return njp != null? njp : JEXL_PACKAGE;
     }
 
@@ -258,11 +258,11 @@ public class Permissions implements JexlPermissions {
      * @param clazz the class
      * @return the class constraints instance, not-null.
      */
-    private NoJexlClass getNoJexl(Class<?> clazz) {
-        String pkgName = ClassTool.getPackageName(clazz);
-        NoJexlPackage njp = getNoJexlPackage(pkgName);
+    private NoJexlClass getNoJexl(final Class<?> clazz) {
+        final String pkgName = ClassTool.getPackageName(clazz);
+        final NoJexlPackage njp = getNoJexlPackage(pkgName);
         if (njp != null) {
-            NoJexlClass njc = njp.getNoJexl(clazz);
+            final NoJexlClass njc = njp.getNoJexl(clazz);
             if (njc != null) {
                 return njc;
             }
@@ -275,7 +275,7 @@ public class Permissions implements JexlPermissions {
      * @param clazz the package name (not null)
      * @return true if allowed, false otherwise
      */
-    private boolean wildcardAllow(Class<?> clazz) {
+    private boolean wildcardAllow(final Class<?> clazz) {
         return wildcardAllow(allowed, ClassTool.getPackageName(clazz));
     }
 
@@ -285,7 +285,7 @@ public class Permissions implements JexlPermissions {
      * @param name the package name (not null)
      * @return true if allowed, false otherwise
      */
-    static boolean wildcardAllow(Set<String> allowed, String name) {
+    static boolean wildcardAllow(final Set<String> allowed, final String name) {
         // allowed packages are explicit in this case
         boolean found = allowed == null || allowed.isEmpty() || allowed.contains(name);
         if (!found) {
@@ -303,7 +303,7 @@ public class Permissions implements JexlPermissions {
      * @param pack the package
      * @return true if denied, false otherwise
      */
-    private boolean deny(Package pack) {
+    private boolean deny(final Package pack) {
         // is package annotated with nojexl ?
         final NoJexl nojexl = pack.getAnnotation(NoJexl.class);
         if (nojexl != null) {
@@ -318,7 +318,7 @@ public class Permissions implements JexlPermissions {
      * @param clazz the class
      * @return true if denied, false otherwise
      */
-    private boolean deny(Class<?> clazz) {
+    private boolean deny(final Class<?> clazz) {
         // Don't deny arrays
         if (clazz.isArray()) {
             return false;
@@ -328,7 +328,7 @@ public class Permissions implements JexlPermissions {
         if (nojexl != null) {
             return true;
         }
-        NoJexlPackage njp = packages.get(ClassTool.getPackageName(clazz));
+        final NoJexlPackage njp = packages.get(ClassTool.getPackageName(clazz));
         return njp != null && Objects.equals(NOJEXL_CLASS, njp.getNoJexl(clazz));
     }
 
@@ -337,7 +337,7 @@ public class Permissions implements JexlPermissions {
      * @param ctor the constructor
      * @return true if denied, false otherwise
      */
-    private boolean deny(Constructor<?> ctor) {
+    private boolean deny(final Constructor<?> ctor) {
         // is ctor annotated with nojexl ?
         final NoJexl nojexl = ctor.getAnnotation(NoJexl.class);
         if (nojexl != null) {
@@ -351,7 +351,7 @@ public class Permissions implements JexlPermissions {
      * @param field the field
      * @return true if denied, false otherwise
      */
-    private boolean deny(Field field) {
+    private boolean deny(final Field field) {
         // is field annotated with nojexl ?
         final NoJexl nojexl = field.getAnnotation(NoJexl.class);
         if (nojexl != null) {
@@ -365,7 +365,7 @@ public class Permissions implements JexlPermissions {
      * @param method the method
      * @return true if denied, false otherwise
      */
-    private boolean deny(Method method) {
+    private boolean deny(final Method method) {
         // is method annotated with nojexl ?
         final NoJexl nojexl = method.getAnnotation(NoJexl.class);
         if (nojexl != null) {
@@ -486,7 +486,7 @@ public class Permissions implements JexlPermissions {
         }
         Class<?> clazz = method.getDeclaringClass();
         // gather if any implementation of the method is explicitly allowed by the packages
-        boolean[] explicit = new boolean[]{wildcardAllow(clazz)};
+        final boolean[] explicit = {wildcardAllow(clazz)};
         // lets walk all interfaces
         for (final Class<?> inter : clazz.getInterfaces()) {
             if (!allow(inter, method, explicit)) {
@@ -515,7 +515,7 @@ public class Permissions implements JexlPermissions {
         if (deny(method)) {
             return false;
         }
-        Class<?> clazz = method.getDeclaringClass();
+        final Class<?> clazz = method.getDeclaringClass();
         // class must not be denied
         return !deny(clazz);
     }
@@ -527,7 +527,7 @@ public class Permissions implements JexlPermissions {
      * @param explicit carries whether the package holding the method is explicitly allowed
      * @return true if JEXL is allowed to introspect, false otherwise
      */
-    private boolean allow(final Class<?> clazz, final Method method, boolean[] explicit) {
+    private boolean allow(final Class<?> clazz, final Method method, final boolean[] explicit) {
         try {
             // check if method in that class is declared ie overrides
             final Method override = clazz.getDeclaredMethod(method.getName(), method.getParameterTypes());

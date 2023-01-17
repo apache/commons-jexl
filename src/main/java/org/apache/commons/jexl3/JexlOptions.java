@@ -130,9 +130,9 @@ public final class JexlOptions {
      * @param flags the flags to set
      * @return the flag mask updated
      */
-    public static int parseFlags(int initial, final String...flags) {
+    public static int parseFlags(final int initial, final String... flags) {
         int mask = initial;
-        for(String flag : flags) {
+        for (final String flag : flags) {
             boolean b = true;
             final String name;
             if (flag.charAt(0) == '+') {
@@ -143,7 +143,7 @@ public final class JexlOptions {
             } else {
                 name = flag;
             }
-            for(int f = 0; f < NAMES.length; ++f) {
+            for (int f = 0; f < NAMES.length; ++f) {
                 if (NAMES[f].equals(name)) {
                     if (b) {
                         mask |= (1 << f);
@@ -439,7 +439,7 @@ public final class JexlOptions {
     }
 
     @Override public String toString() {
-        StringBuilder strb = new StringBuilder();
+        final StringBuilder strb = new StringBuilder();
         for(int i = 0; i < NAMES.length; ++i) {
             if (i > 0) {
                 strb.append(' ');

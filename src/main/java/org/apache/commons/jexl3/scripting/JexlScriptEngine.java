@@ -93,7 +93,7 @@ public class JexlScriptEngine extends AbstractScriptEngine implements Compilable
      * @param engine the JexlEngine instance to use
      * @since 3.3
      */
-    public static void setInstance(JexlEngine engine) {
+    public static void setInstance(final JexlEngine engine) {
         ENGINE = new SoftReference<>(engine);
     }
 
@@ -106,7 +106,7 @@ public class JexlScriptEngine extends AbstractScriptEngine implements Compilable
             synchronized (JexlScriptEngineFactory.class) {
                 engine = ENGINE != null? ENGINE.get() : null;
                 if (engine == null) {
-                    JexlBuilder builder = new JexlBuilder()
+                    final JexlBuilder builder = new JexlBuilder()
                             .strict(true)
                             .safe(false)
                             .logger(JexlScriptEngine.LOG)
@@ -307,11 +307,11 @@ public class JexlScriptEngine extends AbstractScriptEngine implements Compilable
         }
     }
 
-    static ScriptException scriptException(Exception e) {
+    static ScriptException scriptException(final Exception e) {
         Exception xany = e;
         // unwrap a jexl exception
         if (xany instanceof JexlException) {
-            Throwable cause = xany.getCause();
+            final Throwable cause = xany.getCause();
             if (cause instanceof Exception) {
                 xany = (Exception) cause;
             }

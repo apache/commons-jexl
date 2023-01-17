@@ -22,7 +22,7 @@ package org.apache.commons.jexl3.parser;
  */
 public class ASTIdentifierAccessSafe extends ASTIdentifierAccess {
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 1L;
 

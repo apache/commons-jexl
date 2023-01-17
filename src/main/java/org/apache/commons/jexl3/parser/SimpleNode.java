@@ -33,7 +33,7 @@ package org.apache.commons.jexl3.parser;
  */
 public class SimpleNode implements Node {
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 1L;
     /** The parent node. */
@@ -199,7 +199,7 @@ public class SimpleNode implements Node {
      * Override to dump output somewhere.
      * @param str the string to output
      */
-    protected void dumpOut(String str) {
+    protected void dumpOut(final String str) {
         // override to obtain an output
     }
 

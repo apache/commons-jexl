@@ -28,7 +28,7 @@ import java.util.Locale;
  */
 public final class NumberParser implements Serializable {
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 1L;
     /** The type literal value. */
@@ -74,11 +74,11 @@ public final class NumberParser implements Serializable {
         return literal;
     }
 
-    private static boolean isNegative(Token token) {
+    private static boolean isNegative(final Token token) {
         return token != null && "-".equals(token.image);
     }
 
-    static Number parseInteger(Token negative, final Token s) {
+    static Number parseInteger(final Token negative, final Token s) {
         return new NumberParser().assignNatural(isNegative(negative), s.image).getLiteralValue();
     }
 
@@ -92,7 +92,7 @@ public final class NumberParser implements Serializable {
      * @param str the natural as string
      * @return this parser instance
      */
-    NumberParser assignNatural(String str) {
+    NumberParser assignNatural(final String str) {
         String s;
         // determine negative sign if any, ignore +
         final boolean negative;
@@ -119,7 +119,7 @@ public final class NumberParser implements Serializable {
      * @param natural the natural as string
      * @return this parser instance
      */
-    NumberParser assignNatural(boolean negative, String natural) {
+    NumberParser assignNatural(final boolean negative, final String natural) {
         String s = natural;
         Number result;
         Class<? extends Number> rclass;
@@ -141,14 +141,14 @@ public final class NumberParser implements Serializable {
             case 'l':
             case 'L': {
                 rclass = Long.class;
-                long l = Long.parseLong(s.substring(0, last), base);
+                final long l = Long.parseLong(s.substring(0, last), base);
                 result = negative? -l : l;
                 break;
             }
             case 'h':
             case 'H': {
                 rclass = BigInteger.class;
-                BigInteger bi = new BigInteger(s.substring(0, last), base);
+                final BigInteger bi = new BigInteger(s.substring(0, last), base);
                 result = negative? bi.negate() : bi;
                 break;
             }
@@ -156,14 +156,14 @@ public final class NumberParser implements Serializable {
                 // preferred literal class is integer
                 rclass = Integer.class;
                 try {
-                    int i = Integer.parseInt(s, base);
+                    final int i = Integer.parseInt(s, base);
                     result = negative? -i : i;
                 } catch (final NumberFormatException take2) {
                     try {
-                        long l = Long.parseLong(s, base);
+                        final long l = Long.parseLong(s, base);
                         result = negative? -l : l;
                     } catch (final NumberFormatException take3) {
-                        BigInteger bi = new BigInteger(s, base);
+                        final BigInteger bi = new BigInteger(s, base);
                         result = negative? bi.negate() : bi;
                     }
                 }
@@ -207,7 +207,7 @@ public final class NumberParser implements Serializable {
      * @param s the real as string
      * @return this parser instance
      */
-    NumberParser assignReal(boolean negative, String s) {
+    NumberParser assignReal(final boolean negative, final String s) {
         Number result;
         Class<? extends Number> rclass;
         if ("#NaN".equals(s) || "NaN".equals(s)) {
@@ -219,31 +219,31 @@ public final class NumberParser implements Serializable {
                 case 'b':
                 case 'B': {
                     rclass = BigDecimal.class;
-                    BigDecimal bd = new BigDecimal(s.substring(0, last));
+                    final BigDecimal bd = new BigDecimal(s.substring(0, last));
                     result = negative? bd.negate() : bd;
                     break;
                 }
                 case 'f':
                 case 'F': {
                     rclass = Float.class;
-                    float f4 = Float.parseFloat(s.substring(0, last));
+                    final float f4 = Float.parseFloat(s.substring(0, last));
                     result = negative? -f4 : f4;
                     break;
                 }
                 case 'd':
                 case 'D':
                     rclass = Double.class;
-                    double f8 = Double.parseDouble(s.substring(0, last));
+                    final double f8 = Double.parseDouble(s.substring(0, last));
                     result = negative? -f8 : f8;
                     break;
                 default: {
                     // preferred literal class is double
                     rclass = Double.class;
                     try {
-                        double d = Double.parseDouble(s);
+                        final double d = Double.parseDouble(s);
                         result = negative? -d : d;
                     } catch (final NumberFormatException take3) {
-                        BigDecimal bd = new BigDecimal(s);
+                        final BigDecimal bd = new BigDecimal(s);
                         result = negative? bd.negate() : bd;
                     }
                     break;

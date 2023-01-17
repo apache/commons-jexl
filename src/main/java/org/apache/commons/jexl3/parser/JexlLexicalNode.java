@@ -24,7 +24,7 @@ import org.apache.commons.jexl3.internal.LexicalScope;
  */
 public class JexlLexicalNode extends JexlNode implements JexlParser.LexicalUnit {
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 1L;
     private LexicalScope lexicalScope = null;
@@ -51,7 +51,7 @@ public class JexlLexicalNode extends JexlNode implements JexlParser.LexicalUnit 
     }
 
     @Override
-    public void setConstant(int symbol) {
+    public void setConstant(final int symbol) {
         lexicalScope.addConstant(symbol);
     }
 

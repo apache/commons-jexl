@@ -29,7 +29,7 @@ import org.apache.commons.jexl3.introspection.JexlPropertySet;
  */
 public abstract class JexlNode extends SimpleNode {
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 1L;
     // line + column encoded: up to 4096 columns (ie 20 bits for line + 12 bits for column)
@@ -125,7 +125,7 @@ public abstract class JexlNode extends SimpleNode {
      *
      * @return true if node accepts null arguments, false otherwise
      */
-    public boolean isStrictOperator(JexlArithmetic arithmetic) {
+    public boolean isStrictOperator(final JexlArithmetic arithmetic) {
         return OperatorController.INSTANCE.isStrict(arithmetic, this);
     }
 
@@ -144,12 +144,7 @@ public abstract class JexlNode extends SimpleNode {
         if (literal) {
             for (int n = 0; n < jjtGetNumChildren(); ++n) {
                 final JexlNode child = jjtGetChild(n);
-                if (child instanceof ASTReference) {
-                    final boolean is = child.isConstant(true);
-                    if (!is) {
-                        return false;
-                    }
-                } else if (child instanceof ASTMapEntry) {
+                if ((child instanceof ASTReference) || (child instanceof ASTMapEntry)) {
                     final boolean is = child.isConstant(true);
                     if (!is) {
                         return false;

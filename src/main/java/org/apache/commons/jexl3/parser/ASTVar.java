@@ -21,7 +21,7 @@ package org.apache.commons.jexl3.parser;
  */
 public class ASTVar extends ASTIdentifier {
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 1L;
 

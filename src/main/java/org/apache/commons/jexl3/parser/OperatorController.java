@@ -31,11 +31,11 @@ class OperatorController extends ScriptVisitor {
      * @param node the node which should delegate to an operator
      * @return true if node points to a (null-unsafe) operator
      */
-    boolean isStrict(JexlArithmetic arithmetic, final JexlNode node) {
+    boolean isStrict(final JexlArithmetic arithmetic, final JexlNode node) {
         if (arithmetic.isStrict()) {
-            Object ctl = node.jjtAccept(this, arithmetic);
+            final Object ctl = node.jjtAccept(this, arithmetic);
             if (ctl instanceof JexlOperator) {
-                JexlOperator operator = (JexlOperator) ctl;
+                final JexlOperator operator = (JexlOperator) ctl;
                 return arithmetic.isStrict(operator);
             }
         }

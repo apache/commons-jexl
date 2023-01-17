@@ -205,7 +205,7 @@ public abstract class JexlParser extends StringParser {
      * Disables pragma feature is pragma-anywhere feature is disabled.
      */
     protected void controlPragmaAnywhere() {
-        JexlFeatures features = getFeatures();
+        final JexlFeatures features = getFeatures();
         if (features.supportsPragma() && !features.supportsPragmaAnywhere()) {
             featureController.setFeatures(new JexlFeatures(featureController.getFeatures()).pragma(false));
         }
@@ -310,7 +310,7 @@ public abstract class JexlParser extends StringParser {
      * @param name the variable name
      * @return true if a variable with that name was declared
      */
-    protected boolean isVariable(String name) {
+    protected boolean isVariable(final String name) {
         return scope != null && scope.getSymbol(name) != null;
     }
 
@@ -436,7 +436,7 @@ public abstract class JexlParser extends StringParser {
      * @param constant whether the symbol is constant
      * @param token      the variable name toekn
      */
-    protected void declareVariable(final ASTVar variable, final Token token, boolean lexical, boolean constant) {
+    protected void declareVariable(final ASTVar variable, final Token token, final boolean lexical, final boolean constant) {
         final String name = token.image;
         if (!allowVariable(name)) {
             throwFeatureException(JexlFeatures.LOCAL_VAR, token);
@@ -458,12 +458,10 @@ public abstract class JexlParser extends StringParser {
             }
             // not lexical, redefined nevertheless
             variable.setRedefined(true);
-        } else {
-            if (lexical) {
-                scope.addLexical(symbol);
-                if (constant) {
-                    block.setConstant(symbol);
-                }
+        } else if (lexical) {
+            scope.addLexical(symbol);
+            if (constant) {
+                block.setConstant(symbol);
             }
         }
     }
@@ -475,7 +473,7 @@ public abstract class JexlParser extends StringParser {
      * @param lexical whether the parameter is lexical or not
      * @param constant whether the parameter is constant or not
      */
-    protected void declareParameter(final Token token, boolean lexical, boolean constant) {
+    protected void declareParameter(final Token token, final boolean lexical, final boolean constant) {
         final String identifier =  token.image;
         if (!allowVariable(identifier)) {
             throwFeatureException(JexlFeatures.LOCAL_VAR, token);
@@ -518,7 +516,7 @@ public abstract class JexlParser extends StringParser {
      * @param value the pragma value
      */
     protected void declarePragma(final String key, final Object value) {
-        JexlFeatures features = getFeatures();
+        final JexlFeatures features = getFeatures();
         if (!features.supportsPragma()) {
             throwFeatureException(JexlFeatures.PRAGMA, getToken(0));
         }
@@ -529,7 +527,7 @@ public abstract class JexlParser extends StringParser {
             pragmas = new TreeMap<>();
         }
         // declaring a namespace
-        Predicate<String> ns = features.namespaceTest();
+        final Predicate<String> ns = features.namespaceTest();
         if (ns != null && key.startsWith(PRAGMA_JEXLNS)) {
             if (!features.supportsNamespacePragma()) {
                 throwFeatureException(JexlFeatures.NS_PRAGMA, getToken(0));
@@ -549,7 +547,7 @@ public abstract class JexlParser extends StringParser {
                 ((Set<Object>) previous).add(newValue);
                 return previous;
             }
-            Set<Object> values = new LinkedHashSet<>();
+            final Set<Object> values = new LinkedHashSet<>();
             values.add(previous);
             values.add(newValue);
             return values;
@@ -567,7 +565,7 @@ public abstract class JexlParser extends StringParser {
             return true;
         }
         // if name is shared with a variable name, use syntactic hint
-        String name = token.image;
+        final String name = token.image;
         if (!isVariable(name)) {
             final Set<String> ns = namespaces;
             // declared through local pragma ?
@@ -659,9 +657,9 @@ public abstract class JexlParser extends StringParser {
                 throw new JexlException.Assignment(xinfo, msg).clean();
             }
             if (lv instanceof ASTIdentifier && !(lv instanceof ASTVar)) {
-                ASTIdentifier var = (ASTIdentifier) lv;
-                int symbol = var.getSymbol();
-                boolean isconst = symbol >= 0 && block != null && block.isConstant(symbol);
+                final ASTIdentifier var = (ASTIdentifier) lv;
+                final int symbol = var.getSymbol();
+                final boolean isconst = symbol >= 0 && block != null && block.isConstant(symbol);
                 if (isconst) { // if constant, fail...
                     JexlInfo xinfo = lv.jexlInfo();
                     xinfo = info.at(xinfo.getLine(), xinfo.getColumn());
@@ -677,7 +675,7 @@ public abstract class JexlParser extends StringParser {
      * Check fat vs thin arrow syntax feature.
      * @param token the arrow token
      */
-    protected void checkLambda(Token token) {
+    protected void checkLambda(final Token token) {
         final String arrow = token.image;
         if ("->".equals(arrow)) {
             if (!getFeatures().supportsThinArrow()) {
@@ -722,7 +720,7 @@ public abstract class JexlParser extends StringParser {
      * @throws JexlException.Parsing if actual error token can not be found
      * @throws JexlException.Feature in all other cases
      */
-    protected void throwFeatureException(final int feature, Token trigger) {
+    protected void throwFeatureException(final int feature, final Token trigger) {
         Token token = trigger;
         if (token == null) {
             token = this.getToken(0);

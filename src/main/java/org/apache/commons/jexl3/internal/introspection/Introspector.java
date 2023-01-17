@@ -116,7 +116,7 @@ public final class Introspector {
      */
     public Class<?> getClassByName(final String className) {
         try {
-            Class<?> clazz = Class.forName(className, false, loader);
+            final Class<?> clazz = Class.forName(className, false, loader);
             return permissions.allow(clazz)? clazz : null;
         } catch (final ClassNotFoundException xignore) {
             return null;
@@ -331,7 +331,7 @@ public final class Introspector {
      * <p>Also cleans the constructors and methods caches.</p>
      * @param classLoader the class loader; if null, use this instance class loader
      */
-    public void setLoader(ClassLoader classLoader) {
+    public void setLoader(final ClassLoader classLoader) {
         final ClassLoader previous = loader;
         final ClassLoader current = classLoader == null? getClass().getClassLoader() : classLoader;
         if (!current.equals(loader)) {

@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.apache.commons.jexl3.JexlArithmetic;
 import org.apache.commons.jexl3.JexlContext;
+import org.apache.commons.jexl3.JexlContext.NamespaceFunctor;
 import org.apache.commons.jexl3.JexlEngine;
 import org.apache.commons.jexl3.JexlException;
 import org.apache.commons.jexl3.JexlException.VariableIssue;
@@ -71,7 +72,7 @@ public abstract class InterpreterBase extends ParserVisitor {
     /** Cancellation support. */
     protected final AtomicBoolean cancelled;
     /** Empty parameters for method matching. */
-    protected static final Object[] EMPTY_PARAMS = new Object[0];
+    protected static final Object[] EMPTY_PARAMS = {};
     /** The namespace resolver. */
     protected final JexlContext.NamespaceResolver ns;
     /** The class name resolver. */
@@ -118,7 +119,7 @@ public abstract class InterpreterBase extends ParserVisitor {
         this.functors = null;
         this.operators = new Operators(this);
         // the import package facility
-        Collection<String> imports = options.getImports();
+        final Collection<String> imports = options.getImports();
         this.fqcnSolver = imports.isEmpty()
                 ? engine.classNameSolver
                 : new FqcnResolver(engine.classNameSolver).importPackages(imports);
@@ -167,7 +168,7 @@ public abstract class InterpreterBase extends ParserVisitor {
      * @param node the operand node
      * @return true if this node is an operand of a strict operator, false otherwise
      */
-    protected boolean isStrictOperand(JexlNode node) {
+    protected boolean isStrictOperand(final JexlNode node) {
        return node.jjtGetParent().isStrictOperator(arithmetic);
     }
 
@@ -211,7 +212,7 @@ public abstract class InterpreterBase extends ParserVisitor {
             }
             // attempt to reuse last cached constructor
             if (cached instanceof JexlContext.NamespaceFunctor) {
-                Object eval = ((JexlContext.NamespaceFunctor) cached).createFunctor(context);
+                final Object eval = ((JexlContext.NamespaceFunctor) cached).createFunctor(context);
                 if (JexlEngine.TRY_FAILED != eval) {
                     functor = eval;
                     namespace = cached;
@@ -235,14 +236,9 @@ public abstract class InterpreterBase extends ParserVisitor {
                                 // number of arguments to call it with.
                                 final Object ns = namespace;
                                 // make it a class (not a lambda!) so instanceof (see *2) will catch it
-                                namespace = new JexlContext.NamespaceFunctor() {
-                                    @Override
-                                    public Object createFunctor(JexlContext context) {
-                                        return withContext
-                                                ? ctor.tryInvoke(null, ns, context)
-                                                : ctor.tryInvoke(null, ns);
-                                    }
-                                };
+                                namespace = (NamespaceFunctor) context -> withContext
+                                        ? ctor.tryInvoke(null, ns, context)
+                                        : ctor.tryInvoke(null, ns);
                                 if (cacheable && ctor.isCacheable()) {
                                     nsNode.jjtSetValue(namespace);
                                 }

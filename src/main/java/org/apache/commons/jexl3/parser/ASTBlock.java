@@ -22,7 +22,7 @@ package org.apache.commons.jexl3.parser;
 public class ASTBlock extends JexlLexicalNode {
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 1L;
 

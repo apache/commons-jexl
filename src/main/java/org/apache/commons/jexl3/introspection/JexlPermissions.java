@@ -164,7 +164,7 @@ public interface JexlPermissions {
      * @return the permissions instance
      * @since 3.3
      */
-    static JexlPermissions parse(String... src) {
+    static JexlPermissions parse(final String... src) {
         return new PermissionsParser().parse(src);
     }
 
@@ -173,7 +173,7 @@ public interface JexlPermissions {
      * <p>This enables any public class, method, constructor or field to be visible to JEXL and used in scripts.</p>
      * @since 3.3
      */
-    public static final JexlPermissions UNRESTRICTED = JexlPermissions.parse(null);
+    JexlPermissions UNRESTRICTED = JexlPermissions.parse(null);
     /**
      * A restricted singleton.
      * <p>The RESTRICTED set is built using the following allowed packages and denied packages/classes.</p>
@@ -211,7 +211,7 @@ public interface JexlPermissions {
      * <li>java.rmi {}</li>
      * </ul>
      */
-    public static final JexlPermissions RESTRICTED = JexlPermissions.parse(
+    JexlPermissions RESTRICTED = JexlPermissions.parse(
             "# Restricted Uberspect Permissions",
             "java.nio.*",
             "java.io.*",

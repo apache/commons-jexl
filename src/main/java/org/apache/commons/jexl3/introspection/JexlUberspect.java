@@ -237,7 +237,7 @@ public interface JexlUberspect {
     default Class<?> getClassByName(final String className) {
         try {
             return Class.forName(className, false, getClassLoader());
-        } catch (ClassNotFoundException xignore) {
+        } catch (final ClassNotFoundException xignore) {
             return null;
         }
     }

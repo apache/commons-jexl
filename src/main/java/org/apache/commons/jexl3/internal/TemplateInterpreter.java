@@ -225,7 +225,7 @@ public class TemplateInterpreter extends Interpreter {
      * @return the function evaluation result.
      */
     @Override
-    protected Object visit(final ASTFunctionNode node, Object data) {
+    protected Object visit(final ASTFunctionNode node, final Object data) {
         final int argc = node.jjtGetNumChildren();
         if (argc == 2) {
             final ASTIdentifier functionNode = (ASTIdentifier) node.jjtGetChild(0);
@@ -234,7 +234,7 @@ public class TemplateInterpreter extends Interpreter {
                 final ASTArguments argNode = (ASTArguments) node.jjtGetChild(1);
                 if ("print".equals(functionName)) {
                     // evaluate the arguments
-                    Object[] argv = visit(argNode, null);
+                    final Object[] argv = visit(argNode, null);
                     if (argv != null && argv.length > 0 && argv[0] instanceof Number) {
                         print(((Number) argv[0]).intValue());
                         return null;
@@ -245,7 +245,7 @@ public class TemplateInterpreter extends Interpreter {
                     Object[] argv = visit(argNode, null);
                     if (argv != null && argv.length > 0) {
                         if (argv[0] instanceof TemplateScript) {
-                            TemplateScript script = (TemplateScript) argv[0];
+                            final TemplateScript script = (TemplateScript) argv[0];
                             if (argv.length > 1) {
                                 argv = Arrays.copyOfRange(argv, 1, argv.length);
                             } else {

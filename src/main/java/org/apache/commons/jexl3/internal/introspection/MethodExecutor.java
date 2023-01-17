@@ -117,7 +117,7 @@ public final class MethodExecutor extends AbstractExecutor.Method {
      * to fit the method declaration.
      */
     @SuppressWarnings("SuspiciousSystemArraycopy")
-    private Object[] handleVarArg(Object[] args) {
+    private Object[] handleVarArg(final Object[] args) {
         final Class<?> vaclass = vaClass;
         final int vastart = vaStart;
         // variable arguments count

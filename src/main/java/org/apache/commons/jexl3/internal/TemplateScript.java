@@ -66,7 +66,7 @@ public final class TemplateScript implements JxltEngine.Template {
      * @throws IllegalArgumentException if the directive prefix is invalid
      */
     public TemplateScript(final TemplateEngine engine,
-                          JexlInfo jexlInfo,
+                          final JexlInfo jexlInfo,
                           final String directive,
                           final Reader reader,
                           final String... parms) {

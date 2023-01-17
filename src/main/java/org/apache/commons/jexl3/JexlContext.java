@@ -207,7 +207,7 @@ public interface JexlContext {
          * @param value the value
          * @since 3.3
          */
-        default void processPragma(JexlOptions opts, String key, Object value) {
+        default void processPragma(final JexlOptions opts, final String key, final Object value) {
             processPragma(key, value);
         }
     }

@@ -434,10 +434,10 @@ public class Engine extends JexlEngine {
                     }
                 }  else if (PRAGMA_IMPORT.equals(key)) {
                     // jexl.import, may use a set
-                    Set<?> values = value instanceof Set<?>
+                    final Set<?> values = value instanceof Set<?>
                             ? (Set<?>) value
                             : Collections.singleton(value);
-                    for (Object o : values) {
+                    for (final Object o : values) {
                         if (o instanceof String) {
                             if (is == null) {
                                 is = new LinkedHashSet<>();
@@ -454,7 +454,7 @@ public class Engine extends JexlEngine {
                                 ns = new HashMap<>(functions);
                             }
                             final String nsclass = value.toString();
-                            Class<?> clazz = uberspect.getClassByName(nsclass);
+                            final Class<?> clazz = uberspect.getClassByName(nsclass);
                             if (clazz == null) {
                                 logger.warn(key + ": unable to find class " + nsclass);
                             } else {
@@ -515,7 +515,7 @@ public class Engine extends JexlEngine {
      * Creates a template interpreter.
      * @param args the template interpreter arguments
      */
-    protected Interpreter createTemplateInterpreter(TemplateInterpreter.Arguments args) {
+    protected Interpreter createTemplateInterpreter(final TemplateInterpreter.Arguments args) {
         return new TemplateInterpreter(args);
     }
 
@@ -554,7 +554,7 @@ public class Engine extends JexlEngine {
     }
 
     @Override
-    public Object getProperty(JexlContext context, final Object bean, final String expr) {
+    public Object getProperty(final JexlContext context, final Object bean, final String expr) {
         // synthesize expr using register
         String src = trimSource(expr);
         src = "#0" + (src.charAt(0) == '[' ? "" : ".") + src;
@@ -582,7 +582,7 @@ public class Engine extends JexlEngine {
     }
 
     @Override
-    public void setProperty(JexlContext context, final Object bean, final String expr, final Object value) {
+    public void setProperty(final JexlContext context, final Object bean, final String expr, final Object value) {
         // synthesize expr using register
         String src = trimSource(expr);
         src = "#0" + (src.charAt(0) == '[' ? "" : ".") + src + "=" + "#1";
@@ -904,7 +904,7 @@ public class Engine extends JexlEngine {
      */
     protected ASTJexlScript parse(final JexlInfo info, final JexlFeatures parsingf, final String src, final Scope scope) {
         final boolean cached = src.length() < cacheThreshold && cache != null;
-        JexlFeatures features = parsingf != null? parsingf : DEFAULT_FEATURES;
+        final JexlFeatures features = parsingf != null? parsingf : DEFAULT_FEATURES;
        // if (features.getNameSpaces().isEmpty() && !functions.isEmpty()) {
        //     features = new JexlFeatures(features).nameSpaces(functions.keySet());
        // }

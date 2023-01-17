@@ -399,7 +399,7 @@ public final class TemplateEngine extends JxltEngine {
          * @param val    the constant value
          * @param source the source TemplateExpression if any
          */
-        ConstantExpression(Object val, final TemplateExpression source) {
+        ConstantExpression(final Object val, final TemplateExpression source) {
             super(source);
             if (val == null) {
                 throw new NullPointerException("constant can not be null");
@@ -690,8 +690,8 @@ public final class TemplateEngine extends JxltEngine {
 
 
     @Override
-    public JxltEngine.Expression createExpression(JexlInfo jexlInfo, final String expression) {
-        JexlInfo info = jexlInfo == null?  jexl.createInfo() : jexlInfo;
+    public JxltEngine.Expression createExpression(final JexlInfo jexlInfo, final String expression) {
+        final JexlInfo info = jexlInfo == null?  jexl.createInfo() : jexlInfo;
         Exception xuel = null;
         TemplateExpression stmt = null;
         try {
@@ -885,55 +885,59 @@ public final class TemplateEngine extends JxltEngine {
                     break;
                 case DEFERRED1: // #{...
                     // skip inner strings (for '}')
-                    if (c == '"' || c == '\'') {
-                        strb.append(c);
-                        column = StringParser.readString(strb, expr, column + 1, c);
-                        continue;
-                    }
+
                     // nested immediate in deferred; need to balance count of '{' & '}'
-                    if (c == '{') {
-                        if (expr.charAt(column - 1) == immediateChar) {
-                            inner1 += 1;
-                            strb.deleteCharAt(strb.length() - 1);
-                            nested = true;
-                        } else {
-                            deferred1 += 1;
-                            strb.append(c);
-                        }
-                        continue;
-                    }
+
                     // closing '}'
-                    if (c == '}') {
-                        // balance nested immediate
-                        if (deferred1 > 0) {
-                            deferred1 -= 1;
-                            strb.append(c);
-                        } else if (inner1 > 0) {
-                            inner1 -= 1;
-                        } else  {
-                            // materialize the nested/deferred expr
-                            final String src = strb.toString();
-                            TemplateExpression dexpr;
-                            if (nested) {
-                                dexpr = new NestedExpression(
-                                        expr.substring(inested, column + 1),
-                                        jexl.parse(info.at(lineno, column), noscript, src, scope),
-                                        null);
-                            } else {
-                                dexpr = new DeferredExpression(
-                                        strb.toString(),
-                                        jexl.parse(info.at(lineno, column), noscript, src, scope),
-                                        null);
-                            }
-                            builder.add(dexpr);
-                            strb.delete(0, Integer.MAX_VALUE);
-                            nested = false;
-                            state = ParseState.CONST;
-                        }
+                    switch (c) {
+                case '"':
+                case '\'':
+                    strb.append(c);
+                    column = StringParser.readString(strb, expr, column + 1, c);
+                    continue;
+                case '{':
+                    if (expr.charAt(column - 1) == immediateChar) {
+                        inner1 += 1;
+                        strb.deleteCharAt(strb.length() - 1);
+                        nested = true;
                     } else {
-                        // do buildup expr
-                        column = append(strb, expr, column, c);
+                        deferred1 += 1;
+                        strb.append(c);
                     }
+                    continue;
+                case '}':
+                    // balance nested immediate
+                    if (deferred1 > 0) {
+                        deferred1 -= 1;
+                        strb.append(c);
+                    } else if (inner1 > 0) {
+                        inner1 -= 1;
+                    } else  {
+                        // materialize the nested/deferred expr
+                        final String src = strb.toString();
+                        TemplateExpression dexpr;
+                        if (nested) {
+                            dexpr = new NestedExpression(
+                                    expr.substring(inested, column + 1),
+                                    jexl.parse(info.at(lineno, column), noscript, src, scope),
+                                    null);
+                        } else {
+                            dexpr = new DeferredExpression(
+                                    strb.toString(),
+                                    jexl.parse(info.at(lineno, column), noscript, src, scope),
+                                    null);
+                        }
+                        builder.add(dexpr);
+                        strb.delete(0, Integer.MAX_VALUE);
+                        nested = false;
+                        state = ParseState.CONST;
+                    }
+                    break;
+                default:
+                    // do buildup expr
+                    column = append(strb, expr, column, c);
+                    break;
+                }
                     break;
                 case ESCAPE:
                     if (c == deferredChar) {
@@ -1072,14 +1076,14 @@ public final class TemplateEngine extends JxltEngine {
      * @param pattern  the pattern to match at start of sequence
      * @return the first position after end of pattern if it matches, -1 otherwise
      */
-    protected int startsWith(CharSequence sequence, final CharSequence pattern) {
+    protected int startsWith(final CharSequence sequence, final CharSequence pattern) {
         final int length = sequence.length();
         int s = 0;
         while (s < length && Character.isSpaceChar(sequence.charAt(s))) {
             s += 1;
         }
         if (s < length && pattern.length() <= (length - s)) {
-            CharSequence subSequence = sequence.subSequence(s, length);
+            final CharSequence subSequence = sequence.subSequence(s, length);
             if (subSequence.subSequence(0, pattern.length()).equals(pattern)) {
                 return s + pattern.length();
             }

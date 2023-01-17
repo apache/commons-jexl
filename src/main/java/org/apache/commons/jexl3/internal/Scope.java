@@ -74,7 +74,7 @@ public final class Scope {
     /**
      * The empty string array.
      */
-    private static final String[] EMPTY_STRS = new String[0];
+    private static final String[] EMPTY_STRS = {};
 
     /**
      * Creates a new scope with a list of parameters.
@@ -158,7 +158,7 @@ public final class Scope {
      * @param s the symbol
      * @return true if the symbol was not already present in the lexical set
      */
-    public boolean addLexical(int s) {
+    public boolean addLexical(final int s) {
         if (lexicalVariables == null) {
             lexicalVariables = new LexicalScope();
         }
@@ -170,7 +170,7 @@ public final class Scope {
      * @param s the symbol
      * @return true if symbol was declared through let or const
      */
-    public boolean isLexical(int s) {
+    public boolean isLexical(final int s) {
         return lexicalVariables != null && s >= 0 && lexicalVariables.hasSymbol(s);
     }
 

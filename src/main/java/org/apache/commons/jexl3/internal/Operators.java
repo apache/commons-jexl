@@ -95,8 +95,8 @@ public class Operators {
      * @param args the operands
      * @throws JexlArithmetic.NullOperand if operator is strict and an operand is null
      */
-    protected void controlNullOperands(JexlArithmetic arithmetic, JexlOperator operator, Object...args) {
-        for (Object arg : args) {
+    protected void controlNullOperands(final JexlArithmetic arithmetic, final JexlOperator operator, final Object...args) {
+        for (final Object arg : args) {
             // only check operator if necessary
             if (arg == null) {
                 // check operator only once if it is not strict
@@ -121,7 +121,7 @@ public class Operators {
      * @param args     the arguments
      * @return the result of the operator evaluation or TRY_FAILED
      */
-    protected Object tryOverload(final JexlNode node, final JexlOperator operator, Object... args) {
+    protected Object tryOverload(final JexlNode node, final JexlOperator operator, final Object... args) {
         final JexlArithmetic arithmetic = interpreter.arithmetic;
         controlNullOperands(arithmetic, operator, args);
         if (operators != null && operators.overloads(operator)) {
@@ -158,7 +158,7 @@ public class Operators {
      * @param operator the operator
      * @return true if operator is a postfix operator (x++, y--)
      */
-    private static boolean isPostfix(JexlOperator operator) {
+    private static boolean isPostfix(final JexlOperator operator) {
         return operator == JexlOperator.GET_AND_INCREMENT || operator == JexlOperator.GET_AND_DECREMENT;
     }
 
@@ -169,7 +169,7 @@ public class Operators {
      * @param args the arguements (as seen by the interpreter)
      * @return the tidied arguments
      */
-    private Object[] arguments(JexlOperator operator, Object...args) {
+    private Object[] arguments(final JexlOperator operator, final Object...args) {
         return operator.getArity() == 1 && args.length > 1 ? new Object[]{args[0]} : args;
     }
 

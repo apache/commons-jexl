@@ -115,7 +115,7 @@ public final class SandboxUberspect implements JexlUberspect {
      * @param rhs right hand side
      * @return true if left is identical to right
      */
-    private static boolean eq(Object lhs, Object rhs) {
+    private static boolean eq(final Object lhs, final Object rhs) {
         return lhs == rhs;
     }
 

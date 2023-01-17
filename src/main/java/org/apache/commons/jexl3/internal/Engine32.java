@@ -39,7 +39,6 @@ public class Engine32 extends Engine {
     }
 
     public Engine32() {
-        super();
     }
 
     /**
@@ -48,7 +47,7 @@ public class Engine32 extends Engine {
      * @param node the node
      * @return true if node is navigation-safe, false otherwise
      */
-    static boolean isTernaryProtected(Interpreter ii, JexlNode node) {
+    static boolean isTernaryProtected(final Interpreter ii, JexlNode node) {
         for (JexlNode walk = node.jjtGetParent(); walk != null; walk = walk.jjtGetParent()) {
             // protect only the condition part of the ternary
             if (walk instanceof ASTTernaryNode
@@ -73,24 +72,24 @@ public class Engine32 extends Engine {
      * @param identifier the variable identifier
      * @return the variable value
      */
-    static Object getVariable(Interpreter ii, Frame frame, LexicalScope block, ASTIdentifier identifier) {
-        int symbol = identifier.getSymbol();
+    static Object getVariable(final Interpreter ii, final Frame frame, final LexicalScope block, final ASTIdentifier identifier) {
+        final int symbol = identifier.getSymbol();
         // if we have a symbol, we have a scope thus a frame
         if ((ii.options.isLexicalShade() || identifier.isLexical()) && identifier.isShaded()) {
             return ii.undefinedVariable(identifier, identifier.getName());
         }
         if (symbol >= 0) {
             if (frame.has(symbol)) {
-                Object value = frame.get(symbol);
+                final Object value = frame.get(symbol);
                 if (value != Scope.UNDEFINED) {
                     return value;
                 }
             }
         }
-        String name = identifier.getName();
-        Object value = ii.context.get(name);
+        final String name = identifier.getName();
+        final Object value = ii.context.get(name);
         if (value == null && !ii.context.has(name)) {
-            boolean ignore = (ii.isSafe()
+            final boolean ignore = (ii.isSafe()
                     && (symbol >= 0
                     || identifier.jjtGetParent() instanceof ASTAssignment))
                     || (identifier.jjtGetParent() instanceof ASTReference);
@@ -105,37 +104,37 @@ public class Engine32 extends Engine {
     protected Interpreter createInterpreter(final JexlContext context, final Frame frame, final JexlOptions opts) {
         return new Interpreter(this, opts, context, frame) {
             @Override
-            protected boolean isStrictOperand(JexlNode node) {
+            protected boolean isStrictOperand(final JexlNode node) {
                 return false;
             }
 
             @Override
-            protected boolean isTernaryProtected( JexlNode node) {
+            protected boolean isTernaryProtected( final JexlNode node) {
                 return Engine32.isTernaryProtected(this, node);
             }
 
             @Override
-            protected Object getVariable(Frame frame, LexicalScope block, ASTIdentifier identifier) {
+            protected Object getVariable(final Frame frame, final LexicalScope block, final ASTIdentifier identifier) {
                 return Engine32.getVariable(this, frame, block, identifier);
             }
         };
     }
 
     @Override
-    protected Interpreter createTemplateInterpreter(TemplateInterpreter.Arguments args) {
+    protected Interpreter createTemplateInterpreter(final TemplateInterpreter.Arguments args) {
         return new TemplateInterpreter(args) {
             @Override
-            protected boolean isStrictOperand(JexlNode node) {
+            protected boolean isStrictOperand(final JexlNode node) {
                 return false;
             }
 
             @Override
-            protected boolean isTernaryProtected( JexlNode node) {
+            protected boolean isTernaryProtected( final JexlNode node) {
                 return Engine32.isTernaryProtected(this, node);
             }
 
             @Override
-            protected Object getVariable(Frame frame, LexicalScope block, ASTIdentifier identifier) {
+            protected Object getVariable(final Frame frame, final LexicalScope block, final ASTIdentifier identifier) {
                 return Engine32.getVariable(this, frame, block, identifier);
             }
         };

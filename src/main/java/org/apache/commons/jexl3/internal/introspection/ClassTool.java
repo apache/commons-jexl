@@ -37,7 +37,7 @@ class ClassTool {
         MethodHandle getPackageName = null;
         MethodHandle isExported = null;
         try {
-            Class<?> modulec = ClassTool.class.getClassLoader().loadClass("java.lang.Module");
+            final Class<?> modulec = ClassTool.class.getClassLoader().loadClass("java.lang.Module");
             if (modulec != null) {
                 getModule = LOOKUP.findVirtual(Class.class, "getModule", MethodType.methodType(modulec));
                 if (getModule != null) {
@@ -47,7 +47,7 @@ class ClassTool {
                     }
                 }
             }
-        } catch (Exception e) {
+        } catch (final Exception e) {
             // ignore all
         }
         GET_MODULE = getModule;
@@ -69,7 +69,7 @@ class ClassTool {
      * @param declarator the class
      * @return true if class is exported or no module support exists
      */
-    static boolean isExported(Class<?> declarator) {
+    static boolean isExported(final Class<?> declarator) {
         if (IS_EXPORTED != null) {
             try {
                 final Object module = GET_MODULE.invoke(declarator);
@@ -77,7 +77,7 @@ class ClassTool {
                     final String pkgName = (String) GET_PKGNAME.invoke(declarator);
                     return (Boolean) IS_EXPORTED.invoke(module, pkgName);
                 }
-            } catch (Throwable e) {
+            } catch (final Throwable e) {
                 // ignore
             }
         }
@@ -90,14 +90,14 @@ class ClassTool {
      * @param clz the class
      * @return the class package name
      */
-    static String getPackageName(Class<?> clz) {
+    static String getPackageName(final Class<?> clz) {
         String pkgName = "";
         if (clz != null) {
             // use native if we can
             if (GET_PKGNAME != null) {
                 try {
                     return (String) GET_PKGNAME.invoke(clz);
-                } catch (Throwable xany) {
+                } catch (final Throwable xany) {
                     return "";
                 }
             }
@@ -116,11 +116,11 @@ class ClassTool {
                 clazz = walk;
                 walk = walk.getEnclosingClass();
             }
-            Package pkg = clazz.getPackage();
+            final Package pkg = clazz.getPackage();
             // pkg may be null for unobvious reasons
             if (pkg == null) {
-                String name = clazz.getName();
-                int dot = name.lastIndexOf('.');
+                final String name = clazz.getName();
+                final int dot = name.lastIndexOf('.');
                 if (dot > 0) {
                     pkgName = name.substring(0, dot);
                 }

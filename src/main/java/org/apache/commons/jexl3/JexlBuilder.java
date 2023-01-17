@@ -93,7 +93,7 @@ public class JexlBuilder {
      * Sets the default permissions.
      * @param permissions the permissions
      */
-    public static void setDefaultPermissions(JexlPermissions permissions) {
+    public static void setDefaultPermissions(final JexlPermissions permissions) {
         PERMISSIONS = permissions == null? JexlPermissions.RESTRICTED : permissions;
     }
 
