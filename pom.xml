@@ -321,10 +321,12 @@
             </plugin>
 
             <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>animal-sniffer-maven-plugin</artifactId>
-            <version>1.22</version>
-                <configuration><ignores>java.lang.invoke.*</ignores></configuration>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>animal-sniffer-maven-plugin</artifactId>
+                <version>1.22</version>
+                <configuration>
+                    <ignores>java.lang.invoke.*</ignores>
+		        </configuration>
             </plugin>
 
         </plugins>
