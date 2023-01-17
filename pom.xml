@@ -54,7 +54,6 @@
         <checkstyle.plugin.version>3.2.1</checkstyle.plugin.version>
         <checkstyle.version>10.6.0</checkstyle.version>
         <japicmp.skip>false</japicmp.skip>
-        <commons.spotbugs.version>4.7.3.0</commons.spotbugs.version>
 
         <!-- override of Jacoco properties defined in CP52 -->
         <commons.jacoco.classRatio>0.95</commons.jacoco.classRatio>
@@ -402,7 +401,6 @@
             <plugin>
                 <groupId>com.github.spotbugs</groupId>
                 <artifactId>spotbugs-maven-plugin</artifactId>
-                <version>${commons.spotbugs.version}</version>
                 <configuration>
                     <excludeFilterFile>${basedir}/src/main/config/findbugs-exclude-filter.xml</excludeFilterFile>
                     <xmlOutputDirectory>target/site</xmlOutputDirectory>
