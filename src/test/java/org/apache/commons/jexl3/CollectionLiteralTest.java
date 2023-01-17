@@ -31,7 +31,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * Originally intended to prove one could cache results of constant map literals when used to create
  * libraries (a map of lamba).
  * However, those literals must be newly instantiated since their result may be modified; there is
- * thus no point in trying to cache them. (Think harder and nod, dont try again.)
+ * thus no point in trying to cache them. (Think harder and nod, don't try again.)
  * These pointless tests as a reminder of 'why' those behave the way they do.
  * </p>
  */

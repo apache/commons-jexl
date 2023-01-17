@@ -80,7 +80,7 @@ public final class ConstructorMethod implements JexlMethod {
 
     @Override
     public Object tryInvoke(final String name, final Object obj, final Object... args) {
-        // dont try to invoke if no parameter but call has arguments
+        // Don't try to invoke if no parameter but call has arguments
         if (ctor.getParameterCount() > 0 || args.length == 0) {
             try {
                 final Class<?> ctorClass = ctor.getDeclaringClass();

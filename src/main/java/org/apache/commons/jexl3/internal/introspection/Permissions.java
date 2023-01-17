@@ -319,7 +319,7 @@ public class Permissions implements JexlPermissions {
      * @return true if denied, false otherwise
      */
     private boolean deny(Class<?> clazz) {
-        // dont deny arrays
+        // Don't deny arrays
         if (clazz.isArray()) {
             return false;
         }

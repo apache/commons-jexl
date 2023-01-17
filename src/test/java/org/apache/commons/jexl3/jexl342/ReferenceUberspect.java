@@ -235,7 +235,7 @@ public class ReferenceUberspect implements JexlUberspect {
         if (ref == obj) {
             return null;
         }
-        // obj is null means proper dereference of an optional; we dont have an object,
+        // obj is null means proper dereference of an optional; we don't have an object,
         // we can not determine jexlGet, not a pb till we call with a not-null object
         // since the result is likely to be not null... TryInvoke will fail and invoke will throw.
         // from that object, get the property getter if any

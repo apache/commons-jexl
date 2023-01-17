@@ -56,7 +56,7 @@ working with enterprise platforms.
                     <li>Loose-coupling of interfaces and implementations or duck-typing:
                         <ul>
                             <li>You have optional classes that your code cant consider as compilation dependencies.</li>
-                            <li>You have to integrate and call "legacy" code or use components that you dont want to
+                            <li>You have to integrate and call "legacy" code or use components that you don't want to
                             strongly depend upon.</li>
                         </ul>
                     </li>

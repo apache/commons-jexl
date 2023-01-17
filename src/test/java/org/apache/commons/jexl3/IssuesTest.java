@@ -102,7 +102,7 @@ public class IssuesTest extends JexlTestCase {
     }
 
     // JEXL-47: C style comments (single & multi line) (fixed in Parser.jjt)
-    // JEXL-44: comments dont allow double quotes (fixed in Parser.jjt)
+    // JEXL-44: comments don't allow double quotes (fixed in Parser.jjt)
     @Test
     public void test47() throws Exception {
         final JexlEngine jexl = new Engine();
