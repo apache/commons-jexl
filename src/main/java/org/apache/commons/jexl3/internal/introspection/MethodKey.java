@@ -17,6 +17,7 @@
 package org.apache.commons.jexl3.internal.introspection;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Executable;
 import java.lang.reflect.Method;
 
 import java.util.Arrays;
@@ -89,21 +90,13 @@ public final class MethodKey {
      * Creates a key from a method.
      * @param aMethod the method to generate the key from.
      */
-    MethodKey(final Method aMethod) {
+    MethodKey(final Executable aMethod) {
         this(aMethod.getName(), aMethod.getParameterTypes());
     }
 
     /**
-     * Creates a key from a constructor.
-     * @param aCtor the constructor to generate the key from.
-     */
-    MethodKey(final Constructor<?> aCtor) {
-        this(aCtor.getDeclaringClass().getName(), aCtor.getParameterTypes());
-    }
-
-    /**
      * Creates a key from a method name and a set of parameters.
-     * @param aMethod the method to generate the key from
+     * @param aMethod the method to generate the key from, class name for constructors
      * @param args    the intended method parameters
      */
     MethodKey(final String aMethod, final Class<?>[] args) {
@@ -187,10 +180,10 @@ public final class MethodKey {
      * class introspection order, the isVarargs flag on the method itself will be false.
      * To circumvent the potential problem, fetch the method with the same signature from the super-classes,
      * - which will be different if override  -and get the varargs flag from it.
-     * @param method the method to check for varargs
+     * @param method the method or constructor to check for varargs
      * @return true if declared varargs, false otherwise
      */
-    public static boolean isVarArgs(final Method method) {
+    public static boolean isVarArgs(final Executable method) {
         if (method == null) {
             return false;
         }
@@ -226,7 +219,7 @@ public final class MethodKey {
      * @throws MethodKey.AmbiguousException if there is more than one.
      */
     public Method getMostSpecificMethod(final Method[] methods) {
-        return METHODS.getMostSpecific(this, methods);
+        return getMostSpecific(methods);
     }
 
     /**
@@ -236,7 +229,7 @@ public final class MethodKey {
      * @throws MethodKey.AmbiguousException if there is more than one.
      */
     public Constructor<?> getMostSpecificConstructor(final Constructor<?>[] methods) {
-        return CONSTRUCTORS.getMostSpecific(this, methods);
+        return getMostSpecific(methods);
     }
 
     /**
@@ -397,7 +390,7 @@ public final class MethodKey {
         }
         /* Check for vararg conversion. */
         if (possibleVarArg && formal.isArray()) {
-            if (actual != null && actual.isArray()) {
+            if (actual.isArray()) {
                 actual = actual.getComponentType();
             }
             return isInvocationConvertible(formal.getComponentType(), actual, strict, false);
@@ -424,7 +417,7 @@ public final class MethodKey {
      * by the introspector.
      */
     public static class AmbiguousException extends RuntimeException {
-        /** Version Id for serializable. */
+        /** Version identifier for serializable. */
         private static final long serialVersionUID = -201801091655L;
         /** Whether this exception should be considered severe. */
         private final boolean severe;
@@ -449,376 +442,320 @@ public final class MethodKey {
     }
 
     /**
-     * Utility for parameters matching.
-     * @param <T> Method or Constructor
+     * Gets the most specific method that is applicable to actual argument types.<p>
+     * Attempts to find the most specific applicable method using the
+     * algorithm described in the JLS section 15.12.2 (with the exception that it can't
+     * distinguish a primitive type argument from an object type argument, since in reflection
+     * primitive type arguments are represented by their object counterparts, so for an argument of
+     * type (say) java.lang.Integer, it will not be able to decide between a method that takes int and a
+     * method that takes java.lang.Integer as a parameter.
+     * </p>
+     * <p>
+     * This turns out to be a relatively rare case where this is needed - however, functionality
+     * like this is needed.
+     * </p>
+     *
+     * @param methods a list of methods
+     * @return the most specific method.
+     * @throws MethodKey.AmbiguousException if there is more than one.
      */
-    private abstract static class Parameters<T> {
-        /**
-         * Extract the parameter types from its applicable argument.
-         * @param app a method or constructor
-         * @return the parameters
+    private <T extends Executable> T getMostSpecific(final T[] methods) {
+        final Class<?>[] args = getParameters();
+        final Deque<T> applicables = getApplicables(methods, args);
+        if (applicables.isEmpty()) {
+            return null;
+        }
+        if (applicables.size() == 1) {
+            return applicables.getFirst();
+        }
+        /*
+         * This list will contain the maximally specific methods. Hopefully at
+         * the end of the below loop, the list will contain exactly one method,
+         * (the most specific method) otherwise we have ambiguity.
          */
-        protected abstract Class<?>[] getParameterTypes(T app);
-
-        /**
-         * Whether a constructor or method handles varargs.
-         * @param app the constructor or method
-         * @return true if varargs, false otherwise
-         */
-        protected abstract boolean isVarArgs(T app);
-
-        /**
-         * Gets the most specific method that is applicable to actual argument types.<p>
-         * Attempts to find the most specific applicable method using the
-         * algorithm described in the JLS section 15.12.2 (with the exception that it can't
-         * distinguish a primitive type argument from an object type argument, since in reflection
-         * primitive type arguments are represented by their object counterparts, so for an argument of
-         * type (say) java.lang.Integer, it will not be able to decide between a method that takes int and a
-         * method that takes java.lang.Integer as a parameter.
-         * </p>
-         * <p>
-         * This turns out to be a relatively rare case where this is needed - however, functionality
-         * like this is needed.
-         * </p>
-         *
-         * @param key a method key, esp its parameters
-         * @param methods a list of methods
-         * @return the most specific method.
-         * @throws MethodKey.AmbiguousException if there is more than one.
-         */
-        T getMostSpecific(final MethodKey key, final T[] methods) {
-            final Class<?>[] args = key.getParameters();
-            final Deque<T> applicables = getApplicables(methods, args);
-            if (applicables.isEmpty()) {
-                return null;
+        final Deque<T> maximals = new LinkedList<>();
+        for (final T app : applicables) {
+            final Class<?>[] parms = app.getParameterTypes();
+            boolean lessSpecific = false;
+            final Iterator<T> maximal = maximals.iterator();
+            while (!lessSpecific && maximal.hasNext()) {
+                final T max = maximal.next();
+                switch (moreSpecific(args, parms, max.getParameterTypes())) {
+                    case MORE_SPECIFIC:
+                        /*
+                         * This method is more specific than the previously
+                         * known maximally specific, so remove the old maximum.
+                         */
+                        maximal.remove();
+                        break;
+                    case LESS_SPECIFIC:
+                        /*
+                         * This method is less specific than any of the
+                         * currently known maximally specific methods, so we
+                         * won't add it into the set of maximally specific
+                         * methods
+                         */
+                        lessSpecific = true;
+                        break;
+                    default:
+                        // nothing to do
+                }
             }
-
-            if (applicables.size() == 1) {
-                return applicables.getFirst();
+            if (!lessSpecific) {
+                maximals.addLast(app);
             }
+        }
+        // if we have more than one maximally specific method, this call is ambiguous...
+        if (maximals.size() > 1) {
+            throw ambiguousException(args, applicables);
+        }
+        return maximals.getFirst();
+    } // CSON: RedundantThrows
 
-            /*
-             * This list will contain the maximally specific methods. Hopefully at
-             * the end of the below loop, the list will contain exactly one method,
-             * (the most specific method) otherwise we have ambiguity.
-             */
-            final Deque<T> maximals = new LinkedList<>();
-            for (final T app : applicables) {
-                final Class<?>[] parms = getParameterTypes(app);
-                boolean lessSpecific = false;
-                final Iterator<T> maximal = maximals.iterator();
-                while(!lessSpecific && maximal.hasNext()) {
-                    final T max = maximal.next();
-                    switch (moreSpecific(args, parms, getParameterTypes(max))) {
-                        case MORE_SPECIFIC:
-                            /*
-                            * This method is more specific than the previously
-                            * known maximally specific, so remove the old maximum.
-                            */
-                            maximal.remove();
-                            break;
-
-                        case LESS_SPECIFIC:
-                            /*
-                            * This method is less specific than some of the
-                            * currently known maximally specific methods, so we
-                            * won't add it into the set of maximally specific
-                            * methods
-                            */
-
-                            lessSpecific = true;
-                            break;
-                        default:
-                            // nothing to do
+    /**
+     * Creates an ambiguous exception.
+     * <p>
+     * This method computes the severity of the ambiguity. The only <em>non-severe</em> case is when there is
+     * at least one null argument and at most one applicable method or constructor has a corresponding 'Object'
+     * parameter.
+     * We thus consider that ambiguity is benign in presence of null arguments but severe in the case where
+     * the corresponding parameter is of type Object in more than one applicable overloads.
+     * <p>
+     * Rephrasing:
+     * <ul>
+     *  <li>If all arguments are valid instances - no null argument -, ambiguity is severe.</li>
+     *  <li>If there is at least one null argument, the ambiguity is severe if more than one method has a
+     *  corresponding parameter of class 'Object'.</li>
+     * </ul>
+     *
+     * @param classes     the argument args
+     * @param applicables the list of applicable methods or constructors
+     * @return an ambiguous exception
+     */
+    private static <T extends Executable>
+    AmbiguousException ambiguousException(final Class<?>[] classes, final Iterable<T> applicables) {
+        boolean severe = false;
+        int instanceArgCount = 0; // count the number of valid instances, aka not null
+        for (int c = 0; c < classes.length; ++c) {
+            final Class<?> argClazz = classes[c];
+            if (Void.class.equals(argClazz)) {
+                // count the number of methods for which the current arg maps to an Object parameter
+                int objectParmCount = 0;
+                for (final T app : applicables) {
+                    final Class<?>[] parmClasses = app.getParameterTypes();
+                    final Class<?> parmClass = parmClasses[c];
+                    if (Object.class.equals(parmClass) && (objectParmCount++ == 2)) {
+                        severe = true;
+                        break;
                     }
                 }
-
-                if (!lessSpecific) {
-                    maximals.addLast(app);
-                }
+            } else {
+                instanceArgCount += 1;
             }
-            // if we have more than one maximally specific method, this call is ambiguous...
-            if (maximals.size() > 1) {
-                throw ambiguousException(args, applicables);
-            }
-            return maximals.getFirst();
-        } // CSON: RedundantThrows
-
-        /**
-         * Creates an ambiguous exception.
-         * <p>
-         * This method computes the severity of the ambiguity. The only <em>non-severe</em> case is when there is
-         * at least one null argument and at most one applicable method or constructor has a corresponding 'Object'
-         * parameter.
-         * We thus consider that ambiguity is benign in presence of null arguments but in the case where
-         * the corresponding parameter is of type Object in more than one applicable overloads.
-         * <p>
-         * Rephrasing:
-         * <ul>
-         *  <li>If all arguments are valid instances - no null argument -, ambiguity is severe.</li>
-         *  <li>If there is at least one null argument, the ambiguity is severe if more than one method has a
-         *  corresponding parameter of class 'Object'.</li>
-         * </ul>
-         *
-         * @param classes the argument args
-         * @param applicables the list of applicable methods or constructors
-         * @return an ambiguous exception
-         */
-        private AmbiguousException ambiguousException (final Class<?>[] classes, final Deque<T> applicables) {
-            boolean severe = false;
-            int instanceArgCount = 0; // count the number of valid instances, aka not null
-            for(int c = 0; c < classes.length; ++c) {
-                final Class<?> argClazz = classes[c];
-                if (Void.class.equals(argClazz)) {
-                    // count the number of methods for which the current arg maps to an Object parameter
-                    int objectParmCount = 0;
-                    for (final T app : applicables) {
-                        final Class<?>[] parmClasses = getParameterTypes(app);
-                        final Class<?> parmClass =  parmClasses[c];
-                        if (Object.class.equals(parmClass) && (objectParmCount++ == 2)) {
-                            severe = true;
-                            break;
-                        }
-                    }
-                } else {
-                    instanceArgCount += 1;
-                }
-            }
-            return new AmbiguousException(severe || instanceArgCount == classes.length);
         }
-
-        /**
-         * Determines which method signature (represented by a class array) is more
-         * specific. This defines a partial ordering on the method signatures.
-         *
-         * @param a the arguments signature
-         * @param c1 first method signature to compare
-         * @param c2 second method signature to compare
-         * @return MORE_SPECIFIC if c1 is more specific than c2, LESS_SPECIFIC if
-         *         c1 is less specific than c2, INCOMPARABLE if they are incomparable.
-         */
-         private int moreSpecific(final Class<?>[] a, final Class<?>[] c1, final Class<?>[] c2) {
-            // compare lengths to handle comparisons where the size of the arrays
-            // doesn't match, but the methods are both applicable due to the fact
-            // that one is a varargs method
-            if (c1.length > a.length) {
-                return LESS_SPECIFIC;
-            }
-            if (c2.length > a.length) {
-                return MORE_SPECIFIC;
-            }
-            if (c1.length > c2.length) {
-                return MORE_SPECIFIC;
-            }
-            if (c2.length > c1.length) {
-                return LESS_SPECIFIC;
-            }
-            // same length, keep ultimate param offset for vararg checks
-            final int length = c1.length;
-            final int ultimate = c1.length - 1;
-
-             // ok, move on and compare those of equal lengths
-             for (int i = 0; i < length; ++i) {
-                 if (c1[i] != c2[i]) {
-                     final boolean last = (i == ultimate);
-                     // argument is null, prefer an Object param
-                     if (a[i] == Void.class) {
-                         if (c1[i] == Object.class && c2[i] != Object.class) {
-                             return MORE_SPECIFIC;
-                         }
-                         if (c1[i] != Object.class && c2[i] == Object.class) {
-                             return LESS_SPECIFIC;
-                         }
-                     }
-                     // prefer primitive on non null arg, non primitive otherwise
-                     boolean c1s = isPrimitive(c1[i], last);
-                     boolean c2s = isPrimitive(c2[i], last);
-                     if (c1s != c2s) {
-                        return (c1s == (a[i] != Void.class))? MORE_SPECIFIC : LESS_SPECIFIC;
-                     }
-                     // if c2 can be converted to c1 but not the opposite,
-                     // c1 is more specific than c2
-                     c1s = isStrictConvertible(c2[i], c1[i], last);
-                     c2s = isStrictConvertible(c1[i], c2[i], last);
-                     if (c1s != c2s) {
-                         return c1s ? MORE_SPECIFIC : LESS_SPECIFIC;
-                     }
-                 }
-             }
-            // Incomparable due to non-related arguments (i.e.foo(Runnable) vs. foo(Serializable))
-            return INCOMPARABLE;
-        }
-
-        /**
-         * Checks whether a parameter class is a primitive.
-         * @param c              the parameter class
-         * @param possibleVarArg true if this is the last parameter which can be a primitive array (vararg call)
-         * @return true if primitive, false otherwise
-         */
-        private boolean isPrimitive(final Class<?> c, final boolean possibleVarArg) {
-            if (c != null) {
-                if (c.isPrimitive()) {
-                    return true;
-                }
-                if (possibleVarArg) {
-                    final Class<?> t = c.getComponentType();
-                    return t != null && t.isPrimitive();
-                }
-            }
-            return false;
-        }
-
-        /**
-         * Returns all methods that are applicable to actual argument types.
-         *
-         * @param methods list of all candidate methods
-         * @param classes the actual types of the arguments
-         * @return a list that contains only applicable methods (number of
-         *         formal and actual arguments matches, and argument types are assignable
-         *         to formal types through a method invocation conversion).
-         */
-        private Deque<T> getApplicables(final T[] methods, final Class<?>[] classes) {
-            final Deque<T> list = new LinkedList<>();
-            for (final T method : methods) {
-                if (isApplicable(method, classes)) {
-                    list.add(method);
-                }
-            }
-            return list;
-        }
-
-        /**
-         * Returns true if the supplied method is applicable to actual
-         * argument types.
-         *
-         * @param method  method that will be called
-         * @param actuals arguments signature for method
-         * @return true if method is applicable to arguments
-         */
-        private boolean isApplicable(final T method, final Class<?>[] actuals) {
-            final Class<?>[] formals = getParameterTypes(method);
-            // if same number or args or
-            // there's just one more methodArg than class arg
-            // and the last methodArg is an array, then treat it as a vararg
-            if (formals.length == actuals.length) {
-                // this will properly match when the last methodArg
-                // is an array/varargs and the last class is the type of array
-                // (e.g. String when the method is expecting String...)
-                for (int i = 0; i < actuals.length; ++i) {
-                    if (!isConvertible(formals[i], actuals[i], false)) {
-                        // if we're on the last arg and the method expects an array
-                        if (i == actuals.length - 1 && formals[i].isArray()) {
-                            // check to see if the last arg is convertible
-                            // to the array's component type
-                            return isConvertible(formals[i], actuals[i], true);
-                        }
-                        return false;
-                    }
-                }
-                return true;
-            }
-
-            // number of formal and actual differ, method must be vararg
-            if (!isVarArgs(method)) {
-                return false;
-            }
-
-            // less arguments than method parameters: vararg is null
-            if (formals.length > actuals.length) {
-                // only one parameter, the last (ie vararg) can be missing
-                if (formals.length - actuals.length > 1) {
-                    return false;
-                }
-                // check that all present args match up to the method parms
-                for (int i = 0; i < actuals.length; ++i) {
-                    if (!isConvertible(formals[i], actuals[i], false)) {
-                        return false;
-                    }
-                }
-                return true;
-            }
-
-            // more arguments given than the method accepts; check for varargs
-            if (formals.length > 0 && actuals.length > 0) {
-                // check that they all match up to the last method arg
-                for (int i = 0; i < formals.length - 1; ++i) {
-                    if (!isConvertible(formals[i], actuals[i], false)) {
-                        return false;
-                    }
-                }
-                // check that all remaining arguments are convertible to the vararg type
-                // (last parm is an array since method is vararg)
-                final Class<?> vararg = formals[formals.length - 1].getComponentType();
-                for (int i = formals.length - 1; i < actuals.length; ++i) {
-                    if (!isConvertible(vararg, actuals[i], false)) {
-                        return false;
-                    }
-                }
-                return true;
-            }
-            // no match
-            return false;
-        }
-
-        /**
-         * @see #isInvocationConvertible(Class, Class, boolean)
-         * @param formal         the formal parameter type to which the actual
-         *                       parameter type should be convertible
-         * @param actual         the actual parameter type.
-         * @param possibleVarArg whether or not we're dealing with the last parameter
-         *                       in the method declaration
-         * @return see isMethodInvocationConvertible.
-         */
-        private boolean isConvertible(final Class<?> formal, final Class<?> actual, final boolean possibleVarArg) {
-            // if we see Void.class, the argument was null
-            return isInvocationConvertible(formal, actual.equals(Void.class) ? null : actual, possibleVarArg);
-        }
-
-        /**
-         * @see #isStrictInvocationConvertible(Class, Class, boolean)
-         * @param formal         the formal parameter type to which the actual
-         *                       parameter type should be convertible
-         * @param actual         the actual parameter type.
-         * @param possibleVarArg whether or not we're dealing with the last parameter
-         *                       in the method declaration
-         * @return see isStrictMethodInvocationConvertible.
-         */
-        private boolean isStrictConvertible(final Class<?> formal, final Class<?> actual,
-                final boolean possibleVarArg) {
-            // if we see Void.class, the argument was null
-            return isStrictInvocationConvertible(formal, actual.equals(Void.class) ? null : actual, possibleVarArg);
-        }
+        return new AmbiguousException(severe || instanceArgCount == classes.length);
     }
 
     /**
-     * The parameter matching service for methods.
+     * Determines which method signature (represented by a class array) is more
+     * specific. This defines a partial ordering on the method signatures.
+     *
+     * @param a  the arguments signature
+     * @param c1 first method signature to compare
+     * @param c2 second method signature to compare
+     * @return MORE_SPECIFIC if c1 is more specific than c2, LESS_SPECIFIC if
+     * c1 is less specific than c2, INCOMPARABLE if they are incomparable.
      */
-    private static final Parameters<Method> METHODS = new Parameters<Method>() {
-        @Override
-        protected Class<?>[] getParameterTypes(final Method app) {
-            return app.getParameterTypes();
+    private static int moreSpecific(final Class<?>[] a, final Class<?>[] c1, final Class<?>[] c2) {
+        // compare lengths to handle comparisons where the size of the arrays
+        // doesn't match, but the methods are both applicable due to the fact
+        // that one is a varargs method
+        if (c1.length > a.length) {
+            return LESS_SPECIFIC;
         }
-
-        @Override
-        public boolean isVarArgs(final Method app) {
-            return MethodKey.isVarArgs(app);
+        if (c2.length > a.length) {
+            return MORE_SPECIFIC;
         }
-
-    };
+        if (c1.length > c2.length) {
+            return MORE_SPECIFIC;
+        }
+        if (c2.length > c1.length) {
+            return LESS_SPECIFIC;
+        }
+        // same length, keep ultimate param offset for vararg checks
+        final int length = c1.length;
+        final int ultimate = c1.length - 1;
+        // ok, move on and compare those of equal lengths
+        for (int i = 0; i < length; ++i) {
+            if (c1[i] != c2[i]) {
+                final boolean last = (i == ultimate);
+                // argument is null, prefer an Object param
+                if (a[i] == Void.class) {
+                    if (c1[i] == Object.class && c2[i] != Object.class) {
+                        return MORE_SPECIFIC;
+                    }
+                    if (c1[i] != Object.class && c2[i] == Object.class) {
+                        return LESS_SPECIFIC;
+                    }
+                }
+                // prefer primitive on non-null arg, non-primitive otherwise
+                boolean c1s = isPrimitive(c1[i], last);
+                boolean c2s = isPrimitive(c2[i], last);
+                if (c1s != c2s) {
+                    return (c1s == (a[i] != Void.class)) ? MORE_SPECIFIC : LESS_SPECIFIC;
+                }
+                // if c2 can be converted to c1 but not the opposite,
+                // c1 is more specific than c2
+                c1s = isStrictConvertible(c2[i], c1[i], last);
+                c2s = isStrictConvertible(c1[i], c2[i], last);
+                if (c1s != c2s) {
+                    return c1s ? MORE_SPECIFIC : LESS_SPECIFIC;
+                }
+            }
+        }
+        // Incomparable due to non-related arguments (i.e.foo(Runnable) vs. foo(Serializable))
+        return INCOMPARABLE;
+    }
 
     /**
-     * The parameter matching service for constructors.
+     * Checks whether a parameter class is a primitive.
+     *
+     * @param c              the parameter class
+     * @param possibleVarArg true if this is the last parameter which can be a primitive array (vararg call)
+     * @return true if primitive, false otherwise
      */
-    private static final Parameters<Constructor<?>> CONSTRUCTORS = new Parameters<Constructor<?>>() {
-        @Override
-        protected Class<?>[] getParameterTypes(final Constructor<?> app) {
-            return app.getParameterTypes();
+    private static boolean isPrimitive(final Class<?> c, final boolean possibleVarArg) {
+        if (c != null) {
+            if (c.isPrimitive()) {
+                return true;
+            }
+            if (possibleVarArg) {
+                final Class<?> t = c.getComponentType();
+                return t != null && t.isPrimitive();
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Returns all methods that are applicable to actual argument types.
+     *
+     * @param methods list of all candidate methods
+     * @param classes the actual types of the arguments
+     * @return a list that contains only applicable methods (number of
+     * formal and actual arguments matches, and argument types are assignable
+     * to formal types through a method invocation conversion).
+     */
+    private static <T extends Executable> Deque<T> getApplicables(final T[] methods, final Class<?>[] classes) {
+        final Deque<T> list = new LinkedList<>();
+        for (final T method : methods) {
+            if (isApplicable(method, classes)) {
+                list.add(method);
+            }
+        }
+        return list;
+    }
+
+    /**
+     * Returns true if the supplied method is applicable to actual
+     * argument types.
+     *
+     * @param method  method that will be called
+     * @param actuals arguments signature for method
+     * @return true if method is applicable to arguments
+     */
+    private static <T extends Executable> boolean isApplicable(final T method, final Class<?>[] actuals) {
+        final Class<?>[] formals = method.getParameterTypes();
+        // if same number or args or
+        // there's just one more methodArg than class arg
+        // and the last methodArg is an array, then treat it as a vararg
+        if (formals.length == actuals.length) {
+            // this will properly match when the last methodArg
+            // is an array/varargs and the last class is the type of array
+            // (e.g. String when the method is expecting String...)
+            for (int i = 0; i < actuals.length; ++i) {
+                if (!isConvertible(formals[i], actuals[i], false)) {
+                    // if we're on the last arg and the method expects an array
+                    if (i == actuals.length - 1 && formals[i].isArray()) {
+                        // check to see if the last arg is convertible
+                        // to the array's component type
+                        return isConvertible(formals[i], actuals[i], true);
+                    }
+                    return false;
+                }
+            }
+            return true;
         }
 
-        @Override
-        public boolean isVarArgs(final Constructor<?> app) {
-            return app.isVarArgs();
+        // number of formal and actual differ, method must be vararg
+        if (!method.isVarArgs()) {
+            return false;
         }
 
-    };
+        // fewer arguments than method parameters: vararg is null
+        if (formals.length > actuals.length) {
+            // only one parameter, the last (ie vararg) can be missing
+            if (formals.length - actuals.length > 1) {
+                return false;
+            }
+            // check that all present args match up to the method parms
+            for (int i = 0; i < actuals.length; ++i) {
+                if (!isConvertible(formals[i], actuals[i], false)) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        // more arguments given than the method accepts; check for varargs
+        if (formals.length > 0) {
+            // check that they all match up to the last method arg
+            for (int i = 0; i < formals.length - 1; ++i) {
+                if (!isConvertible(formals[i], actuals[i], false)) {
+                    return false;
+                }
+            }
+            // check that all remaining arguments are convertible to the vararg type
+            // (last parm is an array since method is vararg)
+            final Class<?> vararg = formals[formals.length - 1].getComponentType();
+            for (int i = formals.length - 1; i < actuals.length; ++i) {
+                if (!isConvertible(vararg, actuals[i], false)) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        // no match
+        return false;
+    }
+
+    /**
+     * @param formal         the formal parameter type to which the actual
+     *                       parameter type should be convertible
+     * @param actual         the actual parameter type.
+     * @param possibleVarArg whether we're dealing with the last parameter
+     *                       in the method declaration
+     * @return see isMethodInvocationConvertible.
+     * @see #isInvocationConvertible(Class, Class, boolean)
+     */
+    private static boolean isConvertible(final Class<?> formal, final Class<?> actual, final boolean possibleVarArg) {
+        // if we see Void.class, the argument was null
+        return isInvocationConvertible(formal, actual.equals(Void.class) ? null : actual, possibleVarArg);
+    }
+
+    /**
+     * @param formal         the formal parameter type to which the actual
+     *                       parameter type should be convertible
+     * @param actual         the actual parameter type.
+     * @param possibleVarArg whether we're dealing with the last parameter
+     *                       in the method declaration
+     * @return see isStrictMethodInvocationConvertible.
+     * @see #isStrictInvocationConvertible(Class, Class, boolean)
+     */
+    private static boolean isStrictConvertible(final Class<?> formal, final Class<?> actual,
+                                               final boolean possibleVarArg) {
+        // if we see Void.class, the argument was null
+        return isStrictInvocationConvertible(formal, actual.equals(Void.class) ? null : actual, possibleVarArg);
+    }
+
 }
