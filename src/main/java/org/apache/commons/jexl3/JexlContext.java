@@ -159,6 +159,25 @@ public interface JexlContext {
     }
 
     /**
+     * A marker interface of the JexlContext that processes module definitions.
+     * It is used by the interpreter during evaluation of the pragma module definitions.
+     * @since 3.3
+     */
+    interface ModuleProcessor {
+        /**
+         * Defines a module.
+         * The module name will be the namespace mapped to the object returned by the evaluation
+         * of its body.
+         * @param engine the engine evaluating this module pragma
+         * @param info the info at the pragma location
+         * @param name the module name
+         * @param body the module definition which can be its location or source
+         * @return the module object
+         */
+        Object processModule(JexlEngine engine, JexlInfo info, String name, String body);
+    }
+
+    /**
      * A marker interface of the JexlContext that exposes runtime evaluation options.
      * @since 3.2
      */

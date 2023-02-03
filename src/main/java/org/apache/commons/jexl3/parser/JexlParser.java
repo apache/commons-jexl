@@ -506,6 +506,10 @@ public abstract class JexlParser extends StringParser {
      */
     public static final String PRAGMA_JEXLNS = "jexl.namespace.";
     /**
+     * The prefix of a module pragma.
+     */
+    public static final String PRAGMA_MODULE = "jexl.module.";
+    /**
      * The import pragma.
      */
     public static final String PRAGMA_IMPORT = "jexl.import";

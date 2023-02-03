@@ -48,15 +48,17 @@ import org.apache.commons.logging.LogFactory;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import static org.apache.commons.jexl3.parser.JexlParser.PRAGMA_IMPORT;
+import static org.apache.commons.jexl3.parser.JexlParser.PRAGMA_MODULE;
 import static org.apache.commons.jexl3.parser.JexlParser.PRAGMA_JEXLNS;
 import static org.apache.commons.jexl3.parser.JexlParser.PRAGMA_OPTIONS;
 
@@ -422,7 +424,6 @@ public class Engine extends JexlEngine {
                             ? (JexlContext.PragmaProcessor) context
                             : null;
             Map<String, Object> ns = null;
-            Set<String> is = null;
             for (final Map.Entry<String, Object> pragma : pragmas.entrySet()) {
                 final String key = pragma.getKey();
                 final Object value = pragma.getValue();
@@ -434,45 +435,99 @@ public class Engine extends JexlEngine {
                     }
                 }  else if (PRAGMA_IMPORT.equals(key)) {
                     // jexl.import, may use a set
-                    final Set<?> values = value instanceof Set<?>
-                            ? (Set<?>) value
-                            : Collections.singleton(value);
-                    for (final Object o : values) {
+                    final Set<String> is = new LinkedHashSet<>();
+                    withValueSet(value, (o)->{
                         if (o instanceof String) {
-                            if (is == null) {
-                                is = new LinkedHashSet<>();
-                            }
                             is.add(o.toString());
                         }
+                    });
+                    if (!is.isEmpty()) {
+                        opts.setImports(is);
                     }
                 } else if (key.startsWith(PRAGMA_JEXLNS)) {
-                    if (value instanceof String) {
-                        // jexl.namespace.***
-                        final String nsname = key.substring(PRAGMA_JEXLNS.length());
-                        if (!nsname.isEmpty()) {
-                            if (ns == null) {
-                                ns = new HashMap<>(functions);
-                            }
-                            final String nsclass = value.toString();
-                            final Class<?> clazz = uberspect.getClassByName(nsclass);
-                            if (clazz == null) {
-                                logger.warn(key + ": unable to find class " + nsclass);
-                            } else {
-                                ns.put(nsname, clazz);
-                            }
-                        }
-                    }
+                    if (ns == null)  ns = new LinkedHashMap<>(functions);
+                    processPragmaNamespace(ns, key, value);
+                } else if (key.startsWith(PRAGMA_MODULE)) {
+                    if (ns == null)  ns = new LinkedHashMap<>(functions);
+                    processModulePragma(ns, key, value, script.jexlInfo(), context);
                 }
                 if (processor != null) {
                     processor.processPragma(opts, key, value);
                 }
             }
-            if (ns != null) {
-                opts.setNamespaces(ns);
+            opts.setNamespaces(ns);
+        }
+    }
+
+    /**
+     * Utility to deal with single value or set of values.
+     * @param value the value or the set
+     * @param vfunc the consumer of values
+     */
+    private void withValueSet(Object value, Consumer<Object> vfunc) {
+        final Set<?> values = value instanceof Set<?>
+                ? (Set<?>) value
+                : Collections.singleton(value);
+        for (final Object o : values) {
+            vfunc.accept(o);
+        }
+    }
+
+    /**
+     * Processes jexl.namespace.ns pragma.
+     * @param ns the namespace map
+     * @param key the key
+     * @param value the value, ie the class
+     */
+    private void processPragmaNamespace(Map<String, Object> ns, String key, Object value) {
+        if (value instanceof String) {
+            // jexl.namespace.***
+            final String nsname = key.substring(PRAGMA_JEXLNS.length());
+            if (!nsname.isEmpty()) {
+                final String nsclass = value.toString();
+                final Class<?> clazz = uberspect.getClassByName(nsclass);
+                if (clazz == null) {
+                    logger.warn(key + ": unable to find class " + nsclass);
+                } else {
+                    ns.put(nsname, clazz);
+                }
             }
-            if (is != null) {
-                opts.setImports(is);
-            }
+        } else {
+            logger.warn(key + ": ambiguous declaration " + value);
+        }
+    }
+
+    /**
+     * Processes jexl.module.ns pragma.
+     * <p>If the value is empty, the namespace will be cleared which may be useful to debug and force unload
+     * the object bound to the namespace.</p>
+     * @param ns the namespace map
+     * @param key the key the namespace
+     * @param value the value, ie the expression to evaluate and its result bound to the namespace
+     * @param info the expression info
+     * @param context the value-as-expression evaluation context
+     */
+    private void processModulePragma(Map<String, Object> ns, String key, Object value, JexlInfo info, JexlContext context) {
+        // jexl.module.***
+        final String module = key.substring(PRAGMA_MODULE.length());
+        if (module.isEmpty()) {
+            logger.warn(module + ": invalid module declaration");
+        } else {
+            withValueSet(value, (o)->{
+                if (!(o instanceof CharSequence)) {
+                    logger.warn(module + ": unable to define module from " + value);
+                } else {
+                    final String moduleSrc = o.toString();
+                    final Object functor = context instanceof JexlContext.ModuleProcessor
+                            ? ((JexlContext.ModuleProcessor) context).processModule(this, info, module, moduleSrc)
+                            : createExpression(info, moduleSrc).evaluate(context);
+                    if (functor != null) {
+                        ns.put(module, functor);
+                    } else {
+                        ns.remove(module);
+                    }
+                }
+            });
         }
     }
 
