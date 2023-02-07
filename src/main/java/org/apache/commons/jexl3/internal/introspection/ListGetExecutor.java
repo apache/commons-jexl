@@ -46,7 +46,8 @@ public final class ListGetExecutor extends AbstractExecutor.Get {
             if (clazz.isArray()) {
                 return new ListGetExecutor(clazz, ARRAY_GET, index);
             }
-            if (List.class.isAssignableFrom(clazz)) {
+            // we still need to ensure permissions grant access to get(...)
+            if (List.class.isAssignableFrom(clazz) && is.getMethod(clazz, "get", index) != null) {
                 return new ListGetExecutor(clazz, LIST_GET, index);
             }
         }

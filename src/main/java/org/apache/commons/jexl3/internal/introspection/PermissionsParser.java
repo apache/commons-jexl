@@ -75,11 +75,22 @@ public class PermissionsParser {
      * @return the permissions map
      */
     public Permissions parse(final String... srcs) {
+        return parse(new LinkedHashSet<>(), new ConcurrentHashMap<>(), srcs);
+    }
+
+    /**
+     * Parses permissions from a source.
+     * @param wildcards the set of allowed packages
+     * @param packages the map of restricted elements
+     * @param srcs the sources
+     * @return the permissions map
+     */
+    Permissions parse(Set<String> wildcards, Map<String, Permissions.NoJexlPackage> packages, final String... srcs) {
         if (srcs == null || srcs.length == 0) {
             return Permissions.UNRESTRICTED;
         }
-        packages = new ConcurrentHashMap<>();
-        wildcards = new LinkedHashSet<>();
+        this.packages = packages;
+        this.wildcards = wildcards;
         for(final String src : srcs) {
             this.src = src;
             this.size = src.length();

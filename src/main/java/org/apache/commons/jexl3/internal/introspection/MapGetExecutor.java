@@ -39,7 +39,8 @@ public final class MapGetExecutor extends AbstractExecutor.Get {
      * @return the executor if found, null otherwise
      */
     public static MapGetExecutor discover(final Introspector is, final Class<?> clazz, final Object identifier) {
-        if (Map.class.isAssignableFrom(clazz)) {
+        // we still need to ensure permissions grant access to get(...)
+        if (Map.class.isAssignableFrom(clazz) && is.getMethod(clazz, "get", identifier) != null) {
             return new MapGetExecutor(clazz, MAP_GET, identifier);
         }
         return null;

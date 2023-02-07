@@ -43,7 +43,8 @@ public final class MapSetExecutor extends AbstractExecutor.Set {
                                           final Class<?> clazz,
                                           final Object identifier,
                                           final Object value) {
-        if (Map.class.isAssignableFrom(clazz)) {
+        // we still need to ensure permissions grant access to put(...)
+        if (Map.class.isAssignableFrom(clazz) && is.getMethod(clazz, "put", identifier, value) != null) {
             return new MapSetExecutor(clazz, MAP_SET, identifier, value);
         }
         return null;

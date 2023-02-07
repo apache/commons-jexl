@@ -131,7 +131,7 @@ public final class Introspector {
      * @return the desired method object
      * @throws MethodKey.AmbiguousException if no unambiguous method could be found through introspection
      */
-    public Method getMethod(final Class<?> c, final String name, final Object[] params) {
+    public Method getMethod(final Class<?> c, final String name, final Object... params) {
         return getMethod(c, new MethodKey(name, params));
     }
 

@@ -16,6 +16,7 @@
  */
 package org.apache.commons.jexl3.introspection;
 
+import org.apache.commons.jexl3.internal.introspection.Permissions;
 import org.apache.commons.jexl3.internal.introspection.PermissionsParser;
 
 import java.lang.reflect.Constructor;
@@ -169,11 +170,20 @@ public interface JexlPermissions {
     }
 
     /**
+     * Compose these permissions with a new set.
+     * <p>This is a convenience method meant to easily give access to the packages JEXL is
+     * used to integrate with.</p>
+     * @param src the new constraints
+     * @return the new permissions
+     */
+    JexlPermissions compose(final String... src);
+
+    /**
      * The unrestricted permissions.
      * <p>This enables any public class, method, constructor or field to be visible to JEXL and used in scripts.</p>
      * @since 3.3
      */
-    JexlPermissions UNRESTRICTED = JexlPermissions.parse(null);
+    JexlPermissions UNRESTRICTED = Permissions.UNRESTRICTED;
     /**
      * A restricted singleton.
      * <p>The RESTRICTED set is built using the following allowed packages and denied packages/classes.</p>

@@ -109,7 +109,7 @@ public class Uberspect implements JexlUberspect {
     protected final Introspector base() {
         Introspector intro = ref.get();
         if (intro == null) {
-            // double checked locking is ok (fixed by Java 5 memory model).
+            // double-checked locking is ok (fixed by Java 5 memory model).
             synchronized (this) {
                 intro = ref.get();
                 if (intro == null) {
@@ -190,8 +190,7 @@ public class Uberspect implements JexlUberspect {
      *
      * @param c      Class in which the method search is taking place
      * @param name   Name of the method being searched for
-     * @param params An array of Objects (not Classes) that describe the
-     *               the parameters
+     * @param params An array of Objects (not Classes) that describe the parameters
      *
      * @return a {@link java.lang.reflect.Method}
      *         or null if no unambiguous method could be found through introspection.
@@ -338,7 +337,7 @@ public class Uberspect implements JexlUberspect {
                         executor = MapSetExecutor.discover(is, claz, identifier, arg);
                         break;
                     case LIST:
-                    // let's see if we can convert the identifier to an int,
+                        // let's see if we can convert the identifier to an int,
                         // if obj is an array or a list, we can still do something
                         final Integer index = AbstractExecutor.castInteger(identifier);
                         if (index != null) {
@@ -373,6 +372,9 @@ public class Uberspect implements JexlUberspect {
     @Override
     @SuppressWarnings("unchecked")
     public Iterator<?> getIterator(final Object obj) {
+        if (!permissions.allow(obj.getClass())) {
+            return null;
+        }
         if (obj instanceof Iterator<?>) {
             return ((Iterator<?>) obj);
         }

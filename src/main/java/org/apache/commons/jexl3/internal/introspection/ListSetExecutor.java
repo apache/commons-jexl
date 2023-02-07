@@ -57,7 +57,9 @@ public final class ListSetExecutor extends AbstractExecutor.Set {
                 return new ListSetExecutor(clazz, ARRAY_SET, index);
                 // }
             }
-            if (List.class.isAssignableFrom(clazz)) {
+            // we still need to ensure permissions grant access to set(...)
+            if (List.class.isAssignableFrom(clazz)
+                && is.getMethod(clazz, "set", index, value) != null) {
                 return new ListSetExecutor(clazz, LIST_SET, index);
             }
         }

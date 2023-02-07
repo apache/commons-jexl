@@ -23,6 +23,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -224,6 +225,16 @@ public class Permissions implements JexlPermissions {
     }
 
     /**
+     * Creates a new set of permissions by composing these permissions with a new set of rules.
+     * @param src the rules
+     * @return the new permissions
+     */
+    @Override
+    public Permissions compose(final String... src) {
+        return new PermissionsParser().parse(new LinkedHashSet<>(allowed),new ConcurrentHashMap<>(packages), src);
+    }
+
+    /**
      * The no-restriction introspection permission singleton.
      */
     public static final Permissions UNRESTRICTED = new Permissions();
@@ -399,15 +410,20 @@ public class Permissions implements JexlPermissions {
         if (deny(clazz)) {
             return false;
         }
-        // all super classes must be allowed
+        // no super class can be denied and at least one must be allowed
+        boolean explicit = wildcardAllow(clazz);
         Class<?> walk = clazz.getSuperclass();
         while (walk != null) {
             if (deny(walk)) {
                 return false;
             }
+            if (!explicit) {
+                explicit = wildcardAllow(walk);
+            }
             walk = walk.getSuperclass();
         }
-        return true;
+        // check wildcards
+        return explicit;
     }
 
     /**
@@ -486,7 +502,7 @@ public class Permissions implements JexlPermissions {
         }
         Class<?> clazz = method.getDeclaringClass();
         // gather if any implementation of the method is explicitly allowed by the packages
-        final boolean[] explicit = {wildcardAllow(clazz)};
+        final boolean[] explicit = { wildcardAllow(clazz) };
         // lets walk all interfaces
         for (final Class<?> inter : clazz.getInterfaces()) {
             if (!allow(inter, method, explicit)) {

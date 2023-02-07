@@ -42,7 +42,7 @@ public final class DuckGetExecutor extends AbstractExecutor.Get {
      * @return the executor if found, null otherwise
      */
     public static DuckGetExecutor discover(final Introspector is, final Class<?> clazz, final Object identifier) {
-        final java.lang.reflect.Method method = is.getMethod(clazz, "get", makeArgs(identifier));
+        final java.lang.reflect.Method method = is.getMethod(clazz, "get", identifier);
         return method == null? null : new DuckGetExecutor(clazz, method, identifier);
     }
 
