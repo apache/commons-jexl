@@ -22,6 +22,9 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -112,6 +115,67 @@ public class PragmaTest extends JexlTestCase {
             Assert.fail("should have thrown");
         } catch (final JexlException xvar) {
             // ok, expected
+        }
+    }
+
+    public static class ModuleContext extends MapContext implements JexlContext.ModuleProcessor {
+        private final ConcurrentMap<String, Object> modules;
+        private final Map<String, JexlScript> sources;
+        private final AtomicInteger count = new AtomicInteger(0);
+
+        ModuleContext(Map<String, JexlScript> sources , ConcurrentMap<String, Object> modules) {
+            this.sources = sources;
+            this.modules = modules;
+        }
+
+        public Object script(String name) {
+            return sources.get(name);
+        }
+
+        public int getCountCompute() {
+            return count.get();
+        }
+        @Override
+        public Object processModule(JexlEngine engine, JexlInfo info, String name, final String body) {
+            if (body.isEmpty()) {
+                modules.remove(name);
+                return null;
+            }
+            return modules.computeIfAbsent(name, (n) -> {
+                Object module = engine.createExpression(info, body).evaluate(this);
+                if (module instanceof JexlScript) {
+                    module = ((JexlScript) module).execute(this);
+                }
+                count.incrementAndGet();
+                return module;
+            });
+        }
+    }
+
+    @Test public void testPragmaModule() {
+        Map<String, JexlScript> msrcs = new TreeMap<>();
+        msrcs.put("module0", JEXL.createScript("function f42(x) { 42 + x; } function f43(x) { 43 + x; }; { 'f42' : f42, 'f43' : f43 }"));
+        ConcurrentMap<String, Object> modules = new ConcurrentHashMap<>();
+        ModuleContext ctxt = new ModuleContext(msrcs, modules);
+        JexlScript script ;
+        Object result ;
+        script = JEXL.createScript("#pragma jexl.module.m0 \"script('module0')\"\n m0:f42(10);");
+        result = script.execute(ctxt);
+        Assert.assertEquals(52, result);
+        Assert.assertEquals(1, ctxt.getCountCompute());
+        result = script.execute(ctxt);
+        Assert.assertEquals(52, result);
+        Assert.assertEquals(1, ctxt.getCountCompute());
+        script = JEXL.createScript("#pragma jexl.module.m0 \"script('module0')\"\n m0:f43(10);");
+        result = script.execute(ctxt);
+        Assert.assertEquals(53, result);
+        Assert.assertEquals(1, ctxt.getCountCompute());
+        try {
+            script = JEXL.createScript("#pragma jexl.module.m0 ''\n#pragma jexl.module.m0 \"fubar('module0')\"\n m0:f43(10);");
+            result = script.execute(ctxt);
+            Assert.fail("fubar sshoud fail");
+        } catch(JexlException.Method xmethod) {
+            Assert.assertEquals("fubar", xmethod.getMethod());
         }
     }
 

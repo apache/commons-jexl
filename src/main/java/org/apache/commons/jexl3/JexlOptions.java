@@ -411,7 +411,7 @@ public final class JexlOptions {
      * @param ns a namespaces map
      */
     public void setNamespaces(final Map<String, Object> ns) {
-        this.namespaces = ns == null? Collections.emptyMap() : ns;
+        this.namespaces = ns == null || ns.isEmpty()? Collections.emptyMap() : ns;
     }
 
     /**
@@ -427,7 +427,7 @@ public final class JexlOptions {
      * @param imports the imported packages
      */
     public void setImports(final Collection<String> imports) {
-        this.imports = imports == null? Collections.emptySet() : imports;
+        this.imports = imports == null || imports.isEmpty()? Collections.emptySet() : imports;
     }
 
     /**
