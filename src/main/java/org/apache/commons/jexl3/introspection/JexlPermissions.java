@@ -16,7 +16,6 @@
  */
 package org.apache.commons.jexl3.introspection;
 
-import org.apache.commons.jexl3.internal.introspection.Permissions;
 import org.apache.commons.jexl3.internal.introspection.PermissionsParser;
 
 import java.lang.reflect.Constructor;
