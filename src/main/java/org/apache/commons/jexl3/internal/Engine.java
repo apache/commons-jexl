@@ -445,10 +445,14 @@ public class Engine extends JexlEngine {
                         opts.setImports(is);
                     }
                 } else if (key.startsWith(PRAGMA_JEXLNS)) {
-                    if (ns == null)  ns = new LinkedHashMap<>(functions);
+                    if (ns == null)  {
+                        ns = new LinkedHashMap<>(functions);
+                    }
                     processPragmaNamespace(ns, key, value);
                 } else if (key.startsWith(PRAGMA_MODULE)) {
-                    if (ns == null)  ns = new LinkedHashMap<>(functions);
+                    if (ns == null)  {
+                        ns = new LinkedHashMap<>(functions);
+                    }
                     processModulePragma(ns, key, value, script.jexlInfo(), context);
                 }
                 if (processor != null) {
