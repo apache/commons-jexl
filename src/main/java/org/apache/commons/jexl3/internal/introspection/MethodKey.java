@@ -688,7 +688,7 @@ public final class MethodKey {
         }
 
         // number of formal and actual differ, method must be vararg
-        if (!method.isVarArgs()) {
+        if (!MethodKey.isVarArgs(method)) {
             return false;
         }
 
