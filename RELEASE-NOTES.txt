@@ -40,6 +40,7 @@ the skill set required to write scripts.
 
 New Features in 3.3:
 ====================
+* JEXL-392:     Enable namespace declaration based on scripts
 * JEXL-391:     Improve in/=~ operator when arguments are arrays and collections
 * JEXL-390:     Pragmas should not be statements
 * JEXL-389:     Improve parsing timings

@@ -522,9 +522,16 @@ public class Engine extends JexlEngine {
                     logger.warn(module + ": unable to define module from " + value);
                 } else {
                     final String moduleSrc = o.toString();
-                    final Object functor = context instanceof JexlContext.ModuleProcessor
-                            ? ((JexlContext.ModuleProcessor) context).processModule(this, info, module, moduleSrc)
-                            : createExpression(info, moduleSrc).evaluate(context);
+                    final Object functor;
+                    if (context instanceof JexlContext.ModuleProcessor) {
+                        final JexlContext.ModuleProcessor processor = (JexlContext.ModuleProcessor) context;
+                        functor = processor.processModule(this, info, module, moduleSrc);
+                    } else {
+                        final Object moduleObject = createExpression(info, moduleSrc).evaluate(context);
+                        functor =  moduleObject instanceof JexlScript
+                                ? ((JexlScript) moduleObject).execute(context)
+                                : moduleObject;
+                    }
                     if (functor != null) {
                         ns.put(module, functor);
                     } else {

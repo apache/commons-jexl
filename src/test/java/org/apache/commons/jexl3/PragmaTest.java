@@ -118,23 +118,28 @@ public class PragmaTest extends JexlTestCase {
         }
     }
 
-    public static class ModuleContext extends MapContext implements JexlContext.ModuleProcessor {
-        private final ConcurrentMap<String, Object> modules;
-        private final Map<String, JexlScript> sources;
-        private final AtomicInteger count = new AtomicInteger(0);
+    public static class ModuleContext extends MapContext {
+        protected final Map<String, JexlScript> sources = new TreeMap<>();
 
-        ModuleContext(Map<String, JexlScript> sources , ConcurrentMap<String, Object> modules) {
-            this.sources = sources;
-            this.modules = modules;
-        }
-
+        ModuleContext() {  }
         public Object script(String name) {
             return sources.get(name);
         }
 
+        void script(String name, JexlScript script) { sources.put(name, script); }
+    }
+
+    public static class CachingModuleContext extends ModuleContext implements JexlContext.ModuleProcessor {
+        private final ConcurrentMap<String, Object> modules = new ConcurrentHashMap<>();
+        private final AtomicInteger count = new AtomicInteger(0);
+
         public int getCountCompute() {
             return count.get();
         }
+
+        CachingModuleContext() {
+        }
+
         @Override
         public Object processModule(JexlEngine engine, JexlInfo info, String name, final String body) {
             if (body.isEmpty()) {
@@ -152,24 +157,36 @@ public class PragmaTest extends JexlTestCase {
         }
     }
 
-    @Test public void testPragmaModule() {
-        Map<String, JexlScript> msrcs = new TreeMap<>();
-        msrcs.put("module0", JEXL.createScript("function f42(x) { 42 + x; } function f43(x) { 43 + x; }; { 'f42' : f42, 'f43' : f43 }"));
+    @Test public void testPragmaModuleNoCache() {
+        ModuleContext ctxt = new ModuleContext();
+        runPragmaModule(ctxt, null);
+    }
+    @Test public void testPragmaModuleCache() {
+        CachingModuleContext ctxt = new CachingModuleContext();
+        runPragmaModule(ctxt, ctxt);
+    }
+    void runPragmaModule(ModuleContext ctxt, CachingModuleContext cmCtxt) {
+        ctxt.script("module0", JEXL.createScript("function f42(x) { 42 + x; } function f43(x) { 43 + x; }; { 'f42' : f42, 'f43' : f43 }"));
         ConcurrentMap<String, Object> modules = new ConcurrentHashMap<>();
-        ModuleContext ctxt = new ModuleContext(msrcs, modules);
         JexlScript script ;
         Object result ;
         script = JEXL.createScript("#pragma jexl.module.m0 \"script('module0')\"\n m0:f42(10);");
         result = script.execute(ctxt);
         Assert.assertEquals(52, result);
-        Assert.assertEquals(1, ctxt.getCountCompute());
+        if (cmCtxt != null) {
+            Assert.assertEquals(1, cmCtxt.getCountCompute());
+        }
         result = script.execute(ctxt);
         Assert.assertEquals(52, result);
-        Assert.assertEquals(1, ctxt.getCountCompute());
+        if (cmCtxt != null) {
+            Assert.assertEquals(1, cmCtxt.getCountCompute());
+        }
         script = JEXL.createScript("#pragma jexl.module.m0 \"script('module0')\"\n m0:f43(10);");
         result = script.execute(ctxt);
         Assert.assertEquals(53, result);
-        Assert.assertEquals(1, ctxt.getCountCompute());
+        if (cmCtxt != null) {
+            Assert.assertEquals(1, cmCtxt.getCountCompute());
+        }
         try {
             script = JEXL.createScript("#pragma jexl.module.m0 ''\n#pragma jexl.module.m0 \"fubar('module0')\"\n m0:f43(10);");
             result = script.execute(ctxt);

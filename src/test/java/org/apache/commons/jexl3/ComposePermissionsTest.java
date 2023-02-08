@@ -69,7 +69,7 @@ public class ComposePermissionsTest extends JexlTestCase {
       Assert.assertEquals("pageInfo", xproperty.getProperty());
     }
 
-    // will not fail since gson package is not explicitely allowed
+    // will not fail since gson objects
     j1 = createEngine(false, JexlPermissions.RESTRICTED);
     s1 = j1.createScript("json.pageInfo.pagePic", "json");
     Object r1 = s1.execute(null, json);

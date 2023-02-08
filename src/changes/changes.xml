@@ -27,6 +27,9 @@
     <body>
         <release version="3.3" date="YYYY-MM-DD">
             <!-- ADD -->
+            <action dev="henrib" type="add" issue="JEXL-392">
+                Enable namespace declaration based on scripts
+            </action>
             <action dev="henrib" type="add" issue="JEXL-391">
                 Improve in/=~ operator when arguments are arrays and collections
             </action>
