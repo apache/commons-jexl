@@ -191,46 +191,6 @@
                     </execution>
                 </executions>
             </plugin>
-<!--
-            <plugin>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <version>3.1.0</version>
-                <executions>
-                    <execution>
-                        <phase>generate-sources</phase>
-                        <configuration>
-                            <target>
-                                <copy todir="/Users/henri.biestro/kShuttle/trunk/trunk/Jexl/src" overwrite='true' verbose='true'>
-                                    -overwrite='true' verbose='true'-
-                                    <fileset dir="src">
-                                        <include name="**/*.java"/>
-                                    </fileset>
-                                    <regexpmapper from="(.*)/org/apache/commons/jexl3/(.*)\.java$$" to="\1/com/nellarmonia/jexl/\2.java"/>
-                                    <filterchain>
-                                        <replacestring from="org.apache.commons.jexl3" to="com.nellarmonia.jexl"/>
-                                        <replacestring from="org.apache.whatever" to="com.nellarmonia.whatever"/>
-                                    </filterchain>
-                                </copy>
-                                <copy todir="/Users/henri.biestro/kShuttle/trunk/trunk/Jexl/src" overwrite='true' verbose='true'>
-                                    -overwrite='true' verbose='true'-
-                                    <fileset dir="src">
-                                        <include name="**/*.jjt"/>
-                                    </fileset>
-                                    <regexpmapper from="(.*)/org/apache/commons/jexl3/(.*)\.jjt$$" to="\1/com/nellarmonia/jexl/\2.jjt"/>
-                                    <filterchain>
-                                        <replacestring from="org.apache.commons.jexl3" to="com.nellarmonia.jexl"/>
-                                        <replacestring from="org.apache.whatever.logging" to="com.nellarmonia.whatever"/>
-                                    </filterchain>
-                                </copy>
-                            </target>
-                        </configuration>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
--->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
