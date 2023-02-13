@@ -528,8 +528,8 @@ public class Engine extends JexlEngine {
                         functor = processor.processModule(this, info, module, moduleSrc);
                     } else {
                         final Object moduleObject = createExpression(info, moduleSrc).evaluate(context);
-                        functor =  moduleObject instanceof JexlScript
-                                ? ((JexlScript) moduleObject).execute(context)
+                        functor =  moduleObject instanceof Script
+                                ? ((Script) moduleObject).execute(context)
                                 : moduleObject;
                     }
                     if (functor != null) {
