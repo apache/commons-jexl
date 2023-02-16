@@ -58,23 +58,6 @@ public final class Frame {
         return scope;
     }
 
-    @Override
-    public int hashCode() {
-        return Arrays.deepHashCode(this.stack);
-    }
-
-    @Override
-    public boolean equals(final Object obj) {
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final Frame other = (Frame) obj;
-        return Arrays.deepEquals(this.stack, other.stack);
-    }
-
     /**
      * Gets a value.
      * @param s the offset in this frame

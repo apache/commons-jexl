@@ -62,38 +62,6 @@ public class Closure extends Script {
     }
 
     @Override
-    public int hashCode() {
-        // CSOFF: Magic number
-        int hash = 17;
-        hash = 31 * hash + (this.jexl != null ? this.jexl.hashCode() : 0);
-        hash = 31 * hash + (this.source != null ? this.source.hashCode() : 0);
-        hash = 31 * hash + (this.frame != null ? this.frame.hashCode() : 0);
-        // CSON: Magic number
-        return hash;
-    }
-
-    @Override
-    public boolean equals(final Object obj) {
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final Closure other = (Closure) obj;
-        if (this.jexl != other.jexl) {
-            return false;
-        }
-        if (!Objects.equals(this.source, other.source)) {
-            return false;
-        }
-        if (!Objects.equals(this.frame, other.frame)) {
-            return false;
-        }
-        return true;
-    }
-
-    @Override
     public String[] getUnboundParameters() {
         return frame.getUnboundParameters();
     }

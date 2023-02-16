@@ -24,6 +24,7 @@ import org.junit.Test;
 
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.math.MathContext;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -31,6 +32,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -1171,6 +1173,67 @@ public class Issues300Test {
         script = jexl.createScript(src);
         Object result = script.execute(null);
         debuggerCheck(jexl);
+    }
+
+    public static class Arithmetic384c extends JexlArithmetic {
+        AtomicInteger cmp = new AtomicInteger(0);
+        int getCmpCalls() {
+            return cmp.get();
+        }
+        public Arithmetic384c(boolean astrict) {
+            super(astrict);
+        }
+        public Arithmetic384c(boolean astrict, MathContext bigdContext, int bigdScale) {
+            super(astrict, bigdContext, bigdScale);
+        }
+        @Override
+        protected int compare(Object l, Object r, String op) {
+            cmp.incrementAndGet();
+            return super.compare(l, r, op);
+        }
+    }
+
+    public static class Arithmetic384d extends Arithmetic384c {
+        public Arithmetic384d(boolean astrict) {
+            super(astrict);
+        }
+        public Arithmetic384d(boolean astrict, MathContext bigdContext, int bigdScale) {
+            super(astrict, bigdContext, bigdScale);
+        }
+    }
+
+    @Test
+    public void test384c() {
+        Arithmetic384c ja = new Arithmetic384c(true);
+        JexlEngine jexl = new JexlBuilder()
+                .safe(false)
+                .strict(true)
+                .arithmetic(ja)
+                .create();
+        Assert.assertTrue(ja.toBoolean(jexl.createExpression("3 < 4").evaluate(null)));
+        Assert.assertTrue(ja.toBoolean(jexl.createExpression("6 <= 8").evaluate(null)));
+        Assert.assertFalse(ja.toBoolean(jexl.createExpression("6 == 7").evaluate(null)));
+        Assert.assertTrue(ja.toBoolean(jexl.createExpression("4 > 2").evaluate(null)));
+        Assert.assertTrue(ja.toBoolean(jexl.createExpression("8 > 6").evaluate(null)));
+        Assert.assertTrue(ja.toBoolean(jexl.createExpression("7 != 6").evaluate(null)));
+        Assert.assertEquals(6, ja.getCmpCalls());
+    }
+
+    @Test
+    public void test384d() {
+        Arithmetic384c ja = new Arithmetic384d(true);
+        JexlEngine jexl = new JexlBuilder()
+                .safe(false)
+                .strict(true)
+                .arithmetic(ja)
+                .create();
+        Assert.assertTrue(ja.toBoolean(jexl.createExpression("3 < 4").evaluate(null)));
+        Assert.assertTrue(ja.toBoolean(jexl.createExpression("6 <= 8").evaluate(null)));
+        Assert.assertFalse(ja.toBoolean(jexl.createExpression("6 == 7").evaluate(null)));
+        Assert.assertTrue(ja.toBoolean(jexl.createExpression("4 > 2").evaluate(null)));
+        Assert.assertTrue(ja.toBoolean(jexl.createExpression("8 > 6").evaluate(null)));
+        Assert.assertTrue(ja.toBoolean(jexl.createExpression("7 != 6").evaluate(null)));
+        Assert.assertEquals(6, ja.getCmpCalls());
     }
 
 }

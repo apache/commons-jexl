@@ -22,6 +22,7 @@ import org.apache.commons.jexl3.introspection.JexlMethod;
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.MathContext;
@@ -61,8 +62,8 @@ public class JexlArithmetic {
 
     /** Marker class for null operand exceptions. */
     public static class NullOperand extends ArithmeticException {
-
-        private static final long serialVersionUID = 1L;}
+        private static final long serialVersionUID = 1L;
+    }
 
     /** Double.MAX_VALUE as BigDecimal. */
     protected static final BigDecimal BIGD_DOUBLE_MAX_VALUE = BigDecimal.valueOf(Double.MAX_VALUE);
@@ -1873,6 +1874,8 @@ public class JexlArithmetic {
     }
 
     /**
+     * Any override of this method (pre 3.3) should be modified to match the new signature.
+     * @link JexlArithmetic.compare(String, String, JexlOperator);
      * @deprecated 3.3
      */
     @Deprecated
@@ -1884,7 +1887,27 @@ public class JexlArithmetic {
             // ignore
             operator = JexlOperator.EQ;
         }
-        return compare(left, right, operator);
+        return doCompare(left, right, operator);
+    }
+
+    /**
+     * Determines if the compare method(Object, Object, String) is overriden in this class or one of its
+     * superclasses.
+     */
+    private final boolean compare321 = computeCompare321(this);
+    private static boolean computeCompare321(final JexlArithmetic arithmetic) {
+        Class<?> arithmeticClass = arithmetic.getClass();
+        while(arithmeticClass != JexlArithmetic.class) {
+            try {
+                Method cmp = arithmeticClass.getDeclaredMethod("compare", Object.class, Object.class, String.class);
+               if (cmp != null && cmp.getDeclaringClass() != JexlArithmetic.class) {
+                   return true;
+               }
+            } catch (NoSuchMethodException xany) {
+                arithmeticClass = arithmeticClass.getSuperclass();
+            }
+        }
+        return false;
     }
 
     /**
@@ -1897,6 +1920,14 @@ public class JexlArithmetic {
      * @throws ArithmeticException if either left or right is null
      */
     protected int compare(final Object left, final Object right, final JexlOperator operator) {
+        // this is a temporary way of allowing pre-3.3 code that overrode compare() to still call
+        // the user method. This method will merge with doCompare in 3.4 and the compare321 flag will disappear.
+        return compare321
+                ? compare(left, right, operator.toString())
+                : doCompare(left, right, operator);
+    }
+
+    private int doCompare(final Object left, final Object right, final JexlOperator operator) {
         final boolean strictCast = isStrict(operator);
         if (left != null && right != null) {
             if (left instanceof BigDecimal || right instanceof BigDecimal) {
