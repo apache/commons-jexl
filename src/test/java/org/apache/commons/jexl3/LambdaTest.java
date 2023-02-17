@@ -16,6 +16,7 @@
  */
 package org.apache.commons.jexl3;
 
+import org.apache.commons.jexl3.internal.Closure;
 import org.apache.commons.jexl3.internal.Script;
 import org.junit.Assert;
 import org.junit.Test;
@@ -145,6 +146,24 @@ public class LambdaTest extends JexlTestCase {
         Assert.assertEquals(42, result);
         result = s15b.call();
         Assert.assertEquals(42, result);
+    }
+
+    @Test
+    public void testCompareLambdaRecurse() throws Exception {
+        final JexlEngine jexl = createEngine();
+        final String factSrc = "function fact(x) { x < 2? 1 : x * fact(x - 1) }";
+        final JexlScript fact0 = jexl.createScript(factSrc);
+        final JexlScript fact1 = jexl.createScript(fact0.toString());
+        Assert.assertEquals(fact0, fact1);
+        Closure r0 = (Closure) fact0.execute(null);
+        Closure r1 = (Closure) fact1.execute(null);
+        Assert.assertEquals(720, r0.execute(null, 6));
+        Assert.assertEquals(720, r1.execute(null, 6));
+        Assert.assertEquals(r0, r1);
+        Assert.assertEquals(r1, r0);
+        // ensure we did not break anything through equals
+        Assert.assertEquals(720, r0.execute(null, 6));
+        Assert.assertEquals(720, r1.execute(null, 6));
     }
 
     @Test

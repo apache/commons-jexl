@@ -43,6 +43,27 @@ public final class Frame {
     }
 
     /**
+     * Replace any instance of a closure in this stack by its (fuzzy encoded) offset in it.
+     * <p>This is to avoid the cyclic dependency between the closure and its frame stack that
+     * may point back to it that occur with recursive function definitions.</p>
+     * @param closure the owning closure
+     * @return the cleaned-up stack or the stack itself (most of the time)
+     */
+    Object[] nocycleStack(Closure closure) {
+        Object[] ns = stack;
+        for(int i = 0; i < stack.length; ++i) {
+            if (stack[i] == closure) {
+                if (ns == stack) {
+                    ns = stack.clone();
+                }
+                // fuzz it a little
+                ns[i] = Closure.class.hashCode() + i;
+            }
+        }
+        return ns;
+    }
+
+    /**
      * Gets this script unbound parameters, i.e. parameters not bound through curry().
      * @return the parameter names
      */
