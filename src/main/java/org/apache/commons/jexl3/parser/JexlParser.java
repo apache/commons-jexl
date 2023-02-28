@@ -140,6 +140,7 @@ public abstract class JexlParser extends StringParser {
         loopCount = 0;
         blocks.clear();
         block = null;
+        blockScopes.clear();
         this.setFeatures(features);
     }
 
