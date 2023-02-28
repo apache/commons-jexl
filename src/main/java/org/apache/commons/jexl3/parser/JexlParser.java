@@ -30,6 +30,7 @@ import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.Deque;
 import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
@@ -87,6 +88,10 @@ public abstract class JexlParser extends StringParser {
      * Stack of lexical blocks.
      */
     protected final Deque<LexicalUnit> blocks = new ArrayDeque<>();
+    /**
+     * The map of lexical to functional blocks.
+     */
+    protected final Map<LexicalUnit, Scope> blockScopes = new IdentityHashMap<>();
 
     /**
      * A lexical unit is the container defining local symbols and their
@@ -260,6 +265,7 @@ public abstract class JexlParser extends StringParser {
      * @param unit the new lexical unit
      */
     protected void pushUnit(final LexicalUnit unit) {
+        blockScopes.put(unit, scope);
         if (block != null) {
             blocks.push(block);
         }
@@ -272,6 +278,7 @@ public abstract class JexlParser extends StringParser {
      */
     protected void popUnit(final LexicalUnit unit) {
         if (block == unit){
+            blockScopes.remove(unit);
             if (!blocks.isEmpty()) {
                 block = blocks.pop();
             } else {
@@ -629,7 +636,10 @@ public abstract class JexlParser extends StringParser {
      * @param node the node
      */
     protected void jjtreeOpenNodeScope(final JexlNode node) {
-        // nothing
+//        if (node instanceof ASTBlock || node instanceof ASTForeachStatement) {
+//            final LexicalUnit unit = (LexicalUnit) node;
+//            unit.setScope(scope);
+//        }
     }
 
     /**
@@ -662,9 +672,7 @@ public abstract class JexlParser extends StringParser {
             }
             if (lv instanceof ASTIdentifier && !(lv instanceof ASTVar)) {
                 final ASTIdentifier var = (ASTIdentifier) lv;
-                final int symbol = var.getSymbol();
-                final boolean isconst = symbol >= 0 && block != null && block.isConstant(symbol);
-                if (isconst) { // if constant, fail...
+                if (isConstant(var.getSymbol())) { // if constant, fail...
                     JexlInfo xinfo = lv.jexlInfo();
                     xinfo = info.at(xinfo.getLine(), xinfo.getColumn());
                     throw new JexlException.Assignment(xinfo, var.getName()).clean();
@@ -673,6 +681,37 @@ public abstract class JexlParser extends StringParser {
         }
         // heavy check
         featureController.controlNode(node);
+    }
+
+    /**
+     * Checks whether a symbol has been declared as a const in the current stack of lexical units.
+     * @param symbol the symbol
+     * @return true if constant, false otherwise
+     */
+    private boolean isConstant(int symbol) {
+        if (symbol >= 0) {
+            if (block != null && block.isConstant(symbol)) {
+                return true;
+            }
+            Scope blockScope = blockScopes.get(block);
+            for (LexicalUnit unit : blocks) {
+                Scope unitScope = blockScopes.get(unit);
+                // follow through potential capture
+                if (blockScope != unitScope) {
+                    int cs = blockScope.getCaptureDeclaration(symbol);
+                    if (cs >= 0) {
+                        symbol = cs;
+                    }
+                    if (unitScope != null) {
+                        blockScope = unitScope;
+                    }
+                }
+                if (unit.isConstant(symbol)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /**

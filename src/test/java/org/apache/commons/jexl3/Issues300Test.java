@@ -1236,4 +1236,23 @@ public class Issues300Test {
         Assert.assertEquals(6, ja.getCmpCalls());
     }
 
+    @Test
+    public void test393() {
+        String src = "const total = 0;\n" +
+                "if (true) {\n" +
+                "  total = 1;\n" +
+                "}\n" +
+                "total; ";
+        JexlEngine jexl = new JexlBuilder()
+                .safe(false)
+                .strict(true)
+                .create();
+        try {
+            JexlScript script = jexl.createScript(src);
+            Assert.fail("should fail on const total assignment");
+        } catch(JexlException.Parsing xparse) {
+            Assert.assertTrue(xparse.getMessage().contains("total"));
+        }
+
+    }
 }

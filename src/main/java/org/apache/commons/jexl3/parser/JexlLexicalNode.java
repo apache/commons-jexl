@@ -22,11 +22,9 @@ import org.apache.commons.jexl3.internal.LexicalScope;
  * Base class for AST nodes behaving as lexical units.
  * @since 3.2
  */
-public class JexlLexicalNode extends JexlNode implements JexlParser.LexicalUnit {
-    /**
-     *
-     */
+public abstract class JexlLexicalNode extends JexlNode implements JexlParser.LexicalUnit {
     private static final long serialVersionUID = 1L;
+    /** The local lexical scope, local information about let/const. */
     private LexicalScope lexicalScope = null;
 
     public JexlLexicalNode(final int id) {
@@ -69,7 +67,6 @@ public class JexlLexicalNode extends JexlNode implements JexlParser.LexicalUnit 
     public LexicalScope getLexicalScope() {
         return lexicalScope;
     }
-
 
     @Override
     public void jjtClose() {

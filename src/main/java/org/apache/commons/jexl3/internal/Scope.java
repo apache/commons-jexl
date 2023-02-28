@@ -239,7 +239,7 @@ public final class Scope {
     }
 
     /**
-     * Gets the captured index of a given symbol, ie the target index of a symbol in a child frame.
+     * Gets the captured index of a given symbol, ie the target index of a symbol in a child scope.
      * @param symbol the symbol index
      * @return the target symbol index or null if the symbol is not captured
      */
@@ -253,6 +253,16 @@ public final class Scope {
             }
         }
         return null;
+    }
+
+    /**
+     * Gets the index of a captured symbol, ie the source index of a symbol in a parent scope.
+     * @param symbol the symbol index
+     * @return the source symbol index or -1 if the symbol is not captured
+     */
+    public int getCaptureDeclaration(final int symbol) {
+        Integer declared = capturedVariables != null? capturedVariables.get(symbol)  : null;
+        return declared != null? declared.intValue() : -1;
     }
 
     /**

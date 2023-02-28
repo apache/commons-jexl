@@ -20,10 +20,8 @@ package org.apache.commons.jexl3.parser;
  * Declares a for each loop.
  */
 public class ASTForeachStatement extends JexlLexicalNode {
-    /**
-     *
-     */
     private static final long serialVersionUID = 1L;
+    /** for(:)=0 vs for(;;)=1|2|4 form. */
     private int loopForm;
 
     void setLoopForm(final int form) {
