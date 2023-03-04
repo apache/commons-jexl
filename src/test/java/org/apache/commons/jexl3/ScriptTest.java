@@ -16,16 +16,11 @@
  */
 package org.apache.commons.jexl3;
 
-import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpHandler;
-import com.sun.net.httpserver.HttpServer;
-import org.junit.Assert;
-import org.junit.Test;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
@@ -33,6 +28,13 @@ import java.net.URL;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.function.Function;
+
+import org.junit.Assert;
+import org.junit.Test;
+
+import com.sun.net.httpserver.HttpExchange;
+import com.sun.net.httpserver.HttpHandler;
+import com.sun.net.httpserver.HttpServer;
 
 /**
  * Tests for JexlScript
@@ -173,9 +175,9 @@ public class ScriptTest extends JexlTestCase {
         int responseCode = con.getResponseCode();
         InputStream inputStream = null;
         inputStream =  con.getInputStream();
-        StringBuffer response = new java.lang.StringBuffer();
+        StringBuilder response = new StringBuilder();
         if (inputStream != null) {
-            try (BufferedReader in = new java.io.BufferedReader(new java.io.InputStreamReader(inputStream))) {
+            try (BufferedReader in = new BufferedReader(new InputStreamReader(inputStream))) {
                 String inputLine = "";
                 while ((inputLine = in.readLine()) != null) {
                     response.append(inputLine);

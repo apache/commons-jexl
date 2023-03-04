@@ -1104,7 +1104,7 @@ public final class TemplateEngine extends JxltEngine {
             private CharSequence next = doNext();
 
             private CharSequence doNext() {
-                final StringBuffer strb = new StringBuffer(64); // CSOFF: MagicNumber
+                final StringBuilder strb = new StringBuilder(64); // CSOFF: MagicNumber
                 int c;
                 boolean eol = false;
                 try {
