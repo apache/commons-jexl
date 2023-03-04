@@ -55,7 +55,7 @@
         <ul>
           <li>An <a href="https://commons.apache.org/jexl/apidocs/org/apache/commons/jexl3/JexlEngine.html">engine</a> to create expressions,</li>
           <li>A <a href="https://commons.apache.org/jexl/apidocs/org/apache/commons/jexl3/JexlContext.html">context</a> containing any variables, and</li>
-          <li>An <a href="https://commons.apache.org/jexl/apidocs/org/apache/commons/jexl3/Expression.html">expression</a></li>
+          <li>An <a href="https://commons.apache.org/jexl/apidocs/org/apache/commons/jexl3/JexlExpression.html">expression</a></li>
         </ul>
       </p>
       <p>

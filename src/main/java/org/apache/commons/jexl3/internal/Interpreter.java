@@ -667,7 +667,7 @@ public class Interpreter extends InterpreterBase {
             /* last child node is the statement to execute */
             final int numChildren = node.jjtGetNumChildren();
             final JexlNode statement = numChildren >= 3 ? node.jjtGetChild(numChildren - 1) : null;
-            // get an iterator for the collection/array etc via the introspector.
+            // get an iterator for the collection/array/etc. via the introspector.
             forEach = operators.tryOverload(node, JexlOperator.FOR_EACH, iterableValue);
             final Iterator<?> itemsIterator = forEach instanceof Iterator
                     ? (Iterator<?>) forEach
@@ -1395,7 +1395,7 @@ public class Interpreter extends InterpreterBase {
     }
 
     /**
-     * Executes an assignment with an optional side-effect operator.
+     * Executes an assignment with an optional side effect operator.
      * @param node     the node
      * @param assignop the assignment operator or null if simply assignment
      * @param data     the data
@@ -1529,7 +1529,7 @@ public class Interpreter extends InterpreterBase {
                 : null;
         final Object property;
         if (propertyId != null) {
-            // deal with creating/assignining antish variable
+            // deal with creating/assigning antish variable
             if (antish && ant != null && object == null && !propertyId.isSafe() && !propertyId.isExpression()) {
                 ant.append('.');
                 ant.append(propertyId.getName());
@@ -1537,7 +1537,7 @@ public class Interpreter extends InterpreterBase {
                 if (assignop == null) {
                     setContextVariable(propertyNode, name, right);
                 } else {
-                    final Object self = actual = context.get(ant.toString());
+                    final Object self = context.get(ant.toString());
                     final JexlNode pnode = propertyNode;
                     final Consumer<Object> assign = r -> setContextVariable(pnode, name, r);
                     actual = operators.tryAssignOverload(node, assignop, assign, self, right);
@@ -1606,7 +1606,7 @@ public class Interpreter extends InterpreterBase {
     /**
      * Execute a method call, ie syntactically written as name.call(...).
      * @param node the actual method call node
-     * @param antish non null when name.call is an antish variable
+     * @param antish non-null when name.call is an antish variable
      * @param data the context
      * @return the method call result
      */

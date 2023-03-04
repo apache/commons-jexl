@@ -85,7 +85,7 @@ public class PermissionsParser {
      * @param srcs the sources
      * @return the permissions map
      */
-    Permissions parse(Set<String> wildcards, Map<String, Permissions.NoJexlPackage> packages, final String... srcs) {
+    synchronized Permissions parse(Set<String> wildcards, Map<String, Permissions.NoJexlPackage> packages, final String... srcs) {
         if (srcs == null || srcs.length == 0) {
             return Permissions.UNRESTRICTED;
         }

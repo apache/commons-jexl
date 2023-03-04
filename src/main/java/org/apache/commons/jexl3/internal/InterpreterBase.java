@@ -81,7 +81,7 @@ public abstract class InterpreterBase extends ParserVisitor {
     protected final Operators operators;
     /** The map of 'prefix:function' to object resolving as namespaces. */
     protected final Map<String, Object> functions;
-    /** The map of dynamically creates namespaces, NamespaceFunctor or duck-types of those. */
+    /** The map of dynamically created namespaces, NamespaceFunctor or duck-types of those. */
     protected Map<String, Object> functors;
 
     /**
@@ -114,8 +114,7 @@ public abstract class InterpreterBase extends ParserVisitor {
             acancel = ((JexlContext.CancellationHandle) context).getCancellation();
         }
         this.cancelled = acancel != null? acancel : new AtomicBoolean(false);
-        final Map<String,Object> ons = options.getNamespaces();
-        this.functions = ons.isEmpty()? jexl.functions : ons;
+        this.functions = options.getNamespaces();
         this.functors = null;
         this.operators = new Operators(this);
         // the import package facility
@@ -176,7 +175,7 @@ public abstract class InterpreterBase extends ParserVisitor {
      * Resolves a namespace, eventually allocating an instance using context as constructor argument.
      * <p>
      * The lifetime of such instances span the current expression or script evaluation.</p>
-     * @param prefix the prefix name (may be null for global namespace)
+     * @param prefix the prefix name (can be null for global namespace)
      * @param node   the AST node
      * @return the namespace instance
      */
@@ -195,6 +194,9 @@ public abstract class InterpreterBase extends ParserVisitor {
         namespace = ns.resolveNamespace(prefix);
         if (namespace == null) {
             namespace = functions.get(prefix);
+            if (namespace == null) {
+                namespace = jexl.getNamespace(prefix);
+            }
             if (prefix != null && namespace == null) {
                 throw new JexlException(node, "no such function namespace " + prefix, null);
             }

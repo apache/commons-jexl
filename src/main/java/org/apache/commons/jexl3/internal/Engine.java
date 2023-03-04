@@ -215,7 +215,8 @@ public class Engine extends JexlEngine {
         options.setMathContext(arithmetic.getMathContext());
         options.setMathScale(arithmetic.getMathScale());
         options.setStrictArithmetic(arithmetic.isStrict());
-        this.functions = conf.namespaces() == null ? Collections.emptyMap() : conf.namespaces();
+        final Map<String, Object> ns = conf.namespaces();
+        this.functions = ns == null || ns.isEmpty()? Collections.emptyMap() : ns; // should we make a copy?
         this.classNameSolver = new FqcnResolver(uberspect, conf.imports());
         // parsing & features:
         final JexlFeatures features = conf.features() == null? DEFAULT_FEATURES : conf.features();
@@ -334,6 +335,15 @@ public class Engine extends JexlEngine {
     }
 
     /**
+     * Solves a namespace using this engine map of functions.
+     * @param name the namespoce name
+     * @return the object associated
+     */
+    final Object getNamespace(String name) {
+        return functions.get(name);
+    }
+
+    /**
      * Solves an optional option.
      * @param conf the option as configured, may be null
      * @param def the default value if null, shall not be null
@@ -446,16 +456,17 @@ public class Engine extends JexlEngine {
                     }
                 } else if (key.startsWith(PRAGMA_JEXLNS)) {
                     if (ns == null)  {
-                        ns = new LinkedHashMap<>(functions);
+                        ns = new LinkedHashMap<>();
                     }
                     processPragmaNamespace(ns, key, value);
                 } else if (key.startsWith(PRAGMA_MODULE)) {
                     if (ns == null)  {
-                        ns = new LinkedHashMap<>(functions);
+                        ns = new LinkedHashMap<>();
                     }
                     processModulePragma(ns, key, value, script.jexlInfo(), context);
                 }
                 if (processor != null) {
+                    opts.setNamespaces(ns);
                     processor.processPragma(opts, key, value);
                 }
             }
@@ -466,14 +477,14 @@ public class Engine extends JexlEngine {
     /**
      * Utility to deal with single value or set of values.
      * @param value the value or the set
-     * @param vfunc the consumer of values
+     * @param consumer the consumer of values
      */
-    private void withValueSet(Object value, Consumer<Object> vfunc) {
+    private void withValueSet(Object value, Consumer<Object> consumer) {
         final Set<?> values = value instanceof Set<?>
                 ? (Set<?>) value
                 : Collections.singleton(value);
         for (final Object o : values) {
-            vfunc.accept(o);
+            consumer.accept(o);
         }
     }
 

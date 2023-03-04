@@ -110,7 +110,8 @@ public abstract class JexlNode extends SimpleNode {
         if (value instanceof JexlPropertyGet
             || value instanceof JexlPropertySet
             || value instanceof JexlMethod
-            || value instanceof Funcall ) {
+            || value instanceof Funcall
+            || value instanceof Class  ) {
             jjtSetValue(null);
         }
         for (int n = 0; n < jjtGetNumChildren(); ++n) {

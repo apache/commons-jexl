@@ -930,7 +930,7 @@ public class LexicalTest {
     }
 
     @Test
-    public void testConstb0() {
+    public void testConst0b() {
         final JexlFeatures f = new JexlFeatures();
         final JexlEngine jexl = new JexlBuilder().strict(true).create();
         final JexlScript script = jexl.createScript(

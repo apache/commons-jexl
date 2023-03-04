@@ -695,19 +695,20 @@ public abstract class JexlParser extends StringParser {
                 return true;
             }
             Scope blockScope = blockScopes.get(block);
+            int lexical = symbol;
             for (LexicalUnit unit : blocks) {
                 Scope unitScope = blockScopes.get(unit);
                 // follow through potential capture
                 if (blockScope != unitScope) {
-                    int cs = blockScope.getCaptureDeclaration(symbol);
-                    if (cs >= 0) {
-                        symbol = cs;
+                    int declared = blockScope.getCaptureDeclaration(lexical);
+                    if (declared >= 0) {
+                        lexical = declared;
                     }
                     if (unitScope != null) {
                         blockScope = unitScope;
                     }
                 }
-                if (unit.isConstant(symbol)) {
+                if (unit.isConstant(lexical)) {
                     return true;
                 }
             }
