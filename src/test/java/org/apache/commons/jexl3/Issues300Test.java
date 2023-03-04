@@ -1253,6 +1253,27 @@ public class Issues300Test {
         } catch(JexlException.Parsing xparse) {
             Assert.assertTrue(xparse.getMessage().contains("total"));
         }
+    }
 
+    @Test public void testDow() {
+        String src = "(y, m, d)->{\n" +
+                "// will return 0 for Sunday, 6 for Saturday\n" +
+                "const t = [0, 3, 2, 5, 0, 3, 5, 1, 4, 6, 2, 4];\n"+
+                "if (m < 3) { --y }\n" +
+                "(y + y/4 - y/100 + y/400 + t[m-1] + d) % 7;\n" +
+            "}";
+        JexlEngine jexl = new JexlBuilder()
+                .safe(false)
+                .strict(true)
+                .create();
+            JexlScript script = jexl.createScript(src);
+            Object r = script.execute(null, 2023, 3, 1);
+            Assert.assertTrue(r instanceof Number);
+            Number dow = (Number) r;
+            Assert.assertEquals(3, dow.intValue());
+            r = script.execute(null, 1969, 7, 20);
+            Assert.assertTrue(r instanceof Number);
+            dow = (Number) r;
+            Assert.assertEquals(0, dow.intValue());
     }
 }
