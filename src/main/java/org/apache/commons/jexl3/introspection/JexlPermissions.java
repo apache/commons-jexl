@@ -21,6 +21,7 @@ import org.apache.commons.jexl3.internal.introspection.PermissionsParser;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 
 /**
  * This interface describes permissions used by JEXL introspection that constrain which
@@ -246,4 +247,113 @@ public interface JexlPermissions {
             "java.nio { Path { } Paths { } Files { } }",
             "java.rmi"
     );
+
+    /**
+     * Checks that a package is valid for permission check.
+     * @param pack the palcaga
+     * @return true if the class is not null, false otherwise
+     */
+    default boolean validate(final Package pack) {
+        return pack != null;
+    }
+
+    /**
+     * Checks that a class is valid for permission check.
+     * @param clazz the class
+     * @return true if the class is not null, false otherwise
+     */
+    default boolean validate(final Class<?> clazz) {
+        return clazz != null;
+    }
+
+    /**
+     * Checks that a constructor is valid for permission check.
+     * @param ctor the constructor
+     * @return true if constructor is not null and public, false otherwise
+     */
+    default boolean validate(final Constructor<?> ctor) {
+        if (ctor == null) {
+            return false;
+        }
+        // field must be public
+        if (!Modifier.isPublic(ctor.getModifiers())) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Checks that a method is valid for permission check.
+     * @param method the method
+     * @return true if method is not null, public, ,ot-synthetic, not-bridge, false otherwise
+     */
+    default boolean validate(final Method method) {
+        if (method == null) {
+            return false;
+        }
+        // method must be public
+        if (!Modifier.isPublic(method.getModifiers()) || method.isBridge() || method.isSynthetic()) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Checks that a field is valid for permission check.
+     * @param field the constructor
+     * @return true if field is not null and public, false otherwise
+     */
+    default boolean validate(final Field field) {
+        if (field == null) {
+            return false;
+        }
+        // field must be public
+        if (!Modifier.isPublic(field.getModifiers())) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * A base for permission delegation allowing greater functional malleability.
+     * Overloads should call the appropriate validate() method early in their body.
+     */
+     class Delegate implements JexlPermissions {
+         /** The permissions we delegate to. */
+        protected final JexlPermissions base;
+
+        protected Delegate(JexlPermissions delegate) {
+            base = delegate;
+        }
+
+        @Override
+        public boolean allow(Package pack) {
+            return base.allow(pack);
+        }
+
+        @Override
+        public boolean allow(Class<?> clazz) {
+            return base.allow(clazz);
+        }
+
+        @Override
+        public boolean allow(Constructor<?> ctor) {
+            return base.allow(ctor);
+        }
+
+        @Override
+        public boolean allow(Method method) {
+            return base.allow(method);
+        }
+
+        @Override
+        public boolean allow(Field field) {
+            return base.allow(field);
+        }
+
+        @Override
+        public JexlPermissions compose(String... src) {
+            return new Delegate(base.compose(src));
+        }
+    }
 }

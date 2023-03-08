@@ -33,6 +33,8 @@ constructs seen in shell-script or ECMAScript.
 <br/>
 Its goal is to expose scripting features usable by technical operatives or consultants
 working with enterprise platforms.
+In many use cases, JEXL allows end-users of an application to code their own scripts or expressions
+and ensure their execution within controlled functional constraints.
             </p>
             <p>
             The library exposes a small footprint API
@@ -81,20 +83,21 @@ working with enterprise platforms.
             introspection to expose property getters and setters. It also considers public class fields
             as properties and allows to invoke any accessible method.
             </p>
-            <p>
-            JEXL attempts to bring some of the lessons learned by the Velocity
-            community about expression languages in templating to a wider audience.
-                <a href="https://commons.apache.org/jelly">Commons Jelly</a> needed
-            Velocity-ish method access, it just had to have it.
-            </p>
-            <p>
-            It must be noted that JEXL is <strong>not</strong> a compatible implementation of EL as defined
-            in JSTL 1.1 (JSR-052) or JSP 2.0 (JSR-152). For a compatible implementation of
-            these specifications, see the <a href="https://commons.apache.org/el">Commons EL</a> project.
-            </p>
         </section>
 
-        <section name="A Brief Example">
+        <section name="A Detailed Example">
+            <p>
+                To create expressions and scripts, a
+                <a href="apidocs/org/apache/commons/jexl3/JexlEngine.html">JexlEngine</a> is required.
+                To instantiate one, a <a href="apidocs/org/apache/commons/jexl3/JexlBuilder.html">JexlBuilder</a>
+                is needed to describe the allowed <a href="apidocs/org/apache/commons/jexl3/introspection/JexlPermissions.html">JexlPermissions</a>
+                and <a href="apidocs/org/apache/commons/jexl3/JexlFeatures.html">JexlFeatures</a> that will determine
+                which classes and methods scripts can access and call and which syntactic elements
+                scripts are allowed to use. Do not overlook this configuration aspect,
+                especially the permissions since <strong>security of your application</strong> might depend on it.
+                Once built, the JEXL engine should be stored, shared and reused.
+                It is thread-safe ; so are the scripts during evaluation.
+            </p>
             <p>
             When evaluating expressions, JEXL merges an
                 <a href="apidocs/org/apache/commons/jexl3/JexlExpression.html">JexlExpression</a>
@@ -102,34 +105,122 @@ working with enterprise platforms.
                 <a href="apidocs/org/apache/commons/jexl3/JexlScript.html">JexlScript</a>
             with a
                 <a href="apidocs/org/apache/commons/jexl3/JexlContext.html">JexlContext</a>.
-            An Expression is created using
-                <a href="apidocs/org/apache/commons/jexl3/JexlEngine.html#createExpression(java.lang.String)">JexlEngine#createExpression()</a>,
+            In its simplest form, a script is created using
+                <a href="apidocs/org/apache/commons/jexl3/JexlEngine.html#createScript(java.lang.String)">JexlEngine#createExpression()</a>,
             passing a String containing valid JEXL syntax.  A simple JexlContext can be created by instantiating a
                 <a href="apidocs/org/apache/commons/jexl3/MapContext.html">MapContext</a>;
             a map of variables that will be internally wrapped can be optionally provided through its constructor.
-            The following example, takes a variable named foo, and invokes the bar() method on the property innerFoo:
             </p>
+            <p>
+                JEXL's intention is a tight integration with its hosting platform; the scripting syntax is very close
+                to JScript but leverages (potentially) any public class or method that Java exposes. How tight and how
+                rich this integration is up to you; deriving JEXL API classes - most notably JexlPermissions, JexlContext,
+                JexlArithmetic - are the means to that end.
+            </p>
+            <p>The following example illustrate these aspects. It uses a specific set of permissions to allow using
+            URI class and a tailored context to expose streams in a convenient manner.</p>
 
             <source><![CDATA[
-    // Create or retrieve an engine
-    JexlEngine jexl = new JexlBuilder().create();
-    
-    // Create an expression
-    String jexlExp = "foo.innerFoo.bar()";
-    JexlExpression e = jexl.createExpression( jexlExp );
-    
-    // Create a context and add data
-    JexlContext jc = new MapContext();
-    jc.set("foo", new Foo() );
-    
-    // Now evaluate the expression, getting the result
-    Object o = e.evaluate(jc);]]></source>
+
+/**
+ * A test around scripting streams.
+ */
+public class StreamTest {
+    /** Our engine instance. */
+    private final JexlEngine jexl;
+
+    public StreamTest() {
+        // Restricting features; no loops, no side effects
+        JexlFeatures features = new JexlFeatures()
+                .loops(false)
+                .sideEffectGlobal(false)
+                .sideEffect(false);
+        // Restricted permissions to a safe set but with URI allowed
+        JexlPermissions permissions = new ClassPermissions(java.net.URI.class);
+        // Create the engine
+        jexl = new JexlBuilder().permissions(permissions).create();
+    }
+
+    /**
+     * A MapContext that can operate on streams.
+     */
+    public static class StreamContext extends MapContext {
+        /**
+         * This allows using a JEXL lambda as a mapper.
+         * @param stream the stream
+         * @param mapper the lambda to use as mapper
+         * @return the mapped stream
+         */
+        public Stream<?> map(Stream<?> stream, final JexlScript mapper) {
+            return stream.map( x -> mapper.execute(this, x));
+        }
+
+        /**
+         * This allows using a JEXL lambda as a filter.
+         * @param stream the stream
+         * @param filter the lambda to use as filter
+         * @return the filtered stream
+         */
+        public Stream<?> filter(Stream<?> stream, final JexlScript filter) {
+            return stream.filter(x -> x =! null && TRUE.equals(filter.execute(this, x)));
+        }
+    }
+
+    @Test
+    public void testURIStream() throws Exception {
+        // let's assume a collection of uris need to be processed and transformed to be simplified ;
+        // we want only http/https ones, only the host part and forcing an https scheme
+        List<URI> uris = Arrays.asList(
+                URI.create("http://user@www.apache.org:8000?qry=true"),
+                URI.create("https://commons.apache.org/releases/prepare.html"),
+                URI.create("mailto:henrib@apache.org")
+        );
+        // Create the test control, the expected result of our script evaluation
+        List<?> control =  uris.stream()
+                .map(uri -> uri.getScheme().startsWith("http")? "https://" + uri.getHost() : null)
+                .filter(x -> x != null)
+                .collect(Collectors.toList());
+        Assert.assertEquals(2, control.size());
+
+        // Create scripts:
+        // uri is the name of the variable used as parameter; the beans are exposed as properties
+        // note the starts-with operator =^
+        // note that uri is also used in the back-quoted string that performs variable interpolation
+        JexlScript mapper = jexl.createScript("uri.scheme =^ 'http'? `https://${uri.host}` : null", "uri");
+        // using the bang-bang / !! - JScript like -  is the way to coerce to boolean in the filter
+        JexlScript transform = jexl.createScript(
+                "list.stream().map(mapper).filter(x -> !!x).collect(Collectors.toList())", "list");
+
+        // Execute scripts:
+        JexlContext sctxt = new StreamContext();
+        // expose the static methods of Collectors; java.util.* is allowed by permissions
+        sctxt.set("Collectors", Collectors.class);
+        // expose the mapper script as a global variable in the context
+        sctxt.set("mapper", mapper);
+
+        Object transformed = transform.execute(sctxt, uris);
+        Assert.assertTrue(transformed instanceof List<?>);
+        Assert.assertEquals(control, transformed);
+    }
+}
+            ]]></source>
         </section>
 
         <section name="Extensions to JSTL Expression Language">
             <p>
-    While JEXL is similar to the expression language defined in JSTL, it has improved
-    upon the syntax in a few areas:
+                JEXL attempts to bring some of the lessons learned by the Velocity
+                community about expression languages in templating to a wider audience.
+                <a href="https://commons.apache.org/jelly">Commons Jelly</a> needed
+                Velocity-ish method access, it just had to have it.
+            </p>
+            <p>
+                It must be noted that JEXL is <strong>not</strong> a compatible implementation of EL as defined
+                in JSTL 1.1 (JSR-052) or JSP 2.0 (JSR-152). For a compatible implementation of
+                these specifications, see the <a href="https://commons.apache.org/el">Commons EL</a> project.
+            </p>
+            <p>
+                While JEXL 3.3 is now closer to JScript (without prototypes), its roots are the expression language defined in JSTL
+                and its has improved upon its syntax in a few areas:
             </p>
             <ul>
                 <li>Support for invocation of any accessible method (see example above).</li>

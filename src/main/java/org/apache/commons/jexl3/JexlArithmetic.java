@@ -62,7 +62,7 @@ public class JexlArithmetic {
 
     /** Marker class for null operand exceptions. */
     public static class NullOperand extends ArithmeticException {
-        private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = 4720876194840764770L;
     }
 
     /** Double.MAX_VALUE as BigDecimal. */
@@ -1900,7 +1900,7 @@ public class JexlArithmetic {
         while(arithmeticClass != JexlArithmetic.class) {
             try {
                 Method cmp = arithmeticClass.getDeclaredMethod("compare", Object.class, Object.class, String.class);
-               if (cmp != null && cmp.getDeclaringClass() != JexlArithmetic.class) {
+               if (cmp.getDeclaringClass() != JexlArithmetic.class) {
                    return true;
                }
             } catch (NoSuchMethodException xany) {

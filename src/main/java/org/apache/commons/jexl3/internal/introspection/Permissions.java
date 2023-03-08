@@ -20,7 +20,6 @@ package org.apache.commons.jexl3.internal.introspection;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -282,7 +281,7 @@ public class Permissions implements JexlPermissions {
     }
 
     /**
-     * Whether the wilcard set of packages allows a given class to be introspected.
+     * Whether the wildcard set of packages allows a given class to be introspected.
      * @param clazz the package name (not null)
      * @return true if allowed, false otherwise
      */
@@ -392,7 +391,7 @@ public class Permissions implements JexlPermissions {
      */
     @Override
     public boolean allow(final Package pack) {
-       return pack != null && !deny(pack);
+       return validate(pack) && !deny(pack);
     }
 
     /**
@@ -403,7 +402,8 @@ public class Permissions implements JexlPermissions {
      */
     @Override
     public boolean allow(final Class<?> clazz) {
-        if (clazz == null) {
+        // clazz must be not null
+        if (!validate(clazz)) {
             return false;
         }
         // class must be allowed
@@ -433,11 +433,8 @@ public class Permissions implements JexlPermissions {
      */
     @Override
     public boolean allow(final Constructor<?> ctor) {
-        if (ctor == null) {
-            return false;
-        }
-        // field must be public
-        if (!Modifier.isPublic(ctor.getModifiers())) {
+        // method must be not null, public
+        if (!validate(ctor)) {
             return false;
         }
         // check declared restrictions
@@ -460,11 +457,8 @@ public class Permissions implements JexlPermissions {
      */
     @Override
     public boolean allow(final Field field) {
-        if (field == null) {
-            return false;
-        }
         // field must be public
-        if (!Modifier.isPublic(field.getModifiers())) {
+        if (!validate(field)) {
             return false;
         }
         // check declared restrictions
@@ -489,27 +483,24 @@ public class Permissions implements JexlPermissions {
      */
     @Override
     public boolean allow(final Method method) {
-        if (method == null) {
-            return false;
-        }
-        // method must be public
-        if (!Modifier.isPublic(method.getModifiers())) {
+        // method must be not null, public, not synthetic, not bridge
+        if (!validate(method)) {
             return false;
         }
         // method must be allowed
-        if (!allowMethod(method)) {
+        if (denyMethod(method)) {
             return false;
         }
         Class<?> clazz = method.getDeclaringClass();
         // gather if any implementation of the method is explicitly allowed by the packages
         final boolean[] explicit = { wildcardAllow(clazz) };
-        // lets walk all interfaces
+        // let's walk all interfaces
         for (final Class<?> inter : clazz.getInterfaces()) {
             if (!allow(inter, method, explicit)) {
                 return false;
             }
         }
-        // lets walk all super classes
+        // let's walk all super classes
         clazz = clazz.getSuperclass();
         // walk all superclasses
         while (clazz != null) {
@@ -522,18 +513,13 @@ public class Permissions implements JexlPermissions {
     }
 
     /**
-     * Checks whether a method is allowed.
+     * Checks whether a method is denied.
      * @param method the method
-     * @return true if it has not been disallowed through annotation or declaration
+     * @return true if it has been disallowed through annotation or declaration
      */
-    private boolean allowMethod(final Method method) {
-        // check declared restrictions
-        if (deny(method)) {
-            return false;
-        }
-        final Class<?> clazz = method.getDeclaringClass();
-        // class must not be denied
-        return !deny(clazz);
+    private boolean denyMethod(final Method method) {
+        // check declared restrictions, class must not be denied
+        return deny(method) || deny(method.getDeclaringClass());
     }
 
     /**
@@ -548,7 +534,7 @@ public class Permissions implements JexlPermissions {
             // check if method in that class is declared ie overrides
             final Method override = clazz.getDeclaredMethod(method.getName(), method.getParameterTypes());
             // should not be possible...
-            if (!allowMethod(override)) {
+            if (denyMethod(override)) {
                 return false;
             }
             // explicit |= ...

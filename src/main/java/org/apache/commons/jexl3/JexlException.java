@@ -214,7 +214,7 @@ public class JexlException extends RuntimeException {
     }
 
     /**
-     * Merge the node info and the cause info to obtain best possible location.
+     * Merge the node info and the cause info to obtain the best possible location.
      *
      * @param info  the node
      * @param cause the cause
@@ -390,10 +390,10 @@ public class JexlException extends RuntimeException {
     /**
      * Removes a slice from a source.
      * @param src the source
-     * @param froml the begin line
-     * @param fromc the begin column
-     * @param tol the to line
-     * @param toc the to column
+     * @param froml the beginning line
+     * @param fromc the beginning column
+     * @param tol the ending line
+     * @param toc the ending column
      * @return the source with the (begin) to (to) zone removed
      */
     public static String sliceSource(final String src, final int froml, final int fromc, final int tol, final int toc) {
@@ -989,11 +989,7 @@ public class JexlException extends RuntimeException {
      * @since 3.0
      */
     public static class Cancel extends JexlException {
-        /**
-         *
-         */
-        private static final long serialVersionUID = 1L;
-
+        private static final long serialVersionUID = 7735706658499597964L;
         /**
          * Creates a new instance of Cancel.
          *
@@ -1031,7 +1027,7 @@ public class JexlException extends RuntimeException {
         /**
          * Creates a new instance of Continue.
          *
-         * @param node the continue
+         * @param node the continue-node
          */
         public Continue(final JexlNode node) {
             super(node, "continue loop", null, false);
@@ -1072,7 +1068,6 @@ public class JexlException extends RuntimeException {
     /**
      * Detailed info message about this error.
      * Format is "debug![begin,end]: string \n msg" where:
-     *
      * - debug is the debugging information if it exists (@link JexlEngine.setDebug)
      * - begin, end are character offsets in the string for the precise location of the error
      * - string is the string representation of the offending expression

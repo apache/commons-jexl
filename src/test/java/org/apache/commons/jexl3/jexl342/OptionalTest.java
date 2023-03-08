@@ -57,27 +57,39 @@ public class OptionalTest {
             return c.stream().map(a->s.execute(context, a));
         }
         public Object reduce(Stream<Object> stream, JexlScript script) {
-            return stream.reduce((identity, element)->{
+            Object reduced = stream.reduce((identity, element)->{
                 JexlContext context = JexlEngine.getThreadContext();
                 return script.execute(context, identity, element);
             });
+            return reduced instanceof Optional<?>
+                    ? ((Optional<?>) reduced).get()
+                    : reduced;
         }
     }
 
     @Test
-    public void testStream() {
-        String src = "[1, 2, 3, ...].map(x -> x * x).reduce((acc, x)->acc + x)";
+    public void testStream0() {
+        String src = "$0.map(x -> x * x).reduce((a, x) -> a + x)";
         JexlBuilder builder = new JexlBuilder();
         JexlUberspect uber = builder.create().getUberspect();
         JexlArithmetic jexla = new OptionalArithmetic(true);
         JexlEngine jexl = builder.uberspect(new ReferenceUberspect(uber)).arithmetic(jexla).safe(false).create();
         JexlInfo info = new JexlInfo("testStream", 1, 1);
         MapContext context = new StreamContext();
-        JexlScript script = jexl.createScript(src, "list");
+        JexlScript script = jexl.createScript(src, "$0");
         Object result = script.execute(context, Arrays.asList(1, 2, 3));
         Assert.assertEquals(14, result);
-        //Optional<?> result = (Optional<?>) script.execute(context, Arrays.asList(1, 2, 3));
-        //Assert.assertEquals(14, result.get());
+    }
+
+    @Test
+    public void testStream1() {
+        String src = "$0.map(x -> x * x).reduce((a, x) -> a + x)";
+        JexlEngine jexl = new JexlBuilder().safe(false).create();
+        JexlInfo info = new JexlInfo("testStream", 1, 1);
+        MapContext context = new StreamContext();
+        JexlScript script = jexl.createScript(src, "$0");
+        Object result = script.execute(context, Arrays.asList(1, 2d, "3"));
+        Assert.assertEquals(14.0d, (double) result , 0.00001d);
     }
 
     @Test

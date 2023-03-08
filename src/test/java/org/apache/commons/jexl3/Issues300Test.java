@@ -1262,18 +1262,16 @@ public class Issues300Test {
                 "if (m < 3) { --y }\n" +
                 "(y + y/4 - y/100 + y/400 + t[m-1] + d) % 7;\n" +
             "}";
-        JexlEngine jexl = new JexlBuilder()
-                .safe(false)
-                .strict(true)
-                .create();
-            JexlScript script = jexl.createScript(src);
-            Object r = script.execute(null, 2023, 3, 1);
-            Assert.assertTrue(r instanceof Number);
-            Number dow = (Number) r;
-            Assert.assertEquals(3, dow.intValue());
-            r = script.execute(null, 1969, 7, 20);
-            Assert.assertTrue(r instanceof Number);
-            dow = (Number) r;
-            Assert.assertEquals(0, dow.intValue());
+        JexlEngine jexl = new JexlBuilder().create();
+        JexlScript script = jexl.createScript(src);
+        Object r = script.execute(null, 2023, 3, 1);
+        Assert.assertTrue(r instanceof Number);
+        Number dow = (Number) r;
+        Assert.assertEquals(3, dow.intValue());
+        r = script.execute(null, 1969, 7, 20);
+        Assert.assertTrue(r instanceof Number);
+        dow = (Number) r;
+        Assert.assertEquals(0, dow.intValue());
     }
+
 }
