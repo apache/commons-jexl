@@ -21,8 +21,8 @@ import org.apache.commons.jexl3.introspection.JexlPermissions;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -41,9 +41,9 @@ public class ClassPermissions extends JexlPermissions.Delegate {
      * @param allow the set of allowed classes
      */
     public ClassPermissions(Class... allow) {
-        this(JexlPermissions.RESTRICTED, allow != null
-                ? Arrays.asList(allow).stream().map(Class::getCanonicalName).collect(Collectors.toList())
-                : null);
+        this(JexlPermissions.RESTRICTED,
+            Arrays.asList(Objects.requireNonNull(allow))
+            .stream().map(Class::getCanonicalName) .collect(Collectors.toList()));
     }
 
     /**
@@ -53,12 +53,7 @@ public class ClassPermissions extends JexlPermissions.Delegate {
      */
     public ClassPermissions(JexlPermissions delegate, Collection<String> allow) {
         super(delegate);
-        if (allow != null && !allow.isEmpty()) {
-            allowedClasses = new HashSet<>();
-            allow.forEach(c -> allowedClasses.add(c));
-        } else {
-            allowedClasses = Collections.emptySet();
-        }
+        allowedClasses = new HashSet<>(Objects.requireNonNull(allow));
     }
 
     private boolean isClassAllowed(Class<?> clazz) {
