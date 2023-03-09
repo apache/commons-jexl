@@ -27,6 +27,17 @@ Version 3.3 is a minor release.
 Compatibility with previous releases
 ====================================
 Version 3.3 is source and binary compatible with 3.2.
+However, the default setting for permissions that determine which packages, classes and methods are accessible
+to scripts has been reduced to a very narrow set. When migrating from previous version of JEXL, this may result
+in breaking your application behavior ; this breaking change requires remediation in your code.
+Despite the obvious inconvenience - our sincere apologies on the matter -, how much functional and semantic power is
+accessible through scripts has a real impact on your application security and stability ; that potential risk requires
+an informed review and conscious choice on your end.
+To mitigate the change, you can revert to the previous behavior with one line of code (see JexlBuilder) or use this
+opportunity to reduce exposure. Whether Files, URLs, networking, processes, class-loaders or reflection features are
+accessible are part of the choice to make.
+Any CVE linked to JEXL should try resolution by upgrading to 3.3.
+
 
 What's new in 3.3:
 ==================

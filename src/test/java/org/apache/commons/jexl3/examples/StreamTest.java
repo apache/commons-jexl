@@ -16,8 +16,6 @@
  */
 package org.apache.commons.jexl3.examples;
 
-import org.apache.commons.jexl3.ClassPermissions;
-import org.apache.commons.jexl3.JexlArithmetic;
 import org.apache.commons.jexl3.JexlBuilder;
 import org.apache.commons.jexl3.JexlContext;
 import org.apache.commons.jexl3.JexlEngine;
@@ -25,6 +23,7 @@ import org.apache.commons.jexl3.JexlFeatures;
 import org.apache.commons.jexl3.JexlScript;
 import org.apache.commons.jexl3.MapContext;
 import org.apache.commons.jexl3.introspection.JexlPermissions;
+import org.apache.commons.jexl3.introspection.JexlPermissions.ClassPermissions;
 import org.junit.Assert;
 import org.junit.Test;
 

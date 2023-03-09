@@ -55,6 +55,7 @@ public class JexlScriptEngineTest {
     public void tearDown() {
         JexlBuilder.setDefaultPermissions(null);
         JexlScriptEngine.setInstance(null);
+        JexlScriptEngine.setPermissions(null);
     }
 
     @Test
@@ -125,12 +126,8 @@ public class JexlScriptEngineTest {
 
     @Test
     public void testScriptingInstance0() throws Exception {
+        JexlScriptEngine.setPermissions(JexlPermissions.UNRESTRICTED);
         final ScriptEngineManager manager = new ScriptEngineManager();
-        JexlScriptEngine.setInstance(new JexlBuilder()
-                .cache(512)
-                .logger(LogFactory.getLog(JexlScriptEngine.class))
-                .permissions(JexlPermissions.UNRESTRICTED)
-                .create());
         final ScriptEngine engine = manager.getEngineByName("jexl3");
         Long time2 = (Long) engine.eval(
                 "sys=context.class.forName(\"java.lang.System\");"
@@ -141,6 +138,7 @@ public class JexlScriptEngineTest {
     @Test
     public void testScriptingPermissions1() throws Exception {
         JexlBuilder.setDefaultPermissions(JexlPermissions.UNRESTRICTED);
+        JexlScriptEngine.setPermissions(null);
         final ScriptEngineManager manager = new ScriptEngineManager();
         final ScriptEngine engine = manager.getEngineByName("jexl3");
         Long time2 = (Long) engine.eval(

@@ -22,6 +22,12 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * This interface describes permissions used by JEXL introspection that constrain which
@@ -39,10 +45,22 @@ import java.lang.reflect.Modifier;
  * processed.</p>
  * <p>A simple textual configuration can be used to create user defined permissions using
  * {@link JexlPermissions#parse(String...)}.</p>
+ *
  *<p>To instantiate a JEXL engine using permissions, one should use a {@link org.apache.commons.jexl3.JexlBuilder}
  * and call {@link org.apache.commons.jexl3.JexlBuilder#permissions(JexlPermissions)}. Another approach would
  * be to instantiate a {@link JexlUberspect} with those permissions and call
  * {@link org.apache.commons.jexl3.JexlBuilder#uberspect(JexlUberspect)}.</p>
+ *
+ * <p>
+ *     To help migration from earlier versions, it is possible to revert to the JEXL 3.2 default lenient behavior
+ *     by calling {@link org.apache.commons.jexl3.JexlBuilder#setDefaultPermissions(JexlPermissions)} with
+ *     {@link #UNRESTRICTED} as parameter.
+ * </p>
+ * <p>
+ *     For the same reason, using JEXL through scripting, it is possible to revert the underlying JEXL behaviour to
+ *     JEXL 3.2 default by calling {@link org.apache.commons.jexl3.scripting.JexlScriptEngine#setPermissions(JexlPermissions)}
+ *     with {@link #UNRESTRICTED} as parameter.
+ * </p>
  * @since 3.3
  */
 public interface JexlPermissions {
@@ -315,7 +333,7 @@ public interface JexlPermissions {
     }
 
     /**
-     * A base for permission delegation allowing greater functional malleability.
+     * A base for permission delegation allowing functional refinement.
      * Overloads should call the appropriate validate() method early in their body.
      */
      class Delegate implements JexlPermissions {
@@ -354,6 +372,61 @@ public interface JexlPermissions {
         @Override
         public JexlPermissions compose(String... src) {
             return new Delegate(base.compose(src));
+        }
+    }
+
+    /**
+     * A permission delegation that augments the RESTRICTED permission with an explicit
+     * set of classes.
+     * <p>Typical use case is to deny access to a package - and thus all its classes - but allow
+     * a few specific classes.</p>
+     */
+     class ClassPermissions extends JexlPermissions.Delegate {
+        /** The set of explicitly allowed classes, overriding the delegate permissions. */
+        private final Set<String> allowedClasses;
+
+        /**
+         * Creates permissions based on the RESTRICTED set but allowing an explicit set.
+         * @param allow the set of allowed classes
+         */
+        public ClassPermissions(Class... allow) {
+            this(JexlPermissions.RESTRICTED,
+                    Arrays.asList(Objects.requireNonNull(allow))
+                            .stream().map(Class::getCanonicalName).collect(Collectors.toList()));
+        }
+
+        /**
+         * Required for compose().
+         * @param delegate the base to delegate to
+         * @param allow the list of class canonical names
+         */
+        public ClassPermissions(JexlPermissions delegate, Collection<String> allow) {
+            super(Objects.requireNonNull(delegate));
+            allowedClasses = new HashSet<>(Objects.requireNonNull(allow));
+        }
+
+        private boolean isClassAllowed(Class<?> clazz) {
+            return allowedClasses.contains(clazz.getCanonicalName());
+        }
+
+        @Override
+        public boolean allow(Class<?> clazz) {
+            return (validate(clazz) && isClassAllowed(clazz)) || super.allow(clazz);
+        }
+
+        @Override
+        public boolean allow(Method method) {
+            return (validate(method) && isClassAllowed(method.getDeclaringClass())) || super.allow(method);
+        }
+
+        @Override
+        public boolean allow(Constructor constructor) {
+            return (validate(constructor) && isClassAllowed(constructor.getDeclaringClass())) || super.allow(constructor);
+        }
+
+        @Override
+        public JexlPermissions compose(String... src) {
+            return new ClassPermissions(base.compose(src), allowedClasses);
         }
     }
 }

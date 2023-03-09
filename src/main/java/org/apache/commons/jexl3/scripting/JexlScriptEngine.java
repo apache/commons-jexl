@@ -73,22 +73,35 @@ public class JexlScriptEngine extends AbstractScriptEngine implements Compilable
     private static Reference<JexlEngine> ENGINE = null;
 
     /**
+     * The permissions used to create the script engine.
+     */
+    private static JexlPermissions PERMISSIONS = null;
+    /**
+     * Sets the permissions instance used to create the script engine.
+     * <p>Calling this method will force engine instance re-creation.</p>
+     * <p>To restore 3.2 script behavior:</p>
+     * <code>
+     *         JexlScriptEngine.setPermissions(JexlPermissions.UNRESTRICTED);
+     * </code>
+     * @param permissions the permissions instance to use or null to use the {@link JexlBuilder} default
+     * @since 3.3
+     */
+    public static void setPermissions(final JexlPermissions permissions) {
+        PERMISSIONS = permissions;
+        ENGINE = null; // will force recreation
+    }
+
+    /**
      * Sets the shared instance used for the script engine.
      * <p>This should be called early enough to have an effect, ie before any
      * {@link javax.script.ScriptEngineManager} features.</p>
-     * <p>To restore 3.2 script permeability:</p>
+     * <p>To restore 3.2 script behavior:</p>
      * <code>
      *         JexlScriptEngine.setInstance(new JexlBuilder()
      *                 .cache(512)
      *                 .logger(LogFactory.getLog(JexlScriptEngine.class))
      *                 .permissions(JexlPermissions.UNRESTRICTED)
      *                 .create());
-     * </code>
-     * <p>Alternatively, setting the default {@link JexlBuilder#setDefaultPermissions(JexlPermissions)} using
-     * {@link org.apache.commons.jexl3.introspection.JexlPermissions#UNRESTRICTED} will also restore JEXL 3.2
-     * behavior.</p>
-     * <code>
-     *     JexlBuilder.setDefaultPermissions(JexlPermissions.UNRESTRICTED);
      * </code>
      * @param engine the JexlEngine instance to use
      * @since 3.3
@@ -111,6 +124,9 @@ public class JexlScriptEngine extends AbstractScriptEngine implements Compilable
                             .safe(false)
                             .logger(JexlScriptEngine.LOG)
                             .cache(JexlScriptEngine.CACHE_SIZE);
+                    if (PERMISSIONS != null ) {
+                        builder.permissions(PERMISSIONS);
+                    }
                     engine = builder.create();
                     ENGINE = new SoftReference<>(engine);
                 }
