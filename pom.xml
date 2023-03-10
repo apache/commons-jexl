@@ -313,7 +313,7 @@
                         </includes>
                         <excludes>
                             <exclude>org.apache.commons.jexl3.internal</exclude>
-                            <exclude>org.apache.commons.jexl3.introspection.internal</exclude>
+                            <exclude>org.apache.commons.jexl3.internal.introspection</exclude>
                             <exclude>org.apache.commons.jexl3.parser</exclude>
                         </excludes>
                         <onlyModified>true</onlyModified>
