@@ -54,7 +54,7 @@ import java.util.stream.Collectors;
  * <p>
  *     To help migration from earlier versions, it is possible to revert to the JEXL 3.2 default lenient behavior
  *     by calling {@link org.apache.commons.jexl3.JexlBuilder#setDefaultPermissions(JexlPermissions)} with
- *     {@link #UNRESTRICTED} as parameter.
+ *     {@link #UNRESTRICTED} as parameter before creating a JEXL engine instance.
  * </p>
  * <p>
  *     For the same reason, using JEXL through scripting, it is possible to revert the underlying JEXL behaviour to
@@ -142,15 +142,17 @@ public interface JexlPermissions {
      *  java.lang { Runtime {} System {} ProcessBuilder {} Class {} }
      *  org.apache.commons.jexl3 { JexlBuilder {} }
      *  </pre>
-     *  <p>
-     *  Syntax for wildcards is the name of the package suffixed by <code>.*</code>. Syntax for restrictions is
-     *  a list of package restrictions. A package restriction is a package name followed by a block
-     *  (as in curly-bracket block {}) that contains a list of class restrictions. A class restriction is a class name
-     *  followed by a block of member restrictions. A member restriction can be a class restriction - to restrict
+     *  <ul>
+     *  <li>Syntax for wildcards is the name of the package suffixed by <code>.*</code>.</li>
+     *  <li>Syntax for restrictions is a list of package restrictions.</li>
+     *  <li>A package restriction is a package name followed by a block (as in curly-bracket block {})
+     *  that contains a list of class restrictions.</li>
+     *  <li>A class restriction is a class name followed by a block of member restrictions.</li>
+     *  <li>A member restriction can be a class restriction - to restrict
      *  nested classes -, a field which is the Java field name suffixed with <code>;</code>, a method composed of
      *  its Java name suffixed with <code>();</code>. Constructor restrictions are specified like methods using the
-     *  class name as method name.
-     *  </p>
+     *  class name as method name.</li>
+     *  </ul>
      *  <p>
      *  All overrides and overloads of a constructors or method are allowed or restricted at the same time,
      *  the restriction being based on their names, not their whole signature. This differs from the @NoJexl annotation.
@@ -190,7 +192,8 @@ public interface JexlPermissions {
     /**
      * Compose these permissions with a new set.
      * <p>This is a convenience method meant to easily give access to the packages JEXL is
-     * used to integrate with.</p>
+     * used to integrate with. For instance, using <code>{@link #RESTRICTED}.compose("com.my.app.*")</code>
+     * would extend the restricted set of permissions by allowing the com.my.app package.</p>
      * @param src the new constraints
      * @return the new permissions
      */
@@ -268,7 +271,7 @@ public interface JexlPermissions {
 
     /**
      * Checks that a package is valid for permission check.
-     * @param pack the palcaga
+     * @param pack the package
      * @return true if the class is not null, false otherwise
      */
     default boolean validate(final Package pack) {
@@ -286,15 +289,15 @@ public interface JexlPermissions {
 
     /**
      * Checks that a constructor is valid for permission check.
-     * @param ctor the constructor
+     * @param constructor the constructor
      * @return true if constructor is not null and public, false otherwise
      */
-    default boolean validate(final Constructor<?> ctor) {
-        if (ctor == null) {
+    default boolean validate(final Constructor<?> constructor) {
+        if (constructor == null) {
             return false;
         }
         // field must be public
-        if (!Modifier.isPublic(ctor.getModifiers())) {
+        if (!Modifier.isPublic(constructor.getModifiers())) {
             return false;
         }
         return true;

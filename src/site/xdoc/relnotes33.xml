@@ -38,9 +38,8 @@
     (see <a href="apidocs/org/apache/commons/jexl3/introspection/JexlPermissions.html">JexlPermissions</a>,
     <a href="apidocs/org/apache/commons/jexl3/JexlBuilder.html">JexlBuilder</a> and
     <a href="apidocs/org/apache/commons/jexl3/scripting/JexlScriptEngine.html">JexlScriptEngine</a> )  or use this
-    opportunity to reduce exposure. Whether Files, URLs, networking, processes, class-loaders or reflection features are
-    accessible are part of the choice to make.</p><p>
-    <strong>Any CVE linked to JEXL should try resolution by first upgrading to JEXL 3.3.</strong>
+    opportunity to reduce exposure. Whether Files, URLs, networking, processes, class-loaders or reflection classes
+    or whether loops or side-effects are accessible are part of your choice to make.
     </p>
     </section>
     <section name="What's new in 3.3:">
@@ -50,7 +49,7 @@
     a security manager that controls what JEXL can introspect and thus expose to scripts.
     </p><p>
     Used in conjunction with options (JexlOptions) and features (JexlFeatures), the permissions (JexlPermissions)
-    allow fine-tuning the scripting integration into any project.
+    allow fine-tuning the end-user freedom and scripting integration through syntactic and semantic sanitation.
     </p><p>
     JEXL 3.3 also adds some syntactic (ECMAScript) features (let, const, =>, for, ...) to further reduce
     the skill set required to write scripts.
