@@ -277,7 +277,7 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <configuration>
-                    <excludePackageNames>*.internal:*.parser</excludePackageNames>
+                    <excludePackageNames>*.internal:*.internal.introspection:*.parser</excludePackageNames>
                     <show>public</show>
                 </configuration>
             </plugin>
@@ -313,7 +313,7 @@
                         </includes>
                         <excludes>
                             <exclude>org.apache.commons.jexl3.internal</exclude>
-                            <exclude>org.apache.commons.jexl3.internal.introspection</exclude>
+                            <exclude>org.apache.commons.jexl3.introspection.internal</exclude>
                             <exclude>org.apache.commons.jexl3.parser</exclude>
                         </excludes>
                         <onlyModified>true</onlyModified>
@@ -420,7 +420,7 @@
                         </includes>
                         <excludes>
                             <exclude>org.apache.commons.jexl3.internal</exclude>
-                            <exclude>org.apache.commons.jexl3.internal.introspection</exclude>
+                            <exclude>org.apache.commons.jexl3.introspection.internal</exclude>
                             <exclude>org.apache.commons.jexl3.parser</exclude>
                         </excludes>
                         <onlyModified>true</onlyModified>
