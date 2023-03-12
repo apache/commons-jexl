@@ -25,7 +25,7 @@
         <author email="dev@commons.apache.org">Commons Developers</author>
     </properties>
     <body>
-        <release version="3.3" date="YYYY-MM-DD">
+        <release version="3.3" date="2020-03-20">
             <!-- ADD -->
             <action dev="henrib" type="add" issue="JEXL-392">
                 Enable namespace declaration based on scripts

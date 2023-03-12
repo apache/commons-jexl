@@ -275,15 +275,6 @@
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <configuration>
-                    <excludePackageNames>*.internal:*.internal.introspection:*.parser</excludePackageNames>
-                    <show>public</show>
-                </configuration>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-pmd-plugin</artifactId>
                 <configuration>
                     <rulesets>
@@ -451,6 +442,17 @@
                         <exclude>**/org/apache/commons/jexl3/parser/*.class</exclude>
                         <exclude>**/org/apache/commons/jexl3/**/*Test.class</exclude>
                     </excludes>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <configuration>
+                    <excludePackageNames>
+                        *.internal:*.internal.introspection:*.parser:
+                    </excludePackageNames>
+                    <show>protected</show>
                 </configuration>
             </plugin>
 

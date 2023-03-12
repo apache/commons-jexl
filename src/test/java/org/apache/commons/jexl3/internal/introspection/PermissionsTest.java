@@ -34,6 +34,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -98,18 +99,39 @@ public class PermissionsTest {
         int method();
     }
 
-    @Test
-    public void testPermissions() throws Exception {
-        String src = " org.apache.commons.jexl3.internal.introspection { PermissionsTest { "+
-                "InterNoJexl0 { } "+
-                "InterNoJexl1 { method(); } "+
-                "A0 { A0(); i0; } "+
-                "A1 { A1(); } "+
-                "A2 { } "+
-                "InterNoJexl5 { } "+
+    JexlPermissions permissions0() {
+        String src = " org.apache.commons.jexl3.internal.introspection { PermissionsTest { " +
+                "InterNoJexl0 { } " +
+                "InterNoJexl1 { method(); } " +
+                "A0 { A0(); i0; } " +
+                "A1 { A1(); } " +
+                "A2 { } " +
+                "InterNoJexl5 { } " +
                 "} }";
-
         JexlPermissions p = (Permissions) JexlPermissions.parse(src);
+        return p;
+    }
+
+    @Test
+    public void testPermissions0() throws Exception {
+        runTestPermissions(permissions0());
+    }
+
+    @Test
+    public void testPermissions1() throws Exception {
+        runTestPermissions(new JexlPermissions.Delegate(permissions0()) {
+            @Override public String toString() {
+                return "delegate:" + base.toString();
+            }
+        });
+    }
+
+    @Test
+    public void testPermissions2() throws Exception {
+        runTestPermissions(new JexlPermissions.ClassPermissions(permissions0(), Collections.emptySet()));
+    }
+
+    private void runTestPermissions(JexlPermissions p) throws Exception {
         Assert.assertFalse(p.allow((Field) null));
         Assert.assertFalse(p.allow((Package) null));
         Assert.assertFalse(p.allow((Method) null));
