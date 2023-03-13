@@ -19,13 +19,15 @@
 */
 -->
 
-<document>
+<document xmlns="http://maven.apache.org/changes/1.0.0"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/changes/1.0.0 http://maven.apache.org/xsd/changes-1.0.0.xsd">
     <properties>
         <title>Apache Commons JEXL Release Notes</title>
         <author email="dev@commons.apache.org">Commons Developers</author>
     </properties>
     <body>
-        <release version="3.3" date="YYYY-MM-DD">
+        <release version="3.3" date="2020-03-20">
             <!-- ADD -->
             <action dev="henrib" type="add" issue="JEXL-392">
                 Enable namespace declaration based on scripts
@@ -82,7 +84,7 @@
                 Configure accessible packages/classes/methods/fields
             </action>
             <!--  FIX -->
-            <action dev="henrib" type="fix" issue="JEXL-386" dure-to="Song Fuchang">
+            <action dev="henrib" type="fix" issue="JEXL-386" due-to="Song Fuchang">
                 Non-inheritable permissions on interfaces are ignored in an inheritable sandbox
             </action>
             <action dev="henrib" type="add" issue="JEXL-384" due-to="Hussachai Puripunpinyo">
