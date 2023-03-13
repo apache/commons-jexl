@@ -339,12 +339,15 @@
 
     <reporting>
         <plugins>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <configuration>
-                    <excludePackageNames>*.internal:*.parser</excludePackageNames>
-                    <show>public</show>
+                    <excludePackageNames>
+                        *.internal:*.internal.introspection:*.parser:
+                    </excludePackageNames>
+                    <show>protected</show>
                 </configuration>
             </plugin>
 
