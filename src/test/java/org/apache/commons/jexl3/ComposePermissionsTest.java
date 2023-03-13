@@ -18,6 +18,7 @@ package org.apache.commons.jexl3;
 
 import java.io.File;
 import java.io.FileReader;
+import java.util.Collections;
 
 import com.google.gson.Gson;
 import org.apache.commons.jexl3.introspection.JexlPermissions;
@@ -36,7 +37,26 @@ public class ComposePermissionsTest extends JexlTestCase {
     super("PermissionsTest");
   }
 
-  @Test public void testComposePermissions() throws Exception {
+  @Test
+  public void testComposePermissions() throws Exception {
+    runComposePermissions(JexlPermissions.UNRESTRICTED);
+  }
+
+  @Test
+  public void testComposePermissions1() throws Exception {
+    runComposePermissions(new JexlPermissions.Delegate(JexlPermissions.UNRESTRICTED) {
+      @Override public String toString() {
+        return "delegate:" + base.toString();
+      }
+    });
+  }
+
+  @Test
+  public void testComposePermissions2() throws Exception {
+    runComposePermissions(new JexlPermissions.ClassPermissions(JexlPermissions.UNRESTRICTED, Collections.emptySet()));
+  }
+
+  void runComposePermissions(JexlPermissions p) throws Exception {
     final String check = "http://example.com/content.jpg";
     final File jsonFile = new File(SAMPLE_JSON);
     Gson gson = new Gson();
@@ -44,13 +64,13 @@ public class ComposePermissionsTest extends JexlTestCase {
     Assert.assertNotNull(json);
 
     // will succeed because java.util.Map is allowed and gson LinkedTreeMap is one
-    JexlEngine j0 = createEngine(false, JexlPermissions.UNRESTRICTED);
+    JexlEngine j0 = createEngine(false, p);
     JexlScript s0 = j0.createScript("json.pageInfo.pagePic", "json");
     Object r0 = s0.execute(null, json);
     Assert.assertEquals(check, r0);
 
     // will fail if gson package is denied
-    JexlEngine j1 = createEngine(false, JexlPermissions.UNRESTRICTED.compose("com.google.gson.internal {}"));
+    JexlEngine j1 = createEngine(false, p.compose("com.google.gson.internal {}"));
     JexlScript s1 = j1.createScript("json.pageInfo.pagePic", "json");
     try {
       Object r1 = s1.execute(null, json);
@@ -60,7 +80,7 @@ public class ComposePermissionsTest extends JexlTestCase {
     }
 
     // will fail since gson package is denied
-     j1 = createEngine(false, JexlPermissions.UNRESTRICTED.compose("com.google.gson.internal { LinkedTreeMap {} }"));
+     j1 = createEngine(false, p.compose("com.google.gson.internal { LinkedTreeMap {} }"));
      s1 = j1.createScript("json.pageInfo.pagePic", "json");
     try {
       Object r1 = s1.execute(null, json);

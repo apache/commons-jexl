@@ -395,13 +395,13 @@ public final class JexlSandbox {
     }
 
     /**
-     * Unused.
+     * @deprecated since 3.2, use {@link AllowSet}
      */
     @Deprecated
     public static final class WhiteSet extends AllowSet {}
 
     /**
-     * Unused.
+     * @deprecated since 3.2, use {@link BlockSet}
      */
     @Deprecated
     public static final class BlackSet extends BlockSet {}
