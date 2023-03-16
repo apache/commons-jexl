@@ -313,7 +313,7 @@ public interface JexlPermissions {
             return false;
         }
         // method must be public
-        if (!Modifier.isPublic(method.getModifiers()) || method.isBridge() || method.isSynthetic()) {
+        if (!Modifier.isPublic(method.getModifiers())) {
             return false;
         }
         return true;

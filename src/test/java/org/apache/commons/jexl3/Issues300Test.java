@@ -24,6 +24,8 @@ import org.junit.Test;
 
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.math.MathContext;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -1273,5 +1275,16 @@ public class Issues300Test {
         dow = (Number) r;
         Assert.assertEquals(0, dow.intValue());
     }
+
+    @Test public void testIssue394() {
+        StringBuilder x = new StringBuilder("foobar");
+        Assert.assertEquals("foobar", x.toString());
+        String src = "x -> x.setLength(3)";
+        JexlEngine jexl = new JexlBuilder().create();
+        JexlScript script = jexl.createScript(src);
+        Object result = script.execute(null, x);
+        Assert.assertEquals("foo", x.toString());
+    }
+
 
 }

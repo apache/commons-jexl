@@ -62,6 +62,9 @@
         <commons.jacoco.lineRatio>0.85</commons.jacoco.lineRatio>
         <commons.jacoco.haltOnFailure>false</commons.jacoco.haltOnFailure>
 
+        <!-- Cyclone -->
+        <commons.cyclonedx.version>2.7.5</commons.cyclonedx.version>
+
         <!--
           Encoding of Java source files: ensures that the compiler and
           the javadoc generator use the right encoding. Subprojects may

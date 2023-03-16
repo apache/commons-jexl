@@ -322,7 +322,7 @@ final class ClassMap {
             final Method[] methods = clazz.getDeclaredMethods();
             for (final Method mi : methods) {
                 // method must be public, not a bridge, not synthetic
-                if (!Modifier.isPublic(mi.getModifiers()) || mi.isBridge() || mi.isSynthetic()) {
+                if (!Modifier.isPublic(mi.getModifiers())) {
                     continue;
                 }
                 // add method to byKey cache; do not override
