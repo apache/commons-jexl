@@ -1284,5 +1284,4 @@ public class Issues300Test {
         Assert.assertEquals("foo", x.toString());
     }
 
-
 }

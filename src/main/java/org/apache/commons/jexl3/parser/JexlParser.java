@@ -691,8 +691,8 @@ public abstract class JexlParser extends StringParser {
      */
     private boolean isConstant(int symbol) {
         if (symbol >= 0) {
-            if (block != null && block.isConstant(symbol)) {
-                return true;
+            if (block != null && block.hasSymbol(symbol)) {
+                return block.isConstant(symbol);
             }
             Scope blockScope = blockScopes.get(block);
             int lexical = symbol;
@@ -708,8 +708,8 @@ public abstract class JexlParser extends StringParser {
                         blockScope = unitScope;
                     }
                 }
-                if (unit.isConstant(lexical)) {
-                    return true;
+                if (unit.hasSymbol(lexical)) {
+                    return unit.isConstant(lexical);
                 }
             }
         }

@@ -1017,6 +1017,40 @@ public class LexicalTest {
         }
     }
 
+    @Test public void testConst3a() {
+        JexlEngine jexl = new JexlBuilder().create();
+        List<String> srcs = Arrays.asList(
+                "const f = ()->{ var foo = 3; foo = 5; }",
+                "const y = '42'; const f = (let y)->{ var foo = 3; foo = 5; }",
+                "const foo = '34'; const f = ()->{ var foo = 3; foo = 5; };",
+                "const bar = '34'; const f = ()->{ var f = 3; f = 5; };",
+                "const bar = '34'; const f = ()->{ var bar = 3; z ->{ bar += z; } };");
+        for(String src: srcs) {
+            JexlScript script = jexl.createScript(src);
+            Object result = script.execute(null);
+            Assert.assertNotNull(src, result);
+        }
+    }
+
+    @Test public void testConst3b() {
+        JexlEngine jexl = new JexlBuilder().create();
+        List<String> srcs = Arrays.asList(
+                "const f = ()->{ var foo = 3; f = 5; }",
+                "const y = '42'; const f = (let z)->{ y += z; }",
+                "const foo = '34'; const f = ()->{ foo = 3; };",
+                "const bar = '34'; const f = ()->{  bar = 3; z ->{ bar += z; } };",
+                "let bar = '34'; const f = ()->{  const bar = 3; z ->{ bar += z; } };");
+        for(String src: srcs) {
+            try {
+                JexlScript script = jexl.createScript(src);
+                Object result = script.execute(null);
+                Assert.fail(src);
+            } catch(JexlException.Assignment xassign) {
+                Assert.assertNotNull(src, xassign); // debug breakpoint
+            }
+        }
+    }
+
     @Test
     public void testSingleStatementDeclFail() {
         List<String> srcs = Arrays.asList(

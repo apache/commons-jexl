@@ -459,18 +459,23 @@ public class Engine extends JexlEngine {
                         ns = new LinkedHashMap<>();
                     }
                     processPragmaNamespace(ns, key, value);
+                    if (!ns.isEmpty()) {
+                        opts.setNamespaces(ns);
+                    }
                 } else if (key.startsWith(PRAGMA_MODULE)) {
                     if (ns == null)  {
                         ns = new LinkedHashMap<>();
                     }
-                    processModulePragma(ns, key, value, script.jexlInfo(), context);
+                    processPragmaModule(ns, key, value, script.jexlInfo(), context);
+                    if (!ns.isEmpty()) {
+                        opts.setNamespaces(ns);
+                    }
                 }
+                // user defined processor may alter options
                 if (processor != null) {
-                    opts.setNamespaces(ns);
                     processor.processPragma(opts, key, value);
                 }
             }
-            opts.setNamespaces(ns);
         }
     }
 
@@ -522,7 +527,7 @@ public class Engine extends JexlEngine {
      * @param info the expression info
      * @param context the value-as-expression evaluation context
      */
-    private void processModulePragma(Map<String, Object> ns, String key, Object value, JexlInfo info, JexlContext context) {
+    private void processPragmaModule(Map<String, Object> ns, String key, Object value, JexlInfo info, JexlContext context) {
         // jexl.module.***
         final String module = key.substring(PRAGMA_MODULE.length());
         if (module.isEmpty()) {
