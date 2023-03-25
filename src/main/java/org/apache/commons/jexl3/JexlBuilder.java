@@ -78,7 +78,6 @@ import java.nio.charset.Charset;
  * </p>
  * </li>
  * </ul>
- *
  */
 public class JexlBuilder {
     /**

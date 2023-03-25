@@ -44,7 +44,6 @@ import java.util.concurrent.ConcurrentHashMap;
  *     field; # field
  *   } # end class0
  * } # end package my.package
- *
  */
 public class PermissionsParser {
     /** The source. */
