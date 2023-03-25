@@ -25,9 +25,14 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * A crude parser to configure permissions akin to NoJexl annotations.
  * The syntax recognizes 2 types of permissions:
- * - restricting access to packages, classes (and inner classes), methods and fields
- * - allowing access to a wildcard restricted set of packages
+ * <ul>
+ * <li>restricting access to packages, classes (and inner classes), methods and fields</li>
+ * <li>allowing access to a wildcard restricted set of packages</li>
+ * </ul>
+ * <p>
  *  Example:
+ * </p>
+ * <pre>
  *  my.allowed.packages.*
  *  another.allowed.package.*
  *  # nojexl like restrictions
@@ -44,6 +49,7 @@ import java.util.concurrent.ConcurrentHashMap;
  *     field; # field
  *   } # end class0
  * } # end package my.package
+ * </pre>
  */
 public class PermissionsParser {
     /** The source. */
