@@ -271,7 +271,7 @@ public class PermissionsTest {
         try {
             Object result = script.execute(null, new Outer.Inner());
             Assert.fail("callMeNot should be uncallable");
-        } catch(JexlException.Method xany) {
+        } catch (JexlException.Method xany) {
             Assert.assertEquals("callMeNot", xany.getMethod());
         }
         Method uncallable = getMethod(Invisible.class, "uncallable");
@@ -282,7 +282,7 @@ public class PermissionsTest {
         try {
             Object result = script.execute(null, new Invisible());
             Assert.fail("uncallable should be uncallable");
-        } catch(JexlException.Method xany) {
+        } catch (JexlException.Method xany) {
             Assert.assertEquals("uncallable", xany.getMethod());
         }
     }
@@ -341,7 +341,7 @@ public class PermissionsTest {
             try {
                 Permissions p = (Permissions) JexlPermissions.parse(src);
                 Assert.fail(src);
-            } catch(IllegalStateException xill) {
+            } catch (IllegalStateException xill) {
                 Assert.assertNotNull(xill);
             }
         }
@@ -376,7 +376,7 @@ public class PermissionsTest {
         try {
             r = script.execute(null, foo2);
             Assert.fail("protectedMethod() is not public through superclass Foo2");
-        } catch(JexlException xjexl) {
+        } catch (JexlException xjexl) {
             Assert.assertNotNull(xjexl);
         }
         // call public override, ok

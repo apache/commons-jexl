@@ -128,7 +128,7 @@ public class OptionalTest {
             script = jexl.createScript(info.at(62, 1), "thing.name.size()", "thing");
             result = script.execute(null, thing);
             Assert.fail("should have thrown");
-        } catch(JexlException.Method xmethod) {
+        } catch (JexlException.Method xmethod) {
             Assert.assertEquals("size", xmethod.getDetail());
             Assert.assertEquals("test352@62:11 unsolvable function/method 'size'", xmethod.getMessage());
         }
@@ -136,7 +136,7 @@ public class OptionalTest {
         try {
             script = jexl.createScript(info.at(71, 1), "thing.name?.size()", "thing");
             result = script.execute(null, thing);
-        } catch(JexlException.Method xmethod) {
+        } catch (JexlException.Method xmethod) {
             Assert.fail("should not have thrown");
         }
 

@@ -694,7 +694,7 @@ public class Issues300Test {
         try {
             Object result = run361a(jexl);
             Assert.fail("null arg should fail");
-        } catch(JexlException xany) {
+        } catch (JexlException xany) {
             Assert.assertNotNull(xany);
         }
     }
@@ -713,7 +713,7 @@ public class Issues300Test {
         try {
             Object result = run361b(jexl);
             Assert.fail("null arg should fail");
-        } catch(JexlException xany) {
+        } catch (JexlException xany) {
             Assert.assertNotNull(xany);
         }
     }
@@ -746,7 +746,7 @@ public class Issues300Test {
         try {
             run361c(jexl);
             Assert.fail("null arg should fail");
-        } catch(JexlException xany) {
+        } catch (JexlException xany) {
             Assert.assertNotNull(xany);
         }
     }
@@ -788,7 +788,7 @@ public class Issues300Test {
         try {
             Object result = run361d(jexl);
             Assert.fail("null arg should fail");
-        } catch(JexlException xany) {
+        } catch (JexlException xany) {
             Assert.assertNotNull(xany);
         }
     }
@@ -841,7 +841,7 @@ public class Issues300Test {
         try {
             get.evaluate(ctxt);
             Assert.fail("phone should be undefined!");
-        } catch(JexlException.Variable xvar) {
+        } catch (JexlException.Variable xvar) {
             Assert.assertEquals("phone", xvar.getVariable());
         }
     }
@@ -935,7 +935,7 @@ public class Issues300Test {
         try {
             JexlScript script = jexl.createScript(info, src);
             Assert.fail("should not parse");
-        } catch(JexlException.Parsing xparse) {
+        } catch (JexlException.Parsing xparse) {
             String msg = xparse.getMessage();
             Assert.assertTrue(msg.contains("badscript"));
         }
@@ -1045,12 +1045,12 @@ public class Issues300Test {
         s1 = jexl.createScript(src1);
         try {
             Assert.assertEquals(2, s0.execute(null, (Object) null));
-        } catch(JexlException.Variable xvar) {
+        } catch (JexlException.Variable xvar) {
             Assert.assertEquals("a", xvar.getVariable());
         }
         try {
             Assert.assertEquals(1, s1.execute(null, (Object) null));
-        } catch(JexlException.Variable xvar) {
+        } catch (JexlException.Variable xvar) {
             Assert.assertEquals("a", xvar.getVariable());
         }
         // global var null
@@ -1166,7 +1166,7 @@ public class Issues300Test {
         try {
             script = jexl.createScript(src);
             Assert.fail("should have failed parsing");
-        } catch(JexlException.Parsing xparse) {
+        } catch (JexlException.Parsing xparse) {
             Assert.assertTrue(xparse.getDetail().contains("pragma"));
         }
         src = "if (true) { #pragma one 42 }";
@@ -1250,7 +1250,7 @@ public class Issues300Test {
         try {
             JexlScript script = jexl.createScript(src);
             Assert.fail("should fail on const total assignment");
-        } catch(JexlException.Parsing xparse) {
+        } catch (JexlException.Parsing xparse) {
             Assert.assertTrue(xparse.getMessage().contains("total"));
         }
     }

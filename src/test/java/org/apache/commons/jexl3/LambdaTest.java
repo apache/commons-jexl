@@ -441,7 +441,7 @@ public class LambdaTest extends JexlTestCase {
         jexl = createEngine(features);
         try {
             script = jexl.createScript(src);
-        } catch(JexlException.Feature xfeature) {
+        } catch (JexlException.Feature xfeature) {
             Assert.assertTrue(xfeature.getMessage().contains("fat-arrow"));
         }
     }
@@ -462,7 +462,7 @@ public class LambdaTest extends JexlTestCase {
         try {
             JexlScript script = jexl.createScript(src);
             Assert.fail("should fail, foo is already defined");
-        } catch(JexlException.Parsing xparse) {
+        } catch (JexlException.Parsing xparse) {
             Assert.assertTrue(xparse.getMessage().contains("foo"));
         }
     }
@@ -472,7 +472,7 @@ public class LambdaTest extends JexlTestCase {
         JexlEngine jexl = createEngine();
         try {
             JexlScript script = jexl.createScript(src);
-        } catch(JexlException.Parsing xparse) {
+        } catch (JexlException.Parsing xparse) {
             Assert.assertTrue(xparse.getMessage().contains("function"));
         }
     }
@@ -483,7 +483,7 @@ public class LambdaTest extends JexlTestCase {
         JexlEngine jexl = createEngine();
         try {
             JexlScript script = jexl.createScript(src);
-        } catch(JexlException.Parsing xparse) {
+        } catch (JexlException.Parsing xparse) {
             Assert.assertTrue(xparse.getMessage().contains("let"));
         }
     }

@@ -122,7 +122,7 @@ public class AnnotationTest extends JexlTestCase {
                 final boolean b = options.isSilent();
                 try {
                     return statement.call();
-                } catch(final JexlException xjexl) {
+                } catch (final JexlException xjexl) {
                     return null;
                 } finally {
                     options.setSilent(b);

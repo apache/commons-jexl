@@ -171,7 +171,7 @@ public class JexlTestCase {
         try {
             method = this.getClass().getDeclaredMethod(name, NO_PARMS);
         }
-        catch(final Exception xany) {
+        catch (final Exception xany) {
             Assert.fail("no such test: " + name);
             return;
         }
@@ -203,7 +203,7 @@ public class JexlTestCase {
         try {
             clazz = (Class<JexlTestCase>) Class.forName(testClassName);
         }
-        catch(final ClassNotFoundException xclass) {
+        catch (final ClassNotFoundException xclass) {
             Assert.fail("no such class: " + testClassName);
             return;
         }
@@ -213,17 +213,17 @@ public class JexlTestCase {
             ctor = clazz.getConstructor(STRING_PARM);
             test = ctor.newInstance("debug");
         }
-        catch(final NoSuchMethodException xctor) {
+        catch (final NoSuchMethodException xctor) {
             // instantiate default class ctor
             try {
                 test = clazz.newInstance();
             }
-            catch(final Exception xany) {
+            catch (final Exception xany) {
                 Assert.fail("cant instantiate test: " + xany);
                 return;
             }
         }
-        catch(final Exception xany) {
+        catch (final Exception xany) {
             Assert.fail("cant instantiate test: " + xany);
             return;
         }

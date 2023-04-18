@@ -484,7 +484,7 @@ public class ArithmeticOperatorTest extends JexlTestCase {
             } else {
                 Assert.assertEquals(1, log.count("warn"));
             }
-        } catch(final JexlException.Operator xop) {
+        } catch (final JexlException.Operator xop) {
             Assert.assertEquals("*", xop.getSymbol());
         }
         if (!silent) {

@@ -66,7 +66,7 @@ public class ArithmeticTest extends JexlTestCase {
     static private void assertNullOperand(java.util.function.Supplier<Object> fun) {
         try {
             Assert.assertNull(fun.get());
-        } catch(JexlArithmetic.NullOperand xany) {
+        } catch (JexlArithmetic.NullOperand xany) {
             Assert.assertNotNull(xany);
         }
     }
@@ -74,7 +74,7 @@ public class ArithmeticTest extends JexlTestCase {
     static private void assertArithmeticException(java.util.function.Supplier<Object> fun) {
         try {
             Assert.assertNull(fun.get());
-        } catch(ArithmeticException xany) {
+        } catch (ArithmeticException xany) {
             Assert.assertNotNull(xany);
         }
     }
@@ -1653,7 +1653,7 @@ public class ArithmeticTest extends JexlTestCase {
             info = (Attr) nnm.getNamedItem("info");
             Assert.assertEquals(y, r);
             Assert.assertEquals(y, info.getValue());
-        } catch(JexlException.Property xprop) {
+        } catch (JexlException.Property xprop) {
             // test fails in java > 11 because modules, etc; need investigation
             Assert.assertTrue(xprop.getMessage().contains("info"));
             Assert.assertTrue(getJavaVersion() > 11);

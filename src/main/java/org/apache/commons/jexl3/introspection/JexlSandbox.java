@@ -167,7 +167,7 @@ public final class JexlSandbox {
     static Class<?> forName(final String cname) {
         try {
             return Class.forName(cname);
-        } catch(final Exception xany) {
+        } catch (final Exception xany) {
             return null;
         }
     }

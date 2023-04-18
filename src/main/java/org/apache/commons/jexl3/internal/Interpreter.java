@@ -116,7 +116,7 @@ public class Interpreter extends InterpreterBase {
             }
             cancelCheck(node);
             return arithmetic.controlReturn(node.jjtAccept(this, null));
-        } catch(final StackOverflowError xstack) {
+        } catch (final StackOverflowError xstack) {
             final JexlException xjexl = new JexlException.StackOverflow(node.jexlInfo(), "jvm", xstack);
             if (!isSilent()) {
                 throw xjexl.clean();
@@ -979,7 +979,7 @@ public class Interpreter extends InterpreterBase {
         Object condition;
         try {
             condition = node.jjtGetChild(0).jjtAccept(this, data);
-        } catch(final JexlException xany) {
+        } catch (final JexlException xany) {
             if (!(xany.getCause() instanceof JexlArithmetic.NullOperand)) {
                 throw xany;
             }
@@ -1004,7 +1004,7 @@ public class Interpreter extends InterpreterBase {
         Object lhs;
         try {
             lhs = node.jjtGetChild(0).jjtAccept(this, data);
-        } catch(final JexlException xany) {
+        } catch (final JexlException xany) {
             if (!(xany.getCause() instanceof JexlArithmetic.NullOperand)) {
                 throw xany;
             }
@@ -1019,7 +1019,7 @@ public class Interpreter extends InterpreterBase {
         try {
             final Object val = node.jjtGetChild(0).jjtAccept(this, data);
             return operators.size(node, val);
-        } catch(final JexlException xany) {
+        } catch (final JexlException xany) {
             return 0;
         }
     }
@@ -1029,7 +1029,7 @@ public class Interpreter extends InterpreterBase {
         try {
             final Object value = node.jjtGetChild(0).jjtAccept(this, data);
             return operators.empty(node, value);
-        } catch(final JexlException xany) {
+        } catch (final JexlException xany) {
             return true;
         }
     }

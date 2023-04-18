@@ -440,7 +440,7 @@ public class LexicalTest {
         try {
         final Object result = script.execute(ctxt);
         Assert.fail("setting options.lexical should have no effect during execution");
-        } catch(final JexlException xf) {
+        } catch (final JexlException xf) {
             Assert.assertNotNull(xf);
         }
     }
@@ -948,7 +948,7 @@ public class LexicalTest {
             final JexlScript script = jexl.createScript(
                     "const foo;  foo");
             Assert.fail("should fail, const foo must be followed by assign.");
-        } catch(JexlException.Parsing xparse) {
+        } catch (JexlException.Parsing xparse) {
             Assert.assertTrue(xparse.getMessage().contains("const"));
         }
     }
@@ -1011,7 +1011,7 @@ public class LexicalTest {
             try {
                 final JexlScript script = jexl.createScript("{ const foo = 42; } { let foo  = 0; foo " + op + " 1; }");
                 Assert.assertNotNull(script);
-            } catch(JexlException.Parsing xparse) {
+            } catch (JexlException.Parsing xparse) {
                 Assert.fail(xparse.toString());
             }
         }
@@ -1045,7 +1045,7 @@ public class LexicalTest {
                 JexlScript script = jexl.createScript(src);
                 Object result = script.execute(null);
                 Assert.fail(src);
-            } catch(JexlException.Assignment xassign) {
+            } catch (JexlException.Assignment xassign) {
                 Assert.assertNotNull(src, xassign); // debug breakpoint
             }
         }

@@ -83,7 +83,7 @@ public class PublicFieldsTest extends JexlTestCase {
             ctxt.set("value", UPPER42);
             Assert.assertNull(set.evaluate(ctxt));
             Assert.fail("should have thrown");
-        } catch(final JexlException xjexl) {}
+        } catch (final JexlException xjexl) {}
     }
 
     @Test
@@ -126,7 +126,7 @@ public class PublicFieldsTest extends JexlTestCase {
             ctxt.set("value", UPPER42);
             Assert.assertNull(set.evaluate(ctxt));
             Assert.fail("should have thrown");
-        } catch(final JexlException xjexl) {}
+        } catch (final JexlException xjexl) {}
     }
 
     public enum Gender { MALE, FEMALE }

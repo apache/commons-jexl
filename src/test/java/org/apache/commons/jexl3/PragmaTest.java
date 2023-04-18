@@ -191,7 +191,7 @@ public class PragmaTest extends JexlTestCase {
             script = JEXL.createScript("#pragma jexl.module.m0 ''\n#pragma jexl.module.m0 \"fubar('module0')\"\n m0:f43(10);");
             result = script.execute(ctxt);
             Assert.fail("fubar sshoud fail");
-        } catch(JexlException.Method xmethod) {
+        } catch (JexlException.Method xmethod) {
             Assert.assertEquals("fubar", xmethod.getMethod());
         }
     }
@@ -265,7 +265,7 @@ public class PragmaTest extends JexlTestCase {
         final JexlEngine jexl = new JexlBuilder().features(features).create();
         try {
             final JexlScript script = jexl.createScript(src);
-        } catch(JexlException.Parsing xparse) {
+        } catch (JexlException.Parsing xparse) {
             Assert.assertTrue(xparse.getMessage().contains("import pragma"));
         }
     }
@@ -280,7 +280,7 @@ public class PragmaTest extends JexlTestCase {
                             + "sleeper:sleep(100);"
                             + "42");
             Assert.fail("should have thrown syntax exception");
-        } catch(JexlException.Parsing xparse) {
+        } catch (JexlException.Parsing xparse) {
             Assert.assertTrue(xparse.getMessage().contains("namespace pragma"));
         }
     }

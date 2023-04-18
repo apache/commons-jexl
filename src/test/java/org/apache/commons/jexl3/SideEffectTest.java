@@ -752,7 +752,7 @@ public class SideEffectTest extends JexlTestCase {
             Assert.assertTrue(zz instanceof List<?>);
             z = (List<String>) zz;
             Assert.assertEquals(1, z.size());
-        } catch(JexlException | ArithmeticException xjexl) {
+        } catch (JexlException | ArithmeticException xjexl) {
             t246 = true;
             Assert.assertEquals(j246.getClass(), Arithmetic246.class);
         }

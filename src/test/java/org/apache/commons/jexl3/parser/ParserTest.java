@@ -69,7 +69,7 @@ public class ParserTest {
             Assert.fail("should have failed on ambiguous statement");
         } catch (final JexlException.Ambiguous xambiguous) {
             // ok
-        } catch(final JexlException xother) {
+        } catch (final JexlException xother) {
             Assert.fail(xother.toString());
         }
     }

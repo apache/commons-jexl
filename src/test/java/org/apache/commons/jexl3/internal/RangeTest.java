@@ -129,7 +129,7 @@ public class RangeTest extends JexlTestCase {
                     case 14: lr1.removeAll(Collections.singletonList(v0)); Assert.fail(); break;
                     case 15: lr1.retainAll(Collections.singletonList(v0)); Assert.fail(); break;
                 }
-            } catch(final UnsupportedOperationException xuo) {
+            } catch (final UnsupportedOperationException xuo) {
                 // ok
             }
             lc0 -= 1;
@@ -138,7 +138,7 @@ public class RangeTest extends JexlTestCase {
         try {
             il0.next();
             Assert.fail();
-        } catch(final NoSuchElementException xns) {
+        } catch (final NoSuchElementException xns) {
             // ok
         }
 
@@ -156,7 +156,7 @@ public class RangeTest extends JexlTestCase {
                     case 14: ir1.removeAll(Collections.singletonList(v0)); Assert.fail(); break;
                     case 15: ir1.retainAll(Collections.singletonList(v0)); Assert.fail(); break;
                 }
-            } catch(final UnsupportedOperationException xuo) {
+            } catch (final UnsupportedOperationException xuo) {
                 // ok
             }
             ic0 -= 1;
@@ -165,7 +165,7 @@ public class RangeTest extends JexlTestCase {
         try {
             ii0.next();
             Assert.fail();
-        } catch(final NoSuchElementException xns) {
+        } catch (final NoSuchElementException xns) {
             // ok
         }
 

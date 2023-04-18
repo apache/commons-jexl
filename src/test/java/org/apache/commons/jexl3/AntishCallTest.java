@@ -98,7 +98,7 @@ public class AntishCallTest extends JexlTestCase {
             if (!super.has(str)) {
                 try {
                     return CallSupportContext.class.getClassLoader().loadClass(str);
-                } catch(final Exception xany) {
+                } catch (final Exception xany) {
                     return null;
                 }
             }
@@ -109,7 +109,7 @@ public class AntishCallTest extends JexlTestCase {
             if (!super.has(str)){
                 try {
                     return CallSupportContext.class.getClassLoader().loadClass(str) != null;
-                } catch(final Exception xany) {
+                } catch (final Exception xany) {
                     return false;
                 }
             }
@@ -155,7 +155,7 @@ public class AntishCallTest extends JexlTestCase {
         try {
             runTestCall(jexl, jc);
         Assert.fail("should have failed");
-        } catch(final JexlException xjexl) {
+        } catch (final JexlException xjexl) {
             //
         }
     }
@@ -189,9 +189,9 @@ public class AntishCallTest extends JexlTestCase {
         try {
             result = script.execute(ctxt);
             Assert.fail("antish var shall not be resolved");
-        } catch(final JexlException.Variable xvar) {
+        } catch (final JexlException.Variable xvar) {
             Assert.assertEquals("x", xvar.getVariable());
-        } catch(final JexlException xother) {
+        } catch (final JexlException xother) {
             Assert.assertNotNull(xother);
         } finally {
             options.setAntish(true);
@@ -207,7 +207,7 @@ public class AntishCallTest extends JexlTestCase {
         try {
              result = script.execute(ctxt);
              Assert.fail("not antish assign");
-        } catch(final JexlException xjexl) {
+        } catch (final JexlException xjexl) {
             Assert.assertNull(result);
         }
 
@@ -216,7 +216,7 @@ public class AntishCallTest extends JexlTestCase {
         try {
              result = script.execute(ctxt);
              Assert.fail("x not defined");
-        } catch(final JexlException xjexl) {
+        } catch (final JexlException xjexl) {
             Assert.assertNull(result);
         }
 
@@ -225,7 +225,7 @@ public class AntishCallTest extends JexlTestCase {
         try {
              result = script.execute(ctxt);
              Assert.fail("not antish assign");
-        } catch(final JexlException xjexl) {
+        } catch (final JexlException xjexl) {
             Assert.assertNull(result);
         }
 
@@ -234,7 +234,7 @@ public class AntishCallTest extends JexlTestCase {
         try {
              result = script.execute(ctxt);
              Assert.fail("not antish assign");
-        } catch(final JexlException xjexl) {
+        } catch (final JexlException xjexl) {
             Assert.assertNull(result);
         }
     }

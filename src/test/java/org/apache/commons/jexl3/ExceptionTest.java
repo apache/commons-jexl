@@ -263,7 +263,7 @@ public class ExceptionTest extends JexlTestCase {
             if (strict && !silent) {
                 Assert.fail("should have thrown an exception");
             }
-        } catch(final JexlException xjexl) {
+        } catch (final JexlException xjexl) {
             if (!strict || silent) {
                 Assert.fail(src + ": should not have thrown an exception");
             }

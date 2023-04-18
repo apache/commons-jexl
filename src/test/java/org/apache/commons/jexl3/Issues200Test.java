@@ -124,7 +124,7 @@ public class Issues200Test extends JexlTestCase {
         try {
             e.execute(jc);
             Assert.fail("should have thrown an exception");
-        } catch(final JexlException xjexl) {
+        } catch (final JexlException xjexl) {
             final Throwable th = xjexl.getCause();
             Assert.assertEquals("NPE210", th.getMessage());
         }
@@ -150,7 +150,7 @@ public class Issues200Test extends JexlTestCase {
         try {
             r = e.execute(jc);
             Assert.fail("should have thrown an exception");
-        } catch(final JexlException xjexl) {
+        } catch (final JexlException xjexl) {
             final Throwable th = xjexl.getCause();
             Assert.assertEquals(ArrayIndexOutOfBoundsException.class, th.getClass());
         }
@@ -336,14 +336,14 @@ public class Issues200Test extends JexlTestCase {
             try {
                 foobaz.evaluate(ctx);
                 Assert.fail("foo.baz is not solvable, exception expected");
-            } catch(final JexlException xp) {
+            } catch (final JexlException xp) {
                 Assert.assertTrue(xp instanceof JexlException.Property);
             }
             // fail level 2
             try {
                 foobarbaz.evaluate(ctx);
                 Assert.fail("foo.bar.baz is not solvable, exception expected");
-            } catch(final JexlException xp) {
+            } catch (final JexlException xp) {
                 Assert.assertTrue(xp instanceof JexlException.Property);
             }
         }
@@ -378,7 +378,7 @@ public class Issues200Test extends JexlTestCase {
         try {
              script.execute(ctx);
              Assert.fail("should have failed!");
-        } catch(final JexlException xjexl) {
+        } catch (final JexlException xjexl) {
             // expected
         }
         script = engine.createScript("java.version");
@@ -578,7 +578,7 @@ public class Issues200Test extends JexlTestCase {
         try {
             result = script.execute(ctxt, 32);
             Assert.fail("should have overflown");
-        } catch(final JexlException.StackOverflow xstack) {
+        } catch (final JexlException.StackOverflow xstack) {
             // expected
             final String sxs = xstack.toString();
             Assert.assertTrue(sxs.contains("jexl"));
@@ -588,7 +588,7 @@ public class Issues200Test extends JexlTestCase {
         try {
             result = script.execute(ctxt, 32);
             Assert.fail("should have overflown");
-        } catch(final JexlException.StackOverflow xstack) {
+        } catch (final JexlException.StackOverflow xstack) {
             // expected
             final String sxs = xstack.toString();
             Assert.assertTrue(sxs.contains("jvm"));
@@ -680,7 +680,7 @@ public class Issues200Test extends JexlTestCase {
             try {
                 jc = jexl.createScript(src);
                 Assert.fail("should have failed, " + (jc != null));
-            } catch(final JexlException.Ambiguous xa) {
+            } catch (final JexlException.Ambiguous xa) {
                 final String str = xa.toString();
                 Assert.assertTrue(str.contains("143"));
                 src = xa.tryCleanSource(src);
@@ -791,7 +791,7 @@ public class Issues200Test extends JexlTestCase {
         result = null;
         try {
             result = script.execute(ctxt, (Object) null);
-        } catch(final JexlException xany) {
+        } catch (final JexlException xany) {
             Assert.assertNotNull(xany.getMessage());
         }
         Assert.assertNull(result);

@@ -105,7 +105,7 @@ public class JexlScriptEngineTest {
                             + "now=sys.currentTimeMillis();"
             );
             Assert.fail("default engine no longer accesses System classes");
-        } catch(ScriptException xscript) {
+        } catch (ScriptException xscript) {
             JexlException.Method xjexl = (JexlException.Method) xscript.getCause();
             Assert.assertEquals("forName", xjexl.getMethod());
         }
@@ -219,24 +219,24 @@ public class JexlScriptEngineTest {
         engine.put("errors", new Errors());
         try {
             engine.eval("errors.npe()");
-        } catch(ScriptException xscript) {
+        } catch (ScriptException xscript) {
             Assert.assertTrue(xscript.getCause() instanceof NullPointerException);
         }
         try {
             engine.eval("errors.illegal()", ctxt);
-        } catch(ScriptException xscript) {
+        } catch (ScriptException xscript) {
             Assert.assertTrue(xscript.getCause() instanceof IllegalArgumentException);
         }
         CompiledScript script0 = engine.compile("errors.npe()");
         try {
             script0.eval();
-        } catch(ScriptException xscript) {
+        } catch (ScriptException xscript) {
             Assert.assertTrue(xscript.getCause() instanceof NullPointerException);
         }
         CompiledScript script1 = engine.compile("errors.illegal()");
         try {
             script1.eval(ctxt);
-        } catch(ScriptException xscript) {
+        } catch (ScriptException xscript) {
             Assert.assertTrue(xscript.getCause() instanceof IllegalArgumentException);
         }
     }
@@ -252,13 +252,13 @@ public class JexlScriptEngineTest {
         try {
             CompiledScript script0 = engine.compile(str);
             Assert.fail("should have thrown npe");
-        } catch(NullPointerException npe) {
+        } catch (NullPointerException npe) {
             Assert.assertNotNull(npe);
         }
         try {
             CompiledScript script0 = engine.compile(reader);
             Assert.fail("should have thrown npe");
-        } catch(NullPointerException npe) {
+        } catch (NullPointerException npe) {
             Assert.assertNotNull(npe);
         }
         try {
@@ -268,7 +268,7 @@ public class JexlScriptEngineTest {
             Assert.assertEquals(7, result);
             result = script0.eval();
             Assert.assertEquals(7, result);
-        } catch(ScriptException xscript) {
+        } catch (ScriptException xscript) {
             Assert.assertTrue(xscript.getCause() instanceof NullPointerException);
         }
         try {
@@ -281,7 +281,7 @@ public class JexlScriptEngineTest {
             ctxt.setAttribute("y", -22, ScriptContext.ENGINE_SCOPE);
             result = script0.eval();
             Assert.assertEquals(-42, result);
-        } catch(ScriptException xscript) {
+        } catch (ScriptException xscript) {
             Assert.assertTrue(xscript.getCause() instanceof NullPointerException);
         }
 

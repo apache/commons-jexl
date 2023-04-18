@@ -251,7 +251,7 @@ public class ContextNamespaceTest extends JexlTestCase {
         JexlScript script = null;
         try {
            script = jexl.createScript(src);
-        } catch(JexlException.Parsing xparse) {
+        } catch (JexlException.Parsing xparse) {
             Assert.fail(src);
         }
         ctxt.set("x", null);
@@ -313,14 +313,14 @@ public class ContextNamespaceTest extends JexlTestCase {
         try {
             ctxt.get("vat");
             Assert.fail("should have failed");
-        } catch(final JexlException.Property xprop) {
+        } catch (final JexlException.Property xprop) {
             //
         }
 
         try {
             ctxt.set("vat", 33.0d);
             Assert.fail("should have failed");
-        } catch(final JexlException.Property xprop) {
+        } catch (final JexlException.Property xprop) {
             //
         }
     }

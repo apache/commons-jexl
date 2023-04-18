@@ -63,14 +63,14 @@ public class VarTest extends JexlTestCase {
         try {
             final Object o = e.execute(ctxt);
             Assert.fail("should have thrown an unknown var exception");
-        } catch(final JexlException xjexl) {
+        } catch (final JexlException xjexl) {
             // ok since we are strict and x does not exist
         }
         e = JEXL.createScript("x = 42");
         try {
             final Object o = e.execute(ctxt);
             Assert.fail("should have thrown a readonly context exception");
-        } catch(final JexlException xjexl) {
+        } catch (final JexlException xjexl) {
             // ok since we are strict and context is readonly
         }
 
@@ -79,7 +79,7 @@ public class VarTest extends JexlTestCase {
         try {
             final Object o = e.execute(ctxt);
             Assert.fail("should have thrown an unknown method exception");
-        } catch(final JexlException xjexl) {
+        } catch (final JexlException xjexl) {
             // ok since we are strict and method does not exist
         }
     }

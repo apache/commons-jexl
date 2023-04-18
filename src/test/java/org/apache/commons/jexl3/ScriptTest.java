@@ -109,7 +109,7 @@ public class ScriptTest extends JexlTestCase {
             Object result = s.execute(jc, httpr,url);
             Assert.assertNotNull(result);
             Assert.assertEquals(response, result);
-        } catch(IOException xio) {
+        } catch (IOException xio) {
             Assert.fail(xio.getMessage());
         } finally {
             if (server != null) {
@@ -132,7 +132,7 @@ public class ScriptTest extends JexlTestCase {
             Object result = s.execute(jc);
             Assert.assertNotNull(result);
             Assert.assertEquals(response, result);
-        } catch(IOException xio) {
+        } catch (IOException xio) {
             Assert.fail(xio.getMessage());
         } finally {
             if (server != null) {
@@ -199,7 +199,7 @@ public class ScriptTest extends JexlTestCase {
         for(int port = 8001; server == null && port < 8127; ++port) {
             try {
                 server = HttpServer.create(new InetSocketAddress("localhost", port), 0);
-            } catch(java.net.BindException xbind) {
+            } catch (java.net.BindException xbind) {
                 xlatest = xbind;
             }
         }

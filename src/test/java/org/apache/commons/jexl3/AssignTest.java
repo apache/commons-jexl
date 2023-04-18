@@ -120,7 +120,7 @@ public class AssignTest extends JexlTestCase {
         try {
             o = assign.evaluate(jc);
         }
-        catch(final RuntimeException xrt) {
+        catch (final RuntimeException xrt) {
             final String str = xrt.toString();
             Assert.assertTrue(str.contains("nosuchbean"));
         }
