@@ -152,7 +152,7 @@
                 Bump pmd from 6.48.0 to 6.52.0.
             </action>
             <action dev="ggregory" type="update" due-to="Dependabot">
-                Bump commons-parent from 53 to 56 #121, #148, #155.
+                Bump commons-parent from 53 to 57 #121, #148, #155, #176.
             </action>
             <action dev="ggregory" type="update" due-to="Gary Gregory">
                 Bump junit from 4.13.2 to 5.9.1 Vintage.
