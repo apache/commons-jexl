@@ -519,4 +519,49 @@
             <name>Dmitri Blinov</name>
         </contributor>
     </contributors>
+
+    <profiles>
+        <profile>
+            <id>java-module</id>
+            <activation>
+                <jdk>[9,)</jdk>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.moditect</groupId>
+                        <artifactId>moditect-maven-plugin</artifactId>
+                        <version>1.0.0.RC3</version>
+                        <executions>
+                            <execution>
+                                <id>add-module-infos</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>add-module-info</goal>
+                                </goals>
+                                <configuration>
+                                    <jvmVersion>9</jvmVersion>
+                                    <overwriteExistingFiles>true</overwriteExistingFiles>
+                                    <module>
+                                        <moduleInfo>
+                                            <name>${commons.module.name}</name>
+                                            <exports>
+                                                !org.apache.commons.jexl3.parser;
+                                                !org.apache.commons.jexl3.internal*;
+                                                *;
+                                            </exports>
+                                            <addServiceUses>true</addServiceUses>
+                                        </moduleInfo>
+                                    </module>
+                                    <jdepsExtraArgs>
+                                        <arg>--multi-release=9</arg>
+                                    </jdepsExtraArgs>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>
