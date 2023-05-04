@@ -18,12 +18,14 @@ package org.apache.commons.jexl3;
 
 import org.apache.commons.jexl3.internal.Engine32;
 import org.apache.commons.jexl3.internal.OptionsContext;
+import static org.apache.commons.jexl3.introspection.JexlPermissions.RESTRICTED;
 import org.apache.commons.jexl3.introspection.JexlSandbox;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.lang.reflect.Proxy;
 import java.math.MathContext;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -1284,4 +1286,38 @@ public class Issues300Test {
         Assert.assertEquals("foo", x.toString());
     }
 
+    public interface Interface397i {
+        String summary();
+    }
+    static private class Class397 implements Interface397i {
+        @Override public String summary() {
+            return getClass().getName();
+        }
+    }
+    <T> T createProxy(final JexlEngine jexl, final Object o, final Class[] clazzz) {
+        // a JEX-based delegating proxy
+        return (T) Proxy.newProxyInstance(getClass().getClassLoader(), clazzz,
+            (proxy, method, args) ->  jexl.invokeMethod(o, method.getName(), args)
+        );
+    }
+
+    @Test public void testIssue397() {
+        String result;
+        final String control = Class397.class.getName();
+        final JexlEngine jexl = new JexlBuilder().permissions(RESTRICTED).create();
+
+        Interface397i instance = new Class397();
+        result = (String) jexl.invokeMethod(instance, "summary");
+        Assert.assertEquals(control, result);
+
+        Interface397i proxy = createProxy(jexl, instance, new Class[] { Interface397i.class }) ;
+        result = (String) jexl.invokeMethod(proxy, "summary");
+        Assert.assertEquals(control, result);
+
+        JexlScript script = jexl.createScript("dan.summary()", "dan");
+        result = (String) script.execute(null, instance);
+        Assert.assertEquals(control, result);
+        result = (String) script.execute(null, proxy);
+        Assert.assertEquals(control, result);
+    }
 }

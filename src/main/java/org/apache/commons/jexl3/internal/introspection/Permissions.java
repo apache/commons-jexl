@@ -20,6 +20,7 @@ package org.apache.commons.jexl3.internal.introspection;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -405,6 +406,10 @@ public class Permissions implements JexlPermissions {
         // clazz must be not null
         if (!validate(clazz)) {
             return false;
+        }
+        // proxy goes through
+        if (Proxy.isProxyClass(clazz)) {
+            return true;
         }
         // class must be allowed
         if (deny(clazz)) {
