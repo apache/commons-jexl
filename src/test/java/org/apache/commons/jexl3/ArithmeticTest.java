@@ -89,13 +89,13 @@ public class ArithmeticTest extends JexlTestCase {
         assertArithmeticException(() -> jexla.mod(1d, 0d));
         assertArithmeticException(() -> jexla.mod(BigInteger.ONE, BigInteger.ZERO));
         assertArithmeticException(() -> jexla.mod(BigInteger.ONE, BigDecimal.ZERO));
-        assertNullOperand(()-> jexla.divide(null, null));
+        assertNullOperand(() -> jexla.divide(null, null));
     }
 
     @Test
     public void testUnaryopsEdges() {
-        assertArithmeticException(()-> jexla.positivize(date) );
-        assertNullOperand(()-> jexla.positivize(null));
+        assertArithmeticException(() -> jexla.positivize(date));
+        assertNullOperand(() -> jexla.positivize(null));
         Assert.assertNull(jexlb.positivize(null));
         Assert.assertEquals(42, jexla.positivize((char) 42));
         Assert.assertEquals(Boolean.TRUE, jexla.positivize(Boolean.TRUE));
@@ -103,16 +103,16 @@ public class ArithmeticTest extends JexlTestCase {
         Assert.assertEquals(Boolean.TRUE, jexla.positivize(new AtomicBoolean(true)));
         Assert.assertEquals(Boolean.FALSE, jexla.positivize(new AtomicBoolean(false)));
 
-        assertNullOperand(()-> jexla.negate(null));
+        assertNullOperand(() -> jexla.negate(null));
         Assert.assertNull(jexlb.negate(null));
-        assertArithmeticException(()-> jexla.negate(date));
+        assertArithmeticException(() -> jexla.negate(date));
         Assert.assertEquals(Boolean.FALSE, jexla.negate(Boolean.TRUE));
         Assert.assertEquals(Boolean.TRUE, jexla.negate(Boolean.FALSE));
     }
 
     @Test
     public void testDivideEdges() {
-        assertNullOperand(()-> jexla.divide(null, null));
+        assertNullOperand(() -> jexla.divide(null, null));
         Assert.assertEquals(0, jexlb.divide(null, null));
         assertNullOperand(() -> jexla.divide(null, null));
         Assert.assertEquals(0, jexlb.mod(null, null));
@@ -127,11 +127,11 @@ public class ArithmeticTest extends JexlTestCase {
 
     @Test
     public void testOperatorsEdges() {
-        assertNullOperand(()-> jexla.multiply(null, null));
+        assertNullOperand(() -> jexla.multiply(null, null));
         Assert.assertEquals(0, jexlb.multiply(null, null));
-        assertNullOperand(()-> jexla.add(null, null));
+        assertNullOperand(() -> jexla.add(null, null));
         Assert.assertEquals(0, jexlb.add(null, null));
-        assertNullOperand(()-> jexla.subtract(null, null));
+        assertNullOperand(() -> jexla.subtract(null, null));
         Assert.assertEquals(0, jexlb.subtract(null, null));
 
         Assert.assertTrue(jexla.contains(null, null));
@@ -148,12 +148,12 @@ public class ArithmeticTest extends JexlTestCase {
 
     @Test
     public void testIntegerCoercionEdges() {
-        assertNullOperand(()-> jexla.toBoolean(null));
+        assertNullOperand(() -> jexla.toBoolean(null));
         Assert.assertTrue(jexla.toBoolean(date));
         // int coercions
-        assertNullOperand(()-> jexla.toInteger(null));
+        assertNullOperand(() -> jexla.toInteger(null));
         Assert.assertEquals(0, jexlb.toInteger(null));
-        assertArithmeticException(()-> jexla.toInteger(date));
+        assertArithmeticException(() -> jexla.toInteger(date));
         Assert.assertEquals(0, jexla.toInteger(Double.NaN));
         Assert.assertEquals(0, jexla.toInteger(""));
         Assert.assertEquals((int) 'b', jexla.toInteger('b'));
@@ -161,9 +161,9 @@ public class ArithmeticTest extends JexlTestCase {
         Assert.assertEquals(0, jexla.toInteger(new AtomicBoolean(false)));
 
         // long coercions
-        assertNullOperand(()-> jexla.toLong(null));
+        assertNullOperand(() -> jexla.toLong(null));
         Assert.assertEquals(0L, jexlb.toLong(null));
-        assertArithmeticException(()-> jexla.toLong(date));
+        assertArithmeticException(() -> jexla.toLong(date));
         Assert.assertEquals(0L, jexla.toLong(Double.NaN));
         Assert.assertEquals(0L, jexla.toLong(""));
         Assert.assertEquals('b', jexla.toLong('b'));
@@ -173,21 +173,21 @@ public class ArithmeticTest extends JexlTestCase {
 
     @Test
     public void testRealCoercionEdges() {
-        assertNullOperand(()-> jexla.toDouble(null));
+        assertNullOperand(() -> jexla.toDouble(null));
         Assert.assertEquals(0.0d, jexlb.toDouble(null), EPSILON);
         Assert.assertEquals(32.0d, jexlb.toDouble((char) 32), EPSILON);
-        assertArithmeticException(()-> jexla.toDouble(date));
+        assertArithmeticException(() -> jexla.toDouble(date));
         Assert.assertTrue(Double.isNaN(jexla.toDouble("")));
         Assert.assertEquals("", jexla.toString(Double.NaN));
 
-        assertNullOperand(()-> jexla.toBigInteger(null));
-        assertArithmeticException(()-> jexla.toBigInteger(date));
+        assertNullOperand(() -> jexla.toBigInteger(null));
+        assertArithmeticException(() -> jexla.toBigInteger(date));
         Assert.assertEquals(BigInteger.ZERO, jexla.toBigInteger(Double.NaN));
         Assert.assertEquals(BigInteger.ZERO, jexla.toBigInteger(""));
         Assert.assertEquals(BigInteger.ZERO, jexla.toBigInteger((char) 0));
 
-        assertNullOperand(()-> jexla.toBigDecimal(null));
-        assertArithmeticException(()-> jexla.toBigDecimal(date));
+        assertNullOperand(() -> jexla.toBigDecimal(null));
+        assertArithmeticException(() -> jexla.toBigDecimal(date));
 
         Assert.assertEquals(BigDecimal.ZERO, jexla.toBigDecimal(Double.NaN));
         Assert.assertEquals(BigDecimal.ZERO, jexla.toBigDecimal(""));
