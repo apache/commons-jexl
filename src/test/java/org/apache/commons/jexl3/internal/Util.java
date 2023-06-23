@@ -62,13 +62,13 @@ public class Util {
                 // test equality
                 final String reason = checkEquals(root, node);
                 if (reason != null) {
-                    throw new RuntimeException("check equal failed: "
+                    throw new IllegalStateException("check equal failed: "
                             + expressiondbg
                             + " /**** " + reason + " **** */ "
                             + entry.getKey());
                 }
             } catch (final JexlException xjexl) {
-                throw new RuntimeException("check parse failed: "
+                throw new IllegalStateException("check parse failed: "
                         + expressiondbg
                         + " /*********/ "
                         + entry.getKey(), xjexl);

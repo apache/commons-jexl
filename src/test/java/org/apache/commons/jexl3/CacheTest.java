@@ -184,7 +184,7 @@ public class CacheTest extends JexlTestCase {
             if ("flag".equals(prop)) {
                 return Boolean.valueOf(flag);
             }
-            throw new RuntimeException("no such property");
+            throw new IllegalArgumentException("no such property");
         }
 
         public void set(final String p, Object v) {
@@ -196,7 +196,7 @@ public class CacheTest extends JexlTestCase {
             } else if ("flag".equals(p)) {
                 flag = Boolean.parseBoolean(v.toString());
             } else {
-                throw new RuntimeException("no such property");
+                throw new IllegalArgumentException("no such property");
             }
         }
     }

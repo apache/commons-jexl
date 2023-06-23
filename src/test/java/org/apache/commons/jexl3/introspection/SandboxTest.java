@@ -16,6 +16,8 @@
  */
 package org.apache.commons.jexl3.introspection;
 
+import static org.junit.Assert.fail;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -31,10 +33,8 @@ import org.apache.commons.jexl3.JexlScript;
 import org.apache.commons.jexl3.JexlTestCase;
 import org.apache.commons.jexl3.MapContext;
 import org.apache.commons.jexl3.annotations.NoJexl;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -72,7 +72,7 @@ public class SandboxTest extends JexlTestCase {
 
         @NoJexl
         public void callMeNot() {
-            throw new RuntimeException("should not be callable!");
+            fail("should not be callable!");
         }
 
         public String allowInherit() {
@@ -86,7 +86,7 @@ public class SandboxTest extends JexlTestCase {
 
         public @NoJexl
         Foo(final String name, final String notcallable) {
-            throw new RuntimeException("should not be callable!");
+            throw new UnsupportedOperationException("should not be callable!");
         }
 
         public Foo(final String name) {
@@ -112,17 +112,17 @@ public class SandboxTest extends JexlTestCase {
 
         @NoJexl
         public String cantCallMe() {
-            throw new RuntimeException("should not be callable!");
+            throw new UnsupportedOperationException("should not be callable!");
         }
 
         @Override
         public void tryMe() {
-            throw new RuntimeException("should not be callable!");
+            throw new UnsupportedOperationException("should not be callable!");
         }
 
         @Override
         public void tryMeARiver() {
-            throw new RuntimeException("should not be callable!");
+            throw new UnsupportedOperationException("should not be callable!");
         }
     }
 
