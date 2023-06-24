@@ -28,6 +28,11 @@
     </properties>
     <body>
         <release version="3.3.1" date="20YY-MM-DD">
+            <!-- FIX -->
+            <action dev="ggregory" type="fix" due-to="step-security-bot, Gary Gregory">
+                [StepSecurity] ci: Harden GitHub Actions #180.
+            </action>            
+            <!-- UPDATE -->
             <action dev="ggregory" type="update" due-to="Gary Gregory">
                 Bump commons-parent from 57 to 58.
             </action>
