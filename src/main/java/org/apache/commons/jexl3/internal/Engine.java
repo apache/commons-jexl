@@ -471,7 +471,7 @@ public class Engine extends JexlEngine {
                         opts.setNamespaces(ns);
                     }
                 }
-                // user defined processor may alter options
+                // user-defined processor may alter options
                 if (processor != null) {
                     processor.processPragma(opts, key, value);
                 }

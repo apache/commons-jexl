@@ -405,7 +405,7 @@ public class JexlScriptEngine extends AbstractScriptEngine implements Compilable
             final Object o = scriptContext.getAttribute(name);
             if (JEXL_OBJECT_KEY.equals(name)) {
                 if (o != null) {
-                    LOG.warn("JEXL is a reserved variable name, user defined value is ignored");
+                    LOG.warn("JEXL is a reserved variable name, user-defined value is ignored");
                 }
                 return jexlObject;
             }

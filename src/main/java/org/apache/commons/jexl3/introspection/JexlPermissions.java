@@ -43,7 +43,7 @@ import java.util.stream.Collectors;
  * annotation processing is actually performed using the result of calling {@link #parse(String...)} with no arguments;
  * implementations shall delegate calls to its methods for {@link org.apache.commons.jexl3.annotations.NoJexl} to be
  * processed.</p>
- * <p>A simple textual configuration can be used to create user defined permissions using
+ * <p>A simple textual configuration can be used to create user-defined permissions using
  * {@link JexlPermissions#parse(String...)}.</p>
  *
  *<p>To instantiate a JEXL engine using permissions, one should use a {@link org.apache.commons.jexl3.JexlBuilder}

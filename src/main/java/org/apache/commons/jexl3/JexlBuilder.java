@@ -555,7 +555,7 @@ public class JexlBuilder {
      * <p>
      * The key or prefix allows to retrieve the bean that plays the role of the namespace.
      * If the prefix is null, the namespace is the top-level namespace allowing to define
-     * top-level user defined namespaces ( ie: myfunc(...) )
+     * top-level user-defined namespaces ( ie: myfunc(...) )
      * </p>
      * <p>Note that the JexlContext is also used to try to solve top-level namespaces. This allows ObjectContext
      * derived instances to call methods on the wrapped object.</p>
