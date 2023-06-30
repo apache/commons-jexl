@@ -33,6 +33,12 @@
                 [StepSecurity] ci: Harden GitHub Actions #180.
             </action>            
             <!-- UPDATE -->
+            <action dev="hbiestro" type="update" due-to="dependabot">
+                Bumps ossf/scorecard-action from 2.1.3 to 2.2.0.
+            </action>
+            <action dev="hbiestro" type="update" due-to="dependabot">
+                Bumps github/codeql-action from 2.1.22 to 2.20.1.
+            </action>
             <action dev="ggregory" type="update" due-to="Gary Gregory">
                 Bump commons-parent from 57 to 58.
             </action>
