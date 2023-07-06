@@ -137,7 +137,7 @@ public class Closure extends Script {
     public Object execute(final JexlContext context, final Object... args) {
         final Frame local = frame != null? frame.assign(args) : null;
         final Interpreter interpreter = createInterpreter(context, local, options);
-        return interpreter.runClosure(this, null);
+        return interpreter.runClosure(this);
     }
 
     @Override
@@ -146,7 +146,7 @@ public class Closure extends Script {
         return new Callable(createInterpreter(context, local, options)) {
             @Override
             public Object interpret() {
-                return interpreter.runClosure(Closure.this, null);
+                return interpreter.runClosure(Closure.this);
             }
         };
     }

@@ -53,7 +53,7 @@ public class Util {
             final JexlFeatures features = entry.getKey().getFeatures();
             // recreate expr from string
             try {
-                final Script exprdbg = jdbg.createScript(features, null, expressiondbg, null);
+                final Script exprdbg = jdbg.createScript(features, null, expressiondbg);
                 // make arg cause become the root cause
                 JexlNode root = exprdbg.script;
                 while (root.jjtGetParent() != null) {

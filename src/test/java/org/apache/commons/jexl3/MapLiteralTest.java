@@ -16,8 +16,10 @@
  */
 package org.apache.commons.jexl3;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.junit.Assert;
 import org.junit.Test;
@@ -34,24 +36,31 @@ public class MapLiteralTest extends JexlTestCase {
 
     @Test
     public void testLiteralWithStrings() throws Exception {
-        final JexlExpression e = JEXL.createExpression("{ 'foo' : 'bar' }");
-        final JexlContext jc = new MapContext();
-
-        final Object o = e.evaluate(jc);
-        Assert.assertEquals(Collections.singletonMap("foo", "bar"), o);
+        List<String> sources = Arrays.asList("{ 'foo' : 'bar' }", "{ 'foo' : 'bar', }");
+        for(String src : sources) {
+            final JexlExpression e = JEXL.createExpression(src);
+            final Object o = e.evaluate(null);
+            Assert.assertEquals(Collections.singletonMap("foo", "bar"), o);
+        }
+        try {
+            Object ff = JEXL.createExpression("{  : , }");
+            Assert.fail(ff.toString());
+        } catch(JexlException.Parsing parsing) {
+            Assert.assertNotNull(parsing);
+        }
     }
 
     @Test
     public void testLiteralWithMultipleEntries() throws Exception {
-        final JexlExpression e = JEXL.createExpression("{ 'foo' : 'bar', 'eat' : 'food' }");
-        final JexlContext jc = new MapContext();
-
         final Map<String, String> expected = new HashMap<>();
         expected.put("foo", "bar");
         expected.put("eat", "food");
-
-        final Object o = e.evaluate(jc);
-        Assert.assertEquals(expected, o);
+        List<String> sources = Arrays.asList("{ 'foo' : 'bar', 'eat' : 'food' }", "{ 'foo' : 'bar', 'eat' : 'food', }");
+        for(String src : sources) {
+            final JexlExpression e = JEXL.createExpression("{ 'foo' : 'bar', 'eat' : 'food' }");
+            final Object o = e.evaluate(null);
+            Assert.assertEquals(expected, o);
+        }
     }
 
     @Test

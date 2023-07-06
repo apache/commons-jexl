@@ -50,21 +50,21 @@ public class CollectionLiteralTest extends JexlTestCase {
             super(strict);
         }
 
-        @Override public MapBuilder mapBuilder(int size) {
-            return new CountingMapBuilder(maps, size);
+        @Override public MapBuilder mapBuilder(int size, boolean extended) {
+            return new CountingMapBuilder(maps, size, extended);
         }
-        @Override public SetBuilder setBuilder(int size) {
-            return new CountingSetBuilder(sets, size);
+        @Override public SetBuilder setBuilder(int size, boolean extended) {
+            return new CountingSetBuilder(sets, size, extended);
         }
-        @Override public ArrayBuilder arrayBuilder(int size) {
-            return new CountingArrayBuilder(arrays, size);
+        @Override public ArrayBuilder arrayBuilder(int size, boolean extended) {
+            return new CountingArrayBuilder(arrays, size, extended);
         }
     }
 
     static class CountingSetBuilder extends SetBuilder {
         final AtomicInteger count;
-        public CountingSetBuilder(AtomicInteger ai, int size) {
-            super(size);
+        public CountingSetBuilder(AtomicInteger ai, int size, boolean extended) {
+            super(size, extended);
             count = ai;
         }
         @Override public Set<?> create() {
@@ -76,8 +76,8 @@ public class CollectionLiteralTest extends JexlTestCase {
 
     static class CountingMapBuilder extends MapBuilder {
         final AtomicInteger count;
-        public CountingMapBuilder(AtomicInteger ai, int size) {
-            super(size);
+        public CountingMapBuilder(AtomicInteger ai, int size, boolean extended) {
+            super(size, extended);
             count = ai;
         }
         @Override public Map<Object, Object> create() {
@@ -90,8 +90,8 @@ public class CollectionLiteralTest extends JexlTestCase {
     static class CountingArrayBuilder extends ArrayBuilder {
         final AtomicInteger count;
 
-        public CountingArrayBuilder(AtomicInteger ai, int size) {
-            super(size);
+        public CountingArrayBuilder(AtomicInteger ai, int size, boolean extended) {
+            super(size, extended);
             count = ai;
         }
 

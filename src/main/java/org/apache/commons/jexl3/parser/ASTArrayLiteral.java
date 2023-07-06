@@ -16,18 +16,14 @@
  */
 package org.apache.commons.jexl3.parser;
 
-import org.apache.commons.jexl3.internal.Debugger;
-
 /**
  * An array literal.
  */
-public final class ASTArrayLiteral extends JexlNode {
+public final class ASTArrayLiteral extends ExtensibleNode {
     /**
      *
      */
     private static final long serialVersionUID = 1L;
-    /** Whether this array is constant or not. */
-    private boolean constant = false;
 
     ASTArrayLiteral(final int id) {
         super(id);
@@ -35,30 +31,6 @@ public final class ASTArrayLiteral extends JexlNode {
 
     ASTArrayLiteral(final Parser p, final int id) {
         super(p, id);
-    }
-
-    @Override
-    public String toString() {
-        final Debugger dbg = new Debugger();
-        return dbg.data(this);
-    }
-
-    @Override
-    protected boolean isConstant(final boolean literal) {
-        return constant;
-    }
-
-    @Override
-    public void jjtClose() {
-        constant = true;
-        for (int c = 0; c < jjtGetNumChildren() && constant; ++c) {
-            final JexlNode child = jjtGetChild(c);
-            if (child instanceof ASTReference) {
-                constant = child.isConstant(true);
-            } else if (!child.isConstant()) {
-                constant = false;
-            }
-        }
     }
 
     @Override

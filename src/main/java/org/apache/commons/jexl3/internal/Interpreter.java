@@ -164,28 +164,6 @@ public class Interpreter extends InterpreterBase {
         return null;
     }
 
-    /**
-     * Gets an attribute of an object.
-     *
-     * @param object    to retrieve value from
-     * @param attribute the attribute of the object, e.g. an index (1, 0, 2) or key for a map
-     * @return the attribute value
-     */
-    public Object getAttribute(final Object object, final Object attribute) {
-        return getAttribute(object, attribute, null);
-    }
-
-    /**
-     * Sets an attribute of an object.
-     *
-     * @param object    to set the value to
-     * @param attribute the attribute of the object, e.g. an index (1, 0, 2) or key for a map
-     * @param value     the value to assign to the object's attribute
-     */
-    public void setAttribute(final Object object, final Object attribute, final Object value) {
-        setAttribute(object, attribute, value, null);
-    }
-
     @Override
     protected Object visit(final ASTAddNode node, final Object data) {
         final Object left = node.jjtGetChild(0).jjtAccept(this, data);
@@ -923,7 +901,7 @@ public class Interpreter extends InterpreterBase {
     @Override
     protected Object visit(final ASTArrayLiteral node, final Object data) {
         final int childCount = node.jjtGetNumChildren();
-        final JexlArithmetic.ArrayBuilder ab = arithmetic.arrayBuilder(childCount);
+        final JexlArithmetic.ArrayBuilder ab = arithmetic.arrayBuilder(childCount, node.isExtended());
         boolean extended = false;
         for (int i = 0; i < childCount; i++) {
             cancelCheck(node);
@@ -946,11 +924,14 @@ public class Interpreter extends InterpreterBase {
     @Override
     protected Object visit(final ASTSetLiteral node, final Object data) {
         final int childCount = node.jjtGetNumChildren();
-        final JexlArithmetic.SetBuilder mb = arithmetic.setBuilder(childCount);
+        final JexlArithmetic.SetBuilder mb = arithmetic.setBuilder(childCount, node.isExtended());
         for (int i = 0; i < childCount; i++) {
             cancelCheck(node);
-            final Object entry = node.jjtGetChild(i).jjtAccept(this, data);
-            mb.add(entry);
+            final JexlNode child = node.jjtGetChild(i);
+            if (!(child instanceof ASTExtendedLiteral)) {
+                final Object entry = child.jjtAccept(this, data);
+                mb.add(entry);
+            }
         }
         return mb.create();
     }
@@ -958,11 +939,14 @@ public class Interpreter extends InterpreterBase {
     @Override
     protected Object visit(final ASTMapLiteral node, final Object data) {
         final int childCount = node.jjtGetNumChildren();
-        final JexlArithmetic.MapBuilder mb = arithmetic.mapBuilder(childCount);
+        final JexlArithmetic.MapBuilder mb = arithmetic.mapBuilder(childCount, node.isExtended());
         for (int i = 0; i < childCount; i++) {
             cancelCheck(node);
-            final Object[] entry = (Object[]) (node.jjtGetChild(i)).jjtAccept(this, data);
-            mb.put(entry[0], entry[1]);
+            final JexlNode child = node.jjtGetChild(i);
+            if (!(child instanceof ASTExtendedLiteral)) {
+                final Object[] entry = (Object[]) child.jjtAccept(this, data);
+                mb.put(entry[0], entry[1]);
+            }
         }
         return mb.create();
     }
@@ -1052,10 +1036,9 @@ public class Interpreter extends InterpreterBase {
     /**
      * Runs a closure.
      * @param closure the closure
-     * @param data the usual data
      * @return the closure return value
      */
-    protected Object runClosure(final Closure closure, final Object data) {
+    protected Object runClosure(final Closure closure) {
         final ASTJexlScript script = closure.getScript();
         // if empty script, nothing to evaluate
         final int numChildren = script.jjtGetNumChildren();
@@ -1813,13 +1796,16 @@ public class Interpreter extends InterpreterBase {
                 narrow = true;
                 // continue;
             }
-        } catch (final JexlException.Method xmethod) {
-            // ignore and handle at end; treat as an inner discover that fails
-        } catch (final JexlException.TryFailed xany) {
+        }
+        catch (final JexlException.TryFailed xany) {
             throw invocationException(node, methodName, xany);
-        } catch (final JexlException xthru) {
-            throw xthru;
-        } catch (final Exception xany) {
+        }
+        catch (final JexlException xthru) {
+            if (xthru.getInfo() != null) {
+                throw xthru;
+            }
+        }
+        catch (final Exception xany) {
             throw invocationException(node, methodName, xany);
         }
         // we have either evaluated and returned or no method was found

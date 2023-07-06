@@ -234,8 +234,8 @@ public class OptionalArithmetic extends JexlArithmetic {
     }
 
     @Override
-    public ArrayBuilder arrayBuilder(final int size) {
-        return new org.apache.commons.jexl3.internal.ArrayBuilder(size) {
+    public ArrayBuilder arrayBuilder(final int size, final boolean extended) {
+        return new org.apache.commons.jexl3.internal.ArrayBuilder(size, extended) {
             @Override
             public void add(Object value) {
                 super.add(star(value));
@@ -244,8 +244,8 @@ public class OptionalArithmetic extends JexlArithmetic {
     }
 
     @Override
-    public SetBuilder setBuilder(final int size) {
-        return new org.apache.commons.jexl3.internal.SetBuilder(size) {
+    public SetBuilder setBuilder(final int size, final boolean extended) {
+        return new org.apache.commons.jexl3.internal.SetBuilder(size, extended) {
             @Override
             public void add(Object value) {
                 super.add(star(value));
@@ -254,8 +254,8 @@ public class OptionalArithmetic extends JexlArithmetic {
     }
 
     @Override
-    public MapBuilder mapBuilder(final int size) {
-        return new org.apache.commons.jexl3.internal.MapBuilder(size) {
+    public MapBuilder mapBuilder(final int size, final boolean extended) {
+        return new org.apache.commons.jexl3.internal.MapBuilder(size, extended) {
             @Override
             public void put(Object key, Object value) {
                 super.put(key, star(value));

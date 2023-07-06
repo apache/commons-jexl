@@ -46,7 +46,7 @@ public class ArrayBuilder implements JexlArithmetic.ArrayBuilder {
     }
 
     /**
-     * Gets the primitive type of a given class (when it exists).
+     * Gets the primitive type of given class (when it exists).
      * @param parm a class
      * @return the primitive type or null it the argument is not unboxable
      */
@@ -65,13 +65,24 @@ public class ArrayBuilder implements JexlArithmetic.ArrayBuilder {
     protected final Object[] untyped;
     /** Number of added items. */
     protected int added = 0;
+    /** Extended? */
+    protected final boolean extended;
 
     /**
      * Creates a new builder.
      * @param size the exact array size
      */
     public ArrayBuilder(final int size) {
-        untyped = new Object[size];
+        this(size, false);
+    }
+    /**
+     * Creates a new builder.
+     * @param size the exact array size
+     * @param extended whether the array is extended
+     */
+    public ArrayBuilder(final int size, final boolean extended) {
+        this.untyped = new Object[size];
+        this.extended = extended;
     }
 
     @Override
@@ -111,11 +122,11 @@ public class ArrayBuilder implements JexlArithmetic.ArrayBuilder {
     }
 
     @Override
-    public Object create(final boolean extended) {
+    public Object create(final boolean e) {
         if (untyped == null) {
             return new Object[0];
         }
-        if (extended) {
+        if (extended || e) {
             final List<Object> list = new ArrayList<>(added);
             list.addAll(Arrays.asList(untyped).subList(0, added));
             return list;

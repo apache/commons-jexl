@@ -1320,4 +1320,37 @@ public class Issues300Test {
         result = (String) script.execute(null, proxy);
         Assert.assertEquals(control, result);
     }
+
+    @Test
+    public void testUnsolvableMethod() throws Exception {
+        final JexlEngine jexl = new JexlBuilder().create();
+        JexlScript script = jexl.createScript(
+            "var myFunction1 = function(object) {"
+                + " myNonExistentFunction();"
+                + "}"
+                + "var myFunction2 = function(object) {"
+                + " myFunction1();"
+                + "}"
+                + "myFunction2();");
+        try {
+            script.execute(new MapContext());
+            Assert.fail("myNonExistentFunction() is not solvable");
+        } catch (final JexlException.Method unsolvable) {
+            Assert.assertEquals("myNonExistentFunction", unsolvable.getMethod());
+        }
+    }
+
+    @Test
+    public void testIssue398() {
+        String src = "let m = {\n" +
+            "  \"foo\": 1,\n" +
+            "  \"bar\": 2,\n" +
+            "}";
+        final JexlEngine jexl = new JexlBuilder().create();
+        JexlScript script = jexl.createScript(src);
+        Object result = script.execute(null);
+        Assert.assertTrue(result instanceof Map);
+        Map<?,?> map = (Map<?, ?>) result;
+        Assert.assertEquals(2, map.size());
+    }
 }

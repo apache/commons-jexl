@@ -626,7 +626,7 @@ public class SandboxTest extends JexlTestCase {
             super(astrict);
         }
         @Override
-        public MapBuilder mapBuilder(final int size) {
+        public MapBuilder mapBuilder(final int size, boolean extended) {
             return mb;
         }
         Map<?,?> getLastMap() {

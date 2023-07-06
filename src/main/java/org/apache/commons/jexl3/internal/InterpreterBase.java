@@ -679,7 +679,7 @@ public abstract class InterpreterBase extends ParserVisitor {
      * <p>When target == context, we are dealing with a global namespace function call
      * @param target the pseudo-method owner, first to-be argument
      * @param narrow whether we should attempt to narrow number arguments
-     * @param args   the other (non null) arguments
+     * @param args   the other (non-null) arguments
      * @return the arguments array
      */
     protected Object[] functionArguments(final Object target, final boolean narrow, final Object[] args) {
@@ -708,7 +708,7 @@ public abstract class InterpreterBase extends ParserVisitor {
      * Concatenate arguments in call(...).
      * @param target the pseudo-method owner, first to-be argument
      * @param narrow whether we should attempt to narrow number arguments
-     * @param args   the other (non null) arguments
+     * @param args   the other (non-null) arguments
      * @return the arguments array
      */
     protected Object[] callArguments(final Object target, final boolean narrow, final Object[] args) {

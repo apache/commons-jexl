@@ -1,4 +1,4 @@
-JEXL 3.0 uses Maven 3 as the build tool, and requires Java 6 (or later).
+JEXL 3.0 uses Maven 3 as the build tool, and requires Java 8 (or later).
 
 The following goals may be useful:
 * mvn clean - clean up
@@ -11,4 +11,3 @@ Note that the Maven build process uses JavaCC to generate some sources.
 These are created under target/generated sources and automatically compiled.
 The generated class files are needed to compile some of the ordinary Java source files.
 This can cause problems for some IDEs, which will need to be configured accordingly.
- 

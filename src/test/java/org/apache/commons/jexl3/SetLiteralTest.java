@@ -19,6 +19,7 @@ package org.apache.commons.jexl3;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import org.junit.Assert;
 import org.junit.Test;
@@ -40,22 +41,34 @@ public class SetLiteralTest extends JexlTestCase {
 
     @Test
     public void testSetLiteralWithStrings() throws Exception {
-        final JexlExpression e = JEXL.createExpression("{ 'foo' , 'bar' }");
-        final JexlContext jc = new MapContext();
+        List<String> sources = Arrays.asList("{ 'foo', 'bar' }", "{ 'foo', 'bar', ... }", "{ 'foo', 'bar', }");
+        for(String src : sources) {
+            final JexlExpression e = JEXL.createExpression(src);
+            final JexlContext jc = new MapContext();
 
-        final Object o = e.evaluate(jc);
-        final Set<?> check = createSet("foo", "bar");
-        Assert.assertEquals(check, o);
+            final Object o = e.evaluate(jc);
+            final Set<?> check = createSet("foo", "bar");
+            Assert.assertEquals(check, o);
+        }
+        try {
+            JEXL.createExpression("{ , }");
+            Assert.fail("syntax");
+        } catch(JexlException.Parsing parsing) {
+            Assert.assertNotNull(parsing);
+        }
     }
 
     @Test
     public void testLiteralWithOneEntry() throws Exception {
-        final JexlExpression e = JEXL.createExpression("{ 'foo' }");
-        final JexlContext jc = new MapContext();
+        List<String> sources = Arrays.asList("{ 'foo' }", "{ 'foo', }");
+        for(String src : sources) {
+            final JexlExpression e = JEXL.createExpression(src);
+            final JexlContext jc = new MapContext();
 
-        final Object o = e.evaluate(jc);
-        final Set<?> check = createSet("foo");
-        Assert.assertEquals(check, o);
+            final Object o = e.evaluate(jc);
+            final Set<?> check = createSet("foo");
+            Assert.assertEquals(check, o);
+        }
     }
 
     @Test

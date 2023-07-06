@@ -17,6 +17,7 @@
 package org.apache.commons.jexl3.internal;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import org.apache.commons.jexl3.JexlArithmetic;
 
@@ -30,9 +31,18 @@ public class MapBuilder implements JexlArithmetic.MapBuilder {
     /**
      * Creates a new builder.
      * @param size the expected map size
+     * @param extended whether the map is extended
+     */
+    public MapBuilder(final int size, final boolean extended) {
+        map = extended? new LinkedHashMap<>(size) : new HashMap<>(size);
+    }
+
+    /**
+     * Creates a new builder.
+     * @param size the expected map size
      */
     public MapBuilder(final int size) {
-        map = new HashMap<>(size);
+        this(size, false);
     }
 
     @Override

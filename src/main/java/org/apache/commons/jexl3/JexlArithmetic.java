@@ -281,10 +281,18 @@ public class JexlArithmetic {
      * Called by the interpreter when evaluating a literal array.
      *
      * @param size the number of elements in the array
+     * @param extended whether the map is extended or not
      * @return the array builder
      */
-    public ArrayBuilder arrayBuilder(final int size) {
+    public ArrayBuilder arrayBuilder(final int size, final boolean extended) {
         return new org.apache.commons.jexl3.internal.ArrayBuilder(size);
+    }
+    @Deprecated
+    /**
+     * @deprecated since 3.3.1
+     */
+    public ArrayBuilder arrayBuilder(final int size) {
+        return arrayBuilder(size, false);
     }
 
     /**
@@ -311,10 +319,18 @@ public class JexlArithmetic {
      * Called by the interpreter when evaluating a literal set.
      *
      * @param size the number of elements in the set
+     * @param extended whether the set is extended or not
      * @return the array builder
      */
-    public SetBuilder setBuilder(final int size) {
+    public SetBuilder setBuilder(final int size, boolean extended) {
         return new org.apache.commons.jexl3.internal.SetBuilder(size);
+    }
+    @Deprecated
+    /**
+     * @deprecated since 3.3.1
+     */
+    public SetBuilder setBuilder(final int size) {
+        return setBuilder(size, false);
     }
 
     /**
@@ -342,12 +358,20 @@ public class JexlArithmetic {
      * Called by the interpreter when evaluating a literal map.
      *
      * @param size the number of elements in the map
+     * @param extended whether the map is extended or not
      * @return the map builder
      */
-    public MapBuilder mapBuilder(final int size) {
+    public MapBuilder mapBuilder(final int size, boolean extended) {
         return new org.apache.commons.jexl3.internal.MapBuilder(size);
     }
-
+    @Deprecated
+    /**
+     * @deprecated since 3.3.1
+     */
+    public MapBuilder mapBuilder(final int size) {
+        return mapBuilder(size, false);
+    }
+    
     /**
      * Creates a literal range.
      * <p>The default implementation only accepts integers and longs.</p>

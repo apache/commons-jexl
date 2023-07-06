@@ -16,15 +16,11 @@
  */
 package org.apache.commons.jexl3.parser;
 
-import org.apache.commons.jexl3.internal.Debugger;
-
-public final class ASTSetLiteral extends JexlNode {
+public final class ASTSetLiteral extends ExtensibleNode {
     /**
      *
      */
     private static final long serialVersionUID = 1L;
-    /** Whether this set is constant or not. */
-    private boolean constant = false;
 
     ASTSetLiteral(final int id) {
         super(id);
@@ -35,30 +31,7 @@ public final class ASTSetLiteral extends JexlNode {
     }
 
     @Override
-    public String toString() {
-        final Debugger dbg = new Debugger();
-        return dbg.data(this);
-    }
-
-    @Override
-    protected boolean isConstant(final boolean literal) {
-        return constant;
-    }
-
-    @Override
-    public void jjtClose() {
-        constant = true;
-        for (int c = 0; c < jjtGetNumChildren() && constant; ++c) {
-            final JexlNode child = jjtGetChild(c);
-            if (!child.isConstant()) {
-                constant = false;
-            }
-        }
-    }
-
-    @Override
     public Object jjtAccept(final ParserVisitor visitor, final Object data) {
         return visitor.visit(this, data);
     }
-
 }
