@@ -448,9 +448,8 @@ public class Uberspect implements JexlUberspect {
         JexlArithmetic.Uberspect jau = null;
         if (arithmetic != null) {
             final Class<? extends JexlArithmetic> aclass = arithmetic.getClass();
-            Set<JexlOperator> ops = operatorMap.get(aclass);
-            if (ops == null) {
-                ops = EnumSet.noneOf(JexlOperator.class);
+            Set<JexlOperator> ops = operatorMap.computeIfAbsent(aclass, k -> {
+                Set<JexlOperator> newOps = EnumSet.noneOf(JexlOperator.class);
                 // deal only with derived classes
                 if (!JexlArithmetic.class.equals(aclass)) {
                     for (final JexlOperator op : JexlOperator.values()) {
@@ -469,16 +468,15 @@ public class Uberspect implements JexlUberspect {
                                         JexlArithmetic.class.getMethod(method.getName(), method.getParameterTypes());
                                     } catch (final NoSuchMethodException xmethod) {
                                         // method was not found in JexlArithmetic; this is an operator definition
-                                        ops.add(op);
+                                        newOps.add(op);
                                     }
                                 }
                             }
                         }
                     }
                 }
-                // register this arithmetic class in the operator map
-                operatorMap.put(aclass, ops);
-            }
+                return newOps;
+            });
             jau = new ArithmeticUberspect(arithmetic, ops);
         }
         return jau;

@@ -259,8 +259,7 @@ public class Permissions implements JexlPermissions {
      * @return the package constraints instance, not-null.
      */
     private NoJexlPackage getNoJexlPackage(final String packageName) {
-        final NoJexlPackage njp = packages.get(packageName);
-        return njp != null ? njp : JEXL_PACKAGE;
+        return packages.getOrDefault(packageName, JEXL_PACKAGE);
     }
 
     /**
