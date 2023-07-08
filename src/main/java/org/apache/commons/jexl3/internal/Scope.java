@@ -262,7 +262,7 @@ public final class Scope {
      */
     public int getCaptureDeclaration(final int symbol) {
         Integer declared = capturedVariables != null? capturedVariables.get(symbol)  : null;
-        return declared != null? declared.intValue() : -1;
+        return declared != null ? declared.intValue() : -1;
     }
 
     /**
