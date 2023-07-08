@@ -51,8 +51,7 @@ public class ArrayBuilder implements JexlArithmetic.ArrayBuilder {
      * @return the primitive type or null it the argument is not unboxable
      */
     protected static Class<?> unboxingClass(final Class<?> parm) {
-        final Class<?> prim = BOXING_CLASSES.get(parm);
-        return prim == null ? parm : prim;
+        return BOXING_CLASSES.getOrDefault(parm, parm);
     }
 
     /** The intended class array. */
