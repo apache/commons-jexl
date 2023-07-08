@@ -144,7 +144,7 @@ public final class JexlSandbox {
     protected JexlSandbox(final boolean ab, final boolean inh, final Map<String, Permissions> map) {
         allow = ab;
         inherit = inh;
-        sandbox = map != null? map : new HashMap<>();
+        sandbox = map != null ? map : new HashMap<>();
     }
 
     /**
@@ -227,7 +227,7 @@ public final class JexlSandbox {
      */
     public String execute(final Class<?> clazz, final String name) {
         final String m = get(clazz).execute().get(name);
-        return "".equals(name) && m != null? clazz.getName() : m;
+        return "".equals(name) && m != null ? clazz.getName() : m;
     }
 
     /**
@@ -240,7 +240,7 @@ public final class JexlSandbox {
     @Deprecated
     public String execute(final String clazz, final String name) {
         final String m = get(clazz).execute().get(name);
-        return "".equals(name) && m != null? clazz : m;
+        return "".equals(name) && m != null ? clazz : m;
     }
 
     /**
@@ -317,7 +317,7 @@ public final class JexlSandbox {
 
         @Override
         public String get(final String name) {
-            return name == null? NULL : null;
+            return name == null ? NULL : null;
         }
     };
 
@@ -390,7 +390,7 @@ public final class JexlSandbox {
         @Override
         public String get(final String name) {
             // if name is null and contained in set, explicit null aka NULL
-            return names != null && !names.contains(name) ? name : name != null? null : NULL;
+            return names != null && !names.contains(name) ? name : name != null ? null : NULL;
         }
     }
 

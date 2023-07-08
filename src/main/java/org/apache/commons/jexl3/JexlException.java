@@ -121,7 +121,7 @@ public class JexlException extends RuntimeException {
      * @return a string builder
      */
      static StringBuilder errorAt(final JexlNode node) {
-        final JexlInfo info = node != null? detailedInfo(node, node.jexlInfo()) : null;
+        final JexlInfo info = node != null ? detailedInfo(node, node.jexlInfo()) : null;
         final StringBuilder msg = new StringBuilder();
         if (info != null) {
             msg.append(info.toString());

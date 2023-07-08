@@ -219,7 +219,7 @@ public class Engine extends JexlEngine {
         this.functions = ns == null || ns.isEmpty()? Collections.emptyMap() : ns; // should we make a copy?
         this.classNameSolver = new FqcnResolver(uberspect, conf.imports());
         // parsing & features:
-        final JexlFeatures features = conf.features() == null? DEFAULT_FEATURES : conf.features();
+        final JexlFeatures features = conf.features() == null ? DEFAULT_FEATURES : conf.features();
         Predicate<String> nsTest = features.namespaceTest();
         final Set<String> nsNames = functions.keySet();
         if (!nsNames.isEmpty()) {
@@ -351,7 +351,7 @@ public class Engine extends JexlEngine {
      * @return conf or def
      */
     private static <T> T option(final T conf, final T def) {
-        return conf == null? def : conf;
+        return conf == null ? def : conf;
     }
 
     /**
@@ -613,7 +613,7 @@ public class Engine extends JexlEngine {
         }
         final String source = trimSource(scriptText);
         final Scope scope = names == null || names.length == 0? null : new Scope(null, names);
-        final JexlFeatures ftrs = features == null? scriptFeatures : features;
+        final JexlFeatures ftrs = features == null ? scriptFeatures : features;
         final ASTJexlScript tree = parse(info, ftrs, source, scope);
         return new Script(this, source, tree);
     }
@@ -645,7 +645,7 @@ public class Engine extends JexlEngine {
             final ASTJexlScript script = parse(null, PROPERTY_FEATURES, src, scope);
             final JexlNode node = script.jjtGetChild(0);
             final Frame frame = script.createFrame(bean);
-            final Interpreter interpreter = createInterpreter(context == null? EMPTY_CONTEXT : context, frame, options);
+            final Interpreter interpreter = createInterpreter(context == null ? EMPTY_CONTEXT : context, frame, options);
             return interpreter.visitLexicalNode(node, null);
         } catch (final JexlException xjexl) {
             if (silent) {
@@ -673,7 +673,7 @@ public class Engine extends JexlEngine {
             final ASTJexlScript script = parse(null, PROPERTY_FEATURES, src, scope);
             final JexlNode node = script.jjtGetChild(0);
             final Frame frame = script.createFrame(bean, value);
-            final Interpreter interpreter = createInterpreter(context != null? context : EMPTY_CONTEXT, frame, options);
+            final Interpreter interpreter = createInterpreter(context != null ? context : EMPTY_CONTEXT, frame, options);
             interpreter.visitLexicalNode(node, null);
         } catch (final JexlException xjexl) {
             if (silent) {
@@ -986,7 +986,7 @@ public class Engine extends JexlEngine {
      */
     protected ASTJexlScript parse(final JexlInfo info, final JexlFeatures parsingf, final String src, final Scope scope) {
         final boolean cached = src.length() < cacheThreshold && cache != null;
-        final JexlFeatures features = parsingf != null? parsingf : DEFAULT_FEATURES;
+        final JexlFeatures features = parsingf != null ? parsingf : DEFAULT_FEATURES;
        // if (features.getNameSpaces().isEmpty() && !functions.isEmpty()) {
        //     features = new JexlFeatures(features).nameSpaces(functions.keySet());
        // }

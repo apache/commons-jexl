@@ -58,7 +58,7 @@ public final class MethodExecutor extends AbstractExecutor.Method {
         if (m == null && obj instanceof Class<?>) {
             m = is.getMethod((Class<?>) obj, key);
         }
-        return m == null? null : new MethodExecutor(clazz, m, key);
+        return m == null ? null : new MethodExecutor(clazz, m, key);
     }
 
     /**

@@ -40,7 +40,7 @@ public final class PropertyGetExecutor extends AbstractExecutor.Get {
      */
     public static PropertyGetExecutor discover(final Introspector is, final Class<?> clazz, final String property) {
         final java.lang.reflect.Method method = discoverGet(is, "get", clazz, property);
-        return method == null? null : new PropertyGetExecutor(clazz, method, property);
+        return method == null ? null : new PropertyGetExecutor(clazz, method, property);
     }
 
     /**

@@ -45,7 +45,7 @@ public class MiscIntrospectionTest {
         } catch (IllegalArgumentException xill) {
             Assert.assertNotNull(xill);
         }
-        // wih null?
+        // wih null ?
         ArrayIterator ai0 = new ArrayIterator(null);
         Assert.assertFalse(ai0.hasNext());
         try {
@@ -61,7 +61,7 @@ public class MiscIntrospectionTest {
         Assert.assertFalse(ai0.hasNext());
         try {
             ai0.next();
-            Assert.fail("iterator on null?");
+            Assert.fail("iterator on null ?");
         } catch (NoSuchElementException no) {
             Assert.assertNotNull(no);
         }

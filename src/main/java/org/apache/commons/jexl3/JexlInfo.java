@@ -130,7 +130,7 @@ public class JexlInfo {
      */
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder(name != null? name : "");
+        final StringBuilder sb = new StringBuilder(name != null ? name : "");
         sb.append("@");
         sb.append(line);
         sb.append(":");

@@ -90,9 +90,9 @@ public class Uberspect implements JexlUberspect {
      * @param perms the introspector permissions
      */
     public Uberspect(final Log runtimeLogger, final JexlUberspect.ResolverStrategy sty, final JexlPermissions perms) {
-        logger = runtimeLogger == null? LogFactory.getLog(JexlEngine.class) : runtimeLogger;
-        strategy = sty == null? JexlUberspect.JEXL_STRATEGY : sty;
-        permissions = perms == null? JexlPermissions.RESTRICTED : perms;
+        logger = runtimeLogger == null ? LogFactory.getLog(JexlEngine.class) : runtimeLogger;
+        strategy = sty == null ? JexlUberspect.JEXL_STRATEGY : sty;
+        permissions = perms == null ? JexlPermissions.RESTRICTED : perms;
         ref = new SoftReference<>(null);
         loader = new SoftReference<>(getClass().getClassLoader());
         operatorMap = new ConcurrentHashMap<>();
@@ -255,7 +255,7 @@ public class Uberspect implements JexlUberspect {
         final Class<?> claz = obj.getClass();
         final String property = AbstractExecutor.castString(identifier);
         final Introspector is = base();
-        final List<PropertyResolver> r = resolvers == null? strategy.apply(null, obj) : resolvers;
+        final List<PropertyResolver> r = resolvers == null ? strategy.apply(null, obj) : resolvers;
         JexlPropertyGet executor = null;
         for (final PropertyResolver resolver : r) {
             if (resolver instanceof JexlResolver) {
@@ -323,7 +323,7 @@ public class Uberspect implements JexlUberspect {
         final Class<?> claz = obj.getClass();
         final String property = AbstractExecutor.castString(identifier);
         final Introspector is = base();
-        final List<PropertyResolver> actual = resolvers == null? strategy.apply(null, obj) : resolvers;
+        final List<PropertyResolver> actual = resolvers == null ? strategy.apply(null, obj) : resolvers;
         JexlPropertySet executor = null;
         for (final PropertyResolver resolver : actual) {
             if (resolver instanceof JexlResolver) {

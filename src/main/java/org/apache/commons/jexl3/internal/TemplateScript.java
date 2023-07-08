@@ -120,7 +120,7 @@ public final class TemplateScript implements JxltEngine.Template {
             }
         }
         // create the script
-        final JexlInfo info = jexlInfo == null? jxlt.getEngine().createInfo() : jexlInfo;
+        final JexlInfo info = jexlInfo == null ? jxlt.getEngine().createInfo() : jexlInfo;
         // allow lambda defining params
         final Scope scope = parms == null ? null : new Scope(null, parms);
         script = jxlt.getEngine().parse(info.at(1, 1), false, strb.toString(), scope).script();

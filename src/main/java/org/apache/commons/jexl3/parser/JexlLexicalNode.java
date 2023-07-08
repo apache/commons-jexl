@@ -55,7 +55,7 @@ public abstract class JexlLexicalNode extends JexlNode implements JexlParser.Lex
 
     @Override
     public int getSymbolCount() {
-        return lexicalScope == null? 0 : lexicalScope.getSymbolCount();
+        return lexicalScope == null ? 0 : lexicalScope.getSymbolCount();
     }
 
     @Override

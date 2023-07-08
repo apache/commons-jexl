@@ -93,7 +93,7 @@ public class JexlBuilder {
      * @param permissions the permissions
      */
     public static void setDefaultPermissions(final JexlPermissions permissions) {
-        PERMISSIONS = permissions == null? JexlPermissions.RESTRICTED : permissions;
+        PERMISSIONS = permissions == null ? JexlPermissions.RESTRICTED : permissions;
     }
 
     /** The default maximum expression length to hit the expression cache. */

@@ -55,14 +55,14 @@ public class ReferenceMethodExecutor implements JexlMethod {
     @Override
     public Object invoke(Object ref, Object... args) throws Exception {
         Object obj = getReference(ref);
-        return obj == null? null : method.invoke(obj, args);
+        return obj == null ? null : method.invoke(obj, args);
     }
 
     @Override
     public Object tryInvoke(String name, Object ref, Object... args) throws JexlException.TryFailed {
         Object obj = getReference(ref);
         if (method == null) {
-            return obj == null? null : JexlEngine.TRY_FAILED;
+            return obj == null ? null : JexlEngine.TRY_FAILED;
         }
         if (obj == ref) {
             return JexlEngine.TRY_FAILED;
@@ -82,6 +82,6 @@ public class ReferenceMethodExecutor implements JexlMethod {
 
     @Override
     public Class<?> getReturnType() {
-        return method != null?  method.getReturnType() : null;
+        return method != null ?  method.getReturnType() : null;
     }
 }

@@ -161,7 +161,7 @@ public class ReferenceUberspect implements JexlUberspect {
      */
     static Object handleAtomic(Object ref) {
         Object obj = ((AtomicReference<?>) ref).get();
-        return obj == null? ref : obj;
+        return obj == null ? ref : obj;
     }
 
     /**
@@ -171,7 +171,7 @@ public class ReferenceUberspect implements JexlUberspect {
      */
     static Object handleReference(Object ref) {
         Object obj = ((Reference<?>) ref).get();
-        return obj == null? ref : obj;
+        return obj == null ? ref : obj;
     }
 
     @Override

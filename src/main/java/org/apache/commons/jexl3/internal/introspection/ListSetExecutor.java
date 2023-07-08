@@ -52,7 +52,7 @@ public final class ListSetExecutor extends AbstractExecutor.Set {
                 // we could verify if the call can be performed but it does not change
                 // the fact we would fail...
                 // Class<?> formal = clazz.getComponentType();
-                // Class<?> actual = value == null? Object.class : value.getClass();
+                // Class<?> actual = value == null ? Object.class : value.getClass();
                 // if (IntrospectionUtils.isMethodInvocationConvertible(formal, actual, false)) {
                 return new ListSetExecutor(clazz, ARRAY_SET, index);
                 // }

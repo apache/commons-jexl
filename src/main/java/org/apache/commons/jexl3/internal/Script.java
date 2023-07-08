@@ -118,7 +118,7 @@ public class Script implements JexlScript, JexlExpression {
      * @return  the interpreter
      */
     protected Interpreter createInterpreter(final JexlContext context, final Frame frame, final JexlOptions options) {
-        return jexl.createInterpreter(context, frame, options != null? options : jexl.evalOptions(script, context));
+        return jexl.createInterpreter(context, frame, options != null ? options : jexl.evalOptions(script, context));
     }
 
     /**

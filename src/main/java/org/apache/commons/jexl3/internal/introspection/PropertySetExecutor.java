@@ -50,7 +50,7 @@ public class PropertySetExecutor extends AbstractExecutor.Set {
             return null;
         }
         final java.lang.reflect.Method method = discoverSet(is, clazz, property, value);
-        return method != null? new PropertySetExecutor(clazz, method, property, value) : null;
+        return method != null ? new PropertySetExecutor(clazz, method, property, value) : null;
     }
 
     /**

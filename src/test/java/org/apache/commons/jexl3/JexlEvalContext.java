@@ -72,8 +72,8 @@ public class JexlEvalContext implements
      */
     @NoJexl
     public JexlEvalContext(final JexlContext context, final JexlContext.NamespaceResolver namespace) {
-        this.vars = context != null? context : JexlEngine.EMPTY_CONTEXT;
-        this.ns = namespace != null? namespace : JexlEngine.EMPTY_NS;
+        this.vars = context != null ? context : JexlEngine.EMPTY_CONTEXT;
+        this.ns = namespace != null ? namespace : JexlEngine.EMPTY_NS;
     }
 
     @Override
@@ -97,7 +97,7 @@ public class JexlEvalContext implements
     @Override
     @NoJexl
     public Object resolveNamespace(final String name) {
-        return ns != null? ns.resolveNamespace(name) : null;
+        return ns != null ? ns.resolveNamespace(name) : null;
     }
 
     @Override

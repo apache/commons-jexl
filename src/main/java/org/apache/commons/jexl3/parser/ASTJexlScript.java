@@ -117,7 +117,7 @@ public class ASTJexlScript extends JexlLexicalNode  {
      * @return the arguments array
      */
     public Frame createFrame(final Frame caller, final Object... values) {
-        return scope != null? scope.createFrame(caller, values) : null;
+        return scope != null ? scope.createFrame(caller, values) : null;
     }
 
     /**
@@ -134,7 +134,7 @@ public class ASTJexlScript extends JexlLexicalNode  {
      * @return the number of parameters
      */
     public int getArgCount() {
-        return scope != null? scope.getArgCount() : 0;
+        return scope != null ? scope.getArgCount() : 0;
     }
 
     /**
@@ -142,7 +142,7 @@ public class ASTJexlScript extends JexlLexicalNode  {
      * @return the symbol names
      */
     public String[] getSymbols() {
-        return scope != null? scope.getSymbols() : null;
+        return scope != null ? scope.getSymbols() : null;
     }
 
     /**
@@ -150,7 +150,7 @@ public class ASTJexlScript extends JexlLexicalNode  {
      * @return the parameter names
      */
     public String[] getParameters() {
-        return scope != null? scope.getParameters() : null;
+        return scope != null ? scope.getParameters() : null;
     }
 
     /**
@@ -158,7 +158,7 @@ public class ASTJexlScript extends JexlLexicalNode  {
      * @return the local variable names
      */
     public String[] getLocalVariables() {
-        return scope != null? scope.getLocalVariables() : null;
+        return scope != null ? scope.getLocalVariables() : null;
     }
 
     /**
@@ -175,6 +175,6 @@ public class ASTJexlScript extends JexlLexicalNode  {
      * @return the captured variable names
      */
     public String[] getCapturedVariables() {
-        return scope != null? scope.getCapturedVariables() : null;
+        return scope != null ? scope.getCapturedVariables() : null;
     }
 }

@@ -308,7 +308,7 @@ public final class TemplateEngine extends JxltEngine {
          */
         protected final TemplateExpression prepare(final JexlContext context, final Frame frame, final JexlOptions opts) {
             try {
-                final JexlOptions interOptions = opts != null? opts : jexl.evalOptions(context);
+                final JexlOptions interOptions = opts != null ? opts : jexl.evalOptions(context);
                 final Interpreter interpreter = jexl.createInterpreter(context, frame, interOptions);
                 return prepare(interpreter);
             } catch (final JexlException xjexl) {
@@ -359,7 +359,7 @@ public final class TemplateEngine extends JxltEngine {
                 final TemplateInterpreter.Arguments args = new TemplateInterpreter
                         .Arguments(jexl)
                         .context(context)
-                        .options(options != null? options : options(context))
+                        .options(options != null ? options : options(context))
                         .frame(frame);
                 final Interpreter interpreter = jexl.createTemplateInterpreter(args);
                 return evaluate(interpreter);
@@ -691,7 +691,7 @@ public final class TemplateEngine extends JxltEngine {
 
     @Override
     public JxltEngine.Expression createExpression(final JexlInfo jexlInfo, final String expression) {
-        final JexlInfo info = jexlInfo == null?  jexl.createInfo() : jexlInfo;
+        final JexlInfo info = jexlInfo == null ?  jexl.createInfo() : jexlInfo;
         Exception xuel = null;
         TemplateExpression stmt = null;
         try {

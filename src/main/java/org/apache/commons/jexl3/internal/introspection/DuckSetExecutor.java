@@ -56,7 +56,7 @@ public final class DuckSetExecutor extends AbstractExecutor.Set {
         if (method == null) {
             method = is.getMethod(clazz, "put", makeArgs(key, value));
         }
-        return method == null? null : new DuckSetExecutor(clazz, method, key, value);
+        return method == null ? null : new DuckSetExecutor(clazz, method, key, value);
     }
 
     /**

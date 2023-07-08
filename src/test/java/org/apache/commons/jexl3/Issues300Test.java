@@ -312,12 +312,12 @@ public class Issues300Test {
         Assert.assertEquals(44, result);
 
         vars.put("TVALOGAR", null);
-        String jexlExp = "TVALOGAR==null?'SIMON':'SIMONAZO'";
+        String jexlExp = "TVALOGAR==null ?'SIMON':'SIMONAZO'";
         script = jexl.createScript(jexlExp);
         result = script.execute(ctxt);
         Assert.assertEquals("SIMON", result);
 
-        jexlExp = "TVALOGAR.PEPITO==null?'SIMON':'SIMONAZO'";
+        jexlExp = "TVALOGAR.PEPITO==null ?'SIMON':'SIMONAZO'";
         script = jexl.createScript(jexlExp);
 
         final Map<String, Object> tva = new LinkedHashMap<>();

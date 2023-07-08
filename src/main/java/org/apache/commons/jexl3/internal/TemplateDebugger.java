@@ -80,7 +80,7 @@ public class TemplateDebugger extends Debugger {
         }
         final TemplateScript ts = (TemplateScript) jt;
         // ensure expr is not null for templates
-        this.exprs = ts.getExpressions() == null? new TemplateExpression[0] : ts.getExpressions();
+        this.exprs = ts.getExpressions() == null ? new TemplateExpression[0] : ts.getExpressions();
         this.script = ts.getScript();
         start = 0;
         end = 0;

@@ -261,7 +261,7 @@ public final class Scope {
      * @return the source symbol index or -1 if the symbol is not captured
      */
     public int getCaptureDeclaration(final int symbol) {
-        Integer declared = capturedVariables != null? capturedVariables.get(symbol)  : null;
+        Integer declared = capturedVariables != null ? capturedVariables.get(symbol)  : null;
         return declared != null ? declared.intValue() : -1;
     }
 

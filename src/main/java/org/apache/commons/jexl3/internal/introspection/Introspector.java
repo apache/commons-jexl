@@ -106,7 +106,7 @@ public final class Introspector {
     public Introspector(final Log log, final ClassLoader cloader, final JexlPermissions perms) {
         this.logger = log;
         this.loader = cloader;
-        this.permissions = perms == null? JexlPermissions.RESTRICTED : perms;
+        this.permissions = perms == null ? JexlPermissions.RESTRICTED : perms;
     }
 
     /**
@@ -333,7 +333,7 @@ public final class Introspector {
      */
     public void setLoader(final ClassLoader classLoader) {
         final ClassLoader previous = loader;
-        final ClassLoader current = classLoader == null? getClass().getClassLoader() : classLoader;
+        final ClassLoader current = classLoader == null ? getClass().getClassLoader() : classLoader;
         if (!current.equals(loader)) {
             lock.writeLock().lock();
             try {

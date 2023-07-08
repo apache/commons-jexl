@@ -96,7 +96,7 @@ public class ASTIdentifierAccess extends JexlNode {
     }
 
     public Object getIdentifier() {
-        return identifier != null? identifier : name;
+        return identifier != null ? identifier : name;
     }
 
     public String getName() {

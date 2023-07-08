@@ -754,7 +754,7 @@ public abstract class JexlParser extends StringParser {
      * @throws JexlException.Feature in all cases
      */
     protected void throwFeatureException(final int feature, final JexlInfo info) {
-        final String msg = info != null? readSourceLine(source, info.getLine()) : null;
+        final String msg = info != null ? readSourceLine(source, info.getLine()) : null;
         throw new JexlException.Feature(info, feature, msg).clean();
     }
 

@@ -230,7 +230,7 @@ public final class JexlFeatures {
      * @return this features instance
      */
     public JexlFeatures namespaceTest(final Predicate<String> names) {
-        nameSpaces = names == null? TEST_STR_FALSE : names;
+        nameSpaces = names == null ? TEST_STR_FALSE : names;
         return this;
     }
 

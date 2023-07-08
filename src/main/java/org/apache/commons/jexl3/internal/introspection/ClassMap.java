@@ -221,7 +221,7 @@ final class ClassMap {
                 if (methodList != null) {
                     cacheEntry = methodKey.getMostSpecificMethod(methodList);
                 }
-                byKey.put(methodKey, cacheEntry == null? CACHE_MISS : cacheEntry);
+                byKey.put(methodKey, cacheEntry == null ? CACHE_MISS : cacheEntry);
             } catch (final MethodKey.AmbiguousException ae) {
                 // that's a miss :-)
                 byKey.put(methodKey, CACHE_MISS);

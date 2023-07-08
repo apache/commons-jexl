@@ -579,7 +579,7 @@ public class Issues100Test extends JexlTestCase {
         final String[] scripts = {"var x = new ('java.util.HashMap'); x.one = 1; x.two = 2; x.one", // results to 1
             "x = new ('java.util.HashMap'); x.one = 1; x.two = 2; x.one",// results to 1
             "x = new ('java.util.HashMap'); x.one = 1; x.two = 2; x['one']",//results to 1
-            "var x = new ('java.util.HashMap'); x.one = 1; x.two = 2; x['one']"// result to null?
+            "var x = new ('java.util.HashMap'); x.one = 1; x.two = 2; x['one']"// result to null ?
         };
 
         final JexlEngine jexl = new Engine();

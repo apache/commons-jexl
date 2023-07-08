@@ -97,7 +97,7 @@ public abstract class InterpreterBase extends ParserVisitor {
         this.context = aContext != null ? aContext : JexlEngine.EMPTY_CONTEXT;
         this.cache = engine.cache != null;
         final JexlArithmetic jexla = jexl.arithmetic;
-        this.options = opts == null? engine.evalOptions(aContext) : opts;
+        this.options = opts == null ? engine.evalOptions(aContext) : opts;
         this.arithmetic = jexla.options(options);
         if (arithmetic != jexla && !arithmetic.getClass().equals(jexla.getClass()) && logger.isWarnEnabled()) {
             logger.warn("expected arithmetic to be " + jexla.getClass().getSimpleName()
@@ -113,7 +113,7 @@ public abstract class InterpreterBase extends ParserVisitor {
         if (this.context instanceof JexlContext.CancellationHandle) {
             acancel = ((JexlContext.CancellationHandle) context).getCancellation();
         }
-        this.cancelled = acancel != null? acancel : new AtomicBoolean(false);
+        this.cancelled = acancel != null ? acancel : new AtomicBoolean(false);
         this.functions = options.getNamespaces();
         this.functors = null;
         this.operators = new Operators(this);
@@ -315,7 +315,7 @@ public abstract class InterpreterBase extends ParserVisitor {
     protected boolean isVariableDefined(final Frame frame, final LexicalScope block, final String name) {
         if (frame != null && block != null) {
             final Integer ref = frame.getScope().getSymbol(name);
-            final int symbol = ref != null? ref : -1;
+            final int symbol = ref != null ? ref : -1;
             if (symbol >= 0  && block.hasSymbol(symbol)) {
                 final Object value = frame.get(symbol);
                 return value != Scope.UNDEFINED && value != Scope.UNDECLARED;
@@ -593,7 +593,7 @@ public abstract class InterpreterBase extends ParserVisitor {
      * @return the (pretty) string value
      */
     protected static String stringifyPropertyValue(final JexlNode node) {
-        return node != null? new Debugger().depth(1).data(node) : "???";
+        return node != null ? new Debugger().depth(1).data(node) : "???";
     }
 
     /**

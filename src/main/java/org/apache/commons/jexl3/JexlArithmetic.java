@@ -782,7 +782,7 @@ public class JexlArithmetic {
             }
             return dval.toString();
         }
-        return val == null? controlNullOperand(strict, "") : val.toString();
+        return val == null ? controlNullOperand(strict, "") : val.toString();
     }
 
     /**
@@ -1270,7 +1270,7 @@ public class JexlArithmetic {
                 // ignore and continue in sequence
             }
         }
-        return (left == null? "" : toString(left)).concat(right == null ? "" : toString(right));
+        return (left == null ? "" : toString(left)).concat(right == null ? "" : toString(right));
     }
 
     /**
@@ -1771,7 +1771,7 @@ public class JexlArithmetic {
      * @return the <i>size</i> of object, 0 if null, 1 if there is no <i>better</i> solution
      */
     public Integer size(final Object object) {
-        return size(object, object == null? 0 : 1);
+        return size(object, object == null ? 0 : 1);
     }
 
     /**

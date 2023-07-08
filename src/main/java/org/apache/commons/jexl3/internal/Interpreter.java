@@ -75,7 +75,7 @@ public class Interpreter extends InterpreterBase {
     protected Interpreter(final Interpreter ii, final JexlArithmetic jexla) {
         super(ii, jexla);
         frame = ii.frame;
-        block = ii.block != null? new LexicalFrame(ii.block) : null;
+        block = ii.block != null ? new LexicalFrame(ii.block) : null;
     }
 
     /**
@@ -995,7 +995,7 @@ public class Interpreter extends InterpreterBase {
             lhs = null;
         }
         // null elision as in "x ?? z"
-        return lhs != null? lhs : node.jjtGetChild(1).jjtAccept(this, data);
+        return lhs != null ? lhs : node.jjtGetChild(1).jjtAccept(this, data);
     }
 
     @Override

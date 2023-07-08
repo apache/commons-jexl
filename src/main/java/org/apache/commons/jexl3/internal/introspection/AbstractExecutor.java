@@ -80,7 +80,7 @@ abstract class AbstractExecutor {
      * @return the class
      */
     static Class<?> classOf(final Object instance) {
-        return instance == null? Object.class : instance.getClass();
+        return instance == null ? Object.class : instance.getClass();
     }
 
     /** The class this executor applies to. */

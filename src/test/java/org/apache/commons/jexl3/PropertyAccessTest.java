@@ -445,7 +445,7 @@ public class PropertyAccessTest extends JexlTestCase {
 
         public Object get(final String name) {
             final PromptValue v = values.get(name);
-            return v != null? v.getValue() : null;
+            return v != null ? v.getValue() : null;
         }
 
         public void set(final String name, final Object value) {

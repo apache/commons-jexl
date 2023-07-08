@@ -114,10 +114,10 @@ public class JexlScriptEngine extends AbstractScriptEngine implements Compilable
      * @return the shared JexlEngine instance, create it if necessary
      */
     private static JexlEngine getEngine() {
-        JexlEngine engine = ENGINE != null? ENGINE.get() : null;
+        JexlEngine engine = ENGINE != null ? ENGINE.get() : null;
         if (engine == null) {
             synchronized (JexlScriptEngineFactory.class) {
-                engine = ENGINE != null? ENGINE.get() : null;
+                engine = ENGINE != null ? ENGINE.get() : null;
                 if (engine == null) {
                     final JexlBuilder builder = new JexlBuilder()
                             .strict(true)

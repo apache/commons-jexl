@@ -243,14 +243,14 @@ public class Permissions implements JexlPermissions {
      * @return the packages
      */
     Map<String, NoJexlPackage> getPackages() {
-        return packages == null? Collections.emptyMap() : Collections.unmodifiableMap(packages);
+        return packages == null ? Collections.emptyMap() : Collections.unmodifiableMap(packages);
     }
 
     /**
      * @return the wilcards
      */
     Set<String> getWildcards() {
-        return allowed == null? Collections.emptySet() : Collections.unmodifiableSet(allowed);
+        return allowed == null ? Collections.emptySet() : Collections.unmodifiableSet(allowed);
     }
 
     /**
@@ -260,7 +260,7 @@ public class Permissions implements JexlPermissions {
      */
     private NoJexlPackage getNoJexlPackage(final String packageName) {
         final NoJexlPackage njp = packages.get(packageName);
-        return njp != null? njp : JEXL_PACKAGE;
+        return njp != null ? njp : JEXL_PACKAGE;
     }
 
     /**

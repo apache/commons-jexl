@@ -135,14 +135,14 @@ public class Closure extends Script {
 
     @Override
     public Object execute(final JexlContext context, final Object... args) {
-        final Frame local = frame != null? frame.assign(args) : null;
+        final Frame local = frame != null ? frame.assign(args) : null;
         final Interpreter interpreter = createInterpreter(context, local, options);
         return interpreter.runClosure(this);
     }
 
     @Override
     public Callable callable(final JexlContext context, final Object... args) {
-        final Frame local = frame != null? frame.assign(args) : null;
+        final Frame local = frame != null ? frame.assign(args) : null;
         return new Callable(createInterpreter(context, local, options)) {
             @Override
             public Object interpret() {
