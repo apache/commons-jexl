@@ -350,7 +350,7 @@ void Annotation() #Annotation :
     Token t;
 }
 {
-    t=<ANNOTATION> (LOOKAHEAD(<LPAREN>) Arguments() )? { jjtThis.setName(t.image); }
+    t=<ANNOTATION> { jjtThis.setName(t.image); } (LOOKAHEAD(<LPAREN>) Arguments() )?
 }
 
 void AnnotatedStatement() #AnnotatedStatement : {}

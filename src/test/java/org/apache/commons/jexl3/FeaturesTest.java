@@ -311,4 +311,16 @@ public class FeaturesTest extends JexlTestCase {
         checkFeature(f, scripts);
     }
 
+    @Test
+    public void testConstCapture() throws Exception {
+        final JexlFeatures f = new JexlFeatures().constCapture(true);
+        final String[] scripts = new String[]{
+            "let x = 0; const f = y -> x += y; f(42)",
+            "let x = 0; function f(y) { z -> x *= y }; f(42)"
+        };
+        checkFeature(f, scripts);
+        final JexlFeatures nof = new JexlFeatures().constCapture(true);
+        assertOk(nof, scripts);
+    }
+
 }

@@ -19,6 +19,7 @@ package org.apache.commons.jexl3.parser;
 import org.apache.commons.jexl3.JexlException;
 import org.apache.commons.jexl3.JexlFeatures;
 import org.apache.commons.jexl3.JexlInfo;
+import org.apache.commons.jexl3.internal.Debugger;
 import org.apache.commons.jexl3.internal.ScriptVisitor;
 /**
  * Controls that a script only uses enabled features.
@@ -73,7 +74,9 @@ public class FeatureController extends ScriptVisitor {
      */
     public void throwFeatureException(final int feature, final JexlNode node) {
         final JexlInfo dbgInfo = node.jexlInfo();
-        throw new JexlException.Feature(dbgInfo, feature, "");
+        Debugger dbg = new Debugger().depth(1);
+        String msg = dbg.data(node);
+        throw new JexlException.Feature(dbgInfo, feature, msg);
     }
 
     /**
@@ -188,6 +191,9 @@ public class FeatureController extends ScriptVisitor {
         final JexlNode lv = node.jjtGetChild(0);
         if (!features.supportsSideEffectGlobal() && lv.isGlobalVar()) {
             throwFeatureException(JexlFeatures.SIDE_EFFECT_GLOBAL, lv);
+        }
+        if (features.supportsConstCapture() && lv instanceof ASTIdentifier && ((ASTIdentifier) lv).isCaptured()) {
+            throwFeatureException(JexlFeatures.CONST_CAPTURE, lv);
         }
         if (!features.supportsSideEffect()) {
             throwFeatureException(JexlFeatures.SIDE_EFFECT, lv);

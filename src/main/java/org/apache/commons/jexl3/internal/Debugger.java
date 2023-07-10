@@ -268,7 +268,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
      * @return visitor pattern value
      */
     protected Object accept(final JexlNode node, final Object data) {
-        if (depth <= 0) {
+        if (depth <= 0 && builder.length() > 0) {
             builder.append("...");
             return data;
         }
@@ -501,10 +501,14 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
         final int num = node.jjtGetNumChildren();
         builder.append("[ ");
         if (num > 0) {
-            accept(node.jjtGetChild(0), data);
-            for (int i = 1; i < num; ++i) {
-                builder.append(", ");
-                accept(node.jjtGetChild(i), data);
+            if (depth <= 0) {
+                builder.append("...");
+            } else {
+                accept(node.jjtGetChild(0), data);
+                for (int i = 1; i < num; ++i) {
+                    builder.append(", ");
+                    accept(node.jjtGetChild(i), data);
+                }
             }
         }
         builder.append(" ]");
@@ -513,6 +517,10 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
 
     @Override
     protected Object visit(final ASTRangeNode node, final Object data) {
+        if (depth <= 0) {
+            builder.append("( .. )");
+            return data;
+        }
         return infixChildren(node, " .. ", false, data);
     }
 
@@ -901,10 +909,14 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
         final int num = node.jjtGetNumChildren();
         builder.append("{ ");
         if (num > 0) {
-            accept(node.jjtGetChild(0), data);
-            for (int i = 1; i < num; ++i) {
-                builder.append(",");
-                accept(node.jjtGetChild(i), data);
+            if (depth <= 0) {
+                builder.append("...");
+            } else {
+                accept(node.jjtGetChild(0), data);
+                for (int i = 1; i < num; ++i) {
+                    builder.append(",");
+                    accept(node.jjtGetChild(i), data);
+                }
             }
         }
         builder.append(" }");
@@ -916,10 +928,14 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
         final int num = node.jjtGetNumChildren();
         builder.append("{ ");
         if (num > 0) {
-            accept(node.jjtGetChild(0), data);
-            for (int i = 1; i < num; ++i) {
-                builder.append(",");
-                accept(node.jjtGetChild(i), data);
+            if (depth <= 0) {
+                builder.append("...");
+            } else {
+                accept(node.jjtGetChild(0), data);
+                for (int i = 1; i < num; ++i) {
+                    builder.append(",");
+                    accept(node.jjtGetChild(i), data);
+                }
             }
         } else {
             builder.append(':');
@@ -977,7 +993,11 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
         final int num = node.jjtGetNumChildren();
         if (num == 2) {
             accept(node.jjtGetChild(0), data);
-            accept(node.jjtGetChild(1), data);
+            if (depth <= 0) {
+                builder.append("(...)");
+            } else {
+                accept(node.jjtGetChild(1), data);
+            }
         }
         return data;
     }

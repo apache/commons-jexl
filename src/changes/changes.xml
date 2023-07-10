@@ -29,7 +29,10 @@
     <body>
         <release version="3.3.1" date="20YY-MM-DD">
             <!-- ADD -->
-            <action dev="henrib" type="add" due-to="Xu Pengcheng">
+            <action dev="henrib" type="add" issue="JEXL-401">
+                Captured variables should be read-only
+            </action>
+            <action dev="henrib" type="add" issue="JEXL-398" due-to="Xu Pengcheng">
                 Allow 'trailing commas' or ellipsis while defining array, map and set literals
             </action>
             <!-- FIX -->

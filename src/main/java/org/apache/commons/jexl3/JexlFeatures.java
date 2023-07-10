@@ -51,6 +51,7 @@ import java.util.function.Predicate;
  * <code>lt</code> for &lt;, ...)</li>
  * <li>Pragma anywhere: whether pragma, that are <em>not</em> statements and handled before execution begins,
  * can appear anywhere in the source or before any statements - ie at the beginning of a script.</li>
+ * <li>Const Capture: whether variables captured by lambdas are read-only (aka const, same as Java) or read-write.</li>
  * </ul>
  * @since 3.2
  */
@@ -68,7 +69,8 @@ public final class JexlFeatures {
         "register", "reserved variable", "local variable", "assign/modify",
         "global assign/modify", "array reference", "create instance", "loop", "function",
         "method call", "set/map/array literal", "pragma", "annotation", "script", "lexical", "lexicalShade",
-        "thin-arrow", "fat-arrow", "namespace pragma", "import pragma", "comparator names", "pragma anywhere"
+        "thin-arrow", "fat-arrow", "namespace pragma", "import pragma", "comparator names", "pragma anywhere",
+        "const capture"
     };
     /** Registers feature ordinal. */
     private static final int REGISTER = 0;
@@ -114,6 +116,8 @@ public final class JexlFeatures {
     public static final int COMPARATOR_NAMES = 20;
     /** The pragma anywhere feature ordinal. */
     public static final int PRAGMA_ANYWHERE = 21;
+    /** Captured variables are const. */
+    public static final  int CONST_CAPTURE = 22;
     /**
      * The default features flag mask.
      */
@@ -462,6 +466,26 @@ public final class JexlFeatures {
      */
     public boolean supportsLambda() {
         return getFeature(LAMBDA);
+    }
+
+    /**
+     * Sets whether lambda captured-variables are const or not.
+     * <p>
+     * When disabled, lambda-captured variables are implicitly converted to read-write local variable (let),
+     * when enabled, those are implicitly converted to read-only local variables (const).
+     * @param flag true to enable, false to disable
+     * @return this features instance
+     */
+    public JexlFeatures constCapture(final boolean flag) {
+        setFeature(CONST_CAPTURE, flag);
+        return this;
+    }
+
+    /**
+     * @return true if lambda captured-variables are const, false otherwise
+     */
+    public boolean supportsConstCapture() {
+        return getFeature(CONST_CAPTURE);
     }
 
     /**
