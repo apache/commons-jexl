@@ -801,7 +801,7 @@ public class JexlArithmetic {
      * If null-safe (ie not-strict), the operator does accept null arguments even if the arithmetic itself is strict.</p>
      * <p>The default implementation considers equal/not-equal operators as null-safe so one can check for null as in
      * <code>if (myvar == null) {...}</code>. Note that this operator is used for equal and not-equal syntax. The complete
-     * list of operators that are not strict are (==, [], []=, ., .=, empty, size, contains). </p>
+     * list of operators that are not strict are (==, [], []=, ., .=, empty, size, contains).</p>
      * <p>An arithmetic refining its strict behavior handling for more operators must declare which by overriding
      * this method.</p>
      * @param operator the operator to check for null-argument(s) handling

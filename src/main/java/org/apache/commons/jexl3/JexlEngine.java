@@ -520,8 +520,11 @@ public abstract class JexlEngine {
     public abstract void setProperty(Object bean, String expr, Object value);
 
     /**
-     * Assign properties of a bean using an expression. <p> If the JEXL engine is silent, errors will be logged through
-     * its logger as warning. </p>
+     * Assign properties of a bean using an expression.
+     * <p>
+     * If the JEXL engine is silent, errors will be logged through
+     * its logger as warning.
+     * </p>
      *
      * @param context the evaluation context
      * @param bean    the bean to set properties in
