@@ -25,6 +25,7 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.function.Function;
@@ -168,7 +169,7 @@ public class ScriptTest extends JexlTestCase {
             con.setDoOutput(true);
 
             OutputStream outputStream = con.getOutputStream();
-            byte[] input = jsonData.getBytes("utf-8");
+            byte[] input = jsonData.getBytes(StandardCharsets.UTF_8);
             outputStream.write(input, 0, input.length);
         }
         // read response
