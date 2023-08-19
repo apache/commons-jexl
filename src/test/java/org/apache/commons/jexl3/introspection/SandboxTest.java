@@ -66,7 +66,7 @@ public class SandboxTest extends JexlTestCase {
         void tryMeARiver();
     }
 
-    public static abstract class CallMeNot {
+    public static abstract class AbstractCallMeNot {
         public @NoJexl
         String NONO = "should not be accessible!";
 
@@ -80,7 +80,7 @@ public class SandboxTest extends JexlTestCase {
         }
     }
 
-    public static class Foo extends CallMeNot implements CantCallMe, TryCallMe {
+    public static class Foo extends AbstractCallMeNot implements CantCallMe, TryCallMe {
         String name;
         public String alias;
 

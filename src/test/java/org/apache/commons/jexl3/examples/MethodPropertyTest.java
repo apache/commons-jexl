@@ -33,7 +33,7 @@ public class MethodPropertyTest {
     /**
      * An example for method access.
      */
-    public static void example(final Output out) throws Exception {
+    public static void example(final AbstractOutput out) throws Exception {
         /*
          * First step is to retrieve an instance of a JexlEngine;
          * it might be already existing and shared or created anew.
@@ -122,7 +122,7 @@ public class MethodPropertyTest {
      */
     @Test
     public void testExample() throws Exception {
-        example(Output.JUNIT);
+        example(AbstractOutput.JUNIT);
     }
 
     /**
@@ -131,6 +131,6 @@ public class MethodPropertyTest {
      * @throws Exception cos jexl does.
      */
     public static void main(final String[] args) throws Exception {
-        example(Output.SYSTEM);
+        example(AbstractOutput.SYSTEM);
     }
 }

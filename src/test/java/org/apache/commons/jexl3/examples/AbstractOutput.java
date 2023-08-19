@@ -22,11 +22,11 @@ import org.junit.Assert;
 /**
  * Abstracts using a test within Junit or through a main method.
  */
-public abstract class Output {
+public abstract class AbstractOutput {
     /**
      * Creates an output using System.out.
      */
-    private Output() {
+    private AbstractOutput() {
         // nothing to do
     }
 
@@ -41,7 +41,7 @@ public abstract class Output {
     /**
      * The output instance for Junit TestCase calling assertEquals.
      */
-    public static final Output JUNIT = new Output() {
+    public static final AbstractOutput JUNIT = new AbstractOutput() {
         @Override
         public void print(final String expr, final Object actual, final Object expected) {
             Assert.assertEquals(expr, expected, actual);
@@ -52,7 +52,7 @@ public abstract class Output {
     /**
      * The output instance for the general outputing to System.out.
      */
-    public static final Output SYSTEM = new Output() {
+    public static final AbstractOutput SYSTEM = new AbstractOutput() {
         @Override
         public void print(final String expr, final Object actual, final Object expected) {
             System.out.print(expr);

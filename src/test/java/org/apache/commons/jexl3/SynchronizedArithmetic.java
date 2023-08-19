@@ -32,16 +32,16 @@ public class SynchronizedArithmetic extends JexlArithmetic {
     /**
      * Monitor/synchronized protected access to gets/set/iterator on maps.
      */
-    private final Monitor monitor;
+    private final AbstractMonitor abstractMonitor;
 
     /**
      * A base synchronized arithmetic.
-     * @param monitor the synchronization monitor
+     * @param abstractMonitor the synchronization monitor
      * @param strict  whether the arithmetic is strict or not
      */
-    protected SynchronizedArithmetic(final Monitor monitor, final boolean strict) {
+    protected SynchronizedArithmetic(final AbstractMonitor abstractMonitor, final boolean strict) {
         super(strict);
-        this.monitor = monitor;
+        this.abstractMonitor = abstractMonitor;
     }
 
 
@@ -50,7 +50,7 @@ public class SynchronizedArithmetic extends JexlArithmetic {
      * <p>
      * This class counts how many times we called enter & exit; they should be balanced
      */
-    public static abstract class Monitor{
+    public static abstract class AbstractMonitor {
         /* Counts the number of times enter is called. */
         private final AtomicInteger enters = new AtomicInteger(0);
         /* Counts the number of times exit is called. */
@@ -122,7 +122,7 @@ public class SynchronizedArithmetic extends JexlArithmetic {
     /**
      * Crude monitor replacement...
      */
-    static class SafeMonitor extends Monitor {
+    static class SafeMonitor extends AbstractMonitor {
          private final Map<Object, Object> monitored = new IdentityHashMap<>();
 
         @Override
@@ -172,12 +172,12 @@ public class SynchronizedArithmetic extends JexlArithmetic {
 
         SynchronizedIterator(final Object locked, final Iterator<Object> ii) {
             monitored = locked;
-            monitor.monitorEnter(monitored);
+            abstractMonitor.monitorEnter(monitored);
             try {
                 iterator = ii;
             } finally {
                 if (iterator == null) {
-                    monitor.monitorExit(monitored);
+                    abstractMonitor.monitorExit(monitored);
                 }
             }
         }
@@ -191,7 +191,7 @@ public class SynchronizedArithmetic extends JexlArithmetic {
         //@Override
         public void close() {
             if (iterator != null) {
-                monitor.monitorExit(monitored);
+                abstractMonitor.monitorExit(monitored);
                 iterator = null;
             }
         }
@@ -232,11 +232,11 @@ public class SynchronizedArithmetic extends JexlArithmetic {
      * @return the value associated to the key in the map
      */
     public Object arrayGet(final Map<?, ?> map, final Object key) {
-        monitor.monitorEnter(map);
+        abstractMonitor.monitorEnter(map);
         try {
             return map.get(key);
         } finally {
-            monitor.monitorExit(map);
+            abstractMonitor.monitorExit(map);
         }
     }
     /**
@@ -247,11 +247,11 @@ public class SynchronizedArithmetic extends JexlArithmetic {
      * @param value the value
      */
     public void arraySet(final Map<Object, Object> map, final Object key, final Object value) {
-        monitor.monitorEnter(map);
+        abstractMonitor.monitorEnter(map);
         try {
             map.put(key, value);
         } finally {
-            monitor.monitorExit(map);
+            abstractMonitor.monitorExit(map);
         }
     }
     /**
@@ -263,11 +263,11 @@ public class SynchronizedArithmetic extends JexlArithmetic {
      * @return the value associated to the key in the map
      */
     public Object propertyGet(final Map<?, ?> map, final Object key) {
-        monitor.monitorEnter(map);
+        abstractMonitor.monitorEnter(map);
         try {
             return map.get(key);
         } finally {
-            monitor.monitorExit(map);
+            abstractMonitor.monitorExit(map);
         }
     }
 
@@ -279,11 +279,11 @@ public class SynchronizedArithmetic extends JexlArithmetic {
      * @param value the value
      */
     public void propertySet(final Map<Object, Object> map, final Object key, final Object value) {
-        monitor.monitorEnter(map);
+        abstractMonitor.monitorEnter(map);
         try {
             map.put(key, value);
         } finally {
-            monitor.monitorExit(map);
+            abstractMonitor.monitorExit(map);
         }
     }
 
