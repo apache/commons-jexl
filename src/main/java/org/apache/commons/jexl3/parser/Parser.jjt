@@ -418,7 +418,7 @@ void DoWhileStatement() : {}
 
 void ReturnStatement() : {}
 {
-    <RETURN> ExpressionStatement()
+    <RETURN> ( ExpressionStatement() )?
 }
 
 void Continue() #Continue : {
