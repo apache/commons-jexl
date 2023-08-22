@@ -240,10 +240,10 @@ public class ArithmeticOperatorTest extends JexlTestCase {
         }
 
         public boolean startsWith(final int[] i) {
-            final SortedSet<Integer> sw =  values.headSet(i.length);
+            final SortedSet<Integer> sw = values.headSet(i.length);
             int n = 0;
-            for(final Integer value : sw) {
-                if(!value.equals(i[n++])) {
+            for (final Integer value : sw) {
+                if (!value.equals(i[n++])) {
                     return false;
                 }
             }
@@ -252,8 +252,8 @@ public class ArithmeticOperatorTest extends JexlTestCase {
         public boolean endsWith(final int[] i) {
             final SortedSet<Integer> sw =  values.tailSet(values.size() - i.length);
             int n = 0;
-            for(final Integer value : sw) {
-                if(!value.equals(i[n++])) {
+            for (final Integer value : sw) {
+                if (!value.equals(i[n++])) {
                     return false;
                 }
             }
