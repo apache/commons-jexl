@@ -61,4 +61,25 @@ public class Issues400Test {
       Assert.assertNull(o);
     }
   }
+
+  @Test
+  public void test403() {
+    String src = "var a = {'a': 1};\n" +
+        "var list = [a, a];\n" +
+        "let map1 = {:};\n" +
+        "for (var item : list) {\n" +
+        "  map1[`${item.a}`] = 1;\n" +
+        "}\n " +
+        "map1";
+    final JexlEngine jexl = new JexlBuilder().create();
+    JexlScript script = jexl.createScript(src);
+    for(int i = 0; i < 2; ++ i) {
+      Object result = script.execute(null);
+      Assert.assertTrue(result instanceof Map);
+      Map<?, ?> map = (Map<?, ?>) result;
+      Assert.assertEquals(1, map.size());
+      Assert.assertTrue(map.containsKey(1));
+      Assert.assertTrue(map.containsValue(1));
+    }
+  }
 }
