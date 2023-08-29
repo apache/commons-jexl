@@ -36,7 +36,10 @@
                 Allow 'trailing commas' or ellipsis while defining array, map and set literals
             </action>
             <!-- FIX -->
-            <action dev="henrib" type="fix" due-to="Xu Pengcheng">
+            <action dev="henrib" type="fix" issue="JEXL-403" due-to="Xu Pengcheng" >
+                Exception while evaluating template literal used in array assignment in loop.
+            </action>
+            <action dev="henrib" type="fix" issue="JEXL-402" due-to="Xu Pengcheng">
                 Parse failed with empty return value.
             </action>
             <action dev="ggregory" type="fix" due-to="step-security-bot, Gary Gregory">

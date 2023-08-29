@@ -625,7 +625,7 @@ public class Interpreter extends InterpreterBase {
         final ASTReference loopReference = (ASTReference) node.jjtGetChild(0);
         final ASTIdentifier loopVariable = (ASTIdentifier) loopReference.jjtGetChild(0);
         final int symbol = loopVariable.getSymbol();
-        final boolean lexical = loopVariable.isLexical() || options.isLexical() ;// && node.getSymbolCount() > 0;
+        final boolean lexical = loopVariable.isLexical() || options.isLexical();
         final LexicalFrame locals = lexical? new LexicalFrame(frame, block) : null;
         final boolean loopSymbol = symbol >= 0 && loopVariable instanceof ASTVar;
         if (lexical) {
@@ -1065,9 +1065,9 @@ public class Interpreter extends InterpreterBase {
             // if the function is named, assign in the local frame
             final JexlNode child0 = script.jjtGetChild(0);
             if (child0 instanceof ASTVar) {
-                final ASTVar var = (ASTVar) child0;
-                this.visit(var, data);
-                final int symbol = var.getSymbol();
+                final ASTVar variable = (ASTVar) child0;
+                this.visit(variable, data);
+                final int symbol = variable.getSymbol();
                 frame.set(symbol, closure);
                 // make the closure accessible to itself, ie capture the currently set variable after frame creation
                 closure.setCaptured(symbol, closure);
@@ -1390,24 +1390,24 @@ public class Interpreter extends InterpreterBase {
         cancelCheck(node);
         // left contains the reference to assign to
         final JexlNode left = node.jjtGetChild(0);
-        final ASTIdentifier var;
+        final ASTIdentifier variable;
         Object object = null;
         final int symbol;
         // check var decl with assign is ok
         if (left instanceof ASTIdentifier) {
-            var = (ASTIdentifier) left;
-            symbol = var.getSymbol();
-            if (symbol >= 0 && (var.isLexical() || options.isLexical())) {
-                if (var instanceof ASTVar) {
-                    if (!defineVariable((ASTVar) var, block)) {
-                        return redefinedVariable(var, var.getName());
+            variable = (ASTIdentifier) left;
+            symbol = variable.getSymbol();
+            if (symbol >= 0 && (variable.isLexical() || options.isLexical())) {
+                if (variable instanceof ASTVar) {
+                    if (!defineVariable((ASTVar) variable, block)) {
+                        return redefinedVariable(variable, variable.getName());
                     }
-                } else if (var.isShaded() && (var.isLexical() || options.isLexicalShade())) {
-                    return undefinedVariable(var, var.getName());
+                } else if (variable.isShaded() && (variable.isLexical() || options.isLexicalShade())) {
+                    return undefinedVariable(variable, variable.getName());
                 }
             }
         } else {
-            var = null;
+            variable = null;
             symbol = -1;
         }
         boolean antish = options.isAntish();
@@ -1418,7 +1418,7 @@ public class Interpreter extends InterpreterBase {
         // actual value to return, right in most cases
         Object actual = right;
         // a (var?) v = ... expression
-        if (var != null) {
+        if (variable != null) {
             if (symbol >= 0) {
                 // check we are not assigning a symbol itself
                 if (last < 0) {
@@ -1430,18 +1430,18 @@ public class Interpreter extends InterpreterBase {
                         frame.set(symbol, right);
                     } else {
                         // go through potential overload
-                        final Object self = getVariable(frame, block, var);
+                        final Object self = getVariable(frame, block, variable);
                         final Consumer<Object> f = r -> frame.set(symbol, r);
                         actual = operators.tryAssignOverload(node, assignop, f, self, right);
                     }
                     return actual; // 1
                 }
-                object = getVariable(frame, block, var);
+                object = getVariable(frame, block, variable);
                 // top level is a symbol, can not be an antish var
                 antish = false;
             } else {
                 // check we are not assigning direct global
-                final String name = var.getName();
+                final String name = variable.getName();
                 if (last < 0) {
                     if (assignop == null) {
                         setContextVariable(node, name, right);
@@ -1894,15 +1894,18 @@ public class Interpreter extends InterpreterBase {
 
     @Override
     protected Object visit(final ASTJxltLiteral node, final Object data) {
-        TemplateEngine.TemplateExpression tp = (TemplateEngine.TemplateExpression) node.jjtGetValue();
-        if (tp == null) {
+        Object cache = node.getExpression();
+        TemplateEngine.TemplateExpression tp;
+        if (cache instanceof TemplateEngine.TemplateExpression) {
+            tp = (TemplateEngine.TemplateExpression) cache;
+        } else {
             final TemplateEngine jxlt = jexl.jxlt();
             JexlInfo info = node.jexlInfo();
             if (this.block != null) {
                 info = new JexlNode.Info(node, info);
             }
             tp = jxlt.parseExpression(info, node.getLiteral(), frame != null ? frame.getScope() : null);
-            node.jjtSetValue(tp);
+            node.setExpression(tp);
         }
         if (tp != null) {
             return tp.evaluate(context, frame, options);
