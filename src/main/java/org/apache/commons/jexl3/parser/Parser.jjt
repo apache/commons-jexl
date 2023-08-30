@@ -106,6 +106,7 @@ TOKEN_MGR_DECLS : {
     | < LCURLY : "{" >
     | < RCURLY : "}" >
     | < LBRACKET : "[" >
+    | < QLBRACKET : "?[" >
     | < RBRACKET : "]" >
     | < SEMICOL : ";" >
     | < COLON : ":" >
@@ -418,7 +419,7 @@ void DoWhileStatement() : {}
 
 void ReturnStatement() : {}
 {
-    <RETURN> ( ExpressionStatement() )?
+    <RETURN> (LOOKAHEAD(2) ExpressionStatement() )?
 }
 
 void Continue() #Continue : {
@@ -1014,14 +1015,17 @@ void IdentifierAccess() #void :
     )
 }
 
-void ArrayAccess() : {}
+void ArrayAccess() : {
+ long safe = 0L;
+ int s = 0;
+ }
 {
-    (LOOKAHEAD(1) <LBRACKET> Expression() <RBRACKET>)+
+    (LOOKAHEAD(2) (<LBRACKET>|<QLBRACKET> { safe |= (1 << s++); }) Expression() <RBRACKET>)+ { jjtThis.setSafe(safe); }
 }
 
 void MemberAccess() #void : {}
 {
-    LOOKAHEAD(<LBRACKET>) ArrayAccess()
+    LOOKAHEAD(<LBRACKET>|<QLBRACKET>) ArrayAccess()
     |
     LOOKAHEAD(<DOT>) IdentifierAccess()
     |
