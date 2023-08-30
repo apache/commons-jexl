@@ -59,7 +59,7 @@
                 Bumps github/codeql-action from 2.1.22 to 2.20.1.
             </action>
             <action dev="ggregory" type="update" due-to="Gary Gregory">
-                Bump commons-parent from 57 to 59.
+                Bump commons-parent from 57 to 61.
             </action>
         </release>
         <release version="3.3" date="2023-03-20">
