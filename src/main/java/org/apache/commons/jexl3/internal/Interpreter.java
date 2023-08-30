@@ -1069,7 +1069,7 @@ public class Interpreter extends InterpreterBase {
                 this.visit(variable, data);
                 final int symbol = variable.getSymbol();
                 frame.set(symbol, closure);
-                // make the closure accessible to itself, ie capture the currently set variable after frame creation
+                // make the closure accessible to itself, ie capture the 'function' variable after frame creation
                 closure.setCaptured(symbol, closure);
             }
             return closure;
@@ -1428,7 +1428,11 @@ public class Interpreter extends InterpreterBase {
                     if (assignop == null) {
                         // make the closure accessible to itself, ie capture the currently set variable after frame creation
                         if (right instanceof Closure) {
-                            ((Closure) right).setCaptured(symbol, right);
+                            Closure closure = (Closure) right;
+                            // the variable scope must be the parent of the lambdas
+                            if (closure.hasParent(frame.getScope())) {
+                                closure.setCaptured(symbol, right);
+                            }
                         }
                         frame.set(symbol, right);
                     } else {

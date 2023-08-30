@@ -155,4 +155,36 @@ public class Issues400Test {
     result = script.execute(null, a);
     Assert.assertEquals(1042, result);
   }
+
+  @Test
+  public void test405a() {
+    final JexlEngine jexl = new JexlBuilder()
+            .cache(64)
+            .strict(true)
+            .safe(false)
+            .create();
+    String libSrc = "var tfn = pfn -> { var fn = pfn; fn() }; { 'theFunction' : tfn }";
+    String src1 = "var v0 = 42; var v1 = -42; lib.theFunction(()->{ v1 + v0 }) ";
+    JexlScript libMap = jexl.createScript(libSrc);
+    Object theLib = libMap.execute(null);
+    JexlScript f1 = jexl.createScript(src1, "lib");
+    Object result = f1.execute(null, theLib);
+    Assert.assertEquals(0, result);
+  }
+
+  @Test
+  public void test405b() {
+    final JexlEngine jexl = new JexlBuilder()
+            .cache(64)
+            .strict(true)
+            .safe(false)
+            .create();
+    String libSrc = "function tfn(pfn) { var fn = pfn; fn() }; { 'theFunction' : tfn }";
+    String src1 = "var v0 = 42; var v1 = -42; lib.theFunction(()->{ v1 + v0 }) ";
+    JexlScript libMap = jexl.createScript(libSrc);
+    Object theLib = libMap.execute(null);
+    JexlScript f1 = jexl.createScript(src1, "lib");
+    Object result = f1.execute(null, theLib);
+    Assert.assertEquals(0, result);
+  }
 }

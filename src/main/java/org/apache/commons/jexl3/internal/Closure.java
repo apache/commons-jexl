@@ -150,4 +150,11 @@ public class Closure extends Script {
             }
         };
     }
+
+    boolean hasParent(Scope scope) {
+        Scope s = frame != null? frame.getScope() : null;
+        return scope != null  && s != null
+            ? scope == s.getParent()
+            : false;
+    }
 }

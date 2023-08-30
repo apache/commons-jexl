@@ -349,4 +349,8 @@ public final class Scope {
         return locals.toArray(new String[0]);
     }
 
+
+    Scope getParent() {
+        return parent;
+    }
 }
