@@ -88,4 +88,71 @@ public class Issues400Test {
       }
     }
   }
+
+  @Test
+  public void test404a() {
+    final JexlEngine jexl = new JexlBuilder()
+        .cache(64)
+        .strict(true)
+        .safe(false)
+        .create();
+    Map<String,Object> a = Collections.singletonMap("b", 42);
+    // access is constant
+    for(String src : new String[]{ "a.b", "a?.b", "a['b']", "a?['b']", "a?.`b`"}) {
+      run404(jexl, src, a);
+      run404(jexl, src + ";", a);
+    }
+    // access is variable
+    for(String src : new String[]{ "a[b]", "a?[b]", "a?.`${b}`"}) {
+      run404(jexl, src, a, "b");
+      run404(jexl, src + ";", a, "b");
+    }
+    // add a 3rd access
+    Map<String,Object> b = Collections.singletonMap("c", 42);
+    a = Collections.singletonMap("b", b);
+    for(String src : new String[]{ "a[b].c", "a?[b]?['c']", "a?.`${b}`.c"}) {
+      run404(jexl, src, a, "b");
+    }
+  }
+
+  private static void run404(JexlEngine jexl, String src, Object...a) {
+    try {
+      JexlScript script = jexl.createScript(src, "a", "b");
+      if (!src.endsWith(";")) {
+        Assert.assertEquals(script.getSourceText(), script.getParsedText());
+      }
+      Object result = script.execute(null, a);
+      Assert.assertEquals(42, result);
+    } catch(JexlException.Parsing xparse) {
+      Assert.fail(src);
+    }
+  }
+
+  @Test
+  public void test404b() {
+    final JexlEngine jexl = new JexlBuilder()
+        .cache(64)
+        .strict(true)
+        .safe(false)
+        .create();
+    Map<String, Object> a = Collections.singletonMap("b", Collections.singletonMap("c", 42));
+    JexlScript script;
+    Object result = -42;
+    script = jexl.createScript("a?['B']?['C']", "a");
+    result = script.execute(null, a);
+    Assert.assertEquals(script.getSourceText(), script.getParsedText());
+    Assert.assertEquals(null, result);
+    script = jexl.createScript("a?['b']?['C']", "a");
+    Assert.assertEquals(script.getSourceText(), script.getParsedText());
+    result = script.execute(null, a);
+    Assert.assertEquals(null, result);
+    script = jexl.createScript("a?['b']?['c']", "a");
+    Assert.assertEquals(script.getSourceText(), script.getParsedText());
+    result = script.execute(null, a);
+    Assert.assertEquals(42, result);
+    script = jexl.createScript("a?['B']?['C']?: 1042", "a");
+    Assert.assertEquals(script.getSourceText(), script.getParsedText());
+    result = script.execute(null, a);
+    Assert.assertEquals(1042, result);
+  }
 }

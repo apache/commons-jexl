@@ -30,6 +30,7 @@ Version 3.3.1 is source and binary compatible with 3.3.
 
 New Features in 3.3.1:
 ====================
+* JEXL-404:     Support array-access safe navigation (x?[y])
 * JEXL-401:     Captured variables should be read-only
 * JEXL-398:     Allow 'trailing commas' or ellipsis while defining array, map and set literals
 

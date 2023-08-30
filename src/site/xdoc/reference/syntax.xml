@@ -271,6 +271,12 @@
                         back-quoted interpolation strings as in <code>cal.`${dd.year}-${dd.month}-${dd.day}`</code>.
                         These syntaxes are mixable with safe-access as in <code>foo.'b a r'?.quux</code> or <code>
                             foo?.`${bar}`.quux</code>.</p>
+                        <p>The safe-access array operator (as in <code>foo?[bar]</code>) provides the same behavior as
+                        the safe-access operator and shortcuts any null or non-existent references
+                        along the navigation path, allowing a safe-navigation free of errors.
+                        In the previous expression,  if 'foo' is null, the whole expression will evaluate as null.
+                        Note that this can also be used in a chain as in <code>x?[y]?[z]</code>.
+                        </p>
                         <p>Access operators can be overloaded in <code>JexlArithmetic</code>, so that
                            the operator behavior will differ depending on the type of the operator arguments</p>
                     </td>

@@ -29,6 +29,9 @@
     <body>
         <release version="3.3.1" date="20YY-MM-DD">
             <!-- ADD -->
+            <action dev="henrib" type="add" issue="JEXL-404" due-to="Xu Pengcheng">
+                Support array-access safe navigation (x?[y])
+            </action>
             <action dev="henrib" type="add" issue="JEXL-401">
                 Captured variables should be read-only
             </action>

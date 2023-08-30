@@ -1111,7 +1111,10 @@ public class Interpreter extends InterpreterBase {
         for (int i = 0; i < numChildren; i++) {
             final JexlNode nindex = node.jjtGetChild(i);
             if (object == null) {
-                return unsolvableProperty(nindex, stringifyProperty(nindex), false, null);
+                // safe navigation access
+                return node.isSafeChild(i)
+                    ? null
+                    :unsolvableProperty(nindex, stringifyProperty(nindex), false, null);
             }
             final Object index = nindex.jjtAccept(this, null);
             cancelCheck(node);

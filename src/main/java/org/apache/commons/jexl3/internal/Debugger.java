@@ -483,6 +483,9 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     protected Object visit(final ASTArrayAccess node, final Object data) {
         final int num = node.jjtGetNumChildren();
         for (int i = 0; i < num; ++i) {
+            if (node.isSafeChild(i)) {
+                builder.append('?');
+            }
             builder.append('[');
             accept(node.jjtGetChild(i), data);
             builder.append(']');
