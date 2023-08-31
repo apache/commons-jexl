@@ -422,7 +422,7 @@ public class LambdaTest extends JexlTestCase {
     @Test public void testFatFact0() {
         JexlFeatures features = new JexlFeatures();
         features.fatArrow(true);
-        String src = "function (a) { const fact = (x)=>{ x <= 1? 1 : x * fact(x - 1) }; fact(a) }";
+        String src = "function (a) { const fact = x =>{ x <= 1? 1 : x * fact(x - 1) }; fact(a) }";
         JexlEngine jexl = createEngine(features);
         JexlScript script = jexl.createScript(src);
         Object result = script.execute(null, 6);
@@ -533,4 +533,33 @@ public class LambdaTest extends JexlTestCase {
         Assert.assertEquals(1, set.size());
         Assert.assertTrue(set.contains(42));
     }
+
+    @Test
+    public void test405a() {
+        final JexlEngine jexl = new JexlBuilder()
+            .cache(4).strict(true).safe(false)
+            .create();
+        String libSrc = "var theFunction = argFn -> { var fn = argFn; fn() }; { 'theFunction' : theFunction }";
+        String src1 = "var v0 = 42; var v1 = -42; lib.theFunction(()->{ v1 + v0 }) ";
+        JexlScript libMap = jexl.createScript(libSrc);
+        Object theLib = libMap.execute(null);
+        JexlScript f1 = jexl.createScript(src1, "lib");
+        Object result = f1.execute(null, theLib);
+        Assert.assertEquals(0, result);
+    }
+
+    @Test
+    public void test405b() {
+        final JexlEngine jexl = new JexlBuilder()
+            .cache(4).strict(true).safe(false)
+            .create();
+        String libSrc = "function theFunction(argFn) { var fn = argFn; fn() }; { 'theFunction' : theFunction }";
+        String src1 = "var v0 = 42; var v1 = -42; lib.theFunction(()->{ v1 + v0 }) ";
+        JexlScript libMap = jexl.createScript(libSrc);
+        Object theLib = libMap.execute(null);
+        JexlScript f1 = jexl.createScript(src1, "lib");
+        Object result = f1.execute(null, theLib);
+        Assert.assertEquals(0, result);
+    }
+
 }

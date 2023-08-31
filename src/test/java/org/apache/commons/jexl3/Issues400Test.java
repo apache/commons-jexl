@@ -135,7 +135,8 @@ public class Issues400Test {
         .strict(true)
         .safe(false)
         .create();
-    Map<String, Object> a = Collections.singletonMap("b", Collections.singletonMap("c", 42));
+    Map<String, Object> b = Collections.singletonMap("c", 42);
+    Map<String, Object> a = Collections.singletonMap("b", b);
     JexlScript script;
     Object result = -42;
     script = jexl.createScript("a?['B']?['C']", "a");
@@ -154,37 +155,16 @@ public class Issues400Test {
     Assert.assertEquals(script.getSourceText(), script.getParsedText());
     result = script.execute(null, a);
     Assert.assertEquals(1042, result);
+    // can still do ternary, note the space between ? and [
+    script = jexl.createScript("a? ['B']:['C']", "a");
+    result = script.execute(null, a);
+    Assert.assertArrayEquals(new String[]{"B"}, (String[]) result);
+    script = jexl.createScript("a?['b'] ?: ['C']", "a");
+    result = script.execute(null, a);
+    Assert.assertEquals(b, result);
+    script = jexl.createScript("a?['B'] ?: ['C']", "a");
+    result = script.execute(null, a);
+    Assert.assertArrayEquals(new String[]{"C"}, (String[]) result);
   }
 
-  @Test
-  public void test405a() {
-    final JexlEngine jexl = new JexlBuilder()
-            .cache(64)
-            .strict(true)
-            .safe(false)
-            .create();
-    String libSrc = "var tfn = pfn -> { var fn = pfn; fn() }; { 'theFunction' : tfn }";
-    String src1 = "var v0 = 42; var v1 = -42; lib.theFunction(()->{ v1 + v0 }) ";
-    JexlScript libMap = jexl.createScript(libSrc);
-    Object theLib = libMap.execute(null);
-    JexlScript f1 = jexl.createScript(src1, "lib");
-    Object result = f1.execute(null, theLib);
-    Assert.assertEquals(0, result);
-  }
-
-  @Test
-  public void test405b() {
-    final JexlEngine jexl = new JexlBuilder()
-            .cache(64)
-            .strict(true)
-            .safe(false)
-            .create();
-    String libSrc = "function tfn(pfn) { var fn = pfn; fn() }; { 'theFunction' : tfn }";
-    String src1 = "var v0 = 42; var v1 = -42; lib.theFunction(()->{ v1 + v0 }) ";
-    JexlScript libMap = jexl.createScript(libSrc);
-    Object theLib = libMap.execute(null);
-    JexlScript f1 = jexl.createScript(src1, "lib");
-    Object result = f1.execute(null, theLib);
-    Assert.assertEquals(0, result);
-  }
 }

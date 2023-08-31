@@ -89,6 +89,16 @@ public class PropertyAccessTest extends JexlTestCase {
             asserter.assertExpression("foo.0?.`${one}`", i43);
             asserter.assertExpression("foo.0.`${one}` = 42", i42);
             asserter.assertExpression("foo?.0?.`${one}`", i42);
+            //
+            asserter.assertExpression("foo?[0].'1'", i42);
+            asserter.assertExpression("foo?[0]", foo);
+            asserter.assertExpression("foo?[0].'0'", foo);
+            asserter.assertExpression("foo?[1]", foo[1]);
+            asserter.assertExpression("foo[0]?.'1'", foo[1]);
+            asserter.assertExpression("foo?[0].'1' = 43", i43);
+            asserter.assertExpression("foo?[0]?.'1'", i43);
+            asserter.assertExpression("foo?[0].'1' = 42", i42);
+            asserter.assertExpression("foo?[0].'1'", i42);
         }
     }
 

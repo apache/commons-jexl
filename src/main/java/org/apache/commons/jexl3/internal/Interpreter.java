@@ -1070,7 +1070,7 @@ public class Interpreter extends InterpreterBase {
                 final int symbol = variable.getSymbol();
                 frame.set(symbol, closure);
                 // make the closure accessible to itself, ie capture the 'function' variable after frame creation
-                closure.setCaptured(symbol, closure);
+                closure.captureSelfIfRecursive(frame, symbol);
             }
             return closure;
         }
@@ -1430,9 +1430,7 @@ public class Interpreter extends InterpreterBase {
                         if (right instanceof Closure) {
                             Closure closure = (Closure) right;
                             // the variable scope must be the parent of the lambdas
-                            if (closure.hasParent(frame.getScope())) {
-                                closure.setCaptured(symbol, right);
-                            }
+                            closure.captureSelfIfRecursive(frame, symbol);
                         }
                         frame.set(symbol, right);
                     } else {
