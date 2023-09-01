@@ -36,6 +36,7 @@ New Features in 3.3.1:
 
 Bugs Fixed in 3.3.1:
 ===================
+* JEXL-405:     Recursive functions corrupt evaluation frame if reassigned
 * JEXL-403:     Exception while evaluating template literal used in array assignment in loop.
 * JEXL-402:     parse failed with empty return value.
 
