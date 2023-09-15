@@ -105,7 +105,7 @@ public class ClassCreator {
 
     public ClassLoader getClassLoader() throws Exception {
         if (loader == null) {
-            final URL classpath = (new File(base, Integer.toString(seed))).toURI().toURL();
+            final URL classpath = new File(base, Integer.toString(seed)).toURI().toURL();
             loader = new URLClassLoader(new URL[]{classpath}, getClass().getClassLoader());
         }
         return loader;
@@ -202,8 +202,8 @@ public class ClassCreator {
         // the classpath is {hbaseSrc}/target/classes.
         final String currentDir = new File(".").getAbsolutePath();
         final String classpath = currentDir + File.separator + "target" + File.separator + "classes"
-                //+ System.getProperty("path.separator") + System.getProperty("java.class.path")
-                + System.getProperty("path.separator") + System.getProperty("surefire.test.class.path");
+        //+ File.pathSeparator + System.getProperty("java.class.path")
+        + File.pathSeparator + System.getProperty("surefire.test.class.path");
 
         options.add(classpath);
         //LOG.debug("Setting classpath to: " + classpath);

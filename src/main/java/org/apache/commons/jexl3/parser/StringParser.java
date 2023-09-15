@@ -70,7 +70,7 @@ public class StringParser {
         final StringBuilder strb = new StringBuilder(str.length());
         final char sep = eatsep ? str.charAt(0) : 0;
         final int end = str.length() - (eatsep ? 1 : 0);
-        final int begin = (eatsep ? 1 : 0);
+        final int begin = eatsep ? 1 : 0;
         read(strb, str, begin, end, sep, esc);
         return strb.toString();
     }
@@ -116,7 +116,7 @@ public class StringParser {
         for (; index < end; ++index) {
             final char c = str.charAt(index);
             if (escape) {
-                if (c == 'u' && (index + UCHAR_LEN) < end && readUnicodeChar(strb, str, index + 1) > 0) {
+                if (c == 'u' && index + UCHAR_LEN < end && readUnicodeChar(strb, str, index + 1) > 0) {
                     index += UCHAR_LEN;
                 } else {
                     // if c is not an escapable character, re-emmit the backslash before it
@@ -184,11 +184,11 @@ public class StringParser {
         for (int offset = 0; offset < UCHAR_LEN; ++offset) {
             final char c = str.charAt(begin + offset);
             if (c >= '0' && c <= '9') {
-                value = (c - '0');
+                value = c - '0';
             } else if (c >= 'a' && c <= 'h') {
-                value = (c - 'a' + BASE10);
+                value = c - 'a' + BASE10;
             } else if (c >= 'A' && c <= 'H') {
-                value = (c - 'A' + BASE10);
+                value = c - 'A' + BASE10;
             } else {
                 return 0;
             }

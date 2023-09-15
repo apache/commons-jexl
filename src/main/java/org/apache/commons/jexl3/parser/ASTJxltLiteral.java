@@ -38,7 +38,7 @@ public final class ASTJxltLiteral extends JexlNode {
         this.literal = literal;
     }
 
-    public void setExpression(JxltEngine.Expression e) {
+    public void setExpression(final JxltEngine.Expression e) {
         this.jxltExpression = e;
     }
 

@@ -30,28 +30,28 @@ public class FeatureControllerTest extends JexlTestCase {
 
     }
 
-    private JexlEngine createEngine(JexlFeatures features) {
+    private JexlEngine createEngine(final JexlFeatures features) {
         return new JexlBuilder().features(features).imports("java.lang").create();
     }
 
     @Test
     public void testLoopFeatureSwitch() throws Exception {
-        Asserter onAsserter = new Asserter(createEngine(new JexlFeatures().loops(true)));
+        final Asserter onAsserter = new Asserter(createEngine(new JexlFeatures().loops(true)));
         onAsserter.setVariable("cond", true);
         onAsserter.setVariable("i", 0);
 
-        Asserter offAsserter = new Asserter(createEngine(new JexlFeatures().loops(false)));
+        final Asserter offAsserter = new Asserter(createEngine(new JexlFeatures().loops(false)));
         offAsserter.setVariable("cond", true);
         offAsserter.setVariable("i", 0);
         String matchException = "@1:1 loop error in 'while (...) ...'";
-        String whileExpr = "while(cond) { i++;  cond = false; }; i;";
+        final String whileExpr = "while(cond) { i++;  cond = false; }; i;";
         onAsserter.assertExpression(whileExpr, 1);
         offAsserter.failExpression(whileExpr, matchException, String::equals);
 
         matchException = "@1:1 loop error in 'do ... while (...)'";
         onAsserter.setVariable("i", 0);
         offAsserter.setVariable("i", 0);
-        String doWhileExpr = "do { i++; } while(false); i;";
+        final String doWhileExpr = "do { i++; } while(false); i;";
         onAsserter.assertExpression(doWhileExpr, 1);
         offAsserter.failExpression(doWhileExpr, matchException, String::equals);
 
@@ -62,7 +62,7 @@ public class FeatureControllerTest extends JexlTestCase {
         onAsserter.assertExpression(forExpr, 3);
         offAsserter.failExpression(forExpr, matchException, String::equals);
 
-        int[] a = new int[]{1, 2};
+        final int[] a = {1, 2};
         onAsserter.setVariable("a", a);
         offAsserter.setVariable("a", a);
         onAsserter.setVariable("i", 0);
@@ -74,8 +74,8 @@ public class FeatureControllerTest extends JexlTestCase {
 
     @Test
     public void testNewInstanceFeatureSwitch() throws Exception {
-        Asserter onAsserter = new Asserter(createEngine(new JexlFeatures().newInstance(true)));
-        Asserter offAsserter = new Asserter(createEngine(new JexlFeatures().newInstance(false)));
+        final Asserter onAsserter = new Asserter(createEngine(new JexlFeatures().newInstance(true)));
+        final Asserter offAsserter = new Asserter(createEngine(new JexlFeatures().newInstance(false)));
         String expr = "new('java.lang.String', 'JEXL')";
         onAsserter.assertExpression(expr, "JEXL");
         offAsserter.failExpression(expr, "@1:1 create instance error in 'new(..., ...)'", String::equals);
@@ -86,46 +86,46 @@ public class FeatureControllerTest extends JexlTestCase {
 
     @Test
     public void testMethodCallFeatureSwitch() throws Exception {
-        Asserter onAsserter = new Asserter(createEngine(new JexlFeatures().methodCall(true)));
-        Asserter offAsserter = new Asserter(createEngine(new JexlFeatures().methodCall(false)));
-        String expr = "'jexl'.toUpperCase()";
+        final Asserter onAsserter = new Asserter(createEngine(new JexlFeatures().methodCall(true)));
+        final Asserter offAsserter = new Asserter(createEngine(new JexlFeatures().methodCall(false)));
+        final String expr = "'jexl'.toUpperCase()";
         onAsserter.assertExpression(expr, "JEXL");
         offAsserter.failExpression(expr, "@1:7 method call error in '.toUpperCase(...)'", String::equals);
     }
 
     @Test
     public void testAnnotationFeatureSwitch() throws Exception {
-        Asserter onAsserter = new Asserter(createEngine(new JexlFeatures().methodCall(true).annotation(true)));
-        Asserter offAsserter = new Asserter(createEngine(new JexlFeatures().methodCall(true).annotation(false)));
-        String expr = "@silent ''.toString()";
+        final Asserter onAsserter = new Asserter(createEngine(new JexlFeatures().methodCall(true).annotation(true)));
+        final Asserter offAsserter = new Asserter(createEngine(new JexlFeatures().methodCall(true).annotation(false)));
+        final String expr = "@silent ''.toString()";
         onAsserter.assertExpression(expr, "");
         offAsserter.failExpression(expr, "@1:1 annotation error in '@silent'");
     }
 
     @Test
     public void testStructuredLiteralFeatureSwitch() throws Exception {
-        Asserter onAsserter = new Asserter(createEngine(new JexlFeatures().structuredLiteral(true)));
-        Asserter offAsserter = new Asserter(createEngine(new JexlFeatures().structuredLiteral(false)));
-        String arrayLitExpr = "[1, 2, 3, 4][3]";
+        final Asserter onAsserter = new Asserter(createEngine(new JexlFeatures().structuredLiteral(true)));
+        final Asserter offAsserter = new Asserter(createEngine(new JexlFeatures().structuredLiteral(false)));
+        final String arrayLitExpr = "[1, 2, 3, 4][3]";
         onAsserter.assertExpression(arrayLitExpr, 4);
         offAsserter.failExpression(arrayLitExpr, "@1:1 set/map/array literal error in '[ ... ]'", String::equals);
 
-        String mapLitExpr = "{'A' : 1, 'B' : 2}['B']";
+        final String mapLitExpr = "{'A' : 1, 'B' : 2}['B']";
         onAsserter.assertExpression(mapLitExpr, 2);
         offAsserter.failExpression(mapLitExpr, "@1:1 set/map/array literal error in '{ ... }'", String::equals);
 
-        String setLitExpr = "{'A', 'B'}.size()";
+        final String setLitExpr = "{'A', 'B'}.size()";
         onAsserter.assertExpression(setLitExpr, 2);
         offAsserter.failExpression(setLitExpr, "@1:1 set/map/array literal error in '{ ... }'", String::equals);
 
-        String rangeLitExpr = "(0..3).size()";
+        final String rangeLitExpr = "(0..3).size()";
         onAsserter.assertExpression(rangeLitExpr, 4);
         offAsserter.failExpression(rangeLitExpr, "@1:5 set/map/array literal error in '( .. )'", String::equals);
     }
 
     @Test
     public void testSideEffectEnabled() throws Exception {
-        Asserter asserter = new Asserter(createEngine(new JexlFeatures().sideEffect(true)));
+        final Asserter asserter = new Asserter(createEngine(new JexlFeatures().sideEffect(true)));
         asserter.assertExpression("i = 1", 1); // 1
         asserter.assertExpression("i = i + 1", 2); // 1 + 1 = 2
         asserter.assertExpression("i = i - 1", 1); // 2 - 1 = 1
@@ -159,7 +159,7 @@ public class FeatureControllerTest extends JexlTestCase {
 
     @Test
     public void testSideEffectDisabled() throws Exception {
-        Asserter asserter = new Asserter(createEngine(new JexlFeatures().sideEffect(false)));
+        final Asserter asserter = new Asserter(createEngine(new JexlFeatures().sideEffect(false)));
         asserter.setVariable("i", 1);
         String matchException = "@1:1 assign/modify error in 'i'";
         asserter.failExpression("i = 1", matchException);

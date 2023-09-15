@@ -100,7 +100,7 @@ abstract class AbstractExecutor {
 
     @Override
     public boolean equals(final Object obj) {
-        return this == obj || (obj instanceof AbstractExecutor && equals((AbstractExecutor) obj));
+        return this == obj || obj instanceof AbstractExecutor && equals((AbstractExecutor) obj);
     }
 
     @Override
@@ -143,7 +143,7 @@ abstract class AbstractExecutor {
      * @return boolean Whether the executor is alive.
      */
     public final boolean isAlive() {
-        return (method != null);
+        return method != null;
     }
 
     /**

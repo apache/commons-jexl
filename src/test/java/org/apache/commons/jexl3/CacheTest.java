@@ -531,7 +531,7 @@ public class CacheTest extends JexlTestCase {
         @Override
         public Integer call() throws Exception {
             args.ca = new Object[]{args.c0, args.c1, args.c2};
-            args.value = new Object[]{new Integer(2), "quux"};
+            args.value = new Object[]{Integer.valueOf(2), "quux"};
             //jexl.setDebug(true);
             final JexlExpression compute2 = jexl.createExpression("cache.compute(a0, a1)");
             final JexlExpression compute1 = jexl.createExpression("cache.compute(a0)");
@@ -687,7 +687,7 @@ public class CacheTest extends JexlTestCase {
         args.ca = new Object[]{
             Cached.class, Cached1.class, Cached2.class
         };
-        args.value = new Object[]{new Integer(2), "quux"};
+        args.value = new Object[]{Integer.valueOf(2), "quux"};
         doCOMPUTE(args, LOOPS, false);
     }
 
@@ -697,7 +697,7 @@ public class CacheTest extends JexlTestCase {
         args.ca = new Object[]{
             Cached.class, Cached1.class, Cached2.class
         };
-        args.value = new Object[]{new Integer(2), "quux"};
+        args.value = new Object[]{Integer.valueOf(2), "quux"};
         doCOMPUTE(args, LOOPS, true);
     }
 }

@@ -88,7 +88,7 @@ public class ASTIdentifierAccess extends JexlNode {
                     return null;
                 }
                 val *= 10;
-                val += (c - '0');
+                val += c - '0';
             }
             return val;
         }

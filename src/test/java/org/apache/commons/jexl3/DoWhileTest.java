@@ -73,13 +73,13 @@ public class DoWhileTest extends JexlTestCase {
     public void testWhileWithBlock() throws Exception {
         final JexlScript e = JEXL.createScript("do { x = x + 1; y = y * 2; } while (x < 10)");
         final JexlContext jc = new MapContext();
-        jc.set("x", new Integer(1));
-        jc.set("y", new Integer(1));
+        jc.set("x", Integer.valueOf(1));
+        jc.set("y", Integer.valueOf(1));
 
         final Object o = e.execute(jc);
-        Assert.assertEquals("Result is wrong", new Integer(512), o);
-        Assert.assertEquals("x is wrong", new Integer(10), jc.get("x"));
-        Assert.assertEquals("y is wrong", new Integer(512), jc.get("y"));
+        Assert.assertEquals("Result is wrong", Integer.valueOf(512), o);
+        Assert.assertEquals("x is wrong", Integer.valueOf(10), jc.get("x"));
+        Assert.assertEquals("y is wrong", Integer.valueOf(512), jc.get("y"));
     }
 
     @Test
@@ -143,32 +143,32 @@ public class DoWhileTest extends JexlTestCase {
     }
 
     @Test public void testForLoop0() {
-        String src = "(l)->{ for(let x = 0; x < 4; ++x) { l.add(x); } }";
-        JexlEngine jexl = new JexlBuilder().safe(true).create();
-        JexlScript script = jexl.createScript(src);
-        List<Integer> l = new ArrayList<>();
-        Object result = script.execute(null, l);
+        final String src = "(l)->{ for(let x = 0; x < 4; ++x) { l.add(x); } }";
+        final JexlEngine jexl = new JexlBuilder().safe(true).create();
+        final JexlScript script = jexl.createScript(src);
+        final List<Integer> l = new ArrayList<>();
+        final Object result = script.execute(null, l);
         Assert.assertNotNull(result);
         Assert.assertEquals(Arrays.asList(0, 1, 2, 3), l);
     }
 
     @Test public void testForLoop1() {
-        String src = "(l)->{ for(var x = 0; x < 4; ++x) { l.add(x); } }";
-        JexlEngine jexl = new JexlBuilder().safe(true).create();
-        JexlScript script = jexl.createScript(src);
-        List<Integer> l = new ArrayList<>();
-        Object result = script.execute(null, l);
+        final String src = "(l)->{ for(var x = 0; x < 4; ++x) { l.add(x); } }";
+        final JexlEngine jexl = new JexlBuilder().safe(true).create();
+        final JexlScript script = jexl.createScript(src);
+        final List<Integer> l = new ArrayList<>();
+        final Object result = script.execute(null, l);
         Assert.assertNotNull(result);
         Assert.assertEquals(Arrays.asList(0, 1, 2, 3), l);
     }
 
     @Test public void testForLoop2() {
-        String src = "(l)->{ for(x = 0; x < 4; ++x) { l.add(x); } }";
-        JexlEngine jexl = new JexlBuilder().safe(true).create();
-        JexlScript script = jexl.createScript(src);
-        List<Integer> l = new ArrayList<>();
-        JexlContext ctxt = new MapContext();
-        Object result = script.execute(ctxt, l);
+        final String src = "(l)->{ for(x = 0; x < 4; ++x) { l.add(x); } }";
+        final JexlEngine jexl = new JexlBuilder().safe(true).create();
+        final JexlScript script = jexl.createScript(src);
+        final List<Integer> l = new ArrayList<>();
+        final JexlContext ctxt = new MapContext();
+        final Object result = script.execute(ctxt, l);
         Assert.assertNotNull(result);
         Assert.assertEquals(Arrays.asList(0, 1, 2, 3), l);
     }

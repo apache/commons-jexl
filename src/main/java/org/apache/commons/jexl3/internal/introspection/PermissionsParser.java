@@ -90,7 +90,8 @@ public class PermissionsParser {
      * @param srcs the sources
      * @return the permissions map
      */
-    synchronized Permissions parse(Set<String> wildcards, Map<String, Permissions.NoJexlPackage> packages, final String... srcs) {
+    synchronized Permissions parse(final Set<String> wildcards, final Map<String, Permissions.NoJexlPackage> packages,
+            final String... srcs) {
         try {
             if (srcs == null || srcs.length == 0) {
                 return Permissions.UNRESTRICTED;
@@ -322,7 +323,7 @@ public class PermissionsParser {
             // parse a class:
             if (njclass == null) {
                 // we must have read the class ('identifier {'...)
-                if ((identifier == null) || (c != '{')) {
+                if (identifier == null || c != '{') {
                     throw new IllegalStateException(unexpected(c, i));
                 }
                 // if we have a class, it has a name

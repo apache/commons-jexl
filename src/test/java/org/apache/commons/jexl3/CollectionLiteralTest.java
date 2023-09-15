@@ -46,29 +46,29 @@ public class CollectionLiteralTest extends JexlTestCase {
         final AtomicInteger sets = new AtomicInteger(0);
         final AtomicInteger arrays = new AtomicInteger(0);
 
-        public Arithmetic363(boolean strict) {
+        public Arithmetic363(final boolean strict) {
             super(strict);
         }
 
-        @Override public MapBuilder mapBuilder(int size, boolean extended) {
+        @Override public MapBuilder mapBuilder(final int size, final boolean extended) {
             return new CountingMapBuilder(maps, size, extended);
         }
-        @Override public SetBuilder setBuilder(int size, boolean extended) {
+        @Override public SetBuilder setBuilder(final int size, final boolean extended) {
             return new CountingSetBuilder(sets, size, extended);
         }
-        @Override public ArrayBuilder arrayBuilder(int size, boolean extended) {
+        @Override public ArrayBuilder arrayBuilder(final int size, final boolean extended) {
             return new CountingArrayBuilder(arrays, size, extended);
         }
     }
 
     static class CountingSetBuilder extends SetBuilder {
         final AtomicInteger count;
-        public CountingSetBuilder(AtomicInteger ai, int size, boolean extended) {
+        public CountingSetBuilder(final AtomicInteger ai, final int size, final boolean extended) {
             super(size, extended);
             count = ai;
         }
         @Override public Set<?> create() {
-            Set<?> set = super.create();
+            final Set<?> set = super.create();
             count.incrementAndGet();
             return set;
         }
@@ -76,12 +76,12 @@ public class CollectionLiteralTest extends JexlTestCase {
 
     static class CountingMapBuilder extends MapBuilder {
         final AtomicInteger count;
-        public CountingMapBuilder(AtomicInteger ai, int size, boolean extended) {
+        public CountingMapBuilder(final AtomicInteger ai, final int size, final boolean extended) {
             super(size, extended);
             count = ai;
         }
         @Override public Map<Object, Object> create() {
-            Map<Object, Object> map = super.create();
+            final Map<Object, Object> map = super.create();
             count.incrementAndGet();
             return map;
         }
@@ -90,13 +90,13 @@ public class CollectionLiteralTest extends JexlTestCase {
     static class CountingArrayBuilder extends ArrayBuilder {
         final AtomicInteger count;
 
-        public CountingArrayBuilder(AtomicInteger ai, int size, boolean extended) {
+        public CountingArrayBuilder(final AtomicInteger ai, final int size, final boolean extended) {
             super(size, extended);
             count = ai;
         }
 
-        @Override public Object create(boolean extended) {
-            Object array = super.create(extended);
+        @Override public Object create(final boolean extended) {
+            final Object array = super.create(extended);
             count.incrementAndGet();
             return array;
         }
@@ -104,7 +104,7 @@ public class CollectionLiteralTest extends JexlTestCase {
 
     @Test
     public void testMapLBuilder() {
-        Arithmetic363 jc = new Arithmetic363(true);
+        final Arithmetic363 jc = new Arithmetic363(true);
         final JexlEngine jexl = new JexlBuilder().cache(4).arithmetic(jc).create();
         JexlScript script;
         Object result;
@@ -122,7 +122,7 @@ public class CollectionLiteralTest extends JexlTestCase {
 
     @Test
     public void testSetBuilder() {
-        Arithmetic363 jc = new Arithmetic363(true);
+        final Arithmetic363 jc = new Arithmetic363(true);
         final JexlEngine jexl = new JexlBuilder().cache(4).arithmetic(jc).create();
         JexlScript script;
         Object result;
@@ -140,7 +140,7 @@ public class CollectionLiteralTest extends JexlTestCase {
 
     @Test
     public void testArrayBuilder() {
-        Arithmetic363 jc = new Arithmetic363(true);
+        final Arithmetic363 jc = new Arithmetic363(true);
         final JexlEngine jexl = new JexlBuilder().cache(4).arithmetic(jc).create();
         JexlScript script;
         Object result;

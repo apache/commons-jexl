@@ -24,11 +24,11 @@ import java.math.MathContext;
  * An arithmetic that tries to keep argument types for bit-twiddling operators.
  */
 public class Arithmetic360 extends JexlArithmetic {
-    public Arithmetic360(boolean astrict) {
+    public Arithmetic360(final boolean astrict) {
         super(astrict);
     }
 
-    public Arithmetic360(boolean astrict, MathContext bigdContext, int bigdScale) {
+    public Arithmetic360(final boolean astrict, final MathContext bigdContext, final int bigdScale) {
         super(astrict, bigdContext, bigdScale);
     }
 
@@ -44,7 +44,7 @@ public class Arithmetic360 extends JexlArithmetic {
     protected Number narrowLong(final Object lhs, final Object rhs, final long result) {
         if (!(lhs instanceof Long || rhs instanceof Long)) {
             final int ir = (int) result;
-            if (result == (long) ir) {
+            if (result == ir) {
                 return ir;
             }
         }
@@ -61,7 +61,7 @@ public class Arithmetic360 extends JexlArithmetic {
     protected Number narrowLong(final Object operand, final long result) {
         if (!(operand instanceof Long)) {
             final int ir = (int) result;
-            if (result == (long) ir) {
+            if (result == ir) {
                 return ir;
             }
         }
@@ -161,7 +161,7 @@ public class Arithmetic360 extends JexlArithmetic {
      * @return left &lt;&lt; right.
      */
     @Override
-    public Object shiftLeft(Object left, Object right) {
+    public Object shiftLeft(final Object left, final Object right) {
         if (left == null && right == null) {
             return controlNullNullOperands(JexlOperator.SHIFTLEFT);
         }
@@ -185,7 +185,7 @@ public class Arithmetic360 extends JexlArithmetic {
      * @return left &gt;&gt; right.
      */
     @Override
-    public Object shiftRight(Object left, Object right) {
+    public Object shiftRight(final Object left, final Object right) {
         if (left == null && right == null) {
             return controlNullNullOperands(JexlOperator.SHIFTRIGHT);
         }
@@ -209,7 +209,7 @@ public class Arithmetic360 extends JexlArithmetic {
      * @return left &gt;&gt;&gt; right.
      */
     @Override
-    public Object shiftRightUnsigned(Object left, Object right) {
+    public Object shiftRightUnsigned(final Object left, final Object right) {
         if (left == null && right == null) {
             return controlNullNullOperands(JexlOperator.SHIFTRIGHTU);
         }
@@ -222,7 +222,7 @@ public class Arithmetic360 extends JexlArithmetic {
         if (l != null) {
             return l.longValue() >>> r;
         }
-        BigInteger bl = toBigInteger(left);
+        final BigInteger bl = toBigInteger(left);
         return bl.signum() < 0? bl.negate().shiftRight(r) : bl.shiftRight(r);
     }
 

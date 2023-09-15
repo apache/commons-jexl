@@ -94,7 +94,7 @@ public class Asserter extends Assert {
      * @throws Exception if the expression could not be evaluationed or an assertion
      * fails
      */
-    public void assertExpression(final String expression, final Object expected, Object... args) throws Exception {
+    public void assertExpression(final String expression, final Object expected, final Object... args) throws Exception {
         final JexlScript exp = engine.createScript(expression);
         final Object value = exp.execute(context, args);
         if (expected instanceof BigDecimal) {
@@ -137,7 +137,7 @@ public class Asserter extends Assert {
     public void failExpression(final String expression, final String matchException) throws Exception {
          failExpression(expression, matchException, String::matches);
     }
-    public void failExpression(final String expression, final String matchException, BiPredicate<String,String> predicate) throws Exception {
+    public void failExpression(final String expression, final String matchException, final BiPredicate<String,String> predicate) throws Exception {
         try {
             final JexlScript exp = engine.createScript(expression);
             exp.execute(context);

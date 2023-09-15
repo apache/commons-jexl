@@ -34,13 +34,13 @@ public class OptionalNullMethod implements JexlMethod {
     /** The result when we solve it. */
     private JexlMethod delegate;
 
-    OptionalNullMethod(JexlUberspect jexlUberspect, String name) {
+    OptionalNullMethod(final JexlUberspect jexlUberspect, final String name) {
         uberspect = jexlUberspect;
         methodName = name;
     }
 
     @Override
-    public Object invoke(Object obj, Object... params) throws Exception {
+    public Object invoke(final Object obj, final Object... params) throws Exception {
         if (obj == null) {
             return null;
         }
@@ -50,12 +50,11 @@ public class OptionalNullMethod implements JexlMethod {
                 throw new JexlException.Method((JexlInfo) null, methodName, params);
             }
         }
-        ;
         return delegate.invoke(obj, params);
     }
 
     @Override
-    public Object tryInvoke(String name, Object obj, Object... params) throws JexlException.TryFailed {
+    public Object tryInvoke(final String name, final Object obj, final Object... params) throws JexlException.TryFailed {
         if (obj == null) {
             return null;
         }
@@ -63,7 +62,7 @@ public class OptionalNullMethod implements JexlMethod {
     }
 
     @Override
-    public boolean tryFailed(Object rval) {
+    public boolean tryFailed(final Object rval) {
         return delegate != null ? delegate.tryFailed(rval) : JexlEngine.TRY_FAILED == rval;
     }
 

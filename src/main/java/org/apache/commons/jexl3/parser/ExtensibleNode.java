@@ -29,15 +29,15 @@ public class ExtensibleNode extends JexlNode {
   /** Whether this array/set/map is extended or not. */
   private boolean extended = false;
 
-  public ExtensibleNode(int id) {
+  public ExtensibleNode(final int id) {
     super(id);
   }
 
-  public ExtensibleNode(Parser p, int id) {
+  public ExtensibleNode(final Parser p, final int id) {
     super(p, id);
   }
 
-  public void setExtended(boolean e) {
+  public void setExtended(final boolean e) {
     this.extended = e;
   }
 

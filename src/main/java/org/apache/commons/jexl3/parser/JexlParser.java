@@ -221,7 +221,7 @@ public abstract class JexlParser extends StringParser {
      * Gets the frame used by this parser.
      * <p>
      * Since local variables create new symbols, it is important to
-     * regain access after parsing to known which / how-many registers are needed. 
+     * regain access after parsing to known which / how-many registers are needed.
      * </p>
      * @return the named register map
      */
@@ -697,18 +697,18 @@ public abstract class JexlParser extends StringParser {
      * @param symbol the symbol
      * @return true if constant, false otherwise
      */
-    private boolean isConstant(int symbol) {
+    private boolean isConstant(final int symbol) {
         if (symbol >= 0) {
             if (block != null && block.hasSymbol(symbol)) {
                 return block.isConstant(symbol);
             }
             Scope blockScope = blockScopes.get(block);
             int lexical = symbol;
-            for (LexicalUnit unit : blocks) {
-                Scope unitScope = blockScopes.get(unit);
+            for (final LexicalUnit unit : blocks) {
+                final Scope unitScope = blockScopes.get(unit);
                 // follow through potential capture
                 if (blockScope != unitScope) {
-                    int declared = blockScope.getCaptureDeclaration(lexical);
+                    final int declared = blockScope.getCaptureDeclaration(lexical);
                     if (declared >= 0) {
                         lexical = declared;
                     }

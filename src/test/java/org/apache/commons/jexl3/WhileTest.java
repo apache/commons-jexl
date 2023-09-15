@@ -43,22 +43,22 @@ public class WhileTest extends JexlTestCase {
     public void testWhileExecutesExpressionWhenLooping() throws Exception {
         final JexlScript e = JEXL.createScript("while (x < 10) x = x + 1;");
         final JexlContext jc = new MapContext();
-        jc.set("x", new Integer(1));
+        jc.set("x", Integer.valueOf(1));
 
         final Object o = e.execute(jc);
-        Assert.assertEquals("Result is wrong", new Integer(10), o);
+        Assert.assertEquals("Result is wrong", Integer.valueOf(10), o);
     }
 
     @Test
     public void testWhileWithBlock() throws Exception {
         final JexlScript e = JEXL.createScript("while (x < 10) { x = x + 1; y = y * 2; }");
         final JexlContext jc = new MapContext();
-        jc.set("x", new Integer(1));
-        jc.set("y", new Integer(1));
+        jc.set("x", Integer.valueOf(1));
+        jc.set("y", Integer.valueOf(1));
 
         final Object o = e.execute(jc);
-        Assert.assertEquals("Result is wrong", new Integer(512), o);
-        Assert.assertEquals("x is wrong", new Integer(10), jc.get("x"));
-        Assert.assertEquals("y is wrong", new Integer(512), jc.get("y"));
+        Assert.assertEquals("Result is wrong", Integer.valueOf(512), o);
+        Assert.assertEquals("x is wrong", Integer.valueOf(10), jc.get("x"));
+        Assert.assertEquals("y is wrong", Integer.valueOf(512), jc.get("y"));
     }
 }

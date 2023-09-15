@@ -41,8 +41,8 @@ public class SetLiteralTest extends JexlTestCase {
 
     @Test
     public void testSetLiteralWithStrings() throws Exception {
-        List<String> sources = Arrays.asList("{ 'foo', 'bar' }", "{ 'foo', 'bar', ... }", "{ 'foo', 'bar', }");
-        for(String src : sources) {
+        final List<String> sources = Arrays.asList("{ 'foo', 'bar' }", "{ 'foo', 'bar', ... }", "{ 'foo', 'bar', }");
+        for(final String src : sources) {
             final JexlExpression e = JEXL.createExpression(src);
             final JexlContext jc = new MapContext();
 
@@ -53,15 +53,15 @@ public class SetLiteralTest extends JexlTestCase {
         try {
             JEXL.createExpression("{ , }");
             Assert.fail("syntax");
-        } catch(JexlException.Parsing parsing) {
+        } catch(final JexlException.Parsing parsing) {
             Assert.assertNotNull(parsing);
         }
     }
 
     @Test
     public void testLiteralWithOneEntry() throws Exception {
-        List<String> sources = Arrays.asList("{ 'foo' }", "{ 'foo', }");
-        for(String src : sources) {
+        final List<String> sources = Arrays.asList("{ 'foo' }", "{ 'foo', }");
+        for(final String src : sources) {
             final JexlExpression e = JEXL.createExpression(src);
             final JexlContext jc = new MapContext();
 
@@ -117,7 +117,7 @@ public class SetLiteralTest extends JexlTestCase {
         final JexlContext jc = new MapContext();
 
         final Object o = e.evaluate(jc);
-        final Set<?> check = createSet(new Double(5.0), new Integer(10));
+        final Set<?> check = createSet(Double.valueOf(5.0), Integer.valueOf(10));
         Assert.assertEquals(check, o);
     }
 
@@ -133,11 +133,11 @@ public class SetLiteralTest extends JexlTestCase {
         };
         final Set<?>[] checks = {
             Collections.emptySet(),
-            createSet(new Integer(10)),
-            createSet(new Integer(10), null),
-            createSet(new Integer(10), null, new Integer(20)),
+            createSet(Integer.valueOf(10)),
+            createSet(Integer.valueOf(10), null),
+            createSet(Integer.valueOf(10), null, Integer.valueOf(20)),
             createSet("10", null),
-            createSet(null, "10", new Integer(20))
+            createSet(null, "10", Integer.valueOf(20))
         };
         final JexlContext jc = new MapContext();
         for (int t = 0; t < exprs.length; ++t) {
@@ -154,7 +154,7 @@ public class SetLiteralTest extends JexlTestCase {
         final JexlContext jc = new MapContext();
 
         final Object o = e.evaluate(jc);
-        Assert.assertEquals(new Integer(2), o);
+        Assert.assertEquals(Integer.valueOf(2), o);
     }
 
     @Test

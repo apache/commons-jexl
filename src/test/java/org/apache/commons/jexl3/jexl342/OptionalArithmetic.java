@@ -28,7 +28,7 @@ import java.util.concurrent.atomic.AtomicReference;
  * Unwraps Optional/Reference/AtomicReference on public and key methods.
  */
 public class OptionalArithmetic extends JexlArithmetic {
-    public OptionalArithmetic(boolean astrict) {
+    public OptionalArithmetic(final boolean astrict) {
         super(astrict);
     }
 
@@ -37,28 +37,28 @@ public class OptionalArithmetic extends JexlArithmetic {
      * @param ref the reference
      * @return the referenced object
      */
-    protected Object star(Object ref) {
+    protected Object star(final Object ref) {
         if (ref instanceof Optional<?>) {
-            Optional<?> o = (Optional<?>) ref;
+            final Optional<?> o = (Optional<?>) ref;
             return o.orElse(null);
         }
         if (ref instanceof Reference<?>) {
-            Optional<?> r = (Optional<?>) ref;
+            final Optional<?> r = (Optional<?>) ref;
             return r.get();
         }
         if (ref instanceof AtomicReference<?>) {
-            AtomicReference<?> r = (AtomicReference<?>) ref;
+            final AtomicReference<?> r = (AtomicReference<?>) ref;
             return r.get();
         }
         return ref;
     }
 
     @Override
-    public Object controlReturn(Object returned) {
+    public Object controlReturn(final Object returned) {
         return star(returned);
     }
     @Override
-    protected boolean isNullOperand(Object val) {
+    protected boolean isNullOperand(final Object val) {
         return super.isNullOperand(star(val));
     }
 
@@ -103,7 +103,7 @@ public class OptionalArithmetic extends JexlArithmetic {
     }
 
     @Override
-    public Boolean empty(Object o) {
+    public Boolean empty(final Object o) {
         return super.empty(star(o));
     }
 
@@ -113,47 +113,47 @@ public class OptionalArithmetic extends JexlArithmetic {
     }
 
     @Override
-    public Object positivize(Object o) {
+    public Object positivize(final Object o) {
         return super.positivize(star(o));
     }
 
     @Override
-    public Object negate(Object o) {
+    public Object negate(final Object o) {
         return super.negate(star(o));
     }
 
     @Override
-    public Object complement(Object o) {
+    public Object complement(final Object o) {
         return super.complement(star(o));
     }
 
     @Override
-    public Boolean contains(Object lhs, Object rhs) {
+    public Boolean contains(final Object lhs, final Object rhs) {
         return super.contains(star(lhs), star(rhs));
     }
 
     @Override
-    public Object add(Object lhs, Object rhs) {
+    public Object add(final Object lhs, final Object rhs) {
         return super.add(star(lhs), star(rhs));
     }
 
     @Override
-    public Object subtract(Object lhs, Object rhs) {
+    public Object subtract(final Object lhs, final Object rhs) {
         return super.subtract(star(lhs), star(rhs));
     }
 
     @Override
-    public Object multiply(Object lhs, Object rhs) {
+    public Object multiply(final Object lhs, final Object rhs) {
         return super.multiply(star(lhs), star(rhs));
     }
 
     @Override
-    public Object divide(Object lhs, Object rhs) {
+    public Object divide(final Object lhs, final Object rhs) {
         return super.divide(star(lhs), star(rhs));
     }
 
     @Override
-    public Object mod(Object lhs, Object rhs) {
+    public Object mod(final Object lhs, final Object rhs) {
         return super.mod(star(lhs), star(rhs));
     }
 
@@ -216,7 +216,7 @@ public class OptionalArithmetic extends JexlArithmetic {
         if (args != null) {
             for (int a = 0; a < args.length; ++a) {
                 final Object arg = args[a];
-                Object sarg = star(arg);
+                final Object sarg = star(arg);
                 if (sarg != arg) {
                     narrowed = true;
                 }
@@ -237,7 +237,7 @@ public class OptionalArithmetic extends JexlArithmetic {
     public ArrayBuilder arrayBuilder(final int size, final boolean extended) {
         return new org.apache.commons.jexl3.internal.ArrayBuilder(size, extended) {
             @Override
-            public void add(Object value) {
+            public void add(final Object value) {
                 super.add(star(value));
             }
         };
@@ -247,7 +247,7 @@ public class OptionalArithmetic extends JexlArithmetic {
     public SetBuilder setBuilder(final int size, final boolean extended) {
         return new org.apache.commons.jexl3.internal.SetBuilder(size, extended) {
             @Override
-            public void add(Object value) {
+            public void add(final Object value) {
                 super.add(star(value));
             }
         };
@@ -257,7 +257,7 @@ public class OptionalArithmetic extends JexlArithmetic {
     public MapBuilder mapBuilder(final int size, final boolean extended) {
         return new org.apache.commons.jexl3.internal.MapBuilder(size, extended) {
             @Override
-            public void put(Object key, Object value) {
+            public void put(final Object key, final Object value) {
                 super.put(key, star(value));
             }
         };

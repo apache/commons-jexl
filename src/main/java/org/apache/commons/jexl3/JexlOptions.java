@@ -85,7 +85,7 @@ public final class JexlOptions {
      * @return the new flags mask value
      */
     private static int set(final int ordinal, final int mask, final boolean value) {
-        return value? mask | (1 << ordinal) : mask & ~(1 << ordinal);
+        return value? mask | 1 << ordinal : mask & ~(1 << ordinal);
     }
 
     /**
@@ -146,7 +146,7 @@ public final class JexlOptions {
             for (int f = 0; f < NAMES.length; ++f) {
                 if (NAMES[f].equals(name)) {
                     if (b) {
-                        mask |= (1 << f);
+                        mask |= 1 << f;
                     } else {
                         mask &= ~(1 << f);
                     }
@@ -444,7 +444,7 @@ public final class JexlOptions {
             if (i > 0) {
                 strb.append(' ');
             }
-            strb.append((flags & (1 << i)) != 0? '+':'-');
+            strb.append((flags & 1 << i) != 0? '+':'-');
             strb.append(NAMES[i]);
         }
         return strb.toString();

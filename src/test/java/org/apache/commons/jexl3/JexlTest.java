@@ -103,7 +103,7 @@ public final class JexlTest extends JexlTestCase {
         jc.set("foo", new Foo());
         jc.set("a", Boolean.TRUE);
         jc.set("b", Boolean.FALSE);
-        jc.set("num", new Integer(5));
+        jc.set("num", Integer.valueOf(5));
         jc.set("now", Calendar.getInstance().getTime());
         final GregorianCalendar gc = new GregorianCalendar(5000, 11, 20);
         jc.set("now2", gc.getTime());
@@ -166,7 +166,7 @@ public final class JexlTest extends JexlTestCase {
         jc.set("array", new Object[0]);
         jc.set("map", new HashMap<>());
         jc.set("list", new ArrayList<>());
-        jc.set("set", (new HashMap<>()).keySet());
+        jc.set("set", new HashMap<>().keySet());
         jc.set("longstring", "thingthing");
 
         /*
@@ -192,11 +192,11 @@ public final class JexlTest extends JexlTestCase {
 
         final Map<String, Integer> map = new HashMap<>();
 
-        map.put("1", new Integer(1));
-        map.put("2", new Integer(2));
-        map.put("3", new Integer(3));
-        map.put("4", new Integer(4));
-        map.put("5", new Integer(5));
+        map.put("1", Integer.valueOf(1));
+        map.put("2", Integer.valueOf(2));
+        map.put("3", Integer.valueOf(3));
+        map.put("4", Integer.valueOf(4));
+        map.put("5", Integer.valueOf(5));
 
         jc.set("map", map);
 
@@ -220,16 +220,16 @@ public final class JexlTest extends JexlTestCase {
         final BitSet bitset = new BitSet(5);
         jc.set("bitset", bitset);
 
-        assertExpression(jc, "size(s)", new Integer(5));
-        assertExpression(jc, "size(array)", new Integer(5));
-        assertExpression(jc, "size(list)", new Integer(5));
-        assertExpression(jc, "size(map)", new Integer(5));
-        assertExpression(jc, "size(set)", new Integer(5));
-        assertExpression(jc, "size(bitset)", new Integer(64));
-        assertExpression(jc, "list.size()", new Integer(5));
-        assertExpression(jc, "map.size()", new Integer(5));
-        assertExpression(jc, "set.size()", new Integer(5));
-        assertExpression(jc, "bitset.size()", new Integer(64));
+        assertExpression(jc, "size(s)", Integer.valueOf(5));
+        assertExpression(jc, "size(array)", Integer.valueOf(5));
+        assertExpression(jc, "size(list)", Integer.valueOf(5));
+        assertExpression(jc, "size(map)", Integer.valueOf(5));
+        assertExpression(jc, "size(set)", Integer.valueOf(5));
+        assertExpression(jc, "size(bitset)", Integer.valueOf(64));
+        assertExpression(jc, "list.size()", Integer.valueOf(5));
+        assertExpression(jc, "map.size()", Integer.valueOf(5));
+        assertExpression(jc, "set.size()", Integer.valueOf(5));
+        assertExpression(jc, "bitset.size()", Integer.valueOf(64));
 
         assertExpression(jc, "list.get(size(list) - 1)", "5");
         assertExpression(jc, "list[size(list) - 1]", "5");
@@ -266,10 +266,10 @@ public final class JexlTest extends JexlTestCase {
         Object value;
         expr = JEXL.createExpression("new(double, 1)");
         value = expr.evaluate(jc);
-        Assert.assertEquals(expr.toString(), new Double(1.0), value);
+        Assert.assertEquals(expr.toString(), Double.valueOf(1.0), value);
         expr = JEXL.createExpression("new('java.lang.Float', 100)");
         value = expr.evaluate(jc);
-        Assert.assertEquals(expr.toString(), new Float(100.0), value);
+        Assert.assertEquals(expr.toString(), Float.valueOf((float) 100.0), value);
         expr = JEXL.createExpression("new(foo).quux");
         value = expr.evaluate(jc);
         Assert.assertEquals(expr.toString(), "String : quux", value);
@@ -295,11 +295,11 @@ public final class JexlTest extends JexlTestCase {
          * test new null coersion
          */
         jc.set("imanull", null);
-        assertExpression(jc, "imanull + 2", new Integer(2));
-        assertExpression(jc, "imanull + imanull", new Integer(0));
+        assertExpression(jc, "imanull + 2", Integer.valueOf(2));
+        assertExpression(jc, "imanull + imanull", Integer.valueOf(0));
 
         /* test for bugzilla 31577 */
-        jc.set("n", new Integer(0));
+        jc.set("n", Integer.valueOf(0));
         assertExpression(jc, "n != null && n != 0", Boolean.FALSE);
     }
 
@@ -310,10 +310,10 @@ public final class JexlTest extends JexlTestCase {
     public void testConditions() throws Exception {
         final JexlEvalContext jc = new JexlEvalContext();
         final JexlOptions options = jc.getEngineOptions();
-        jc.set("foo", new Integer(2));
-        jc.set("aFloat", new Float(1));
-        jc.set("aDouble", new Double(2));
-        jc.set("aChar", new Character('A'));
+        jc.set("foo", Integer.valueOf(2));
+        jc.set("aFloat", Float.valueOf(1));
+        jc.set("aDouble", Double.valueOf(2));
+        jc.set("aChar", Character.valueOf('A'));
         jc.set("aBool", Boolean.TRUE);
         final StringBuilder buffer = new StringBuilder("abc");
         final List<Object> list = new ArrayList<>();
@@ -420,7 +420,7 @@ public final class JexlTest extends JexlTestCase {
         final JexlEvalContext jc = new JexlEvalContext();
         final JexlOptions options = jc.getEngineOptions();
         options.setStrict(false);
-        jc.set("bar", new Integer(2));
+        jc.set("bar", Integer.valueOf(2));
 
         assertExpression(jc, "empty foo", Boolean.TRUE);
         assertExpression(jc, "bar == null", Boolean.FALSE);
@@ -526,9 +526,9 @@ public final class JexlTest extends JexlTestCase {
         final JexlContext jc = new MapContext();
         jc.set("foo", foo);
 
-        assertExpression(jc, "foo.count", new Integer(5));
-        assertExpression(jc, "foo.square(2)", new Integer(4));
-        assertExpression(jc, "foo.square(-2)", new Integer(4));
+        assertExpression(jc, "foo.count", Integer.valueOf(5));
+        assertExpression(jc, "foo.square(2)", Integer.valueOf(4));
+        assertExpression(jc, "foo.square(-2)", Integer.valueOf(4));
     }
 
     /**
@@ -557,7 +557,7 @@ public final class JexlTest extends JexlTestCase {
         jc.set("foo", "abcdef");
 
         assertExpression(jc, "foo.substring(2,4)", "cd");
-        assertExpression(jc, "foo.charAt(2)", new Character('c'));
+        assertExpression(jc, "foo.charAt(2)", Character.valueOf('c'));
         assertExpression(jc, "foo.charAt(-2)", null);
 
     }
@@ -702,8 +702,8 @@ public final class JexlTest extends JexlTestCase {
 
         assertExpression(jc, "hello = 'world'", "world");
         Assert.assertEquals("hello variable not changed", "world", jc.get("hello"));
-        assertExpression(jc, "result = 1 + 1", new Integer(2));
-        Assert.assertEquals("result variable not changed", new Integer(2), jc.get("result"));
+        assertExpression(jc, "result = 1 + 1", Integer.valueOf(2));
+        Assert.assertEquals("result variable not changed", Integer.valueOf(2), jc.get("result"));
         // todo: make sure properties can be assigned to, fall back to flat var if no property
         // assertExpression(jc, "foo.property1 = '99'", "99");
         // Assert.assertEquals("property not set", "99", foo.getProperty1());
@@ -714,9 +714,9 @@ public final class JexlTest extends JexlTestCase {
         final JexlContext jc = new MapContext();
         final String value = "Stinky Cheese";
         jc.set("maven.bob.food", value);
-        assertExpression(jc, "maven.bob.food.length()", new Integer(value.length()));
+        assertExpression(jc, "maven.bob.food.length()", Integer.valueOf(value.length()));
         assertExpression(jc, "empty(maven.bob.food)", Boolean.FALSE);
-        assertExpression(jc, "size(maven.bob.food)", new Integer(value.length()));
+        assertExpression(jc, "size(maven.bob.food)", Integer.valueOf(value.length()));
         assertExpression(jc, "maven.bob.food + ' is good'", value + " is good");
 
         // DG: Note the following ant properties don't work

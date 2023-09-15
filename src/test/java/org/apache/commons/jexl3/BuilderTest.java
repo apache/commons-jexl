@@ -62,14 +62,14 @@ public class BuilderTest {
 
     @Test
     public void testOther() {
-        ClassLoader cls = getClass().getClassLoader().getParent();
+        final ClassLoader cls = getClass().getClassLoader().getParent();
         Assert.assertEquals(cls, builder().loader(cls).loader());
-        Charset cs = Charset.forName("UTF16");
+        final Charset cs = Charset.forName("UTF16");
         Assert.assertEquals(cs, builder().charset(cs).charset());
         Assert.assertEquals(cs, builder().loader(cs).charset());
-        JexlUberspect u0 = builder().create().getUberspect();
-        JexlSandbox sandbox = new JexlSandbox();
-        JexlUberspect uberspect = new SandboxUberspect(u0, sandbox);
+        final JexlUberspect u0 = builder().create().getUberspect();
+        final JexlSandbox sandbox = new JexlSandbox();
+        final JexlUberspect uberspect = new SandboxUberspect(u0, sandbox);
         Assert.assertEquals(sandbox, builder().sandbox(sandbox).sandbox());
         Assert.assertEquals(uberspect, builder().uberspect(uberspect).uberspect());
     }

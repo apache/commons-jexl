@@ -146,7 +146,7 @@ public class JXLTTest extends JexlTestCase {
         context.set("froboz", froboz);
         final JxltEngine.Expression check = JXLT.createExpression("${ froboz.plus10() }");
         final Object o = check.evaluate(context);
-        Assert.assertEquals("Result is not 32", new Integer(32), o);
+        Assert.assertEquals("Result is not 32", Integer.valueOf(32), o);
         Assert.assertEquals("Result is not 42", 42, froboz.getValue());
         final Set<List<String>> evars = check.getVariables();
         Assert.assertEquals(1, evars.size());
@@ -159,9 +159,9 @@ public class JXLTTest extends JexlTestCase {
         final JxltEngine.Expression assign = JXLT.createExpression("${froboz.value = 42}");
         final JxltEngine.Expression check = JXLT.createExpression("${froboz.value}");
         Object o = assign.evaluate(context);
-        Assert.assertEquals("Result is not 10", new Integer(42), o);
+        Assert.assertEquals("Result is not 10", Integer.valueOf(42), o);
         o = check.evaluate(context);
-        Assert.assertEquals("Result is not 10", new Integer(42), o);
+        Assert.assertEquals("Result is not 10", Integer.valueOf(42), o);
     }
 
     @Test
@@ -778,7 +778,7 @@ public class JXLTTest extends JexlTestCase {
     @Test
     public void testInterpolationParameter() throws Exception {
         final String expr =  "(user)->{`Hello \n${user}`}";
-        JexlScript script = ENGINE.createScript(expr);
+        final JexlScript script = ENGINE.createScript(expr);
         Object value = script.execute(context, "Henrib");
         Assert.assertEquals(expr, "Hello \nHenrib", value);
         value = ENGINE.createScript(expr).execute(context, "Dimitri");
@@ -787,18 +787,18 @@ public class JXLTTest extends JexlTestCase {
 
     @Test
     public void testDbgEscapes() throws Exception {
-        String[] srcs = new String[]{
+        final String[] srcs = {
                 "jexl:print('hello\\'\\nworld')",
                 "'hello\\tworld'",
                 "'hello\\nworld'",
                 "'hello\\fworld'",
                 "'hello\\rworld'"
         };
-        for(String src : srcs) {
-            JexlScript script = ENGINE.createScript(src);
-            Debugger dbg = new Debugger();
+        for(final String src : srcs) {
+            final JexlScript script = ENGINE.createScript(src);
+            final Debugger dbg = new Debugger();
             dbg.debug(script);
-            String msrc = dbg.toString();
+            final String msrc = dbg.toString();
             Assert.assertEquals(src, msrc);
         }
     }
@@ -1035,7 +1035,7 @@ public class JXLTTest extends JexlTestCase {
         final Writer strw0 = new StringWriter();
         tmplt0.evaluate(ctxt, strw0);
         final String output0 = strw0.toString();
-        JexlFeatures features = BUILDER.features();
+        final JexlFeatures features = BUILDER.features();
         if (features != null && features.isLexical() && features.isLexicalShade()) {
             Assert.assertEquals("-strict -cancellable +lexical +lexicalShade +safe", output0);
         } else {
@@ -1155,7 +1155,7 @@ public class JXLTTest extends JexlTestCase {
 
     @Test
     public void testConstantTemplate() {
-        String src = "<script>\n" +
+        final String src = "<script>\n" +
                 "      function test(src){\n" +
                 "        var res = src.replace(/\\n\\t\\s/g, '\\n');\n" +
                 "      }\n" +
@@ -1169,13 +1169,13 @@ public class JXLTTest extends JexlTestCase {
         Assert.assertNotNull(tmplt);
         final Writer strw = new StringWriter();
         tmplt.evaluate(ctxt, strw);
-        String result = strw.toString();
+        final String result = strw.toString();
         Assert.assertEquals(src, result);
     }
 
     private static final Permissions NOJEXL3 = new Permissions() {
-        @Override public boolean allow(Class<?> clazz) {
-            String cname = clazz.getName();
+        @Override public boolean allow(final Class<?> clazz) {
+            final String cname = clazz.getName();
             return !cname.contains("jexl3") || cname.contains("311");
         }
     };
@@ -1186,25 +1186,25 @@ public class JXLTTest extends JexlTestCase {
         final JexlContext ctxt = new MapContext();
         ctxt.set("user", "Francesco");
         /// this uberspect can not access jexl3 classes (besides test)
-        Uberspect uberspect = new Uberspect(LogFactory.getLog(JXLTTest.class), null, NOJEXL3);
-        Method method = uberspect.getMethod(TemplateInterpreter.class, "print", new Object[]{Integer.TYPE});
+        final Uberspect uberspect = new Uberspect(LogFactory.getLog(JXLTTest.class), null, NOJEXL3);
+        final Method method = uberspect.getMethod(TemplateInterpreter.class, "print", new Object[]{Integer.TYPE});
         Assert.assertNull(method);
         // ensures JXLT sandboxed still executes
         final JexlEngine jexl= new JexlBuilder().uberspect(uberspect).create();
         final JxltEngine jxlt = jexl.createJxltEngine();
 
-        JxltEngine.Template tmplt = jxlt.createTemplate(src);
-        Writer strw = new StringWriter();
+        final JxltEngine.Template tmplt = jxlt.createTemplate(src);
+        final Writer strw = new StringWriter();
         tmplt.evaluate(ctxt, strw);
-        String result = strw.toString();
+        final String result = strw.toString();
         Assert.assertEquals("Hello Francesco", result);
     }
 
     @Test
     public void testSanboxed311i() throws Exception {
         /// this uberspect can not access jexl3 classes (besides test)
-        Uberspect uberspect = new Uberspect(LogFactory.getLog(JXLTTest.class), null, NOJEXL3);
-        Method method = uberspect.getMethod(TemplateInterpreter.class, "print", new Object[]{Integer.TYPE});
+        final Uberspect uberspect = new Uberspect(LogFactory.getLog(JXLTTest.class), null, NOJEXL3);
+        final Method method = uberspect.getMethod(TemplateInterpreter.class, "print", new Object[]{Integer.TYPE});
         final JexlEngine jexl= new JexlBuilder().uberspect(uberspect).create();
         final JxltEngine jxlt = jexl.createJxltEngine();
         final JexlContext ctx311 = new Context311();

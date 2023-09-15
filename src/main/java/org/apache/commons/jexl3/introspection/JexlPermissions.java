@@ -343,37 +343,37 @@ public interface JexlPermissions {
          /** The permissions we delegate to. */
         protected final JexlPermissions base;
 
-        protected Delegate(JexlPermissions delegate) {
+        protected Delegate(final JexlPermissions delegate) {
             base = delegate;
         }
 
         @Override
-        public boolean allow(Package pack) {
+        public boolean allow(final Package pack) {
             return base.allow(pack);
         }
 
         @Override
-        public boolean allow(Class<?> clazz) {
+        public boolean allow(final Class<?> clazz) {
             return base.allow(clazz);
         }
 
         @Override
-        public boolean allow(Constructor<?> ctor) {
+        public boolean allow(final Constructor<?> ctor) {
             return base.allow(ctor);
         }
 
         @Override
-        public boolean allow(Method method) {
+        public boolean allow(final Method method) {
             return base.allow(method);
         }
 
         @Override
-        public boolean allow(Field field) {
+        public boolean allow(final Field field) {
             return base.allow(field);
         }
 
         @Override
-        public JexlPermissions compose(String... src) {
+        public JexlPermissions compose(final String... src) {
             return new Delegate(base.compose(src));
         }
     }
@@ -392,7 +392,7 @@ public interface JexlPermissions {
          * Creates permissions based on the RESTRICTED set but allowing an explicit set.
          * @param allow the set of allowed classes
          */
-        public ClassPermissions(Class... allow) {
+        public ClassPermissions(final Class... allow) {
             this(JexlPermissions.RESTRICTED,
                     Arrays.asList(Objects.requireNonNull(allow))
                             .stream().map(Class::getCanonicalName).collect(Collectors.toList()));
@@ -403,32 +403,32 @@ public interface JexlPermissions {
          * @param delegate the base to delegate to
          * @param allow the list of class canonical names
          */
-        public ClassPermissions(JexlPermissions delegate, Collection<String> allow) {
+        public ClassPermissions(final JexlPermissions delegate, final Collection<String> allow) {
             super(Objects.requireNonNull(delegate));
             allowedClasses = new HashSet<>(Objects.requireNonNull(allow));
         }
 
-        private boolean isClassAllowed(Class<?> clazz) {
+        private boolean isClassAllowed(final Class<?> clazz) {
             return allowedClasses.contains(clazz.getCanonicalName());
         }
 
         @Override
-        public boolean allow(Class<?> clazz) {
-            return (validate(clazz) && isClassAllowed(clazz)) || super.allow(clazz);
+        public boolean allow(final Class<?> clazz) {
+            return validate(clazz) && isClassAllowed(clazz) || super.allow(clazz);
         }
 
         @Override
-        public boolean allow(Method method) {
-            return (validate(method) && isClassAllowed(method.getDeclaringClass())) || super.allow(method);
+        public boolean allow(final Method method) {
+            return validate(method) && isClassAllowed(method.getDeclaringClass()) || super.allow(method);
         }
 
         @Override
-        public boolean allow(Constructor constructor) {
-            return (validate(constructor) && isClassAllowed(constructor.getDeclaringClass())) || super.allow(constructor);
+        public boolean allow(final Constructor constructor) {
+            return validate(constructor) && isClassAllowed(constructor.getDeclaringClass()) || super.allow(constructor);
         }
 
         @Override
-        public JexlPermissions compose(String... src) {
+        public JexlPermissions compose(final String... src) {
             return new ClassPermissions(base.compose(src), allowedClasses);
         }
     }

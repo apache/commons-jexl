@@ -96,7 +96,7 @@ public class ArithmeticOperatorTest extends JexlTestCase {
     @Test
     public void test391() throws Exception {
         // with literals
-        for(String src : Arrays.asList(
+        for(final String src : Arrays.asList(
                 "2 =~ [1, 2, 3, 4]",
                 "[2, 3] =~ [1, 2, 3, 4]",
                 "[2, 3,...] =~ [1, 2, 3, 4]",
@@ -106,15 +106,15 @@ public class ArithmeticOperatorTest extends JexlTestCase {
             asserter.assertExpression(src, Boolean.TRUE);
         }
         // with variables
-        int[] ic = new int[]{1, 2,  3, 4};
-        List<Integer> iic = new ArrayList<>();
-        for(int v : ic) { iic.add(v); }
-        int[] iv = new int[]{2, 3};
-        List<Integer> iiv = new ArrayList<>();
-        for(int v : iv) { iiv.add(v); }
-        String src = "(x,y) -> x =~ y ";
-        for(Object v : Arrays.asList(iv, iiv, 2)) {
-            for(Object c : Arrays.asList(ic, iic)) {
+        final int[] ic = {1, 2,  3, 4};
+        final List<Integer> iic = new ArrayList<>();
+        for(final int v : ic) { iic.add(v); }
+        final int[] iv = {2, 3};
+        final List<Integer> iiv = new ArrayList<>();
+        for(final int v : iv) { iiv.add(v); }
+        final String src = "(x,y) -> x =~ y ";
+        for(final Object v : Arrays.asList(iv, iiv, 2)) {
+            for(final Object c : Arrays.asList(ic, iic)) {
                 asserter.assertExpression(src, Boolean.TRUE, v, c);
             }
         }
@@ -227,7 +227,11 @@ public class ArithmeticOperatorTest extends JexlTestCase {
         }
 
         public boolean contains(final int[] i) {
-            for(int ii : i) if (!values.contains(ii)) return false;
+            for(final int ii : i) {
+                if (!values.contains(ii)) {
+                    return false;
+                }
+            }
             return true;
         }
 
@@ -601,15 +605,15 @@ public class ArithmeticOperatorTest extends JexlTestCase {
         testSelfAssignOperators("y.add(--x)", 42, 41, 41);
     }
 
-    void testSelfAssignOperators(String text, int x, int y0, int x0) {
+    void testSelfAssignOperators(final String text, final int x, final int y0, final int x0) {
         //String text = "y.add(x++)";
-        JexlEngine jexl = new JexlBuilder().safe(true).create();
-        JexlScript script = jexl.createScript(text);
-        JexlContext context = new MapContext();
+        final JexlEngine jexl = new JexlBuilder().safe(true).create();
+        final JexlScript script = jexl.createScript(text);
+        final JexlContext context = new MapContext();
         context.set("x", x);
-        List<Number> y = new ArrayList<>();
+        final List<Number> y = new ArrayList<>();
         context.set("y", y);
-        Object result = script.execute(context);
+        final Object result = script.execute(context);
         Assert.assertEquals("x0", x0, context.get("x"));
         Assert.assertEquals("y0", y0, y.get(0));
     }

@@ -27,16 +27,16 @@ import org.junit.Test;
  */
 @SuppressWarnings({"UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
 public class ShiftOperatorsTest extends JexlTestCase {
-    private Asserter asserter;
+    private final Asserter asserter;
 
-    private Asserter a360;
+    private final Asserter a360;
 
     public ShiftOperatorsTest() {
         super("ShiftOperatorsTest");
         asserter = new Asserter(JEXL);
         asserter.setStrict(false, false);
 
-        JexlEngine j360 = new JexlBuilder().arithmetic(new Arithmetic360(true)).strict(true).create();
+        final JexlEngine j360 = new JexlBuilder().arithmetic(new Arithmetic360(true)).strict(true).create();
         a360 = new Asserter(j360);
         a360.setStrict(false, false);
     }
@@ -112,10 +112,10 @@ public class ShiftOperatorsTest extends JexlTestCase {
         a360.assertExpression("-9223372036854775809 >> -2", new BigInteger("-9223372036854775809").shiftRight(-2));
     }
 
-    static BigInteger shiftRightUnsigned(String bl, int r) {
+    static BigInteger shiftRightUnsigned(final String bl, final int r) {
         return shiftRightUnsigned(new BigInteger(bl), r);
     }
-    static BigInteger shiftRightUnsigned(BigInteger bl, int r) {
+    static BigInteger shiftRightUnsigned(final BigInteger bl, final int r) {
         return bl.signum() < 0 ? bl.negate().shiftRight(r) : bl.shiftRight(r);
     }
 
@@ -128,21 +128,21 @@ public class ShiftOperatorsTest extends JexlTestCase {
     }
 
     public static class ShiftArithmetic extends JexlArithmetic {
-        ShiftArithmetic(boolean flag) {
+        ShiftArithmetic(final boolean flag) {
             super(flag);
         }
 
-        public Object shiftLeft(StringBuilder c, String value) {
+        public Object shiftLeft(final StringBuilder c, final String value) {
             c.append(value);
             return c;
         }
 
-        public Object shiftRight(String value, StringBuilder c) {
+        public Object shiftRight(final String value, final StringBuilder c) {
             c.append(value);
             return c;
         }
 
-        public Object shiftRightUnsigned(String value, StringBuilder c) {
+        public Object shiftRightUnsigned(final String value, final StringBuilder c) {
             c.append(value.toLowerCase());
             return c;
         }
@@ -150,7 +150,7 @@ public class ShiftOperatorsTest extends JexlTestCase {
 
     @Test
     public void testOverloadedShift() throws Exception {
-        JexlEngine jexl = new JexlBuilder().arithmetic(new ShiftArithmetic(true)).create();
+        final JexlEngine jexl = new JexlBuilder().arithmetic(new ShiftArithmetic(true)).create();
         StringBuilder x;
         JexlScript e;
         Object o;
@@ -175,15 +175,15 @@ public class ShiftOperatorsTest extends JexlTestCase {
     public void testPrecedence() throws Exception {
         a360.assertExpression("40 + 2 << 1 + 1", 40 + 2 << 1 + 1);
         a360.assertExpression("40 + (2 << 1) + 1", 40 + (2 << 1) + 1);
-        a360.assertExpression("(40 + 2) << (1 + 1)", (40 + 2) << (1 + 1));
+        a360.assertExpression("(40 + 2) << (1 + 1)", 40 + 2 << 1 + 1);
 
         a360.assertExpression("40 + 2L << 1 + 1", 40 + 2L << 1 + 1);
         a360.assertExpression("40 + (2L << 1) + 1", 40 + (2L << 1) + 1);
-        a360.assertExpression("(40 + 2L) << (1 + 1)", (40 + 2L) << (1 + 1));
+        a360.assertExpression("(40 + 2L) << (1 + 1)", 40 + 2L << 1 + 1);
 
         a360.assertExpression("40L + 2 << 1 + 1", 40L + 2L << 1 + 1);
         a360.assertExpression("40L + (2 << 1) + 1", 40L + (2L << 1) + 1);
-        a360.assertExpression("(40L + 2) << (1 + 1)", (40L + 2L) << (1 + 1));
+        a360.assertExpression("(40L + 2) << (1 + 1)", 40L + 2L << 1 + 1);
     }
 
 }

@@ -376,7 +376,7 @@ public class Uberspect implements JexlUberspect {
             return null;
         }
         if (obj instanceof Iterator<?>) {
-            return ((Iterator<?>) obj);
+            return (Iterator<?>) obj;
         }
         if (obj.getClass().isArray()) {
             return new ArrayIterator(obj);
@@ -448,8 +448,8 @@ public class Uberspect implements JexlUberspect {
         JexlArithmetic.Uberspect jau = null;
         if (arithmetic != null) {
             final Class<? extends JexlArithmetic> aclass = arithmetic.getClass();
-            Set<JexlOperator> ops = operatorMap.computeIfAbsent(aclass, k -> {
-                Set<JexlOperator> newOps = EnumSet.noneOf(JexlOperator.class);
+            final Set<JexlOperator> ops = operatorMap.computeIfAbsent(aclass, k -> {
+                final Set<JexlOperator> newOps = EnumSet.noneOf(JexlOperator.class);
                 // deal only with derived classes
                 if (!JexlArithmetic.class.equals(aclass)) {
                     for (final JexlOperator op : JexlOperator.values()) {

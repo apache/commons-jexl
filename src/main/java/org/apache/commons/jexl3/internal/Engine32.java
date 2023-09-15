@@ -89,10 +89,10 @@ public class Engine32 extends Engine {
         final String name = identifier.getName();
         final Object value = ii.context.get(name);
         if (value == null && !ii.context.has(name)) {
-            final boolean ignore = (ii.isSafe()
+            final boolean ignore = ii.isSafe()
                     && (symbol >= 0
-                    || identifier.jjtGetParent() instanceof ASTAssignment))
-                    || (identifier.jjtGetParent() instanceof ASTReference);
+                    || identifier.jjtGetParent() instanceof ASTAssignment)
+                    || identifier.jjtGetParent() instanceof ASTReference;
             if (!ignore) {
                 return ii.unsolvableVariable(identifier, name, true); // undefined
             }

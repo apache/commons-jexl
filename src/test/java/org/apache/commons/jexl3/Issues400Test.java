@@ -16,30 +16,11 @@
  */
 package org.apache.commons.jexl3;
 
-import org.apache.commons.jexl3.internal.Engine32;
-import org.apache.commons.jexl3.internal.OptionsContext;
-import static org.apache.commons.jexl3.introspection.JexlPermissions.RESTRICTED;
-import org.apache.commons.jexl3.introspection.JexlSandbox;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.lang.reflect.Proxy;
-import java.math.MathContext;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import static org.apache.commons.jexl3.internal.Util.debuggerCheck;
-import static org.junit.Assert.assertEquals;
 
 /**
  * Test cases for reported issue between JEXL-300 and JEXL-399.
@@ -49,7 +30,7 @@ public class Issues400Test {
   @Test
   public void test402() {
     final JexlContext jc = new MapContext();
-    final String[] sources = new String[]{
+    final String[] sources = {
         "if (true) { return }",
         "if (true) { 3; return }",
         "(x->{ 3; return })()"
@@ -64,12 +45,12 @@ public class Issues400Test {
 
   @Test
   public void test403() {
-    for(String setmap : new String[]{
+    for(final String setmap : new String[]{
         "  map1.`${item.a}` = 1;\n",
         "  map1[`${item.a}`] = 1;\n",
         "  map1[item.a] = 1;\n"
     }) {
-      String src = "var a = {'a': 1};\n" +
+      final String src = "var a = {'a': 1};\n" +
           "var list = [a, a];\n" +
           "let map1 = {:};\n" +
           "for (var item : list) {\n" +
@@ -77,11 +58,11 @@ public class Issues400Test {
           "}\n " +
           "map1";
       final JexlEngine jexl = new JexlBuilder().cache(64).create();
-      JexlScript script = jexl.createScript(src);
+      final JexlScript script = jexl.createScript(src);
       for (int i = 0; i < 2; ++i) {
-        Object result = script.execute(null);
+        final Object result = script.execute(null);
         Assert.assertTrue(result instanceof Map);
-        Map<?, ?> map = (Map<?, ?>) result;
+        final Map<?, ?> map = (Map<?, ?>) result;
         Assert.assertEquals(1, map.size());
         Assert.assertTrue(map.containsKey(1));
         Assert.assertTrue(map.containsValue(1));
@@ -98,32 +79,32 @@ public class Issues400Test {
         .create();
     Map<String,Object> a = Collections.singletonMap("b", 42);
     // access is constant
-    for(String src : new String[]{ "a.b", "a?.b", "a['b']", "a?['b']", "a?.`b`"}) {
+    for(final String src : new String[]{ "a.b", "a?.b", "a['b']", "a?['b']", "a?.`b`"}) {
       run404(jexl, src, a);
       run404(jexl, src + ";", a);
     }
     // access is variable
-    for(String src : new String[]{ "a[b]", "a?[b]", "a?.`${b}`"}) {
+    for(final String src : new String[]{ "a[b]", "a?[b]", "a?.`${b}`"}) {
       run404(jexl, src, a, "b");
       run404(jexl, src + ";", a, "b");
     }
     // add a 3rd access
-    Map<String,Object> b = Collections.singletonMap("c", 42);
+    final Map<String,Object> b = Collections.singletonMap("c", 42);
     a = Collections.singletonMap("b", b);
-    for(String src : new String[]{ "a[b].c", "a?[b]?['c']", "a?.`${b}`.c"}) {
+    for(final String src : new String[]{ "a[b].c", "a?[b]?['c']", "a?.`${b}`.c"}) {
       run404(jexl, src, a, "b");
     }
   }
 
-  private static void run404(JexlEngine jexl, String src, Object...a) {
+  private static void run404(final JexlEngine jexl, final String src, final Object...a) {
     try {
-      JexlScript script = jexl.createScript(src, "a", "b");
+      final JexlScript script = jexl.createScript(src, "a", "b");
       if (!src.endsWith(";")) {
         Assert.assertEquals(script.getSourceText(), script.getParsedText());
       }
-      Object result = script.execute(null, a);
+      final Object result = script.execute(null, a);
       Assert.assertEquals(42, result);
-    } catch(JexlException.Parsing xparse) {
+    } catch(final JexlException.Parsing xparse) {
       Assert.fail(src);
     }
   }
@@ -135,8 +116,8 @@ public class Issues400Test {
         .strict(true)
         .safe(false)
         .create();
-    Map<String, Object> b = Collections.singletonMap("c", 42);
-    Map<String, Object> a = Collections.singletonMap("b", b);
+    final Map<String, Object> b = Collections.singletonMap("c", 42);
+    final Map<String, Object> a = Collections.singletonMap("b", b);
     JexlScript script;
     Object result = -42;
     script = jexl.createScript("a?['B']?['C']", "a");

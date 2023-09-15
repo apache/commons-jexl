@@ -123,8 +123,8 @@ public class Util {
                 }
                 final String lhss = lhs.toString();
                 final String rhss = rhs.toString();
-                if ((lhss == null && rhss != null)
-                        || (lhss != null && rhss == null)) {
+                if (lhss == null && rhss != null
+                        || lhss != null && rhss == null) {
                     return "image: " + lhss + " != " + rhss;
                 }
                 if (lhss != null && !lhss.equals(rhss)) {

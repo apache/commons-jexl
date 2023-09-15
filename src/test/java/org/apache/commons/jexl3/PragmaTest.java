@@ -106,7 +106,7 @@ public class PragmaTest extends JexlTestCase {
         final JexlScript script = JEXL.createScript("#pragma jexl.safe true\nfoo.bar;");
         Assert.assertNotNull(script);
         jc.processPragmas(script.getPragmas());
-        Object result = script.execute(jc);
+        final Object result = script.execute(jc);
         Assert.assertNull(result);
         jc = new SafeContext();
         jc.set("foo", null);
@@ -122,11 +122,11 @@ public class PragmaTest extends JexlTestCase {
         protected final Map<String, JexlScript> sources = new TreeMap<>();
 
         ModuleContext() {  }
-        public Object script(String name) {
+        public Object script(final String name) {
             return sources.get(name);
         }
 
-        void script(String name, JexlScript script) { sources.put(name, script); }
+        void script(final String name, final JexlScript script) { sources.put(name, script); }
     }
 
     public static class CachingModuleContext extends ModuleContext implements JexlContext.ModuleProcessor {
@@ -141,12 +141,12 @@ public class PragmaTest extends JexlTestCase {
         }
 
         @Override
-        public Object processModule(JexlEngine engine, JexlInfo info, String name, final String body) {
+        public Object processModule(final JexlEngine engine, final JexlInfo info, final String name, final String body) {
             if (body.isEmpty()) {
                 modules.remove(name);
                 return null;
             }
-            return modules.computeIfAbsent(name, (n) -> {
+            return modules.computeIfAbsent(name, n -> {
                 Object module = engine.createExpression(info, body).evaluate(this);
                 if (module instanceof JexlScript) {
                     module = ((JexlScript) module).execute(this);
@@ -158,16 +158,16 @@ public class PragmaTest extends JexlTestCase {
     }
 
     @Test public void testPragmaModuleNoCache() {
-        ModuleContext ctxt = new ModuleContext();
+        final ModuleContext ctxt = new ModuleContext();
         runPragmaModule(ctxt, null);
     }
     @Test public void testPragmaModuleCache() {
-        CachingModuleContext ctxt = new CachingModuleContext();
+        final CachingModuleContext ctxt = new CachingModuleContext();
         runPragmaModule(ctxt, ctxt);
     }
-    void runPragmaModule(ModuleContext ctxt, CachingModuleContext cmCtxt) {
+    void runPragmaModule(final ModuleContext ctxt, final CachingModuleContext cmCtxt) {
         ctxt.script("module0", JEXL.createScript("function f42(x) { 42 + x; } function f43(x) { 43 + x; }; { 'f42' : f42, 'f43' : f43 }"));
-        ConcurrentMap<String, Object> modules = new ConcurrentHashMap<>();
+        final ConcurrentMap<String, Object> modules = new ConcurrentHashMap<>();
         JexlScript script ;
         Object result ;
         script = JEXL.createScript("#pragma jexl.module.m0 \"script('module0')\"\n m0:f42(10);");
@@ -191,7 +191,7 @@ public class PragmaTest extends JexlTestCase {
             script = JEXL.createScript("#pragma jexl.module.m0 ''\n#pragma jexl.module.m0 \"fubar('module0')\"\n m0:f43(10);");
             result = script.execute(ctxt);
             Assert.fail("fubar sshoud fail");
-        } catch (JexlException.Method xmethod) {
+        } catch (final JexlException.Method xmethod) {
             Assert.assertEquals("fubar", xmethod.getMethod());
         }
     }
@@ -222,21 +222,21 @@ public class PragmaTest extends JexlTestCase {
 
     @Test
     public void testImportPragmaValueSet() {
-        String src =
+        final String src =
                 "#pragma jexl.import java.util\n"+
                 "#pragma jexl.import java.io\n"+
                 "#pragma jexl.import java.net\n"+
                 "42";
         final JexlScript script = JEXL.createScript(src);
-        Map<String, Object> pragmas = script.getPragmas();
-        Object importz = pragmas.get("jexl.import");
+        final Map<String, Object> pragmas = script.getPragmas();
+        final Object importz = pragmas.get("jexl.import");
         Assert.assertTrue(importz instanceof Set<?>);
-        Set<String> importzz = (Set<String>) importz;
+        final Set<String> importzz = (Set<String>) importz;
         Assert.assertTrue(importzz.contains("java.util"));
         Assert.assertTrue(importzz.contains("java.io"));
         Assert.assertTrue(importzz.contains("java.net"));
         Assert.assertEquals(3, importzz.size());
-        String parsed = script.getParsedText();
+        final String parsed = script.getParsedText();
         Assert.assertEquals(src, parsed);
     }
     @Test
@@ -255,12 +255,12 @@ public class PragmaTest extends JexlTestCase {
     }
     @Test
     public void testImportPragmaDisabled() {
-        String src =
+        final String src =
                 "#pragma jexl.import java.util\n"+
                         "#pragma jexl.import java.io\n"+
                         "#pragma jexl.import java.net\n"+
                         "42";
-        JexlFeatures features = new JexlFeatures();
+        final JexlFeatures features = new JexlFeatures();
         features.importPragma(false);
         final JexlEngine jexl = new JexlBuilder().features(features).create();
         try {
@@ -271,7 +271,7 @@ public class PragmaTest extends JexlTestCase {
     }
     @Test
     public void testNamespacePragmaDisabled() {
-        JexlFeatures features = new JexlFeatures();
+        final JexlFeatures features = new JexlFeatures();
         features.namespacePragma(false);
         final JexlEngine jexl = new JexlBuilder().features(features).create();
         try {
@@ -320,7 +320,7 @@ public class PragmaTest extends JexlTestCase {
         final JexlScript script = JEXL.createScript(src);
         final Object result = script.execute(jc);
         Assert.assertEquals(42, result);
-        String parsed = script.getParsedText();
+        final String parsed = script.getParsedText();
         Assert.assertEquals(src, parsed);
     }
 
@@ -338,7 +338,7 @@ public class PragmaTest extends JexlTestCase {
     }
 
     @Test public void test354() {
-        Map<String, Number> values = new TreeMap<>();
+        final Map<String, Number> values = new TreeMap<>();
         values.put("1", 1);
         values.put("+1", 1);
         values.put("-1", -1);
@@ -366,12 +366,12 @@ public class PragmaTest extends JexlTestCase {
         values.put("-42424242424242424242424242424242", new BigInteger("-42424242424242424242424242424242"));
         values.put("+42424242424242424242424242424242", new BigInteger("+42424242424242424242424242424242"));
         values.put("42424242424242424242424242424242", new BigInteger("42424242424242424242424242424242"));
-        JexlEngine jexl = new JexlBuilder().safe(true).create();
-        for(Map.Entry<String, Number> e : values.entrySet()) {
-            String text = "#pragma number " + e.getKey();
-            JexlScript script = jexl.createScript(text);
+        final JexlEngine jexl = new JexlBuilder().safe(true).create();
+        for(final Map.Entry<String, Number> e : values.entrySet()) {
+            final String text = "#pragma number " + e.getKey();
+            final JexlScript script = jexl.createScript(text);
             Assert.assertNotNull(script);
-            Map<String, Object> pragmas = script.getPragmas();
+            final Map<String, Object> pragmas = script.getPragmas();
             Assert.assertNotNull(pragmas);
             Assert.assertEquals(e.getKey(), e.getValue(), pragmas.get("number"));
         }

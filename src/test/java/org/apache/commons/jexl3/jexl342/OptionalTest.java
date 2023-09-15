@@ -52,13 +52,13 @@ public class OptionalTest {
     }
 
     public static class StreamContext extends MapContext {
-        public Stream map(Collection<Object> c, JexlScript s) {
-            JexlContext context = JexlEngine.getThreadContext();
+        public Stream map(final Collection<Object> c, final JexlScript s) {
+            final JexlContext context = JexlEngine.getThreadContext();
             return c.stream().map(a->s.execute(context, a));
         }
-        public Object reduce(Stream<Object> stream, JexlScript script) {
-            Object reduced = stream.reduce((identity, element)->{
-                JexlContext context = JexlEngine.getThreadContext();
+        public Object reduce(final Stream<Object> stream, final JexlScript script) {
+            final Object reduced = stream.reduce((identity, element)->{
+                final JexlContext context = JexlEngine.getThreadContext();
                 return script.execute(context, identity, element);
             });
             return reduced instanceof Optional<?>
@@ -69,51 +69,51 @@ public class OptionalTest {
 
     @Test
     public void testStream0() {
-        String src = "$0.map(x -> x * x).reduce((a, x) -> a + x)";
-        JexlBuilder builder = new JexlBuilder();
-        JexlUberspect uber = builder.create().getUberspect();
-        JexlArithmetic jexla = new OptionalArithmetic(true);
-        JexlEngine jexl = builder.uberspect(new ReferenceUberspect(uber)).arithmetic(jexla).safe(false).create();
-        JexlInfo info = new JexlInfo("testStream", 1, 1);
-        MapContext context = new StreamContext();
-        JexlScript script = jexl.createScript(src, "$0");
-        Object result = script.execute(context, Arrays.asList(1, 2, 3));
+        final String src = "$0.map(x -> x * x).reduce((a, x) -> a + x)";
+        final JexlBuilder builder = new JexlBuilder();
+        final JexlUberspect uber = builder.create().getUberspect();
+        final JexlArithmetic jexla = new OptionalArithmetic(true);
+        final JexlEngine jexl = builder.uberspect(new ReferenceUberspect(uber)).arithmetic(jexla).safe(false).create();
+        final JexlInfo info = new JexlInfo("testStream", 1, 1);
+        final MapContext context = new StreamContext();
+        final JexlScript script = jexl.createScript(src, "$0");
+        final Object result = script.execute(context, Arrays.asList(1, 2, 3));
         Assert.assertEquals(14, result);
     }
 
     @Test
     public void testStream1() {
-        String src = "$0.map(x -> x * x).reduce((a, x) -> a + x)";
-        JexlEngine jexl = new JexlBuilder().safe(false).create();
-        JexlInfo info = new JexlInfo("testStream", 1, 1);
-        MapContext context = new StreamContext();
-        JexlScript script = jexl.createScript(src, "$0");
-        Object result = script.execute(context, Arrays.asList(1, 2d, "3"));
+        final String src = "$0.map(x -> x * x).reduce((a, x) -> a + x)";
+        final JexlEngine jexl = new JexlBuilder().safe(false).create();
+        final JexlInfo info = new JexlInfo("testStream", 1, 1);
+        final MapContext context = new StreamContext();
+        final JexlScript script = jexl.createScript(src, "$0");
+        final Object result = script.execute(context, Arrays.asList(1, 2d, "3"));
         Assert.assertEquals(14.0d, (double) result , 0.00001d);
     }
 
     @Test
     public void testOptionalArgs() {
-        JexlBuilder builder = new JexlBuilder();
-        JexlArithmetic jexla = new OptionalArithmetic(true);
-        JexlUberspect uber = builder.create().getUberspect();
-        JexlEngine jexl = builder.uberspect(new ReferenceUberspect(uber)).arithmetic(jexla).safe(false).create();
-        JexlInfo info = new JexlInfo("testStream", 1, 1);
-        MapContext context = new StreamContext();
-        String src = "x + x";
-        JexlScript script = jexl.createScript(src, "x");
-        Optional<Integer> x = Optional.of(21);
-        Object result = script.execute(context, x);
+        final JexlBuilder builder = new JexlBuilder();
+        final JexlArithmetic jexla = new OptionalArithmetic(true);
+        final JexlUberspect uber = builder.create().getUberspect();
+        final JexlEngine jexl = builder.uberspect(new ReferenceUberspect(uber)).arithmetic(jexla).safe(false).create();
+        final JexlInfo info = new JexlInfo("testStream", 1, 1);
+        final MapContext context = new StreamContext();
+        final String src = "x + x";
+        final JexlScript script = jexl.createScript(src, "x");
+        final Optional<Integer> x = Optional.of(21);
+        final Object result = script.execute(context, x);
         Assert.assertEquals(42, result);
     }
 
     @Test
     public void test342() {
-        JexlBuilder builder = new JexlBuilder();
-        JexlUberspect uber = builder.create().getUberspect();
-        JexlEngine jexl = builder.uberspect(new ReferenceUberspect(uber)).safe(false).create();
-        JexlInfo info = new JexlInfo("test352", 1, 1);
-        Thing thing = new Thing();
+        final JexlBuilder builder = new JexlBuilder();
+        final JexlUberspect uber = builder.create().getUberspect();
+        final JexlEngine jexl = builder.uberspect(new ReferenceUberspect(uber)).safe(false).create();
+        final JexlInfo info = new JexlInfo("test352", 1, 1);
+        final Thing thing = new Thing();
         JexlScript script;
 
         script = jexl.createScript(info.at(53, 1),"thing.name.length()", "thing");
@@ -128,7 +128,7 @@ public class OptionalTest {
             script = jexl.createScript(info.at(62, 1), "thing.name.size()", "thing");
             result = script.execute(null, thing);
             Assert.fail("should have thrown");
-        } catch (JexlException.Method xmethod) {
+        } catch (final JexlException.Method xmethod) {
             Assert.assertEquals("size", xmethod.getDetail());
             Assert.assertEquals("test352@62:11 unsolvable function/method 'size'", xmethod.getMessage());
         }
@@ -136,7 +136,7 @@ public class OptionalTest {
         try {
             script = jexl.createScript(info.at(71, 1), "thing.name?.size()", "thing");
             result = script.execute(null, thing);
-        } catch (JexlException.Method xmethod) {
+        } catch (final JexlException.Method xmethod) {
             Assert.fail("should not have thrown");
         }
 

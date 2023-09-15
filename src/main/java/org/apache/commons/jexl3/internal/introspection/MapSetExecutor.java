@@ -71,7 +71,7 @@ public final class MapSetExecutor extends AbstractExecutor.Set {
     @Override
     public Object invoke(final Object obj, final Object value) {
         @SuppressWarnings("unchecked") // ctor only allows Map instances - see discover() method
-        final Map<Object,Object> map = ((Map<Object, Object>) obj);
+        final Map<Object,Object> map = (Map<Object, Object>) obj;
         map.put(property, value);
         return value;
     }
@@ -81,11 +81,11 @@ public final class MapSetExecutor extends AbstractExecutor.Set {
         if (obj != null
             && method != null
             && objectClass.equals(obj.getClass())
-            && ((property == null && key == null)
-                || (property != null && key != null && property.getClass().equals(key.getClass())))
+            && (property == null && key == null
+                || property != null && key != null && property.getClass().equals(key.getClass()))
             && valueClass.equals(classOf(value))) {
             @SuppressWarnings("unchecked") // ctor only allows Map instances - see discover() method
-            final Map<Object,Object> map = ((Map<Object, Object>) obj);
+            final Map<Object,Object> map = (Map<Object, Object>) obj;
             map.put(key, value);
             return value;
         }

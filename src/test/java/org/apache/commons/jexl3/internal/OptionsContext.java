@@ -25,7 +25,7 @@ public class OptionsContext extends MapContext {
     @Override
     public Object get(final String name) {
         if ("$options".equals(name)) {
-            Interpreter pinter = Interpreter.INTER.get();
+            final Interpreter pinter = Interpreter.INTER.get();
             return pinter.options;
         }
         return super.get(name);

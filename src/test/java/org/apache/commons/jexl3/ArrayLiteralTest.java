@@ -43,15 +43,15 @@ public class ArrayLiteralTest extends JexlTestCase {
         Assert.assertTrue(o instanceof List<?>);
         Assert.assertEquals(0, ((List<?>) o).size());
         try {
-            Object ff = JEXL.createExpression("[ , ]");
+            final Object ff = JEXL.createExpression("[ , ]");
             Assert.fail(ff.toString());
-        } catch(JexlException.Parsing parsing) {
+        } catch(final JexlException.Parsing parsing) {
             Assert.assertNotNull(parsing);
         }
         try {
-            Object ff = JEXL.createExpression("[ ... , ]");
+            final Object ff = JEXL.createExpression("[ ... , ]");
             Assert.fail(ff.toString());
-        } catch(JexlException.Parsing parsing) {
+        } catch(final JexlException.Parsing parsing) {
             Assert.assertNotNull(parsing);
         }
     }
@@ -59,8 +59,8 @@ public class ArrayLiteralTest extends JexlTestCase {
     @Test
     public void testLiteralWithStrings() throws Exception {
         final Object[] check = {"foo", "bar"};
-        List<String> sources = Arrays.asList("[ 'foo' , 'bar' ]", "[ 'foo' , 'bar', ]");
-        for(String src : sources) {
+        final List<String> sources = Arrays.asList("[ 'foo' , 'bar' ]", "[ 'foo' , 'bar', ]");
+        for(final String src : sources) {
             final JexlExpression e = JEXL.createExpression(src);
             final Object o = e.evaluate(null);
             Assert.assertArrayEquals(check, (Object[]) o);
@@ -79,7 +79,7 @@ public class ArrayLiteralTest extends JexlTestCase {
         try {
             JEXL.createExpression("[ 'foo' , 'bar', ... , ]");
             Assert.fail("syntax");
-        } catch(JexlException.Parsing parsing) {
+        } catch(final JexlException.Parsing parsing) {
             Assert.assertNotNull(parsing);
         }
     }
@@ -87,8 +87,8 @@ public class ArrayLiteralTest extends JexlTestCase {
     @Test
     public void testLiteralWithOneEntry() throws Exception {
         final Object[] check = {"foo"};
-        List<String> sources = Arrays.asList("[ 'foo']", "[ 'foo' , ]");
-        for(String src : sources) {
+        final List<String> sources = Arrays.asList("[ 'foo']", "[ 'foo' , ]");
+        for(final String src : sources) {
             final JexlExpression e = JEXL.createExpression(src);
             final Object o = e.evaluate(null);
             Assert.assertArrayEquals(check, (Object[]) o);
@@ -101,7 +101,7 @@ public class ArrayLiteralTest extends JexlTestCase {
         final JexlContext jc = new MapContext();
 
         final Object o = e.evaluate(jc);
-        final Object[] check = {new Double(5), new Integer(10)};
+        final Object[] check = {Double.valueOf(5), Integer.valueOf(10)};
         Assert.assertArrayEquals(check, (Object[]) o);
         Assert.assertTrue(o.getClass().isArray() && o.getClass().getComponentType().equals(Number.class));
     }
@@ -116,9 +116,9 @@ public class ArrayLiteralTest extends JexlTestCase {
             "[ null, '10' , null ]"
         };
         final Object[][] checks = {
-            {null, new Integer(10)},
-            {new Integer(10), null},
-            {new Integer(10), null, new Integer(10)},
+            {null, Integer.valueOf(10)},
+            {Integer.valueOf(10), null},
+            {Integer.valueOf(10), null, Integer.valueOf(10)},
             {"10", null},
             {null, "10", null}
         };
@@ -147,7 +147,7 @@ public class ArrayLiteralTest extends JexlTestCase {
         final JexlContext jc = new MapContext();
 
         final Object o = e.evaluate(jc);
-        Assert.assertEquals(new Integer(2), o);
+        Assert.assertEquals(Integer.valueOf(2), o);
     }
 
     @Test
@@ -156,7 +156,7 @@ public class ArrayLiteralTest extends JexlTestCase {
         final JexlContext jc = new MapContext();
 
         final Object o = e.evaluate(jc);
-        Assert.assertEquals(new Integer(1), o);
+        Assert.assertEquals(Integer.valueOf(1), o);
     }
 
     @Test

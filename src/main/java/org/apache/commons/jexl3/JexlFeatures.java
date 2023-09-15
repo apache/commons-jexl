@@ -122,23 +122,23 @@ public final class JexlFeatures {
      * The default features flag mask.
      */
     private static final long DEFAULT_FEATURES =
-            (1L << LOCAL_VAR)
-            | (1L << SIDE_EFFECT)
-            | (1L << SIDE_EFFECT_GLOBAL)
-            | (1L << ARRAY_REF_EXPR)
-            | (1L << NEW_INSTANCE)
-            | (1L << LOOP)
-            | (1L << LAMBDA)
-            | (1L << METHOD_CALL)
-            | (1L << STRUCTURED_LITERAL)
-            | (1L << PRAGMA)
-            | (1L << ANNOTATION)
-            | (1L << SCRIPT)
-            | (1L << THIN_ARROW)
-            | (1L << NS_PRAGMA)
-            | (1L << IMPORT_PRAGMA)
-            | (1L << COMPARATOR_NAMES)
-            | (1L << PRAGMA_ANYWHERE);
+            1L << LOCAL_VAR
+            | 1L << SIDE_EFFECT
+            | 1L << SIDE_EFFECT_GLOBAL
+            | 1L << ARRAY_REF_EXPR
+            | 1L << NEW_INSTANCE
+            | 1L << LOOP
+            | 1L << LAMBDA
+            | 1L << METHOD_CALL
+            | 1L << STRUCTURED_LITERAL
+            | 1L << PRAGMA
+            | 1L << ANNOTATION
+            | 1L << SCRIPT
+            | 1L << THIN_ARROW
+            | 1L << NS_PRAGMA
+            | 1L << IMPORT_PRAGMA
+            | 1L << COMPARATOR_NAMES
+            | 1L << PRAGMA_ANYWHERE;
 
     /**
      * Creates an all-features-enabled instance.
@@ -162,7 +162,7 @@ public final class JexlFeatures {
     @Override
     public int hashCode() { //CSOFF: MagicNumber
         int hash = 3;
-        hash = 53 * hash + (int) (this.flags ^ (this.flags >>> 32));
+        hash = 53 * hash + (int) (this.flags ^ this.flags >>> 32);
         hash = 53 * hash + (this.reservedNames != null ? this.reservedNames.hashCode() : 0);
         return hash;
     }
@@ -252,7 +252,7 @@ public final class JexlFeatures {
      */
     private void setFeature(final int feature, final boolean flag) {
         if (flag) {
-            flags |= (1L << feature);
+            flags |= 1L << feature;
         } else {
             flags &= ~(1L << feature);
         }
@@ -264,7 +264,7 @@ public final class JexlFeatures {
      * @return true if on, false if off
      */
     private boolean getFeature(final int feature) {
-        return (flags & (1L << feature)) != 0L;
+        return (flags & 1L << feature) != 0L;
     }
 
     /**

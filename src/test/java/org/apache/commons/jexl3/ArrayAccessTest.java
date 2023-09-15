@@ -40,11 +40,11 @@ public class ArrayAccessTest extends JexlTestCase {
 
     // Needs to be accessible by Foo.class
     static final String[] GET_METHOD_ARRAY =
-        new String[] { "One", "Two", "Three" };
+        { "One", "Two", "Three" };
 
     // Needs to be accessible by Foo.class
     static final String[][] GET_METHOD_ARRAY2 =
-        new String[][] { {"One", "Two", "Three"},{"Four", "Five", "Six"} };
+        { {"One", "Two", "Three"},{"Four", "Five", "Six"} };
 
     public ArrayAccessTest() {
         super("ArrayAccessTest");
@@ -67,16 +67,16 @@ public class ArrayAccessTest extends JexlTestCase {
          */
 
         final List<Integer> l = new ArrayList<>();
-        l.add(new Integer(1));
-        l.add(new Integer(2));
-        l.add(new Integer(3));
+        l.add(Integer.valueOf(1));
+        l.add(Integer.valueOf(2));
+        l.add(Integer.valueOf(3));
 
         asserter.setVariable("list", l);
 
-        asserter.assertExpression("list[1]", new Integer(2));
-        asserter.assertExpression("list[1+1]", new Integer(3));
-        asserter.setVariable("loc", new Integer(1));
-        asserter.assertExpression("list[loc+1]", new Integer(3));
+        asserter.assertExpression("list[1]", Integer.valueOf(2));
+        asserter.assertExpression("list[1+1]", Integer.valueOf(3));
+        asserter.setVariable("loc", Integer.valueOf(1));
+        asserter.assertExpression("list[loc+1]", Integer.valueOf(3));
 
         /*
          * test array access
@@ -206,7 +206,7 @@ public class ArrayAccessTest extends JexlTestCase {
     // This is JEXL-26
     @Test
     public void testArrayAndDottedConflict() throws Exception {
-        final Object[] objects = new Object[] {"an", "array", new Long(0)};
+        final Object[] objects = {"an", "array", Long.valueOf(0)};
         asserter.setStrict(false);
         asserter.setSilent(true);
         asserter.setVariable("objects", objects);
@@ -234,11 +234,11 @@ public class ArrayAccessTest extends JexlTestCase {
 
     @Test
     public void testArrayMethods() throws Exception {
-        final Object[] objects = new Object[] {"an", "array", new Long(0)};
+        final Object[] objects = {"an", "array", Long.valueOf(0)};
 
         asserter.setVariable("objects", objects);
         asserter.assertExpression("objects.get(1)", "array");
-        asserter.assertExpression("objects.size()", new Integer(3));
+        asserter.assertExpression("objects.size()", Integer.valueOf(3));
         // setting an index returns the old value
         asserter.assertExpression("objects.set(1, 'dion')", "array");
         asserter.assertExpression("objects[1]", "dion");

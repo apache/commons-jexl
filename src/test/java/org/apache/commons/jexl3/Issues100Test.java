@@ -323,7 +323,7 @@ public class Issues100Test extends JexlTestCase {
         final JexlEngine jexl = new Engine();
         final JexlExpression e = jexl.createExpression("TIMESTAMP > 20100102000000");
         final JexlContext ctx = new MapContext();
-        ctx.set("TIMESTAMP", new Long("20100103000000"));
+        ctx.set("TIMESTAMP", Long.valueOf("20100103000000"));
         final Object result = e.evaluate(ctx);
         Assert.assertTrue((Boolean) result);
     }

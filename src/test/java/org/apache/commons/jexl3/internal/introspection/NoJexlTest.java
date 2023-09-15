@@ -83,7 +83,7 @@ public class NoJexlTest {
 
     @Test
     public void testNoJexlPermissions() throws Exception {
-        Permissions p = Permissions.UNRESTRICTED;
+        final Permissions p = Permissions.UNRESTRICTED;
         Assert.assertFalse(p.allow((Field) null));
         Assert.assertFalse(p.allow((Package) null));
         Assert.assertFalse(p.allow((Method) null));
@@ -94,15 +94,15 @@ public class NoJexlTest {
         Assert.assertTrue(p.allow(A3.class));
         Assert.assertTrue(p.allow(A5.class));
 
-        Method mA = A.class.getMethod("method");
+        final Method mA = A.class.getMethod("method");
         Assert.assertNotNull(mA);
-        Method mA0 = A0.class.getMethod("method");
+        final Method mA0 = A0.class.getMethod("method");
         Assert.assertNotNull(mA0);
-        Method mA1 = A1.class.getMethod("method");
+        final Method mA1 = A1.class.getMethod("method");
         Assert.assertNotNull(mA1);
-        Method mA2 = A2.class.getMethod("method");
+        final Method mA2 = A2.class.getMethod("method");
         Assert.assertNotNull(mA2);
-        Method mA3 = A2.class.getDeclaredMethod("method");
+        final Method mA3 = A2.class.getDeclaredMethod("method");
         Assert.assertNotNull(mA3);
 
         Assert.assertTrue(p.allow(mA));
@@ -111,26 +111,26 @@ public class NoJexlTest {
         Assert.assertFalse(p.allow(mA2));
         Assert.assertFalse(p.allow(mA3));
 
-        Field fA = A.class.getField("i");
+        final Field fA = A.class.getField("i");
         Assert.assertNotNull(fA);
         Assert.assertTrue(p.allow(fA));
 
-        Field fA0 = A0.class.getField("i0");
+        final Field fA0 = A0.class.getField("i0");
         Assert.assertNotNull(fA0);
         Assert.assertFalse(p.allow(fA0));
-        Field fA1 = A1.class.getDeclaredField("i1");
+        final Field fA1 = A1.class.getDeclaredField("i1");
         Assert.assertNotNull(fA1);
         Assert.assertFalse(p.allow(fA0));
 
-        Constructor<?> cA = A.class.getConstructor();
+        final Constructor<?> cA = A.class.getConstructor();
         Assert.assertNotNull(cA);
         Assert.assertTrue(p.allow(cA));
 
-        Constructor<?> cA0 = A0.class.getConstructor();
+        final Constructor<?> cA0 = A0.class.getConstructor();
         Assert.assertNotNull(cA0);
         Assert.assertFalse(p.allow(cA0));
 
-        Constructor<?> cA3 = A3.class.getDeclaredConstructor();
+        final Constructor<?> cA3 = A3.class.getDeclaredConstructor();
         Assert.assertNotNull(cA3);
         Assert.assertFalse(p.allow(cA3));
     }

@@ -1082,7 +1082,7 @@ public final class TemplateEngine extends JxltEngine {
         while (s < length && Character.isSpaceChar(sequence.charAt(s))) {
             s += 1;
         }
-        if (s < length && pattern.length() <= (length - s)) {
+        if (s < length && pattern.length() <= length - s) {
             final CharSequence subSequence = sequence.subSequence(s, length);
             if (subSequence.subSequence(0, pattern.length()).equals(pattern)) {
                 return s + pattern.length();

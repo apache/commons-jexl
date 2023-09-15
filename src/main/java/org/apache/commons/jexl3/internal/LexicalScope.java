@@ -41,7 +41,7 @@ public class LexicalScope {
     /**
      * Bitmask for symbols.
      */
-    protected static final long SYMBOL_MASK = (1L << (BITS_PER_SYMBOL - 1)) - 1; // 3, as 1+2, 2 bits
+    protected static final long SYMBOL_MASK = (1L << BITS_PER_SYMBOL - 1) - 1; // 3, as 1+2, 2 bits
     /**
      * Number of symbols.
      */
@@ -90,7 +90,7 @@ public class LexicalScope {
      */
     private boolean isSet(final int bit) {
         if (bit < BITS_PER_LONG) {
-            return (symbols & (1L << bit)) != 0L;
+            return (symbols & 1L << bit) != 0L;
         }
         return moreSymbols != null && moreSymbols.get(bit - BITS_PER_LONG);
     }
@@ -102,10 +102,10 @@ public class LexicalScope {
      */
     private boolean set(final int bit) {
         if (bit < BITS_PER_LONG) {
-            if ((symbols & (1L << bit)) != 0L) {
+            if ((symbols & 1L << bit) != 0L) {
                 return false;
             }
-            symbols |= (1L << bit);
+            symbols |= 1L << bit;
         } else {
             final int bit64 = bit - BITS_PER_LONG;
             final BitSet ms = moreBits();
@@ -135,7 +135,7 @@ public class LexicalScope {
      * @return true if declared as constant, false otherwise
      */
     public boolean isConstant(final int symbol) {
-        final int bit = (symbol << SYMBOL_SHIFT) | 1;
+        final int bit = symbol << SYMBOL_SHIFT | 1;
         return isSet(bit);
     }
 
@@ -146,7 +146,7 @@ public class LexicalScope {
      * @return true if registered, false if symbol was already registered
      */
     public boolean addSymbol(final int symbol) {
-        final int bit = (symbol << SYMBOL_SHIFT) ;
+        final int bit = symbol << SYMBOL_SHIFT ;
         if (set(bit)) {
             count += 1;
             return true;
@@ -161,11 +161,11 @@ public class LexicalScope {
      * @return true if registered, false if symbol was already registered
      */
     public boolean addConstant(final int symbol) {
-        final int letb = (symbol << SYMBOL_SHIFT) ;
+        final int letb = symbol << SYMBOL_SHIFT ;
         if (!isSet(letb)) {
             throw new IllegalStateException("const not declared as symbol " + symbol);
         }
-        final int bit = (symbol << SYMBOL_SHIFT) | 1;
+        final int bit = symbol << SYMBOL_SHIFT | 1;
         return set(bit);
     }
 
@@ -188,7 +188,7 @@ public class LexicalScope {
             // step by bits per symbol
             int bit = moreSymbols != null ? moreSymbols.nextSetBit(0) : -1;
             while (bit >= 0) {
-                final int s = (bit + BITS_PER_LONG) >> SYMBOL_SHIFT;
+                final int s = bit + BITS_PER_LONG >> SYMBOL_SHIFT;
                 cleanSymbol.accept(s);
                 bit = moreSymbols.nextSetBit(bit + BITS_PER_SYMBOL);
             }

@@ -472,10 +472,10 @@ public class SideEffectTest extends JexlTestCase {
         JexlScript script = jexl.createScript("x -> [+x, +(x++), +x]");
         final Var v11 = new Var(3115);
         final AtomicInteger i11 = new AtomicInteger(3115);
-        for(Object v : Arrays.asList(v11, i11)) {
-            Object result = script.execute(jc, v);
+        for(final Object v : Arrays.asList(v11, i11)) {
+            final Object result = script.execute(jc, v);
             Assert.assertTrue(result instanceof int[]);
-            int[] r = (int[]) result;
+            final int[] r = (int[]) result;
             Assert.assertEquals(3115, r[0]);
             Assert.assertEquals(3115, r[1]);
             Assert.assertEquals(3116, r[2]);
@@ -484,10 +484,10 @@ public class SideEffectTest extends JexlTestCase {
         script = jexl.createScript("x -> [+x, +(++x), +x]");
         final Var v12 = new Var(3189);
         final AtomicInteger i12 = new AtomicInteger(3189);
-        for(Object v : Arrays.asList(v12, i12)) {
-            Object result = script.execute(jc, v);
+        for(final Object v : Arrays.asList(v12, i12)) {
+            final Object result = script.execute(jc, v);
             Assert.assertTrue(result instanceof int[]);
-            int[] r = (int[]) result;
+            final int[] r = (int[]) result;
             Assert.assertEquals(3189, r[0]);
             Assert.assertEquals(3190, r[1]);
             Assert.assertEquals(3190, r[2]);
@@ -495,10 +495,10 @@ public class SideEffectTest extends JexlTestCase {
 
         script = jexl.createScript("x -> [+x, +(x--), +x]");
         final Var v13 = new Var(3115);
-        for(Object v : Arrays.asList(v13)) {
-            Object result = script.execute(jc, v13);
+        for(final Object v : Arrays.asList(v13)) {
+            final Object result = script.execute(jc, v13);
             Assert.assertTrue(result instanceof int[]);
-            int[] r = (int[]) result;
+            final int[] r = (int[]) result;
             Assert.assertEquals(3115, r[0]);
             Assert.assertEquals(3115, r[1]);
             Assert.assertEquals(3114, r[2]);
@@ -506,10 +506,10 @@ public class SideEffectTest extends JexlTestCase {
 
         script = jexl.createScript("x -> [+x, +(--x), +x]");
         final Var v14 = new Var(3189);
-        for(Object v : Arrays.asList(v14)) {
-            Object result = script.execute(jc, v);
+        for(final Object v : Arrays.asList(v14)) {
+            final Object result = script.execute(jc, v);
             Assert.assertTrue(result instanceof int[]);
-            int[] r = (int[]) result;
+            final int[] r = (int[]) result;
             Assert.assertEquals(3189, r[0]);
             Assert.assertEquals(3188, r[1]);
             Assert.assertEquals(3188, r[2]);
@@ -659,19 +659,19 @@ public class SideEffectTest extends JexlTestCase {
             return lhs.value - 1;
         }
 
-        public int incrementAndGet(AtomicInteger i) {
+        public int incrementAndGet(final AtomicInteger i) {
             return i.incrementAndGet();
         }
 
-        public int getAndIncrement(AtomicInteger i) {
+        public int getAndIncrement(final AtomicInteger i) {
             return i.getAndIncrement();
         }
 
-        public int positivize(Var n) {
+        public int positivize(final Var n) {
             return n.value;
         }
 
-        public int positivize(Number n) {
+        public int positivize(final Number n) {
             return n.intValue();
         }
     }

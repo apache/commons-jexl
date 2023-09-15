@@ -302,7 +302,7 @@ public class MethodTest extends JexlTestCase {
 
         // another ambiguous call fails
         try {
-            final String[] arg2 = new String[]{"more", "than", "one"};
+            final String[] arg2 = {"more", "than", "one"};
             JEXL.invokeMethod(func, "over", "not null", arg2);
             Assert.fail("should be ambiguous");
         } catch (final JexlException.Method xinvoke) {
@@ -487,17 +487,17 @@ public class MethodTest extends JexlTestCase {
 
         JexlExpression e = JEXL.createExpression("ten()");
         Object o = e.evaluate(jc);
-        Assert.assertEquals("Result is not 10", new Integer(10), o);
+        Assert.assertEquals("Result is not 10", Integer.valueOf(10), o);
 
         e = JEXL.createExpression("plus10(10)");
         o = e.evaluate(jc);
-        Assert.assertEquals("Result is not 20", new Integer(20), o);
+        Assert.assertEquals("Result is not 20", Integer.valueOf(20), o);
 
         e = JEXL.createExpression("plus10(ten())");
         o = e.evaluate(jc);
-        Assert.assertEquals("Result is not 20", new Integer(20), o);
+        Assert.assertEquals("Result is not 20", Integer.valueOf(20), o);
 
-        jc.set("pi", new Double(Math.PI));
+        jc.set("pi", Double.valueOf(Math.PI));
         e = JEXL.createExpression("math:cos(pi)");
         o = e.evaluate(jc);
         Assert.assertEquals(Double.valueOf(-1), o);
@@ -517,23 +517,23 @@ public class MethodTest extends JexlTestCase {
         final JexlEvalContext jc = new EnhancedContext(funcs);
 
         Object o = e.evaluate(jc);
-        Assert.assertEquals("Result is not 10", new Integer(10), o);
+        Assert.assertEquals("Result is not 10", Integer.valueOf(10), o);
 
         e = JEXL.createExpression("func:plus10(10)");
         o = e.evaluate(jc);
-        Assert.assertEquals("Result is not 20", new Integer(20), o);
+        Assert.assertEquals("Result is not 20", Integer.valueOf(20), o);
 
         e = JEXL.createExpression("func:plus10(func:ten())");
         o = e.evaluate(jc);
-        Assert.assertEquals("Result is not 20", new Integer(20), o);
+        Assert.assertEquals("Result is not 20", Integer.valueOf(20), o);
 
         e = JEXL.createExpression("FUNC:PLUS20(10)");
         o = e.evaluate(jc);
-        Assert.assertEquals("Result is not 30", new Integer(30), o);
+        Assert.assertEquals("Result is not 30", Integer.valueOf(30), o);
 
         e = JEXL.createExpression("FUNC:PLUS20(FUNC:TWENTY())");
         o = e.evaluate(jc);
-        Assert.assertEquals("Result is not 40", new Integer(40), o);
+        Assert.assertEquals("Result is not 40", Integer.valueOf(40), o);
     }
 
     public static class Edge {
@@ -707,19 +707,19 @@ public class MethodTest extends JexlTestCase {
         context.set("plus", plus);
         JexlScript forty2 = JEXL.createScript("plus(4, 2) * plus(4, 3)");
         Object o = forty2.execute(context);
-        Assert.assertEquals("Result is not 42", new Integer(42), o);
+        Assert.assertEquals("Result is not 42", Integer.valueOf(42), o);
 
         final Map<String, Object> foo = new HashMap<>();
         foo.put("plus", plus);
         context.set("foo", foo);
         forty2 = JEXL.createScript("foo.plus(4, 2) * foo.plus(4, 3)");
         o = forty2.execute(context);
-        Assert.assertEquals("Result is not 42", new Integer(42), o);
+        Assert.assertEquals("Result is not 42", Integer.valueOf(42), o);
 
         context = new ScriptContext(foo);
         forty2 = JEXL.createScript("script:plus(4, 2) * script:plus(4, 3)");
         o = forty2.execute(context);
-        Assert.assertEquals("Result is not 42", new Integer(42), o);
+        Assert.assertEquals("Result is not 42", Integer.valueOf(42), o);
 
         final JexlArithmetic ja = JEXL.getArithmetic();
         final JexlMethod mplus = new JexlMethod() {
@@ -763,17 +763,17 @@ public class MethodTest extends JexlTestCase {
         foo.put("PLUS", mplus);
         forty2 = JEXL.createScript("script:PLUS(4, 2) * script:PLUS(4, 3)");
         o = forty2.execute(context);
-        Assert.assertEquals("Result is not 42", new Integer(42), o);
+        Assert.assertEquals("Result is not 42", Integer.valueOf(42), o);
 
         context.set("foo.bar", foo);
         forty2 = JEXL.createScript("foo.'bar'.PLUS(4, 2) * foo.bar.PLUS(4, 3)");
         o = forty2.execute(context);
-        Assert.assertEquals("Result is not 42", new Integer(42), o);
+        Assert.assertEquals("Result is not 42", Integer.valueOf(42), o);
     }
 
     @Test
     public void testFizzCall() throws Exception {
-        final ScriptContext context = new ScriptContext(new HashMap<String, Object>());
+        final ScriptContext context = new ScriptContext(new HashMap<>());
 
         JexlScript bar = JEXL.createScript("functor:get('drink')");
         Object o;

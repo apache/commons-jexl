@@ -88,21 +88,21 @@ public class VarTest extends JexlTestCase {
     public void testLocalBasic() throws Exception {
         final JexlScript e = JEXL.createScript("var x; x = 42");
         final Object o = e.execute(null);
-        Assert.assertEquals("Result is not 42", new Integer(42), o);
+        Assert.assertEquals("Result is not 42", Integer.valueOf(42), o);
     }
 
     @Test
     public void testLocalSimple() throws Exception {
         final JexlScript e = JEXL.createScript("var x = 21; x + x");
         final Object o = e.execute(null);
-        Assert.assertEquals("Result is not 42", new Integer(42), o);
+        Assert.assertEquals("Result is not 42", Integer.valueOf(42), o);
     }
 
     @Test
     public void testLocalFor() throws Exception {
         final JexlScript e = JEXL.createScript("var y  = 0; for(var x : [5, 17, 20]) { y = y + x; } y;");
         final Object o = e.execute(null);
-        Assert.assertEquals("Result is not 42", new Integer(42), o);
+        Assert.assertEquals("Result is not 42", Integer.valueOf(42), o);
     }
 
     public static class NumbersContext extends MapContext implements JexlContext.NamespaceResolver {
@@ -121,7 +121,7 @@ public class VarTest extends JexlTestCase {
         final JexlContext jc = new NumbersContext();
         final JexlScript e = JEXL.createScript("var y  = 0; for(var x : numbers()) { y = y + x; } y;");
         final Object o = e.execute(jc);
-        Assert.assertEquals("Result is not 42", new Integer(42), o);
+        Assert.assertEquals("Result is not 42", Integer.valueOf(42), o);
     }
 
     @Test
@@ -129,7 +129,7 @@ public class VarTest extends JexlTestCase {
         final JexlContext jc = new NumbersContext();
         final JexlScript e = JEXL.createScript("var y  = 42; for(var x : numbers()) { if (x > 10) return x } y;");
         final Object o = e.execute(jc);
-        Assert.assertEquals("Result is not 17", new Integer(17), o);
+        Assert.assertEquals("Result is not 17", Integer.valueOf(17), o);
 
         Assert.assertTrue(toString(e.getVariables()), e.getVariables().isEmpty());
     }
@@ -477,8 +477,8 @@ public class VarTest extends JexlTestCase {
             }
             // identifier pending to be added (only add map keys)
             if (id != null && c == ']' || c == ')'
-                || (kind != '{' && c == ',') // array or set
-                || (kind == '{' && c == ':')) // map key
+                || kind != '{' && c == ',' // array or set
+                || kind == '{' && c == ':') // map key
             {
                 ids.add(id);
                 id = null;

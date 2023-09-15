@@ -89,7 +89,7 @@ public final class SandboxUberspect implements JexlUberspect {
     @Override
     public JexlMethod getMethod(final Object obj, final String method, final Object... args) {
         if (obj != null && method != null) {
-            final Class<?> clazz = (obj instanceof Class) ? (Class<?>) obj : obj.getClass();
+            final Class<?> clazz = obj instanceof Class ? (Class<?>) obj : obj.getClass();
             final String actual = sandbox.execute(clazz, method);
             if (actual != null && actual != JexlSandbox.NULL) {
                 return uberspect.getMethod(obj, actual, args);

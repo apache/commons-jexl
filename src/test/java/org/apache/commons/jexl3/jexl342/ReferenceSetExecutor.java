@@ -35,7 +35,7 @@ public class ReferenceSetExecutor implements JexlPropertySet {
      * @param referenceHandler the reference handler
      * @param jexlSet the property setter
      */
-    public ReferenceSetExecutor(ReferenceUberspect.ReferenceHandler referenceHandler, JexlPropertySet jexlSet) {
+    public ReferenceSetExecutor(final ReferenceUberspect.ReferenceHandler referenceHandler, final JexlPropertySet jexlSet) {
         if (referenceHandler == null || jexlSet == null) {
             throw new IllegalArgumentException("handler and setter cant be null");
         }
@@ -48,24 +48,24 @@ public class ReferenceSetExecutor implements JexlPropertySet {
      * @param opt the reference
      * @return the reference value, TRY_FAILED if null
      */
-    protected Object getReference(Object opt) {
+    protected Object getReference(final Object opt) {
         return handler.callGet(opt);
     }
 
     @Override
     public Object invoke(final Object opt, final Object arg) throws Exception {
-        Object obj = getReference(opt);
+        final Object obj = getReference(opt);
         return setter.invoke(obj, arg);
     }
 
     @Override
     public Object tryInvoke(final Object opt, final Object key, final Object arg) throws JexlException.TryFailed {
-        Object obj = getReference(opt);
+        final Object obj = getReference(opt);
         return obj == opt? JexlEngine.TRY_FAILED : obj == null ? null : setter.tryInvoke(key, obj, arg);
     }
 
     @Override
-    public boolean tryFailed(Object rval) {
+    public boolean tryFailed(final Object rval) {
         return setter.tryFailed(rval);
     }
 

@@ -74,8 +74,8 @@ public class FeatureController extends ScriptVisitor {
      */
     public void throwFeatureException(final int feature, final JexlNode node) {
         final JexlInfo dbgInfo = node.jexlInfo();
-        Debugger dbg = new Debugger().depth(1);
-        String msg = dbg.data(node);
+        final Debugger dbg = new Debugger().depth(1);
+        final String msg = dbg.data(node);
         throw new JexlException.Feature(dbgInfo, feature, msg);
     }
 

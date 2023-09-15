@@ -76,7 +76,7 @@ public class ParserTest {
 
     @Test
     public void testIdentifierEscape() {
-        final String[] ids = new String[]{"a\\ b", "a\\ b\\ c", "a\\'b\\\"c", "a\\ \\ c"};
+        final String[] ids = {"a\\ b", "a\\ b\\ c", "a\\'b\\\"c", "a\\ \\ c"};
         for(final String id : ids) {
             final String esc0 = StringParser.unescapeIdentifier(id);
             Assert.assertFalse(esc0.contains("\\"));
@@ -92,7 +92,7 @@ public class ParserTest {
     public void testControlCharacters() {
         // Both '' and "" are valid JEXL string
         // The array of tuples where the first element is an expected result and the second element is a test string.
-        final String[][] strings = new String[][] {
+        final String[][] strings = {
             new String[] {"a\nb\tc", "'a\nb\tc'"}, // we still honor the actual characters
             new String[] {"a\nb\tc", "'a\\nb\\tc'"},
             new String[] {"a\nb\tc", "\"a\\nb\\tc\""},

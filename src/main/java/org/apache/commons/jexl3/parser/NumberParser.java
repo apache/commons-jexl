@@ -126,7 +126,7 @@ public final class NumberParser implements Serializable {
         // determine the base
         final int base;
         if (s.charAt(0) == '0') {
-            if ((s.length() > 1 && (s.charAt(1) == 'x' || s.charAt(1) == 'X'))) {
+            if (s.length() > 1 && (s.charAt(1) == 'x' || s.charAt(1) == 'X')) {
                 base = 16;
                 s = s.substring(2); // Trim the 0x off the front
             } else {

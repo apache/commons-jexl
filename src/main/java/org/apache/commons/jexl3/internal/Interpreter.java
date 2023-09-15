@@ -530,7 +530,7 @@ public class Interpreter extends InterpreterBase {
         try {
             Object result = null;
             // pairs of { conditions , 'then' statement }
-            for(int ifElse = 0; ifElse < (numChildren - 1); ifElse += 2) {
+            for(int ifElse = 0; ifElse < numChildren - 1; ifElse += 2) {
                 final JexlNode testNode = node.jjtGetChild(ifElse);
                 final Object condition = testNode.jjtAccept(this, null);
                 if (testPredicate(testNode, condition)) {
@@ -1428,7 +1428,7 @@ public class Interpreter extends InterpreterBase {
                     if (assignop == null) {
                         // make the closure accessible to itself, ie capture the currently set variable after frame creation
                         if (right instanceof Closure) {
-                            Closure closure = (Closure) right;
+                            final Closure closure = (Closure) right;
                             // the variable scope must be the parent of the lambdas
                             closure.captureSelfIfRecursive(frame, symbol);
                         }
@@ -1485,7 +1485,7 @@ public class Interpreter extends InterpreterBase {
                     final ASTIdentifier firstId = first instanceof ASTIdentifier
                             ? (ASTIdentifier) first
                             : null;
-                    if ((firstId == null) || (firstId.getSymbol() >= 0)) {
+                    if (firstId == null || firstId.getSymbol() >= 0) {
                         // ant remains null, object is null, stop solving
                         antish = false;
                         break main;
@@ -1499,7 +1499,7 @@ public class Interpreter extends InterpreterBase {
                             ? (ASTIdentifierAccess) child
                             : null;
                     // remain antish only if unsafe navigation
-                    if ((aid == null) || aid.isSafe() || aid.isExpression()) {
+                    if (aid == null || aid.isSafe() || aid.isExpression()) {
                         antish = false;
                         break main;
                     }
@@ -1642,7 +1642,7 @@ public class Interpreter extends InterpreterBase {
     protected Object visit(final ASTFunctionNode node, final Object data) {
         final ASTIdentifier functionNode = (ASTIdentifier) node.jjtGetChild(0);
         final String nsid = functionNode.getNamespace();
-        final Object namespace = (nsid != null)? resolveNamespace(nsid, node) : context;
+        final Object namespace = nsid != null? resolveNamespace(nsid, node) : context;
         final ASTArguments argNode = (ASTArguments) node.jjtGetChild(1);
         return call(node, namespace, functionNode, argNode);
     }
@@ -1899,7 +1899,7 @@ public class Interpreter extends InterpreterBase {
 
     @Override
     protected Object visit(final ASTJxltLiteral node, final Object data) {
-        Object cache = node.getExpression();
+        final Object cache = node.getExpression();
         TemplateEngine.TemplateExpression tp;
         if (cache instanceof TemplateEngine.TemplateExpression) {
             tp = (TemplateEngine.TemplateExpression) cache;

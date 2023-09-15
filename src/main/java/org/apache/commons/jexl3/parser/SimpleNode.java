@@ -125,7 +125,7 @@ public class SimpleNode implements Node {
      */
     @Override
     public int jjtGetNumChildren() {
-        return (children == null) ? 0 : children.length;
+        return children == null ? 0 : children.length;
     }
 
     /** Sets this node value.

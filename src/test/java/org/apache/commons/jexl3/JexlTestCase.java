@@ -69,7 +69,7 @@ public class JexlTestCase {
     static JexlEngine createEngine() {
         return new JexlBuilder().create();
     }
-    static JexlEngine createEngine(JexlFeatures features) {
+    static JexlEngine createEngine(final JexlFeatures features) {
         return new JexlBuilder().features(features).create();
     }
 
@@ -87,17 +87,16 @@ public class JexlTestCase {
         }
 
         public PragmaticContext(final JexlOptions o) {
-            super();
             this.options = o;
         }
 
         @Override
-        public void processPragma(String key, Object value) {
+        public void processPragma(final String key, final Object value) {
             processPragma(null, key, value);
         }
 
         @Override
-        public void processPragma(JexlOptions opts, final String key, final Object value) {
+        public void processPragma(final JexlOptions opts, final String key, final Object value) {
             if ("script.mode".equals(key) && "pro50".equals(value)) {
                 opts.set(MODE_PRO50);
             }
@@ -117,18 +116,18 @@ public class JexlTestCase {
      * @param rhs right hand side
      * @return true if strings are equal besides whitespace
      */
-    public static boolean equalsIgnoreWhiteSpace(String lhs, String rhs) {
-        String lhsw = lhs.trim().replaceAll("\\s+", "");
-        String rhsw = rhs.trim().replaceAll("\\s+", "");
+    public static boolean equalsIgnoreWhiteSpace(final String lhs, final String rhs) {
+        final String lhsw = lhs.trim().replaceAll("\\s+", "");
+        final String rhsw = rhs.trim().replaceAll("\\s+", "");
         return lhsw.equals(rhsw);
     }
 
-    public String simpleWhitespace(String arg) {
+    public String simpleWhitespace(final String arg) {
         return arg.trim().replaceAll("\\s+", " ");
     }
 
-    public static String toString(JexlScript script) {
-        Debugger d = new Debugger().lineFeed("").indentation(0);
+    public static String toString(final JexlScript script) {
+        final Debugger d = new Debugger().lineFeed("").indentation(0);
         d.debug(script);
         return  d.toString();
     }
@@ -142,7 +141,7 @@ public class JexlTestCase {
         return createEngine(lenient, SECURE);
     }
 
-    public static JexlEngine createEngine(final boolean lenient, JexlPermissions permissions) {
+    public static JexlEngine createEngine(final boolean lenient, final JexlPermissions permissions) {
         return new JexlBuilder()
                 .uberspect(new Uberspect(null, null, permissions))
                 .arithmetic(new JexlArithmetic(!lenient)).cache(128).create();

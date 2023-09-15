@@ -35,7 +35,7 @@ public class ReferenceMethodExecutor implements JexlMethod {
      * @param referenceHandler the reference handler
      * @param jexlMethod the method executor
      */
-    public ReferenceMethodExecutor(ReferenceUberspect.ReferenceHandler referenceHandler, JexlMethod jexlMethod) {
+    public ReferenceMethodExecutor(final ReferenceUberspect.ReferenceHandler referenceHandler, final JexlMethod jexlMethod) {
         if (referenceHandler == null || jexlMethod == null) {
             throw new IllegalArgumentException("handler and method cant be null");
         }
@@ -48,19 +48,19 @@ public class ReferenceMethodExecutor implements JexlMethod {
      * @param opt the reference
      * @return the reference value
      */
-    protected Object getReference(Object opt) {
+    protected Object getReference(final Object opt) {
         return handler.callGet(opt);
     }
 
     @Override
-    public Object invoke(Object ref, Object... args) throws Exception {
-        Object obj = getReference(ref);
+    public Object invoke(final Object ref, final Object... args) throws Exception {
+        final Object obj = getReference(ref);
         return obj == null ? null : method.invoke(obj, args);
     }
 
     @Override
-    public Object tryInvoke(String name, Object ref, Object... args) throws JexlException.TryFailed {
-        Object obj = getReference(ref);
+    public Object tryInvoke(final String name, final Object ref, final Object... args) throws JexlException.TryFailed {
+        final Object obj = getReference(ref);
         if (method == null) {
             return obj == null ? null : JexlEngine.TRY_FAILED;
         }
@@ -71,7 +71,7 @@ public class ReferenceMethodExecutor implements JexlMethod {
     }
 
     @Override
-    public boolean tryFailed(Object rval) {
+    public boolean tryFailed(final Object rval) {
         return method == null || method.tryFailed(rval);
     }
 

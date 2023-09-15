@@ -81,9 +81,9 @@ public class AssignTest extends JexlTestCase {
         final JexlExpression check = JEXL.createExpression("froboz.value");
         final JexlContext jc = new MapContext();
         Object o = assign.evaluate(jc);
-        Assert.assertEquals("Result is not 10", new Integer(10), o);
+        Assert.assertEquals("Result is not 10", Integer.valueOf(10), o);
         o = check.evaluate(jc);
-        Assert.assertEquals("Result is not 10", new Integer(10), o);
+        Assert.assertEquals("Result is not 10", Integer.valueOf(10), o);
     }
 
     @Test
@@ -92,9 +92,9 @@ public class AssignTest extends JexlTestCase {
         final JexlExpression check = JEXL.createExpression("froboz.0");
         final JexlContext jc = new MapContext();
         Object o = assign.evaluate(jc);
-        Assert.assertEquals("Result is not 10", new Integer(10), o);
+        Assert.assertEquals("Result is not 10", Integer.valueOf(10), o);
         o = check.evaluate(jc);
-        Assert.assertEquals("Result is not 10", new Integer(10), o);
+        Assert.assertEquals("Result is not 10", Integer.valueOf(10), o);
     }
 
     @Test
@@ -105,9 +105,9 @@ public class AssignTest extends JexlTestCase {
         final Froboz froboz = new Froboz(-169);
         jc.set("froboz", froboz);
         Object o = assign.evaluate(jc);
-        Assert.assertEquals("Result is not 10", new Integer(10), o);
+        Assert.assertEquals("Result is not 10", Integer.valueOf(10), o);
         o = check.evaluate(jc);
-        Assert.assertEquals("Result is not 10", new Integer(10), o);
+        Assert.assertEquals("Result is not 10", Integer.valueOf(10), o);
     }
 
     @Test
@@ -137,9 +137,9 @@ public class AssignTest extends JexlTestCase {
         final Froboz froboz = new Froboz(0);
         jc.set("froboz", froboz);
         Object o = assign.evaluate(jc);
-        Assert.assertEquals("Result is not 10", new Integer(10), o);
+        Assert.assertEquals("Result is not 10", Integer.valueOf(10), o);
         o = check.evaluate(jc);
-        Assert.assertEquals("Result is not 10", new Integer(10), o);
+        Assert.assertEquals("Result is not 10", Integer.valueOf(10), o);
     }
 
     @Test
@@ -147,7 +147,7 @@ public class AssignTest extends JexlTestCase {
         final JexlContext jc = new MapContext();
         final JexlExpression assign = JEXL.createExpression("quux = 10");
         final Object o = assign.evaluate(jc);
-        Assert.assertEquals("Result is not 10", new Integer(10), o);
+        Assert.assertEquals("Result is not 10", Integer.valueOf(10), o);
 
     }
 
@@ -162,9 +162,9 @@ public class AssignTest extends JexlTestCase {
         final Quux quux = (Quux) create.evaluate(jc);
         Assert.assertNotNull("quux is null", quux);
         Object o = assign.evaluate(jc);
-        Assert.assertEquals("Result is not 10", new Integer(10), o);
+        Assert.assertEquals("Result is not 10", Integer.valueOf(10), o);
         o = check.evaluate(jc);
-        Assert.assertEquals("Result is not 10", new Integer(10), o);
+        Assert.assertEquals("Result is not 10", Integer.valueOf(10), o);
     }
 
     @Test
@@ -173,10 +173,10 @@ public class AssignTest extends JexlTestCase {
         Assert.assertNotNull(quux);
         JEXL.setProperty(quux, "froboz.value", Integer.valueOf(100));
         Object o = JEXL.getProperty(quux, "froboz.value");
-        Assert.assertEquals("Result is not 100", new Integer(100), o);
+        Assert.assertEquals("Result is not 100", Integer.valueOf(100), o);
         JEXL.setProperty(quux, "['froboz'].value", Integer.valueOf(1000));
         o = JEXL.getProperty(quux, "['froboz']['value']");
-        Assert.assertEquals("Result is not 1000", new Integer(1000), o);
+        Assert.assertEquals("Result is not 1000", Integer.valueOf(1000), o);
     }
 
     @Test
@@ -199,7 +199,7 @@ public class AssignTest extends JexlTestCase {
     @Test
     public void testPropertyInError0() {
         JexlScript script;
-        for(String op : Arrays.asList(
+        for(final String op : Arrays.asList(
                 " = ", "+= ", " -= "," *= "," /= "," %= ",
                 " &= ", " |= ", " ^= ",
                 " <<= ", " >>= ", " >>>= ")) {

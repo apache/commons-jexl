@@ -91,8 +91,8 @@ public final class DuckSetExecutor extends AbstractExecutor.Set {
         if (obj != null
             && objectClass.equals(obj.getClass())
             && method !=  null
-            && ((property != null && property.equals(key))
-                || (property == null && key == null))
+            && (property != null && property.equals(key)
+                || property == null && key == null)
             && valueClass.equals(classOf(value))) {
             try {
                 final Object[] args = {property, value};

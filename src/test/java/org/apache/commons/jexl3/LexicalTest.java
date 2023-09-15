@@ -400,10 +400,10 @@ public class LexicalTest {
     }
 
     void runTestScope(final LexicalScope scope, final int init, final int count, final int step) {
-        int size = (count - init) / step;
+        final int size = (count - init) / step;
         for(int i = init; i < count; i += step) {
             Assert.assertTrue(scope.addSymbol(i));
-            if ((i % (step + 1)) == 1) {
+            if (i % (step + 1) == 1) {
                 Assert.assertTrue(scope.addConstant(i));
             }
             Assert.assertFalse(scope.addSymbol(i));
@@ -413,12 +413,12 @@ public class LexicalTest {
             for(int s = 1; s < step; ++s) {
                 Assert.assertFalse(scope.hasSymbol(i + s));
             }
-            if ((i % (step + 1)) == 1) {
+            if (i % (step + 1) == 1) {
                 Assert.assertTrue(scope.isConstant(i));
             }
         }
         Assert.assertEquals(size, scope.getSymbolCount());
-        BitSet collect = new BitSet();
+        final BitSet collect = new BitSet();
         scope.clearSymbols(b -> collect.set(b));
         for(int i = init; i < count; i += step) {
             Assert.assertTrue("missing " + i, collect.get(i));
@@ -543,8 +543,8 @@ public class LexicalTest {
         final JexlEngine jexl = new JexlBuilder().strict(true).create();
         final JexlScript script = jexl.createScript("let x = 32; (()->{ for(let x : null) { let c = 0; { return x; } } } )(); ");
         Assert.assertNotNull(script);
-        String dbg = JexlTestCase.toString(script);
-        String src = script.getSourceText();
+        final String dbg = JexlTestCase.toString(script);
+        final String src = script.getSourceText();
         Assert.assertTrue(JexlTestCase.equalsIgnoreWhiteSpace(src, dbg));
     }
 
@@ -850,7 +850,7 @@ public class LexicalTest {
 
     @Test
     public void testLetSucceed() {
-        List<String> srcs = Arrays.asList(
+        final List<String> srcs = Arrays.asList(
             "var x = 1; var x = 0;",
             "{ let x = 0; } var x = 1;",
             "var x = 0; var f = () -> { let x = 1; } f()",
@@ -865,7 +865,7 @@ public class LexicalTest {
 
     @Test
     public void testLetFail() {
-        List<String> srcs = Arrays.asList(
+        final List<String> srcs = Arrays.asList(
             "let x = 0; var x = 1;",
             "var x = 0; let x = 1;",
             "let x = 0; let x = 1;",
@@ -879,7 +879,7 @@ public class LexicalTest {
 
     @Test
     public void testVarFail() {
-        List<String> srcs = Arrays.asList(
+        final List<String> srcs = Arrays.asList(
                 "var x = 0; var x = 1;",
                 "var x = 0; let x = 1;",
                 "let x = 0; var x = 1;",
@@ -888,7 +888,7 @@ public class LexicalTest {
                 "var x = 0; const f = (var x) -> { var x = 1; } f()",
                 ""
         );
-        JexlFeatures f=  new JexlFeatures();
+        final JexlFeatures f=  new JexlFeatures();
         f.lexical(true).lexicalShade(true);
         checkParse(f, srcs, false);
     }
@@ -896,7 +896,7 @@ public class LexicalTest {
 
     @Test
     public void testConstCaptures() {
-        List<String> srcsFalse = Arrays.asList(
+        final List<String> srcsFalse = Arrays.asList(
                 "const x = 0;  x = 1;",
                 "const x = 0; x *= 1;",
                 "const x = 0; var x = 1;",
@@ -909,7 +909,7 @@ public class LexicalTest {
                 ""
         );
         checkParse(srcsFalse, false);
-        List<String> srcsTrue = Arrays.asList(
+        final List<String> srcsTrue = Arrays.asList(
             "const x = 0; if (true) { var f  = x -> x + 1;}" ,
             "const x = 0; if (true) { var f  = y -> { var x = y + 1; x } }" ,
             "const x = 0; if (true) { var f  = y -> { const x = y + 1; x } }" ,
@@ -922,7 +922,7 @@ public class LexicalTest {
     public void testConst0a() {
         final JexlFeatures f = new JexlFeatures();
         final JexlEngine jexl = new JexlBuilder().strict(true).create();
-        JexlScript script = jexl.createScript(
+        final JexlScript script = jexl.createScript(
                 "{ const x = 10; x + 1 }; { let x = 20; x = 22}");
         final JexlContext jc = new MapContext();
         final Object result = script.execute(jc);
@@ -948,30 +948,30 @@ public class LexicalTest {
             final JexlScript script = jexl.createScript(
                     "const foo;  foo");
             Assert.fail("should fail, const foo must be followed by assign.");
-        } catch (JexlException.Parsing xparse) {
+        } catch (final JexlException.Parsing xparse) {
             Assert.assertTrue(xparse.getMessage().contains("const"));
         }
     }
 
     @Test public void testManyLet() {
-        String text = "let x = 1, y = 41, z; x + y";
-        JexlEngine jexl = new JexlBuilder().safe(true).create();
-        JexlScript script = jexl.createScript(text);
-        Object result = script.execute(null);
+        final String text = "let x = 1, y = 41, z; x + y";
+        final JexlEngine jexl = new JexlBuilder().safe(true).create();
+        final JexlScript script = jexl.createScript(text);
+        final Object result = script.execute(null);
         Assert.assertEquals(42, result);
-        String s0 = script.getParsedText();
-        String s1 = script.getSourceText();
+        final String s0 = script.getParsedText();
+        final String s1 = script.getSourceText();
         Assert.assertNotEquals(s0, s1);
     }
 
     @Test public void testManyConst() {
-        String text = "const x = 1, y = 41; x + y";
-        JexlEngine jexl = new JexlBuilder().safe(true).create();
-        JexlScript script = jexl.createScript(text);
-        Object result = script.execute(null);
+        final String text = "const x = 1, y = 41; x + y";
+        final JexlEngine jexl = new JexlBuilder().safe(true).create();
+        final JexlScript script = jexl.createScript(text);
+        final Object result = script.execute(null);
         Assert.assertEquals(42, result);
-        String s0 = script.getParsedText();
-        String s1 = script.getSourceText();
+        final String s0 = script.getParsedText();
+        final String s1 = script.getSourceText();
         Assert.assertNotEquals(s0, s1);
     }
 
@@ -979,11 +979,11 @@ public class LexicalTest {
     public void testConst2a() {
         final JexlFeatures f = new JexlFeatures();
         final JexlEngine jexl = new JexlBuilder().strict(true).create();
-        for(String op : Arrays.asList("=", "+=", "-=", "/=", "*=", "%=", "<<=", ">>=", ">>>=", "^=", "&=", "|=")) {
+        for(final String op : Arrays.asList("=", "+=", "-=", "/=", "*=", "%=", "<<=", ">>=", ">>>=", "^=", "&=", "|=")) {
             try {
                 final JexlScript script = jexl.createScript("const foo = 42;  foo "+op+" 1;");
                 Assert.fail("should fail, const precludes assignment");
-            } catch (JexlException.Parsing xparse) {
+            } catch (final JexlException.Parsing xparse) {
                 Assert.assertTrue(xparse.getMessage().contains("foo"));
             }
         }
@@ -993,11 +993,11 @@ public class LexicalTest {
     public void testConst2b() {
         final JexlFeatures f = new JexlFeatures();
         final JexlEngine jexl = new JexlBuilder().strict(true).create();
-        for(String op : Arrays.asList("=", "+=", "-=", "/=", "*=", "%=", "<<=", ">>=", ">>>=", "^=", "&=", "|=")) {
+        for(final String op : Arrays.asList("=", "+=", "-=", "/=", "*=", "%=", "<<=", ">>=", ">>>=", "^=", "&=", "|=")) {
             try {
                 final JexlScript script = jexl.createScript("const foo = 42;  if (true) { foo "+op+" 1; }");
                 Assert.fail("should fail, const precludes assignment");
-            } catch (JexlException.Parsing xparse) {
+            } catch (final JexlException.Parsing xparse) {
                 Assert.assertTrue(xparse.getMessage().contains("foo"));
             }
         }
@@ -1007,45 +1007,45 @@ public class LexicalTest {
     public void testConst2c() {
         final JexlFeatures f = new JexlFeatures();
         final JexlEngine jexl = new JexlBuilder().strict(true).create();
-        for(String op : Arrays.asList("=", "+=", "-=", "/=", "*=", "%=", "<<=", ">>=", ">>>=", "^=", "&=", "|=")) {
+        for(final String op : Arrays.asList("=", "+=", "-=", "/=", "*=", "%=", "<<=", ">>=", ">>>=", "^=", "&=", "|=")) {
             try {
                 final JexlScript script = jexl.createScript("{ const foo = 42; } { let foo  = 0; foo " + op + " 1; }");
                 Assert.assertNotNull(script);
-            } catch (JexlException.Parsing xparse) {
+            } catch (final JexlException.Parsing xparse) {
                 Assert.fail(xparse.toString());
             }
         }
     }
 
     @Test public void testConst3a() {
-        JexlEngine jexl = new JexlBuilder().create();
-        List<String> srcs = Arrays.asList(
+        final JexlEngine jexl = new JexlBuilder().create();
+        final List<String> srcs = Arrays.asList(
                 "const f = ()->{ var foo = 3; foo = 5; }",
                 "const y = '42'; const f = (let y)->{ var foo = 3; foo = 5; }",
                 "const foo = '34'; const f = ()->{ var foo = 3; foo = 5; };",
                 "const bar = '34'; const f = ()->{ var f = 3; f = 5; };",
                 "const bar = '34'; const f = ()->{ var bar = 3; z ->{ bar += z; } };");
-        for(String src: srcs) {
-            JexlScript script = jexl.createScript(src);
-            Object result = script.execute(null);
+        for(final String src: srcs) {
+            final JexlScript script = jexl.createScript(src);
+            final Object result = script.execute(null);
             Assert.assertNotNull(src, result);
         }
     }
 
     @Test public void testConst3b() {
-        JexlEngine jexl = new JexlBuilder().create();
-        List<String> srcs = Arrays.asList(
+        final JexlEngine jexl = new JexlBuilder().create();
+        final List<String> srcs = Arrays.asList(
                 "const f = ()->{ var foo = 3; f = 5; }",
                 "const y = '42'; const f = (let z)->{ y += z; }",
                 "const foo = '34'; const f = ()->{ foo = 3; };",
                 "const bar = '34'; const f = ()->{  bar = 3; z ->{ bar += z; } };",
                 "let bar = '34'; const f = ()->{  const bar = 3; z ->{ bar += z; } };");
-        for(String src: srcs) {
+        for(final String src: srcs) {
             try {
-                JexlScript script = jexl.createScript(src);
-                Object result = script.execute(null);
+                final JexlScript script = jexl.createScript(src);
+                final Object result = script.execute(null);
                 Assert.fail(src);
-            } catch (JexlException.Assignment xassign) {
+            } catch (final JexlException.Assignment xassign) {
                 Assert.assertNotNull(src, xassign); // debug breakpoint
             }
         }
@@ -1053,7 +1053,7 @@ public class LexicalTest {
 
     @Test
     public void testSingleStatementDeclFail() {
-        List<String> srcs = Arrays.asList(
+        final List<String> srcs = Arrays.asList(
                 "if (true) let x ;",
                 "if (true) let x = 1;",
                 "if (true) var x = 1;",
@@ -1071,14 +1071,14 @@ public class LexicalTest {
                 "for (let i:ii) var x = 1;",
                 ""
         );
-        JexlFeatures f=  new JexlFeatures();
+        final JexlFeatures f=  new JexlFeatures();
         f.lexical(true).lexicalShade(true);
         checkParse(f, srcs, false);
     }
 
     @Test
     public void testSingleStatementVarSucceed() {
-        List<String> srcs = Arrays.asList(
+        final List<String> srcs = Arrays.asList(
                 "if (true) var x = 1;",
                 "if (true) { 1 } else var x = 1;",
                 "while (true) var x = 1;",
@@ -1089,23 +1089,25 @@ public class LexicalTest {
         checkParse(srcs, true);
     }
 
-    private void checkParse(List<String> srcs, boolean expected) {
+    private void checkParse(final List<String> srcs, final boolean expected) {
         checkParse(null, srcs, expected);
     }
 
-    private void checkParse(JexlFeatures f, List<String> srcs, boolean expected) {
+    private void checkParse(final JexlFeatures f, final List<String> srcs, final boolean expected) {
         final JexlEngine jexl = new JexlBuilder().features(f).strict(true).create();
-        for(String src : srcs) {
-            if (!src.isEmpty()) try {
-                final JexlScript script = jexl.createScript(src);
-                if (!expected) {
-                    Assert.fail(src);
+        for(final String src : srcs) {
+            if (!src.isEmpty()) {
+                try {
+                    final JexlScript script = jexl.createScript(src);
+                    if (!expected) {
+                        Assert.fail(src);
+                    }
+                } catch (final JexlException.Parsing xlexical) {
+                    if (expected) {
+                        Assert.fail(src);
+                    }
+                    //Assert.assertTrue(xlexical.detailedMessage().contains("x"));
                 }
-            } catch (JexlException.Parsing xlexical) {
-                if (expected) {
-                    Assert.fail(src);
-                }
-                //Assert.assertTrue(xlexical.detailedMessage().contains("x"));
             }
         }
 

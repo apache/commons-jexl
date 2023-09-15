@@ -85,7 +85,7 @@ public class ArrayIterator implements Iterator<Object> {
      */
     @Override
     public boolean hasNext() {
-        return (pos < size);
+        return pos < size;
     }
 
     /**

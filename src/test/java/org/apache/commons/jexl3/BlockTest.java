@@ -64,7 +64,7 @@ public class BlockTest extends JexlTestCase {
         final JexlScript e = JEXL.createScript("if (true) { x = 1; } else { x = 2; }");
         final JexlContext jc = new MapContext();
         final Object o = e.execute(jc);
-        Assert.assertEquals("Block result is wrong", new Integer(1), o);
+        Assert.assertEquals("Block result is wrong", Integer.valueOf(1), o);
     }
 
     @Test
@@ -72,7 +72,7 @@ public class BlockTest extends JexlTestCase {
         final JexlScript e = JEXL.createScript("if (false) { x = 1; } else { x = 2; }");
         final JexlContext jc = new MapContext();
         final Object o = e.execute(jc);
-        Assert.assertEquals("Block result is wrong", new Integer(2), o);
+        Assert.assertEquals("Block result is wrong", Integer.valueOf(2), o);
     }
 
     @Test

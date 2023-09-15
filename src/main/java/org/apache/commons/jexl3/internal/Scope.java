@@ -261,7 +261,7 @@ public final class Scope {
      * @return the source symbol index or -1 if the symbol is not captured
      */
     public int getCaptureDeclaration(final int symbol) {
-        Integer declared = capturedVariables != null ? capturedVariables.get(symbol)  : null;
+        final Integer declared = capturedVariables != null ? capturedVariables.get(symbol)  : null;
         return declared != null ? declared.intValue() : -1;
     }
 
@@ -317,7 +317,7 @@ public final class Scope {
      */
      String[] getParameters(final int bound) {
         final int unbound = parms - bound;
-        if ((namedVariables == null) || (unbound <= 0)) {
+        if (namedVariables == null || unbound <= 0) {
             return EMPTY_STRS;
         }
         final String[] pa = new String[unbound];
@@ -336,7 +336,7 @@ public final class Scope {
      * @return the local variable names
      */
     public String[] getLocalVariables() {
-        if ((namedVariables == null) || (vars <= 0)) {
+        if (namedVariables == null || vars <= 0) {
             return EMPTY_STRS;
         }
         final List<String> locals = new ArrayList<>(vars);

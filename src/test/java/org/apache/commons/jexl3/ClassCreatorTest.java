@@ -309,12 +309,12 @@ public class ClassCreatorTest extends JexlTestCase {
             context.set("clazz", clazz);
             z = newx.evaluate(context);
             Assert.assertNotNull(clazz + ": class " + i + " could not be instantiated on pass " + pass, z);
-            Assert.assertEquals(new Integer(i), expr.evaluate(context));
+            Assert.assertEquals(Integer.valueOf(i), expr.evaluate(context));
             // with the proper class loader, attempt to create an instance from the class name
             jexl.setClassLoader(cctor.getClassLoader());
             z = newx.evaluate(context);
             Assert.assertEquals(z.getClass(), clazz);
-            Assert.assertEquals(new Integer(i), expr.evaluate(context));
+            Assert.assertEquals(Integer.valueOf(i), expr.evaluate(context));
             cctor.clear();
             jexl.setClassLoader(null);
 

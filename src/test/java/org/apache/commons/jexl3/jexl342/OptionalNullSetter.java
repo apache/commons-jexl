@@ -35,13 +35,13 @@ public class OptionalNullSetter implements JexlPropertySet {
     /** The result when we solve it. */
     private JexlPropertySet delegate;
 
-    OptionalNullSetter(JexlUberspect jexlUberspect, Object key) {
+    OptionalNullSetter(final JexlUberspect jexlUberspect, final Object key) {
         uberspect = jexlUberspect;
         property = key;
     }
 
     @Override
-    public Object invoke(Object obj, Object arg) throws Exception {
+    public Object invoke(final Object obj, final Object arg) throws Exception {
         if (obj == null) {
             return null;
         }
@@ -55,7 +55,7 @@ public class OptionalNullSetter implements JexlPropertySet {
     }
 
     @Override
-    public Object tryInvoke(Object obj, Object key, Object arg) throws JexlException.TryFailed {
+    public Object tryInvoke(final Object obj, final Object key, final Object arg) throws JexlException.TryFailed {
         if (obj == null) {
             return null;
         }
@@ -63,7 +63,7 @@ public class OptionalNullSetter implements JexlPropertySet {
     }
 
     @Override
-    public boolean tryFailed(Object rval) {
+    public boolean tryFailed(final Object rval) {
         return delegate != null ? delegate.tryFailed(rval) : JexlEngine.TRY_FAILED == rval;
     }
 

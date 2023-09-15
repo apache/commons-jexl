@@ -49,7 +49,7 @@ public final class Frame {
      * @param closure the owning closure
      * @return the cleaned-up stack or the stack itself (most of the time)
      */
-    Object[] nocycleStack(Closure closure) {
+    Object[] nocycleStack(final Closure closure) {
         Object[] ns = stack;
         for(int i = 0; i < stack.length; ++i) {
             if (stack[i] == closure) {

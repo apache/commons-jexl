@@ -77,7 +77,7 @@ public final class MethodKey {
                 final Object arg = args[p];
                 // null arguments use void as Void.class as marker
                 final Class<?> parm = arg == null ? Void.class : arg.getClass();
-                hash = (HASH * hash) + parm.hashCode();
+                hash = HASH * hash + parm.hashCode();
                 this.params[p] = parm;
             }
         } else {
@@ -109,7 +109,7 @@ public final class MethodKey {
             this.params = new Class<?>[size];
             for (int p = 0; p < size; ++p) {
                 final Class<?> parm = primitiveClass(args[p]);
-                hash = (HASH * hash) + parm.hashCode();
+                hash = HASH * hash + parm.hashCode();
                 this.params[p] = parm;
             }
         } else {
@@ -544,7 +544,7 @@ public final class MethodKey {
                 for (final T app : applicables) {
                     final Class<?>[] parmClasses = app.getParameterTypes();
                     final Class<?> parmClass = parmClasses[c];
-                    if (Object.class.equals(parmClass) && (objectParmCount++ == 2)) {
+                    if (Object.class.equals(parmClass) && objectParmCount++ == 2) {
                         severe = true;
                         break;
                     }
@@ -588,7 +588,7 @@ public final class MethodKey {
         // ok, move on and compare those of equal lengths
         for (int i = 0; i < length; ++i) {
             if (c1[i] != c2[i]) {
-                final boolean last = (i == ultimate);
+                final boolean last = i == ultimate;
                 // argument is null, prefer an Object param
                 if (a[i] == Void.class) {
                     if (c1[i] == Object.class && c2[i] != Object.class) {
@@ -602,7 +602,7 @@ public final class MethodKey {
                 boolean c1s = isPrimitive(c1[i], last);
                 boolean c2s = isPrimitive(c2[i], last);
                 if (c1s != c2s) {
-                    return (c1s == (a[i] != Void.class)) ? MORE_SPECIFIC : LESS_SPECIFIC;
+                    return c1s == (a[i] != Void.class) ? MORE_SPECIFIC : LESS_SPECIFIC;
                 }
                 // if c2 can be converted to c1 but not the opposite,
                 // c1 is more specific than c2

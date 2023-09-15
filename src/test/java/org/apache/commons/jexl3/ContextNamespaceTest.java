@@ -49,7 +49,7 @@ public class ContextNamespaceTest extends JexlTestCase {
         }
 
         public double vat(final double n) {
-            return (n * vat) / 100.;
+            return n * vat / 100.;
         }
     }
 
@@ -104,14 +104,14 @@ public class ContextNamespaceTest extends JexlTestCase {
     }
 
     public static class Context346 extends MapContext {
-        public int func(int y) { return 42 * y;}
+        public int func(final int y) { return 42 * y;}
     }
 
     @Test
     public void testNamespace346a() {
-        JexlContext ctxt = new Context346();
+        final JexlContext ctxt = new Context346();
         final JexlEngine jexl = new JexlBuilder().safe(false).create();
-        String src = "x != null ? x : func(y)";
+        final String src = "x != null ? x : func(y)";
         final JexlScript script = jexl.createScript(src,"x","y");
         Object result = script.execute(ctxt, null, 1);
         Assert.assertEquals(42, result);
@@ -121,12 +121,12 @@ public class ContextNamespaceTest extends JexlTestCase {
 
     @Test
     public void testNamespace346b() {
-        JexlContext ctxt = new MapContext();
-        Map<String, Object> ns = new HashMap<>();
+        final JexlContext ctxt = new MapContext();
+        final Map<String, Object> ns = new HashMap<>();
         ns.put("x", Math.class);
         ns.put(null, Math.class);
         final JexlEngine jexl = new JexlBuilder().safe(false).namespaces(ns).create();
-        String src = "x != null ? x : abs(y)";
+        final String src = "x != null ? x : abs(y)";
         final JexlScript script = jexl.createScript(src,"x","y");
         Object result = script.execute(ctxt, null, 42);
         Assert.assertEquals(42, result);
@@ -135,22 +135,22 @@ public class ContextNamespaceTest extends JexlTestCase {
     }
 
     public static class Ns348 {
-        public static int func(int y) { return 42 * y;}
+        public static int func(final int y) { return 42 * y;}
     }
 
     public static class ContextNs348 extends MapContext implements JexlContext.NamespaceResolver {
-        ContextNs348() { super(); }
+        ContextNs348() { }
 
         @Override
-        public Object resolveNamespace(String name) {
+        public Object resolveNamespace(final String name) {
             return "ns".equals(name)? new Ns348() : null;
         }
     }
 
     @Test
     public void testNamespace348a() {
-        JexlContext ctxt = new MapContext();
-        Map<String, Object> ns = new HashMap<>();
+        final JexlContext ctxt = new MapContext();
+        final Map<String, Object> ns = new HashMap<>();
         ns.put("ns", Ns348.class);
         final JexlEngine jexl = new JexlBuilder().safe(false).namespaces(ns).create();
         run348a(jexl, ctxt);
@@ -161,7 +161,7 @@ public class ContextNamespaceTest extends JexlTestCase {
 
     @Test
     public void testNamespace348b() {
-        JexlContext ctxt = new ContextNs348();
+        final JexlContext ctxt = new ContextNs348();
         final JexlEngine jexl = new JexlBuilder().safe(false).create();
         // no space for ns name as syntactic hint
         run348a(jexl, ctxt, "ns:");
@@ -172,11 +172,11 @@ public class ContextNamespaceTest extends JexlTestCase {
 
     @Test
     public void testNamespace348c() {
-        JexlContext ctxt = new ContextNs348();
-        Map<String, Object> ns = new HashMap<>();
+        final JexlContext ctxt = new ContextNs348();
+        final Map<String, Object> ns = new HashMap<>();
         ns.put("ns", Ns348.class);
-        JexlFeatures f = new JexlFeatures();
-        f.namespaceTest((n)->true);
+        final JexlFeatures f = new JexlFeatures();
+        f.namespaceTest(n -> true);
         final JexlEngine jexl = new JexlBuilder().namespaces(ns).features(f).safe(false).create();
         run348a(jexl, ctxt);
         run348b(jexl, ctxt);
@@ -186,9 +186,9 @@ public class ContextNamespaceTest extends JexlTestCase {
 
     @Test
     public void testNamespace348d() {
-        JexlContext ctxt = new ContextNs348();
-        JexlFeatures f = new JexlFeatures();
-        f.namespaceTest((n)->true);
+        final JexlContext ctxt = new ContextNs348();
+        final JexlFeatures f = new JexlFeatures();
+        f.namespaceTest(n -> true);
         final JexlEngine jexl = new JexlBuilder().features(f).safe(false).create();
         run348a(jexl, ctxt);
         run348b(jexl, ctxt);
@@ -196,26 +196,26 @@ public class ContextNamespaceTest extends JexlTestCase {
         run348d(jexl, ctxt);
     }
 
-    private void run348a(JexlEngine jexl, JexlContext ctxt) {
+    private void run348a(final JexlEngine jexl, final JexlContext ctxt) {
         run348a(jexl, ctxt, "ns : ");
     }
-    private void run348a(JexlEngine jexl, JexlContext ctxt, String ns) {
-        String src = "empty(x) ? "+ns+"func(y) : z";
+    private void run348a(final JexlEngine jexl, final JexlContext ctxt, final String ns) {
+        final String src = "empty(x) ? "+ns+"func(y) : z";
         // local vars
-        JexlScript script = jexl.createScript(src, "x", "y", "z");
+        final JexlScript script = jexl.createScript(src, "x", "y", "z");
         Object result = script.execute(ctxt, null, 1, 169);
         Assert.assertEquals(42, result);
         result = script.execute(ctxt, "42", 1, 169);
         Assert.assertEquals(169, result);
     }
 
-    private void run348b(JexlEngine jexl, JexlContext ctxt) {
+    private void run348b(final JexlEngine jexl, final JexlContext ctxt) {
         run348b(jexl, ctxt, "ns : ");
     }
-    private void run348b(JexlEngine jexl, JexlContext ctxt, String ns) {
-        String src = "empty(x) ? "+ns+"func(y) : z";
+    private void run348b(final JexlEngine jexl, final JexlContext ctxt, final String ns) {
+        final String src = "empty(x) ? "+ns+"func(y) : z";
         // global vars
-        JexlScript script = jexl.createScript(src);
+        final JexlScript script = jexl.createScript(src);
         ctxt.set("x", null);
         ctxt.set("y", 1);
         ctxt.set("z", 169);
@@ -229,29 +229,29 @@ public class ContextNamespaceTest extends JexlTestCase {
         Assert.assertEquals(169, result);
     }
 
-    private void run348c(JexlEngine jexl, JexlContext ctxt) {
+    private void run348c(final JexlEngine jexl, final JexlContext ctxt) {
         run348c(jexl, ctxt, "ns : ");
     }
-    private void run348c(JexlEngine jexl, JexlContext ctxt, String ns) {
-        String src = "empty(x) ? z : "+ns+"func(y)";
+    private void run348c(final JexlEngine jexl, final JexlContext ctxt, final String ns) {
+        final String src = "empty(x) ? z : "+ns+"func(y)";
         // local vars
-        JexlScript script = jexl.createScript(src, "x", "z", "y");
+        final JexlScript script = jexl.createScript(src, "x", "z", "y");
         Object result = script.execute(ctxt, null, 169, 1);
         Assert.assertEquals(src, 169, result);
         result = script.execute(ctxt, "42", 169, 1);
         Assert.assertEquals(src, 42, result);
     }
 
-    private void run348d(JexlEngine jexl, JexlContext ctxt) {
+    private void run348d(final JexlEngine jexl, final JexlContext ctxt) {
         run348d(jexl, ctxt, "ns : ");
     }
-    private void run348d(JexlEngine jexl, JexlContext ctxt, String ns) {
-        String src = "empty(x) ? z : "+ns+"func(y)";
+    private void run348d(final JexlEngine jexl, final JexlContext ctxt, final String ns) {
+        final String src = "empty(x) ? z : "+ns+"func(y)";
         // global vars
         JexlScript script = null;
         try {
            script = jexl.createScript(src);
-        } catch (JexlException.Parsing xparse) {
+        } catch (final JexlException.Parsing xparse) {
             Assert.fail(src);
         }
         ctxt.set("x", null);
@@ -329,13 +329,13 @@ public class ContextNamespaceTest extends JexlTestCase {
 
     public static class NsNs {
         private final int constVar;
-        public NsNs(JexlContext ctxt) {
+        public NsNs(final JexlContext ctxt) {
             nsnsCtor.incrementAndGet();
-            Object n = ctxt.get("NUMBER");
-            constVar = (n instanceof Number) ? ((Number) n).intValue() : -1;
+            final Object n = ctxt.get("NUMBER");
+            constVar = n instanceof Number ? ((Number) n).intValue() : -1;
         }
 
-        public int callIt(int n) {
+        public int callIt(final int n) {
             return n + constVar;
         }
     }
@@ -343,7 +343,7 @@ public class ContextNamespaceTest extends JexlTestCase {
     @Test
     public void testNsNsContext0() {
         nsnsCtor.set(0);
-        String clsName = NsNs.class.getName();
+        final String clsName = NsNs.class.getName();
         runNsNsContext(Collections.singletonMap("nsns", clsName));
     }
 
@@ -353,8 +353,8 @@ public class ContextNamespaceTest extends JexlTestCase {
         runNsNsContext(Collections.singletonMap("nsns", NsNs.class));
     }
 
-    private void runNsNsContext(Map<String,Object> nsMap) {
-        JexlContext ctxt = new MapContext();
+    private void runNsNsContext(final Map<String,Object> nsMap) {
+        final JexlContext ctxt = new MapContext();
         ctxt.set("NUMBER", 19);
         final JexlEngine jexl = new JexlBuilder().strict(true).silent(false).cache(32)
                 .namespaces(nsMap).create();
@@ -369,7 +369,7 @@ public class ContextNamespaceTest extends JexlTestCase {
 
     public static class StaticNs {
         private StaticNs() { }
-        public static int callIt(int n) {
+        public static int callIt(final int n) {
             return n + 19;
         }
     }
@@ -384,8 +384,8 @@ public class ContextNamespaceTest extends JexlTestCase {
         runStaticNsContext(Collections.singletonMap("sns", StaticNs.class.getName()));
     }
 
-    private void runStaticNsContext(Map<String,Object> nsMap) {
-        JexlContext ctxt = new MapContext();
+    private void runStaticNsContext(final Map<String,Object> nsMap) {
+        final JexlContext ctxt = new MapContext();
         final JexlEngine jexl = new JexlBuilder().strict(true).silent(false).cache(32)
                 .namespaces(nsMap).create();
         final JexlScript script = jexl.createScript("x ->{ sns:callIt(x); sns:callIt(x); }");

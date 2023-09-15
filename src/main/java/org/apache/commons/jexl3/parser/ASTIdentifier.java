@@ -76,7 +76,7 @@ public class ASTIdentifier extends JexlNode {
      * @return the new flags mask value
      */
     private static int set(final int ordinal, final int mask, final boolean value) {
-        return value? mask | (1 << ordinal) : mask & ~(1 << ordinal);
+        return value? mask | 1 << ordinal : mask & ~(1 << ordinal);
     }
 
     /**

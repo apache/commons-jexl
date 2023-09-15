@@ -74,8 +74,8 @@ public final class DuckGetExecutor extends AbstractExecutor.Get {
                 && objectClass.equals(obj.getClass())
                 // ensure method name matches the property name
                 && method != null
-                && ((property == null && key == null)
-                || (property != null && property.equals(key)))) {
+                && (property == null && key == null
+                || property != null && property.equals(key))) {
             try {
                 final Object[] args = {property};
                 return method.invoke(obj, args);

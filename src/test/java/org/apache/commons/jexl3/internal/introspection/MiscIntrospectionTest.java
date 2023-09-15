@@ -33,7 +33,7 @@ public class MiscIntrospectionTest {
         try {
             JexlEngine.EMPTY_CONTEXT.set("nope", 42);
             Assert.fail("empty context should be readonly");
-        } catch (UnsupportedOperationException xun) {
+        } catch (final UnsupportedOperationException xun) {
             Assert.assertNotNull(xun);
         }
     }
@@ -42,7 +42,7 @@ public class MiscIntrospectionTest {
         // not on lists
         try {
             new ArrayIterator(new ArrayList<>());
-        } catch (IllegalArgumentException xill) {
+        } catch (final IllegalArgumentException xill) {
             Assert.assertNotNull(xill);
         }
         // wih null ?
@@ -51,7 +51,7 @@ public class MiscIntrospectionTest {
         try {
             ai0.next();
             Assert.fail("should have failed");
-        } catch (NoSuchElementException no) {
+        } catch (final NoSuchElementException no) {
             Assert.assertNotNull(no);
         }
         // an array
@@ -62,14 +62,14 @@ public class MiscIntrospectionTest {
         try {
             ai0.next();
             Assert.fail("iterator on null ?");
-        } catch (NoSuchElementException no) {
+        } catch (final NoSuchElementException no) {
             Assert.assertNotNull(no);
         }
         // no remove
         try {
             ai0.remove();
             Assert.fail("should have failed");
-        } catch (UnsupportedOperationException no) {
+        } catch (final UnsupportedOperationException no) {
             Assert.assertNotNull(no);
         }
     }
@@ -80,10 +80,10 @@ public class MiscIntrospectionTest {
         try {
             new ArrayListWrapper(1);
             Assert.fail("non-array wrap?");
-        } catch (IllegalArgumentException xil) {
+        } catch (final IllegalArgumentException xil) {
             Assert.assertNotNull(xil);
         }
-        Integer[] ai = new Integer[]{1, 2};
+        final Integer[] ai = {1, 2};
         alw = new ArrayListWrapper(ai);
         Assert.assertEquals(1, alw.indexOf(2));
         Assert.assertEquals(-1, alw.indexOf(null));

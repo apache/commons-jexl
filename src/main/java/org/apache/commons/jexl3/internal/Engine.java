@@ -312,7 +312,7 @@ public class Engine extends JexlEngine {
             for(final String name : names) {
                 final Object functor = functions.get(name);
                 if (functor instanceof Class<?>) {
-                    final Class<?> fclass = ((Class<?>) functor);
+                    final Class<?> fclass = (Class<?>) functor;
                     try {
                         final Class<?> nclass = loader.loadClass(fclass.getName());
                         if (nclass != fclass) {
@@ -339,7 +339,7 @@ public class Engine extends JexlEngine {
      * @param name the namespoce name
      * @return the object associated
      */
-    final Object getNamespace(String name) {
+    final Object getNamespace(final String name) {
         return functions.get(name);
     }
 
@@ -446,7 +446,7 @@ public class Engine extends JexlEngine {
                 }  else if (PRAGMA_IMPORT.equals(key)) {
                     // jexl.import, may use a set
                     final Set<String> is = new LinkedHashSet<>();
-                    withValueSet(value, (o)->{
+                    withValueSet(value, o -> {
                         if (o instanceof String) {
                             is.add(o.toString());
                         }
@@ -484,7 +484,7 @@ public class Engine extends JexlEngine {
      * @param value the value or the set
      * @param consumer the consumer of values
      */
-    private void withValueSet(Object value, Consumer<Object> consumer) {
+    private void withValueSet(final Object value, final Consumer<Object> consumer) {
         final Set<?> values = value instanceof Set<?>
                 ? (Set<?>) value
                 : Collections.singleton(value);
@@ -499,7 +499,7 @@ public class Engine extends JexlEngine {
      * @param key the key
      * @param value the value, ie the class
      */
-    private void processPragmaNamespace(Map<String, Object> ns, String key, Object value) {
+    private void processPragmaNamespace(final Map<String, Object> ns, final String key, final Object value) {
         if (value instanceof String) {
             // jexl.namespace.***
             final String nsname = key.substring(PRAGMA_JEXLNS.length());
@@ -519,6 +519,7 @@ public class Engine extends JexlEngine {
 
     /**
      * Processes jexl.module.ns pragma.
+     *
      * <p>If the value is empty, the namespace will be cleared which may be useful to debug and force unload
      * the object bound to the namespace.</p>
      * @param ns the namespace map
@@ -527,13 +528,14 @@ public class Engine extends JexlEngine {
      * @param info the expression info
      * @param context the value-as-expression evaluation context
      */
-    private void processPragmaModule(Map<String, Object> ns, String key, Object value, JexlInfo info, JexlContext context) {
+    private void processPragmaModule(final Map<String, Object> ns, final String key, final Object value, final JexlInfo info,
+            final JexlContext context) {
         // jexl.module.***
         final String module = key.substring(PRAGMA_MODULE.length());
         if (module.isEmpty()) {
             logger.warn(module + ": invalid module declaration");
         } else {
-            withValueSet(value, (o)->{
+            withValueSet(value, o -> {
                 if (!(o instanceof CharSequence)) {
                     logger.warn(module + ": unable to define module from " + value);
                 } else {
@@ -544,9 +546,7 @@ public class Engine extends JexlEngine {
                         functor = processor.processModule(this, info, module, moduleSrc);
                     } else {
                         final Object moduleObject = createExpression(info, moduleSrc).evaluate(context);
-                        functor =  moduleObject instanceof Script
-                                ? ((Script) moduleObject).execute(context)
-                                : moduleObject;
+                        functor = moduleObject instanceof Script ? ((Script) moduleObject).execute(context) : moduleObject;
                     }
                     if (functor != null) {
                         ns.put(module, functor);
@@ -919,7 +919,7 @@ public class Engine extends JexlEngine {
                 if (collecting && child.isConstant()) {
                     // collect all constants or only string and number literals
                     final boolean collect = collector.mode > 1
-                            || (child instanceof ASTStringLiteral || child instanceof ASTNumberLiteral);
+                            || child instanceof ASTStringLiteral || child instanceof ASTNumberLiteral;
                     if (collect) {
                         final String image = child.toString();
                         collector.add(image);
@@ -996,7 +996,7 @@ public class Engine extends JexlEngine {
             script = cache.get(source);
             if (script != null) {
                 final Scope f = script.getScope();
-                if ((f == null && scope == null) || (f != null && f.equals(scope))) {
+                if (f == null && scope == null || f != null && f.equals(scope)) {
                     return script;
                 }
             }

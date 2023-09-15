@@ -34,7 +34,6 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 
 /**
@@ -103,14 +102,14 @@ public class ScriptTest extends JexlTestCase {
             final File httprFile = new File(TEST_JSON);
             final JexlScript httprScript = JEXL.createScript(httprFile);
             final JexlContext jc = new MapContext();
-            Object httpr = httprScript.execute(jc);
+            final Object httpr = httprScript.execute(jc);
             final JexlScript s = JEXL.createScript("(httpr,url)->httpr.execute(url, null)");
             //jc.set("httpr", new HttpPostRequest());
-            String url = "http:/"+server.getAddress().toString()+"/test";
-            Object result = s.execute(jc, httpr,url);
+            final String url = "http:/"+server.getAddress().toString()+"/test";
+            final Object result = s.execute(jc, httpr,url);
             Assert.assertNotNull(result);
             Assert.assertEquals(response, result);
-        } catch (IOException xio) {
+        } catch (final IOException xio) {
             Assert.fail(xio.getMessage());
         } finally {
             if (server != null) {
@@ -125,15 +124,15 @@ public class ScriptTest extends JexlTestCase {
         try {
             final String response = "{  \"id\": 101}";
             server = createJsonServer(h -> response);
-            String url = "http:/"+server.getAddress().toString()+"/test";
+            final String url = "http:/"+server.getAddress().toString()+"/test";
             final String testScript = "httpr.execute('"+url+"', null)";
             final JexlScript s = JEXL.createScript(testScript);
             final JexlContext jc = new MapContext();
             jc.set("httpr", new HttpPostRequest());
-            Object result = s.execute(jc);
+            final Object result = s.execute(jc);
             Assert.assertNotNull(result);
             Assert.assertEquals(response, result);
-        } catch (IOException xio) {
+        } catch (final IOException xio) {
             Assert.fail(xio.getMessage());
         } finally {
             if (server != null) {
@@ -146,7 +145,7 @@ public class ScriptTest extends JexlTestCase {
      * An object to call from.
      */
     public static class HttpPostRequest {
-        public static String execute(String url, String data) throws IOException {
+        public static String execute(final String url, final String data) throws IOException {
             return httpPostRequest(url, data);
         }
     }
@@ -158,9 +157,9 @@ public class ScriptTest extends JexlTestCase {
      * @return the result
      * @throws IOException
      */
-    private static String httpPostRequest(String sURL, String jsonData) throws IOException {
-        URL url = new java.net.URL(sURL);
-        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+    private static String httpPostRequest(final String sURL, final String jsonData) throws IOException {
+        final URL url = new java.net.URL(sURL);
+        final HttpURLConnection con = (HttpURLConnection) url.openConnection();
         con.setRequestMethod("POST");
         con.setRequestProperty("Accept", "application/json");
         // send data
@@ -168,15 +167,15 @@ public class ScriptTest extends JexlTestCase {
             con.setRequestProperty("Content-Type", "application/json");
             con.setDoOutput(true);
 
-            OutputStream outputStream = con.getOutputStream();
-            byte[] input = jsonData.getBytes(StandardCharsets.UTF_8);
+            final OutputStream outputStream = con.getOutputStream();
+            final byte[] input = jsonData.getBytes(StandardCharsets.UTF_8);
             outputStream.write(input, 0, input.length);
         }
         // read response
-        int responseCode = con.getResponseCode();
+        final int responseCode = con.getResponseCode();
         InputStream inputStream = null;
         inputStream =  con.getInputStream();
-        StringBuilder response = new StringBuilder();
+        final StringBuilder response = new StringBuilder();
         if (inputStream != null) {
             try (BufferedReader in = new BufferedReader(new InputStreamReader(inputStream))) {
                 String inputLine = "";
@@ -200,28 +199,25 @@ public class ScriptTest extends JexlTestCase {
         for(int port = 8001; server == null && port < 8127; ++port) {
             try {
                 server = HttpServer.create(new InetSocketAddress("localhost", port), 0);
-            } catch (java.net.BindException xbind) {
+            } catch (final java.net.BindException xbind) {
                 xlatest = xbind;
             }
         }
         if (server == null) {
             throw xlatest;
         }
-        ThreadPoolExecutor threadPoolExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(1);
-        server.createContext("/test", new HttpHandler() {
-            @Override
-            public void handle(HttpExchange httpExchange) throws IOException {
-                if ("POST".equals(httpExchange.getRequestMethod())) {
-                    try (OutputStream outputStream = httpExchange.getResponseBody()) {
-                        String json = responder.apply(httpExchange);
-                        httpExchange.sendResponseHeaders(200, json.length());
-                        outputStream.write(json.toString().getBytes());
-                        outputStream.flush();
-                    }
-                } else {
-                    // error
-                    httpExchange.sendResponseHeaders(500, 0);
+        final ThreadPoolExecutor threadPoolExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(1);
+        server.createContext("/test", httpExchange -> {
+            if ("POST".equals(httpExchange.getRequestMethod())) {
+                try (OutputStream outputStream = httpExchange.getResponseBody()) {
+                    final String json = responder.apply(httpExchange);
+                    httpExchange.sendResponseHeaders(200, json.length());
+                    outputStream.write(json.toString().getBytes());
+                    outputStream.flush();
                 }
+            } else {
+                // error
+                httpExchange.sendResponseHeaders(500, 0);
             }
         });
         server.setExecutor(threadPoolExecutor);

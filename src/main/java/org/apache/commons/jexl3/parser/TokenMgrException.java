@@ -84,12 +84,12 @@ public class TokenMgrException extends RuntimeException implements JavaccError {
      */
     @Override
     public String getMessage() {
-        return ("Lexical error at line "
+        return "Lexical error at line "
                 + line + ", column "
                 + column + ".  Encountered: "
                 + (eof ? "<EOF> "
-                   : (StringParser.escapeString(String.valueOf(current), '"')) + " (" + (int) current + "), ")
-                + "after : " + StringParser.escapeString(after, '"'));
+                   : StringParser.escapeString(String.valueOf(current), '"') + " (" + (int) current + "), ")
+                + "after : " + StringParser.escapeString(after, '"');
     }
 
 

@@ -54,7 +54,7 @@ public abstract class JexlNode extends SimpleNode {
     public void jjtSetFirstToken(final Token t) {
         // 0xc = 12, 12 bits -> 4096
         // 0xfff, 12 bits mask
-        this.lc = (t.beginLine << 0xc) | (0xfff & t.beginColumn);
+        this.lc = t.beginLine << 0xc | 0xfff & t.beginColumn;
     }
 
     public void jjtSetLastToken(final Token t) {
@@ -145,7 +145,7 @@ public abstract class JexlNode extends SimpleNode {
         if (literal) {
             for (int n = 0; n < jjtGetNumChildren(); ++n) {
                 final JexlNode child = jjtGetChild(n);
-                if ((child instanceof ASTReference) || (child instanceof ASTMapEntry)) {
+                if (child instanceof ASTReference || child instanceof ASTMapEntry) {
                     final boolean is = child.isConstant(true);
                     if (!is) {
                         return false;

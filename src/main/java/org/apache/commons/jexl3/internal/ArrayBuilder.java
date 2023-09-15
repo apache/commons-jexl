@@ -131,7 +131,7 @@ public class ArrayBuilder implements JexlArithmetic.ArrayBuilder {
             return list;
         }
         // convert untyped array to the common class if not Object.class
-        if ((commonClass == null) || Object.class.equals(commonClass)) {
+        if (commonClass == null || Object.class.equals(commonClass)) {
             return untyped.clone();
         }
         final int size = added;

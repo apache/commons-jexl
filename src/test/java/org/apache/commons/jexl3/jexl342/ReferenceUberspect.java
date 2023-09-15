@@ -60,16 +60,16 @@ public class ReferenceUberspect implements JexlUberspect {
      * Constructor.
      * @param jexlUberspect the uberspect to delegate to
      */
-    public ReferenceUberspect(JexlUberspect jexlUberspect) {
+    public ReferenceUberspect(final JexlUberspect jexlUberspect) {
         uberspect = jexlUberspect;
-        PropertyResolver find = new PropertyResolver() {
+        final PropertyResolver find = new PropertyResolver() {
             @Override
-            public JexlPropertyGet getPropertyGet(JexlUberspect uber, Object obj, Object identifier) {
+            public JexlPropertyGet getPropertyGet(final JexlUberspect uber, final Object obj, final Object identifier) {
                 return discoverFind(uberspect, obj.getClass(), identifier.toString());
             }
 
             @Override
-            public JexlPropertySet getPropertySet(JexlUberspect uber, Object obj, Object identifier, Object arg) {
+            public JexlPropertySet getPropertySet(final JexlUberspect uber, final Object obj, final Object identifier, final Object arg) {
                 return null;
             }
         };
@@ -95,7 +95,7 @@ public class ReferenceUberspect implements JexlUberspect {
      * A JEXL strategy improved with optionals/references.
      */
     @Override
-    public List<PropertyResolver> getResolvers(JexlOperator op, Object obj) {
+    public List<PropertyResolver> getResolvers(final JexlOperator op, final Object obj) {
         if (op == JexlOperator.ARRAY_GET) {
             return mapStrategy;
         }
@@ -126,7 +126,7 @@ public class ReferenceUberspect implements JexlUberspect {
      * @param ref the reference
      * @return the handler or null if object can not be handled
      */
-    private static ReferenceHandler discoverHandler(Object ref) {
+    private static ReferenceHandler discoverHandler(final Object ref) {
         // optional support
         if (ref instanceof Optional<?>) {
             return ReferenceUberspect::handleOptional;
@@ -148,9 +148,9 @@ public class ReferenceUberspect implements JexlUberspect {
      * @param ref the reference
      * @return the get() result
      */
-    static Object handleOptional(Object ref) {
+    static Object handleOptional(final Object ref) {
         // optional support
-        Optional<?> optional = (Optional<?>) ref;
+        final Optional<?> optional = (Optional<?>) ref;
         return optional.isPresent() ? optional.get() : null;
     }
 
@@ -159,8 +159,8 @@ public class ReferenceUberspect implements JexlUberspect {
      * @param ref the reference
      * @return the get() result if not null, ref otherwise
      */
-    static Object handleAtomic(Object ref) {
-        Object obj = ((AtomicReference<?>) ref).get();
+    static Object handleAtomic(final Object ref) {
+        final Object obj = ((AtomicReference<?>) ref).get();
         return obj == null ? ref : obj;
     }
 
@@ -169,13 +169,13 @@ public class ReferenceUberspect implements JexlUberspect {
      * @param ref the reference
      * @return the get() result if not null, ref otherwise
      */
-    static Object handleReference(Object ref) {
-        Object obj = ((Reference<?>) ref).get();
+    static Object handleReference(final Object ref) {
+        final Object obj = ((Reference<?>) ref).get();
         return obj == null ? ref : obj;
     }
 
     @Override
-    public void setClassLoader(ClassLoader loader) {
+    public void setClassLoader(final ClassLoader loader) {
         uberspect.setClassLoader(loader);
     }
 
@@ -190,19 +190,19 @@ public class ReferenceUberspect implements JexlUberspect {
     }
 
     @Override
-    public JexlMethod getConstructor(Object ctorHandle, Object... args) {
+    public JexlMethod getConstructor(final Object ctorHandle, final Object... args) {
         return uberspect.getConstructor(ctorHandle, args);
     }
 
     @Override
-    public JexlMethod getMethod(Object ref, String method, Object... args) {
+    public JexlMethod getMethod(final Object ref, final String method, final Object... args) {
         // is this is a reference of some kind?
-        ReferenceHandler handler = discoverHandler(ref);
+        final ReferenceHandler handler = discoverHandler(ref);
         if (handler == null) {
             return uberspect.getMethod(ref, method, args);
         }
         // do we have an object referenced ?
-        Object obj = handler.callGet(ref);
+        final Object obj = handler.callGet(ref);
         if (ref == obj) {
             return null;
         }
@@ -219,19 +219,19 @@ public class ReferenceUberspect implements JexlUberspect {
     }
 
     @Override
-    public JexlPropertyGet getPropertyGet(Object obj, Object identifier) {
+    public JexlPropertyGet getPropertyGet(final Object obj, final Object identifier) {
         return getPropertyGet(null, obj, identifier);
     }
 
     @Override
-    public JexlPropertyGet getPropertyGet(List<PropertyResolver> resolvers, Object ref, Object identifier) {
+    public JexlPropertyGet getPropertyGet(final List<PropertyResolver> resolvers, final Object ref, final Object identifier) {
         // is this is a reference of some kind?
-        ReferenceHandler handler = discoverHandler(ref);
+        final ReferenceHandler handler = discoverHandler(ref);
         if (handler == null) {
             return uberspect.getPropertyGet(resolvers, ref, identifier);
         }
         // do we have an object referenced ?
-        Object obj = handler.callGet(ref);
+        final Object obj = handler.callGet(ref);
         if (ref == obj) {
             return null;
         }
@@ -252,19 +252,19 @@ public class ReferenceUberspect implements JexlUberspect {
     }
 
     @Override
-    public JexlPropertySet getPropertySet(Object obj, Object identifier, Object arg) {
+    public JexlPropertySet getPropertySet(final Object obj, final Object identifier, final Object arg) {
         return getPropertySet(null, obj, identifier, arg);
     }
 
     @Override
-    public JexlPropertySet getPropertySet(List<PropertyResolver> resolvers, Object ref, Object identifier, Object arg) {
+    public JexlPropertySet getPropertySet(final List<PropertyResolver> resolvers, final Object ref, final Object identifier, final Object arg) {
         // is this is a reference of some kind?
-        ReferenceHandler handler = discoverHandler(ref);
+        final ReferenceHandler handler = discoverHandler(ref);
         if (handler == null) {
             return uberspect.getPropertySet(resolvers, ref, identifier, arg);
         }
         // do we have an object referenced ?
-        Object obj = handler.callGet(ref);
+        final Object obj = handler.callGet(ref);
         if (ref  == obj) {
             return null;
         }
@@ -283,14 +283,14 @@ public class ReferenceUberspect implements JexlUberspect {
     }
 
     @Override
-    public Iterator<?> getIterator(Object ref) {
+    public Iterator<?> getIterator(final Object ref) {
         // is this is a reference of some kind?
-        ReferenceHandler handler = discoverHandler(ref);
+        final ReferenceHandler handler = discoverHandler(ref);
         if (handler == null) {
             return uberspect.getIterator(ref);
         }
         // do we have an object referenced ?
-        Object obj = handler.callGet(ref);
+        final Object obj = handler.callGet(ref);
         if (ref == obj) {
             return null;
         }
@@ -301,7 +301,7 @@ public class ReferenceUberspect implements JexlUberspect {
     }
 
     @Override
-    public JexlArithmetic.Uberspect getArithmetic(JexlArithmetic arithmetic) {
+    public JexlArithmetic.Uberspect getArithmetic(final JexlArithmetic arithmetic) {
         return uberspect.getArithmetic(arithmetic);
     }
 
@@ -342,17 +342,17 @@ public class ReferenceUberspect implements JexlUberspect {
             final String name = sb.toString();
             return new JexlPropertyGet() {
                 @Override
-                public Object invoke(Object obj) throws Exception {
+                public Object invoke(final Object obj) throws Exception {
                     return getter.invoke(obj);
                 }
 
                 @Override
-                public Object tryInvoke(Object obj, Object key) throws JexlException.TryFailed {
+                public Object tryInvoke(final Object obj, final Object key) throws JexlException.TryFailed {
                     return !Objects.equals(property, key) ? JexlEngine.TRY_FAILED : getter.tryInvoke(name, obj);
                 }
 
                 @Override
-                public boolean tryFailed(Object rval) {
+                public boolean tryFailed(final Object rval) {
                     return rval == JexlEngine.TRY_FAILED;
                 }
 

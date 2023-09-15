@@ -35,13 +35,13 @@ public class OptionalNullGetter implements JexlPropertyGet {
     /** The result when we solve it. */
     private JexlPropertyGet delegate;
 
-    OptionalNullGetter(JexlUberspect jexlUberspect, Object key) {
+    OptionalNullGetter(final JexlUberspect jexlUberspect, final Object key) {
         uberspect = jexlUberspect;
         property = key;
     }
 
     @Override
-    public Object invoke(Object obj) throws Exception {
+    public Object invoke(final Object obj) throws Exception {
         if (obj == null) {
             return null;
         }
@@ -55,7 +55,7 @@ public class OptionalNullGetter implements JexlPropertyGet {
     }
 
     @Override
-    public Object tryInvoke(Object obj, Object key) throws JexlException.TryFailed {
+    public Object tryInvoke(final Object obj, final Object key) throws JexlException.TryFailed {
         if (obj == null) {
             return null;
         }
@@ -63,7 +63,7 @@ public class OptionalNullGetter implements JexlPropertyGet {
     }
 
     @Override
-    public boolean tryFailed(Object rval) {
+    public boolean tryFailed(final Object rval) {
         return delegate != null ? delegate.tryFailed(rval) : JexlEngine.TRY_FAILED == rval;
     }
 

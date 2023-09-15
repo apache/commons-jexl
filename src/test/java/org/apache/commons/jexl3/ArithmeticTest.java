@@ -53,7 +53,7 @@ public class ArithmeticTest extends JexlTestCase {
         super("ArithmeticTest");
         asserter = new Asserter(JEXL);
         jexla = JEXL.getArithmetic();
-        JexlOptions options = new JexlOptions();
+        final JexlOptions options = new JexlOptions();
         options.setStrictArithmetic(false);
         jexlb = jexla.options(options);
     }
@@ -63,18 +63,18 @@ public class ArithmeticTest extends JexlTestCase {
     public void setUp() {
     }
 
-    static private void assertNullOperand(java.util.function.Supplier<Object> fun) {
+    static private void assertNullOperand(final java.util.function.Supplier<Object> fun) {
         try {
             Assert.assertNull(fun.get());
-        } catch (JexlArithmetic.NullOperand xany) {
+        } catch (final JexlArithmetic.NullOperand xany) {
             Assert.assertNotNull(xany);
         }
     }
 
-    static private void assertArithmeticException(java.util.function.Supplier<Object> fun) {
+    static private void assertArithmeticException(final java.util.function.Supplier<Object> fun) {
         try {
             Assert.assertNull(fun.get());
-        } catch (ArithmeticException xany) {
+        } catch (final ArithmeticException xany) {
             Assert.assertNotNull(xany);
         }
     }
@@ -156,7 +156,7 @@ public class ArithmeticTest extends JexlTestCase {
         assertArithmeticException(() -> jexla.toInteger(date));
         Assert.assertEquals(0, jexla.toInteger(Double.NaN));
         Assert.assertEquals(0, jexla.toInteger(""));
-        Assert.assertEquals((int) 'b', jexla.toInteger('b'));
+        Assert.assertEquals('b', jexla.toInteger('b'));
         Assert.assertEquals(1, jexla.toInteger(new AtomicBoolean(true)));
         Assert.assertEquals(0, jexla.toInteger(new AtomicBoolean(false)));
 
@@ -333,25 +333,25 @@ public class ArithmeticTest extends JexlTestCase {
      */
     @Test
     public void testUnaryMinus() throws Exception {
-        asserter.setVariable("aByte", new Byte((byte) 1));
-        asserter.setVariable("aShort", new Short((short) 2));
-        asserter.setVariable("anInteger", new Integer(3));
-        asserter.setVariable("aLong", new Long(4));
-        asserter.setVariable("aFloat", new Float(5.5));
-        asserter.setVariable("aDouble", new Double(6.6));
+        asserter.setVariable("aByte", Byte.valueOf((byte) 1));
+        asserter.setVariable("aShort", Short.valueOf((short) 2));
+        asserter.setVariable("anInteger", Integer.valueOf(3));
+        asserter.setVariable("aLong", Long.valueOf(4));
+        asserter.setVariable("aFloat", Float.valueOf((float) 5.5));
+        asserter.setVariable("aDouble", Double.valueOf(6.6));
         asserter.setVariable("aBigInteger", new BigInteger("7"));
         asserter.setVariable("aBigDecimal", new BigDecimal("8.8"));
 
         // loop to allow checking caching of constant numerals (debug)
         for(int i = 0 ; i < 2; ++i) {
-            asserter.assertExpression("-3", new Integer("-3"));
-            asserter.assertExpression("-3.0", new Double("-3.0"));
-            asserter.assertExpression("-aByte", new Byte((byte) -1));
-            asserter.assertExpression("-aShort", new Short((short) -2));
-            asserter.assertExpression("-anInteger", new Integer(-3));
-            asserter.assertExpression("-aLong", new Long(-4));
-            asserter.assertExpression("-aFloat", new Float(-5.5));
-            asserter.assertExpression("-aDouble", new Double(-6.6));
+            asserter.assertExpression("-3", Integer.valueOf("-3"));
+            asserter.assertExpression("-3.0", Double.valueOf("-3.0"));
+            asserter.assertExpression("-aByte", Byte.valueOf((byte) -1));
+            asserter.assertExpression("-aShort", Short.valueOf((short) -2));
+            asserter.assertExpression("-anInteger", Integer.valueOf(-3));
+            asserter.assertExpression("-aLong", Long.valueOf(-4));
+            asserter.assertExpression("-aFloat", Float.valueOf((float) -5.5));
+            asserter.assertExpression("-aDouble", Double.valueOf(-6.6));
             asserter.assertExpression("-aBigInteger", new BigInteger("-7"));
             asserter.assertExpression("-aBigDecimal", new BigDecimal("-8.8"));
         }
@@ -362,25 +362,25 @@ public class ArithmeticTest extends JexlTestCase {
      */
     @Test
     public void testUnaryPlus() throws Exception {
-        asserter.setVariable("aByte", new Byte((byte) 1));
-        asserter.setVariable("aShort", new Short((short) 2));
-        asserter.setVariable("anInteger", new Integer(3));
-        asserter.setVariable("aLong", new Long(4));
-        asserter.setVariable("aFloat", new Float(5.5));
-        asserter.setVariable("aDouble", new Double(6.6));
+        asserter.setVariable("aByte", Byte.valueOf((byte) 1));
+        asserter.setVariable("aShort", Short.valueOf((short) 2));
+        asserter.setVariable("anInteger", Integer.valueOf(3));
+        asserter.setVariable("aLong", Long.valueOf(4));
+        asserter.setVariable("aFloat", Float.valueOf((float) 5.5));
+        asserter.setVariable("aDouble", Double.valueOf(6.6));
         asserter.setVariable("aBigInteger", new BigInteger("7"));
         asserter.setVariable("aBigDecimal", new BigDecimal("8.8"));
 
         // loop to allow checking caching of constant numerals (debug)
         for(int i = 0 ; i < 2; ++i) {
-            asserter.assertExpression("+3", new Integer("3"));
-            asserter.assertExpression("+3.0", new Double("3.0"));
-            asserter.assertExpression("+aByte", new Integer(1));
-            asserter.assertExpression("+aShort", new Integer(2));
-            asserter.assertExpression("+anInteger", new Integer(3));
-            asserter.assertExpression("+aLong", new Long(4));
-            asserter.assertExpression("+aFloat", new Float(5.5));
-            asserter.assertExpression("+aDouble", new Double(6.6));
+            asserter.assertExpression("+3", Integer.valueOf("3"));
+            asserter.assertExpression("+3.0", Double.valueOf("3.0"));
+            asserter.assertExpression("+aByte", Integer.valueOf(1));
+            asserter.assertExpression("+aShort", Integer.valueOf(2));
+            asserter.assertExpression("+anInteger", Integer.valueOf(3));
+            asserter.assertExpression("+aLong", Long.valueOf(4));
+            asserter.assertExpression("+aFloat", Float.valueOf((float) 5.5));
+            asserter.assertExpression("+aDouble", Double.valueOf(6.6));
             asserter.assertExpression("+aBigInteger", new BigInteger("7"));
             asserter.assertExpression("+aBigDecimal", new BigDecimal("8.8"));
         }
@@ -388,22 +388,22 @@ public class ArithmeticTest extends JexlTestCase {
 
     @Test
     public void testMinusMinusPrefix() throws Exception {
-        asserter.setVariable("aByte", new Byte((byte) 2));
-        asserter.setVariable("aShort", new Short((short) 3));
-        asserter.setVariable("anInteger", new Integer(4));
-        asserter.setVariable("aLong", new Long(5));
-        asserter.setVariable("aFloat", new Float(6.6));
-        asserter.setVariable("aDouble", new Double(7.7));
+        asserter.setVariable("aByte", Byte.valueOf((byte) 2));
+        asserter.setVariable("aShort", Short.valueOf((short) 3));
+        asserter.setVariable("anInteger", Integer.valueOf(4));
+        asserter.setVariable("aLong", Long.valueOf(5));
+        asserter.setVariable("aFloat", Float.valueOf((float) 6.6));
+        asserter.setVariable("aDouble", Double.valueOf(7.7));
         asserter.setVariable("aBigInteger", new BigInteger("8"));
         asserter.setVariable("aBigDecimal", new BigDecimal("9.9"));
         asserter.setVariable("aString", "forty-two");
 
-        asserter.assertExpression("--aByte", new Byte((byte) 1));
-        asserter.assertExpression("--aShort", new Short((short) 2));
-        asserter.assertExpression("--anInteger", new Integer(3));
-        asserter.assertExpression("--aLong", new Long(4));
-        asserter.assertExpression("--aFloat", new Float(5.6));
-        asserter.assertExpression("--aDouble", new Double(6.7));
+        asserter.assertExpression("--aByte", Byte.valueOf((byte) 1));
+        asserter.assertExpression("--aShort", Short.valueOf((short) 2));
+        asserter.assertExpression("--anInteger", Integer.valueOf(3));
+        asserter.assertExpression("--aLong", Long.valueOf(4));
+        asserter.assertExpression("--aFloat", Float.valueOf((float) 5.6));
+        asserter.assertExpression("--aDouble", Double.valueOf(6.7));
         asserter.assertExpression("--aBigInteger", new BigInteger("7"));
         asserter.assertExpression("--aBigDecimal", new BigDecimal("8.9"));
 
@@ -412,31 +412,31 @@ public class ArithmeticTest extends JexlTestCase {
 
     @Test
     public void testMinusMinusPostfix() throws Exception {
-        asserter.setVariable("aByte", new Byte((byte) 2));
-        asserter.setVariable("aShort", new Short((short) 3));
-        asserter.setVariable("anInteger", new Integer(4));
-        asserter.setVariable("aLong", new Long(5));
-        asserter.setVariable("aFloat", new Float(6.6));
-        asserter.setVariable("aDouble", new Double(7.7));
+        asserter.setVariable("aByte", Byte.valueOf((byte) 2));
+        asserter.setVariable("aShort", Short.valueOf((short) 3));
+        asserter.setVariable("anInteger", Integer.valueOf(4));
+        asserter.setVariable("aLong", Long.valueOf(5));
+        asserter.setVariable("aFloat", Float.valueOf((float) 6.6));
+        asserter.setVariable("aDouble", Double.valueOf(7.7));
         asserter.setVariable("aBigInteger", new BigInteger("8"));
         asserter.setVariable("aBigDecimal", new BigDecimal("9.9"));
         asserter.setVariable("aString", "forty-two");
 
-        asserter.assertExpression("aByte--",new Byte((byte) 2));
-        asserter.assertExpression("aShort--", new Short((short) 3));
-        asserter.assertExpression("anInteger--", new Integer(4));
-        asserter.assertExpression("aLong--", new Long(5));
-        asserter.assertExpression("aFloat--", new Float(6.6));
-        asserter.assertExpression("aDouble--", new Double(7.7));
+        asserter.assertExpression("aByte--",Byte.valueOf((byte) 2));
+        asserter.assertExpression("aShort--", Short.valueOf((short) 3));
+        asserter.assertExpression("anInteger--", Integer.valueOf(4));
+        asserter.assertExpression("aLong--", Long.valueOf(5));
+        asserter.assertExpression("aFloat--", Float.valueOf((float) 6.6));
+        asserter.assertExpression("aDouble--", Double.valueOf(7.7));
         asserter.assertExpression("aBigInteger--", new BigInteger("8"));
         asserter.assertExpression("aBigDecimal--", new BigDecimal("9.9"));
 
-        asserter.assertExpression("aByte", new Byte((byte) 1));
-        asserter.assertExpression("aShort", new Short((short) 2));
-        asserter.assertExpression("anInteger", new Integer(3));
-        asserter.assertExpression("aLong", new Long(4));
-        asserter.assertExpression("aFloat", new Float(5.6));
-        asserter.assertExpression("aDouble", new Double(6.7));
+        asserter.assertExpression("aByte", Byte.valueOf((byte) 1));
+        asserter.assertExpression("aShort", Short.valueOf((short) 2));
+        asserter.assertExpression("anInteger", Integer.valueOf(3));
+        asserter.assertExpression("aLong", Long.valueOf(4));
+        asserter.assertExpression("aFloat", Float.valueOf((float) 5.6));
+        asserter.assertExpression("aDouble", Double.valueOf(6.7));
         asserter.assertExpression("aBigInteger", new BigInteger("7"));
         asserter.assertExpression("aBigDecimal", new BigDecimal("8.9"));
 
@@ -445,22 +445,22 @@ public class ArithmeticTest extends JexlTestCase {
 
     @Test
     public void testPlusPlusPrefix() throws Exception {
-        asserter.setVariable("aByte", new Byte((byte) 0));
-        asserter.setVariable("aShort", new Short((short) 1));
-        asserter.setVariable("anInteger", new Integer(2));
-        asserter.setVariable("aLong", new Long(3));
-        asserter.setVariable("aFloat", new Float(4.4));
-        asserter.setVariable("aDouble", new Double(5.5));
+        asserter.setVariable("aByte", Byte.valueOf((byte) 0));
+        asserter.setVariable("aShort", Short.valueOf((short) 1));
+        asserter.setVariable("anInteger", Integer.valueOf(2));
+        asserter.setVariable("aLong", Long.valueOf(3));
+        asserter.setVariable("aFloat", Float.valueOf((float) 4.4));
+        asserter.setVariable("aDouble", Double.valueOf(5.5));
         asserter.setVariable("aBigInteger", new BigInteger("6"));
         asserter.setVariable("aBigDecimal", new BigDecimal("7.7"));
         asserter.setVariable("aString", "forty-two");
 
-        asserter.assertExpression("++aByte", new Byte((byte) 1));
-        asserter.assertExpression("++aShort", new Short((short) 2));
-        asserter.assertExpression("++anInteger", new Integer(3));
-        asserter.assertExpression("++aLong", new Long(4));
-        asserter.assertExpression("++aFloat", new Float(5.4));
-        asserter.assertExpression("++aDouble", new Double(6.5));
+        asserter.assertExpression("++aByte", Byte.valueOf((byte) 1));
+        asserter.assertExpression("++aShort", Short.valueOf((short) 2));
+        asserter.assertExpression("++anInteger", Integer.valueOf(3));
+        asserter.assertExpression("++aLong", Long.valueOf(4));
+        asserter.assertExpression("++aFloat", Float.valueOf((float) 5.4));
+        asserter.assertExpression("++aDouble", Double.valueOf(6.5));
         asserter.assertExpression("++aBigInteger", new BigInteger("7"));
         asserter.assertExpression("++aBigDecimal", new BigDecimal("8.7"));
 
@@ -469,31 +469,31 @@ public class ArithmeticTest extends JexlTestCase {
 
     @Test
     public void testPlusPlusPostfix() throws Exception {
-        asserter.setVariable("aByte", new Byte((byte) 0));
-        asserter.setVariable("aShort", new Short((short) 1));
-        asserter.setVariable("anInteger", new Integer(2));
-        asserter.setVariable("aLong", new Long(3));
-        asserter.setVariable("aFloat", new Float(4.4));
-        asserter.setVariable("aDouble", new Double(5.5));
+        asserter.setVariable("aByte", Byte.valueOf((byte) 0));
+        asserter.setVariable("aShort", Short.valueOf((short) 1));
+        asserter.setVariable("anInteger", Integer.valueOf(2));
+        asserter.setVariable("aLong", Long.valueOf(3));
+        asserter.setVariable("aFloat", Float.valueOf((float) 4.4));
+        asserter.setVariable("aDouble", Double.valueOf(5.5));
         asserter.setVariable("aBigInteger", new BigInteger("6"));
         asserter.setVariable("aBigDecimal", new BigDecimal("7.7"));
         asserter.setVariable("aString", "forty-two");
 
-        asserter.assertExpression("aByte++", new Byte((byte) 0));
-        asserter.assertExpression("aShort++", new Short((short) 1));
-        asserter.assertExpression("anInteger++", new Integer(2));
-        asserter.assertExpression("aLong++", new Long(3));
-        asserter.assertExpression("aFloat++", new Float(4.4));
-        asserter.assertExpression("aDouble++", new Double(5.5));
+        asserter.assertExpression("aByte++", Byte.valueOf((byte) 0));
+        asserter.assertExpression("aShort++", Short.valueOf((short) 1));
+        asserter.assertExpression("anInteger++", Integer.valueOf(2));
+        asserter.assertExpression("aLong++", Long.valueOf(3));
+        asserter.assertExpression("aFloat++", Float.valueOf((float) 4.4));
+        asserter.assertExpression("aDouble++", Double.valueOf(5.5));
         asserter.assertExpression("aBigInteger++", new BigInteger("6"));
         asserter.assertExpression("aBigDecimal++", new BigDecimal("7.7"));
 
-        asserter.assertExpression("aByte", new Byte((byte) 1));
-        asserter.assertExpression("aShort", new Short((short) 2));
-        asserter.assertExpression("anInteger", new Integer(3));
-        asserter.assertExpression("aLong", new Long(4));
-        asserter.assertExpression("aFloat", new Float(5.4));
-        asserter.assertExpression("aDouble", new Double(6.5));
+        asserter.assertExpression("aByte", Byte.valueOf((byte) 1));
+        asserter.assertExpression("aShort", Short.valueOf((short) 2));
+        asserter.assertExpression("anInteger", Integer.valueOf(3));
+        asserter.assertExpression("aLong", Long.valueOf(4));
+        asserter.assertExpression("aFloat", Float.valueOf((float) 5.4));
+        asserter.assertExpression("aDouble", Double.valueOf(6.5));
         asserter.assertExpression("aBigInteger", new BigInteger("7"));
         asserter.assertExpression("aBigDecimal", new BigDecimal("8.7"));
 
@@ -502,7 +502,7 @@ public class ArithmeticTest extends JexlTestCase {
 
     @Test
     public void testNarrowBig() throws Exception {
-        List<String> ls = Arrays.asList("zero", "one", "two");
+        final List<String> ls = Arrays.asList("zero", "one", "two");
         asserter.setVariable("list",ls);
         asserter.setVariable("aBigDecimal", new BigDecimal("1"));
         asserter.setVariable("aBigInteger", new BigDecimal("1"));
@@ -533,67 +533,67 @@ public class ArithmeticTest extends JexlTestCase {
          * test new null coersion
          */
         asserter.setVariable("imanull", null);
-        asserter.assertExpression("imanull + 2", new Integer(2));
-        asserter.assertExpression("imanull + imanull", new Integer(0));
-        asserter.setVariable("foo", new Integer(2));
+        asserter.assertExpression("imanull + 2", Integer.valueOf(2));
+        asserter.assertExpression("imanull + imanull", Integer.valueOf(0));
+        asserter.setVariable("foo", Integer.valueOf(2));
 
-        asserter.assertExpression("foo + 2", new Integer(4));
-        asserter.assertExpression("3 + 3", new Integer(6));
-        asserter.assertExpression("3 + 3 + foo", new Integer(8));
-        asserter.assertExpression("3 * 3", new Integer(9));
-        asserter.assertExpression("3 * 3 + foo", new Integer(11));
-        asserter.assertExpression("3 * 3 - foo", new Integer(7));
+        asserter.assertExpression("foo + 2", Integer.valueOf(4));
+        asserter.assertExpression("3 + 3", Integer.valueOf(6));
+        asserter.assertExpression("3 + 3 + foo", Integer.valueOf(8));
+        asserter.assertExpression("3 * 3", Integer.valueOf(9));
+        asserter.assertExpression("3 * 3 + foo", Integer.valueOf(11));
+        asserter.assertExpression("3 * 3 - foo", Integer.valueOf(7));
 
         /*
          * test parenthesized exprs
          */
-        asserter.assertExpression("(4 + 3) * 6", new Integer(42));
-        asserter.assertExpression("(8 - 2) * 7", new Integer(42));
+        asserter.assertExpression("(4 + 3) * 6", Integer.valueOf(42));
+        asserter.assertExpression("(8 - 2) * 7", Integer.valueOf(42));
 
         /*
          * test some floaty stuff
          */
-        asserter.assertExpression("3 * \"3.0\"", new Double(9));
-        asserter.assertExpression("3 * 3.0", new Double(9));
+        asserter.assertExpression("3 * \"3.0\"", Double.valueOf(9));
+        asserter.assertExpression("3 * 3.0", Double.valueOf(9));
 
         /*
          * test / and %
          */
         asserter.setStrict(false, false);
-        asserter.assertExpression("6 / 3", new Integer(6 / 3));
-        asserter.assertExpression("6.4 / 3", new Double(6.4 / 3));
-        asserter.assertExpression("0 / 3", new Integer(0 / 3));
-        asserter.assertExpression("3 / 0", new Double(0));
-        asserter.assertExpression("4 % 3", new Integer(1));
-        asserter.assertExpression("4.8 % 3", new Double(4.8 % 3));
+        asserter.assertExpression("6 / 3", Integer.valueOf(6 / 3));
+        asserter.assertExpression("6.4 / 3", Double.valueOf(6.4 / 3));
+        asserter.assertExpression("0 / 3", Integer.valueOf(0 / 3));
+        asserter.assertExpression("3 / 0", Double.valueOf(0));
+        asserter.assertExpression("4 % 3", Integer.valueOf(1));
+        asserter.assertExpression("4.8 % 3", Double.valueOf(4.8 % 3));
 
     }
 
     @Test
     public void testCoercions() throws Exception {
-        asserter.assertExpression("1", new Integer(1)); // numerics default to Integer
-        asserter.assertExpression("5L", new Long(5));
+        asserter.assertExpression("1", Integer.valueOf(1)); // numerics default to Integer
+        asserter.assertExpression("5L", Long.valueOf(5));
 
-        asserter.setVariable("I2", new Integer(2));
-        asserter.setVariable("L2", new Long(2));
-        asserter.setVariable("L3", new Long(3));
+        asserter.setVariable("I2", Integer.valueOf(2));
+        asserter.setVariable("L2", Long.valueOf(2));
+        asserter.setVariable("L3", Long.valueOf(3));
         asserter.setVariable("B10", BigInteger.TEN);
 
         // Integer & Integer => Integer
-        asserter.assertExpression("I2 + 2", new Integer(4));
-        asserter.assertExpression("I2 * 2", new Integer(4));
-        asserter.assertExpression("I2 - 2", new Integer(0));
-        asserter.assertExpression("I2 / 2", new Integer(1));
+        asserter.assertExpression("I2 + 2", Integer.valueOf(4));
+        asserter.assertExpression("I2 * 2", Integer.valueOf(4));
+        asserter.assertExpression("I2 - 2", Integer.valueOf(0));
+        asserter.assertExpression("I2 / 2", Integer.valueOf(1));
 
         // Integer & Long => Long
-        asserter.assertExpression("I2 * L2", new Long(4));
-        asserter.assertExpression("I2 / L2", new Long(1));
+        asserter.assertExpression("I2 * L2", Long.valueOf(4));
+        asserter.assertExpression("I2 / L2", Long.valueOf(1));
 
         // Long & Long => Long
-        asserter.assertExpression("L2 + 3", new Long(5));
-        asserter.assertExpression("L2 + L3", new Long(5));
-        asserter.assertExpression("L2 / L2", new Long(1));
-        asserter.assertExpression("L2 / 2", new Long(1));
+        asserter.assertExpression("L2 + 3", Long.valueOf(5));
+        asserter.assertExpression("L2 + L3", Long.valueOf(5));
+        asserter.assertExpression("L2 / L2", Long.valueOf(1));
+        asserter.assertExpression("L2 / 2", Long.valueOf(1));
 
         // BigInteger
         asserter.assertExpression("B10 / 10", BigInteger.ONE);
@@ -706,21 +706,21 @@ public class ArithmeticTest extends JexlTestCase {
         final JexlEvalContext context = new JexlEvalContext(vars);
         final JexlOptions options = context.getEngineOptions();
         options.setStrictArithmetic(true);
-        vars.put("aByte", new Byte((byte) 1));
-        vars.put("aShort", new Short((short) 2));
-        vars.put("aInteger", new Integer(3));
-        vars.put("aLong", new Long(4));
-        vars.put("aFloat", new Float(5.5));
-        vars.put("aDouble", new Double(6.6));
+        vars.put("aByte", Byte.valueOf((byte) 1));
+        vars.put("aShort", Short.valueOf((short) 2));
+        vars.put("aInteger", Integer.valueOf(3));
+        vars.put("aLong", Long.valueOf(4));
+        vars.put("aFloat", Float.valueOf((float) 5.5));
+        vars.put("aDouble", Double.valueOf(6.6));
         vars.put("aBigInteger", new BigInteger("7"));
         vars.put("aBigDecimal", new BigDecimal("8.8"));
 
-        vars.put("zByte", new Byte((byte) 0));
-        vars.put("zShort", new Short((short) 0));
-        vars.put("zInteger", new Integer(0));
-        vars.put("zLong", new Long(0));
-        vars.put("zFloat", new Float(0));
-        vars.put("zDouble", new Double(0));
+        vars.put("zByte", Byte.valueOf((byte) 0));
+        vars.put("zShort", Short.valueOf((short) 0));
+        vars.put("zInteger", Integer.valueOf(0));
+        vars.put("zLong", Long.valueOf(0));
+        vars.put("zFloat", Float.valueOf(0));
+        vars.put("zDouble", Double.valueOf(0));
         vars.put("zBigInteger", new BigInteger("0"));
         vars.put("zBigDecimal", new BigDecimal("0"));
 
@@ -922,13 +922,13 @@ public class ArithmeticTest extends JexlTestCase {
 
     @Test
     public void testNullArgs() {
-        JexlEngine jexl =  new JexlBuilder().arithmetic(new JexlArithmetic(true) {
-            @Override public boolean isStrict(JexlOperator op) {
+        final JexlEngine jexl =  new JexlBuilder().arithmetic(new JexlArithmetic(true) {
+            @Override public boolean isStrict(final JexlOperator op) {
                 return JexlOperator.ADD == op? false: super.isStrict(op);
             }
         }).create();
-        JexlScript script = jexl.createScript("'1.2' + x ", "x");
-        Object result = script.execute(null);
+        final JexlScript script = jexl.createScript("'1.2' + x ", "x");
+        final Object result = script.execute(null);
         Assert.assertEquals("1.2", result);
     }
 
@@ -1475,7 +1475,7 @@ public class ArithmeticTest extends JexlTestCase {
             if (isFloatingPointNumber(left) || isFloatingPointNumber(right)) {
                 final double l = toDouble(left);
                 final double r = toDouble(right);
-                return new Double(l / r);
+                return Double.valueOf(l / r);
             }
             // otherwise treat as integers
             final BigInteger l = toBigInteger(left);
@@ -1506,7 +1506,7 @@ public class ArithmeticTest extends JexlTestCase {
             if (isFloatingPointNumber(left) || isFloatingPointNumber(right)) {
                 final double l = toDouble(left);
                 final double r = toDouble(right);
-                return new Double(l % r);
+                return Double.valueOf(l % r);
             }
             // otherwise treat as integers
             final BigInteger l = toBigInteger(left);
@@ -1653,7 +1653,7 @@ public class ArithmeticTest extends JexlTestCase {
             info = (Attr) nnm.getNamedItem("info");
             Assert.assertEquals(y, r);
             Assert.assertEquals(y, info.getValue());
-        } catch (JexlException.Property xprop) {
+        } catch (final JexlException.Property xprop) {
             // test fails in java > 11 because modules, etc; need investigation
             Assert.assertTrue(xprop.getMessage().contains("info"));
             Assert.assertTrue(getJavaVersion() > 11);
@@ -1846,10 +1846,10 @@ public class ArithmeticTest extends JexlTestCase {
         final AtomicBoolean ab = new AtomicBoolean(false);
         Object o;
         o = e.execute(jc, ab);
-        Assert.assertEquals("Result is not 2", new Integer(2), o);
+        Assert.assertEquals("Result is not 2", Integer.valueOf(2), o);
         ab.set(true);
         o = e.execute(jc, ab);
-        Assert.assertEquals("Result is not 1", new Integer(1), o);
+        Assert.assertEquals("Result is not 1", Integer.valueOf(1), o);
         // in a binary logical op
         e = JEXL.createScript("x && y", "x", "y");
         ab.set(true);

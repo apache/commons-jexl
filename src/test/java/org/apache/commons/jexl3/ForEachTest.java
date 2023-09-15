@@ -39,26 +39,26 @@ public class ForEachTest extends JexlTestCase {
     }
 
     @Test public void testForLoop0b0() {
-        String src = "(l)->{ for(let x = 0, y = 0; x < 4; ++x) l.add(x) }";
-        JexlEngine jexl = new JexlBuilder().safe(false).create();
-        JexlScript script = jexl.createScript(src);
-        List<Integer> l = new ArrayList<>();
-        Object result = script.execute(null, l);
+        final String src = "(l)->{ for(let x = 0, y = 0; x < 4; ++x) l.add(x) }";
+        final JexlEngine jexl = new JexlBuilder().safe(false).create();
+        final JexlScript script = jexl.createScript(src);
+        final List<Integer> l = new ArrayList<>();
+        final Object result = script.execute(null, l);
         Assert.assertNotNull(result);
         Assert.assertEquals(Arrays.asList(0, 1, 2, 3), l);
-        String resrc = toString(script);
+        final String resrc = toString(script);
         Assert.assertEquals(src, resrc);
     }
 
     @Test public void testForLoop0a() {
-        String src = "(l)->{ for(let x = 0; x < 4; ++x) { l.add(x); } }";
-        JexlEngine jexl = new JexlBuilder().safe(false).create();
-        JexlScript script = jexl.createScript(src);
-        List<Integer> l = new ArrayList<>();
-        Object result = script.execute(null, l);
+        final String src = "(l)->{ for(let x = 0; x < 4; ++x) { l.add(x); } }";
+        final JexlEngine jexl = new JexlBuilder().safe(false).create();
+        final JexlScript script = jexl.createScript(src);
+        final List<Integer> l = new ArrayList<>();
+        final Object result = script.execute(null, l);
         Assert.assertNotNull(result);
         Assert.assertEquals(Arrays.asList(0, 1, 2, 3), l);
-        String resrc = toString(script);
+        final String resrc = toString(script);
         Assert.assertEquals(src, resrc);
     }
 
@@ -134,10 +134,10 @@ public class ForEachTest extends JexlTestCase {
         final JexlScript exs0 = JEXL.createScript("for(var in : list) { x = x + in; }");
         final JexlContext jc = new MapContext();
         jc.set("list", new Object[]{2, 3});
-            jc.set("x", new Integer(1));
+            jc.set("x", Integer.valueOf(1));
         final Object o = exs0.execute(jc);
-            Assert.assertEquals("Result is wrong", new Integer(6), o);
-            Assert.assertEquals("x is wrong", new Integer(6), jc.get("x"));
+            Assert.assertEquals("Result is wrong", Integer.valueOf(6), o);
+            Assert.assertEquals("x is wrong", Integer.valueOf(6), jc.get("x"));
         }
 
     @Test

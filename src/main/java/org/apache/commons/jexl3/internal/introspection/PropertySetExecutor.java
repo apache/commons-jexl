@@ -118,7 +118,7 @@ public class PropertySetExecutor extends AbstractExecutor.Set {
      * @return true if <code>arg</code> is an empty array
      */
     private static boolean isEmptyArray(final Object arg) {
-        return (arg != null && arg.getClass().isArray() && Array.getLength(arg) == 0);
+        return arg != null && arg.getClass().isArray() && Array.getLength(arg) == 0;
     }
 
     /**

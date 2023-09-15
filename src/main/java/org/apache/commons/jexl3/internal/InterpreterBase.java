@@ -105,7 +105,7 @@ public abstract class InterpreterBase extends ParserVisitor {
             );
         }
         if (this.context instanceof JexlContext.NamespaceResolver) {
-            ns = ((JexlContext.NamespaceResolver) context);
+            ns = (JexlContext.NamespaceResolver) context;
         } else {
             ns = JexlEngine.EMPTY_NS;
         }
@@ -358,7 +358,7 @@ public abstract class InterpreterBase extends ParserVisitor {
             if (!context.has(name)) {
                 // not defined, ignore in some cases...
                 final boolean ignore = identifier.jjtGetParent() instanceof ASTReference
-                        || (isSafe() && (symbol >= 0 || identifier.jjtGetParent() instanceof ASTAssignment));
+                        || isSafe() && (symbol >= 0 || identifier.jjtGetParent() instanceof ASTAssignment);
                 if (!ignore) {
                     return undefinedVariable(identifier, name); // undefined
                 }
@@ -1014,7 +1014,7 @@ public abstract class InterpreterBase extends ParserVisitor {
                     + ", property: " + attribute;
             throw new UnsupportedOperationException(error, xcause);
         }
-        final boolean safe = (node instanceof ASTIdentifierAccess) && ((ASTIdentifierAccess) node).isSafe();
+        final boolean safe = node instanceof ASTIdentifierAccess && ((ASTIdentifierAccess) node).isSafe();
         if (safe) {
             return null;
         }

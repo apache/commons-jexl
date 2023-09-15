@@ -36,16 +36,16 @@ public class MapLiteralTest extends JexlTestCase {
 
     @Test
     public void testLiteralWithStrings() throws Exception {
-        List<String> sources = Arrays.asList("{ 'foo' : 'bar' }", "{ 'foo' : 'bar', }");
-        for(String src : sources) {
+        final List<String> sources = Arrays.asList("{ 'foo' : 'bar' }", "{ 'foo' : 'bar', }");
+        for(final String src : sources) {
             final JexlExpression e = JEXL.createExpression(src);
             final Object o = e.evaluate(null);
             Assert.assertEquals(Collections.singletonMap("foo", "bar"), o);
         }
         try {
-            Object ff = JEXL.createExpression("{  : , }");
+            final Object ff = JEXL.createExpression("{  : , }");
             Assert.fail(ff.toString());
-        } catch(JexlException.Parsing parsing) {
+        } catch(final JexlException.Parsing parsing) {
             Assert.assertNotNull(parsing);
         }
     }
@@ -55,8 +55,8 @@ public class MapLiteralTest extends JexlTestCase {
         final Map<String, String> expected = new HashMap<>();
         expected.put("foo", "bar");
         expected.put("eat", "food");
-        List<String> sources = Arrays.asList("{ 'foo' : 'bar', 'eat' : 'food' }", "{ 'foo' : 'bar', 'eat' : 'food', }");
-        for(String src : sources) {
+        final List<String> sources = Arrays.asList("{ 'foo' : 'bar', 'eat' : 'food' }", "{ 'foo' : 'bar', 'eat' : 'food', }");
+        for(final String src : sources) {
             final JexlExpression e = JEXL.createExpression("{ 'foo' : 'bar', 'eat' : 'food' }");
             final Object o = e.evaluate(null);
             Assert.assertEquals(expected, o);
@@ -69,18 +69,18 @@ public class MapLiteralTest extends JexlTestCase {
         final JexlContext jc = new MapContext();
 
         Object o = e.evaluate(jc);
-        Assert.assertEquals(Collections.singletonMap(new Integer(5), new Integer(10)), o);
+        Assert.assertEquals(Collections.singletonMap(Integer.valueOf(5), Integer.valueOf(10)), o);
 
         e = JEXL.createExpression("m = { 3 : 30, 4 : 40, 5 : 'fifty', '7' : 'seven', 7 : 'SEVEN' }");
         e.evaluate(jc);
 
         e = JEXL.createExpression("m.3");
         o = e.evaluate(jc);
-        Assert.assertEquals(new Integer(30), o);
+        Assert.assertEquals(Integer.valueOf(30), o);
 
         e = JEXL.createExpression("m[4]");
         o = e.evaluate(jc);
-        Assert.assertEquals(new Integer(40), o);
+        Assert.assertEquals(Integer.valueOf(40), o);
 
         jc.set("i", Integer.valueOf(5));
         e = JEXL.createExpression("m[i]");
@@ -118,7 +118,7 @@ public class MapLiteralTest extends JexlTestCase {
         final JexlContext jc = new MapContext();
 
         final Object o = e.evaluate(jc);
-        Assert.assertEquals(new Integer(1), o);
+        Assert.assertEquals(Integer.valueOf(1), o);
     }
 
     @Test
@@ -127,7 +127,7 @@ public class MapLiteralTest extends JexlTestCase {
         final JexlContext jc = new MapContext();
 
         final Object o = e.evaluate(jc);
-        Assert.assertEquals(new Integer(1), o);
+        Assert.assertEquals(Integer.valueOf(1), o);
     }
 
     @Test

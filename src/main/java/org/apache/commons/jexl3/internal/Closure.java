@@ -51,7 +51,7 @@ public class Closure extends Script {
      */
     protected Closure(final Script base, final Object[] args) {
         super(base.jexl, base.source, base.script);
-        final Frame sf = (base instanceof Closure) ? ((Closure) base).frame :  null;
+        final Frame sf = base instanceof Closure ? ((Closure) base).frame :  null;
         frame = sf == null
                 ? script.createFrame(args)
                 : sf.assign(args);
@@ -113,8 +113,8 @@ public class Closure extends Script {
      */
     void captureSelfIfRecursive(final Frame parentFrame, final int symbol) {
         if (script instanceof ASTJexlLambda) {
-            Scope parentScope = parentFrame != null ? parentFrame.getScope() : null;
-            Scope localScope = frame != null ? frame.getScope() : null;
+            final Scope parentScope = parentFrame != null ? parentFrame.getScope() : null;
+            final Scope localScope = frame != null ? frame.getScope() : null;
             if (parentScope != null  && localScope != null && parentScope == localScope.getParent()) {
                 final Integer reg = localScope.getCaptured(symbol);
                 if (reg != null) {

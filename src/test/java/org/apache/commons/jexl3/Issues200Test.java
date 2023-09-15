@@ -659,13 +659,13 @@ public class Issues200Test extends JexlTestCase {
 
     @Test
     public void test278() throws Exception {
-        final String[] srcs = new String[]{
+        final String[] srcs = {
             "return union x143('arg',5,6) ",
             "return union y143('arg',5,6)   ;",
             "return union\n z143('arg',5,6)   ;",
             "var f =()->{ return union 143 } foo[0]"
         };
-        final Object[] ctls = new Object[]{
+        final Object[] ctls = {
             "42","42","42", 42
         };
         final JexlEngine jexl = new JexlBuilder().cache(4).create();
@@ -716,7 +716,7 @@ public class Issues200Test extends JexlTestCase {
         Object result;
         JexlScript script;
         final JexlContext ctxt = new Context279();
-        final String[] srcs = new String[]{
+        final String[] srcs = {
             "var z = null; identity(z[0]);",
              "var z = null; z.0;",
              "var z = null; z.foo();",
@@ -932,7 +932,7 @@ public class Issues200Test extends JexlTestCase {
     public void test290a() throws Exception {
         Object result;
         JexlScript script;
-        final String[] srcs = new String[]{
+        final String[] srcs = {
             "(x)->{ x.nothing().toString() }",
             "(x)->{ x.toString().nothing() }",
             "(x)->{ x.nothing().nothing() }",
@@ -963,7 +963,7 @@ public class Issues200Test extends JexlTestCase {
     public void test290b() throws Exception {
         Object result;
         JexlScript script;
-        final String[] srcs = new String[]{
+        final String[] srcs = {
             "(x)->{ x?.nothing()?.toString() }",
             "(x)->{ x.toString()?.nothing() }",
             "(x)->{ x?.nothing().nothing() }",};

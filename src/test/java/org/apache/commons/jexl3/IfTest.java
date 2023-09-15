@@ -41,7 +41,7 @@ public class IfTest extends JexlTestCase {
         final JexlContext jc = new MapContext();
 
         final Object o = e.execute(jc);
-        Assert.assertEquals("Result is not 1", new Integer(1), o);
+        Assert.assertEquals("Result is not 1", Integer.valueOf(1), o);
     }
 
     /**
@@ -69,7 +69,7 @@ public class IfTest extends JexlTestCase {
         final JexlContext jc = new MapContext();
 
         final Object o = e.execute(jc);
-        Assert.assertEquals("Result is not 2", new Integer(2), o);
+        Assert.assertEquals("Result is not 2", Integer.valueOf(2), o);
     }
 
     /**
@@ -97,7 +97,7 @@ public class IfTest extends JexlTestCase {
         final JexlContext jc = new MapContext();
 
         final Object o = e.execute(jc);
-        Assert.assertEquals("Result is wrong", new Integer(3), o);
+        Assert.assertEquals("Result is wrong", Integer.valueOf(3), o);
     }
 
     /**
@@ -109,7 +109,7 @@ public class IfTest extends JexlTestCase {
     public void testIfWithSimpleExpression() throws Exception {
         final JexlScript e = JEXL.createScript("if (x == 1) true;");
         final JexlContext jc = new MapContext();
-        jc.set("x", new Integer(1));
+        jc.set("x", Integer.valueOf(1));
 
         final Object o = e.execute(jc);
         Assert.assertEquals("Result is not true", Boolean.TRUE, o);
@@ -165,7 +165,7 @@ public class IfTest extends JexlTestCase {
     public void testIfWithArithmeticExpression() throws Exception {
         final JexlScript e = JEXL.createScript("if ((x * 2) + 1 == 5) true;");
         final JexlContext jc = new MapContext();
-        jc.set("x", new Integer(2));
+        jc.set("x", Integer.valueOf(2));
 
         final Object o = e.execute(jc);
         Assert.assertEquals("Result is not true", Boolean.TRUE, o);
@@ -180,7 +180,7 @@ public class IfTest extends JexlTestCase {
     public void testIfWithDecimalArithmeticExpression() throws Exception {
         final JexlScript e = JEXL.createScript("if ((x * 2) == 5) true");
         final JexlContext jc = new MapContext();
-        jc.set("x", new Float(2.5f));
+        jc.set("x", Float.valueOf(2.5f));
 
         final Object o = e.execute(jc);
         Assert.assertEquals("Result is not true", Boolean.TRUE, o);
@@ -195,11 +195,11 @@ public class IfTest extends JexlTestCase {
     public void testIfWithAssignment() throws Exception {
         final JexlScript e = JEXL.createScript("if ((x * 2) == 5) {y = 1} else {y = 2;}");
         final JexlContext jc = new MapContext();
-        jc.set("x", new Float(2.5f));
+        jc.set("x", Float.valueOf(2.5f));
 
         e.execute(jc);
         final Object result = jc.get("y");
-        Assert.assertEquals("y has the wrong value", new Integer(1), result);
+        Assert.assertEquals("y has the wrong value", Integer.valueOf(1), result);
     }
 
     /**
