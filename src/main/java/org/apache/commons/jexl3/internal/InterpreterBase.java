@@ -1082,7 +1082,7 @@ public abstract class InterpreterBase extends ParserVisitor {
                     + ", argument: " + value.getClass().getSimpleName();
             throw new UnsupportedOperationException(error, xcause);
         }
-        final String attrStr = attribute != null ? attribute.toString() : null;
+        final String attrStr = Objects.toString(attribute, null);
         unsolvableProperty(node, attrStr, true, xcause);
     }
 }
