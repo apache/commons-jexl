@@ -18,6 +18,7 @@
 package org.apache.commons.jexl3.internal;
 
 import java.util.Iterator;
+import java.util.Objects;
 import java.util.concurrent.Callable;
 import java.util.function.Consumer;
 
@@ -1887,7 +1888,7 @@ public class Interpreter extends InterpreterBase {
                 }
                 return eval;
             }
-            final String tstr = target != null ? target.toString() : "?";
+            final String tstr = Objects.toString(target, "?");
             return unsolvableMethod(node, tstr, argv);
         } catch (final JexlException.Method xmethod) {
             throw xmethod;
