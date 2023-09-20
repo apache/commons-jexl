@@ -21,6 +21,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.apache.commons.jexl3.JexlArithmetic;
 import org.apache.commons.jexl3.JexlContext;
@@ -1018,7 +1019,7 @@ public abstract class InterpreterBase extends ParserVisitor {
         if (safe) {
             return null;
         }
-        final String attrStr = attribute != null ? attribute.toString() : null;
+        final String attrStr = Objects.toString(attribute, null);
         return unsolvableProperty(node, attrStr, true, xcause);
     }
 
