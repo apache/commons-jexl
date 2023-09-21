@@ -19,8 +19,12 @@ package org.apache.commons.jexl3;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Test cases for reported issue between JEXL-300 and JEXL-399.
@@ -148,4 +152,64 @@ public class Issues400Test {
     Assert.assertArrayEquals(new String[]{"C"}, (String[]) result);
   }
 
+  /**
+   * Any function in a context can be used as a method of its first parameter.
+   * Overloads are respected.
+   */
+  public static class XuContext extends MapContext {
+    public String join(Iterator<?> iterator, String str) {
+      if (!iterator.hasNext()) {
+        return "";
+      }
+      StringBuilder strb = new StringBuilder(256);
+      strb.append(iterator.next().toString());
+      while(iterator.hasNext()) {
+        strb.append(str);
+        strb.append(Objects.toString(iterator.next(), "?"));
+      }
+      return strb.toString();
+    }
+    public String join(Iterable<?> list, String str) {
+      return join(list.iterator(), str);
+    }
+
+    public String join(int[] list, String str) {
+      return join(Arrays.stream(list).iterator(), str);
+    }
+  }
+
+  @Test
+  public void test406() {
+    final JexlEngine jexl = new JexlBuilder()
+        .cache(64)
+        .strict(true)
+        .safe(false)
+        .create();
+
+    JexlContext context = new XuContext();
+    for(String src : Arrays.asList(
+        "[1, 2, 3, 4, ...].join('-')", // List<Integer>
+        "[1, 2, 3, 4,].join('-')", // int[]
+        "(1 .. 4).join('-')", // iterable<Integer>
+        "join([1, 2, 3, 4, ...], '-')",
+        "join([1, 2, 3, 4], '-')",
+        "join((1 .. 4), '-')")) {
+      JexlScript script = jexl.createScript(src);
+      Object result = script.execute(context);
+      Assert.assertEquals("1-2-3-4", result);
+    }
+
+    String src0 = "x.join('*')";
+    JexlScript script0 = jexl.createScript(src0, "x");
+    String src1 = "join(x, '*')";
+    JexlScript script1 = jexl.createScript(src1, "x");
+    for(Object x : Arrays.asList(
+        Arrays.asList(1, 2, 3, 4),
+        new int[]{1, 2, 3, 4})) {
+      Object result = script0.execute(context, x);
+      Assert.assertEquals("1*2*3*4", result);
+      result = script1.execute(context, x);
+      Assert.assertEquals("1*2*3*4", result);
+    }
+  }
 }
