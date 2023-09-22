@@ -180,7 +180,7 @@ public class Issues400Test {
   }
 
   @Test
-  public void test406() {
+  public void test406a() {
     final JexlEngine jexl = new JexlBuilder()
         .cache(64)
         .strict(true)

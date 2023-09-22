@@ -48,7 +48,7 @@ public class TemplateInterpreter extends Interpreter {
      * Helper ctor.
      * <p>Stores the different properties required to create a Template interpreter.
      */
-    static class Arguments {
+    public static class Arguments {
         /** The engine. */
         Engine jexl;
         /** The options. */
@@ -120,7 +120,7 @@ public class TemplateInterpreter extends Interpreter {
      * Creates a template interpreter instance.
      * @param args the template interpreter arguments
      */
-    TemplateInterpreter(final Arguments args) {
+    protected TemplateInterpreter(final Arguments args) {
         super(args.jexl, args.options, args.jcontext, args.jframe);
         exprs = args.expressions;
         writer = args.out;
@@ -243,17 +243,11 @@ public class TemplateInterpreter extends Interpreter {
                 if ("include".equals(functionName)) {
                     // evaluate the arguments
                     Object[] argv = visit(argNode, null);
-                    if (argv != null && argv.length > 0) {
-                        if (argv[0] instanceof TemplateScript) {
-                            final TemplateScript script = (TemplateScript) argv[0];
-                            if (argv.length > 1) {
-                                argv = Arrays.copyOfRange(argv, 1, argv.length);
-                            } else {
-                                argv = null;
-                            }
-                            include(script, argv);
-                            return null;
-                        }
+                    if (argv != null && argv.length > 0 && argv[0] instanceof TemplateScript) {
+                        final TemplateScript script = (TemplateScript) argv[0];
+                        argv = argv.length > 1? Arrays.copyOfRange(argv, 1, argv.length) : null;
+                        include(script, argv);
+                        return null;
                     }
                 }
                 // fail safe
@@ -270,24 +264,24 @@ public class TemplateInterpreter extends Interpreter {
                 @Override
                 protected Interpreter createInterpreter(final JexlContext context, final Frame local, final JexlOptions options) {
                     final TemplateInterpreter.Arguments targs = new TemplateInterpreter.Arguments(jexl)
-                            .context(context)
-                            .options(options)
-                            .frame(local)
-                            .expressions(exprs)
-                            .writer(writer);
+                        .context(context)
+                        .options(options)
+                        .frame(local)
+                        .expressions(exprs)
+                        .writer(writer);
                     return jexl.createTemplateInterpreter(targs);
                 }
             };
         }
         // otherwise...
         final int numChildren = script.jjtGetNumChildren();
-            Object result = null;
-            for (int i = 0; i < numChildren; i++) {
+        Object result = null;
+        for (int i = 0; i < numChildren; i++) {
             final JexlNode child = script.jjtGetChild(i);
-                result = child.jjtAccept(this, data);
-                cancelCheck(child);
-            }
-            return result;
+            result = child.jjtAccept(this, data);
+            cancelCheck(child);
         }
+        return result;
+    }
 
 }
