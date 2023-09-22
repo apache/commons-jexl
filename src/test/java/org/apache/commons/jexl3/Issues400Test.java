@@ -156,6 +156,7 @@ public class Issues400Test {
    * Overloads are respected.
    */
   public static class XuContext extends MapContext {
+
     public String join(Iterator<?> iterator, String str) {
       if (!iterator.hasNext()) {
         return "";
@@ -168,6 +169,7 @@ public class Issues400Test {
       }
       return strb.toString();
     }
+
     public String join(Iterable<?> list, String str) {
       return join(list.iterator(), str);
     }
@@ -195,7 +197,7 @@ public class Issues400Test {
         "join((1 .. 4), '-')")) {
       JexlScript script = jexl.createScript(src);
       Object result = script.execute(context);
-      Assert.assertEquals("1-2-3-4", result);
+      Assert.assertEquals(src,"1-2-3-4", result);
     }
 
     String src0 = "x.join('*')";
@@ -206,9 +208,9 @@ public class Issues400Test {
         Arrays.asList(1, 2, 3, 4),
         new int[]{1, 2, 3, 4})) {
       Object result = script0.execute(context, x);
-      Assert.assertEquals("1*2*3*4", result);
+      Assert.assertEquals(src0, "1*2*3*4", result);
       result = script1.execute(context, x);
-      Assert.assertEquals("1*2*3*4", result);
+      Assert.assertEquals(src1, "1*2*3*4", result);
     }
   }
 }
