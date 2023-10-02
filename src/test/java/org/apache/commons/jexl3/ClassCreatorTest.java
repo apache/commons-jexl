@@ -323,7 +323,7 @@ public class ClassCreatorTest extends JexlTestCase {
                 // add a weak reference on the class
                 stuff.add(new ClassReference(clazz, queue));
                 // add a soft reference on an instance
-                stuff.add(new InstanceReference(clazz.newInstance(), queue));
+                stuff.add(new InstanceReference(clazz.getConstructor().newInstance(), queue));
 
                 // attempt to force GC:
                 // while we still have a MB free, create & store big objects

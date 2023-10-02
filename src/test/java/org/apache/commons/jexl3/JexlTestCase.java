@@ -215,7 +215,7 @@ public class JexlTestCase {
         catch (final NoSuchMethodException xctor) {
             // instantiate default class ctor
             try {
-                test = clazz.newInstance();
+                test = clazz.getConstructor().newInstance();
             }
             catch (final Exception xany) {
                 Assert.fail("cant instantiate test: " + xany);

@@ -227,7 +227,7 @@ public class ClassCreator {
     Object validate(final Class<?> clazz) throws Exception {
         final Class<?>[] params = {};
         final Object[] paramsObj = {};
-        final Object iClass = clazz.newInstance();
+        final Object iClass = clazz.getConstructor().newInstance();
         final Method thisMethod = clazz.getDeclaredMethod("getValue", params);
         return thisMethod.invoke(iClass, paramsObj);
     }
