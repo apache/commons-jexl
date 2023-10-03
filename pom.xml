@@ -83,8 +83,6 @@
         <commons.release.version>3.3.1</commons.release.version>
         <commons.release.isDistModule>true</commons.release.isDistModule>
         <commons.distSvnStagingUrl>scm:svn:https://dist.apache.org/repos/dist/dev/commons/${commons.componentid}</commons.distSvnStagingUrl>
-        <commons.releaseManagerName>Henri Biestro</commons.releaseManagerName>
-        <commons.releaseManagerKey>4E066E0459CD109B</commons.releaseManagerKey>
     </properties>
 
     <scm>
