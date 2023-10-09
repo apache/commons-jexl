@@ -16,10 +16,11 @@
  */
 package org.apache.commons.jexl3.parser;
 
-import org.apache.commons.jexl3.JexlFeatures;
-import org.apache.commons.jexl3.internal.Scope;
 import java.util.Map;
+
+import org.apache.commons.jexl3.JexlFeatures;
 import org.apache.commons.jexl3.internal.Frame;
+import org.apache.commons.jexl3.internal.Scope;
 
 /**
  * Enhanced script to allow parameters declaration.

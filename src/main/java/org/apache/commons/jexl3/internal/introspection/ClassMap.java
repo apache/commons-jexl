@@ -16,9 +16,6 @@
  */
 package org.apache.commons.jexl3.internal.introspection;
 
-import org.apache.commons.jexl3.introspection.JexlPermissions;
-import org.apache.commons.logging.Log;
-
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -31,6 +28,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+
+import org.apache.commons.jexl3.introspection.JexlPermissions;
+import org.apache.commons.logging.Log;
 
 /**
  * A cache of introspection information for a specific class instance.

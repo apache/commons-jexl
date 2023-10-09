@@ -17,8 +17,9 @@
 
 package org.apache.commons.jexl3;
 
-import org.apache.commons.jexl3.internal.Engine;
 import java.util.Map;
+
+import org.apache.commons.jexl3.internal.Engine;
 
 /**
  * Command line interface for JEXL for use in testing

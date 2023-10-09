@@ -40,7 +40,6 @@ import org.apache.commons.jexl3.JexlContext;
 import org.apache.commons.jexl3.JexlEngine;
 import org.apache.commons.jexl3.JexlException;
 import org.apache.commons.jexl3.JexlScript;
-
 import org.apache.commons.jexl3.introspection.JexlPermissions;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

@@ -16,15 +16,6 @@
  */
 package org.apache.commons.jexl3.jexl342;
 
-import org.apache.commons.jexl3.JexlArithmetic;
-import org.apache.commons.jexl3.JexlEngine;
-import org.apache.commons.jexl3.JexlException;
-import org.apache.commons.jexl3.JexlOperator;
-import org.apache.commons.jexl3.introspection.JexlMethod;
-import org.apache.commons.jexl3.introspection.JexlPropertyGet;
-import org.apache.commons.jexl3.introspection.JexlPropertySet;
-import org.apache.commons.jexl3.introspection.JexlUberspect;
-
 import java.lang.ref.Reference;
 import java.util.Arrays;
 import java.util.Collections;
@@ -34,6 +25,15 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
+
+import org.apache.commons.jexl3.JexlArithmetic;
+import org.apache.commons.jexl3.JexlEngine;
+import org.apache.commons.jexl3.JexlException;
+import org.apache.commons.jexl3.JexlOperator;
+import org.apache.commons.jexl3.introspection.JexlMethod;
+import org.apache.commons.jexl3.introspection.JexlPropertyGet;
+import org.apache.commons.jexl3.introspection.JexlPropertySet;
+import org.apache.commons.jexl3.introspection.JexlUberspect;
 
 /**
  * An Uberspect that handles references (java.lang.ref.Reference) and optionals (java.util.Optional).

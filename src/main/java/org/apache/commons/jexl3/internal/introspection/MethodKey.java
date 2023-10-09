@@ -19,7 +19,6 @@ package org.apache.commons.jexl3.internal.introspection;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Executable;
 import java.lang.reflect.Method;
-
 import java.util.Arrays;
 import java.util.Deque;
 import java.util.HashMap;

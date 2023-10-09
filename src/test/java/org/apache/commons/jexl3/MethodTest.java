@@ -16,15 +16,16 @@
  */
 package org.apache.commons.jexl3;
 
-import java.util.HashMap;
-import java.util.Map;
-import org.apache.commons.jexl3.junit.Asserter;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.commons.jexl3.introspection.JexlMethod;
 import org.apache.commons.jexl3.introspection.JexlPropertyGet;
 import org.apache.commons.jexl3.introspection.JexlPropertySet;
 import org.apache.commons.jexl3.introspection.JexlUberspect;
+import org.apache.commons.jexl3.junit.Asserter;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

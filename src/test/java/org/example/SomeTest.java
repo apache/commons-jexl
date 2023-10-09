@@ -16,28 +16,22 @@
  */
 package org.example;
 
-import org.apache.commons.jexl3.JexlArithmetic;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
+
 import org.apache.commons.jexl3.JexlBuilder;
 import org.apache.commons.jexl3.JexlContext;
 import org.apache.commons.jexl3.JexlEngine;
-import org.apache.commons.jexl3.JexlException;
 import org.apache.commons.jexl3.JexlExpression;
-import org.apache.commons.jexl3.JexlOptions;
 import org.apache.commons.jexl3.JexlScript;
 import org.apache.commons.jexl3.MapContext;
 import org.apache.commons.jexl3.internal.Engine;
-import org.apache.commons.jexl3.internal.Frame;
-import org.apache.commons.jexl3.internal.Interpreter;
-import org.apache.commons.jexl3.internal.TemplateEngine;
 import org.apache.commons.jexl3.internal.TemplateInterpreter;
 import org.apache.commons.jexl3.introspection.JexlPermissions;
 import org.apache.commons.jexl3.parser.JexlNode;
 import org.junit.Assert;
 import org.junit.Test;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class SomeTest {
 

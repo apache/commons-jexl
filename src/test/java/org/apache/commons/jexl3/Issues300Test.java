@@ -16,12 +16,9 @@
  */
 package org.apache.commons.jexl3;
 
-import org.apache.commons.jexl3.internal.Engine32;
-import org.apache.commons.jexl3.internal.OptionsContext;
+import static org.apache.commons.jexl3.internal.Util.debuggerCheck;
 import static org.apache.commons.jexl3.introspection.JexlPermissions.RESTRICTED;
-import org.apache.commons.jexl3.introspection.JexlSandbox;
-import org.junit.Assert;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -38,8 +35,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.apache.commons.jexl3.internal.Util.debuggerCheck;
-import static org.junit.Assert.assertEquals;
+import org.apache.commons.jexl3.internal.Engine32;
+import org.apache.commons.jexl3.internal.OptionsContext;
+import org.apache.commons.jexl3.introspection.JexlSandbox;
+import org.junit.Assert;
+import org.junit.Test;
 
 /**
  * Test cases for reported issue between JEXL-300 and JEXL-399.

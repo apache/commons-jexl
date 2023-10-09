@@ -17,7 +17,7 @@
 
 package org.apache.commons.jexl3;
 
-import org.apache.commons.jexl3.introspection.JexlMethod;
+import static java.lang.StrictMath.floor;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
@@ -32,7 +32,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static java.lang.StrictMath.floor;
+import org.apache.commons.jexl3.introspection.JexlMethod;
 
 /**
  * Perform arithmetic, implements JexlOperator methods.

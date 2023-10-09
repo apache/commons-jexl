@@ -16,9 +16,9 @@
  */
 package org.apache.commons.jexl3.internal;
 
-import org.apache.commons.jexl3.JexlFeatures;
-
 import java.util.Objects;
+
+import org.apache.commons.jexl3.JexlFeatures;
 
 /**
  * Maintains the set of allowed features associated with a script/expression source.

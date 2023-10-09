@@ -91,6 +91,13 @@ limitations under the License.
       <property name="checkFormat" value="$1"/>
     </module>
 
+    <module name="ImportOrder">
+      <property name="option" value="top"/>
+      <property name="groups" value="java,javax,org"/>
+      <property name="ordered" value="true"/>
+      <property name="separated" value="true"/>
+    </module>
+
   </module>
 
   <module name="SuppressionFilter">

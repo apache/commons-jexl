@@ -16,12 +16,12 @@
  */
 package org.apache.commons.jexl3;
 
-import org.junit.Assert;
-import org.junit.Test;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import org.junit.Assert;
+import org.junit.Test;
 
 /**
  * Tests do while statement.

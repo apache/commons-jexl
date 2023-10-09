@@ -16,8 +16,8 @@
  */
 package org.apache.commons.jexl3.internal.introspection;
 
-import java.util.List;
 import java.lang.reflect.Array;
+import java.util.List;
 
 /**
  * Specialized executor to get a property from a List or array.

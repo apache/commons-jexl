@@ -17,8 +17,6 @@
 
 package org.apache.commons.jexl3;
 
-import org.apache.commons.jexl3.introspection.JexlUberspect;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -27,6 +25,8 @@ import java.io.InputStreamReader;
 import java.math.MathContext;
 import java.net.URL;
 import java.nio.charset.Charset;
+
+import org.apache.commons.jexl3.introspection.JexlUberspect;
 
 /**
  * Creates and evaluates JexlExpression and JexlScript objects.

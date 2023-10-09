@@ -16,10 +16,11 @@
  */
 package org.apache.commons.jexl3.internal;
 
-import org.apache.commons.jexl3.JexlArithmetic;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
+
+import org.apache.commons.jexl3.JexlArithmetic;
 
 /**
  * Helper class to create set literals.

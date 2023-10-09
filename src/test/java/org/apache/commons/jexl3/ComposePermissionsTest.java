@@ -20,10 +20,11 @@ import java.io.File;
 import java.io.FileReader;
 import java.util.Collections;
 
-import com.google.gson.Gson;
 import org.apache.commons.jexl3.introspection.JexlPermissions;
 import org.junit.Assert;
 import org.junit.Test;
+
+import com.google.gson.Gson;
 
 /**
  * Tests for pragmas

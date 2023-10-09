@@ -16,11 +16,11 @@
  */
 package org.apache.commons.jexl3;
 
-import org.apache.commons.jexl3.internal.Engine;
-import org.apache.commons.jexl3.internal.introspection.Uberspect;
-
 import java.util.HashMap;
 import java.util.Map;
+
+import org.apache.commons.jexl3.internal.Engine;
+import org.apache.commons.jexl3.internal.introspection.Uberspect;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

@@ -16,13 +16,13 @@
  */
 package org.apache.commons.jexl3.jexl342;
 
-import org.apache.commons.jexl3.JexlArithmetic;
-
 import java.lang.ref.Reference;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
+
+import org.apache.commons.jexl3.JexlArithmetic;
 
 /**
  * Unwraps Optional/Reference/AtomicReference on public and key methods.

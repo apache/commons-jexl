@@ -16,12 +16,12 @@
  */
 package org.apache.commons.jexl3.internal.introspection;
 
+import java.util.ArrayList;
+import java.util.NoSuchElementException;
+
 import org.apache.commons.jexl3.JexlEngine;
 import org.junit.Assert;
 import org.junit.Test;
-
-import java.util.ArrayList;
-import java.util.NoSuchElementException;
 
 /**
  * Checks the CacheMap.MethodKey implementation

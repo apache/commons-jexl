@@ -17,16 +17,16 @@
 
 package org.apache.commons.jexl3;
 
+import java.nio.charset.Charset;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Map;
+
 import org.apache.commons.jexl3.internal.Engine;
 import org.apache.commons.jexl3.introspection.JexlPermissions;
 import org.apache.commons.jexl3.introspection.JexlSandbox;
 import org.apache.commons.jexl3.introspection.JexlUberspect;
 import org.apache.commons.logging.Log;
-
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Map;
-import java.nio.charset.Charset;
 
 /**
  * Configures and builds a JexlEngine.

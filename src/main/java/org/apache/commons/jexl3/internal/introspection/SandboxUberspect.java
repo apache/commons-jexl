@@ -16,6 +16,9 @@
  */
 package org.apache.commons.jexl3.internal.introspection;
 
+import java.util.Iterator;
+import java.util.List;
+
 import org.apache.commons.jexl3.JexlArithmetic;
 import org.apache.commons.jexl3.JexlOperator;
 import org.apache.commons.jexl3.introspection.JexlMethod;
@@ -23,9 +26,6 @@ import org.apache.commons.jexl3.introspection.JexlPropertyGet;
 import org.apache.commons.jexl3.introspection.JexlPropertySet;
 import org.apache.commons.jexl3.introspection.JexlSandbox;
 import org.apache.commons.jexl3.introspection.JexlUberspect;
-
-import java.util.Iterator;
-import java.util.List;
 
 /**
  * An uberspect that controls usage of properties, methods and constructors through a sandbox.

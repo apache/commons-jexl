@@ -18,9 +18,9 @@ package org.apache.commons.jexl3;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.Objects;
 import java.util.function.Predicate;
 
 /**

@@ -16,8 +16,6 @@
  */
 package org.apache.commons.jexl3.introspection;
 
-import org.apache.commons.jexl3.internal.introspection.PermissionsParser;
-
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -28,6 +26,8 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import org.apache.commons.jexl3.internal.introspection.PermissionsParser;
 
 /**
  * This interface describes permissions used by JEXL introspection that constrain which

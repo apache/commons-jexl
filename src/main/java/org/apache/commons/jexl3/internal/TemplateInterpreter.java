@@ -16,6 +16,9 @@
  */
 package org.apache.commons.jexl3.internal;
 
+import java.io.Writer;
+import java.util.Arrays;
+
 import org.apache.commons.jexl3.JexlContext;
 import org.apache.commons.jexl3.JexlInfo;
 import org.apache.commons.jexl3.JexlOptions;
@@ -29,9 +32,6 @@ import org.apache.commons.jexl3.parser.ASTIdentifier;
 import org.apache.commons.jexl3.parser.ASTJexlLambda;
 import org.apache.commons.jexl3.parser.ASTJexlScript;
 import org.apache.commons.jexl3.parser.JexlNode;
-
-import java.io.Writer;
-import java.util.Arrays;
 
 /**
  * The type of interpreter to use during evaluation of templates.

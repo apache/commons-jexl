@@ -16,12 +16,12 @@
  */
 package org.apache.commons.jexl3.internal;
 
+import java.util.Arrays;
+import java.util.Objects;
+
 import org.apache.commons.jexl3.JexlContext;
 import org.apache.commons.jexl3.JexlOptions;
 import org.apache.commons.jexl3.parser.ASTJexlLambda;
-
-import java.util.Arrays;
-import java.util.Objects;
 
 /**
  * A Script closure.

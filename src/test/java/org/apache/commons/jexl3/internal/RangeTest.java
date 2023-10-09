@@ -16,10 +16,11 @@
  */
 package org.apache.commons.jexl3.internal;
 
-import org.apache.commons.jexl3.JexlTestCase;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+
+import org.apache.commons.jexl3.JexlTestCase;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;

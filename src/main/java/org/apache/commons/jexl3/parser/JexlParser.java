@@ -16,13 +16,6 @@
  */
 package org.apache.commons.jexl3.parser;
 
-import org.apache.commons.jexl3.JexlEngine;
-import org.apache.commons.jexl3.JexlException;
-import org.apache.commons.jexl3.JexlFeatures;
-import org.apache.commons.jexl3.JexlInfo;
-import org.apache.commons.jexl3.internal.LexicalScope;
-import org.apache.commons.jexl3.internal.Scope;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
@@ -36,6 +29,13 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.function.Predicate;
+
+import org.apache.commons.jexl3.JexlEngine;
+import org.apache.commons.jexl3.JexlException;
+import org.apache.commons.jexl3.JexlFeatures;
+import org.apache.commons.jexl3.JexlInfo;
+import org.apache.commons.jexl3.internal.LexicalScope;
+import org.apache.commons.jexl3.internal.Scope;
 
 
 /**

@@ -19,6 +19,7 @@ package org.apache.commons.jexl3.internal.introspection;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+
 import org.apache.commons.jexl3.introspection.JexlPropertySet;
 
 /**

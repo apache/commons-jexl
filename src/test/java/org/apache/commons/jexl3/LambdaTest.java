@@ -16,15 +16,15 @@
  */
 package org.apache.commons.jexl3;
 
-import org.apache.commons.jexl3.internal.Closure;
-import org.apache.commons.jexl3.internal.Script;
-import org.junit.Assert;
-import org.junit.Test;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
+
+import org.apache.commons.jexl3.internal.Closure;
+import org.apache.commons.jexl3.internal.Script;
+import org.junit.Assert;
+import org.junit.Test;
 
 /**
  * Tests function/lambda/closure features.

@@ -17,22 +17,20 @@
 
 package org.apache.commons.jexl3;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.StringReader;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.UndeclaredThrowableException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
 import org.apache.commons.jexl3.internal.Debugger;
 import org.apache.commons.jexl3.parser.JavaccError;
 import org.apache.commons.jexl3.parser.JexlNode;
 import org.apache.commons.jexl3.parser.ParseException;
 import org.apache.commons.jexl3.parser.TokenMgrException;
-
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.UndeclaredThrowableException;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.StringReader;
 
 /**
  * Wraps any error that might occur during interpretation of a script or expression.

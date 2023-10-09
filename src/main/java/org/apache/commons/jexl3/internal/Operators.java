@@ -16,6 +16,9 @@
  */
 package org.apache.commons.jexl3.internal;
 
+import java.lang.reflect.Method;
+import java.util.function.Consumer;
+
 import org.apache.commons.jexl3.JexlArithmetic;
 import org.apache.commons.jexl3.JexlEngine;
 import org.apache.commons.jexl3.JexlException;
@@ -24,9 +27,6 @@ import org.apache.commons.jexl3.internal.introspection.MethodExecutor;
 import org.apache.commons.jexl3.introspection.JexlMethod;
 import org.apache.commons.jexl3.introspection.JexlUberspect;
 import org.apache.commons.jexl3.parser.JexlNode;
-
-import java.lang.reflect.Method;
-import java.util.function.Consumer;
 
 /**
  * Helper class to deal with operator overloading and specifics.

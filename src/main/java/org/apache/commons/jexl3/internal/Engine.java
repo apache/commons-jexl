@@ -16,6 +16,23 @@
  */
 package org.apache.commons.jexl3.internal;
 
+import static org.apache.commons.jexl3.parser.JexlParser.PRAGMA_IMPORT;
+import static org.apache.commons.jexl3.parser.JexlParser.PRAGMA_JEXLNS;
+import static org.apache.commons.jexl3.parser.JexlParser.PRAGMA_MODULE;
+import static org.apache.commons.jexl3.parser.JexlParser.PRAGMA_OPTIONS;
+
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
+
 import org.apache.commons.jexl3.JexlArithmetic;
 import org.apache.commons.jexl3.JexlBuilder;
 import org.apache.commons.jexl3.JexlContext;
@@ -44,23 +61,6 @@ import org.apache.commons.jexl3.parser.Parser;
 import org.apache.commons.jexl3.parser.StringProvider;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Consumer;
-import java.util.function.Predicate;
-
-import static org.apache.commons.jexl3.parser.JexlParser.PRAGMA_IMPORT;
-import static org.apache.commons.jexl3.parser.JexlParser.PRAGMA_MODULE;
-import static org.apache.commons.jexl3.parser.JexlParser.PRAGMA_JEXLNS;
-import static org.apache.commons.jexl3.parser.JexlParser.PRAGMA_OPTIONS;
 
 /**
  * A JexlEngine implementation.

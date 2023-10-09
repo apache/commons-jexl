@@ -16,6 +16,14 @@
  */
 package org.apache.commons.jexl3.examples;
 
+import static java.lang.Boolean.TRUE;
+
+import java.net.URI;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import org.apache.commons.jexl3.JexlBuilder;
 import org.apache.commons.jexl3.JexlContext;
 import org.apache.commons.jexl3.JexlEngine;
@@ -26,14 +34,6 @@ import org.apache.commons.jexl3.introspection.JexlPermissions;
 import org.apache.commons.jexl3.introspection.JexlPermissions.ClassPermissions;
 import org.junit.Assert;
 import org.junit.Test;
-
-import java.net.URI;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import static java.lang.Boolean.TRUE;
 
 /**
  * A test around scripting streams.

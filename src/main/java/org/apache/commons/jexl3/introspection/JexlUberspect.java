@@ -17,14 +17,14 @@
 
 package org.apache.commons.jexl3.introspection;
 
-import org.apache.commons.jexl3.JexlArithmetic;
-import org.apache.commons.jexl3.JexlOperator;
-
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.commons.jexl3.JexlArithmetic;
+import org.apache.commons.jexl3.JexlOperator;
 
 /**
  * 'Federated' introspection/reflection interface to allow JEXL introspection

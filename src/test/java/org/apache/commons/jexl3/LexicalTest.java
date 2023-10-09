@@ -16,6 +16,8 @@
  */
 package org.apache.commons.jexl3;
 
+import static org.apache.commons.jexl3.JexlTestCase.createEngine;
+
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -25,12 +27,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
+
 import org.apache.commons.jexl3.internal.LexicalScope;
 import org.apache.commons.jexl3.internal.Script;
 import org.junit.Assert;
 import org.junit.Test;
-
-import static org.apache.commons.jexl3.JexlTestCase.createEngine;
 
 /**
  * Test cases for lexical option and feature.

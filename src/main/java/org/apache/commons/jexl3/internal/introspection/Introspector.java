@@ -16,21 +16,19 @@
  */
 package org.apache.commons.jexl3.internal.introspection;
 
-import org.apache.commons.jexl3.introspection.JexlPermissions;
-import org.apache.commons.logging.Log;
-
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+
+import org.apache.commons.jexl3.introspection.JexlPermissions;
+import org.apache.commons.logging.Log;
 
 /**
  * This basic function of this class is to return a Method object for a

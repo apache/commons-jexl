@@ -16,10 +16,10 @@
  */
 package org.apache.commons.jexl3;
 
+import java.util.Arrays;
+
 import org.junit.Assert;
 import org.junit.Test;
-
-import java.util.Arrays;
 
 /**
  * Test cases for assignment.

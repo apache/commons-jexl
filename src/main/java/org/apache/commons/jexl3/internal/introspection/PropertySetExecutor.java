@@ -18,6 +18,7 @@ package org.apache.commons.jexl3.internal.introspection;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
+
 import org.apache.commons.jexl3.JexlException;
 
 /**

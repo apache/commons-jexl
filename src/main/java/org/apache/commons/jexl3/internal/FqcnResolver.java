@@ -16,15 +16,15 @@
  */
 package org.apache.commons.jexl3.internal;
 
-import org.apache.commons.jexl3.JexlContext;
-import org.apache.commons.jexl3.introspection.JexlUberspect;
-
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+
+import org.apache.commons.jexl3.JexlContext;
+import org.apache.commons.jexl3.introspection.JexlUberspect;
 
 /**
  * Helper resolving a simple class name into a fully-qualified class name (hence FqcnResolver) using

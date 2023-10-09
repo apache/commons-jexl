@@ -16,6 +16,19 @@
  */
 package org.apache.commons.jexl3.internal.introspection;
 
+import java.lang.ref.Reference;
+import java.lang.ref.SoftReference;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.EnumSet;
+import java.util.Enumeration;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
+
 import org.apache.commons.jexl3.JexlArithmetic;
 import org.apache.commons.jexl3.JexlEngine;
 import org.apache.commons.jexl3.JexlOperator;
@@ -24,24 +37,8 @@ import org.apache.commons.jexl3.introspection.JexlPermissions;
 import org.apache.commons.jexl3.introspection.JexlPropertyGet;
 import org.apache.commons.jexl3.introspection.JexlPropertySet;
 import org.apache.commons.jexl3.introspection.JexlUberspect;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-
-import java.util.EnumSet;
-import java.util.Enumeration;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.ConcurrentHashMap;
-
-import java.lang.ref.Reference;
-import java.lang.ref.SoftReference;
-import java.util.List;
 
 /**
  * Implementation of Uberspect to provide the default introspective

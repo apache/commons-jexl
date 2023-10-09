@@ -17,14 +17,14 @@
 
 package org.apache.commons.jexl3.examples;
 
-import org.apache.commons.jexl3.JexlExpression;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.commons.jexl3.JexlBuilder;
 import org.apache.commons.jexl3.JexlContext;
 import org.apache.commons.jexl3.JexlEngine;
+import org.apache.commons.jexl3.JexlExpression;
 import org.apache.commons.jexl3.MapContext;
-
-import java.util.List;
-import java.util.ArrayList;
-import org.apache.commons.jexl3.JexlBuilder;
 import org.junit.Test;
 
 /**

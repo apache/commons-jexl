@@ -16,13 +16,13 @@
  */
 package org.apache.commons.jexl3;
 
+import java.nio.charset.Charset;
+
 import org.apache.commons.jexl3.internal.introspection.SandboxUberspect;
 import org.apache.commons.jexl3.introspection.JexlSandbox;
 import org.apache.commons.jexl3.introspection.JexlUberspect;
 import org.junit.Assert;
 import org.junit.Test;
-
-import java.nio.charset.Charset;
 
 /**
  * Checking the builder basics.

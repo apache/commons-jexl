@@ -16,13 +16,13 @@
  */
 package org.apache.commons.jexl3;
 
-import org.junit.Assert;
-import org.junit.Test;
-
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import org.junit.Assert;
+import org.junit.Test;
 
 /**
  * Tests JexlContext (advanced) features.

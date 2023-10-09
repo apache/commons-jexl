@@ -16,12 +16,12 @@
  */
 package org.apache.commons.jexl3.jexl342;
 
+import java.util.Objects;
+
 import org.apache.commons.jexl3.JexlEngine;
 import org.apache.commons.jexl3.JexlException;
 import org.apache.commons.jexl3.introspection.JexlPropertyGet;
 import org.apache.commons.jexl3.introspection.JexlUberspect;
-
-import java.util.Objects;
 
 /**
  * JexlPropertyGet on a reference that pointed null.

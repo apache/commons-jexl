@@ -16,13 +16,13 @@
  */
 package org.apache.commons.jexl3.internal.introspection;
 
-import org.apache.commons.jexl3.annotations.NoJexl;
-import org.junit.Assert;
-import org.junit.Test;
-
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+
+import org.apache.commons.jexl3.annotations.NoJexl;
+import org.junit.Assert;
+import org.junit.Test;
 
 /**
  * Checks the CacheMap.MethodKey implementation

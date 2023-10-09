@@ -18,9 +18,10 @@
 package org.apache.commons.jexl3.internal.introspection;
 
 
-import org.apache.commons.jexl3.introspection.JexlPropertyGet;
-import java.lang.reflect.Method;
 import java.beans.IntrospectionException;
+import java.lang.reflect.Method;
+
+import org.apache.commons.jexl3.introspection.JexlPropertyGet;
 
 /**
  * Abstract an indexed property container.
