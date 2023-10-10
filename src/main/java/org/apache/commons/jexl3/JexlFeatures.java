@@ -463,6 +463,7 @@ public final class JexlFeatures {
      * <p>
      * When disabled, parsing a script/expression using syntactic lambda constructs (-&gt;,function)
      * will throw a parsing exception.
+     * </p>
      * @param flag true to enable, false to disable
      * @return this features instance
      */
