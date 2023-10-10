@@ -271,8 +271,10 @@ public final class JexlFeatures {
      * Sets whether register are enabled.
      * <p>
      * This is mostly used internally during execution of JexlEngine.{g,s}etProperty.
+     * </p>
      * <p>
      * When disabled, parsing a script/expression using the register syntax will throw a parsing exception.
+     * </p>
      * @param flag true to enable, false to disable
      * @return this features instance
      */
@@ -293,6 +295,7 @@ public final class JexlFeatures {
      * <p>
      * When disabled, parsing a script/expression using a local variable or parameter syntax
      * will throw a parsing exception.
+     * </p>
      * @param flag true to enable, false to disable
      * @return this features instance
      */
@@ -313,6 +316,7 @@ public final class JexlFeatures {
      * <p>
      * When disabled, parsing a script/expression using syntactical constructs modifying variables
      * <em>including all potentially ant-ish variables</em> will throw a parsing exception.
+     * </p>
      * @param flag true to enable, false to disable
      * @return this features instance
      */
@@ -333,6 +337,7 @@ public final class JexlFeatures {
      * <p>
      * When disabled, parsing a script/expression using syntactical constructs modifying variables
      * or members will throw a parsing exception.
+     * </p>
      * @param flag true to enable, false to disable
      * @return this features instance
      */
@@ -353,6 +358,7 @@ public final class JexlFeatures {
      * <p>
      * When disabled, parsing a script/expression using 'obj[ ref ]' where ref is not a string or integer literal
      * will throw a parsing exception;
+     * </p>
      * @param flag true to enable, false to disable
      * @return this features instance
      */
@@ -373,6 +379,7 @@ public final class JexlFeatures {
      * <p>
      * When disabled, parsing a script/expression using 'obj.method()'
      * will throw a parsing exception;
+     * </p>
      * @param flag true to enable, false to disable
      * @return this features instance
      */
@@ -393,6 +400,7 @@ public final class JexlFeatures {
      * <p>
      * When disabled, parsing a script/expression creating one of these literals
      * will throw a parsing exception;
+     * </p>
      * @param flag true to enable, false to disable
      * @return this features instance
      */
@@ -413,6 +421,7 @@ public final class JexlFeatures {
      * <p>
      * When disabled, parsing a script/expression using 'new(...)' will throw a parsing exception;
      * using a class as functor will fail at runtime.
+     * </p>
      * @param flag true to enable, false to disable
      * @return this features instance
      */
@@ -433,6 +442,7 @@ public final class JexlFeatures {
      * <p>
      * When disabled, parsing a script/expression using syntactic looping constructs (for,while)
      * will throw a parsing exception.
+     * </p>
      * @param flag true to enable, false to disable
      * @return this features instance
      */
@@ -473,6 +483,7 @@ public final class JexlFeatures {
      * <p>
      * When disabled, lambda-captured variables are implicitly converted to read-write local variable (let),
      * when enabled, those are implicitly converted to read-only local variables (const).
+     * </p>
      * @param flag true to enable, false to disable
      * @return this features instance
      */
@@ -493,6 +504,7 @@ public final class JexlFeatures {
      * <p>
      * When disabled, parsing a script/expression using syntactic thin-arrow (-&lt;)
      * will throw a parsing exception.
+     * </p>
      * @param flag true to enable, false to disable
      * @return this features instance
      * @since 3.3
@@ -515,6 +527,7 @@ public final class JexlFeatures {
      * <p>
      * When disabled, parsing a script/expression using syntactic fat-arrow (=&lt;)
      * will throw a parsing exception.
+     * </p>
      * @param flag true to enable, false to disable
      * @return this features instance
      * @since 3.3
@@ -537,6 +550,7 @@ public final class JexlFeatures {
      * <p>
      * When disabled, comparison operators names (eq;ne;le;lt;ge;gt)
      * will be treated as plain identifiers.
+     * </p>
      * @param flag true to enable, false to disable
      * @return this features instance
      * @since 3.3
@@ -559,6 +573,7 @@ public final class JexlFeatures {
      * <p>
      * When disabled, parsing a script/expression using syntactic pragma constructs (#pragma)
      * will throw a parsing exception.
+     * </p>
      * @param flag true to enable, false to disable
      * @return this features instance
      */
@@ -580,7 +595,7 @@ public final class JexlFeatures {
 
     /**
      * Sets whether pragma constructs can appear anywhere in the code.
-     * <p>
+     *
      * @param flag true to enable, false to disable
      * @return this features instance
      * @since 3.3
@@ -603,6 +618,7 @@ public final class JexlFeatures {
      * <p>
      * When disabled, parsing a script/expression using syntactic namespace pragma constructs
      * (#pragma jexl.namespace....) will throw a parsing exception.
+     * </p>
      * @param flag true to enable, false to disable
      * @return this features instance
      * @since 3.3
@@ -624,6 +640,7 @@ public final class JexlFeatures {
      * <p>
      * When disabled, parsing a script/expression using syntactic import pragma constructs
      * (#pragma jexl.import....) will throw a parsing exception.
+     * </p>
      * @param flag true to enable, false to disable
      * @return this features instance
      * @since 3.3
@@ -647,6 +664,7 @@ public final class JexlFeatures {
      * <p>
      * When disabled, parsing a script/expression using syntactic annotation constructs (@annotation)
      * will throw a parsing exception.
+     * </p>
      * @param flag true to enable, false to disable
      * @return this features instance
      */
@@ -667,6 +685,7 @@ public final class JexlFeatures {
      * <p>
      * When disabled, parsing a script using syntactic script constructs (statements, ...)
      * will throw a parsing exception.
+     * </p>
      * @param flag true to enable, false to disable
      * @return this features instance
      */
