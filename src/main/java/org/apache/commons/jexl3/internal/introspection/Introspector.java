@@ -47,7 +47,7 @@ public final class Introspector {
     /**
      * A Constructor get cache-miss.
      */
-    private static class CacheMiss {
+    private static final class CacheMiss {
         /** The constructor used as cache-miss. */
         @SuppressWarnings("unused")
         public CacheMiss() {
