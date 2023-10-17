@@ -45,7 +45,9 @@
         <!-- Override the default, which is ${project.artifactId}-${commons.release.[23].version} -->
         <commons.release.name>commons-jexl-${commons.release.version}</commons.release.name>
         <commons.release.2.name>commons-jexl-${commons.release.2.version}</commons.release.2.name>
+        <commons.release.2.hash>sha1</commons.release.2.hash>
         <commons.release.3.name>commons-jexl-${commons.release.3.version}</commons.release.3.name>
+        <commons.release.3.hash>sha1</commons.release.3.hash>
         <commons.release.3.desc>Legacy</commons.release.3.desc>
         <commons.release.3.version>1.1</commons.release.3.version>
         <commons.release.3.binary.suffix />
