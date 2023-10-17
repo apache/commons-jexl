@@ -51,7 +51,7 @@ public class StreamTest {
         // Restricted permissions to a safe set but with URI allowed
         final JexlPermissions permissions = new ClassPermissions(java.net.URI.class);
         // Create the engine
-        jexl = new JexlBuilder().permissions(permissions).create();
+        jexl = new JexlBuilder().features(features).permissions(permissions).create();
     }
 
     /**

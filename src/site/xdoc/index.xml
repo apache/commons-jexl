@@ -139,7 +139,7 @@ and ensure their execution within controlled functional constraints.
         <span style='color:#3F7F5F'>// Restricted permissions to a safe set but with URI allowed
 </span>        JexlPermissions permissions = <span style='font-weight:bold;color:#7B0052;'>new</span> ClassPermissions(java.net.URI.class);
         <span style='color:#3F7F5F'>// Create the engine
-</span>        jexl = <span style='font-weight:bold;color:#7B0052;'>new</span> JexlBuilder().permissions(permissions).create();
+</span>        jexl = <span style='font-weight:bold;color:#7B0052;'>new</span> JexlBuilder().features(features).permissions(permissions).create();
     <span style='font-weight:bold;color:#D3171B'>}</span>
 
     <span style='color:#3F5FBF'>/**
@@ -163,7 +163,7 @@ and ensure their execution within controlled functional constraints.
          * @return the filtered stream
          */</span>
         <span style='font-weight:bold;color:#7B0052;'>public</span> Stream&lt;?&gt; filter(Stream&lt;?&gt; stream, <span style='font-weight:bold;color:#7B0052;'>final</span> JexlScript filter) <span style='font-weight:bold;color:#D3171B'>{</span>
-            <span style='font-weight:bold;color:#7B0052;'>return</span> stream.filter(x -&gt; x =! <span style='font-weight:bold;color:#7B0052;'>null</span> &quot;&quot; TRUE.equals(filter.execute(this, x)));
+            <span style='font-weight:bold;color:#7B0052;'>return</span> stream.filter(x -&gt; x =! <span style='font-weight:bold;color:#7B0052;'>null</span> &ampersand;&ampersand; TRUE.equals(filter.execute(this, x)));
         <span style='font-weight:bold;color:#D3171B'>}</span>
     <span style='font-weight:bold;color:#D3171B'>}</span>
 
