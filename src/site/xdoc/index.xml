@@ -163,7 +163,7 @@ and ensure their execution within controlled functional constraints.
          * @return the filtered stream
          */</span>
         <span style='font-weight:bold;color:#7B0052;'>public</span> Stream&lt;?&gt; filter(Stream&lt;?&gt; stream, <span style='font-weight:bold;color:#7B0052;'>final</span> JexlScript filter) <span style='font-weight:bold;color:#D3171B'>{</span>
-            <span style='font-weight:bold;color:#7B0052;'>return</span> stream.filter(x -&gt; x =! <span style='font-weight:bold;color:#7B0052;'>null</span> &ampersand;&ampersand; TRUE.equals(filter.execute(this, x)));
+            <span style='font-weight:bold;color:#7B0052;'>return</span> stream.filter(x -&gt; x =! <span style='font-weight:bold;color:#7B0052;'>null</span> &amp;&amp; TRUE.equals(filter.execute(this, x)));
         <span style='font-weight:bold;color:#D3171B'>}</span>
     <span style='font-weight:bold;color:#D3171B'>}</span>
 
