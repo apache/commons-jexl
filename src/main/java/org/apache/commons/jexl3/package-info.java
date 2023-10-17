@@ -293,7 +293,7 @@
  * </p>
  * <p>
  * {@link org.apache.commons.jexl3.JexlBuilder#debug(boolean)}
- * makes stacktraces carried by JExlException more meaningful; in particular, these
+ * makes stack traces carried by JExlException more meaningful; in particular, these
  * traces will carry the exact caller location the Expression was created from.
  * </p>
  * <h3><a id="dynamic_configuration">Dynamic Configuration</a></h3>

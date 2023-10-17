@@ -77,7 +77,7 @@ public class JexlException extends RuntimeException {
      * @param node  the node causing the error
      * @param msg   the error message
      * @param cause the exception causing the error
-     * @param trace whether this exception has a stacktrace and can <em>not</em> be suppressed
+     * @param trace whether this exception has a stack trace and can <em>not</em> be suppressed
      */
     protected JexlException(final JexlNode node, final String msg, final Throwable cause, final boolean trace) {
         super(msg != null ? msg : "", unwrap(cause), !trace, trace);
