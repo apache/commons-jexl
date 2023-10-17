@@ -75,7 +75,7 @@ public final class JexlFeatures {
     /** Registers feature ordinal. */
     private static final int REGISTER = 0;
     /** Reserved name feature ordinal. */
-    public static final int RESERVED = 1;
+    public static final int RESERVED = 1; // set to indicate that the resevedNames collection is non-empty; not read
     /** Locals feature ordinal. */
     public static final int LOCAL_VAR = 2;
     /** Side effects feature ordinal. */
