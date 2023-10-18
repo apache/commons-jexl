@@ -169,7 +169,7 @@ public final class JexlFeatures {
      * Creates a default features set suitable for basic scripting needs.
      * <p>Meant for legacy (before 3.3) scripting checks.</p>
      * <p>The following scripting features are enabled:</p>
-     * <lu>
+     * <ul>
      *   <li>local variable {@link JexlFeatures#supportsLocalVar()}</li>
      *   <li>side effect {@link JexlFeatures#supportsSideEffect()}</li>
      *   <li>global side effect {@link JexlFeatures#supportsSideEffectGlobal()}</li>
@@ -186,7 +186,7 @@ public final class JexlFeatures {
      *   <li>namespace pragma  {@link JexlFeatures#supportsNamespacePragma()}</li>
      *   <li>import pragma {@link JexlFeatures#supportsImportPragma()}</li>
      *   <li>pragma anywhere {@link JexlFeatures#supportsPragmaAnywhere()} </li>
-     * </lu>
+     * </ul>
      * @return a new instance of a default scripting features set
      * @since 3.3.1
      */
