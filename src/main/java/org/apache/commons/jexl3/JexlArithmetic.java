@@ -1393,9 +1393,12 @@ public class JexlArithmetic {
     protected static boolean isMultiplyExact(final long x, final long y, final long r) {
         final long ax = Math.abs(x);
         final long ay = Math.abs(y);
-        return !((ax | ay) >>> Integer.SIZE - 1 != 0
-                  && (y != 0 && r / y != x
-                      || x == Long.MIN_VALUE && y == -1));
+        // Some bits greater than 2^31 that might cause overflow
+        // Check the result using the divide operator
+        // and check for the special case of Long.MIN_VALUE * -1
+        return !(((ax | ay) >>> (Integer.SIZE - 1) != 0)
+                 && ((y != 0 && r / y != x)
+                     || (x == Long.MIN_VALUE && y == -1)));
     }
 
     /**

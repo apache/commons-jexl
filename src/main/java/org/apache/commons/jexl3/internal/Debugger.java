@@ -439,7 +439,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     /**
      * Checks if a terminal node is the cause to debug &amp; adds its representation to the rebuilt expression.
      * @param node  the child node
-     * @param image the child node token image (may be null)
+     * @param image the child node token image (optionally null)
      * @param data  visitor pattern argument
      * @return visitor pattern value
      */
@@ -802,7 +802,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
      * (but underscore, at-sign, sharp-sign and dollar).
      */
     protected static final Pattern QUOTED_IDENTIFIER =
-            Pattern.compile("[\\s]|[\\p{Punct}&&[^@#$_]]");
+            Pattern.compile("\\s|\\p{Punct}&&[^@#$_]");
 
     /**
      * Checks whether an identifier should be quoted or not.
@@ -897,7 +897,9 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
             for (final Map.Entry<String, Object> pragma : pragmas.entrySet()) {
                 final String key = pragma.getKey();
                 final Object value = pragma.getValue();
-                final Set<Object> values = value instanceof Set ? (Set) value : Collections.singleton(value);
+                final Set<Object> values = value instanceof Set<?>
+                    ? (Set<Object>) value
+                    : Collections.singleton(value);
                 for (final Object pragmaValue : values) {
                     builder.append("#pragma ");
                     builder.append(key);
@@ -1054,8 +1056,6 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
             for (int i = 1; i < num; ++i) {
                 if (!first) {
                     builder.append(", ");
-                } else {
-                    first = true;
                 }
                 accept(node.jjtGetChild(i), data);
             }
@@ -1275,15 +1275,15 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
                 if (child instanceof ASTAssignment) {
                     final ASTAssignment assign = (ASTAssignment) child;
                     final int nc = assign.jjtGetNumChildren();
-                    final ASTVar var = (ASTVar) assign.jjtGetChild(0);
-                    builder.append(var.getName());
+                    final ASTVar avar = (ASTVar) assign.jjtGetChild(0);
+                    builder.append(avar.getName());
                     if (nc > 1) {
                         builder.append(" = ");
                         accept(assign.jjtGetChild(1), data);
                     }
                 } else if (child instanceof ASTVar) {
-                    final ASTVar var = (ASTVar) child;
-                    builder.append(var.getName());
+                    final ASTVar avar = (ASTVar) child;
+                    builder.append(avar.getName());
                 } else {
                     // that's odd
                     accept(child, data);
@@ -1411,7 +1411,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     protected Object visit(final ASTAnnotatedStatement node, final Object data) {
         final int num = node.jjtGetNumChildren();
         for (int i = 0; i < num; ++i) {
-            if (i > 0) {// && child instanceof ASTBlock) {
+            if (i > 0) {
                 builder.append(' ');
             }
             final JexlNode child = node.jjtGetChild(i);

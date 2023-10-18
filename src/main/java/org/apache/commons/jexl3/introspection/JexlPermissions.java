@@ -392,10 +392,11 @@ public interface JexlPermissions {
          * Creates permissions based on the RESTRICTED set but allowing an explicit set.
          * @param allow the set of allowed classes
          */
-        public ClassPermissions(final Class... allow) {
+        public ClassPermissions(final Class<?>... allow) {
             this(JexlPermissions.RESTRICTED,
-                    Arrays.asList(Objects.requireNonNull(allow))
-                            .stream().map(Class::getCanonicalName).collect(Collectors.toList()));
+                    Arrays.stream(Objects.requireNonNull(allow))
+                        .map(Class::getCanonicalName)
+                        .collect(Collectors.toList()));
         }
 
         /**
@@ -423,7 +424,7 @@ public interface JexlPermissions {
         }
 
         @Override
-        public boolean allow(final Constructor constructor) {
+        public boolean allow(final Constructor<?> constructor) {
             return validate(constructor) && isClassAllowed(constructor.getDeclaringClass()) || super.allow(constructor);
         }
 
