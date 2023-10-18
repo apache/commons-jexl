@@ -80,7 +80,7 @@ public final class JexlFeatures {
     public static final int LOCAL_VAR = 2;
     /** Side effects feature ordinal. */
     public static final int SIDE_EFFECT = 3;
-    /** Global side-effects feature ordinal. */
+    /** Global side effects feature ordinal. */
     public static final int SIDE_EFFECT_GLOBAL = 4;
     /** Array get is allowed on expr. */
     public static final int ARRAY_REF_EXPR = 5;
@@ -104,7 +104,7 @@ public final class JexlFeatures {
     public static final int LEXICAL = 14;
     /** Lexical shade feature ordinal. */
     public static final int LEXICAL_SHADE = 15;
-    /** Fat-arrow lambda syntax. */
+    /** Thin-arrow lambda syntax. */
     public static final int THIN_ARROW = 16;
     /** Fat-arrow lambda syntax. */
     public static final int FAT_ARROW = 17;
@@ -117,36 +117,99 @@ public final class JexlFeatures {
     /** The pragma anywhere feature ordinal. */
     public static final int PRAGMA_ANYWHERE = 21;
     /** Captured variables are const. */
-    public static final  int CONST_CAPTURE = 22;
-    /**
-     * The default features flag mask.
-     */
-    private static final long DEFAULT_FEATURES =
-            1L << LOCAL_VAR
-            | 1L << SIDE_EFFECT
-            | 1L << SIDE_EFFECT_GLOBAL
-            | 1L << ARRAY_REF_EXPR
-            | 1L << NEW_INSTANCE
-            | 1L << LOOP
-            | 1L << LAMBDA
-            | 1L << METHOD_CALL
-            | 1L << STRUCTURED_LITERAL
-            | 1L << PRAGMA
-            | 1L << ANNOTATION
-            | 1L << SCRIPT
-            | 1L << THIN_ARROW
-            | 1L << NS_PRAGMA
-            | 1L << IMPORT_PRAGMA
-            | 1L << COMPARATOR_NAMES
-            | 1L << PRAGMA_ANYWHERE;
+    public static final int CONST_CAPTURE = 22;
 
     /**
-     * Creates an all-features-enabled instance.
+     * The default features flag mask.
+     * <p>Meant for compatibility with scripts written before 3.3.1</p>
+     */
+    private static final long DEFAULT_FEATURES =
+        1L << LOCAL_VAR
+        | 1L << SIDE_EFFECT
+        | 1L << SIDE_EFFECT_GLOBAL
+        | 1L << ARRAY_REF_EXPR
+        | 1L << NEW_INSTANCE
+        | 1L << LOOP
+        | 1L << LAMBDA
+        | 1L << METHOD_CALL
+        | 1L << STRUCTURED_LITERAL
+        | 1L << PRAGMA
+        | 1L << ANNOTATION
+        | 1L << SCRIPT
+        | 1L << THIN_ARROW
+        | 1L << NS_PRAGMA
+        | 1L << IMPORT_PRAGMA
+        | 1L << COMPARATOR_NAMES
+        | 1L << PRAGMA_ANYWHERE;
+
+    /**
+     * The canonical scripting (since 3.3.1) features flag mask based on the original default.
+     * <p>Adds lexical, lexical-shade and const-capture but removes comparator-names and pragma-anywhere</p>
+     */
+    private static final long SCRIPT_FEATURES =
+        DEFAULT_FEATURES
+        | 1L << LEXICAL
+        | 1L << LEXICAL_SHADE
+        | 1L << CONST_CAPTURE
+        & ~(1L << COMPARATOR_NAMES)
+        & ~(1L << PRAGMA_ANYWHERE);
+
+    /**
+     * Creates an empty feature set.
+     * <p>This is the strictest base-set since no feature is allowed, suitable as-is only
+     * for the simplest expressions.</p>
+     * @return a new instance of an empty features set
+     * @since 3.3.1
+     */
+    public static JexlFeatures create() {
+        return new JexlFeatures(0L, null, null);
+    }
+
+    /**
+     * Creates a default features set suitable for basic scripting needs.
+     * <p>Meant for legacy (before 3.3) scripting checks.</p>
+     * <p>The following scripting features are enabled:</p>
+     * <lu>
+     *   <li>local variable {@link JexlFeatures#supportsLocalVar()}</li>
+     *   <li>side effect {@link JexlFeatures#supportsSideEffect()}</li>
+     *   <li>global side effect {@link JexlFeatures#supportsSideEffectGlobal()}</li>
+     *   <li>array reference expression {@link JexlFeatures#supportsStructuredLiteral()}</li>
+     *   <li>new instance  {@link JexlFeatures#supportsNewInstance()} </li>
+     *   <li>loop {@link JexlFeatures#supportsLoops()} </li>
+     *   <li>lambda {@link JexlFeatures#supportsLambda()}</li>
+     *   <li>method call {@link JexlFeatures#supportsMethodCall()}</li>
+     *   <li>structured literal {@link JexlFeatures#supportsStructuredLiteral()}</li>
+     *   <li>pragma {@link JexlFeatures#supportsPragma()}</li>
+     *   <li>annotation {@link JexlFeatures#supportsAnnotation()}</li>
+     *   <li>script {@link JexlFeatures#supportsScript()}</li>
+     *   <li>comparator names  {@link JexlFeatures#supportsComparatorNames()}</li>
+     *   <li>namespace pragma  {@link JexlFeatures#supportsNamespacePragma()}</li>
+     *   <li>import pragma {@link JexlFeatures#supportsImportPragma()}</li>
+     *   <li>pragma anywhere {@link JexlFeatures#supportsPragmaAnywhere()} </li>
+     * </lu>
+     * @return a new instance of a default scripting features set
+     * @since 3.3.1
+     */
+    public static JexlFeatures createDefault() {
+        return new JexlFeatures(DEFAULT_FEATURES, null, null);
+    }
+
+    /**
+     * The modern scripting features set.
+     * <p>All scripting features are set including lexical, lexical-shade and const-capture.</p>
+     * @return a new instance of a modern scripting features set
+     * @since 3.3.1
+     */
+    public static JexlFeatures createScript() {
+        return new JexlFeatures(SCRIPT_FEATURES, null, null);
+    }
+
+    /**
+     * Creates default instance, equivalent to the result of calling the preferred alternative
+     * {@link JexlFeatures#createDefault()}
      */
     public JexlFeatures() {
-        flags = DEFAULT_FEATURES;
-        reservedNames = Collections.emptySet();
-        nameSpaces = TEST_STR_FALSE;
+        this(DEFAULT_FEATURES, null, null);
     }
 
     /**
@@ -154,9 +217,20 @@ public final class JexlFeatures {
      * @param features the feature to copy from
      */
     public JexlFeatures(final JexlFeatures features) {
-        this.flags = features.flags;
-        this.reservedNames = features.reservedNames;
-        this.nameSpaces = features.nameSpaces;
+        this(features.flags, features.reservedNames, features.nameSpaces);
+    }
+
+    /**
+     * An all member constructor.
+     * @param f flag
+     * @param r reserved variable names
+     * @param n namespace predicate
+     */
+    protected JexlFeatures(final long f, final Set<String> r, final Predicate<String> n) {
+        this.flags = f;
+        this.reservedNames = r == null? Collections.emptySet() : r;
+        this.nameSpaces = n == null? TEST_STR_FALSE : n;
+        setFeature(RESERVED, !reservedNames.isEmpty());
     }
 
     @Override
@@ -718,6 +792,9 @@ public final class JexlFeatures {
      */
     public JexlFeatures lexical(final boolean flag) {
         setFeature(LEXICAL, flag);
+        if (!flag) {
+            setFeature(LEXICAL_SHADE, false);
+        }
         return this;
     }
 

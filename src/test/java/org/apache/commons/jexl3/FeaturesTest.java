@@ -32,7 +32,7 @@ public class FeaturesTest extends JexlTestCase {
      * Create the test
      */
     public FeaturesTest() {
-        super("BlockTest");
+        super("FeaturesTest");
     }
 
     /**
@@ -322,6 +322,54 @@ public class FeaturesTest extends JexlTestCase {
         checkFeature(f, scripts);
         final JexlFeatures nof = new JexlFeatures().constCapture(true);
         assertOk(nof, scripts);
+    }
+
+    @Test
+    public void testIssue409() {
+        final JexlFeatures baseFeatures = JexlFeatures.createDefault();
+        Assert.assertFalse(baseFeatures.isLexical());
+        Assert.assertFalse(baseFeatures.isLexicalShade());
+        Assert.assertFalse(baseFeatures.supportsConstCapture());
+
+        final JexlFeatures scriptFeatures = JexlFeatures.createScript();
+        Assert.assertTrue(scriptFeatures.isLexical());
+        Assert.assertTrue(scriptFeatures.isLexicalShade());
+        scriptFeatures.lexical(false);
+        Assert.assertFalse(scriptFeatures.isLexical());
+        Assert.assertFalse(scriptFeatures.isLexicalShade());
+
+        scriptFeatures.constCapture(false);
+        Assert.assertEquals(baseFeatures, scriptFeatures);
+    }
+
+    @Test
+    public void testCreate() {
+        final JexlFeatures f = JexlFeatures.create();
+        Assert.assertTrue(f.supportsExpression());
+
+        Assert.assertFalse(f.supportsAnnotation());
+        Assert.assertFalse(f.supportsArrayReferenceExpr());
+        Assert.assertFalse(f.supportsComparatorNames());
+        Assert.assertFalse(f.supportsFatArrow());
+        Assert.assertFalse(f.supportsImportPragma());
+        Assert.assertFalse(f.supportsLambda());
+        Assert.assertFalse(f.supportsLocalVar());
+        Assert.assertFalse(f.supportsLoops());
+        Assert.assertFalse(f.supportsMethodCall());
+        Assert.assertFalse(f.supportsNamespacePragma());
+        Assert.assertFalse(f.supportsNewInstance());
+        Assert.assertFalse(f.supportsPragma());
+        Assert.assertFalse(f.supportsPragmaAnywhere());
+        Assert.assertFalse(f.supportsScript());
+        Assert.assertFalse(f.supportsStructuredLiteral());
+
+        Assert.assertFalse(f.isLexical());
+        Assert.assertFalse(f.isLexicalShade());
+        Assert.assertFalse(f.supportsConstCapture());
+
+        JexlEngine jnof = new JexlBuilder().features(f).create();
+        Assert.assertThrows(JexlException.Feature.class, ()->jnof.createScript("{ 3 + 4 }"));
+        Assert.assertNotNull(jnof.createExpression("3 + 4"));
     }
 
 }
