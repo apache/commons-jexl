@@ -151,11 +151,11 @@ final class ClassMap {
     /**
      * Find a Field using its name.
      *
-     * @param fname the field name
+     * @param fieldName the field name
      * @return A Field object representing the field to invoke or null.
      */
-    Field getField(final String fname) {
-        return fieldCache.get(fname);
+    Field getField(final String fieldName) {
+        return fieldCache.get(fieldName);
     }
 
     /**

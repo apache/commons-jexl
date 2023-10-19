@@ -194,12 +194,12 @@ public final class MethodKey {
         if (ptypes.length == 0 || ptypes[ptypes.length - 1].getComponentType() == null) {
             return false;
         }
-        final String mname = method.getName();
+        final String methodName = method.getName();
         // if this is an override, was it actually declared as varargs?
         Class<?> clazz = method.getDeclaringClass();
         do {
             try {
-                final Method m = clazz.getMethod(mname, ptypes);
+                final Method m = clazz.getMethod(methodName, ptypes);
                 if (m.isVarArgs()) {
                     return true;
                 }

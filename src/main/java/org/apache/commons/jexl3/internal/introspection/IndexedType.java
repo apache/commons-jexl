@@ -187,8 +187,8 @@ public final class IndexedType implements JexlPropertyGet {
                 }
             }
             final Object[] args = {key};
-            final String mname = getters[0].getName();
-            final MethodKey km = new MethodKey(mname, args);
+            final String methodName = getters[0].getName();
+            final MethodKey km = new MethodKey(methodName, args);
             jm = km.getMostSpecificMethod(getters);
             if (jm != null) {
                 final Object invoked = jm.invoke(object, args);
@@ -222,8 +222,8 @@ public final class IndexedType implements JexlPropertyGet {
                 }
             }
             final Object[] args = {key, value};
-            final String mname = setters[0].getName();
-            final MethodKey km = new MethodKey(mname, args);
+            final String methodName = setters[0].getName();
+            final MethodKey km = new MethodKey(methodName, args);
             jm = km.getMostSpecificMethod(setters);
             if (jm != null) {
                 final Object invoked = jm.invoke(object, args);

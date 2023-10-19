@@ -466,12 +466,12 @@ public final class JexlSandbox {
         /**
          * Adds a list of readable property names to these permissions.
          *
-         * @param pnames the property names
+         * @param propertyNames the property names
          * @return this instance of permissions
          */
-        public Permissions read(final String... pnames) {
-            for (final String pname : pnames) {
-                read.add(pname);
+        public Permissions read(final String... propertyNames) {
+            for (final String propertyName : propertyNames) {
+                read.add(propertyName);
             }
             return this;
         }
@@ -479,12 +479,12 @@ public final class JexlSandbox {
         /**
          * Adds a list of writable property names to these permissions.
          *
-         * @param pnames the property names
+         * @param propertyNames the property names
          * @return this instance of permissions
          */
-        public Permissions write(final String... pnames) {
-            for (final String pname : pnames) {
-                write.add(pname);
+        public Permissions write(final String... propertyNames) {
+            for (final String propertyName : propertyNames) {
+                write.add(propertyName);
             }
             return this;
         }
@@ -493,12 +493,12 @@ public final class JexlSandbox {
          * Adds a list of executable methods names to these permissions.
          * <p>The constructor is denoted as the empty-string, all other methods by their names.</p>
          *
-         * @param mnames the method names
+         * @param methodNames the method names
          * @return this instance of permissions
          */
-        public Permissions execute(final String... mnames) {
-            for (final String mname : mnames) {
-                execute.add(mname);
+        public Permissions execute(final String... methodNames) {
+            for (final String methodName : methodNames) {
+                execute.add(methodName);
             }
             return this;
         }

@@ -245,19 +245,19 @@ public final class Introspector {
                 // miss or not?
                 return CTOR_MISS.equals(ctor) ? null : ctor;
             }
-            final String cname = key.getMethod();
+            final String constructorName = key.getMethod();
             // do we know about this class?
-            Class<?> clazz = constructibleClasses.get(cname);
+            Class<?> clazz = constructibleClasses.get(constructorName);
             try {
                 // do find the most specific ctor
                 if (clazz == null) {
                     if (c != null && c.getName().equals(key.getMethod())) {
                         clazz = c;
                     } else {
-                        clazz = loader.loadClass(cname);
+                        clazz = loader.loadClass(constructorName);
                     }
                     // add it to list of known loaded classes
-                    constructibleClasses.put(cname, clazz);
+                    constructibleClasses.put(constructorName, clazz);
                 }
                 final List<Constructor<?>> l = new ArrayList<>();
                 for (final Constructor<?> ictor : clazz.getConstructors()) {
@@ -275,13 +275,13 @@ public final class Introspector {
             } catch (final ClassNotFoundException xnotfound) {
                 if (logger != null && logger.isDebugEnabled()) {
                     logger.debug("unable to find class: "
-                            + cname + "."
+                            + constructorName + "."
                             + key.debugString(), xnotfound);
                 }
             } catch (final MethodKey.AmbiguousException xambiguous) {
                 if (logger != null  && xambiguous.isSevere() &&  logger.isInfoEnabled()) {
                     logger.info("ambiguous constructor invocation: "
-                            + cname + "."
+                            + constructorName + "."
                             + key.debugString(), xambiguous);
                 }
                 ctor = null;
