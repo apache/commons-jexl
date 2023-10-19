@@ -221,13 +221,15 @@ public final class JexlFeatures {
     }
 
     /**
-     * An all member constructor.
+     * An all member constructor for use by this class only
      * @param f flag
-     * @param r reserved variable names
+     * @param r reserved variable names; must be an immutable Set
      * @param n namespace predicate
      */
-    protected JexlFeatures(final long f, final Set<String> r, final Predicate<String> n) {
+    private JexlFeatures(final long f, final Set<String> r, final Predicate<String> n) {
         this.flags = f;
+        // N.B. reservedNames must be an immutable Set.
+        // This can only be guaranteed if this ctor is private
         this.reservedNames = r == null? Collections.emptySet() : r;
         this.nameSpaces = n == null? TEST_STR_FALSE : n;
         setFeature(RESERVED, !this.reservedNames.isEmpty());
