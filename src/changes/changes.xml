@@ -29,6 +29,9 @@
     <body>
         <release version="3.3.1" date="20YY-MM-DD">
             <!-- ADD -->
+            <action dev="henrib" type="add" issue="JEXL-408" due-to="sebb">
+                Using JexlFeatures is tedious
+            </action>
             <action dev="henrib" type="add" issue="JEXL-404" due-to="Xu Pengcheng">
                 Support array-access safe navigation (x?[y])
             </action>
@@ -39,6 +42,12 @@
                 Allow 'trailing commas' or ellipsis while defining array, map and set literals
             </action>
             <!-- FIX -->
+            <action dev="henrib" type="fix" issue="JEXL-410" due-to="sebb">
+                JexlFeatures: ctor does not enable all features
+            </action>
+            <action dev="henrib" type="fix" issue="JEXL-409" due-to="sebb">
+                Disable LEXICAL should disable LEXICAL_SHADE
+            </action>
             <action dev="henrib" type="fix" issue="JEXL-405">
                 Recursive functions corrupt evaluation frame if reassigned
             </action>

@@ -21,6 +21,8 @@ import java.util.Arrays;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.apache.commons.jexl3.JexlFeatures.CONST_CAPTURE;
+
 /**
  * Tests for blocks
  * @since 1.1
@@ -326,7 +328,7 @@ public class FeaturesTest extends JexlTestCase {
 
     @Test
     public void testIssue409() {
-        final JexlFeatures baseFeatures = JexlFeatures.createDefault();
+        final JexlFeatures baseFeatures =  JexlFeatures.createDefault();
         Assert.assertFalse(baseFeatures.isLexical());
         Assert.assertFalse(baseFeatures.isLexicalShade());
         Assert.assertFalse(baseFeatures.supportsConstCapture());
@@ -337,14 +339,11 @@ public class FeaturesTest extends JexlTestCase {
         scriptFeatures.lexical(false);
         Assert.assertFalse(scriptFeatures.isLexical());
         Assert.assertFalse(scriptFeatures.isLexicalShade());
-
-        scriptFeatures.constCapture(false);
-        Assert.assertEquals(baseFeatures, scriptFeatures);
     }
 
     @Test
     public void testCreate() {
-        final JexlFeatures f = JexlFeatures.create();
+        final JexlFeatures f = JexlFeatures.createNone();
         Assert.assertTrue(f.supportsExpression());
 
         Assert.assertFalse(f.supportsAnnotation());
@@ -372,4 +371,46 @@ public class FeaturesTest extends JexlTestCase {
         Assert.assertNotNull(jnof.createExpression("3 + 4"));
     }
 
+    @Test
+    public void test410a() {
+        long x = JexlFeatures.ALL_FEATURES;
+        Assert.assertEquals(23, Long.bitCount(x));
+        Assert.assertTrue((x & (1L << CONST_CAPTURE)) != 0);
+
+        JexlFeatures all = JexlFeatures.createAll();
+        final JexlEngine jexl = new JexlBuilder().features(all).create();
+        JexlScript script = jexl.createScript("#0 * #1", "#0", "#1");
+        Object r = script.execute(null, 6, 7);
+        Assert.assertEquals(42, r);
+    }
+
+    @Test
+    public void test410b() {
+        JexlFeatures features = JexlFeatures.createScript();
+        Assert.assertTrue(features.isLexical());
+        Assert.assertTrue(features.isLexicalShade());
+        Assert.assertTrue(features.supportsConstCapture());
+        //features.pragmaAnywhere(false);
+        Assert.assertFalse(features.supportsPragmaAnywhere());
+        //features.comparatorNames(false);
+        Assert.assertFalse(features.supportsComparatorNames());
+
+        final JexlEngine jexl = new JexlBuilder().features(features).create();
+        for(String varName : JexlFeatures.RESERVED_WORDS) {
+            String src = "var " + varName;
+            //JexlScript script = jexl.createScript(src);
+            Assert.assertThrows(JexlException.Feature.class, () -> jexl.createScript(src));
+        }
+        final String[] cmpNameScripts = {
+            "1 eq 1",
+            "2 ne 3",
+            "1 lt 2",
+            "3 le 3",
+            "4 gt 2",
+            "3 ge 2"
+        };
+        for(String src : cmpNameScripts) {
+            Assert.assertThrows(JexlException.Ambiguous.class, () -> jexl.createScript(src));
+        }
+    }
 }

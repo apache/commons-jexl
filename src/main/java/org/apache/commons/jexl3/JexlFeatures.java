@@ -16,8 +16,10 @@
  */
 package org.apache.commons.jexl3;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
@@ -25,8 +27,13 @@ import java.util.function.Predicate;
 
 /**
  * A set of language feature options.
+ * <p>
  * These control <em>syntactical</em> constructs that will throw JexlException.Feature exceptions (a
  * subclass of JexlException.Parsing) when disabled.
+ * </p>
+ * <p>It is recommended to be explicit in choosing the features you need rather than rely on the default
+ * constructor: the 2 convenience methods {@link JexlFeatures#createNone()} and {@link JexlFeatures#createAll()}
+ * are the recommended starting points to selectively enable or disable chosen features.</p>
  * <ul>
  * <li>Registers: register syntax (#number), used internally for {g,s}etProperty
  * <li>Reserved Names: a set of reserved variable names that can not be used as local variable (or parameter) names
@@ -63,7 +70,7 @@ public final class JexlFeatures {
     /** The namespace names. */
     private Predicate<String> nameSpaces;
     /** The false predicate. */
-    public static final Predicate<String> TEST_STR_FALSE = s->false;
+    public static final Predicate<String> TEST_STR_FALSE = s -> false;
     /** Te feature names (for toString()). */
     private static final String[] F_NAMES = {
         "register", "reserved variable", "local variable", "assign/modify",
@@ -74,15 +81,15 @@ public final class JexlFeatures {
     };
     /** Registers feature ordinal. */
     private static final int REGISTER = 0;
-    /** Reserved name feature ordinal. */
-    public static final int RESERVED = 1; // set to indicate that the resevedNames collection is non-empty; not read
+    /** Reserved future feature ordinal (unused as of 3.3.1). */
+    public static final int RESERVED = 1;
     /** Locals feature ordinal. */
     public static final int LOCAL_VAR = 2;
     /** Side effects feature ordinal. */
     public static final int SIDE_EFFECT = 3;
     /** Global side effects feature ordinal. */
     public static final int SIDE_EFFECT_GLOBAL = 4;
-    /** Array get is allowed on expr. */
+    /** Expressions allowed in array reference ordinal. */
     public static final int ARRAY_REF_EXPR = 5;
     /** New-instance feature ordinal. */
     public static final int NEW_INSTANCE = 6;
@@ -123,7 +130,7 @@ public final class JexlFeatures {
      * The default features flag mask.
      * <p>Meant for compatibility with scripts written before 3.3.1</p>
      */
-    private static final long DEFAULT_FEATURES =
+    public static final long DEFAULT_FEATURES =
         1L << LOCAL_VAR
         | 1L << SIDE_EFFECT
         | 1L << SIDE_EFFECT_GLOBAL
@@ -146,13 +153,27 @@ public final class JexlFeatures {
      * The canonical scripting (since 3.3.1) features flag mask based on the original default.
      * <p>Adds lexical, lexical-shade and const-capture but removes comparator-names and pragma-anywhere</p>
      */
-    private static final long SCRIPT_FEATURES =
-        DEFAULT_FEATURES
+    public static final long SCRIPT_FEATURES =
+        ( DEFAULT_FEATURES
         | 1L << LEXICAL
         | 1L << LEXICAL_SHADE
-        | 1L << CONST_CAPTURE
+        | 1L << CONST_CAPTURE ) // these parentheses are necessary :-)
         & ~(1L << COMPARATOR_NAMES)
         & ~(1L << PRAGMA_ANYWHERE);
+
+    /**
+     * All features.
+     */
+    public static final long ALL_FEATURES = (1L << (CONST_CAPTURE + 1)) - 1L;
+
+    /**
+     * Creates an all features enabled set.
+     * @return a new instance of all features set
+     * @since 3.3.1
+     */
+    public static JexlFeatures createAll() {
+        return new JexlFeatures(ALL_FEATURES, null, null);
+    }
 
     /**
      * Creates an empty feature set.
@@ -161,31 +182,32 @@ public final class JexlFeatures {
      * @return a new instance of an empty features set
      * @since 3.3.1
      */
-    public static JexlFeatures create() {
+    public static JexlFeatures createNone() {
         return new JexlFeatures(0L, null, null);
     }
 
     /**
-     * Creates a default features set suitable for basic scripting needs.
-     * <p>Meant for legacy (before 3.3) scripting checks.</p>
+     * Creates a default features set suitable for basic but complete scripting needs.
+     * <p>Maximizes compatibility with older version scripts (before 3.3), new projects should
+     * use {@link JexlFeatures#createScript()} or equivalent features as a base.</p>
      * <p>The following scripting features are enabled:</p>
      * <ul>
-     *   <li>local variable {@link JexlFeatures#supportsLocalVar()}</li>
-     *   <li>side effect {@link JexlFeatures#supportsSideEffect()}</li>
-     *   <li>global side effect {@link JexlFeatures#supportsSideEffectGlobal()}</li>
-     *   <li>array reference expression {@link JexlFeatures#supportsStructuredLiteral()}</li>
-     *   <li>new instance  {@link JexlFeatures#supportsNewInstance()} </li>
-     *   <li>loop {@link JexlFeatures#supportsLoops()} </li>
-     *   <li>lambda {@link JexlFeatures#supportsLambda()}</li>
-     *   <li>method call {@link JexlFeatures#supportsMethodCall()}</li>
-     *   <li>structured literal {@link JexlFeatures#supportsStructuredLiteral()}</li>
-     *   <li>pragma {@link JexlFeatures#supportsPragma()}</li>
-     *   <li>annotation {@link JexlFeatures#supportsAnnotation()}</li>
-     *   <li>script {@link JexlFeatures#supportsScript()}</li>
-     *   <li>comparator names  {@link JexlFeatures#supportsComparatorNames()}</li>
-     *   <li>namespace pragma  {@link JexlFeatures#supportsNamespacePragma()}</li>
-     *   <li>import pragma {@link JexlFeatures#supportsImportPragma()}</li>
-     *   <li>pragma anywhere {@link JexlFeatures#supportsPragmaAnywhere()} </li>
+     *   <li>local variable, {@link JexlFeatures#supportsLocalVar()}</li>
+     *   <li>side effect, {@link JexlFeatures#supportsSideEffect()}</li>
+     *   <li>global side effect, {@link JexlFeatures#supportsSideEffectGlobal()}</li>
+     *   <li>array reference expression, {@link JexlFeatures#supportsStructuredLiteral()}</li>
+     *   <li>new instance, {@link JexlFeatures#supportsNewInstance()} </li>
+     *   <li>loop, {@link JexlFeatures#supportsLoops()}</li>
+     *   <li>lambda, {@link JexlFeatures#supportsLambda()}</li>
+     *   <li>method call, {@link JexlFeatures#supportsMethodCall()}</li>
+     *   <li>structured literal, {@link JexlFeatures#supportsStructuredLiteral()}</li>
+     *   <li>pragma, {@link JexlFeatures#supportsPragma()}</li>
+     *   <li>annotation, {@link JexlFeatures#supportsAnnotation()}</li>
+     *   <li>script, {@link JexlFeatures#supportsScript()}</li>
+     *   <li>comparator names,  {@link JexlFeatures#supportsComparatorNames()}</li>
+     *   <li>namespace pragma,  {@link JexlFeatures#supportsNamespacePragma()}</li>
+     *   <li>import pragma, {@link JexlFeatures#supportsImportPragma()}</li>
+     *   <li>pragma anywhere, {@link JexlFeatures#supportsPragmaAnywhere()}</li>
      * </ul>
      * @return a new instance of a default scripting features set
      * @since 3.3.1
@@ -195,13 +217,34 @@ public final class JexlFeatures {
     }
 
     /**
+     * Protected future syntactic elements.
+     * <p><em>try, catch, throw, finally, switch, case, default, class, instanceof</em></p>
+     * @since 3.3.1
+     */
+    public static final Set<String> RESERVED_WORDS =
+        Collections.unmodifiableSet(
+            new HashSet<>((Arrays.asList(
+                "try", "catch", "throw", "finally", "switch", "case", "default", "class", "instanceof"))));
+
+    /**
      * The modern scripting features set.
-     * <p>All scripting features are set including lexical, lexical-shade and const-capture.</p>
+     * <p>This is the recommended set for new projects.</p>
+     * <p>All default features with the following differences:</p>
+     * <ul>
+     * <li><em>disable</em> pragma-anywhere, {@link JexlFeatures#supportsPragmaAnywhere()}</li>
+     * <li><em>disable</em> comparator-names, {@link JexlFeatures#supportsComparatorNames()}</li>
+     * <li><em>enable</em> lexical, {@link JexlFeatures#isLexical()}</li>
+     * <li><em>enable</em> lexical-shade, {@link JexlFeatures#isLexicalShade()} </li>
+     * <li><em>enable</em> const-capture, {@link JexlFeatures#supportsConstCapture()}</li>
+     * </ul>
+     * <p>It also adds a set of reserved words to enable future unencumbered syntax evolution:
+     * <em>try, catch, throw, finally, switch, case, default, class, instanceof</em>
+     * </p>
      * @return a new instance of a modern scripting features set
      * @since 3.3.1
      */
     public static JexlFeatures createScript() {
-        return new JexlFeatures(SCRIPT_FEATURES, null, null);
+        return new JexlFeatures(SCRIPT_FEATURES, RESERVED_WORDS, null);
     }
 
     /**
@@ -232,7 +275,6 @@ public final class JexlFeatures {
         // This can only be guaranteed if this ctor is private
         this.reservedNames = r == null? Collections.emptySet() : r;
         this.nameSpaces = n == null? TEST_STR_FALSE : n;
-        setFeature(RESERVED, !this.reservedNames.isEmpty());
     }
 
     @Override
@@ -284,7 +326,6 @@ public final class JexlFeatures {
         } else {
             reservedNames = Collections.unmodifiableSet(new TreeSet<>(names));
         }
-        setFeature(RESERVED, !reservedNames.isEmpty());
         return this;
     }
 

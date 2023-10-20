@@ -19,7 +19,7 @@ Its goal is to expose scripting features usable by technical operatives or consu
   https://commons.apache.org/jexl/
 
 ========================================================================================================================
-Release 3.2.1
+Release 3.3.1
 ========================================================================================================================
 
 Version 3.3.1 is a maintenance release.
@@ -30,12 +30,15 @@ Version 3.3.1 is source and binary compatible with 3.3.
 
 New Features in 3.3.1:
 ====================
+* JEXL-408:     Using JexlFeatures is tedious
 * JEXL-404:     Support array-access safe navigation (x?[y])
 * JEXL-401:     Captured variables should be read-only
 * JEXL-398:     Allow 'trailing commas' or ellipsis while defining array, map and set literals
 
 Bugs Fixed in 3.3.1:
 ===================
+* JEXL-410:     JexlFeatures: ctor does not enable all features
+* JEXL-409:     Disable LEXICAL should disable LEXICAL_SHADE
 * JEXL-405:     Recursive functions corrupt evaluation frame if reassigned
 * JEXL-403:     Exception while evaluating template literal used in array assignment in loop.
 * JEXL-402:     parse failed with empty return value.
@@ -57,7 +60,7 @@ accessible through scripts has a real impact on your application security and st
 an informed review and conscious choice on your end.
 To mitigate the change, you can revert to the previous behavior with one line of code  (see JexlPermissions, JexlBuilder
 and JexlScriptEngine) or use this opportunity to reduce exposure. Whether Files, URLs, networking, processes,
-class-loaders or reflection classes or whether loops or side-effects are accessible are part of your choice to make.
+class-loaders or reflection classes or whether loops or side effects are accessible are part of your choice to make.
 
 What's new in 3.3:
 ==================
