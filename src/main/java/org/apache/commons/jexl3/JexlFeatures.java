@@ -218,13 +218,13 @@ public final class JexlFeatures {
 
     /**
      * Protected future syntactic elements.
-     * <p><em>try, catch, throw, finally, switch, case, default, class, instanceof</em></p>
+     * <p><em>try, catch, throw, finally, switch, case, default, class, instanceof, jexl, $jexl</em></p>
      * @since 3.3.1
      */
     public static final Set<String> RESERVED_WORDS =
         Collections.unmodifiableSet(
             new HashSet<>((Arrays.asList(
-                "try", "catch", "throw", "finally", "switch", "case", "default", "class", "instanceof"))));
+                "try", "catch", "throw", "finally", "switch", "case", "default", "class", "instanceof", "jexl", "$jexl"))));
 
     /**
      * The modern scripting features set.
@@ -264,15 +264,15 @@ public final class JexlFeatures {
     }
 
     /**
-     * An all member constructor for use by this class only
+     * An all member constructor for derivation.
+     * <p>Not respecting immutability or thread-safety constraints for this class constructor arguments will
+     * likely result in unexpected behavior.</p>
      * @param f flag
-     * @param r reserved variable names; must be an immutable Set
-     * @param n namespace predicate
+     * @param r reserved variable names; must be an immutable Set or thread-safe (concurrent or synchronized set)
+     * @param n namespace predicate; must be stateless or thread-safe
      */
-    private JexlFeatures(final long f, final Set<String> r, final Predicate<String> n) {
+    protected JexlFeatures(final long f, final Set<String> r, final Predicate<String> n) {
         this.flags = f;
-        // N.B. reservedNames must be an immutable Set.
-        // This can only be guaranteed if this ctor is private
         this.reservedNames = r == null? Collections.emptySet() : r;
         this.nameSpaces = n == null? TEST_STR_FALSE : n;
     }
@@ -316,8 +316,8 @@ public final class JexlFeatures {
     }
 
     /**
-     * Sets a collection of reserved names precluding those to be used as local variables or parameter names.
-     * @param names the names to reserve
+     * Sets a collection of reserved r precluding those to be used as local variables or parameter r.
+     * @param names the r to reserve
      * @return this features instance
      */
     public JexlFeatures reservedNames(final Collection<String> names) {
