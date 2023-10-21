@@ -43,11 +43,11 @@
 Apache Commons JEXL
 ===================
 
-[![GitHub Actions Status](https://github.com/apache/commons-jexl/workflows/Java%20CI/badge.svg)](https://github.com/apache/commons-jexl/actions)
+[![Java CI](https://github.com/apache/commons-jexl/actions/workflows/maven.yml/badge.svg)](https://github.com/apache/commons-jexl/actions/workflows/maven.yml)
 [![Coverage Status](https://codecov.io/gh/apache/commons-jexl/branch/master/graph/badge.svg)](https://app.codecov.io/gh/apache/commons-jexl)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.apache.commons/commons-jexl3/badge.svg?gav=true)](https://maven-badges.herokuapp.com/maven-central/org.apache.commons/commons-jexl3/?gav=true)
 [![Javadocs](https://javadoc.io/badge/org.apache.commons/commons-jexl3/3.2.svg)](https://javadoc.io/doc/org.apache.commons/commons-jexl3/3.2)
-[![CodeQL](https://github.com/apache/commons-jexl/workflows/CodeQL/badge.svg)](https://github.com/apache/commons-jexl/actions/workflows/codeql-analysis.yml?query=workflow%3ACodeQL)
+[![CodeQL](https://github.com/apache/commons-jexl/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/apache/commons-jexl/actions/workflows/codeql-analysis.yml)
 
 The Apache Commons JEXL library is an implementation of a Java-symbiotic Expression Language.
 
