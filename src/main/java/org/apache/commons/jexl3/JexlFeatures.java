@@ -130,13 +130,21 @@ public final class JexlFeatures {
      * All features.
      * N.B. ensure this is updated if additional features are added.
      */
-    private static final long ALL_FEATURES = (1L << (CONST_CAPTURE + 1)) - 1L;
+    private static final long ALL_FEATURES = (1L << (CONST_CAPTURE + 1)) - 1L; // MUST REMAIN PRIVATE
 
-    /**
+    /*
+     * *WARNING* 
+     * Static fields may be inlined by the Java compiler, so their _values_ effectively form part of the external API.
+     * Classes that reference them need to be recompiled to pick up new values.
+     * This means that changes in value are not binary compatible.
+     * Such fields must be private or problems may occur.
+     */
+
+     /**
      * The default features flag mask.
      * <p>Meant for compatibility with scripts written before 3.3.1</p>
      */
-    private static final long DEFAULT_FEATURES =
+    private static final long DEFAULT_FEATURES = // MUST REMAIN PRIVATE
         1L << LOCAL_VAR
         | 1L << SIDE_EFFECT
         | 1L << SIDE_EFFECT_GLOBAL
@@ -159,7 +167,7 @@ public final class JexlFeatures {
      * The canonical scripting (since 3.3.1) features flag mask based on the original default.
      * <p>Adds lexical, lexical-shade and const-capture but removes comparator-names and pragma-anywhere</p>
      */
-    private static final long SCRIPT_FEATURES =
+    private static final long SCRIPT_FEATURES = // MUST REMAIN PRIVATE
         ( DEFAULT_FEATURES
         | 1L << LEXICAL
         | 1L << LEXICAL_SHADE
