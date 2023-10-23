@@ -17,6 +17,7 @@
 package org.apache.commons.jexl3;
 
 import java.util.Arrays;
+import java.util.Collection;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -373,8 +374,8 @@ public class FeaturesTest extends JexlTestCase {
 
     @Test
     public void test410a() {
-        long x = JexlFeatures.ALL_FEATURES;
-        Assert.assertEquals(23, Long.bitCount(x));
+        long x = JexlFeatures.createAll().getFlags();
+        Assert.assertEquals(CONST_CAPTURE + 1, Long.bitCount(x));
         Assert.assertTrue((x & (1L << CONST_CAPTURE)) != 0);
 
         JexlFeatures all = JexlFeatures.createAll();
@@ -396,7 +397,8 @@ public class FeaturesTest extends JexlTestCase {
         Assert.assertFalse(features.supportsComparatorNames());
 
         final JexlEngine jexl = new JexlBuilder().features(features).create();
-        for(String varName : JexlFeatures.RESERVED_WORDS) {
+        Collection<String> reserved = features.getReservedNames();
+        for(String varName : reserved) {
             String src = "var " + varName;
             //JexlScript script = jexl.createScript(src);
             Assert.assertThrows(JexlException.Feature.class, () -> jexl.createScript(src));
