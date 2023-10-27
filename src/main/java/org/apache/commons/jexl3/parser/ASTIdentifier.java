@@ -24,9 +24,9 @@ public class ASTIdentifier extends JexlNode {
      *
      */
     private static final long serialVersionUID = 1L;
-    protected String name = null;
+    protected String name;
     protected int symbol = -1;
-    protected int flags = 0;
+    protected int flags;
 
     /** The redefined variable flag. */
     private static final int REDEFINED = 0;

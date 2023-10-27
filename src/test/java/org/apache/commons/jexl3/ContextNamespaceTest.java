@@ -57,7 +57,7 @@ public class ContextNamespaceTest extends JexlTestCase {
      * A thread local context carrying a namespace and some inner constants.
      */
     public static class TaxesContext extends MapContext implements JexlContext.ThreadLocal, JexlContext.NamespaceResolver {
-        private Taxes taxes = null;
+        private Taxes taxes;
         private final double vat;
 
         TaxesContext(final double vat) {

@@ -26,7 +26,7 @@ public class ASTArrayAccess extends JexlLexicalNode {
    * However, an expression like 'a?[b]?[c]?...?[b0]' with 64 terms is very unlikely
    * to occur in real life and a bad idea anyhow.
    */
-  private long safe = 0;
+  private long safe;
 
   public ASTArrayAccess(final int id) {
     super(id);

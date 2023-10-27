@@ -833,15 +833,15 @@ public abstract class InterpreterBase extends ParserVisitor {
         /** Whether solution is cacheable. */
         final boolean cacheable;
         /** Whether arguments have been narrowed.  */
-        boolean narrow = false;
+        boolean narrow;
         /** The method to call. */
-        JexlMethod vm = null;
+        JexlMethod vm;
         /** The method invocation target. */
-        Object target = null;
+        Object target;
         /** The actual arguments. */
-        Object[] argv = null;
+        Object[] argv;
         /** The cacheable funcall if any. */
-        Funcall funcall = null;
+        Funcall funcall;
 
         /**
          * Dispatcher ctor.

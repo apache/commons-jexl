@@ -175,8 +175,8 @@ public class MethodTest extends JexlTestCase {
     }
 
     public static class Functor {
-        private boolean overKill = false;
-        private String under = null;
+        private boolean overKill;
+        private String under;
 
         void setKill(final boolean ok) {
             overKill = ok;

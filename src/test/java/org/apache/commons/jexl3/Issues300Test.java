@@ -815,7 +815,7 @@ public class Issues300Test {
     }
 
     public static class Var370 {
-        private String name = null;
+        private String name;
         public void setName(final String s) {
             name = s;
         }
@@ -850,7 +850,7 @@ public class Issues300Test {
 
     public static class TestObject374 {
         private String name;
-        private TestObject374 nested = null;
+        private TestObject374 nested;
         public String getName() {
             return name;
         }

@@ -29,7 +29,7 @@ public class ASTJexlScript extends JexlLexicalNode  {
     /** serial uid.*/
     private static final long serialVersionUID = 202112111533L;
     /** The pragmas. */
-    private Map<String, Object> pragmas = null;
+    private Map<String, Object> pragmas;
     /** Features. */
     private transient JexlFeatures features = null;
     /** The script scope. */

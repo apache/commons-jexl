@@ -128,13 +128,13 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     /** The builder to compose messages. */
     protected final StringBuilder builder = new StringBuilder();
     /** The cause of the issue to debug. */
-    protected JexlNode cause = null;
+    protected JexlNode cause;
     /** The starting character location offset of the cause in the builder. */
-    protected int start = 0;
+    protected int start;
     /** The ending character location offset of the cause in the builder. */
-    protected int end = 0;
+    protected int end;
     /** The indentation level. */
-    protected int indentLevel = 0;
+    protected int indentLevel;
     /** Perform indentation?. */
     protected int indent = 2;
     /** accept() relative depth. */
@@ -144,7 +144,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     /** EOL. */
     protected String lf = "\n";
     /** Pragmas out. */
-    protected boolean outputPragmas = false;
+    protected boolean outputPragmas;
 
     /**
      * Creates a Debugger.

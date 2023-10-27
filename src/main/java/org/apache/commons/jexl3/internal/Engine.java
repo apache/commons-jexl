@@ -164,7 +164,7 @@ public class Engine extends JexlEngine {
     /**
      * The default jxlt engine.
      */
-    protected volatile TemplateEngine jxlt = null;
+    protected volatile TemplateEngine jxlt;
     /**
      * Collect all or only dot references.
      */
@@ -824,7 +824,7 @@ public class Engine extends JexlEngine {
         /**
          * The node that started the collect.
          */
-        private JexlNode root = null;
+        private JexlNode root;
         /**
          * Whether constant array-access is considered equivalent to dot-access;
          * if so, > 1 means collect any constant (set,map,...) instead of just

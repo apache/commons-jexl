@@ -24,7 +24,7 @@ public class ASTQualifiedIdentifier extends JexlNode {
      *
      */
     private static final long serialVersionUID = 1L;
-    protected String name = null;
+    protected String name;
 
     ASTQualifiedIdentifier(final int id) {
         super(id);

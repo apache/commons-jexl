@@ -22,7 +22,7 @@ public final class ASTJxltLiteral extends JexlNode {
     /** serial uid.*/
     private static final long serialVersionUID = 1L;
     /** The actual literal value. */
-    private String literal = null;
+    private String literal;
     /** The expression (parsed). */
     private transient JxltEngine.Expression jxltExpression = null;
 

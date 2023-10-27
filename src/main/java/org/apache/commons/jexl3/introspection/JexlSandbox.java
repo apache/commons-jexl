@@ -326,7 +326,7 @@ public final class JexlSandbox {
      */
     static class AllowSet extends Names {
         /** The map of controlled names and aliases. */
-        private Map<String, String> names = null;
+        private Map<String, String> names;
 
         @Override
         protected Names copy() {
@@ -370,7 +370,7 @@ public final class JexlSandbox {
      */
     static class BlockSet extends Names {
         /** The set of controlled names. */
-        private Set<String> names = null;
+        private Set<String> names;
 
         @Override
         protected Names copy() {

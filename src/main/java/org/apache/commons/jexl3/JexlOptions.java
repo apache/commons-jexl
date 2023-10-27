@@ -65,7 +65,7 @@ public final class JexlOptions {
     /** Default mask .*/
     private static int DEFAULT = 1 /*<< CANCELLABLE*/ | 1 << STRICT | 1 << ANTISH | 1 << SAFE;
     /** The arithmetic math context. */
-    private MathContext mathContext = null;
+    private MathContext mathContext;
     /** The arithmetic math scale. */
     private int mathScale = Integer.MIN_VALUE;
     /** The arithmetic strict math flag. */

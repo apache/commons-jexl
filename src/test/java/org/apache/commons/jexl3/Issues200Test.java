@@ -305,7 +305,7 @@ public class Issues200Test extends JexlTestCase {
     }
 
     public static class Foo245 {
-        private Object bar = null;
+        private Object bar;
 
         void setBar(final Object bar) {
             this.bar = bar;

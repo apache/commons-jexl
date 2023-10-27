@@ -26,7 +26,7 @@ import org.apache.commons.jexl3.parser.JexlNode;
  */
 public class Dumper {
     private final StringBuilder strb = new StringBuilder();
-    private int indent = 0;
+    private int indent;
 
     private void indent() {
         for (int i = 0; i < indent; ++i) {

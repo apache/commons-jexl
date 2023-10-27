@@ -51,7 +51,7 @@ public class AnnotationTest extends JexlTestCase {
     }
 
     public static class AnnotationContext extends MapContext implements JexlContext.AnnotationProcessor {
-        private int count = 0;
+        private int count;
         private final Set<String> names = new TreeSet<>();
 
         @Override
@@ -318,7 +318,7 @@ public class AnnotationTest extends JexlTestCase {
      * A counter whose inc method will misbehave if not mutex-ed.
      */
     public static class Counter {
-        private int value = 0;
+        private int value;
 
         public void inc() {
             final int v = value;

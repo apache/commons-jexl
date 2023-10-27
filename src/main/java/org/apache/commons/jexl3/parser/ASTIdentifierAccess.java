@@ -25,8 +25,8 @@ public class ASTIdentifierAccess extends JexlNode {
      *
      */
     private static final long serialVersionUID = 1L;
-    private String name = null;
-    private Integer identifier = null;
+    private String name;
+    private Integer identifier;
 
     ASTIdentifierAccess(final int id) {
         super(id);

@@ -55,7 +55,7 @@ public class ArrayBuilder implements JexlArithmetic.ArrayBuilder {
     }
 
     /** The intended class array. */
-    protected Class<?> commonClass = null;
+    protected Class<?> commonClass;
     /** Whether the array stores numbers. */
     protected boolean isNumber = true;
     /** Whether we can try unboxing. */
@@ -63,7 +63,7 @@ public class ArrayBuilder implements JexlArithmetic.ArrayBuilder {
     /** The untyped list of items being added. */
     protected final Object[] untyped;
     /** Number of added items. */
-    protected int added = 0;
+    protected int added;
     /** Extended? */
     protected final boolean extended;
 

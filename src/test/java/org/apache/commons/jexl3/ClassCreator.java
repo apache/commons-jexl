@@ -41,12 +41,12 @@ public class ClassCreator {
 
     //private final JexlEngine jexl;
     private final File base;
-    private File packageDir = null;
-    private int seed = 0;
+    private File packageDir;
+    private int seed;
     private String ctorBody = "";
-    private String className = null;
-    private String sourceName = null;
-    private ClassLoader loader = null;
+    private String className;
+    private String sourceName;
+    private ClassLoader loader;
     public static final boolean canRun = true;//comSunToolsJavacMain();
 
     static final String JEXL_PACKAGE = "org.apache.commons.jexl3";

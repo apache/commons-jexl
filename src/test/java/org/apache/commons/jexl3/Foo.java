@@ -27,7 +27,7 @@ import java.util.List;
  */
 public class Foo {
 
-    private boolean beenModified = false;
+    private boolean beenModified;
     private String property1 = "some value";
     public Foo() {}
     public class Cheezy {

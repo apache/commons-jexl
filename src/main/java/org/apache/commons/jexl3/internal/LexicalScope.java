@@ -45,15 +45,15 @@ public class LexicalScope {
     /**
      * Number of symbols.
      */
-    protected int count = 0;
+    protected int count;
     /**
      * The mask of symbols in the scope.
      */
-    protected long symbols = 0L;
+    protected long symbols;
     /**
      * Symbols after bit 64 (aka symbol 32 when 2 bits per symbol).
      */
-    protected BitSet moreSymbols = null;
+    protected BitSet moreSymbols;
 
     /**
      * Create a scope.

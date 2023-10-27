@@ -37,11 +37,11 @@ public final class IndexedType implements JexlPropertyGet {
     /** The array of getter methods. */
     private final Method[] getters;
     /** Last get method used. */
-    private volatile Method get = null;
+    private volatile Method get;
     /** The array of setter methods. */
     private final Method[] setters;
     /** Last set method used. */
-    private volatile Method set = null;
+    private volatile Method set;
 
     /**
      * Attempts to find an indexed-property getter in an object.

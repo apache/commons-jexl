@@ -24,7 +24,7 @@ public class ASTAnnotation extends JexlNode {
      *
      */
     private static final long serialVersionUID = 1L;
-    private String name = null;
+    private String name;
 
     ASTAnnotation(final int id) {
         super(id);

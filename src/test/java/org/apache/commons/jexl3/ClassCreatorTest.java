@@ -40,8 +40,8 @@ import org.junit.Test;
 public class ClassCreatorTest extends JexlTestCase {
     static final Log logger = LogFactory.getLog(JexlTestCase.class);
     static final int LOOPS = 8;
-    private File base = null;
-    private JexlEngine jexl = null;
+    private File base;
+    private JexlEngine jexl;
 
     public ClassCreatorTest() {
         super("ClassCreatorTest");

@@ -32,9 +32,9 @@ public final class NumberParser implements Serializable {
      */
     private static final long serialVersionUID = 1L;
     /** The type literal value. */
-    private Number literal = null;
+    private Number literal;
     /** The expected class. */
-    private Class<? extends Number> clazz = null;
+    private Class<? extends Number> clazz;
     /** JEXL locale-neutral big decimal format. */
     static final DecimalFormat BIGDF = new DecimalFormat("0.0b", new DecimalFormatSymbols(Locale.ENGLISH));
 

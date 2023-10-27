@@ -54,6 +54,7 @@ limitations under the License.
   </module>
 
   <module name="TreeWalker">
+    <module name="ExplicitInitializationCheck" />
     <module name="AvoidStarImport">
       <property name="excludes" value="org.junit.Assert,org.apache.commons.jexl3.parser"/>
     </module>

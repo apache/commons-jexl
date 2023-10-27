@@ -25,9 +25,9 @@ import org.apache.commons.jexl3.internal.Debugger;
  */
 public class ExtensibleNode extends JexlNode {
   /** Whether this array/set/map is constant or not. */
-  protected boolean constant = false;
+  protected boolean constant;
   /** Whether this array/set/map is extended or not. */
-  private boolean extended = false;
+  private boolean extended;
 
   public ExtensibleNode(final int id) {
     super(id);

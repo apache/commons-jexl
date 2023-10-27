@@ -69,12 +69,12 @@ public class JexlScriptEngine extends AbstractScriptEngine implements Compilable
      * The shared engine instance.
      * <p>A single soft-reference JEXL engine and JexlUberspect is shared by all instances of JexlScriptEngine.</p>
      */
-    private static Reference<JexlEngine> ENGINE = null;
+    private static Reference<JexlEngine> ENGINE;
 
     /**
      * The permissions used to create the script engine.
      */
-    private static JexlPermissions PERMISSIONS = null;
+    private static JexlPermissions PERMISSIONS;
     /**
      * Sets the permissions instance used to create the script engine.
      * <p>Calling this method will force engine instance re-creation.</p>

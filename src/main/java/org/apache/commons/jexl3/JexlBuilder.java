@@ -100,25 +100,25 @@ public class JexlBuilder {
     protected static final int CACHE_THRESHOLD = 64;
 
     /** The JexlUberspect instance. */
-    private JexlUberspect uberspect = null;
+    private JexlUberspect uberspect;
 
     /** The {@link JexlUberspect} resolver strategy. */
-    private JexlUberspect.ResolverStrategy strategy = null;
+    private JexlUberspect.ResolverStrategy strategy;
 
     /** The set of permissions. */
     private JexlPermissions permissions;
 
     /** The sandbox. */
-    private JexlSandbox sandbox = null;
+    private JexlSandbox sandbox;
 
     /** The Log to which all JexlEngine messages will be logged. */
-    private Log logger = null;
+    private Log logger;
 
     /** Whether error messages will carry debugging information. */
-    private Boolean debug = null;
+    private Boolean debug;
 
     /** Whether interrupt throws JexlException.Cancel. */
-    private Boolean cancellable = null;
+    private Boolean cancellable;
 
     /** The options. */
     private final JexlOptions options = new JexlOptions();
@@ -127,7 +127,7 @@ public class JexlBuilder {
     private int collectMode = 1;
 
     /** The {@link JexlArithmetic} instance. */
-    private JexlArithmetic arithmetic = null;
+    private JexlArithmetic arithmetic;
 
     /** The cache size. */
     private int cache = -1;
@@ -142,10 +142,10 @@ public class JexlBuilder {
     private Charset charset = Charset.defaultCharset();
 
     /** The class loader. */
-    private ClassLoader loader = null;
+    private ClassLoader loader;
 
     /** The features. */
-    private JexlFeatures features = null;
+    private JexlFeatures features;
 
     /**
      * Default constructor.

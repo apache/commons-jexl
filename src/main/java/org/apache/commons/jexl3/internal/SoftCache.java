@@ -46,7 +46,7 @@ public class SoftCache<K, V> {
     /**
      * The soft reference to the cache map.
      */
-    private SoftReference<Map<K, V>> ref = null;
+    private SoftReference<Map<K, V>> ref;
     /**
      * The cache r/w lock.
      */

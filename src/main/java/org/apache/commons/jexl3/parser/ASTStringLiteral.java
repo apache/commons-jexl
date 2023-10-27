@@ -22,7 +22,7 @@ public final class ASTStringLiteral extends JexlNode implements JexlNode.Constan
      */
     private static final long serialVersionUID = 1L;
     /** The actual literal value; the inherited 'value' member may host a cached getter. */
-    private String literal = null;
+    private String literal;
 
     ASTStringLiteral(final int id) {
         super(id);
