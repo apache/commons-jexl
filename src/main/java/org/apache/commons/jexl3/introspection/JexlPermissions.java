@@ -57,7 +57,7 @@ import org.apache.commons.jexl3.internal.introspection.PermissionsParser;
  *     {@link #UNRESTRICTED} as parameter before creating a JEXL engine instance.
  * </p>
  * <p>
- *     For the same reason, using JEXL through scripting, it is possible to revert the underlying JEXL behaviour to
+ *     For the same reason, using JEXL through scripting, it is possible to revert the underlying JEXL behavior to
  *     JEXL 3.2 default by calling {@link org.apache.commons.jexl3.scripting.JexlScriptEngine#setPermissions(JexlPermissions)}
  *     with {@link #UNRESTRICTED} as parameter.
  * </p>
