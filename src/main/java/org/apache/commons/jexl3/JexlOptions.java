@@ -372,7 +372,7 @@ public final class JexlOptions {
     }
 
     /**
-     * Set options from engine.
+     * Sets options from engine.
      * @param jexl the engine
      * @return this instance
      */
@@ -384,7 +384,7 @@ public final class JexlOptions {
     }
 
     /**
-     * Set options from options.
+     * Sets options from options.
      * @param src the options
      * @return this instance
      */
