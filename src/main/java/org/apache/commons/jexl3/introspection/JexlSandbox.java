@@ -636,7 +636,7 @@ public final class JexlSandbox {
     }
 
     /**
-     * Get the permissions associated to a class.
+     * Gets the permissions associated to a class.
      * @param clazz the class
      * @return the permissions
      */

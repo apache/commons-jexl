@@ -263,7 +263,7 @@ public class Script implements JexlScript, JexlExpression {
     }
 
     /**
-     * Get this script pragmas
+     * Gets this script pragmas
      * <p>Pragma keys are ant-ish variables, their values are scalar literals..
      * @return the pragmas
      */
