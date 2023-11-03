@@ -39,6 +39,31 @@ import org.junit.Test;
  * A test around scripting streams.
  */
 public class StreamTest {
+    /**
+     * A MapContext that can operate on streams.
+     */
+    public static class StreamContext extends MapContext {
+        /**
+         * This allows using a JEXL lambda as a filter.
+         * @param stream the stream
+         * @param filter the lambda to use as filter
+         * @return the filtered stream
+         */
+        public Stream<?> filter(final Stream<?> stream, final JexlScript filter) {
+            return stream.filter(x -> x != null && TRUE.equals(filter.execute(this, x)));
+        }
+
+        /**
+         * This allows using a JEXL lambda as a mapper.
+         * @param stream the stream
+         * @param mapper the lambda to use as mapper
+         * @return the mapped stream
+         */
+        public Stream<?> map(final Stream<?> stream, final JexlScript mapper) {
+            return stream.map( x -> mapper.execute(this, x));
+        }
+    }
+
     /** Our engine instance. */
     private final JexlEngine jexl;
 
@@ -52,31 +77,6 @@ public class StreamTest {
         final JexlPermissions permissions = new ClassPermissions(java.net.URI.class);
         // Create the engine
         jexl = new JexlBuilder().features(features).permissions(permissions).create();
-    }
-
-    /**
-     * A MapContext that can operate on streams.
-     */
-    public static class StreamContext extends MapContext {
-        /**
-         * This allows using a JEXL lambda as a mapper.
-         * @param stream the stream
-         * @param mapper the lambda to use as mapper
-         * @return the mapped stream
-         */
-        public Stream<?> map(final Stream<?> stream, final JexlScript mapper) {
-            return stream.map( x -> mapper.execute(this, x));
-        }
-
-        /**
-         * This allows using a JEXL lambda as a filter.
-         * @param stream the stream
-         * @param filter the lambda to use as filter
-         * @return the filtered stream
-         */
-        public Stream<?> filter(final Stream<?> stream, final JexlScript filter) {
-            return stream.filter(x -> x != null && TRUE.equals(filter.execute(this, x)));
-        }
     }
 
     @Test

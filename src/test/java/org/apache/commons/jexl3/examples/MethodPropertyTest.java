@@ -31,6 +31,37 @@ import org.junit.Test;
  */
 public class MethodPropertyTest {
     /**
+     * Helper example class.
+     */
+    public static class Foo {
+        /**
+         * Gets a string from the argument.
+         * @param i a long.
+         * @return The argument prefixed with 'The value is : '
+         */
+        public String convert(final long i) {
+            return "The value is : " + i;
+        }
+
+        /**
+         * Gets an arbitrary property.
+         * @param arg property name.
+         * @return arg prefixed with 'This is the property '.
+         */
+        public String get(final String arg) {
+            return "This is the property " + arg;
+        }
+
+        /**
+         * Gets foo.
+         * @return a string.
+         */
+        public String getFoo() {
+            return "This is from getFoo()";
+        }
+    }
+
+    /**
      * An example for method access.
      */
     public static void example(final AbstractOutput out) throws Exception {
@@ -84,46 +115,6 @@ public class MethodPropertyTest {
 
     }
 
-    /**
-     * Helper example class.
-     */
-    public static class Foo {
-        /**
-         * Gets foo.
-         * @return a string.
-         */
-        public String getFoo() {
-            return "This is from getFoo()";
-        }
-
-        /**
-         * Gets an arbitrary property.
-         * @param arg property name.
-         * @return arg prefixed with 'This is the property '.
-         */
-        public String get(final String arg) {
-            return "This is the property " + arg;
-        }
-
-        /**
-         * Gets a string from the argument.
-         * @param i a long.
-         * @return The argument prefixed with 'The value is : '
-         */
-        public String convert(final long i) {
-            return "The value is : " + i;
-        }
-    }
-
-
-    /**
-     * Unit test entry point.
-     * @throws Exception
-     */
-    @Test
-    public void testExample() throws Exception {
-        example(AbstractOutput.JUNIT);
-    }
 
     /**
      * Command line entry point.
@@ -132,5 +123,14 @@ public class MethodPropertyTest {
      */
     public static void main(final String[] args) throws Exception {
         example(AbstractOutput.SYSTEM);
+    }
+
+    /**
+     * Unit test entry point.
+     * @throws Exception
+     */
+    @Test
+    public void testExample() throws Exception {
+        example(AbstractOutput.JUNIT);
     }
 }

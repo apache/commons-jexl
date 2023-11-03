@@ -38,25 +38,6 @@ public class ComposePermissionsTest extends JexlTestCase {
     super("PermissionsTest");
   }
 
-  @Test
-  public void testComposePermissions() throws Exception {
-    runComposePermissions(JexlPermissions.UNRESTRICTED);
-  }
-
-  @Test
-  public void testComposePermissions1() throws Exception {
-    runComposePermissions(new JexlPermissions.Delegate(JexlPermissions.UNRESTRICTED) {
-      @Override public String toString() {
-        return "delegate:" + base.toString();
-      }
-    });
-  }
-
-  @Test
-  public void testComposePermissions2() throws Exception {
-    runComposePermissions(new JexlPermissions.ClassPermissions(JexlPermissions.UNRESTRICTED, Collections.emptySet()));
-  }
-
   void runComposePermissions(final JexlPermissions p) throws Exception {
     final String check = "http://example.com/content.jpg";
     final File jsonFile = new File(SAMPLE_JSON);
@@ -95,5 +76,24 @@ public class ComposePermissionsTest extends JexlTestCase {
     s1 = j1.createScript("json.pageInfo.pagePic", "json");
     final Object r1 = s1.execute(null, json);
     Assert.assertEquals(check, r0);
+  }
+
+  @Test
+  public void testComposePermissions() throws Exception {
+    runComposePermissions(JexlPermissions.UNRESTRICTED);
+  }
+
+  @Test
+  public void testComposePermissions1() throws Exception {
+    runComposePermissions(new JexlPermissions.Delegate(JexlPermissions.UNRESTRICTED) {
+      @Override public String toString() {
+        return "delegate:" + base.toString();
+      }
+    });
+  }
+
+  @Test
+  public void testComposePermissions2() throws Exception {
+    runComposePermissions(new JexlPermissions.ClassPermissions(JexlPermissions.UNRESTRICTED, Collections.emptySet()));
   }
 }

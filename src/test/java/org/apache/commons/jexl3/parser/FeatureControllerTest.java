@@ -35,6 +35,15 @@ public class FeatureControllerTest extends JexlTestCase {
     }
 
     @Test
+    public void testAnnotationFeatureSwitch() throws Exception {
+        final Asserter onAsserter = new Asserter(createEngine(new JexlFeatures().methodCall(true).annotation(true)));
+        final Asserter offAsserter = new Asserter(createEngine(new JexlFeatures().methodCall(true).annotation(false)));
+        final String expr = "@silent ''.toString()";
+        onAsserter.assertExpression(expr, "");
+        offAsserter.failExpression(expr, "@1:1 annotation error in '@silent'");
+    }
+
+    @Test
     public void testLoopFeatureSwitch() throws Exception {
         final Asserter onAsserter = new Asserter(createEngine(new JexlFeatures().loops(true)));
         onAsserter.setVariable("cond", true);
@@ -73,6 +82,15 @@ public class FeatureControllerTest extends JexlTestCase {
     }
 
     @Test
+    public void testMethodCallFeatureSwitch() throws Exception {
+        final Asserter onAsserter = new Asserter(createEngine(new JexlFeatures().methodCall(true)));
+        final Asserter offAsserter = new Asserter(createEngine(new JexlFeatures().methodCall(false)));
+        final String expr = "'jexl'.toUpperCase()";
+        onAsserter.assertExpression(expr, "JEXL");
+        offAsserter.failExpression(expr, "@1:7 method call error in '.toUpperCase(...)'", String::equals);
+    }
+
+    @Test
     public void testNewInstanceFeatureSwitch() throws Exception {
         final Asserter onAsserter = new Asserter(createEngine(new JexlFeatures().newInstance(true)));
         final Asserter offAsserter = new Asserter(createEngine(new JexlFeatures().newInstance(false)));
@@ -85,42 +103,36 @@ public class FeatureControllerTest extends JexlTestCase {
     }
 
     @Test
-    public void testMethodCallFeatureSwitch() throws Exception {
-        final Asserter onAsserter = new Asserter(createEngine(new JexlFeatures().methodCall(true)));
-        final Asserter offAsserter = new Asserter(createEngine(new JexlFeatures().methodCall(false)));
-        final String expr = "'jexl'.toUpperCase()";
-        onAsserter.assertExpression(expr, "JEXL");
-        offAsserter.failExpression(expr, "@1:7 method call error in '.toUpperCase(...)'", String::equals);
-    }
+    public void testSideEffectDisabled() throws Exception {
+        final Asserter asserter = new Asserter(createEngine(new JexlFeatures().sideEffect(false)));
+        asserter.setVariable("i", 1);
+        String matchException = "@1:1 assign/modify error in 'i'";
+        asserter.failExpression("i = 1", matchException);
+        asserter.failExpression("i = i + 1", matchException);
+        asserter.failExpression("i = i - 1", matchException);
+        asserter.failExpression("i = i * 2", matchException);
+        asserter.failExpression("i = i / 2", matchException);
+        asserter.failExpression("i = i % 2", matchException);
+        asserter.failExpression("i = i ^ 0", matchException);
+        asserter.failExpression("i = i << 1", matchException);
+        asserter.failExpression("i = i >> 1", matchException);
+        asserter.failExpression("i = i >>> 1", matchException);
 
-    @Test
-    public void testAnnotationFeatureSwitch() throws Exception {
-        final Asserter onAsserter = new Asserter(createEngine(new JexlFeatures().methodCall(true).annotation(true)));
-        final Asserter offAsserter = new Asserter(createEngine(new JexlFeatures().methodCall(true).annotation(false)));
-        final String expr = "@silent ''.toString()";
-        onAsserter.assertExpression(expr, "");
-        offAsserter.failExpression(expr, "@1:1 annotation error in '@silent'");
-    }
+        asserter.failExpression("i += 1", matchException);
+        asserter.failExpression("i -= 1", matchException);
+        asserter.failExpression("i *= 2", matchException);
+        asserter.failExpression("i /= 2", matchException);
+        asserter.failExpression("i %= 2", matchException);
+        asserter.failExpression("i ^= 0", matchException);
+        asserter.failExpression("i <<= 1", matchException);
+        asserter.failExpression("i >>= 1", matchException);
+        asserter.failExpression("i >>>= 1", matchException);
 
-    @Test
-    public void testStructuredLiteralFeatureSwitch() throws Exception {
-        final Asserter onAsserter = new Asserter(createEngine(new JexlFeatures().structuredLiteral(true)));
-        final Asserter offAsserter = new Asserter(createEngine(new JexlFeatures().structuredLiteral(false)));
-        final String arrayLitExpr = "[1, 2, 3, 4][3]";
-        onAsserter.assertExpression(arrayLitExpr, 4);
-        offAsserter.failExpression(arrayLitExpr, "@1:1 set/map/array literal error in '[ ... ]'", String::equals);
-
-        final String mapLitExpr = "{'A' : 1, 'B' : 2}['B']";
-        onAsserter.assertExpression(mapLitExpr, 2);
-        offAsserter.failExpression(mapLitExpr, "@1:1 set/map/array literal error in '{ ... }'", String::equals);
-
-        final String setLitExpr = "{'A', 'B'}.size()";
-        onAsserter.assertExpression(setLitExpr, 2);
-        offAsserter.failExpression(setLitExpr, "@1:1 set/map/array literal error in '{ ... }'", String::equals);
-
-        final String rangeLitExpr = "(0..3).size()";
-        onAsserter.assertExpression(rangeLitExpr, 4);
-        offAsserter.failExpression(rangeLitExpr, "@1:5 set/map/array literal error in '( .. )'", String::equals);
+        asserter.failExpression("i++", matchException);
+        asserter.failExpression("i--", matchException);
+        matchException = "@1:3 assign/modify error in 'i'";
+        asserter.failExpression("++i", matchException);
+        asserter.failExpression("--i", matchException);
     }
 
     @Test
@@ -158,36 +170,24 @@ public class FeatureControllerTest extends JexlTestCase {
     }
 
     @Test
-    public void testSideEffectDisabled() throws Exception {
-        final Asserter asserter = new Asserter(createEngine(new JexlFeatures().sideEffect(false)));
-        asserter.setVariable("i", 1);
-        String matchException = "@1:1 assign/modify error in 'i'";
-        asserter.failExpression("i = 1", matchException);
-        asserter.failExpression("i = i + 1", matchException);
-        asserter.failExpression("i = i - 1", matchException);
-        asserter.failExpression("i = i * 2", matchException);
-        asserter.failExpression("i = i / 2", matchException);
-        asserter.failExpression("i = i % 2", matchException);
-        asserter.failExpression("i = i ^ 0", matchException);
-        asserter.failExpression("i = i << 1", matchException);
-        asserter.failExpression("i = i >> 1", matchException);
-        asserter.failExpression("i = i >>> 1", matchException);
+    public void testStructuredLiteralFeatureSwitch() throws Exception {
+        final Asserter onAsserter = new Asserter(createEngine(new JexlFeatures().structuredLiteral(true)));
+        final Asserter offAsserter = new Asserter(createEngine(new JexlFeatures().structuredLiteral(false)));
+        final String arrayLitExpr = "[1, 2, 3, 4][3]";
+        onAsserter.assertExpression(arrayLitExpr, 4);
+        offAsserter.failExpression(arrayLitExpr, "@1:1 set/map/array literal error in '[ ... ]'", String::equals);
 
-        asserter.failExpression("i += 1", matchException);
-        asserter.failExpression("i -= 1", matchException);
-        asserter.failExpression("i *= 2", matchException);
-        asserter.failExpression("i /= 2", matchException);
-        asserter.failExpression("i %= 2", matchException);
-        asserter.failExpression("i ^= 0", matchException);
-        asserter.failExpression("i <<= 1", matchException);
-        asserter.failExpression("i >>= 1", matchException);
-        asserter.failExpression("i >>>= 1", matchException);
+        final String mapLitExpr = "{'A' : 1, 'B' : 2}['B']";
+        onAsserter.assertExpression(mapLitExpr, 2);
+        offAsserter.failExpression(mapLitExpr, "@1:1 set/map/array literal error in '{ ... }'", String::equals);
 
-        asserter.failExpression("i++", matchException);
-        asserter.failExpression("i--", matchException);
-        matchException = "@1:3 assign/modify error in 'i'";
-        asserter.failExpression("++i", matchException);
-        asserter.failExpression("--i", matchException);
+        final String setLitExpr = "{'A', 'B'}.size()";
+        onAsserter.assertExpression(setLitExpr, 2);
+        offAsserter.failExpression(setLitExpr, "@1:1 set/map/array literal error in '{ ... }'", String::equals);
+
+        final String rangeLitExpr = "(0..3).size()";
+        onAsserter.assertExpression(rangeLitExpr, 4);
+        offAsserter.failExpression(rangeLitExpr, "@1:5 set/map/array literal error in '( .. )'", String::equals);
     }
 
 }

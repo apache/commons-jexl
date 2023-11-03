@@ -55,11 +55,8 @@ public class OptionalNullGetter implements JexlPropertyGet {
     }
 
     @Override
-    public Object tryInvoke(final Object obj, final Object key) throws JexlException.TryFailed {
-        if (obj == null) {
-            return null;
-        }
-        return delegate != null ? delegate.tryInvoke(obj, property) : JexlEngine.TRY_FAILED;
+    public boolean isCacheable() {
+        return false;
     }
 
     @Override
@@ -68,7 +65,10 @@ public class OptionalNullGetter implements JexlPropertyGet {
     }
 
     @Override
-    public boolean isCacheable() {
-        return false;
+    public Object tryInvoke(final Object obj, final Object key) throws JexlException.TryFailed {
+        if (obj == null) {
+            return null;
+        }
+        return delegate != null ? delegate.tryInvoke(obj, property) : JexlEngine.TRY_FAILED;
     }
 }

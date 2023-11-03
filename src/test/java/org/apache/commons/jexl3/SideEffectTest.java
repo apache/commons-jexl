@@ -42,215 +42,67 @@ import org.junit.Test;
 @SuppressWarnings({"UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
 public class SideEffectTest extends JexlTestCase {
 
-    private Asserter asserter;
+    /**
+     * An arithmetic that implements 2 selfAdd methods.
+     */
+    public static class Arithmetic246 extends JexlArithmetic {
+        public Arithmetic246(final boolean astrict) {
+            super(astrict);
+        }
 
-    public SideEffectTest() {
-        super("SideEffectTest");
+        @Override
+        public Object add(final Object right, final Object left) {
+            return super.add(left, right);
+        }
+
+        public Object selfAdd(final Appendable c, final String item) throws IOException {
+            c.append(item);
+            return c;
+        }
+
+        public Object selfAdd(final Collection<String> c, final String item) throws IOException {
+            c.add(item);
+            return c;
+        }
     }
 
-    @Override
-    @Before
-    public void setUp() {
-        asserter = new Asserter(JEXL);
-    }
+    public static class Arithmetic246b extends Arithmetic246 {
+            public Arithmetic246b(final boolean astrict) {
+                super(astrict);
+            }
+    
+            public Object selfAdd(final Object c, final String item) throws IOException {
+                if (c == null) {
+                    return new ArrayList<>(Collections.singletonList(item));
+                }
+                if (c instanceof Appendable) {
+                    ((Appendable) c).append(item);
+                    return c;
+                }
+                return JexlEngine.TRY_FAILED;
+            }
+        }
 
-    @Test
-    public void testSideEffectVar() throws Exception {
-        final Map<String,Object> context = asserter.getVariables();
-        final Integer i41 = Integer.valueOf(4141);
-        final Object foo = i41;
+    // an arithmetic that performs side effects
+    public static class Arithmetic248 extends JexlArithmetic {
+        public Arithmetic248(final boolean strict) {
+            super(strict);
+        }
 
-        context.put("foo", foo);
-        asserter.assertExpression("foo += 2", i41 + 2);
-        Assert.assertEquals(context.get("foo"), i41 + 2);
+        public Object arrayGet(final List<?> list, final Collection<Integer> range) {
+            final List<Object> rl = new ArrayList<>(range.size());
+            for(final int i : range) {
+                rl.add(list.get(i));
+            }
+            return rl;
+        }
 
-        context.put("foo", foo);
-        asserter.assertExpression("foo -= 2", i41 - 2);
-        Assert.assertEquals(context.get("foo"), i41 - 2);
-
-        context.put("foo", foo);
-        asserter.assertExpression("foo *= 2", i41 * 2);
-        Assert.assertEquals(context.get("foo"), i41 * 2);
-
-        context.put("foo", foo);
-        asserter.assertExpression("foo /= 2", i41 / 2);
-        Assert.assertEquals(context.get("foo"), i41 / 2);
-
-        context.put("foo", foo);
-        asserter.assertExpression("foo %= 2", i41 % 2);
-        Assert.assertEquals(context.get("foo"), i41 % 2);
-
-        context.put("foo", foo);
-        asserter.assertExpression("foo &= 3", (long) (i41 & 3));
-        Assert.assertEquals(context.get("foo"), (long)(i41 & 3));
-
-        context.put("foo", foo);
-        asserter.assertExpression("foo |= 2", (long)(i41 | 2));
-        Assert.assertEquals(context.get("foo"), (long)(i41 | 2));
-
-        context.put("foo", foo);
-        asserter.assertExpression("foo ^= 2", (long)(i41 ^ 2));
-        Assert.assertEquals(context.get("foo"), (long)(i41 ^ 2));
-
-        context.put("foo", foo);
-        asserter.assertExpression("foo <<= 2", (long)(i41 << 2));
-        Assert.assertEquals(context.get("foo"), (long)(i41 << 2));
-
-        context.put("foo", foo);
-        asserter.assertExpression("foo >>= 2", (long)(i41 >> 2));
-        Assert.assertEquals(context.get("foo"), (long)(i41 >> 2));
-
-        context.put("foo", foo);
-        asserter.assertExpression("foo >>>= 2", (long)(i41 >>> 2));
-        Assert.assertEquals(context.get("foo"), (long)(i41 >>> 2));
-    }
-
-    @Test
-    public void testSideEffectVarDots() throws Exception {
-        final Map<String,Object> context = asserter.getVariables();
-        final Integer i41 = Integer.valueOf(4141);
-        final Object foo = i41;
-
-        context.put("foo.bar.quux", foo);
-        asserter.assertExpression("foo.bar.quux += 2", i41 + 2);
-        Assert.assertEquals(context.get("foo.bar.quux"), i41 + 2);
-
-        context.put("foo.bar.quux", foo);
-        asserter.assertExpression("foo.bar.quux -= 2", i41 - 2);
-        Assert.assertEquals(context.get("foo.bar.quux"), i41 - 2);
-
-        context.put("foo.bar.quux", foo);
-        asserter.assertExpression("foo.bar.quux *= 2", i41 * 2);
-        Assert.assertEquals(context.get("foo.bar.quux"), i41 * 2);
-
-        context.put("foo.bar.quux", foo);
-        asserter.assertExpression("foo.bar.quux /= 2", i41 / 2);
-        Assert.assertEquals(context.get("foo.bar.quux"), i41 / 2);
-
-        context.put("foo.bar.quux", foo);
-        asserter.assertExpression("foo.bar.quux %= 2", i41 % 2);
-        Assert.assertEquals(context.get("foo.bar.quux"), i41 % 2);
-
-        context.put("foo.bar.quux", foo);
-        asserter.assertExpression("foo.bar.quux &= 3", (long) (i41 & 3));
-        Assert.assertEquals(context.get("foo.bar.quux"), (long)(i41 & 3));
-
-        context.put("foo.bar.quux", foo);
-        asserter.assertExpression("foo.bar.quux |= 2", (long)(i41 | 2));
-        Assert.assertEquals(context.get("foo.bar.quux"), (long)(i41 | 2));
-
-        context.put("foo.bar.quux", foo);
-        asserter.assertExpression("foo.bar.quux ^= 2", (long)(i41 ^ 2));
-        Assert.assertEquals(context.get("foo.bar.quux"), (long)(i41 ^ 2));
-    }
-
-    @Test
-    public void testSideEffectArray() throws Exception {
-        final Integer i41 = Integer.valueOf(4141);
-        final Integer i42 = Integer.valueOf(42);
-        final Integer i43 = Integer.valueOf(43);
-        final String s42 = "fourty-two";
-        final String s43 = "fourty-three";
-        final Object[] foo = new Object[3];
-        foo[1] = i42;
-        foo[2] = i43;
-        asserter.setVariable("foo", foo);
-        foo[0] = i41;
-        asserter.assertExpression("foo[0] += 2", i41 + 2);
-        Assert.assertEquals(foo[0], i41 + 2);
-        foo[0] = i41;
-        asserter.assertExpression("foo[0] -= 2", i41 - 2);
-        Assert.assertEquals(foo[0], i41 - 2);
-        foo[0] = i41;
-        asserter.assertExpression("foo[0] *= 2", i41 * 2);
-        Assert.assertEquals(foo[0], i41 * 2);
-        foo[0] = i41;
-        asserter.assertExpression("foo[0] /= 2", i41 / 2);
-        Assert.assertEquals(foo[0], i41 / 2);
-        foo[0] = i41;
-        asserter.assertExpression("foo[0] %= 2", i41 % 2);
-        Assert.assertEquals(foo[0], i41 % 2);
-        foo[0] = i41;
-        asserter.assertExpression("foo[0] &= 3", (long) (i41 & 3));
-        Assert.assertEquals(foo[0], (long)(i41 & 3));
-        foo[0] = i41;
-        asserter.assertExpression("foo[0] |= 2", (long)(i41 | 2));
-        Assert.assertEquals(foo[0], (long)(i41 | 2));
-        foo[0] = i41;
-        asserter.assertExpression("foo[0] ^= 2", (long)(i41 ^ 2));
-        Assert.assertEquals(foo[0], (long)(i41 ^ 2));
-    }
-
-    @Test
-    public void testSideEffectDotArray() throws Exception {
-        final Integer i41 = Integer.valueOf(4141);
-        final Integer i42 = Integer.valueOf(42);
-        final Integer i43 = Integer.valueOf(43);
-        final String s42 = "fourty-two";
-        final String s43 = "fourty-three";
-        final Object[] foo = new Object[3];
-        foo[1] = i42;
-        foo[2] = i43;
-        asserter.setVariable("foo", foo);
-        foo[0] = i41;
-        asserter.assertExpression("foo.0 += 2", i41 + 2);
-        Assert.assertEquals(foo[0], i41 + 2);
-        foo[0] = i41;
-        asserter.assertExpression("foo.0 -= 2", i41 - 2);
-        Assert.assertEquals(foo[0], i41 - 2);
-        foo[0] = i41;
-        asserter.assertExpression("foo.0 *= 2", i41 * 2);
-        Assert.assertEquals(foo[0], i41 * 2);
-        foo[0] = i41;
-        asserter.assertExpression("foo.0 /= 2", i41 / 2);
-        Assert.assertEquals(foo[0], i41 / 2);
-        foo[0] = i41;
-        asserter.assertExpression("foo.0 %= 2", i41 % 2);
-        Assert.assertEquals(foo[0], i41 % 2);
-        foo[0] = i41;
-        asserter.assertExpression("foo.0 &= 3", (long) (i41 & 3));
-        Assert.assertEquals(foo[0], (long)(i41 & 3));
-        foo[0] = i41;
-        asserter.assertExpression("foo.0 |= 2", (long)(i41 | 2));
-        Assert.assertEquals(foo[0], (long)(i41 | 2));
-        foo[0] = i41;
-        asserter.assertExpression("foo.0 ^= 2", (long)(i41 ^ 2));
-        Assert.assertEquals(foo[0], (long)(i41 ^ 2));
-    }
-
-    @Test
-    public void testSideEffectAntishArray() throws Exception {
-        final Integer i41 = Integer.valueOf(4141);
-        final Integer i42 = Integer.valueOf(42);
-        final Integer i43 = Integer.valueOf(43);
-        final Object[] foo = new Object[3];
-        foo[1] = i42;
-        foo[2] = i43;
-        asserter.setVariable("foo.bar", foo);
-        foo[0] = i41;
-        asserter.assertExpression("foo.bar[0] += 2", i41 + 2);
-        Assert.assertEquals(foo[0], i41 + 2);
-        foo[0] = i41;
-        asserter.assertExpression("foo.bar[0] -= 2", i41 - 2);
-        Assert.assertEquals(foo[0], i41 - 2);
-        foo[0] = i41;
-        asserter.assertExpression("foo.bar[0] *= 2", i41 * 2);
-        Assert.assertEquals(foo[0], i41 * 2);
-        foo[0] = i41;
-        asserter.assertExpression("foo.bar[0] /= 2", i41 / 2);
-        Assert.assertEquals(foo[0], i41 / 2);
-        foo[0] = i41;
-        asserter.assertExpression("foo.bar[0] %= 2", i41 % 2);
-        Assert.assertEquals(foo[0], i41 % 2);
-        foo[0] = i41;
-        asserter.assertExpression("foo.bar[0] &= 3", (long) (i41 & 3));
-        Assert.assertEquals(foo[0], (long)(i41 & 3));
-        foo[0] = i41;
-        asserter.assertExpression("foo.bar[0] |= 2", (long)(i41 | 2));
-        Assert.assertEquals(foo[0], (long)(i41 | 2));
-        foo[0] = i41;
-        asserter.assertExpression("foo.bar[0] ^= 2", (long)(i41 ^ 2));
-        Assert.assertEquals(foo[0], (long)(i41 ^ 2));
+        public Object arraySet(final List<Object> list, final Collection<Integer> range, final Object value) {
+            for(final int i : range) {
+                list.set(i, value);
+            }
+            return list;
+        }
     }
 
     public static class Foo {
@@ -259,105 +111,255 @@ public class SideEffectTest extends JexlTestCase {
             value = v;
         }
 
-        @Override
-        public String toString() {
-            return Integer.toString(value);
+        public int getBar(final int x) {
+            return value + x;
+        }
+
+        public int getValue() {
+            return value;
+        }
+        public void setBar(final int x, final long v) {
+            value = (int) v + x;
         }
 
         public void setValue(final long v) {
             value = (int) v;
         }
-        public int getValue() {
-            return value;
-        }
 
-        public void setBar(final int x, final long v) {
-            value = (int) v + x;
-        }
-
-        public int getBar(final int x) {
-            return value + x;
+        @Override
+        public String toString() {
+            return Integer.toString(value);
         }
     }
 
-    @Test
-    public void testSideEffectBean() throws Exception {
-        final Integer i41 = Integer.valueOf(4141);
-        final Foo foo = new Foo(0);
-        asserter.setVariable("foo", foo);
-        foo.value = i41;
-        asserter.assertExpression("foo.value += 2", i41 + 2);
-        Assert.assertEquals(foo.value, i41 + 2);
-        foo.value = i41;
-        asserter.assertExpression("foo.value -= 2", i41 - 2);
-        Assert.assertEquals(foo.value, i41 - 2);
-        foo.value = i41;
-        asserter.assertExpression("foo.value *= 2", i41 * 2);
-        Assert.assertEquals(foo.value, i41 * 2);
-        foo.value = i41;
-        asserter.assertExpression("foo.value /= 2", i41 / 2);
-        Assert.assertEquals(foo.value, i41 / 2);
-        foo.value = i41;
-        asserter.assertExpression("foo.value %= 2", i41 % 2);
-        Assert.assertEquals(foo.value, i41 % 2);
-        foo.value = i41;
-        asserter.assertExpression("foo.value &= 3", (long) (i41 & 3));
-        Assert.assertEquals(foo.value, i41 & 3);
-        foo.value = i41;
-        asserter.assertExpression("foo.value |= 2", (long)(i41 | 2));
-        Assert.assertEquals(foo.value, i41 | 2);
-        foo.value = i41;
-        asserter.assertExpression("foo.value ^= 2", (long)(i41 ^ 2));
-        Assert.assertEquals(foo.value, i41 ^ 2);
+    // an arithmetic that performs side effects
+    public static class SelfArithmetic extends OptionalArithmetic {
+        public SelfArithmetic(final boolean strict) {
+            super(strict);
+        }
+
+        public Var and(final Var lhs, final Var rhs) {
+            return new Var(lhs.value & rhs.value);
+        }
+
+        public Object arrayGet(final Var var, final String property) {
+            return "VALUE".equals(property)? var.value : JexlEngine.TRY_FAILED;
+        }
+
+        public Object arraySet(final Var var, final String property, final int v) {
+            return "VALUE".equals(property)? var.value = v : JexlEngine.TRY_FAILED;
+        }
+
+        public int decrement(final Var lhs) {
+            return lhs.value - 1;
+        }
+
+        public int getAndIncrement(final AtomicInteger i) {
+            return i.getAndIncrement();
+        }
+
+        public int increment(final Var lhs) {
+            return lhs.value + 1;
+        }
+
+        public int incrementAndGet(final AtomicInteger i) {
+            return i.incrementAndGet();
+        }
+
+        public Var or(final Var lhs, final Var rhs) {
+            return new Var(lhs.value | rhs.value);
+        }
+
+        public int positivize(final Number n) {
+            return n.intValue();
+        }
+
+        public int positivize(final Var n) {
+            return n.value;
+        }
+
+        public Object propertyGet(final Var var, final String property) {
+            return "value".equals(property)? var.value : JexlEngine.TRY_FAILED;
+        }
+
+        public Object propertySet(final Var var, final String property, final int v) {
+            return "value".equals(property)? var.value = v : JexlEngine.TRY_FAILED;
+        }
+
+        public Var selfAdd(final Var lhs, final Var rhs) {
+            lhs.value += rhs.value;
+            return lhs;
+        }
+
+        public Var selfAnd(final Var lhs, final Var rhs) {
+            lhs.value &= rhs.value;
+            return lhs;
+        }
+
+        public Var selfDivide(final Var lhs, final Var rhs) {
+            lhs.value /= rhs.value;
+            return lhs;
+        }
+
+        public Var selfMod(final Var lhs, final Var rhs) {
+            lhs.value %= rhs.value;
+            return lhs;
+        }
+
+        public Var selfMultiply(final Var lhs, final Var rhs) {
+            lhs.value *= rhs.value;
+            return lhs;
+        }
+
+        public Var selfOr(final Var lhs, final Var rhs) {
+            lhs.value |= rhs.value;
+            return lhs;
+        }
+
+        public Var selfShiftLeft(final Var lhs, final int rhs) {
+            lhs.value <<= rhs;
+            return lhs;
+        }
+
+        public Var selfShiftRight(final Var lhs, final int rhs) {
+            lhs.value >>= rhs;
+            return lhs;
+        }
+
+        public Var selfShiftRightUnsigned(final Var lhs, final int rhs) {
+            lhs.value >>>= rhs;
+            return lhs;
+        }
+
+        // for kicks, this one does not side effect but overloads nevertheless
+        public Var selfSubtract(final Var lhs, final Var rhs) {
+            return new Var(lhs.value - rhs.value);
+        }
+
+        public Var selfXor(final Var lhs, final Var rhs) {
+            lhs.value ^= rhs.value;
+            return lhs;
+        }
+
+        public Var shiftLeft(final Var lhs, final int rhs) {
+            return new Var(lhs.value << rhs);
+        }
+
+        public Var shiftRight(final Var lhs, final int rhs) {
+            return new Var(lhs.value >> rhs);
+        }
+
+        public Var shiftRightUnsigned(final Var lhs, final int rhs) {
+            return new Var(lhs.value >>> rhs);
+        }
+
+        public Var xor(final Var lhs, final Var rhs) {
+            return new Var(lhs.value ^ rhs.value);
+        }
     }
 
-    @Test
-    public void testSideEffectBeanContainer() throws Exception {
-        final Integer i41 = Integer.valueOf(4141);
-        final Foo foo = new Foo(0);
-        asserter.setVariable("foo", foo);
-        foo.value = i41;
-        asserter.assertExpression("foo.bar[0] += 2", i41 + 2);
-        Assert.assertEquals(foo.value, i41 + 2);
-        foo.value = i41;
-        asserter.assertExpression("foo.bar[1] += 2", i41 + 3);
-        Assert.assertEquals(foo.value, i41 + 4);
-        foo.value = i41;
-        asserter.assertExpression("foo.bar[0] -= 2", i41 - 2);
-        Assert.assertEquals(foo.value, i41 - 2);
-        foo.value = i41;
-        asserter.assertExpression("foo.bar[0] *= 2", i41 * 2);
-        Assert.assertEquals(foo.value, i41 * 2);
-        foo.value = i41;
-        asserter.assertExpression("foo.bar[0] /= 2", i41 / 2);
-        Assert.assertEquals(foo.value, i41 / 2);
-        foo.value = i41;
-        asserter.assertExpression("foo.bar[0] %= 2", i41 % 2);
-        Assert.assertEquals(foo.value, i41 % 2);
-        foo.value = i41;
-        asserter.assertExpression("foo.bar[0] &= 3", (long) (i41 & 3));
-        Assert.assertEquals(foo.value, i41 & 3);
-        foo.value = i41;
-        asserter.assertExpression("foo.bar[0] |= 2", (long)(i41 | 2));
-        Assert.assertEquals(foo.value, i41 | 2);
-        foo.value = i41;
-        asserter.assertExpression("foo.bar[0] ^= 2", (long)(i41 ^ 2));
-        Assert.assertEquals(foo.value, i41 ^ 2);
+    public static class Var {
+        int value;
+
+        Var(final int v) {
+            value = v;
+        }
+
+        @Override public String toString() {
+            return Integer.toString(value);
+        }
     }
 
-    @Test
-    public void testArithmeticSelf() throws Exception {
-        final JexlEngine jexl = new JexlBuilder().cache(64).arithmetic(new SelfArithmetic(false)).create();
-        final JexlContext jc = null;
-        runSelfOverload(jexl, jc);
-        runSelfOverload(jexl, jc);
+    private Asserter asserter;
+
+    public SideEffectTest() {
+        super("SideEffectTest");
     }
 
-    @Test
-    public void testArithmeticSelfNoCache() throws Exception {
-        final JexlEngine jexl = new JexlBuilder().cache(0).arithmetic(new SelfArithmetic(false)).create();
-        final JexlContext jc = null;
-        runSelfOverload(jexl, jc);
+    private void run246(final JexlArithmetic j246) throws Exception {
+        final Log log246 = LogFactory.getLog(SideEffectTest.class);
+        // quiesce the logger
+        final java.util.logging.Logger ll246 = java.util.logging.LogManager.getLogManager().getLogger(SideEffectTest.class.getName());
+       // ll246.setLevel(Level.WARNING);
+        final JexlEngine jexl = new JexlBuilder().arithmetic(j246).cache(32).debug(true).logger(log246).create();
+        final JexlScript script = jexl.createScript("z += x", "x");
+        final MapContext ctx = new MapContext();
+        List<String> z = new ArrayList<>(1);
+
+        // no ambiguous, std case
+        ctx.set("z", z);
+        Object zz = script.execute(ctx, "42");
+        Assert.assertSame(zz, z);
+        Assert.assertEquals(1, z.size());
+        z.clear();
+
+        boolean t246 = false;
+        // call with null
+        try {
+            script.execute(ctx, "42");
+            zz = ctx.get("z");
+            Assert.assertTrue(zz instanceof List<?>);
+            z = (List<String>) zz;
+            Assert.assertEquals(1, z.size());
+        } catch (JexlException | ArithmeticException xjexl) {
+            t246 = true;
+            Assert.assertEquals(j246.getClass(), Arithmetic246.class);
+        }
+        ctx.clear();
+
+        // a non ambiguous call still succeeds
+        ctx.set("z", z);
+        zz = script.execute(ctx, "-42");
+        Assert.assertSame(zz, z);
+        Assert.assertEquals(t246? 1 : 2, z.size());
+    }
+
+    protected void runSelfIncrement(final JexlEngine jexl, final JexlContext jc) {
+        JexlScript script = jexl.createScript("x -> [+x, +(x++), +x]");
+        final Var v11 = new Var(3115);
+        final AtomicInteger i11 = new AtomicInteger(3115);
+        for(final Object v : Arrays.asList(v11, i11)) {
+            final Object result = script.execute(jc, v);
+            Assert.assertTrue(result instanceof int[]);
+            final int[] r = (int[]) result;
+            Assert.assertEquals(3115, r[0]);
+            Assert.assertEquals(3115, r[1]);
+            Assert.assertEquals(3116, r[2]);
+        }
+
+        script = jexl.createScript("x -> [+x, +(++x), +x]");
+        final Var v12 = new Var(3189);
+        final AtomicInteger i12 = new AtomicInteger(3189);
+        for(final Object v : Arrays.asList(v12, i12)) {
+            final Object result = script.execute(jc, v);
+            Assert.assertTrue(result instanceof int[]);
+            final int[] r = (int[]) result;
+            Assert.assertEquals(3189, r[0]);
+            Assert.assertEquals(3190, r[1]);
+            Assert.assertEquals(3190, r[2]);
+        }
+
+        script = jexl.createScript("x -> [+x, +(x--), +x]");
+        final Var v13 = new Var(3115);
+        for(final Object v : Arrays.asList(v13)) {
+            final Object result = script.execute(jc, v13);
+            Assert.assertTrue(result instanceof int[]);
+            final int[] r = (int[]) result;
+            Assert.assertEquals(3115, r[0]);
+            Assert.assertEquals(3115, r[1]);
+            Assert.assertEquals(3114, r[2]);
+        }
+
+        script = jexl.createScript("x -> [+x, +(--x), +x]");
+        final Var v14 = new Var(3189);
+        for(final Object v : Arrays.asList(v14)) {
+            final Object result = script.execute(jc, v);
+            Assert.assertTrue(result instanceof int[]);
+            final int[] r = (int[]) result;
+            Assert.assertEquals(3189, r[0]);
+            Assert.assertEquals(3188, r[1]);
+            Assert.assertEquals(3188, r[2]);
+        }
     }
 
     protected void runSelfOverload(final JexlEngine jexl, final JexlContext jc) {
@@ -452,269 +454,10 @@ public class SideEffectTest extends JexlTestCase {
         Assert.assertEquals(3115L << 2, v10.value);
     }
 
-
-    @Test
-    public void testIncrementSelf() throws Exception {
-        final JexlEngine jexl = new JexlBuilder().cache(64).arithmetic(new SelfArithmetic(false)).create();
-        final JexlContext jc = null;
-        runSelfIncrement(jexl, jc);
-        runSelfIncrement(jexl, jc);
-    }
-
-    @Test
-    public void testIncrementSelfNoCache() throws Exception {
-        final JexlEngine jexl = new JexlBuilder().cache(0).arithmetic(new SelfArithmetic(false)).create();
-        final JexlContext jc = null;
-        runSelfIncrement(jexl, jc);
-    }
-
-    protected void runSelfIncrement(final JexlEngine jexl, final JexlContext jc) {
-        JexlScript script = jexl.createScript("x -> [+x, +(x++), +x]");
-        final Var v11 = new Var(3115);
-        final AtomicInteger i11 = new AtomicInteger(3115);
-        for(final Object v : Arrays.asList(v11, i11)) {
-            final Object result = script.execute(jc, v);
-            Assert.assertTrue(result instanceof int[]);
-            final int[] r = (int[]) result;
-            Assert.assertEquals(3115, r[0]);
-            Assert.assertEquals(3115, r[1]);
-            Assert.assertEquals(3116, r[2]);
-        }
-
-        script = jexl.createScript("x -> [+x, +(++x), +x]");
-        final Var v12 = new Var(3189);
-        final AtomicInteger i12 = new AtomicInteger(3189);
-        for(final Object v : Arrays.asList(v12, i12)) {
-            final Object result = script.execute(jc, v);
-            Assert.assertTrue(result instanceof int[]);
-            final int[] r = (int[]) result;
-            Assert.assertEquals(3189, r[0]);
-            Assert.assertEquals(3190, r[1]);
-            Assert.assertEquals(3190, r[2]);
-        }
-
-        script = jexl.createScript("x -> [+x, +(x--), +x]");
-        final Var v13 = new Var(3115);
-        for(final Object v : Arrays.asList(v13)) {
-            final Object result = script.execute(jc, v13);
-            Assert.assertTrue(result instanceof int[]);
-            final int[] r = (int[]) result;
-            Assert.assertEquals(3115, r[0]);
-            Assert.assertEquals(3115, r[1]);
-            Assert.assertEquals(3114, r[2]);
-        }
-
-        script = jexl.createScript("x -> [+x, +(--x), +x]");
-        final Var v14 = new Var(3189);
-        for(final Object v : Arrays.asList(v14)) {
-            final Object result = script.execute(jc, v);
-            Assert.assertTrue(result instanceof int[]);
-            final int[] r = (int[]) result;
-            Assert.assertEquals(3189, r[0]);
-            Assert.assertEquals(3188, r[1]);
-            Assert.assertEquals(3188, r[2]);
-        }
-    }
-
-    @Test
-    public void testOverrideGetSet() throws Exception {
-        final JexlEngine jexl = new JexlBuilder().cache(64).arithmetic(new SelfArithmetic(false)).create();
-        final JexlContext jc = null;
-
-        JexlScript script;
-        Object result;
-        final Var v0 = new Var(3115);
-        script = jexl.createScript("(x)->{ x.value}");
-        result = script.execute(jc, v0);
-        Assert.assertEquals(3115, result);
-        script = jexl.createScript("(x)->{ x['VALUE']}");
-        result = script.execute(jc, v0);
-        Assert.assertEquals(3115, result);
-        script = jexl.createScript("(x,y)->{ x.value = y}");
-        result = script.execute(jc, v0, 42);
-        Assert.assertEquals(42, result);
-        script = jexl.createScript("(x,y)->{ x['VALUE'] = y}");
-        result = script.execute(jc, v0, 169);
-        Assert.assertEquals(169, result);
-    }
-
-    public static class Var {
-        int value;
-
-        Var(final int v) {
-            value = v;
-        }
-
-        @Override public String toString() {
-            return Integer.toString(value);
-        }
-    }
-
-    // an arithmetic that performs side effects
-    public static class SelfArithmetic extends OptionalArithmetic {
-        public SelfArithmetic(final boolean strict) {
-            super(strict);
-        }
-
-        public Object propertyGet(final Var var, final String property) {
-            return "value".equals(property)? var.value : JexlEngine.TRY_FAILED;
-        }
-
-        public Object propertySet(final Var var, final String property, final int v) {
-            return "value".equals(property)? var.value = v : JexlEngine.TRY_FAILED;
-        }
-
-        public Object arrayGet(final Var var, final String property) {
-            return "VALUE".equals(property)? var.value : JexlEngine.TRY_FAILED;
-        }
-
-        public Object arraySet(final Var var, final String property, final int v) {
-            return "VALUE".equals(property)? var.value = v : JexlEngine.TRY_FAILED;
-        }
-
-        public Var selfAdd(final Var lhs, final Var rhs) {
-            lhs.value += rhs.value;
-            return lhs;
-        }
-
-        // for kicks, this one does not side effect but overloads nevertheless
-        public Var selfSubtract(final Var lhs, final Var rhs) {
-            return new Var(lhs.value - rhs.value);
-        }
-
-        public Var selfDivide(final Var lhs, final Var rhs) {
-            lhs.value /= rhs.value;
-            return lhs;
-        }
-
-        public Var selfMultiply(final Var lhs, final Var rhs) {
-            lhs.value *= rhs.value;
-            return lhs;
-        }
-
-        public Var selfMod(final Var lhs, final Var rhs) {
-            lhs.value %= rhs.value;
-            return lhs;
-        }
-
-        public Var and(final Var lhs, final Var rhs) {
-            return new Var(lhs.value & rhs.value);
-        }
-
-        public Var selfAnd(final Var lhs, final Var rhs) {
-            lhs.value &= rhs.value;
-            return lhs;
-        }
-
-        public Var or(final Var lhs, final Var rhs) {
-            return new Var(lhs.value | rhs.value);
-        }
-
-        public Var selfOr(final Var lhs, final Var rhs) {
-            lhs.value |= rhs.value;
-            return lhs;
-        }
-
-        public Var xor(final Var lhs, final Var rhs) {
-            return new Var(lhs.value ^ rhs.value);
-        }
-
-        public Var selfXor(final Var lhs, final Var rhs) {
-            lhs.value ^= rhs.value;
-            return lhs;
-        }
-
-        public Var shiftLeft(final Var lhs, final int rhs) {
-            return new Var(lhs.value << rhs);
-        }
-
-        public Var selfShiftLeft(final Var lhs, final int rhs) {
-            lhs.value <<= rhs;
-            return lhs;
-        }
-
-        public Var shiftRight(final Var lhs, final int rhs) {
-            return new Var(lhs.value >> rhs);
-        }
-
-        public Var selfShiftRight(final Var lhs, final int rhs) {
-            lhs.value >>= rhs;
-            return lhs;
-        }
-
-        public Var shiftRightUnsigned(final Var lhs, final int rhs) {
-            return new Var(lhs.value >>> rhs);
-        }
-
-        public Var selfShiftRightUnsigned(final Var lhs, final int rhs) {
-            lhs.value >>>= rhs;
-            return lhs;
-        }
-
-        public int increment(final Var lhs) {
-            return lhs.value + 1;
-        }
-
-        public int decrement(final Var lhs) {
-            return lhs.value - 1;
-        }
-
-        public int incrementAndGet(final AtomicInteger i) {
-            return i.incrementAndGet();
-        }
-
-        public int getAndIncrement(final AtomicInteger i) {
-            return i.getAndIncrement();
-        }
-
-        public int positivize(final Var n) {
-            return n.value;
-        }
-
-        public int positivize(final Number n) {
-            return n.intValue();
-        }
-    }
-
-    /**
-     * An arithmetic that implements 2 selfAdd methods.
-     */
-    public static class Arithmetic246 extends JexlArithmetic {
-        public Arithmetic246(final boolean astrict) {
-            super(astrict);
-        }
-
-        public Object selfAdd(final Collection<String> c, final String item) throws IOException {
-            c.add(item);
-            return c;
-        }
-
-        public Object selfAdd(final Appendable c, final String item) throws IOException {
-            c.append(item);
-            return c;
-        }
-
-        @Override
-        public Object add(final Object right, final Object left) {
-            return super.add(left, right);
-        }
-    }
-
-   public static class Arithmetic246b extends Arithmetic246 {
-        public Arithmetic246b(final boolean astrict) {
-            super(astrict);
-        }
-
-        public Object selfAdd(final Object c, final String item) throws IOException {
-            if (c == null) {
-                return new ArrayList<>(Collections.singletonList(item));
-            }
-            if (c instanceof Appendable) {
-                ((Appendable) c).append(item);
-                return c;
-            }
-            return JexlEngine.TRY_FAILED;
-        }
+    @Override
+    @Before
+    public void setUp() {
+        asserter = new Asserter(JEXL);
     }
 
     @Test
@@ -727,65 +470,6 @@ public class SideEffectTest extends JexlTestCase {
         run246(new Arithmetic246b(true));
     }
 
-    private void run246(final JexlArithmetic j246) throws Exception {
-        final Log log246 = LogFactory.getLog(SideEffectTest.class);
-        // quiesce the logger
-        final java.util.logging.Logger ll246 = java.util.logging.LogManager.getLogManager().getLogger(SideEffectTest.class.getName());
-       // ll246.setLevel(Level.WARNING);
-        final JexlEngine jexl = new JexlBuilder().arithmetic(j246).cache(32).debug(true).logger(log246).create();
-        final JexlScript script = jexl.createScript("z += x", "x");
-        final MapContext ctx = new MapContext();
-        List<String> z = new ArrayList<>(1);
-
-        // no ambiguous, std case
-        ctx.set("z", z);
-        Object zz = script.execute(ctx, "42");
-        Assert.assertSame(zz, z);
-        Assert.assertEquals(1, z.size());
-        z.clear();
-
-        boolean t246 = false;
-        // call with null
-        try {
-            script.execute(ctx, "42");
-            zz = ctx.get("z");
-            Assert.assertTrue(zz instanceof List<?>);
-            z = (List<String>) zz;
-            Assert.assertEquals(1, z.size());
-        } catch (JexlException | ArithmeticException xjexl) {
-            t246 = true;
-            Assert.assertEquals(j246.getClass(), Arithmetic246.class);
-        }
-        ctx.clear();
-
-        // a non ambiguous call still succeeds
-        ctx.set("z", z);
-        zz = script.execute(ctx, "-42");
-        Assert.assertSame(zz, z);
-        Assert.assertEquals(t246? 1 : 2, z.size());
-    }
-
-    // an arithmetic that performs side effects
-    public static class Arithmetic248 extends JexlArithmetic {
-        public Arithmetic248(final boolean strict) {
-            super(strict);
-        }
-
-        public Object arrayGet(final List<?> list, final Collection<Integer> range) {
-            final List<Object> rl = new ArrayList<>(range.size());
-            for(final int i : range) {
-                rl.add(list.get(i));
-            }
-            return rl;
-        }
-
-        public Object arraySet(final List<Object> list, final Collection<Integer> range, final Object value) {
-            for(final int i : range) {
-                list.set(i, value);
-            }
-            return list;
-        }
-    }
 
     @Test
     public void test248() throws Exception {
@@ -810,6 +494,322 @@ public class SideEffectTest extends JexlTestCase {
         } catch (final JexlException xp) {
             Assert.assertTrue(xp instanceof JexlException.Property);
         }
+    }
+
+    @Test
+    public void testArithmeticSelf() throws Exception {
+        final JexlEngine jexl = new JexlBuilder().cache(64).arithmetic(new SelfArithmetic(false)).create();
+        final JexlContext jc = null;
+        runSelfOverload(jexl, jc);
+        runSelfOverload(jexl, jc);
+    }
+
+    @Test
+    public void testArithmeticSelfNoCache() throws Exception {
+        final JexlEngine jexl = new JexlBuilder().cache(0).arithmetic(new SelfArithmetic(false)).create();
+        final JexlContext jc = null;
+        runSelfOverload(jexl, jc);
+    }
+
+    @Test
+    public void testIncrementSelf() throws Exception {
+        final JexlEngine jexl = new JexlBuilder().cache(64).arithmetic(new SelfArithmetic(false)).create();
+        final JexlContext jc = null;
+        runSelfIncrement(jexl, jc);
+        runSelfIncrement(jexl, jc);
+    }
+
+    @Test
+    public void testIncrementSelfNoCache() throws Exception {
+        final JexlEngine jexl = new JexlBuilder().cache(0).arithmetic(new SelfArithmetic(false)).create();
+        final JexlContext jc = null;
+        runSelfIncrement(jexl, jc);
+    }
+
+    @Test
+    public void testOverrideGetSet() throws Exception {
+        final JexlEngine jexl = new JexlBuilder().cache(64).arithmetic(new SelfArithmetic(false)).create();
+        final JexlContext jc = null;
+
+        JexlScript script;
+        Object result;
+        final Var v0 = new Var(3115);
+        script = jexl.createScript("(x)->{ x.value}");
+        result = script.execute(jc, v0);
+        Assert.assertEquals(3115, result);
+        script = jexl.createScript("(x)->{ x['VALUE']}");
+        result = script.execute(jc, v0);
+        Assert.assertEquals(3115, result);
+        script = jexl.createScript("(x,y)->{ x.value = y}");
+        result = script.execute(jc, v0, 42);
+        Assert.assertEquals(42, result);
+        script = jexl.createScript("(x,y)->{ x['VALUE'] = y}");
+        result = script.execute(jc, v0, 169);
+        Assert.assertEquals(169, result);
+    }
+
+    @Test
+    public void testSideEffectAntishArray() throws Exception {
+        final Integer i41 = Integer.valueOf(4141);
+        final Integer i42 = Integer.valueOf(42);
+        final Integer i43 = Integer.valueOf(43);
+        final Object[] foo = new Object[3];
+        foo[1] = i42;
+        foo[2] = i43;
+        asserter.setVariable("foo.bar", foo);
+        foo[0] = i41;
+        asserter.assertExpression("foo.bar[0] += 2", i41 + 2);
+        Assert.assertEquals(foo[0], i41 + 2);
+        foo[0] = i41;
+        asserter.assertExpression("foo.bar[0] -= 2", i41 - 2);
+        Assert.assertEquals(foo[0], i41 - 2);
+        foo[0] = i41;
+        asserter.assertExpression("foo.bar[0] *= 2", i41 * 2);
+        Assert.assertEquals(foo[0], i41 * 2);
+        foo[0] = i41;
+        asserter.assertExpression("foo.bar[0] /= 2", i41 / 2);
+        Assert.assertEquals(foo[0], i41 / 2);
+        foo[0] = i41;
+        asserter.assertExpression("foo.bar[0] %= 2", i41 % 2);
+        Assert.assertEquals(foo[0], i41 % 2);
+        foo[0] = i41;
+        asserter.assertExpression("foo.bar[0] &= 3", (long) (i41 & 3));
+        Assert.assertEquals(foo[0], (long)(i41 & 3));
+        foo[0] = i41;
+        asserter.assertExpression("foo.bar[0] |= 2", (long)(i41 | 2));
+        Assert.assertEquals(foo[0], (long)(i41 | 2));
+        foo[0] = i41;
+        asserter.assertExpression("foo.bar[0] ^= 2", (long)(i41 ^ 2));
+        Assert.assertEquals(foo[0], (long)(i41 ^ 2));
+    }
+
+   @Test
+public void testSideEffectArray() throws Exception {
+    final Integer i41 = Integer.valueOf(4141);
+    final Integer i42 = Integer.valueOf(42);
+    final Integer i43 = Integer.valueOf(43);
+    final String s42 = "fourty-two";
+    final String s43 = "fourty-three";
+    final Object[] foo = new Object[3];
+    foo[1] = i42;
+    foo[2] = i43;
+    asserter.setVariable("foo", foo);
+    foo[0] = i41;
+    asserter.assertExpression("foo[0] += 2", i41 + 2);
+    Assert.assertEquals(foo[0], i41 + 2);
+    foo[0] = i41;
+    asserter.assertExpression("foo[0] -= 2", i41 - 2);
+    Assert.assertEquals(foo[0], i41 - 2);
+    foo[0] = i41;
+    asserter.assertExpression("foo[0] *= 2", i41 * 2);
+    Assert.assertEquals(foo[0], i41 * 2);
+    foo[0] = i41;
+    asserter.assertExpression("foo[0] /= 2", i41 / 2);
+    Assert.assertEquals(foo[0], i41 / 2);
+    foo[0] = i41;
+    asserter.assertExpression("foo[0] %= 2", i41 % 2);
+    Assert.assertEquals(foo[0], i41 % 2);
+    foo[0] = i41;
+    asserter.assertExpression("foo[0] &= 3", (long) (i41 & 3));
+    Assert.assertEquals(foo[0], (long)(i41 & 3));
+    foo[0] = i41;
+    asserter.assertExpression("foo[0] |= 2", (long)(i41 | 2));
+    Assert.assertEquals(foo[0], (long)(i41 | 2));
+    foo[0] = i41;
+    asserter.assertExpression("foo[0] ^= 2", (long)(i41 ^ 2));
+    Assert.assertEquals(foo[0], (long)(i41 ^ 2));
+}
+
+    @Test
+    public void testSideEffectBean() throws Exception {
+        final Integer i41 = Integer.valueOf(4141);
+        final Foo foo = new Foo(0);
+        asserter.setVariable("foo", foo);
+        foo.value = i41;
+        asserter.assertExpression("foo.value += 2", i41 + 2);
+        Assert.assertEquals(foo.value, i41 + 2);
+        foo.value = i41;
+        asserter.assertExpression("foo.value -= 2", i41 - 2);
+        Assert.assertEquals(foo.value, i41 - 2);
+        foo.value = i41;
+        asserter.assertExpression("foo.value *= 2", i41 * 2);
+        Assert.assertEquals(foo.value, i41 * 2);
+        foo.value = i41;
+        asserter.assertExpression("foo.value /= 2", i41 / 2);
+        Assert.assertEquals(foo.value, i41 / 2);
+        foo.value = i41;
+        asserter.assertExpression("foo.value %= 2", i41 % 2);
+        Assert.assertEquals(foo.value, i41 % 2);
+        foo.value = i41;
+        asserter.assertExpression("foo.value &= 3", (long) (i41 & 3));
+        Assert.assertEquals(foo.value, i41 & 3);
+        foo.value = i41;
+        asserter.assertExpression("foo.value |= 2", (long)(i41 | 2));
+        Assert.assertEquals(foo.value, i41 | 2);
+        foo.value = i41;
+        asserter.assertExpression("foo.value ^= 2", (long)(i41 ^ 2));
+        Assert.assertEquals(foo.value, i41 ^ 2);
+    }
+
+    @Test
+    public void testSideEffectBeanContainer() throws Exception {
+        final Integer i41 = Integer.valueOf(4141);
+        final Foo foo = new Foo(0);
+        asserter.setVariable("foo", foo);
+        foo.value = i41;
+        asserter.assertExpression("foo.bar[0] += 2", i41 + 2);
+        Assert.assertEquals(foo.value, i41 + 2);
+        foo.value = i41;
+        asserter.assertExpression("foo.bar[1] += 2", i41 + 3);
+        Assert.assertEquals(foo.value, i41 + 4);
+        foo.value = i41;
+        asserter.assertExpression("foo.bar[0] -= 2", i41 - 2);
+        Assert.assertEquals(foo.value, i41 - 2);
+        foo.value = i41;
+        asserter.assertExpression("foo.bar[0] *= 2", i41 * 2);
+        Assert.assertEquals(foo.value, i41 * 2);
+        foo.value = i41;
+        asserter.assertExpression("foo.bar[0] /= 2", i41 / 2);
+        Assert.assertEquals(foo.value, i41 / 2);
+        foo.value = i41;
+        asserter.assertExpression("foo.bar[0] %= 2", i41 % 2);
+        Assert.assertEquals(foo.value, i41 % 2);
+        foo.value = i41;
+        asserter.assertExpression("foo.bar[0] &= 3", (long) (i41 & 3));
+        Assert.assertEquals(foo.value, i41 & 3);
+        foo.value = i41;
+        asserter.assertExpression("foo.bar[0] |= 2", (long)(i41 | 2));
+        Assert.assertEquals(foo.value, i41 | 2);
+        foo.value = i41;
+        asserter.assertExpression("foo.bar[0] ^= 2", (long)(i41 ^ 2));
+        Assert.assertEquals(foo.value, i41 ^ 2);
+    }
+
+    @Test
+    public void testSideEffectDotArray() throws Exception {
+        final Integer i41 = Integer.valueOf(4141);
+        final Integer i42 = Integer.valueOf(42);
+        final Integer i43 = Integer.valueOf(43);
+        final String s42 = "fourty-two";
+        final String s43 = "fourty-three";
+        final Object[] foo = new Object[3];
+        foo[1] = i42;
+        foo[2] = i43;
+        asserter.setVariable("foo", foo);
+        foo[0] = i41;
+        asserter.assertExpression("foo.0 += 2", i41 + 2);
+        Assert.assertEquals(foo[0], i41 + 2);
+        foo[0] = i41;
+        asserter.assertExpression("foo.0 -= 2", i41 - 2);
+        Assert.assertEquals(foo[0], i41 - 2);
+        foo[0] = i41;
+        asserter.assertExpression("foo.0 *= 2", i41 * 2);
+        Assert.assertEquals(foo[0], i41 * 2);
+        foo[0] = i41;
+        asserter.assertExpression("foo.0 /= 2", i41 / 2);
+        Assert.assertEquals(foo[0], i41 / 2);
+        foo[0] = i41;
+        asserter.assertExpression("foo.0 %= 2", i41 % 2);
+        Assert.assertEquals(foo[0], i41 % 2);
+        foo[0] = i41;
+        asserter.assertExpression("foo.0 &= 3", (long) (i41 & 3));
+        Assert.assertEquals(foo[0], (long)(i41 & 3));
+        foo[0] = i41;
+        asserter.assertExpression("foo.0 |= 2", (long)(i41 | 2));
+        Assert.assertEquals(foo[0], (long)(i41 | 2));
+        foo[0] = i41;
+        asserter.assertExpression("foo.0 ^= 2", (long)(i41 ^ 2));
+        Assert.assertEquals(foo[0], (long)(i41 ^ 2));
+    }
+
+    @Test
+    public void testSideEffectVar() throws Exception {
+        final Map<String,Object> context = asserter.getVariables();
+        final Integer i41 = Integer.valueOf(4141);
+        final Object foo = i41;
+
+        context.put("foo", foo);
+        asserter.assertExpression("foo += 2", i41 + 2);
+        Assert.assertEquals(context.get("foo"), i41 + 2);
+
+        context.put("foo", foo);
+        asserter.assertExpression("foo -= 2", i41 - 2);
+        Assert.assertEquals(context.get("foo"), i41 - 2);
+
+        context.put("foo", foo);
+        asserter.assertExpression("foo *= 2", i41 * 2);
+        Assert.assertEquals(context.get("foo"), i41 * 2);
+
+        context.put("foo", foo);
+        asserter.assertExpression("foo /= 2", i41 / 2);
+        Assert.assertEquals(context.get("foo"), i41 / 2);
+
+        context.put("foo", foo);
+        asserter.assertExpression("foo %= 2", i41 % 2);
+        Assert.assertEquals(context.get("foo"), i41 % 2);
+
+        context.put("foo", foo);
+        asserter.assertExpression("foo &= 3", (long) (i41 & 3));
+        Assert.assertEquals(context.get("foo"), (long)(i41 & 3));
+
+        context.put("foo", foo);
+        asserter.assertExpression("foo |= 2", (long)(i41 | 2));
+        Assert.assertEquals(context.get("foo"), (long)(i41 | 2));
+
+        context.put("foo", foo);
+        asserter.assertExpression("foo ^= 2", (long)(i41 ^ 2));
+        Assert.assertEquals(context.get("foo"), (long)(i41 ^ 2));
+
+        context.put("foo", foo);
+        asserter.assertExpression("foo <<= 2", (long)(i41 << 2));
+        Assert.assertEquals(context.get("foo"), (long)(i41 << 2));
+
+        context.put("foo", foo);
+        asserter.assertExpression("foo >>= 2", (long)(i41 >> 2));
+        Assert.assertEquals(context.get("foo"), (long)(i41 >> 2));
+
+        context.put("foo", foo);
+        asserter.assertExpression("foo >>>= 2", (long)(i41 >>> 2));
+        Assert.assertEquals(context.get("foo"), (long)(i41 >>> 2));
+    }
+
+    @Test
+    public void testSideEffectVarDots() throws Exception {
+        final Map<String,Object> context = asserter.getVariables();
+        final Integer i41 = Integer.valueOf(4141);
+        final Object foo = i41;
+
+        context.put("foo.bar.quux", foo);
+        asserter.assertExpression("foo.bar.quux += 2", i41 + 2);
+        Assert.assertEquals(context.get("foo.bar.quux"), i41 + 2);
+
+        context.put("foo.bar.quux", foo);
+        asserter.assertExpression("foo.bar.quux -= 2", i41 - 2);
+        Assert.assertEquals(context.get("foo.bar.quux"), i41 - 2);
+
+        context.put("foo.bar.quux", foo);
+        asserter.assertExpression("foo.bar.quux *= 2", i41 * 2);
+        Assert.assertEquals(context.get("foo.bar.quux"), i41 * 2);
+
+        context.put("foo.bar.quux", foo);
+        asserter.assertExpression("foo.bar.quux /= 2", i41 / 2);
+        Assert.assertEquals(context.get("foo.bar.quux"), i41 / 2);
+
+        context.put("foo.bar.quux", foo);
+        asserter.assertExpression("foo.bar.quux %= 2", i41 % 2);
+        Assert.assertEquals(context.get("foo.bar.quux"), i41 % 2);
+
+        context.put("foo.bar.quux", foo);
+        asserter.assertExpression("foo.bar.quux &= 3", (long) (i41 & 3));
+        Assert.assertEquals(context.get("foo.bar.quux"), (long)(i41 & 3));
+
+        context.put("foo.bar.quux", foo);
+        asserter.assertExpression("foo.bar.quux |= 2", (long)(i41 | 2));
+        Assert.assertEquals(context.get("foo.bar.quux"), (long)(i41 | 2));
+
+        context.put("foo.bar.quux", foo);
+        asserter.assertExpression("foo.bar.quux ^= 2", (long)(i41 ^ 2));
+        Assert.assertEquals(context.get("foo.bar.quux"), (long)(i41 ^ 2));
     }
 
 }

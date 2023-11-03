@@ -34,14 +34,6 @@ public class BlockTest extends JexlTestCase {
     }
 
     @Test
-    public void testBlockSimple() throws Exception {
-        final JexlScript e = JEXL.createScript("if (true) { 'hello'; }");
-        final JexlContext jc = new MapContext();
-        final Object o = e.execute(jc);
-        Assert.assertEquals("Result is wrong", "hello", o);
-    }
-
-    @Test
     public void testBlockExecutesAll() throws Exception {
         final JexlScript e = JEXL.createScript("if (true) { x = 'Hello'; y = 'World';}");
         final JexlContext jc = new MapContext();
@@ -49,14 +41,6 @@ public class BlockTest extends JexlTestCase {
         Assert.assertEquals("First result is wrong", "Hello", jc.get("x"));
         Assert.assertEquals("Second result is wrong", "World", jc.get("y"));
         Assert.assertEquals("Block result is wrong", "World", o);
-    }
-
-    @Test
-    public void testEmptyBlock() throws Exception {
-        final JexlScript e = JEXL.createScript("if (true) { }");
-        final JexlContext jc = new MapContext();
-        final Object o = e.execute(jc);
-        Assert.assertNull("Result is wrong", o);
     }
 
     @Test
@@ -73,6 +57,22 @@ public class BlockTest extends JexlTestCase {
         final JexlContext jc = new MapContext();
         final Object o = e.execute(jc);
         Assert.assertEquals("Block result is wrong", Integer.valueOf(2), o);
+    }
+
+    @Test
+    public void testBlockSimple() throws Exception {
+        final JexlScript e = JEXL.createScript("if (true) { 'hello'; }");
+        final JexlContext jc = new MapContext();
+        final Object o = e.execute(jc);
+        Assert.assertEquals("Result is wrong", "hello", o);
+    }
+
+    @Test
+    public void testEmptyBlock() throws Exception {
+        final JexlScript e = JEXL.createScript("if (true) { }");
+        final JexlContext jc = new MapContext();
+        final Object o = e.execute(jc);
+        Assert.assertNull("Result is wrong", o);
     }
 
     @Test

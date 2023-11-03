@@ -32,6 +32,47 @@ import org.junit.Test;
  */
 public class Issues400Test {
 
+  /**
+   * Any function in a context can be used as a method of its first parameter.
+   * Overloads are respected.
+   */
+  public static class XuContext extends MapContext {
+
+    public String join(int[] list, String str) {
+      return join(Arrays.stream(list).iterator(), str);
+    }
+
+    public String join(Iterable<?> list, String str) {
+      return join(list.iterator(), str);
+    }
+
+    public String join(Iterator<?> iterator, String str) {
+      if (!iterator.hasNext()) {
+        return "";
+      }
+      StringBuilder strb = new StringBuilder(256);
+      strb.append(iterator.next().toString());
+      while(iterator.hasNext()) {
+        strb.append(str);
+        strb.append(Objects.toString(iterator.next(), "?"));
+      }
+      return strb.toString();
+    }
+  }
+
+  private static void run404(final JexlEngine jexl, final String src, final Object...a) {
+    try {
+      final JexlScript script = jexl.createScript(src, "a", "b");
+      if (!src.endsWith(";")) {
+        Assert.assertEquals(script.getSourceText(), script.getParsedText());
+      }
+      final Object result = script.execute(null, a);
+      Assert.assertEquals(42, result);
+    } catch(final JexlException.Parsing xparse) {
+      Assert.fail(src);
+    }
+  }
+
   @Test
   public void test402() {
     final JexlContext jc = new MapContext();
@@ -101,19 +142,6 @@ public class Issues400Test {
     }
   }
 
-  private static void run404(final JexlEngine jexl, final String src, final Object...a) {
-    try {
-      final JexlScript script = jexl.createScript(src, "a", "b");
-      if (!src.endsWith(";")) {
-        Assert.assertEquals(script.getSourceText(), script.getParsedText());
-      }
-      final Object result = script.execute(null, a);
-      Assert.assertEquals(42, result);
-    } catch(final JexlException.Parsing xparse) {
-      Assert.fail(src);
-    }
-  }
-
   @Test
   public void test404b() {
     final JexlEngine jexl = new JexlBuilder()
@@ -151,34 +179,6 @@ public class Issues400Test {
     script = jexl.createScript("a?['B'] ?: ['C']", "a");
     result = script.execute(null, a);
     Assert.assertArrayEquals(new String[]{"C"}, (String[]) result);
-  }
-
-  /**
-   * Any function in a context can be used as a method of its first parameter.
-   * Overloads are respected.
-   */
-  public static class XuContext extends MapContext {
-
-    public String join(Iterator<?> iterator, String str) {
-      if (!iterator.hasNext()) {
-        return "";
-      }
-      StringBuilder strb = new StringBuilder(256);
-      strb.append(iterator.next().toString());
-      while(iterator.hasNext()) {
-        strb.append(str);
-        strb.append(Objects.toString(iterator.next(), "?"));
-      }
-      return strb.toString();
-    }
-
-    public String join(Iterable<?> list, String str) {
-      return join(list.iterator(), str);
-    }
-
-    public String join(int[] list, String str) {
-      return join(Arrays.stream(list).iterator(), str);
-    }
   }
 
   @Test

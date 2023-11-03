@@ -35,50 +35,6 @@ import org.junit.Assert;
  * Eases the implementation of main methods to debug.
  */
 public class JexlTestCase {
-    // The default options: all tests where engine lexicality is
-    // important can be identified by the builder  calling lexical(...).
-    static {
-        JexlOptions.setDefaultFlags("-safe", "+lexical");
-    }
-    /** No parameters signature for test run. */
-    private static final Class<?>[] NO_PARMS = {};
-    /** String parameter signature for test run. */
-    private static final Class<?>[] STRING_PARM = {String.class};
-
-    /** A default JEXL engine instance. */
-    protected final JexlEngine JEXL;
-
-    public JexlTestCase(final String name) {
-        this(name, new JexlBuilder().imports(Arrays.asList("java.lang","java.math")).permissions(null).cache(128).create());
-    }
-
-    protected JexlTestCase(final String name, final JexlEngine jexl) {
-        //super(name);
-        JEXL = jexl;
-    }
-
-    public void setUp() throws Exception {
-        // nothing to do
-    }
-
-    @After
-    public void tearDown() throws Exception {
-        debuggerCheck(JEXL);
-    }
-
-    static JexlEngine createEngine() {
-        return new JexlBuilder().create();
-    }
-    static JexlEngine createEngine(final JexlFeatures features) {
-        return new JexlBuilder().features(features).create();
-    }
-
-    // define mode pro50
-    static final JexlOptions MODE_PRO50 = new JexlOptions();
-    static {
-        MODE_PRO50.setFlags( "+strict +cancellable +lexical +lexicalShade -safe".split(" "));
-    }
-
     public static class PragmaticContext extends OptionsContext implements JexlContext.PragmaProcessor, JexlContext.OptionsHandle {
         private final JexlOptions options;
 
@@ -91,8 +47,8 @@ public class JexlTestCase {
         }
 
         @Override
-        public void processPragma(final String key, final Object value) {
-            processPragma(null, key, value);
+        public JexlOptions getEngineOptions() {
+            return options;
         }
 
         @Override
@@ -103,9 +59,57 @@ public class JexlTestCase {
         }
 
         @Override
-        public JexlOptions getEngineOptions() {
-            return options;
+        public void processPragma(final String key, final Object value) {
+            processPragma(null, key, value);
         }
+    }
+    // The default options: all tests where engine lexicality is
+    // important can be identified by the builder  calling lexical(...).
+    static {
+        JexlOptions.setDefaultFlags("-safe", "+lexical");
+    }
+    /** No parameters signature for test run. */
+    private static final Class<?>[] NO_PARMS = {};
+
+    /** String parameter signature for test run. */
+    private static final Class<?>[] STRING_PARM = {String.class};
+
+    // define mode pro50
+    static final JexlOptions MODE_PRO50 = new JexlOptions();
+
+    static {
+        MODE_PRO50.setFlags( "+strict +cancellable +lexical +lexicalShade -safe".split(" "));
+    }
+
+    /**
+     * A very secure singleton.
+     */
+    public static final JexlPermissions SECURE = JexlPermissions.RESTRICTED;
+
+    static JexlEngine createEngine() {
+        return new JexlBuilder().create();
+    }
+
+    public static JexlEngine createEngine(final boolean lenient) {
+        return createEngine(lenient, SECURE);
+    }
+    public static JexlEngine createEngine(final boolean lenient, final JexlPermissions permissions) {
+        return new JexlBuilder()
+                .uberspect(new Uberspect(null, null, permissions))
+                .arithmetic(new JexlArithmetic(!lenient)).cache(128).create();
+    }
+
+    static JexlEngine createEngine(final JexlFeatures features) {
+        return new JexlBuilder().features(features).create();
+    }
+    /**
+     * Will force testing the debugger for each derived test class by
+     * recreating each expression from the JexlNode in the JexlEngine cache &
+     * testing them for equality with the origin.
+     * @throws Exception
+     */
+    public static void debuggerCheck(final JexlEngine ijexl) throws Exception {
+         Util.debuggerCheck(ijexl);
     }
 
     /**
@@ -122,64 +126,13 @@ public class JexlTestCase {
         return lhsw.equals(rhsw);
     }
 
-    public String simpleWhitespace(final String arg) {
-        return arg.trim().replaceAll("\\s+", " ");
-    }
-
-    public static String toString(final JexlScript script) {
-        final Debugger d = new Debugger().lineFeed("").indentation(0);
-        d.debug(script);
-        return  d.toString();
-    }
-
     /**
-     * A very secure singleton.
-     */
-    public static final JexlPermissions SECURE = JexlPermissions.RESTRICTED;
-
-    public static JexlEngine createEngine(final boolean lenient) {
-        return createEngine(lenient, SECURE);
-    }
-
-    public static JexlEngine createEngine(final boolean lenient, final JexlPermissions permissions) {
-        return new JexlBuilder()
-                .uberspect(new Uberspect(null, null, permissions))
-                .arithmetic(new JexlArithmetic(!lenient)).cache(128).create();
-    }
-
-    /**
-     * Will force testing the debugger for each derived test class by
-     * recreating each expression from the JexlNode in the JexlEngine cache &
-     * testing them for equality with the origin.
+     * Runs a test.
+     * @param args where args[0] is the test class name and args[1] the test class method
      * @throws Exception
      */
-    public static void debuggerCheck(final JexlEngine ijexl) throws Exception {
-         Util.debuggerCheck(ijexl);
-    }
-
-    /**
-     * Dynamically runs a test method.
-     * @param name the test method to run
-     * @throws Exception if anything goes wrong
-     */
-    public void runTest(final String name) throws Exception {
-        if ("runTest".equals(name)) {
-            return;
-        }
-        Method method = null;
-        try {
-            method = this.getClass().getDeclaredMethod(name, NO_PARMS);
-        }
-        catch (final Exception xany) {
-            Assert.fail("no such test: " + name);
-            return;
-        }
-        try {
-            this.setUp();
-            method.invoke(this);
-        } finally {
-            this.tearDown();
-        }
+    public static void main(final String[] args) throws Exception {
+        runTest(args[0], args[1]);
     }
 
     /**
@@ -230,12 +183,59 @@ public class JexlTestCase {
         test.runTest(mname);
     }
 
+    public static String toString(final JexlScript script) {
+        final Debugger d = new Debugger().lineFeed("").indentation(0);
+        d.debug(script);
+        return  d.toString();
+    }
+
+    /** A default JEXL engine instance. */
+    protected final JexlEngine JEXL;
+
+    public JexlTestCase(final String name) {
+        this(name, new JexlBuilder().imports(Arrays.asList("java.lang","java.math")).permissions(null).cache(128).create());
+    }
+
+    protected JexlTestCase(final String name, final JexlEngine jexl) {
+        //super(name);
+        JEXL = jexl;
+    }
+
     /**
-     * Runs a test.
-     * @param args where args[0] is the test class name and args[1] the test class method
-     * @throws Exception
+     * Dynamically runs a test method.
+     * @param name the test method to run
+     * @throws Exception if anything goes wrong
      */
-    public static void main(final String[] args) throws Exception {
-        runTest(args[0], args[1]);
+    public void runTest(final String name) throws Exception {
+        if ("runTest".equals(name)) {
+            return;
+        }
+        Method method = null;
+        try {
+            method = this.getClass().getDeclaredMethod(name, NO_PARMS);
+        }
+        catch (final Exception xany) {
+            Assert.fail("no such test: " + name);
+            return;
+        }
+        try {
+            this.setUp();
+            method.invoke(this);
+        } finally {
+            this.tearDown();
+        }
+    }
+
+    public void setUp() throws Exception {
+        // nothing to do
+    }
+
+    public String simpleWhitespace(final String arg) {
+        return arg.trim().replaceAll("\\s+", " ");
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        debuggerCheck(JEXL);
     }
 }

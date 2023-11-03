@@ -29,63 +29,6 @@ public class ParserTest {
     public ParserTest() {}
 
     /**
-     * See if we can parse simple scripts
-     */
-    @Test
-    public void testParse() throws Exception {
-        final Parser parser = new Parser(";");
-        JexlNode sn;
-        sn = parser.parse(null, FEATURES, "foo = 1;", null);
-        Assert.assertNotNull("parsed node is null", sn);
-
-        sn = parser.parse(null, FEATURES, "foo = \"bar\";", null);
-        Assert.assertNotNull("parsed node is null", sn);
-
-        sn = parser.parse(null, FEATURES, "foo = 'bar';", null);
-        Assert.assertNotNull("parsed node is null", sn);
-    }
-
-    @Test
-    public void testErrorAssign() throws Exception {
-        final String[] ops = { "=", "+=", "-=", "/=", "*=", "^=", "&=", "|=" };
-        for(final String op : ops) {
-            final Parser parser = new Parser(";");
-            try {
-                final JexlNode sn = parser.parse(null, FEATURES, "foo() "+op+" 1;", null);
-                Assert.fail("should have failed on invalid assignment " + op);
-            } catch (final JexlException.Parsing xparse) {
-                // ok
-                final String ss = xparse.getDetail();
-                final String sss = xparse.toString();
-            }
-        }
-    }
-
-    @Test
-    public void testErrorAmbiguous() throws Exception {
-        final Parser parser = new Parser(";");
-        try {
-            final JexlNode sn = parser.parse(null, FEATURES, "x = 1 y = 5", null);
-            Assert.fail("should have failed on ambiguous statement");
-        } catch (final JexlException.Ambiguous xambiguous) {
-            // ok
-        } catch (final JexlException xother) {
-            Assert.fail(xother.toString());
-        }
-    }
-
-    @Test
-    public void testIdentifierEscape() {
-        final String[] ids = {"a\\ b", "a\\ b\\ c", "a\\'b\\\"c", "a\\ \\ c"};
-        for(final String id : ids) {
-            final String esc0 = StringParser.unescapeIdentifier(id);
-            Assert.assertFalse(esc0.contains("\\"));
-            final String esc1 = StringParser.escapeIdentifier(esc0);
-            Assert.assertEquals(id, esc1);
-        }
-    }
-
-    /**
      * Test the escaped control characters.
      */
     @Test
@@ -105,5 +48,62 @@ public class ParserTest {
             final String output = StringParser.buildString(pair[1], true);
             Assert.assertEquals(pair[0], output);
         }
+    }
+
+    @Test
+    public void testErrorAmbiguous() throws Exception {
+        final Parser parser = new Parser(";");
+        try {
+            final JexlNode sn = parser.parse(null, FEATURES, "x = 1 y = 5", null);
+            Assert.fail("should have failed on ambiguous statement");
+        } catch (final JexlException.Ambiguous xambiguous) {
+            // ok
+        } catch (final JexlException xother) {
+            Assert.fail(xother.toString());
+        }
+    }
+
+    @Test
+    public void testErrorAssign() throws Exception {
+        final String[] ops = { "=", "+=", "-=", "/=", "*=", "^=", "&=", "|=" };
+        for(final String op : ops) {
+            final Parser parser = new Parser(";");
+            try {
+                final JexlNode sn = parser.parse(null, FEATURES, "foo() "+op+" 1;", null);
+                Assert.fail("should have failed on invalid assignment " + op);
+            } catch (final JexlException.Parsing xparse) {
+                // ok
+                final String ss = xparse.getDetail();
+                final String sss = xparse.toString();
+            }
+        }
+    }
+
+    @Test
+    public void testIdentifierEscape() {
+        final String[] ids = {"a\\ b", "a\\ b\\ c", "a\\'b\\\"c", "a\\ \\ c"};
+        for(final String id : ids) {
+            final String esc0 = StringParser.unescapeIdentifier(id);
+            Assert.assertFalse(esc0.contains("\\"));
+            final String esc1 = StringParser.escapeIdentifier(esc0);
+            Assert.assertEquals(id, esc1);
+        }
+    }
+
+    /**
+     * See if we can parse simple scripts
+     */
+    @Test
+    public void testParse() throws Exception {
+        final Parser parser = new Parser(";");
+        JexlNode sn;
+        sn = parser.parse(null, FEATURES, "foo = 1;", null);
+        Assert.assertNotNull("parsed node is null", sn);
+
+        sn = parser.parse(null, FEATURES, "foo = \"bar\";", null);
+        Assert.assertNotNull("parsed node is null", sn);
+
+        sn = parser.parse(null, FEATURES, "foo = 'bar';", null);
+        Assert.assertNotNull("parsed node is null", sn);
     }
 }

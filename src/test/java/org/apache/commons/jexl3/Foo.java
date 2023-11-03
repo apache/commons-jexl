@@ -27,36 +27,18 @@ import java.util.List;
  */
 public class Foo {
 
-    private boolean beenModified;
-    private String property1 = "some value";
-    public Foo() {}
     public class Cheezy {
         public Iterator<String> iterator() {
             return getCheeseList().iterator();
         }
     }
+    private boolean beenModified;
+    private String property1 = "some value";
+    public Foo() {}
 
     public String bar()
     {
         return JexlTest.METHOD_STRING;
-    }
-
-    public String getBar()
-    {
-        return JexlTest.GET_METHOD_STRING;
-    }
-
-    public Foo getInnerFoo()
-    {
-        return new Foo();
-    }
-
-    public String getQuux() {
-        return "String : quux";
-    }
-
-    public String repeat(final String str) {
-        return "Repeat : " + str;
     }
 
     public String convertBoolean(final boolean b)
@@ -64,8 +46,19 @@ public class Foo {
         return "Boolean : " + b;
     }
 
-    public int getCount() {
-        return 5;
+    public String[] getArray()
+    {
+        return ArrayAccessTest.GET_METHOD_ARRAY;
+    }
+
+    public String[][] getArray2()
+    {
+        return ArrayAccessTest.GET_METHOD_ARRAY2;
+    }
+
+    public String getBar()
+    {
+        return JexlTest.GET_METHOD_STRING;
     }
 
     public List<String> getCheeseList()
@@ -82,24 +75,31 @@ public class Foo {
         return new Cheezy();
     }
 
-    public String[] getArray()
-    {
-        return ArrayAccessTest.GET_METHOD_ARRAY;
+    public int getCount() {
+        return 5;
     }
 
-    public String[][] getArray2()
+    public Foo getInnerFoo()
     {
-        return ArrayAccessTest.GET_METHOD_ARRAY2;
+        return new Foo();
     }
 
-    public boolean isSimple()
+    public boolean getModified()
     {
-        return true;
+        return beenModified;
     }
 
-    public int square(final int value)
+    public String getProperty1() {
+        return property1;
+    }
+
+    public String getQuux() {
+        return "String : quux";
+    }
+
+    public int getSize()
     {
-        return value * value;
+        return 22;
     }
 
     public boolean getTrueAndModify()
@@ -108,22 +108,22 @@ public class Foo {
         return true;
     }
 
-    public boolean getModified()
+    public boolean isSimple()
     {
-        return beenModified;
+        return true;
     }
 
 
-    public int getSize()
-    {
-        return 22;
-    }
-
-    public String getProperty1() {
-        return property1;
+    public String repeat(final String str) {
+        return "Repeat : " + str;
     }
 
     public void setProperty1(final String newValue) {
         property1 = newValue;
+    }
+
+    public int square(final int value)
+    {
+        return value * value;
     }
 }

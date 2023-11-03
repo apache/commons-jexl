@@ -36,11 +36,6 @@ import org.junit.Test;
  * </p>
  */
 public class CollectionLiteralTest extends JexlTestCase {
-    public CollectionLiteralTest() {
-        super("CollectionLiteralTest");
-    }
-
-
     public static class Arithmetic363 extends JexlArithmetic {
         final AtomicInteger maps = new AtomicInteger(0);
         final AtomicInteger sets = new AtomicInteger(0);
@@ -50,27 +45,30 @@ public class CollectionLiteralTest extends JexlTestCase {
             super(strict);
         }
 
+        @Override public ArrayBuilder arrayBuilder(final int size, final boolean extended) {
+            return new CountingArrayBuilder(arrays, size, extended);
+        }
         @Override public MapBuilder mapBuilder(final int size, final boolean extended) {
             return new CountingMapBuilder(maps, size, extended);
         }
         @Override public SetBuilder setBuilder(final int size, final boolean extended) {
             return new CountingSetBuilder(sets, size, extended);
         }
-        @Override public ArrayBuilder arrayBuilder(final int size, final boolean extended) {
-            return new CountingArrayBuilder(arrays, size, extended);
-        }
     }
 
-    static class CountingSetBuilder extends SetBuilder {
+
+    static class CountingArrayBuilder extends ArrayBuilder {
         final AtomicInteger count;
-        public CountingSetBuilder(final AtomicInteger ai, final int size, final boolean extended) {
+
+        public CountingArrayBuilder(final AtomicInteger ai, final int size, final boolean extended) {
             super(size, extended);
             count = ai;
         }
-        @Override public Set<?> create() {
-            final Set<?> set = super.create();
+
+        @Override public Object create(final boolean extended) {
+            final Object array = super.create(extended);
             count.incrementAndGet();
-            return set;
+            return array;
         }
     }
 
@@ -87,18 +85,38 @@ public class CollectionLiteralTest extends JexlTestCase {
         }
     }
 
-    static class CountingArrayBuilder extends ArrayBuilder {
+    static class CountingSetBuilder extends SetBuilder {
         final AtomicInteger count;
-
-        public CountingArrayBuilder(final AtomicInteger ai, final int size, final boolean extended) {
+        public CountingSetBuilder(final AtomicInteger ai, final int size, final boolean extended) {
             super(size, extended);
             count = ai;
         }
-
-        @Override public Object create(final boolean extended) {
-            final Object array = super.create(extended);
+        @Override public Set<?> create() {
+            final Set<?> set = super.create();
             count.incrementAndGet();
-            return array;
+            return set;
+        }
+    }
+
+    public CollectionLiteralTest() {
+        super("CollectionLiteralTest");
+    }
+
+    @Test
+    public void testArrayBuilder() {
+        final Arithmetic363 jc = new Arithmetic363(true);
+        final JexlEngine jexl = new JexlBuilder().cache(4).arithmetic(jc).create();
+        JexlScript script;
+        Object result;
+
+        script = jexl.createScript("[ (x)->{ 1 + x; }, (y)->{ y - 1; } ]");
+        Object previous = null;
+        for(int i = 0; i < 4; ++i) {
+            result = script.execute(null);
+            Assert.assertNotNull(result);
+            Assert.assertNotSame(previous, result);
+            previous = result;
+            Assert.assertEquals( 1 + i, jc.arrays.get());
         }
     }
 
@@ -135,24 +153,6 @@ public class CollectionLiteralTest extends JexlTestCase {
             Assert.assertNotSame(previous, result);
             previous = result;
             Assert.assertEquals(1 + i, jc.sets.get());
-        }
-    }
-
-    @Test
-    public void testArrayBuilder() {
-        final Arithmetic363 jc = new Arithmetic363(true);
-        final JexlEngine jexl = new JexlBuilder().cache(4).arithmetic(jc).create();
-        JexlScript script;
-        Object result;
-
-        script = jexl.createScript("[ (x)->{ 1 + x; }, (y)->{ y - 1; } ]");
-        Object previous = null;
-        for(int i = 0; i < 4; ++i) {
-            result = script.execute(null);
-            Assert.assertNotNull(result);
-            Assert.assertNotSame(previous, result);
-            previous = result;
-            Assert.assertEquals( 1 + i, jc.arrays.get());
         }
     }
 

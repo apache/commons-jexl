@@ -40,6 +40,11 @@ public class OptionalNullMethod implements JexlMethod {
     }
 
     @Override
+    public Class<?> getReturnType() {
+        return delegate != null ? delegate.getReturnType() : null;
+    }
+
+    @Override
     public Object invoke(final Object obj, final Object... params) throws Exception {
         if (obj == null) {
             return null;
@@ -54,11 +59,8 @@ public class OptionalNullMethod implements JexlMethod {
     }
 
     @Override
-    public Object tryInvoke(final String name, final Object obj, final Object... params) throws JexlException.TryFailed {
-        if (obj == null) {
-            return null;
-        }
-        return delegate != null ? delegate.tryInvoke(name, obj, params) : JexlEngine.TRY_FAILED;
+    public boolean isCacheable() {
+        return false;
     }
 
     @Override
@@ -67,12 +69,10 @@ public class OptionalNullMethod implements JexlMethod {
     }
 
     @Override
-    public boolean isCacheable() {
-        return false;
-    }
-
-    @Override
-    public Class<?> getReturnType() {
-        return delegate != null ? delegate.getReturnType() : null;
+    public Object tryInvoke(final String name, final Object obj, final Object... params) throws JexlException.TryFailed {
+        if (obj == null) {
+            return null;
+        }
+        return delegate != null ? delegate.tryInvoke(name, obj, params) : JexlEngine.TRY_FAILED;
     }
 }

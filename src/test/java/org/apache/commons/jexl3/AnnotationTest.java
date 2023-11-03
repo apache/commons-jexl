@@ -35,24 +35,17 @@ import org.junit.Test;
 
 public class AnnotationTest extends JexlTestCase {
 
-    public final static int NUM_THREADS = 10;
-    public final static int NUM_ITERATIONS = 1000;
-
-    public AnnotationTest() {
-        super("AnnotationTest");
-    }
-
-    @Test
-    public void test197a() throws Exception {
-        final JexlContext jc = new MapContext();
-        final JexlScript e = JEXL.createScript("@synchronized { return 42; }");
-        final Object r = e.execute(jc);
-        Assert.assertEquals(42, r);
-    }
-
     public static class AnnotationContext extends MapContext implements JexlContext.AnnotationProcessor {
         private int count;
         private final Set<String> names = new TreeSet<>();
+
+        public int getCount() {
+            return count;
+        }
+
+        public Set<String> getNames() {
+            return names;
+        }
 
         @Override
         public Object processAnnotation(final String name, final Object[] args, final Callable<Object> statement) throws Exception {
@@ -86,13 +79,24 @@ public class AnnotationTest extends JexlTestCase {
             }
             return statement.call();
         }
+    }
+    /**
+     * A counter whose inc method will misbehave if not mutex-ed.
+     */
+    public static class Counter {
+        private int value;
 
-        public int getCount() {
-            return count;
+        public int getValue() {
+            return value;
         }
 
-        public Set<String> getNames() {
-            return names;
+        public void inc() {
+            final int v = value;
+            // introduce some concurency
+            for (int i = (int) System.currentTimeMillis() % 5; i >= 0; --i) {
+                Thread.yield();
+            }
+            value = v + 1;
         }
     }
 
@@ -135,6 +139,202 @@ public class AnnotationTest extends JexlTestCase {
                 return statement.call();
             }
             return statement.call();
+        }
+    }
+
+    /**
+     * Runs a counter test with n-thread in //.
+     */
+    public static class TestRunner {
+        public final Counter syncCounter = new Counter();
+        public final Counter concCounter = new Counter();
+
+        public void run(final Runnable runnable) throws InterruptedException {
+            final ExecutorService executor = Executors.newFixedThreadPool(NUM_THREADS);
+            for (int i = 0; i < NUM_THREADS; i++) {
+                executor.submit(runnable);
+            }
+            executor.shutdown();
+            executor.awaitTermination(5, TimeUnit.SECONDS);
+            // this may succeed concurrently if there is only one 'real' thread
+            // during execution; we can only prove the 'synchronized' if the unsync-ed
+            // version fails...
+            if (NUM_THREADS * NUM_ITERATIONS != concCounter.getValue()) {
+                Assert.assertEquals(NUM_THREADS * NUM_ITERATIONS, syncCounter.getValue());
+            }
+        }
+    }
+
+    public final static int NUM_THREADS = 10;
+
+    public final static int NUM_ITERATIONS = 1000;
+
+    public AnnotationTest() {
+        super("AnnotationTest");
+    }
+
+    @Test
+    public void test197a() throws Exception {
+        final JexlContext jc = new MapContext();
+        final JexlScript e = JEXL.createScript("@synchronized { return 42; }");
+        final Object r = e.execute(jc);
+        Assert.assertEquals(42, r);
+    }
+
+    @Test
+    public void testError() throws Exception {
+        testError(true);
+        testError(false);
+    }
+
+    private void testError(final boolean silent) throws Exception {
+        final CaptureLog log = new CaptureLog();
+        final AnnotationContext jc = new AnnotationContext();
+        final JexlEngine jexl = new JexlBuilder().logger(log).strict(true).silent(silent).create();
+        final JexlScript e = jexl.createScript("@error('42') { return 42; }");
+        try {
+            final Object r = e.execute(jc);
+            if (!silent) {
+                Assert.fail("should have failed");
+            } else {
+                Assert.assertEquals(1, log.count("warn"));
+            }
+        } catch (final JexlException.Annotation xjexl) {
+            Assert.assertEquals("error", xjexl.getAnnotation());
+        }
+        Assert.assertEquals(1, jc.getCount());
+        Assert.assertTrue(jc.getNames().contains("error"));
+        Assert.assertTrue(jc.getNames().contains("42"));
+        if (!silent) {
+            Assert.assertEquals(0, log.count("warn"));
+        }
+    }
+
+    @Test
+    public void testHoistingStatement() throws Exception {
+        final AnnotationContext jc = new AnnotationContext();
+        final JexlScript e = JEXL.createScript("var t = 1; @synchronized for(var x : [2,3,7]) t *= x; t");
+        final Object r = e.execute(jc);
+        Assert.assertEquals(42, r);
+        Assert.assertEquals(1, jc.getCount());
+        Assert.assertTrue(jc.getNames().contains("synchronized"));
+    }
+
+    @Test
+    public void testJexlSynchronized0() throws InterruptedException {
+        final TestRunner tr = new TestRunner();
+        final AnnotationContext ctxt = new AnnotationContext();
+        final JexlScript script = JEXL.createScript(
+                "for(var i : 1..NUM_ITERATIONS) {"
+                + "@synchronized { syncCounter.inc(); }"
+                + "concCounter.inc();"
+                + "}",
+                "NUM_ITERATIONS",
+                "syncCounter",
+                "concCounter");
+        // will sync on syncCounter
+        tr.run(() -> {
+            script.execute(ctxt, NUM_ITERATIONS, tr.syncCounter, tr.concCounter);
+        });
+    }
+
+    @Test
+    public void testMultiple() throws Exception {
+        final AnnotationContext jc = new AnnotationContext();
+        final JexlScript e = JEXL.createScript("@one(1) @synchronized { return 42; }");
+        final Object r = e.execute(jc);
+        Assert.assertEquals(42, r);
+        Assert.assertEquals(2, jc.getCount());
+        Assert.assertTrue(jc.getNames().contains("synchronized"));
+        Assert.assertTrue(jc.getNames().contains("one"));
+        Assert.assertTrue(jc.getNames().contains("1"));
+    }
+
+    @Test
+    public void testNoArg() throws Exception {
+        final AnnotationContext jc = new AnnotationContext();
+        final JexlScript e = JEXL.createScript("@synchronized { return 42; }");
+        final Object r = e.execute(jc);
+        Assert.assertEquals(42, r);
+        Assert.assertEquals(1, jc.getCount());
+        Assert.assertTrue(jc.getNames().contains("synchronized"));
+    }
+
+    @Test
+    public void testNoArgExpression() throws Exception {
+        final AnnotationContext jc = new AnnotationContext();
+        final JexlScript e = JEXL.createScript("@synchronized 42");
+        final Object r = e.execute(jc);
+        Assert.assertEquals(42, r);
+        Assert.assertEquals(1, jc.getCount());
+        Assert.assertTrue(jc.getNames().contains("synchronized"));
+    }
+
+    @Test
+    public void testNoArgStatement() throws Exception {
+        final AnnotationContext jc = new AnnotationContext();
+        final JexlScript e = JEXL.createScript("@synchronized if (true) 2 * 3 * 7; else -42;");
+        final Object r = e.execute(jc);
+        Assert.assertEquals(42, r);
+        Assert.assertEquals(1, jc.getCount());
+        Assert.assertTrue(jc.getNames().contains("synchronized"));
+    }
+
+    @Test
+    public void testOneArg() throws Exception {
+        final AnnotationContext jc = new AnnotationContext();
+        final JexlScript e = JEXL.createScript("@one(1) { return 42; }");
+        final Object r = e.execute(jc);
+        Assert.assertEquals(42, r);
+        Assert.assertEquals(1, jc.getCount());
+        Assert.assertTrue(jc.getNames().contains("one"));
+        Assert.assertTrue(jc.getNames().contains("1"));
+    }
+
+    @Test
+    /**
+     * A base test to ensure synchronized makes a difference.
+     */
+    public void testSynchronized() throws InterruptedException {
+        final TestRunner tr = new TestRunner();
+        final Counter syncCounter = tr.syncCounter;
+        final Counter concCounter = tr.concCounter;
+        tr.run(() -> {
+            for (int i = 0; i < NUM_ITERATIONS; i++) {
+                synchronized (syncCounter) {
+                    syncCounter.inc();
+                }
+                concCounter.inc();
+            }
+        });
+    }
+
+    @Test
+    public void testUnknown() throws Exception {
+        testUnknown(true);
+        testUnknown(false);
+    }
+
+    private void testUnknown(final boolean silent) throws Exception {
+        final CaptureLog log = new CaptureLog();
+        final AnnotationContext jc = new AnnotationContext();
+        final JexlEngine jexl = new JexlBuilder().logger(log).strict(true).silent(silent).create();
+        final JexlScript e = jexl.createScript("@unknown('42') { return 42; }");
+        try {
+            final Object r = e.execute(jc);
+            if (!silent) {
+                Assert.fail("should have failed");
+            } else {
+                Assert.assertEquals(1, log.count("warn"));
+            }
+        } catch (final JexlException.Annotation xjexl) {
+            Assert.assertEquals("unknown", xjexl.getAnnotation());
+        }
+        Assert.assertEquals(1, jc.getCount());
+        Assert.assertTrue(jc.getNames().contains("unknown"));
+        Assert.assertFalse(jc.getNames().contains("42"));
+        if (!silent) {
+            Assert.assertEquals(0, log.count("warn"));
         }
     }
 
@@ -191,205 +391,5 @@ public class AnnotationTest extends JexlTestCase {
         Assert.assertEquals(42, r);
         Assert.assertTrue(options.isStrict());
         Assert.assertEquals(5, options.getMathScale());
-    }
-
-    @Test
-    public void testNoArg() throws Exception {
-        final AnnotationContext jc = new AnnotationContext();
-        final JexlScript e = JEXL.createScript("@synchronized { return 42; }");
-        final Object r = e.execute(jc);
-        Assert.assertEquals(42, r);
-        Assert.assertEquals(1, jc.getCount());
-        Assert.assertTrue(jc.getNames().contains("synchronized"));
-    }
-
-    @Test
-    public void testNoArgExpression() throws Exception {
-        final AnnotationContext jc = new AnnotationContext();
-        final JexlScript e = JEXL.createScript("@synchronized 42");
-        final Object r = e.execute(jc);
-        Assert.assertEquals(42, r);
-        Assert.assertEquals(1, jc.getCount());
-        Assert.assertTrue(jc.getNames().contains("synchronized"));
-    }
-
-    @Test
-    public void testNoArgStatement() throws Exception {
-        final AnnotationContext jc = new AnnotationContext();
-        final JexlScript e = JEXL.createScript("@synchronized if (true) 2 * 3 * 7; else -42;");
-        final Object r = e.execute(jc);
-        Assert.assertEquals(42, r);
-        Assert.assertEquals(1, jc.getCount());
-        Assert.assertTrue(jc.getNames().contains("synchronized"));
-    }
-
-    @Test
-    public void testHoistingStatement() throws Exception {
-        final AnnotationContext jc = new AnnotationContext();
-        final JexlScript e = JEXL.createScript("var t = 1; @synchronized for(var x : [2,3,7]) t *= x; t");
-        final Object r = e.execute(jc);
-        Assert.assertEquals(42, r);
-        Assert.assertEquals(1, jc.getCount());
-        Assert.assertTrue(jc.getNames().contains("synchronized"));
-    }
-
-    @Test
-    public void testOneArg() throws Exception {
-        final AnnotationContext jc = new AnnotationContext();
-        final JexlScript e = JEXL.createScript("@one(1) { return 42; }");
-        final Object r = e.execute(jc);
-        Assert.assertEquals(42, r);
-        Assert.assertEquals(1, jc.getCount());
-        Assert.assertTrue(jc.getNames().contains("one"));
-        Assert.assertTrue(jc.getNames().contains("1"));
-    }
-
-    @Test
-    public void testMultiple() throws Exception {
-        final AnnotationContext jc = new AnnotationContext();
-        final JexlScript e = JEXL.createScript("@one(1) @synchronized { return 42; }");
-        final Object r = e.execute(jc);
-        Assert.assertEquals(42, r);
-        Assert.assertEquals(2, jc.getCount());
-        Assert.assertTrue(jc.getNames().contains("synchronized"));
-        Assert.assertTrue(jc.getNames().contains("one"));
-        Assert.assertTrue(jc.getNames().contains("1"));
-    }
-
-    @Test
-    public void testError() throws Exception {
-        testError(true);
-        testError(false);
-    }
-
-    private void testError(final boolean silent) throws Exception {
-        final CaptureLog log = new CaptureLog();
-        final AnnotationContext jc = new AnnotationContext();
-        final JexlEngine jexl = new JexlBuilder().logger(log).strict(true).silent(silent).create();
-        final JexlScript e = jexl.createScript("@error('42') { return 42; }");
-        try {
-            final Object r = e.execute(jc);
-            if (!silent) {
-                Assert.fail("should have failed");
-            } else {
-                Assert.assertEquals(1, log.count("warn"));
-            }
-        } catch (final JexlException.Annotation xjexl) {
-            Assert.assertEquals("error", xjexl.getAnnotation());
-        }
-        Assert.assertEquals(1, jc.getCount());
-        Assert.assertTrue(jc.getNames().contains("error"));
-        Assert.assertTrue(jc.getNames().contains("42"));
-        if (!silent) {
-            Assert.assertEquals(0, log.count("warn"));
-        }
-    }
-
-    @Test
-    public void testUnknown() throws Exception {
-        testUnknown(true);
-        testUnknown(false);
-    }
-
-    private void testUnknown(final boolean silent) throws Exception {
-        final CaptureLog log = new CaptureLog();
-        final AnnotationContext jc = new AnnotationContext();
-        final JexlEngine jexl = new JexlBuilder().logger(log).strict(true).silent(silent).create();
-        final JexlScript e = jexl.createScript("@unknown('42') { return 42; }");
-        try {
-            final Object r = e.execute(jc);
-            if (!silent) {
-                Assert.fail("should have failed");
-            } else {
-                Assert.assertEquals(1, log.count("warn"));
-            }
-        } catch (final JexlException.Annotation xjexl) {
-            Assert.assertEquals("unknown", xjexl.getAnnotation());
-        }
-        Assert.assertEquals(1, jc.getCount());
-        Assert.assertTrue(jc.getNames().contains("unknown"));
-        Assert.assertFalse(jc.getNames().contains("42"));
-        if (!silent) {
-            Assert.assertEquals(0, log.count("warn"));
-        }
-    }
-
-    /**
-     * A counter whose inc method will misbehave if not mutex-ed.
-     */
-    public static class Counter {
-        private int value;
-
-        public void inc() {
-            final int v = value;
-            // introduce some concurency
-            for (int i = (int) System.currentTimeMillis() % 5; i >= 0; --i) {
-                Thread.yield();
-            }
-            value = v + 1;
-        }
-
-        public int getValue() {
-            return value;
-        }
-    }
-
-    /**
-     * Runs a counter test with n-thread in //.
-     */
-    public static class TestRunner {
-        public final Counter syncCounter = new Counter();
-        public final Counter concCounter = new Counter();
-
-        public void run(final Runnable runnable) throws InterruptedException {
-            final ExecutorService executor = Executors.newFixedThreadPool(NUM_THREADS);
-            for (int i = 0; i < NUM_THREADS; i++) {
-                executor.submit(runnable);
-            }
-            executor.shutdown();
-            executor.awaitTermination(5, TimeUnit.SECONDS);
-            // this may succeed concurrently if there is only one 'real' thread
-            // during execution; we can only prove the 'synchronized' if the unsync-ed
-            // version fails...
-            if (NUM_THREADS * NUM_ITERATIONS != concCounter.getValue()) {
-                Assert.assertEquals(NUM_THREADS * NUM_ITERATIONS, syncCounter.getValue());
-            }
-        }
-    }
-
-    @Test
-    /**
-     * A base test to ensure synchronized makes a difference.
-     */
-    public void testSynchronized() throws InterruptedException {
-        final TestRunner tr = new TestRunner();
-        final Counter syncCounter = tr.syncCounter;
-        final Counter concCounter = tr.concCounter;
-        tr.run(() -> {
-            for (int i = 0; i < NUM_ITERATIONS; i++) {
-                synchronized (syncCounter) {
-                    syncCounter.inc();
-                }
-                concCounter.inc();
-            }
-        });
-    }
-
-    @Test
-    public void testJexlSynchronized0() throws InterruptedException {
-        final TestRunner tr = new TestRunner();
-        final AnnotationContext ctxt = new AnnotationContext();
-        final JexlScript script = JEXL.createScript(
-                "for(var i : 1..NUM_ITERATIONS) {"
-                + "@synchronized { syncCounter.inc(); }"
-                + "concCounter.inc();"
-                + "}",
-                "NUM_ITERATIONS",
-                "syncCounter",
-                "concCounter");
-        // will sync on syncCounter
-        tr.run(() -> {
-            script.execute(ctxt, NUM_ITERATIONS, tr.syncCounter, tr.concCounter);
-        });
     }
 }

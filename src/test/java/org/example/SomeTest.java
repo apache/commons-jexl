@@ -35,28 +35,6 @@ import org.junit.Test;
 
 public class SomeTest {
 
-  public static class MyMath {
-    public double cos(final double x) {
-      return Math.cos(x);
-    }
-  }
-
-  /**
-   * User namespace needs to be allowed through permissions.
-   */
-  @Test
-  public void testCustomFunctionPermissions() {
-      Map<String, Object> funcs = new HashMap<String, Object>();
-      funcs.put("math", new MyMath());
-      JexlPermissions permissions = JexlPermissions.parse("org.example.*");
-      JexlEngine jexl = new JexlBuilder().permissions(permissions).namespaces(funcs).create();
-      JexlContext jc = new MapContext();
-      jc.set("pi", Math.PI);
-      JexlExpression e = jexl.createExpression("math:cos(pi)");
-      Number result = (Number) e.evaluate(jc);
-      Assert.assertEquals(-1, result.intValue());
-  }
-
   /**
    * Engine creating dedicated template interpreter.
    */
@@ -69,8 +47,11 @@ public class SomeTest {
     }
   }
 
-  /** Counting the number of node interpretation calls. */
-  static AtomicInteger CALL406 = new AtomicInteger(0);
+  public static class MyMath {
+    public double cos(final double x) {
+      return Math.cos(x);
+    }
+  }
 
   public static class TemplateInterpreter406 extends TemplateInterpreter {
     protected TemplateInterpreter406(final Arguments args) {
@@ -81,6 +62,9 @@ public class SomeTest {
       return super.interpret(node);
     }
   }
+
+  /** Counting the number of node interpretation calls. */
+  static AtomicInteger CALL406 = new AtomicInteger(0);
 
   @Test
   public void test406b() {
@@ -98,5 +82,21 @@ public class SomeTest {
     result = script.execute(null, 42);
     Assert.assertEquals("Call 42", result);
     Assert.assertEquals(2, CALL406.get());
+  }
+
+  /**
+   * User namespace needs to be allowed through permissions.
+   */
+  @Test
+  public void testCustomFunctionPermissions() {
+      Map<String, Object> funcs = new HashMap<String, Object>();
+      funcs.put("math", new MyMath());
+      JexlPermissions permissions = JexlPermissions.parse("org.example.*");
+      JexlEngine jexl = new JexlBuilder().permissions(permissions).namespaces(funcs).create();
+      JexlContext jc = new MapContext();
+      jc.set("pi", Math.PI);
+      JexlExpression e = jexl.createExpression("math:cos(pi)");
+      Number result = (Number) e.evaluate(jc);
+      Assert.assertEquals(-1, result.intValue());
   }
 }

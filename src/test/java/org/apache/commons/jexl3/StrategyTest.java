@@ -33,22 +33,10 @@ import org.junit.Test;
  */
 @SuppressWarnings({"UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
 public class StrategyTest extends JexlTestCase {
-    public StrategyTest() {
-        super("StrategyTest");
-    }
-
     // JEXL-174
     public static class MapArithmetic extends JexlArithmetic {
         public MapArithmetic(final boolean flag) {
             super(flag);
-        }
-
-        public Object propertyGet(final Map<?,?> map, final Object identifier) {
-            return arrayGet(map, identifier);
-        }
-
-        public Object propertySet(final Map<Object, Object> map, final Object identifier, final Object value) {
-             return arraySet(map, identifier, value);
         }
 
         public Object arrayGet(final Map<?,?> map, final Object identifier) {
@@ -59,41 +47,18 @@ public class StrategyTest extends JexlTestCase {
              map.put(identifier, value);
              return value;
         }
+
+        public Object propertyGet(final Map<?,?> map, final Object identifier) {
+            return arrayGet(map, identifier);
+        }
+
+        public Object propertySet(final Map<Object, Object> map, final Object identifier, final Object value) {
+             return arraySet(map, identifier, value);
+        }
     }
 
-    @Test
-    public void testRawResolvers() throws Exception {
-        final Object map  = new HashMap<String, Object>();
-        final JexlEngine jexl = new JexlBuilder().create();
-        final JexlUberspect uberspect = jexl.getUberspect();
-        final JexlUberspect.PropertyResolver rfieldp = JexlUberspect.JexlResolver.FIELD;
-        final JexlPropertyGet fget = rfieldp.getPropertyGet(uberspect, map, "key");
-        Assert.assertNull(fget);
-        final JexlPropertySet fset = rfieldp.getPropertySet(uberspect, map, "key", "value");
-        Assert.assertNull(fset);
-        final JexlUberspect.PropertyResolver rmap = JexlUberspect.JexlResolver.MAP;
-        final JexlPropertyGet mget = rmap.getPropertyGet(uberspect, map, "key");
-        Assert.assertNotNull(mget);
-        final JexlPropertySet mset = rmap.getPropertySet(uberspect, map, "key", "value");
-        Assert.assertNotNull(mset);
-    }
-
-    @Test
-    public void testJexlStrategy() throws Exception {
-        final JexlEngine jexl = new Engine();
-        run171(jexl, true);
-    }
-
-    @Test
-    public void testMyMapStrategy() throws Exception {
-        final JexlEngine jexl = new JexlBuilder().arithmetic( new MapArithmetic(true)).create();
-        run171(jexl, false);
-    }
-
-    @Test
-    public void testMapStrategy() throws Exception {
-        final JexlEngine jexl = new JexlBuilder().strategy(JexlUberspect.MAP_STRATEGY).create();
-        run171(jexl, false);
+    public StrategyTest() {
+        super("StrategyTest");
     }
 
     public void run171(final JexlEngine jexl, final boolean std) throws Exception {
@@ -144,5 +109,40 @@ public class StrategyTest extends JexlTestCase {
         }
         result = jexl.createScript("empty i", "i").execute((JexlContext)null, i);
         Assert.assertFalse((Boolean) result);
+    }
+
+    @Test
+    public void testJexlStrategy() throws Exception {
+        final JexlEngine jexl = new Engine();
+        run171(jexl, true);
+    }
+
+    @Test
+    public void testMapStrategy() throws Exception {
+        final JexlEngine jexl = new JexlBuilder().strategy(JexlUberspect.MAP_STRATEGY).create();
+        run171(jexl, false);
+    }
+
+    @Test
+    public void testMyMapStrategy() throws Exception {
+        final JexlEngine jexl = new JexlBuilder().arithmetic( new MapArithmetic(true)).create();
+        run171(jexl, false);
+    }
+
+    @Test
+    public void testRawResolvers() throws Exception {
+        final Object map  = new HashMap<String, Object>();
+        final JexlEngine jexl = new JexlBuilder().create();
+        final JexlUberspect uberspect = jexl.getUberspect();
+        final JexlUberspect.PropertyResolver rfieldp = JexlUberspect.JexlResolver.FIELD;
+        final JexlPropertyGet fget = rfieldp.getPropertyGet(uberspect, map, "key");
+        Assert.assertNull(fget);
+        final JexlPropertySet fset = rfieldp.getPropertySet(uberspect, map, "key", "value");
+        Assert.assertNull(fset);
+        final JexlUberspect.PropertyResolver rmap = JexlUberspect.JexlResolver.MAP;
+        final JexlPropertyGet mget = rmap.getPropertyGet(uberspect, map, "key");
+        Assert.assertNotNull(mget);
+        final JexlPropertySet mset = rmap.getPropertySet(uberspect, map, "key", "value");
+        Assert.assertNotNull(mset);
     }
 }

@@ -31,6 +31,40 @@ import org.apache.commons.jexl3.parser.JexlNode;
  */
 public class Util {
     /**
+     * Checks the equality of 2 nodes by comparing all their descendants.
+     * Descendants must have the same class and same image if non null.
+     * @param lhs the left script
+     * @param rhs the right script
+     * @return null if true, a reason otherwise
+     */
+    private static String checkEquals(JexlNode lhs, JexlNode rhs) {
+        if (lhs != rhs) {
+            final ArrayList<JexlNode> lhsl = flatten(lhs);
+            final ArrayList<JexlNode> rhsl = flatten(rhs);
+            if (lhsl.size() != rhsl.size()) {
+                return "size: " + lhsl.size() + " != " + rhsl.size();
+            }
+            for (int n = 0; n < lhsl.size(); ++n) {
+                lhs = lhsl.get(n);
+                rhs = rhsl.get(n);
+                if (lhs.getClass() != rhs.getClass()) {
+                    return "class: " + lhs.getClass() + " != " + rhs.getClass();
+                }
+                final String lhss = lhs.toString();
+                final String rhss = rhs.toString();
+                if (lhss == null && rhss != null
+                        || lhss != null && rhss == null) {
+                    return "image: " + lhss + " != " + rhss;
+                }
+                if (lhss != null && !lhss.equals(rhss)) {
+                    return "image: " + lhss + " != " + rhss;
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
      * Will force testing the debugger for each derived test class by
      * recreating each expression from the JexlNode in the JexlEngine cache &
      * testing them for equality with the origin.
@@ -100,40 +134,6 @@ public class Util {
         for (int c = 0; c < nc; ++c) {
             flatten(list, node.jjtGetChild(c));
         }
-    }
-
-    /**
-     * Checks the equality of 2 nodes by comparing all their descendants.
-     * Descendants must have the same class and same image if non null.
-     * @param lhs the left script
-     * @param rhs the right script
-     * @return null if true, a reason otherwise
-     */
-    private static String checkEquals(JexlNode lhs, JexlNode rhs) {
-        if (lhs != rhs) {
-            final ArrayList<JexlNode> lhsl = flatten(lhs);
-            final ArrayList<JexlNode> rhsl = flatten(rhs);
-            if (lhsl.size() != rhsl.size()) {
-                return "size: " + lhsl.size() + " != " + rhsl.size();
-            }
-            for (int n = 0; n < lhsl.size(); ++n) {
-                lhs = lhsl.get(n);
-                rhs = rhsl.get(n);
-                if (lhs.getClass() != rhs.getClass()) {
-                    return "class: " + lhs.getClass() + " != " + rhs.getClass();
-                }
-                final String lhss = lhs.toString();
-                final String rhss = rhs.toString();
-                if (lhss == null && rhss != null
-                        || lhss != null && rhss == null) {
-                    return "image: " + lhss + " != " + rhss;
-                }
-                if (lhss != null && !lhss.equals(rhss)) {
-                    return "image: " + lhss + " != " + rhss;
-                }
-            }
-        }
-        return null;
     }
 
     /**

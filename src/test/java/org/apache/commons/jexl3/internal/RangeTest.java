@@ -36,17 +36,18 @@ public class RangeTest extends JexlTestCase {
         super("InternalTest");
     }
 
-    @Before
-    @Override
-    public void setUp() throws Exception {
-        // ensure jul logging is only error
-        java.util.logging.Logger.getLogger(org.apache.commons.jexl3.JexlEngine.class.getName()).setLevel(java.util.logging.Level.SEVERE);
-    }
-
-    @After
-    @Override
-    public void tearDown() throws Exception {
-        super.tearDown();
+    private void checkIteration(final IntegerRange ir, final int first, final int last) throws Exception {
+        final Iterator<Integer> ii = ir.iterator();
+        if (ii.hasNext()) {
+            int l = ii.next();
+            Assert.assertEquals(first, l);
+            while(ii.hasNext()) {
+                l = ii.next();
+            }
+            Assert.assertEquals(last, l);
+        } else {
+            Assert.fail("empty iterator?");
+        }
     }
 
     private void checkIteration(final LongRange lr, final long first, final long last) throws Exception {
@@ -63,18 +64,17 @@ public class RangeTest extends JexlTestCase {
         }
     }
 
-    private void checkIteration(final IntegerRange ir, final int first, final int last) throws Exception {
-        final Iterator<Integer> ii = ir.iterator();
-        if (ii.hasNext()) {
-            int l = ii.next();
-            Assert.assertEquals(first, l);
-            while(ii.hasNext()) {
-                l = ii.next();
-            }
-            Assert.assertEquals(last, l);
-        } else {
-            Assert.fail("empty iterator?");
-        }
+    @Before
+    @Override
+    public void setUp() throws Exception {
+        // ensure jul logging is only error
+        java.util.logging.Logger.getLogger(org.apache.commons.jexl3.JexlEngine.class.getName()).setLevel(java.util.logging.Level.SEVERE);
+    }
+
+    @After
+    @Override
+    public void tearDown() throws Exception {
+        super.tearDown();
     }
 
     @Test

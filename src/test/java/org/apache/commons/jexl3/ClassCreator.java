@@ -39,21 +39,11 @@ import javax.tools.ToolProvider;
  */
 public class ClassCreator {
 
-    //private final JexlEngine jexl;
-    private final File base;
-    private File packageDir;
-    private int seed;
-    private String ctorBody = "";
-    private String className;
-    private String sourceName;
-    private ClassLoader loader;
     public static final boolean canRun = true;//comSunToolsJavacMain();
-
     static final String JEXL_PACKAGE = "org.apache.commons.jexl3";
     static final String GEN_PACKAGE = "org.apache.commons.jexl3.generated";
     static final String GEN_PATH = "/" + GEN_PACKAGE.replace(".", "/");///org/apache/commons/jexl3/generated";
     static final String GEN_CLASS = GEN_PACKAGE + ".";
-
     /**
      * Check if we can invoke Sun's java compiler.
      *
@@ -67,6 +57,16 @@ public class ClassCreator {
             return false;
         }
     }
+    //private final JexlEngine jexl;
+    private final File base;
+    private File packageDir;
+
+    private int seed;
+    private String ctorBody = "";
+    private String className;
+    private String sourceName;
+
+    private ClassLoader loader;
 
     public ClassCreator(final JexlEngine theJexl, final File theBase) throws Exception {
         //jexl = theJexl;
@@ -82,112 +82,6 @@ public class ClassCreator {
         packageDir = null;
         loader = null;
     }
-
-    public void setSeed(final int s) {
-        seed = s;
-        className = "foo" + s;
-        sourceName = className + ".java";
-        packageDir = new File(base, seed + GEN_PATH);
-        packageDir.mkdirs();
-        loader = null;
-    }
-
-    public void setCtorBody(final String arg) {
-        ctorBody = arg;
-    }
-
-    public String getClassName() {
-        return GEN_CLASS + className;
-    }
-
-    public Class<?> getClassInstance() throws Exception {
-        return getClassLoader().loadClass(getClassName());
-    }
-
-    public ClassLoader getClassLoader() throws Exception {
-        if (loader == null) {
-            final URL classpath = new File(base, Integer.toString(seed)).toURI().toURL();
-            loader = new URLClassLoader(new URL[]{classpath}, getClass().getClassLoader());
-        }
-        return loader;
-    }
-
-    public Class<?> createClass() throws Exception {
-        return createClass(false);
-    }
-
-    public Class<?> createClass(final boolean ftor) throws Exception {
-        // generate, compile & validate
-        generate(ftor);
-        final Class<?> clazz = compile();
-        if (clazz == null) {
-            throw new Exception("failed to compile foo" + seed);
-        }
-        if (ftor) {
-            return clazz;
-        }
-        final Object v = validate(clazz);
-        if (v instanceof Integer && (Integer) v == seed) {
-            return clazz;
-        }
-        throw new Exception("failed to validate foo" + seed);
-    }
-
-    Object newInstance(final Class<?> clazz, final JexlContext ctxt) throws Exception {
-        return clazz.getConstructor(JexlContext.class).newInstance(ctxt);
-    }
-
-    void generate(final boolean ftor) throws Exception {
-        try (final FileWriter writer = new FileWriter(new File(packageDir, sourceName), false)) {
-            writer.write("package ");
-            writer.write(GEN_PACKAGE);
-            writer.write(";\n");
-            if (ftor) {
-                writer.write("import " + JEXL_PACKAGE + ".JexlContext;");
-                writer.write(";\n");
-            }
-            writer.write("public class " + className);
-            writer.write(" {\n");
-            if (ftor) {
-                writer.write("public " + className + "(JexlContext ctxt) {\n");
-                writer.write(ctorBody);
-                writer.write(" }\n");
-            }
-            writer.write("private int value =");
-            writer.write(Integer.toString(seed));
-            writer.write(";\n");
-            writer.write(" public void setValue(int v) {");
-            writer.write(" value = v;");
-            writer.write(" }\n");
-            writer.write(" public int getValue() {");
-            writer.write(" return value;");
-            writer.write(" }\n");
-            writer.write(" }\n");
-            writer.flush();
-        }
-    }
-
-//    Class<?> compile0() throws Exception {
-//        String source = packageDir.getPath() + "/" + sourceName;
-//        Class<?> javac = getClassLoader().loadClass("com.sun.tools.javac.Main");
-//        if (javac == null) {
-//            return null;
-//        }
-//        Integer r;
-//        try {
-//            r = (Integer) jexl.invokeMethod(javac, "compile", source);
-//            if (r.intValue() >= 0) {
-//                return getClassLoader().loadClass(GEN_CLASS + className);
-//            }
-//        } catch (JexlException xignore) {
-//            // ignore
-//        }
-//        r = (Integer) jexl.invokeMethod(javac, "compile", (Object) new String[]{source});
-//        if (r.intValue() >= 0) {
-//            return getClassLoader().loadClass(GEN_CLASS + className);
-//        }
-//        return null;
-//    }
 
     Class<?> compile() throws Exception {
         final String source = packageDir.getPath() + "/" + sourceName;
@@ -223,6 +117,112 @@ public class ClassCreator {
 
         }
         return null;
+    }
+
+    public Class<?> createClass() throws Exception {
+        return createClass(false);
+    }
+
+    public Class<?> createClass(final boolean ftor) throws Exception {
+        // generate, compile & validate
+        generate(ftor);
+        final Class<?> clazz = compile();
+        if (clazz == null) {
+            throw new Exception("failed to compile foo" + seed);
+        }
+        if (ftor) {
+            return clazz;
+        }
+        final Object v = validate(clazz);
+        if (v instanceof Integer && (Integer) v == seed) {
+            return clazz;
+        }
+        throw new Exception("failed to validate foo" + seed);
+    }
+
+    void generate(final boolean ftor) throws Exception {
+        try (final FileWriter writer = new FileWriter(new File(packageDir, sourceName), false)) {
+            writer.write("package ");
+            writer.write(GEN_PACKAGE);
+            writer.write(";\n");
+            if (ftor) {
+                writer.write("import " + JEXL_PACKAGE + ".JexlContext;");
+                writer.write(";\n");
+            }
+            writer.write("public class " + className);
+            writer.write(" {\n");
+            if (ftor) {
+                writer.write("public " + className + "(JexlContext ctxt) {\n");
+                writer.write(ctorBody);
+                writer.write(" }\n");
+            }
+            writer.write("private int value =");
+            writer.write(Integer.toString(seed));
+            writer.write(";\n");
+            writer.write(" public void setValue(int v) {");
+            writer.write(" value = v;");
+            writer.write(" }\n");
+            writer.write(" public int getValue() {");
+            writer.write(" return value;");
+            writer.write(" }\n");
+            writer.write(" }\n");
+            writer.flush();
+        }
+    }
+
+    public Class<?> getClassInstance() throws Exception {
+        return getClassLoader().loadClass(getClassName());
+    }
+
+    public ClassLoader getClassLoader() throws Exception {
+        if (loader == null) {
+            final URL classpath = new File(base, Integer.toString(seed)).toURI().toURL();
+            loader = new URLClassLoader(new URL[]{classpath}, getClass().getClassLoader());
+        }
+        return loader;
+    }
+
+    public String getClassName() {
+        return GEN_CLASS + className;
+    }
+
+    Object newInstance(final Class<?> clazz, final JexlContext ctxt) throws Exception {
+        return clazz.getConstructor(JexlContext.class).newInstance(ctxt);
+    }
+
+    public void setCtorBody(final String arg) {
+        ctorBody = arg;
+    }
+
+//    Class<?> compile0() throws Exception {
+//        String source = packageDir.getPath() + "/" + sourceName;
+//        Class<?> javac = getClassLoader().loadClass("com.sun.tools.javac.Main");
+//        if (javac == null) {
+//            return null;
+//        }
+//        Integer r;
+//        try {
+//            r = (Integer) jexl.invokeMethod(javac, "compile", source);
+//            if (r.intValue() >= 0) {
+//                return getClassLoader().loadClass(GEN_CLASS + className);
+//            }
+//        } catch (JexlException xignore) {
+//            // ignore
+//        }
+//        r = (Integer) jexl.invokeMethod(javac, "compile", (Object) new String[]{source});
+//        if (r.intValue() >= 0) {
+//            return getClassLoader().loadClass(GEN_CLASS + className);
+//        }
+//        return null;
+//    }
+
+    public void setSeed(final int s) {
+        seed = s;
+        className = "foo" + s;
+        sourceName = className + ".java";
+        packageDir = new File(base, seed + GEN_PATH);
+        packageDir.mkdirs();
+        loader = null;
     }
 
     Object validate(final Class<?> clazz) throws Exception {

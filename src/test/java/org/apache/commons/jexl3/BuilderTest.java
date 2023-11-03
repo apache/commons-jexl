@@ -53,14 +53,6 @@ public class BuilderTest {
     }
 
     @Test
-    public void testValues() {
-        Assert.assertEquals(1, builder().collectMode(1).collectMode());
-        Assert.assertEquals(0, builder().collectMode(0).collectMode());
-        Assert.assertEquals(32, builder().cacheThreshold(32).cacheThreshold());
-        Assert.assertEquals(8, builder().stackOverflow(8).stackOverflow());
-    }
-
-    @Test
     public void testOther() {
         final ClassLoader cls = getClass().getClassLoader().getParent();
         Assert.assertEquals(cls, builder().loader(cls).loader());
@@ -72,5 +64,13 @@ public class BuilderTest {
         final JexlUberspect uberspect = new SandboxUberspect(u0, sandbox);
         Assert.assertEquals(sandbox, builder().sandbox(sandbox).sandbox());
         Assert.assertEquals(uberspect, builder().uberspect(uberspect).uberspect());
+    }
+
+    @Test
+    public void testValues() {
+        Assert.assertEquals(1, builder().collectMode(1).collectMode());
+        Assert.assertEquals(0, builder().collectMode(0).collectMode());
+        Assert.assertEquals(32, builder().cacheThreshold(32).cacheThreshold());
+        Assert.assertEquals(8, builder().stackOverflow(8).stackOverflow());
     }
 }

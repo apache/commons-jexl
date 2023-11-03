@@ -36,8 +36,76 @@ import org.junit.Test;
  * @since 2.0
  */
 public class DiscoveryTest extends JexlTestCase {
-    public DiscoveryTest() {
-        super("DiscoveryTest");
+    public static class Bean {
+        private String value;
+        private String eulav;
+        private boolean flag;
+
+        public Bean(final String v, final String e) {
+            value = v;
+            eulav = e;
+            flag = true;
+        }
+
+        public String getEulav() {
+            return eulav;
+        }
+
+        public String getValue() {
+            return value;
+        }
+
+        public boolean isFlag() {
+            return flag;
+        }
+
+        public void setEulav(final String v) {
+            eulav = v;
+        }
+
+        public void setFlag(final boolean f) {
+            flag = f;
+        }
+
+        public void setValue(final String v) {
+            value = v;
+        }
+    }
+
+    public static class Bulgroz {
+        public Object amb(final Number x) {
+            return -2;
+        }
+        public Object amb(final Serializable x) {
+            return -1;
+        }
+        public Object list(final int x) {
+            return 0;
+        }
+        public Object list(final int x, final int y) {
+            return 4;
+        }
+        public Object list(final int x, final Object...y) {
+            return 3;
+        }
+        public Object list(final Object x) {
+            return 2;
+        }
+        public Object list(final Object x, final Object...y) {
+            return 7;
+        }
+        public Object list(final Object x, final Object y) {
+            return 8;
+        }
+        public Object list(final String x) {
+            return 1;
+        }
+        public Object list(final String x, final Object...y) {
+            return 5;
+        }
+        public Object list(final String x, final String y) {
+            return 6;
+        }
     }
 
     public static class Duck {
@@ -68,40 +136,8 @@ public class DiscoveryTest extends JexlTestCase {
         }
     }
 
-    public static class Bean {
-        private String value;
-        private String eulav;
-        private boolean flag;
-
-        public Bean(final String v, final String e) {
-            value = v;
-            eulav = e;
-            flag = true;
-        }
-
-        public String getValue() {
-            return value;
-        }
-
-        public void setValue(final String v) {
-            value = v;
-        }
-
-        public String getEulav() {
-            return eulav;
-        }
-
-        public void setEulav(final String v) {
-            eulav = v;
-        }
-
-        public boolean isFlag() {
-            return flag;
-        }
-
-        public void setFlag(final boolean f) {
-            flag = f;
-        }
+    public DiscoveryTest() {
+        super("DiscoveryTest");
     }
 
     @Test
@@ -221,42 +257,6 @@ public class DiscoveryTest extends JexlTestCase {
         Assert.assertEquals("quux", get.invoke(map));
         // tryExecute should fail on different property class
         Assert.assertEquals(AbstractExecutor.TRY_FAILED, set.tryInvoke(map, 1, "nope"));
-    }
-
-    public static class Bulgroz {
-        public Object list(final int x) {
-            return 0;
-        }
-        public Object list(final String x) {
-            return 1;
-        }
-        public Object list(final Object x) {
-            return 2;
-        }
-        public Object list(final int x, final Object...y) {
-            return 3;
-        }
-        public Object list(final int x, final int y) {
-            return 4;
-        }
-        public Object list(final String x, final Object...y) {
-            return 5;
-        }
-        public Object list(final String x, final String y) {
-            return 6;
-        }
-        public Object list(final Object x, final Object...y) {
-            return 7;
-        }
-        public Object list(final Object x, final Object y) {
-            return 8;
-        }
-        public Object amb(final Serializable x) {
-            return -1;
-        }
-        public Object amb(final Number x) {
-            return -2;
-        }
     }
 
     @Test

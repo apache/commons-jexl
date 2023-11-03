@@ -56,35 +56,6 @@ public class Asserter extends Assert {
     }
 
     /**
-     * Retrieves the underlying JEXL engine.
-     * @return the JEXL engine
-     */
-    public JexlEngine getEngine() {
-        return engine;
-    }
-
-    /**
-     * Retrieves the underlying JEXL context.
-     * @return the JEXL context
-     */
-    public JexlContext getContext() {
-        return context;
-    }
-
-    public void setStrict(final boolean s) {
-        context.getEngineOptions().setStrict(s);
-    }
-
-    public void setStrict(final boolean es, final boolean as) {
-        context.getEngineOptions().setStrict(es);
-        context.getEngineOptions().setStrictArithmetic(as);
-    }
-
-    public void setSilent(final boolean silent) {
-        context.getEngineOptions().setSilent(silent);
-    }
-
-    /**
      * Performs an assertion that the value of the given JEXL expression
      * evaluates to the given expected value.
      *
@@ -136,6 +107,7 @@ public class Asserter extends Assert {
     public void failExpression(final String expression, final String matchException) throws Exception {
          failExpression(expression, matchException, String::matches);
     }
+
     public void failExpression(final String expression, final String matchException, final BiPredicate<String,String> predicate) throws Exception {
         try {
             final JexlScript exp = engine.createScript(expression);
@@ -149,23 +121,19 @@ public class Asserter extends Assert {
     }
 
     /**
-     * Puts a variable of a certain name in the context so that it can be used from
-     * assertion expressions.
-     *
-     * @param name variable name
-     * @param value variable value
+     * Retrieves the underlying JEXL context.
+     * @return the JEXL context
      */
-    public void setVariable(final String name, final Object value) {
-        variables.put(name, value);
+    public JexlContext getContext() {
+        return context;
     }
 
     /**
-     * Removes a variable of a certain name from the context.
-     * @param name variable name
-     * @return variable value
+     * Retrieves the underlying JEXL engine.
+     * @return the JEXL engine
      */
-    public Object removeVariable(final String name) {
-        return variables.remove(name);
+    public JexlEngine getEngine() {
+        return engine;
     }
 
     /**
@@ -183,5 +151,37 @@ public class Asserter extends Assert {
      */
     public Map<String, Object> getVariables() {
         return variables;
+    }
+    /**
+     * Removes a variable of a certain name from the context.
+     * @param name variable name
+     * @return variable value
+     */
+    public Object removeVariable(final String name) {
+        return variables.remove(name);
+    }
+
+    public void setSilent(final boolean silent) {
+        context.getEngineOptions().setSilent(silent);
+    }
+
+    public void setStrict(final boolean s) {
+        context.getEngineOptions().setStrict(s);
+    }
+
+    public void setStrict(final boolean es, final boolean as) {
+        context.getEngineOptions().setStrict(es);
+        context.getEngineOptions().setStrictArithmetic(as);
+    }
+
+    /**
+     * Puts a variable of a certain name in the context so that it can be used from
+     * assertion expressions.
+     *
+     * @param name variable name
+     * @param value variable value
+     */
+    public void setVariable(final String name, final Object value) {
+        variables.put(name, value);
     }
 }

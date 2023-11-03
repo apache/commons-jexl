@@ -30,22 +30,6 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class SynchronizedArithmetic extends JexlArithmetic {
     /**
-     * Monitor/synchronized protected access to gets/set/iterator on maps.
-     */
-    private final AbstractMonitor abstractMonitor;
-
-    /**
-     * A base synchronized arithmetic.
-     * @param abstractMonitor the synchronization monitor
-     * @param strict  whether the arithmetic is strict or not
-     */
-    protected SynchronizedArithmetic(final AbstractMonitor abstractMonitor, final boolean strict) {
-        super(strict);
-        this.abstractMonitor = abstractMonitor;
-    }
-
-
-    /**
      * An indirect way to determine we are actually calling what is needed.
      * <p>
      * This class counts how many times we called enter & exit; they should be balanced
@@ -55,6 +39,22 @@ public class SynchronizedArithmetic extends JexlArithmetic {
         private final AtomicInteger enters = new AtomicInteger(0);
         /* Counts the number of times exit is called. */
         private final AtomicInteger exits = new AtomicInteger(0);
+
+        /**
+         * The number of enter calls.
+         * @return how many enter were executed
+         */
+        public int getCount() {
+            return enters.get();
+        }
+
+        /**
+         * Whether the number of monitor enter is equals to the number of exits.
+         * @return true if balanced, false otherwise
+         */
+        public boolean isBalanced() {
+            return enters.get() == exits.get();
+        }
 
         /**
          * Enter an object monitor.
@@ -72,52 +72,7 @@ public class SynchronizedArithmetic extends JexlArithmetic {
             exits.incrementAndGet();
         }
 
-        /**
-         * Whether the number of monitor enter is equals to the number of exits.
-         * @return true if balanced, false otherwise
-         */
-        public boolean isBalanced() {
-            return enters.get() == exits.get();
-        }
-
-        /**
-         * The number of enter calls.
-         * @return how many enter were executed
-         */
-        public int getCount() {
-            return enters.get();
-        }
-
     }
-
-    /*
-     * You should know better than to use this...
-     */
-//    private static Unsafe UNSAFE;
-//    static {
-//        try {
-//            Field f = Unsafe.class.getDeclaredField("theUnsafe");
-//            f.setAccessible(true);
-//            UNSAFE = (Unsafe) f.get(null);
-//        } catch (Exception e) {
-//            UNSAFE = null;
-//        }
-//    }
-//
-//    /**
-//     * Using the unsafe to enter & exit object intrinsic monitors.
-//     */
-//    static class UnsafeMonitor extends Monitor {
-//        @Override protected void monitorEnter(Object o) {
-//            UNSAFE.monitorEnter(o);
-//            super.monitorEnter(o);
-//        }
-//
-//        @Override protected void monitorExit(Object o) {
-//            UNSAFE.monitorExit(o);
-//            super.monitorExit(o);
-//        }
-//    }
 
     /**
      * Crude monitor replacement...
@@ -162,6 +117,7 @@ public class SynchronizedArithmetic extends JexlArithmetic {
         }
     }
 
+
     /**
      * An iterator that implements Closeable (at least implements a close method)
      * and uses monitors to protect iteration.
@@ -182,18 +138,18 @@ public class SynchronizedArithmetic extends JexlArithmetic {
             }
         }
 
-        @Override
-        protected void finalize() throws Throwable {
-            close();
-            super.finalize();
-        }
-
         //@Override
         public void close() {
             if (iterator != null) {
                 abstractMonitor.monitorExit(monitored);
                 iterator = null;
             }
+        }
+
+        @Override
+        protected void finalize() throws Throwable {
+            close();
+            super.finalize();
         }
 
         @Override
@@ -222,6 +178,50 @@ public class SynchronizedArithmetic extends JexlArithmetic {
                 iterator.remove();
             }
         }
+    }
+
+    /*
+     * You should know better than to use this...
+     */
+//    private static Unsafe UNSAFE;
+//    static {
+//        try {
+//            Field f = Unsafe.class.getDeclaredField("theUnsafe");
+//            f.setAccessible(true);
+//            UNSAFE = (Unsafe) f.get(null);
+//        } catch (Exception e) {
+//            UNSAFE = null;
+//        }
+//    }
+//
+//    /**
+//     * Using the unsafe to enter & exit object intrinsic monitors.
+//     */
+//    static class UnsafeMonitor extends Monitor {
+//        @Override protected void monitorEnter(Object o) {
+//            UNSAFE.monitorEnter(o);
+//            super.monitorEnter(o);
+//        }
+//
+//        @Override protected void monitorExit(Object o) {
+//            UNSAFE.monitorExit(o);
+//            super.monitorExit(o);
+//        }
+//    }
+
+    /**
+     * Monitor/synchronized protected access to gets/set/iterator on maps.
+     */
+    private final AbstractMonitor abstractMonitor;
+
+    /**
+     * A base synchronized arithmetic.
+     * @param abstractMonitor the synchronization monitor
+     * @param strict  whether the arithmetic is strict or not
+     */
+    protected SynchronizedArithmetic(final AbstractMonitor abstractMonitor, final boolean strict) {
+        super(strict);
+        this.abstractMonitor = abstractMonitor;
     }
 
     /**
@@ -255,39 +255,6 @@ public class SynchronizedArithmetic extends JexlArithmetic {
         }
     }
     /**
-     * Jexl pseudo-overload for property access get operator (map.key) for maps.
-     * <p>synchronized(map) { return map.get(key); }
-     *
-     * @param map the map
-     * @param key the key
-     * @return the value associated to the key in the map
-     */
-    public Object propertyGet(final Map<?, ?> map, final Object key) {
-        abstractMonitor.monitorEnter(map);
-        try {
-            return map.get(key);
-        } finally {
-            abstractMonitor.monitorExit(map);
-        }
-    }
-
-   /**
-     * Jexl pseudo-overload for array-like access set operator (map.key = value) for maps.
-     * <p>synchronized(map) { map.put(key, value); }
-     * @param map the map
-     * @param key the key
-     * @param value the value
-     */
-    public void propertySet(final Map<Object, Object> map, final Object key, final Object value) {
-        abstractMonitor.monitorEnter(map);
-        try {
-            map.put(key, value);
-        } finally {
-            abstractMonitor.monitorExit(map);
-        }
-    }
-
-    /**
      * Creates an iterator on the map values that executes under the map monitor.
      * @param map the map
      * @return the iterator
@@ -295,4 +262,37 @@ public class SynchronizedArithmetic extends JexlArithmetic {
     public Iterator<Object> forEach(final Map<Object, Object> map) {
         return new SynchronizedIterator(map, map.values().iterator());
     }
+
+   /**
+ * Jexl pseudo-overload for property access get operator (map.key) for maps.
+ * <p>synchronized(map) { return map.get(key); }
+ *
+ * @param map the map
+ * @param key the key
+ * @return the value associated to the key in the map
+ */
+public Object propertyGet(final Map<?, ?> map, final Object key) {
+    abstractMonitor.monitorEnter(map);
+    try {
+        return map.get(key);
+    } finally {
+        abstractMonitor.monitorExit(map);
+    }
+}
+
+    /**
+         * Jexl pseudo-overload for array-like access set operator (map.key = value) for maps.
+         * <p>synchronized(map) { map.put(key, value); }
+         * @param map the map
+         * @param key the key
+         * @param value the value
+         */
+        public void propertySet(final Map<Object, Object> map, final Object key, final Object value) {
+            abstractMonitor.monitorEnter(map);
+            try {
+                map.put(key, value);
+            } finally {
+                abstractMonitor.monitorExit(map);
+            }
+        }
 }

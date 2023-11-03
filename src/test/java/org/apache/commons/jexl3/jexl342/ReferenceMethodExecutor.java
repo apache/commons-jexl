@@ -53,9 +53,24 @@ public class ReferenceMethodExecutor implements JexlMethod {
     }
 
     @Override
+    public Class<?> getReturnType() {
+        return method != null ?  method.getReturnType() : null;
+    }
+
+    @Override
     public Object invoke(final Object ref, final Object... args) throws Exception {
         final Object obj = getReference(ref);
         return obj == null ? null : method.invoke(obj, args);
+    }
+
+    @Override
+    public boolean isCacheable() {
+        return method != null && method.isCacheable();
+    }
+
+    @Override
+    public boolean tryFailed(final Object rval) {
+        return method == null || method.tryFailed(rval);
     }
 
     @Override
@@ -68,20 +83,5 @@ public class ReferenceMethodExecutor implements JexlMethod {
             return JexlEngine.TRY_FAILED;
         }
         return method.tryInvoke(name, obj, args);
-    }
-
-    @Override
-    public boolean tryFailed(final Object rval) {
-        return method == null || method.tryFailed(rval);
-    }
-
-    @Override
-    public boolean isCacheable() {
-        return method != null && method.isCacheable();
-    }
-
-    @Override
-    public Class<?> getReturnType() {
-        return method != null ?  method.getReturnType() : null;
     }
 }

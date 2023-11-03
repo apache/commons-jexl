@@ -46,18 +46,6 @@ public class JexlEvalContext implements
     }
 
     /**
-     * Creates an evaluation environment wrapping an existing user provided vars.
-     * <p>The supplied vars should be null only in derived classes that override the get/set/has methods.
-     * For a default vars context with a code supplied vars, use the default no-parameter contructor.</p>
-     * @param map the variables map
-     */
-    @NoJexl
-    public JexlEvalContext(final Map<String, Object> map) {
-        this.vars = map == EMPTY_MAP ? new MapContext() : new MapContext(map);
-        this.ns = null;
-    }
-
-    /**
      * Creates an evaluation environment from a context.
      * @param context the context (may be null, implies readonly)
      */
@@ -77,10 +65,16 @@ public class JexlEvalContext implements
         this.ns = namespace != null ? namespace : JexlEngine.EMPTY_NS;
     }
 
-    @Override
+    /**
+     * Creates an evaluation environment wrapping an existing user provided vars.
+     * <p>The supplied vars should be null only in derived classes that override the get/set/has methods.
+     * For a default vars context with a code supplied vars, use the default no-parameter contructor.</p>
+     * @param map the variables map
+     */
     @NoJexl
-    public boolean has(final String name) {
-        return vars.has(name);
+    public JexlEvalContext(final Map<String, Object> map) {
+        this.vars = map == EMPTY_MAP ? new MapContext() : new MapContext(map);
+        this.ns = null;
     }
 
     @Override
@@ -91,8 +85,14 @@ public class JexlEvalContext implements
 
     @Override
     @NoJexl
-    public void set(final String name, final Object value) {
-        vars.set(name, value);
+    public JexlOptions getEngineOptions() {
+        return options;
+    }
+
+    @Override
+    @NoJexl
+    public boolean has(final String name) {
+        return vars.has(name);
     }
 
     @Override
@@ -103,8 +103,8 @@ public class JexlEvalContext implements
 
     @Override
     @NoJexl
-    public JexlOptions getEngineOptions() {
-        return options;
+    public void set(final String name, final Object value) {
+        vars.set(name, value);
     }
 
 }

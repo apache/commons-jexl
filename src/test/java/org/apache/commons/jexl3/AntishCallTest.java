@@ -30,45 +30,6 @@ import org.junit.Test;
 @SuppressWarnings({"UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
 public class AntishCallTest extends JexlTestCase {
 
-    public AntishCallTest() {
-        super("AntishCallTest");
-    }
-
-    /**
-     * Wraps a class.
-     */
-    public static class ClassReference {
-        final Class<?> clazz;
-        ClassReference(final Class<?> c) {
-            this.clazz = c;
-        }
-    }
-
-    /**
-     * Considers any call using a class reference as functor as a call to its constructor.
-     * <p>Note that before 3.2, a class was not considered a functor.
-     * @param ref the ClassReference of the class we seek to instantiate
-     * @param args the constructor arguments
-     * @return an instance if that was possible
-     */
-    public static Object callConstructor(final JexlEngine engine, final ClassReference ref, final Object... args) {
-        return callConstructor(engine, ref.clazz, args);
-    }
-    public static Object callConstructor(final JexlEngine engine, final Class<?> clazz, final Object... args) {
-        if (clazz == null || clazz.isPrimitive() || clazz.isInterface()
-            || clazz.isMemberClass() || clazz.isAnnotation() || clazz.isArray()) {
-            throw new ArithmeticException("not a constructible object");
-        }
-        JexlEngine jexl = engine;
-        if (jexl == null) {
-            jexl = JexlEngine.getThreadEngine();
-            if (jexl == null) {
-                throw new ArithmeticException("no engine to solve constructor");
-            }
-        }
-        return jexl.newInstance(clazz, args);
-    }
-
     /**
      * An arithmetic that considers class objects as callable.
      */
@@ -77,11 +38,11 @@ public class AntishCallTest extends JexlTestCase {
             super(strict);
         }
 
-        public Object call(final ClassReference clazz, final Object... args) {
+        public Object call(final Class<?> clazz, final Object... args) {
             return callConstructor(null, clazz, args);
         }
 
-        public Object call(final Class<?> clazz, final Object... args) {
+        public Object call(final ClassReference clazz, final Object... args) {
             return callConstructor(null, clazz, args);
         }
     }
@@ -90,10 +51,23 @@ public class AntishCallTest extends JexlTestCase {
      * A context that considers class references as callable.
      */
     public static class CallSupportContext extends MapContext {
+        private JexlEngine engine;
         CallSupportContext(final Map<String, Object> map) {
             super(map);
         }
-        private JexlEngine engine;
+
+        public Object call(final Class<?> clazz, final Object... args) {
+            return callConstructor(engine, clazz, args);
+        }
+
+        public Object call(final ClassReference clazz, final Object... args) {
+            return callConstructor(engine, clazz, args);
+        }
+
+        CallSupportContext engine(final JexlEngine j) {
+            engine = j;
+            return this;
+        }
 
         @Override public Object get(final String str) {
             if (!super.has(str)) {
@@ -116,30 +90,56 @@ public class AntishCallTest extends JexlTestCase {
             }
             return true;
         }
-
-        CallSupportContext engine(final JexlEngine j) {
-            engine = j;
-            return this;
-        }
-
-        public Object call(final ClassReference clazz, final Object... args) {
-            return callConstructor(engine, clazz, args);
-        }
-
-        public Object call(final Class<?> clazz, final Object... args) {
-            return callConstructor(engine, clazz, args);
-        }
     }
 
-    @Test
-    public void testAntishContextVar() throws Exception {
-        final Map<String,Object> lmap = new TreeMap<>();
-        final JexlContext jc = new CallSupportContext(lmap).engine(JEXL);
-        runTestCall(JEXL, jc);
-        lmap.put("java.math.BigInteger", new ClassReference(BigInteger.class));
-        runTestCall(JEXL, jc);
-        lmap.remove("java.math.BigInteger");
-        runTestCall(JEXL, jc);
+    /**
+     * Wraps a class.
+     */
+    public static class ClassReference {
+        final Class<?> clazz;
+        ClassReference(final Class<?> c) {
+            this.clazz = c;
+        }
+    }
+    public static Object callConstructor(final JexlEngine engine, final Class<?> clazz, final Object... args) {
+        if (clazz == null || clazz.isPrimitive() || clazz.isInterface()
+            || clazz.isMemberClass() || clazz.isAnnotation() || clazz.isArray()) {
+            throw new ArithmeticException("not a constructible object");
+        }
+        JexlEngine jexl = engine;
+        if (jexl == null) {
+            jexl = JexlEngine.getThreadEngine();
+            if (jexl == null) {
+                throw new ArithmeticException("no engine to solve constructor");
+            }
+        }
+        return jexl.newInstance(clazz, args);
+    }
+
+    /**
+     * Considers any call using a class reference as functor as a call to its constructor.
+     * <p>Note that before 3.2, a class was not considered a functor.
+     * @param ref the ClassReference of the class we seek to instantiate
+     * @param args the constructor arguments
+     * @return an instance if that was possible
+     */
+    public static Object callConstructor(final JexlEngine engine, final ClassReference ref, final Object... args) {
+        return callConstructor(engine, ref.clazz, args);
+    }
+
+    public AntishCallTest() {
+        super("AntishCallTest");
+    }
+
+    void runTestCall(final JexlEngine jexl, final JexlContext jc) throws Exception {
+        final JexlScript check1 = jexl.createScript("var x = java.math.BigInteger; x('1234')");
+        final JexlScript check2 = jexl.createScript("java.math.BigInteger('4321')");
+
+        final Object o1 = check1.execute(jc);
+        Assert.assertEquals("Result is not 1234", new java.math.BigInteger("1234"), o1);
+
+        final Object o2 = check2.execute(jc);
+        Assert.assertEquals("Result is not 4321", new java.math.BigInteger("4321"), o2);
     }
 
     @Test
@@ -161,15 +161,15 @@ public class AntishCallTest extends JexlTestCase {
         }
     }
 
-    void runTestCall(final JexlEngine jexl, final JexlContext jc) throws Exception {
-        final JexlScript check1 = jexl.createScript("var x = java.math.BigInteger; x('1234')");
-        final JexlScript check2 = jexl.createScript("java.math.BigInteger('4321')");
-
-        final Object o1 = check1.execute(jc);
-        Assert.assertEquals("Result is not 1234", new java.math.BigInteger("1234"), o1);
-
-        final Object o2 = check2.execute(jc);
-        Assert.assertEquals("Result is not 4321", new java.math.BigInteger("4321"), o2);
+    @Test
+    public void testAntishContextVar() throws Exception {
+        final Map<String,Object> lmap = new TreeMap<>();
+        final JexlContext jc = new CallSupportContext(lmap).engine(JEXL);
+        runTestCall(JEXL, jc);
+        lmap.put("java.math.BigInteger", new ClassReference(BigInteger.class));
+        runTestCall(JEXL, jc);
+        lmap.remove("java.math.BigInteger");
+        runTestCall(JEXL, jc);
     }
 
     // JEXL-300

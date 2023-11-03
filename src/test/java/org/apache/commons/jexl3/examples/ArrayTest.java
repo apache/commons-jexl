@@ -64,20 +64,20 @@ public class ArrayTest {
     }
 
     /**
-     * Unit test entry point.
-     * @throws Exception
-     */
-    @Test
-    public void testExample() throws Exception {
-        example(AbstractOutput.JUNIT);
-    }
-
-    /**
      * Command line entry point.
      * @param args command line arguments
      * @throws Exception cos jexl does.
      */
     public static void main(final String[] args) throws Exception {
         example(AbstractOutput.SYSTEM);
+    }
+
+    /**
+     * Unit test entry point.
+     * @throws Exception
+     */
+    @Test
+    public void testExample() throws Exception {
+        example(AbstractOutput.JUNIT);
     }
 }

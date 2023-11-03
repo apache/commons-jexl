@@ -59,9 +59,8 @@ public class ReferenceSetExecutor implements JexlPropertySet {
     }
 
     @Override
-    public Object tryInvoke(final Object opt, final Object key, final Object arg) throws JexlException.TryFailed {
-        final Object obj = getReference(opt);
-        return obj == opt? JexlEngine.TRY_FAILED : obj == null ? null : setter.tryInvoke(key, obj, arg);
+    public boolean isCacheable() {
+        return setter.isCacheable();
     }
 
     @Override
@@ -70,7 +69,8 @@ public class ReferenceSetExecutor implements JexlPropertySet {
     }
 
     @Override
-    public boolean isCacheable() {
-        return setter.isCacheable();
+    public Object tryInvoke(final Object opt, final Object key, final Object arg) throws JexlException.TryFailed {
+        final Object obj = getReference(opt);
+        return obj == opt? JexlEngine.TRY_FAILED : obj == null ? null : setter.tryInvoke(key, obj, arg);
     }
 }

@@ -38,6 +38,164 @@ import org.junit.Test;
  */
 @SuppressWarnings({"boxing", "UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
 public class Issues100Test extends JexlTestCase {
+    // A's class definition
+    public static class A105 {
+        String nameA;
+        String propA;
+
+        public A105(final String nameA, final String propA) {
+            this.nameA = nameA;
+            this.propA = propA;
+        }
+
+        public String getNameA() {
+            return nameA;
+        }
+
+        public String getPropA() {
+            return propA;
+        }
+
+        @Override
+        public String toString() {
+            return "A [nameA=" + nameA + ", propA=" + propA + "]";
+        }
+
+        public String uppercase(final String str) {
+            return str.toUpperCase();
+        }
+    }
+
+    public static class Arithmetic42 extends JexlArithmetic {
+        public Arithmetic42() {
+            super(false);
+        }
+
+        public Object and(final String lhs, final String rhs) {
+            if (rhs.isEmpty()) {
+                return "";
+            }
+            if (lhs.isEmpty()) {
+                return "";
+            }
+            return lhs + rhs;
+        }
+
+        public Object or(final String lhs, final String rhs) {
+            if (rhs.isEmpty()) {
+                return lhs;
+            }
+            if (lhs.isEmpty()) {
+                return rhs;
+            }
+            return lhs + rhs;
+        }
+    }
+
+
+    public static class C192 {
+        public static Integer callme(final Integer n) {
+            if (n == null) {
+                return null;
+            }
+            return n >= 0 ? 42 : -42;
+        }
+
+        public static Object kickme() {
+            return C192.class;
+        }
+
+        public C192() {
+        }
+    }
+
+public static class Foo125 {
+        public String method() {
+            return "OK";
+        }
+
+        public String total(final String tt) {
+            return "total " + tt;
+        }
+    }
+
+    public static class Foo125Context extends ObjectContext<Foo125> {
+        public Foo125Context(final JexlEngine engine, final Foo125 wrapped) {
+            super(engine, wrapped);
+        }
+    }
+
+    public static class Question42 extends MapContext {
+        public String functionA(final String arg) {
+            return "a".equals(arg) ? "A" : "";
+        }
+
+        public String functionB(final String arg) {
+            return "b".equals(arg) ? "B" : "";
+        }
+
+        public String functionC(final String arg) {
+            return "c".equals(arg) ? "C" : "";
+        }
+
+        public String functionD(final String arg) {
+            return "d".equals(arg) ? "D" : "";
+        }
+    }
+
+    /**
+     * Test cases for empty array assignment.
+     */
+    public static class Quux144 {
+        String[] arr;
+        String[] arr2;
+
+        public Quux144() {
+        }
+
+        public String[] getArr() {
+            return arr;
+        }
+
+        public String[] getArr2() {
+            return arr2;
+        }
+
+        public void setArr(final String[] arr) {
+            this.arr = arr;
+        }
+
+        // Overloaded setter with different argument type.
+        public void setArr2(final Integer[] arr2) {
+        }
+
+        public void setArr2(final String[] arr2) {
+            this.arr2 = arr2;
+        }
+    }
+
+    public static class RichContext extends ObjectContext<A105> {
+        RichContext(final JexlEngine jexl, final A105 a105) {
+            super(jexl, a105);
+        }
+    }
+
+    public static class Utils {
+        public List<Integer> asList(final int[] array) {
+            final List<Integer> l = new ArrayList<>(array.length);
+            for (final int i : array) {
+                l.add(i);
+            }
+            return l;
+        }
+
+        public <T> List<T> asList(final T[] array) {
+            return Arrays.asList(array);
+        }
+    }
+
+    static final String TESTA = "src/test/scripts/testA.jexl";
+
     public Issues100Test() {
         super("Issues100Test", null);
     }
@@ -48,7 +206,6 @@ public class Issues100Test extends JexlTestCase {
         // ensure jul logging is only error to avoid warning in silent mode
         java.util.logging.Logger.getLogger(JexlEngine.class.getName()).setLevel(java.util.logging.Level.SEVERE);
     }
-
 
     @Test
     public void test100() throws Exception {
@@ -66,34 +223,6 @@ public class Issues100Test extends JexlTestCase {
             Assert.assertEquals(43, value);
             value = jexl.createExpression("foo.0 = 42").evaluate(ctxt);
             Assert.assertEquals(42, value);
-        }
-    }
-
-// A's class definition
-    public static class A105 {
-        String nameA;
-        String propA;
-
-        public A105(final String nameA, final String propA) {
-            this.nameA = nameA;
-            this.propA = propA;
-        }
-
-        @Override
-        public String toString() {
-            return "A [nameA=" + nameA + ", propA=" + propA + "]";
-        }
-
-        public String getNameA() {
-            return nameA;
-        }
-
-        public String getPropA() {
-            return propA;
-        }
-
-        public String uppercase(final String str) {
-            return str.toUpperCase();
         }
     }
 
@@ -220,22 +349,6 @@ public class Issues100Test extends JexlTestCase {
         Assert.assertEquals(-42, value);
     }
 
-    public static class RichContext extends ObjectContext<A105> {
-        RichContext(final JexlEngine jexl, final A105 a105) {
-            super(jexl, a105);
-        }
-    }
-
-    @Test
-    public void testRichContext() throws Exception {
-        final A105 a105 = new A105("foo", "bar");
-        final JexlEngine jexl = new Engine();
-        Object value;
-        final JexlContext context = new RichContext(jexl, a105);
-        value = jexl.createScript("uppercase(nameA + propA)").execute(context);
-        Assert.assertEquals("FOOBAR", value);
-    }
-
     @Test
     public void test111() throws Exception {
         final JexlEngine jexl = new Engine();
@@ -286,26 +399,6 @@ public class Issues100Test extends JexlTestCase {
     }
 
     @Test
-    public void testScaleIssue() throws Exception {
-        final JexlEngine jexlX = new Engine();
-        final String expStr1 = "result == salary/month * work.percent/100.00";
-        final JexlExpression exp1 = jexlX.createExpression(expStr1);
-        final JexlEvalContext ctx = new JexlEvalContext();
-        final JexlOptions options = ctx.getEngineOptions();
-        ctx.set("result", new BigDecimal("9958.33"));
-        ctx.set("salary", new BigDecimal("119500.00"));
-        ctx.set("month", new BigDecimal("12.00"));
-        ctx.set("work.percent", new BigDecimal("100.00"));
-
-        // will fail because default scale is 5
-        Assert.assertFalse((Boolean) exp1.evaluate(ctx));
-
-        // will succeed with scale = 2
-        options.setMathScale(2);
-        Assert.assertTrue((Boolean) exp1.evaluate(ctx));
-    }
-
-    @Test
     public void test112() throws Exception {
         Object result;
         final JexlEngine jexl = new Engine();
@@ -327,22 +420,6 @@ public class Issues100Test extends JexlTestCase {
         Assert.assertTrue((Boolean) result);
     }
 
-    public static class Foo125 {
-        public String method() {
-            return "OK";
-        }
-
-        public String total(final String tt) {
-            return "total " + tt;
-        }
-    }
-
-    public static class Foo125Context extends ObjectContext<Foo125> {
-        public Foo125Context(final JexlEngine engine, final Foo125 wrapped) {
-            super(engine, wrapped);
-        }
-    }
-
     @Test
     public void test125() throws Exception {
         final JexlEngine jexl = new Engine();
@@ -351,7 +428,7 @@ public class Issues100Test extends JexlTestCase {
         Assert.assertEquals("OK", e.evaluate(jc));
     }
 
-    @Test
+@Test
     public void test130a() throws Exception {
         final String myName = "Test.Name";
         final Object myValue = "Test.Value";
@@ -448,7 +525,7 @@ public class Issues100Test extends JexlTestCase {
         Assert.assertEquals("EXPR01 result", 22, result);
     }
 
-//    @Test
+    //    @Test
 //    public void test138() throws Exception {
 //        MapContext ctxt = new MapContext();
 //        ctxt.set("tz", java.util.TimeZone.class);
@@ -493,37 +570,6 @@ public class Issues100Test extends JexlTestCase {
             Assert.fail("total() is not solvable");
         } catch (final JexlException.Method ambiguous) {
             Assert.assertEquals("total", ambiguous.getMethod());
-        }
-    }
-
-    /**
-     * Test cases for empty array assignment.
-     */
-    public static class Quux144 {
-        String[] arr;
-        String[] arr2;
-
-        public Quux144() {
-        }
-
-        public String[] getArr() {
-            return arr;
-        }
-
-        public String[] getArr2() {
-            return arr2;
-        }
-
-        public void setArr(final String[] arr) {
-            this.arr = arr;
-        }
-
-        public void setArr2(final String[] arr2) {
-            this.arr2 = arr2;
-        }
-
-        // Overloaded setter with different argument type.
-        public void setArr2(final Integer[] arr2) {
         }
     }
 
@@ -606,48 +652,6 @@ public class Issues100Test extends JexlTestCase {
     }
 
     @Test
-    public void test5115a() throws Exception {
-        final String str = "{\n"
-                + "  var x = \"A comment\";\n"
-                + "  var y = \"A comment\";\n"
-                + "}";
-        final JexlEngine jexl = new Engine();
-        final JexlScript s = jexl.createScript(str);
-    }
-
-    @Test
-    public void test5115b() throws Exception {
-        final String str = "{\n"
-                + "  var x = \"A comment\";\n"
-                + "}";
-        final JexlEngine jexl = new Engine();
-        final JexlScript s = jexl.createScript(str);
-    }
-
-    static final String TESTA = "src/test/scripts/testA.jexl";
-
-    @Test
-    public void test5115c() throws Exception {
-        final URL testUrl = new File(TESTA).toURI().toURL();
-        final JexlEngine jexl = new Engine();
-        final JexlScript s = jexl.createScript(testUrl);
-    }
-
-    public static class Utils {
-        public <T> List<T> asList(final T[] array) {
-            return Arrays.asList(array);
-        }
-
-        public List<Integer> asList(final int[] array) {
-            final List<Integer> l = new ArrayList<>(array.length);
-            for (final int i : array) {
-                l.add(i);
-            }
-            return l;
-        }
-    }
-
-    @Test
     public void test148a() throws Exception {
         final JexlEngine jexl = new Engine();
         final JexlContext jc = new MapContext();
@@ -677,66 +681,6 @@ public class Issues100Test extends JexlTestCase {
         Assert.assertEquals("RIGHT", value.toString());
     }
 
-    public static class Question42 extends MapContext {
-        public String functionA(final String arg) {
-            return "a".equals(arg) ? "A" : "";
-        }
-
-        public String functionB(final String arg) {
-            return "b".equals(arg) ? "B" : "";
-        }
-
-        public String functionC(final String arg) {
-            return "c".equals(arg) ? "C" : "";
-        }
-
-        public String functionD(final String arg) {
-            return "d".equals(arg) ? "D" : "";
-        }
-    }
-
-    public static class Arithmetic42 extends JexlArithmetic {
-        public Arithmetic42() {
-            super(false);
-        }
-
-        public Object and(final String lhs, final String rhs) {
-            if (rhs.isEmpty()) {
-                return "";
-            }
-            if (lhs.isEmpty()) {
-                return "";
-            }
-            return lhs + rhs;
-        }
-
-        public Object or(final String lhs, final String rhs) {
-            if (rhs.isEmpty()) {
-                return lhs;
-            }
-            if (lhs.isEmpty()) {
-                return rhs;
-            }
-            return lhs + rhs;
-        }
-    }
-
-    @Test
-    public void testQuestion42() throws Exception {
-        final JexlEngine jexl = new JexlBuilder().arithmetic(new Arithmetic42()).create();
-        final JexlContext jc = new Question42();
-
-        final String str0 = "(functionA('z') | functionB('b')) &  (functionC('c') |  functionD('d') ) ";
-        final JexlExpression expr0 = jexl.createExpression(str0);
-        final Object value0 = expr0.evaluate(jc);
-        Assert.assertEquals("BCD", value0);
-
-        final String str1 = "(functionA('z') & functionB('b')) |  (functionC('c') &  functionD('d') ) ";
-        final JexlExpression expr1 = jexl.createExpression(str1);
-        final Object value1 = expr1.evaluate(jc);
-        Assert.assertEquals("CD", value1);
-    }
-
     @Test
     public void test179() throws Exception {
         final JexlContext jc = new MapContext();
@@ -746,22 +690,6 @@ public class Issues100Test extends JexlTestCase {
         final Object o = e.execute(jc);
         Assert.assertTrue(o instanceof Set);
         Assert.assertTrue(((Set) o).contains(1));
-    }
-
-    public static class C192 {
-        public C192() {
-        }
-
-        public static Integer callme(final Integer n) {
-            if (n == null) {
-                return null;
-            }
-            return n >= 0 ? 42 : -42;
-        }
-
-        public static Object kickme() {
-            return C192.class;
-        }
     }
 
     @Test
@@ -799,6 +727,78 @@ public class Issues100Test extends JexlTestCase {
         Assert.assertEquals("trueEURT", r);
         r = e.execute(jc, "ELSAF", false);
         Assert.assertEquals("ELSAFfalse", r);
+    }
+
+    @Test
+    public void test5115a() throws Exception {
+        final String str = "{\n"
+                + "  var x = \"A comment\";\n"
+                + "  var y = \"A comment\";\n"
+                + "}";
+        final JexlEngine jexl = new Engine();
+        final JexlScript s = jexl.createScript(str);
+    }
+
+    @Test
+    public void test5115b() throws Exception {
+        final String str = "{\n"
+                + "  var x = \"A comment\";\n"
+                + "}";
+        final JexlEngine jexl = new Engine();
+        final JexlScript s = jexl.createScript(str);
+    }
+
+    @Test
+    public void test5115c() throws Exception {
+        final URL testUrl = new File(TESTA).toURI().toURL();
+        final JexlEngine jexl = new Engine();
+        final JexlScript s = jexl.createScript(testUrl);
+    }
+
+    @Test
+    public void testQuestion42() throws Exception {
+        final JexlEngine jexl = new JexlBuilder().arithmetic(new Arithmetic42()).create();
+        final JexlContext jc = new Question42();
+
+        final String str0 = "(functionA('z') | functionB('b')) &  (functionC('c') |  functionD('d') ) ";
+        final JexlExpression expr0 = jexl.createExpression(str0);
+        final Object value0 = expr0.evaluate(jc);
+        Assert.assertEquals("BCD", value0);
+
+        final String str1 = "(functionA('z') & functionB('b')) |  (functionC('c') &  functionD('d') ) ";
+        final JexlExpression expr1 = jexl.createExpression(str1);
+        final Object value1 = expr1.evaluate(jc);
+        Assert.assertEquals("CD", value1);
+    }
+
+    @Test
+    public void testRichContext() throws Exception {
+        final A105 a105 = new A105("foo", "bar");
+        final JexlEngine jexl = new Engine();
+        Object value;
+        final JexlContext context = new RichContext(jexl, a105);
+        value = jexl.createScript("uppercase(nameA + propA)").execute(context);
+        Assert.assertEquals("FOOBAR", value);
+    }
+
+    @Test
+    public void testScaleIssue() throws Exception {
+        final JexlEngine jexlX = new Engine();
+        final String expStr1 = "result == salary/month * work.percent/100.00";
+        final JexlExpression exp1 = jexlX.createExpression(expStr1);
+        final JexlEvalContext ctx = new JexlEvalContext();
+        final JexlOptions options = ctx.getEngineOptions();
+        ctx.set("result", new BigDecimal("9958.33"));
+        ctx.set("salary", new BigDecimal("119500.00"));
+        ctx.set("month", new BigDecimal("12.00"));
+        ctx.set("work.percent", new BigDecimal("100.00"));
+
+        // will fail because default scale is 5
+        Assert.assertFalse((Boolean) exp1.evaluate(ctx));
+
+        // will succeed with scale = 2
+        options.setMathScale(2);
+        Assert.assertTrue((Boolean) exp1.evaluate(ctx));
     }
 
 }

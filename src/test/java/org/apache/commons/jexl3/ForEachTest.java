@@ -38,38 +38,77 @@ public class ForEachTest extends JexlTestCase {
         super("ForEachTest");
     }
 
-    @Test public void testForLoop0b0() {
-        final String src = "(l)->{ for(let x = 0, y = 0; x < 4; ++x) l.add(x) }";
-        final JexlEngine jexl = new JexlBuilder().safe(false).create();
-        final JexlScript script = jexl.createScript(src);
-        final List<Integer> l = new ArrayList<>();
-        final Object result = script.execute(null, l);
-        Assert.assertNotNull(result);
-        Assert.assertEquals(Arrays.asList(0, 1, 2, 3), l);
-        final String resrc = toString(script);
-        Assert.assertEquals(src, resrc);
-    }
-
-    @Test public void testForLoop0a() {
-        final String src = "(l)->{ for(let x = 0; x < 4; ++x) { l.add(x); } }";
-        final JexlEngine jexl = new JexlBuilder().safe(false).create();
-        final JexlScript script = jexl.createScript(src);
-        final List<Integer> l = new ArrayList<>();
-        final Object result = script.execute(null, l);
-        Assert.assertNotNull(result);
-        Assert.assertEquals(Arrays.asList(0, 1, 2, 3), l);
-        final String resrc = toString(script);
-        Assert.assertEquals(src, resrc);
+    @Test
+    public void testForEachBreakBroken() throws Exception {
+        try {
+            final JexlScript e = JEXL.createScript("if (true) { break; }");
+            Assert.fail("break is out of loop!");
+        } catch (final JexlException.Parsing xparse) {
+            final String str = xparse.detailedMessage();
+            Assert.assertTrue(str.contains("break"));
+        }
     }
 
     @Test
-    public void testForEachWithEmptyStatement() throws Exception {
-        final JexlScript e = JEXL.createScript("for(item : list) ;");
+    public void testForEachBreakMethod() throws Exception {
+        final JexlScript e = JEXL.createScript(
+                "var rr = -1; for(var item : [1, 2, 3 ,4 ,5, 6]) { if (item == 3) { rr = item; break; }} rr"
+        );
         final JexlContext jc = new MapContext();
-        jc.set("list", Collections.emptyList());
-
+        jc.set("list", new Foo());
         final Object o = e.execute(jc);
-        Assert.assertNull("Result is not null", o);
+        Assert.assertEquals("Result is not last evaluated expression", 3, o);
+    }
+
+    @Test
+    public void testForEachContinueBroken() throws Exception {
+        try {
+            final JexlScript e = JEXL.createScript("var rr = 0; continue;");
+            Assert.fail("continue is out of loop!");
+        } catch (final JexlException.Parsing xparse) {
+            final String str = xparse.detailedMessage();
+            Assert.assertTrue(str.contains("continue"));
+        }
+    }
+
+    @Test
+    public void testForEachContinueMethod() throws Exception {
+        final JexlScript e = JEXL.createScript(
+                "var rr = 0; for(var item : [1, 2, 3 ,4 ,5, 6]) { if (item <= 3) continue; rr = rr + item;}"
+        );
+        final JexlContext jc = new MapContext();
+        jc.set("list", new Foo());
+        final Object o = e.execute(jc);
+        Assert.assertEquals("Result is not last evaluated expression", 15, o);
+    }
+
+    @Test
+    public void testForEachWithArray() throws Exception {
+        final JexlScript e = JEXL.createScript("for(item : list) item");
+        final JexlContext jc = new MapContext();
+        jc.set("list", new Object[]{"Hello", "World"});
+        final Object o = e.execute(jc);
+        Assert.assertEquals("Result is not last evaluated expression", "World", o);
+    }
+
+    @Test
+    public void testForEachWithBlock() throws Exception {
+        final JexlScript exs0 = JEXL.createScript("for(var in : list) { x = x + in; }");
+        final JexlContext jc = new MapContext();
+        jc.set("list", new Object[]{2, 3});
+            jc.set("x", Integer.valueOf(1));
+        final Object o = exs0.execute(jc);
+            Assert.assertEquals("Result is wrong", Integer.valueOf(6), o);
+            Assert.assertEquals("x is wrong", Integer.valueOf(6), jc.get("x"));
+        }
+
+    @Test
+    public void testForEachWithCollection() throws Exception {
+        final JexlScript e = JEXL.createScript("for(var item : list) item");
+        final JexlContext jc = new MapContext();
+        jc.set("list", Arrays.asList("Hello", "World"));
+        final Object o = e.execute(jc);
+        Assert.assertEquals("Result is not last evaluated expression", "World", o);
     }
 
     @Test
@@ -83,21 +122,13 @@ public class ForEachTest extends JexlTestCase {
     }
 
     @Test
-    public void testForEachWithArray() throws Exception {
-        final JexlScript e = JEXL.createScript("for(item : list) item");
+    public void testForEachWithEmptyStatement() throws Exception {
+        final JexlScript e = JEXL.createScript("for(item : list) ;");
         final JexlContext jc = new MapContext();
-        jc.set("list", new Object[]{"Hello", "World"});
-        final Object o = e.execute(jc);
-        Assert.assertEquals("Result is not last evaluated expression", "World", o);
-    }
+        jc.set("list", Collections.emptyList());
 
-    @Test
-    public void testForEachWithCollection() throws Exception {
-        final JexlScript e = JEXL.createScript("for(var item : list) item");
-        final JexlContext jc = new MapContext();
-        jc.set("list", Arrays.asList("Hello", "World"));
         final Object o = e.execute(jc);
-        Assert.assertEquals("Result is not last evaluated expression", "World", o);
+        Assert.assertNull("Result is not null", o);
     }
 
     @Test
@@ -119,26 +150,13 @@ public class ForEachTest extends JexlTestCase {
     }
 
     @Test
-    public void testForEachWithMap() throws Exception {
-        final JexlScript e = JEXL.createScript("for(item : list) item");
+    public void testForEachWithIteratorMethod() throws Exception {
+        final JexlScript e = JEXL.createScript("for(var item : list.cheezy) item");
         final JexlContext jc = new MapContext();
-        final Map<?, ?> map = System.getProperties();
-        final String lastProperty = (String) new ArrayList<Object>(map.values()).get(System.getProperties().size() - 1);
-        jc.set("list", map);
+        jc.set("list", new Foo());
         final Object o = e.execute(jc);
-        Assert.assertEquals("Result is not last evaluated expression", lastProperty, o);
+        Assert.assertEquals("Result is not last evaluated expression", "brie", o);
     }
-
-    @Test
-    public void testForEachWithBlock() throws Exception {
-        final JexlScript exs0 = JEXL.createScript("for(var in : list) { x = x + in; }");
-        final JexlContext jc = new MapContext();
-        jc.set("list", new Object[]{2, 3});
-            jc.set("x", Integer.valueOf(1));
-        final Object o = exs0.execute(jc);
-            Assert.assertEquals("Result is wrong", Integer.valueOf(6), o);
-            Assert.assertEquals("x is wrong", Integer.valueOf(6), jc.get("x"));
-        }
 
     @Test
     public void testForEachWithListExpression() throws Exception {
@@ -152,6 +170,17 @@ public class ForEachTest extends JexlTestCase {
     }
 
     @Test
+    public void testForEachWithMap() throws Exception {
+        final JexlScript e = JEXL.createScript("for(item : list) item");
+        final JexlContext jc = new MapContext();
+        final Map<?, ?> map = System.getProperties();
+        final String lastProperty = (String) new ArrayList<Object>(map.values()).get(System.getProperties().size() - 1);
+        jc.set("list", map);
+        final Object o = e.execute(jc);
+        Assert.assertEquals("Result is not last evaluated expression", lastProperty, o);
+    }
+
+    @Test
     public void testForEachWithProperty() throws Exception {
         final JexlScript e = JEXL.createScript("for(var item : list.cheeseList) item");
         final JexlContext jc = new MapContext();
@@ -160,56 +189,27 @@ public class ForEachTest extends JexlTestCase {
         Assert.assertEquals("Result is not last evaluated expression", "brie", o);
     }
 
-    @Test
-    public void testForEachWithIteratorMethod() throws Exception {
-        final JexlScript e = JEXL.createScript("for(var item : list.cheezy) item");
-        final JexlContext jc = new MapContext();
-        jc.set("list", new Foo());
-        final Object o = e.execute(jc);
-        Assert.assertEquals("Result is not last evaluated expression", "brie", o);
+    @Test public void testForLoop0a() {
+        final String src = "(l)->{ for(let x = 0; x < 4; ++x) { l.add(x); } }";
+        final JexlEngine jexl = new JexlBuilder().safe(false).create();
+        final JexlScript script = jexl.createScript(src);
+        final List<Integer> l = new ArrayList<>();
+        final Object result = script.execute(null, l);
+        Assert.assertNotNull(result);
+        Assert.assertEquals(Arrays.asList(0, 1, 2, 3), l);
+        final String resrc = toString(script);
+        Assert.assertEquals(src, resrc);
     }
 
-    @Test
-    public void testForEachBreakMethod() throws Exception {
-        final JexlScript e = JEXL.createScript(
-                "var rr = -1; for(var item : [1, 2, 3 ,4 ,5, 6]) { if (item == 3) { rr = item; break; }} rr"
-        );
-        final JexlContext jc = new MapContext();
-        jc.set("list", new Foo());
-        final Object o = e.execute(jc);
-        Assert.assertEquals("Result is not last evaluated expression", 3, o);
-    }
-
-    @Test
-    public void testForEachContinueMethod() throws Exception {
-        final JexlScript e = JEXL.createScript(
-                "var rr = 0; for(var item : [1, 2, 3 ,4 ,5, 6]) { if (item <= 3) continue; rr = rr + item;}"
-        );
-        final JexlContext jc = new MapContext();
-        jc.set("list", new Foo());
-        final Object o = e.execute(jc);
-        Assert.assertEquals("Result is not last evaluated expression", 15, o);
-    }
-
-    @Test
-    public void testForEachContinueBroken() throws Exception {
-        try {
-            final JexlScript e = JEXL.createScript("var rr = 0; continue;");
-            Assert.fail("continue is out of loop!");
-        } catch (final JexlException.Parsing xparse) {
-            final String str = xparse.detailedMessage();
-            Assert.assertTrue(str.contains("continue"));
-        }
-    }
-
-    @Test
-    public void testForEachBreakBroken() throws Exception {
-        try {
-            final JexlScript e = JEXL.createScript("if (true) { break; }");
-            Assert.fail("break is out of loop!");
-        } catch (final JexlException.Parsing xparse) {
-            final String str = xparse.detailedMessage();
-            Assert.assertTrue(str.contains("break"));
-        }
+    @Test public void testForLoop0b0() {
+        final String src = "(l)->{ for(let x = 0, y = 0; x < 4; ++x) l.add(x) }";
+        final JexlEngine jexl = new JexlBuilder().safe(false).create();
+        final JexlScript script = jexl.createScript(src);
+        final List<Integer> l = new ArrayList<>();
+        final Object result = script.execute(null, l);
+        Assert.assertNotNull(result);
+        Assert.assertEquals(Arrays.asList(0, 1, 2, 3), l);
+        final String resrc = toString(script);
+        Assert.assertEquals(src, resrc);
     }
 }

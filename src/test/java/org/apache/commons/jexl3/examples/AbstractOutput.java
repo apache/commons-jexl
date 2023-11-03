@@ -24,21 +24,6 @@ import org.junit.Assert;
  */
 public abstract class AbstractOutput {
     /**
-     * Creates an output using System.out.
-     */
-    private AbstractOutput() {
-        // nothing to do
-    }
-
-    /**
-     * Outputs the actual and value or checks the actual equals the expected value.
-     * @param expr the message to output
-     * @param actual the actual value to output
-     * @param expected the expected value
-     */
-    public abstract void print(String expr, Object actual, Object expected);
-
-    /**
      * The output instance for Junit TestCase calling assertEquals.
      */
     public static final AbstractOutput JUNIT = new AbstractOutput() {
@@ -47,7 +32,6 @@ public abstract class AbstractOutput {
             Assert.assertEquals(expr, expected, actual);
         }
     };
-
 
     /**
      * The output instance for the general outputing to System.out.
@@ -59,4 +43,20 @@ public abstract class AbstractOutput {
             System.out.println(actual);
         }
     };
+
+    /**
+     * Creates an output using System.out.
+     */
+    private AbstractOutput() {
+        // nothing to do
+    }
+
+
+    /**
+     * Outputs the actual and value or checks the actual equals the expected value.
+     * @param expr the message to output
+     * @param actual the actual value to output
+     * @param expected the expected value
+     */
+    public abstract void print(String expr, Object actual, Object expected);
 }

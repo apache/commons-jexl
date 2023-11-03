@@ -35,6 +35,81 @@ public class DoWhileTest extends JexlTestCase {
     }
 
     @Test
+    public void testEmptyBody() throws Exception {
+        final JexlScript e = JEXL.createScript("var i = 0; do ; while((i+=1) < 10); i");
+        final JexlContext jc = new MapContext();
+        final Object o = e.execute(jc);
+        Assert.assertEquals(10, o);
+    }
+
+    @Test
+    public void testEmptyStmtBody() throws Exception {
+        final JexlScript e = JEXL.createScript("var i = 0; do {} while((i+=1) < 10); i");
+        final JexlContext jc = new MapContext();
+        final Object o = e.execute(jc);
+        Assert.assertEquals(10, o);
+    }
+
+    @Test
+    public void testForEachBreakInsideFunction() throws Exception {
+        try {
+            final JexlScript e = JEXL.createScript("for (i : 1..2) {  y = function() { break; } }");
+            Assert.fail("break is out of loop!");
+        } catch (final JexlException.Parsing xparse) {
+            final String str = xparse.detailedMessage();
+            Assert.assertTrue(str.contains("break"));
+        }
+    }
+
+    @Test
+    public void testForEachContinueInsideFunction() throws Exception {
+        try {
+            final JexlScript e = JEXL.createScript("for (i : 1..2) {  y = function() { continue; } }");
+            Assert.fail("continue is out of loop!");
+        } catch (final JexlException.Parsing xparse) {
+            final String str = xparse.detailedMessage();
+            Assert.assertTrue(str.contains("continue"));
+        }
+    }
+
+    @Test
+    public void testForEachLambda() throws Exception {
+        final JexlScript e = JEXL.createScript("(x)->{ for (i : 1..2) {  continue; var y = function() { 42; } break; } }");
+        Assert.assertNotNull(e);
+    }
+
+    @Test public void testForLoop0() {
+        final String src = "(l)->{ for(let x = 0; x < 4; ++x) { l.add(x); } }";
+        final JexlEngine jexl = new JexlBuilder().safe(true).create();
+        final JexlScript script = jexl.createScript(src);
+        final List<Integer> l = new ArrayList<>();
+        final Object result = script.execute(null, l);
+        Assert.assertNotNull(result);
+        Assert.assertEquals(Arrays.asList(0, 1, 2, 3), l);
+    }
+
+    @Test public void testForLoop1() {
+        final String src = "(l)->{ for(var x = 0; x < 4; ++x) { l.add(x); } }";
+        final JexlEngine jexl = new JexlBuilder().safe(true).create();
+        final JexlScript script = jexl.createScript(src);
+        final List<Integer> l = new ArrayList<>();
+        final Object result = script.execute(null, l);
+        Assert.assertNotNull(result);
+        Assert.assertEquals(Arrays.asList(0, 1, 2, 3), l);
+    }
+
+    @Test public void testForLoop2() {
+        final String src = "(l)->{ for(x = 0; x < 4; ++x) { l.add(x); } }";
+        final JexlEngine jexl = new JexlBuilder().safe(true).create();
+        final JexlScript script = jexl.createScript(src);
+        final List<Integer> l = new ArrayList<>();
+        final JexlContext ctxt = new MapContext();
+        final Object result = script.execute(ctxt, l);
+        Assert.assertNotNull(result);
+        Assert.assertEquals(Arrays.asList(0, 1, 2, 3), l);
+    }
+
+    @Test
     public void testSimpleWhileFalse() throws Exception {
         JexlScript e = JEXL.createScript("do {} while (false)");
         final JexlContext jc = new MapContext();
@@ -45,6 +120,22 @@ public class DoWhileTest extends JexlTestCase {
         o = e.execute(jc);
         Assert.assertEquals(23, o);
 
+    }
+
+    @Test
+    public void testWhileEmptyBody() throws Exception {
+        final JexlScript e = JEXL.createScript("var i = 0; while((i+=1) < 10); i");
+        final JexlContext jc = new MapContext();
+        final Object o = e.execute(jc);
+        Assert.assertEquals(10, o);
+    }
+
+    @Test
+    public void testWhileEmptyStmtBody() throws Exception {
+        final JexlScript e = JEXL.createScript("var i = 0; while((i+=1) < 10) {}; i");
+        final JexlContext jc = new MapContext();
+        final Object o = e.execute(jc);
+        Assert.assertEquals(10, o);
     }
 
     @Test
@@ -80,96 +171,5 @@ public class DoWhileTest extends JexlTestCase {
         Assert.assertEquals("Result is wrong", Integer.valueOf(512), o);
         Assert.assertEquals("x is wrong", Integer.valueOf(10), jc.get("x"));
         Assert.assertEquals("y is wrong", Integer.valueOf(512), jc.get("y"));
-    }
-
-    @Test
-    public void testForEachBreakInsideFunction() throws Exception {
-        try {
-            final JexlScript e = JEXL.createScript("for (i : 1..2) {  y = function() { break; } }");
-            Assert.fail("break is out of loop!");
-        } catch (final JexlException.Parsing xparse) {
-            final String str = xparse.detailedMessage();
-            Assert.assertTrue(str.contains("break"));
-        }
-    }
-
-    @Test
-    public void testForEachContinueInsideFunction() throws Exception {
-        try {
-            final JexlScript e = JEXL.createScript("for (i : 1..2) {  y = function() { continue; } }");
-            Assert.fail("continue is out of loop!");
-        } catch (final JexlException.Parsing xparse) {
-            final String str = xparse.detailedMessage();
-            Assert.assertTrue(str.contains("continue"));
-        }
-    }
-
-    @Test
-    public void testForEachLambda() throws Exception {
-        final JexlScript e = JEXL.createScript("(x)->{ for (i : 1..2) {  continue; var y = function() { 42; } break; } }");
-        Assert.assertNotNull(e);
-    }
-
-    @Test
-    public void testEmptyBody() throws Exception {
-        final JexlScript e = JEXL.createScript("var i = 0; do ; while((i+=1) < 10); i");
-        final JexlContext jc = new MapContext();
-        final Object o = e.execute(jc);
-        Assert.assertEquals(10, o);
-    }
-
-    @Test
-    public void testEmptyStmtBody() throws Exception {
-        final JexlScript e = JEXL.createScript("var i = 0; do {} while((i+=1) < 10); i");
-        final JexlContext jc = new MapContext();
-        final Object o = e.execute(jc);
-        Assert.assertEquals(10, o);
-    }
-
-    @Test
-    public void testWhileEmptyBody() throws Exception {
-        final JexlScript e = JEXL.createScript("var i = 0; while((i+=1) < 10); i");
-        final JexlContext jc = new MapContext();
-        final Object o = e.execute(jc);
-        Assert.assertEquals(10, o);
-    }
-
-    @Test
-    public void testWhileEmptyStmtBody() throws Exception {
-        final JexlScript e = JEXL.createScript("var i = 0; while((i+=1) < 10) {}; i");
-        final JexlContext jc = new MapContext();
-        final Object o = e.execute(jc);
-        Assert.assertEquals(10, o);
-    }
-
-    @Test public void testForLoop0() {
-        final String src = "(l)->{ for(let x = 0; x < 4; ++x) { l.add(x); } }";
-        final JexlEngine jexl = new JexlBuilder().safe(true).create();
-        final JexlScript script = jexl.createScript(src);
-        final List<Integer> l = new ArrayList<>();
-        final Object result = script.execute(null, l);
-        Assert.assertNotNull(result);
-        Assert.assertEquals(Arrays.asList(0, 1, 2, 3), l);
-    }
-
-    @Test public void testForLoop1() {
-        final String src = "(l)->{ for(var x = 0; x < 4; ++x) { l.add(x); } }";
-        final JexlEngine jexl = new JexlBuilder().safe(true).create();
-        final JexlScript script = jexl.createScript(src);
-        final List<Integer> l = new ArrayList<>();
-        final Object result = script.execute(null, l);
-        Assert.assertNotNull(result);
-        Assert.assertEquals(Arrays.asList(0, 1, 2, 3), l);
-    }
-
-    @Test public void testForLoop2() {
-        final String src = "(l)->{ for(x = 0; x < 4; ++x) { l.add(x); } }";
-        final JexlEngine jexl = new JexlBuilder().safe(true).create();
-        final JexlScript script = jexl.createScript(src);
-        final List<Integer> l = new ArrayList<>();
-        final JexlContext ctxt = new MapContext();
-        final Object result = script.execute(ctxt, l);
-        Assert.assertNotNull(result);
-        Assert.assertEquals(Arrays.asList(0, 1, 2, 3), l);
     }
 }

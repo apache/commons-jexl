@@ -24,12 +24,12 @@ import org.apache.commons.logging.Log;
  * A log implementation to help control tests results.
  */
 public class CaptureLog implements Log {
-    private final List<Object[]> captured = new ArrayList<>();
-
     static Object caller() {
         final StackTraceElement[] stack = new Exception().fillInStackTrace().getStackTrace();
         return stack[2];
     }
+
+    private final List<Object[]> captured = new ArrayList<>();
 
     public CaptureLog() {
         this("org.apache.commons.jexl3");
@@ -37,10 +37,6 @@ public class CaptureLog implements Log {
 
     public CaptureLog(final String name) {
         //super(name);
-    }
-
-    public boolean isEmpty() {
-        return captured.isEmpty();
     }
 
     public int count(final String type) {
@@ -51,11 +47,6 @@ public class CaptureLog implements Log {
             }
         }
         return count;
-    }
-
-    //@Override
-    public boolean isEnabledFor(final int /*Priority*/ p) {
-        return true;
     }
 
     @Override
@@ -100,6 +91,15 @@ public class CaptureLog implements Log {
 
     @Override
     public boolean isDebugEnabled() {
+        return true;
+    }
+
+    public boolean isEmpty() {
+        return captured.isEmpty();
+    }
+
+    //@Override
+    public boolean isEnabledFor(final int /*Priority*/ p) {
         return true;
     }
 

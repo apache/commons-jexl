@@ -25,13 +25,15 @@ import org.apache.commons.jexl3.parser.JexlNode;
  * Utility to dump AST, useful in debug sessions.
  */
 public class Dumper {
+    public static String toString(final JexlScript script) {
+        return new Dumper(script).toString();
+    }
     private final StringBuilder strb = new StringBuilder();
+
     private int indent;
 
-    private void indent() {
-        for (int i = 0; i < indent; ++i) {
-            strb.append("  ");
-        }
+    private Dumper(final JexlScript script) {
+        dump(((Script) script).script, null);
     }
 
     private void dump(final JexlNode node, final Object data) {
@@ -63,16 +65,14 @@ public class Dumper {
         strb.append(')');
     }
 
-    private Dumper(final JexlScript script) {
-        dump(((Script) script).script, null);
+    private void indent() {
+        for (int i = 0; i < indent; ++i) {
+            strb.append("  ");
+        }
     }
 
     @Override
     public String toString() {
         return strb.toString();
-    }
-
-    public static String toString(final JexlScript script) {
-        return new Dumper(script).toString();
     }
 }

@@ -44,6 +44,18 @@ public final class ReadonlyContext implements JexlContext, JexlContext.OptionsHa
         return wrapped.get(name);
     }
 
+    @Override
+    @NoJexl
+    public JexlOptions getEngineOptions() {
+        return options;
+    }
+
+    @Override
+    @NoJexl
+    public boolean has(final String name) {
+        return wrapped.has(name);
+    }
+
     /**
      * Will throw an UnsupportedOperationException when called; the JexlEngine deals with it appropriately.
      * @param name the unused variable name
@@ -53,17 +65,5 @@ public final class ReadonlyContext implements JexlContext, JexlContext.OptionsHa
     @NoJexl
     public void set(final String name, final Object value) {
         throw new UnsupportedOperationException("Not supported.");
-    }
-
-    @Override
-    @NoJexl
-    public boolean has(final String name) {
-        return wrapped.has(name);
-    }
-
-    @Override
-    @NoJexl
-    public JexlOptions getEngineOptions() {
-        return options;
     }
 }

@@ -25,13 +25,15 @@ import org.junit.Test;
  */
 @SuppressWarnings({"UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
 public class ExceptionTest extends JexlTestCase {
-    /** create a named test */
-    public ExceptionTest() {
-        super("ExceptionTest");
-    }
-
     public static class ThrowNPE {
         boolean doThrow = false;
+        public boolean getFail() {
+            if (doThrow) {
+                throw new NullPointerException("ThrowNPE/get");
+            }
+            return doThrow;
+        }
+
         public String npe() {
             throw new NullPointerException("ThrowNPE");
         }
@@ -42,80 +44,59 @@ public class ExceptionTest extends JexlTestCase {
                 throw new NullPointerException("ThrowNPE/set");
             }
         }
+    }
 
-        public boolean getFail() {
-            if (doThrow) {
-                throw new NullPointerException("ThrowNPE/get");
+    /** create a named test */
+    public ExceptionTest() {
+        super("ExceptionTest");
+    }
+
+    private void doTest206(final String src, final boolean strict, final boolean silent) throws Exception {
+        final CaptureLog l = new CaptureLog();
+        final JexlContext jc = new MapContext();
+        final JexlEngine jexl = new JexlBuilder().logger(l).strict(strict).silent(silent).create();
+        JexlScript e;
+        Object r = -1;
+        e = jexl.createScript(src);
+        try {
+            r = e.execute(jc);
+            if (strict && !silent) {
+                Assert.fail("should have thrown an exception");
             }
-            return doThrow;
+        } catch (final JexlException xjexl) {
+            if (!strict || silent) {
+                Assert.fail(src + ": should not have thrown an exception");
+            }
+        }
+        if (strict) {
+            if (silent && l.count("warn") == 0) {
+                Assert.fail(src + ": should have generated a warning");
+            }
+        } else {
+            if (l.count("debug") == 0) {
+                Assert.fail(src + ": should have generated a debug");
+            }
+            Assert.assertEquals(42, r);
         }
     }
 
     @Test
-    public void testWrappedEx() throws Exception {
-        final JexlEngine jexl = new Engine();
-        final JexlExpression e = jexl.createExpression("npe()");
-        final JexlContext jc = new ObjectContext<>(jexl, new ThrowNPE());
-        try {
-            e.evaluate(jc);
-            Assert.fail("Should have thrown NPE");
-        } catch (final JexlException xany) {
-            final Throwable xth = xany.getCause();
-            Assert.assertEquals(NullPointerException.class, xth.getClass());
-        }
-    }
-
-    @Test
-    public void testWrappedExmore() throws Exception {
-        final JexlEngine jexl = new Engine();
-        final ThrowNPE npe = new ThrowNPE();
-        try {
-            final Object r = jexl.getProperty(npe, "foo");
-            Assert.fail("Should have thrown JexlException.Property");
-        } catch (final JexlException.Property xany) {
-            final Throwable xth = xany.getCause();
-            Assert.assertNull(xth);
-        }
-        try {
-            jexl.setProperty(npe, "foo", 42);
-            Assert.fail("Should have thrown JexlException.Property");
-        } catch (final JexlException.Property xany) {
-            final Throwable xth = xany.getCause();
-            Assert.assertNull(xth);
-        }
-
-        final boolean b = (Boolean) jexl.getProperty(npe, "fail");
-        Assert.assertFalse(b);
-        try {
-            jexl.setProperty(npe, "fail", false);
-            jexl.setProperty(npe, "fail", true);
-            Assert.fail("Should have thrown JexlException.Property");
-        } catch (final JexlException.Property xany) {
-            final Throwable xth = xany.getCause();
-            Assert.assertEquals(NullPointerException.class, xth.getClass());
-        }
-        try {
-            jexl.getProperty(npe, "fail");
-            Assert.fail("Should have thrown JexlException.Property");
-        } catch (final JexlException.Property xany) {
-            final Throwable xth = xany.getCause();
-            Assert.assertEquals(NullPointerException.class, xth.getClass());
-        }
-
-        try {
-            jexl.invokeMethod(npe, "foo", 42);
-            Assert.fail("Should have thrown JexlException.Method");
-        } catch (final JexlException.Method xany) {
-            final Throwable xth = xany.getCause();
-            Assert.assertNull(xth);
-        }
-        try {
-            jexl.invokeMethod(npe, "npe");
-            Assert.fail("Should have thrown NullPointerException");
-        } catch (final JexlException.Method xany) {
-            final Throwable xth = xany.getCause();
-            Assert.assertEquals(NullPointerException.class, xth.getClass());
-        }
+    public void test206() throws Exception {
+        String src = "null.1 = 2; return 42";
+        doTest206(src, false, false);
+        doTest206(src, false, true);
+        doTest206(src, true, false);
+        doTest206(src, true, true);
+        src = "x = null.1; return 42";
+        doTest206(src, false, false);
+        doTest206(src, false, true);
+        doTest206(src, true, false);
+        doTest206(src, true, true);
+        src = "x = y.1; return 42";
+        doTest206(src, false, false);
+        doTest206(src, false, true);
+        doTest206(src, true, false);
+        doTest206(src, true, true);
     }
 
     // Unknown vars and properties versus null operands
@@ -171,36 +152,6 @@ public class ExceptionTest extends JexlTestCase {
         }
     }
 
-    // null local vars and strict arithmetic effects
-    @Test
-    public void testExVar() throws Exception {
-        final JexlEngine jexl = createEngine(false);
-        final JexlScript e = jexl.createScript("(x)->{ x * 6 }");
-        final JexlEvalContext ctxt = new JexlEvalContext();
-        final JexlOptions options = ctxt.getEngineOptions();
-        // ensure errors will throw
-        options.setSilent(false);
-        // make unknown vars throw
-        options.setStrict(true);
-        options.setStrictArithmetic(true);
-        // empty cotext
-        try {
-            /* Object o = */ e.execute(ctxt);
-            Assert.fail("x is null, should throw");
-        } catch (final JexlException xjexl) {
-            final String msg = xjexl.getMessage();
-            Assert.assertTrue(msg.indexOf("null") > 0);
-        }
-
-        // allow null operands
-        options.setStrictArithmetic(false);
-        try {
-            final Object o = e.execute(ctxt, (Object) null);
-        } catch (final JexlException.Variable xjexl) {
-            Assert.fail("arithmetic allows null operands, should not throw");
-        }
-    }
-
     // Unknown vars and properties versus null operands
     @Test
     public void testExMethod() throws Exception {
@@ -233,50 +184,99 @@ public class ExceptionTest extends JexlTestCase {
         }
     }
 
+    // null local vars and strict arithmetic effects
     @Test
-    public void test206() throws Exception {
-        String src = "null.1 = 2; return 42";
-        doTest206(src, false, false);
-        doTest206(src, false, true);
-        doTest206(src, true, false);
-        doTest206(src, true, true);
-        src = "x = null.1; return 42";
-        doTest206(src, false, false);
-        doTest206(src, false, true);
-        doTest206(src, true, false);
-        doTest206(src, true, true);
-        src = "x = y.1; return 42";
-        doTest206(src, false, false);
-        doTest206(src, false, true);
-        doTest206(src, true, false);
-        doTest206(src, true, true);
-    }
-    private void doTest206(final String src, final boolean strict, final boolean silent) throws Exception {
-        final CaptureLog l = new CaptureLog();
-        final JexlContext jc = new MapContext();
-        final JexlEngine jexl = new JexlBuilder().logger(l).strict(strict).silent(silent).create();
-        JexlScript e;
-        Object r = -1;
-        e = jexl.createScript(src);
+    public void testExVar() throws Exception {
+        final JexlEngine jexl = createEngine(false);
+        final JexlScript e = jexl.createScript("(x)->{ x * 6 }");
+        final JexlEvalContext ctxt = new JexlEvalContext();
+        final JexlOptions options = ctxt.getEngineOptions();
+        // ensure errors will throw
+        options.setSilent(false);
+        // make unknown vars throw
+        options.setStrict(true);
+        options.setStrictArithmetic(true);
+        // empty cotext
         try {
-            r = e.execute(jc);
-            if (strict && !silent) {
-                Assert.fail("should have thrown an exception");
-            }
+            /* Object o = */ e.execute(ctxt);
+            Assert.fail("x is null, should throw");
         } catch (final JexlException xjexl) {
-            if (!strict || silent) {
-                Assert.fail(src + ": should not have thrown an exception");
-            }
+            final String msg = xjexl.getMessage();
+            Assert.assertTrue(msg.indexOf("null") > 0);
         }
-        if (strict) {
-            if (silent && l.count("warn") == 0) {
-                Assert.fail(src + ": should have generated a warning");
-            }
-        } else {
-            if (l.count("debug") == 0) {
-                Assert.fail(src + ": should have generated a debug");
-            }
-            Assert.assertEquals(42, r);
+
+        // allow null operands
+        options.setStrictArithmetic(false);
+        try {
+            final Object o = e.execute(ctxt, (Object) null);
+        } catch (final JexlException.Variable xjexl) {
+            Assert.fail("arithmetic allows null operands, should not throw");
+        }
+    }
+
+    @Test
+    public void testWrappedEx() throws Exception {
+        final JexlEngine jexl = new Engine();
+        final JexlExpression e = jexl.createExpression("npe()");
+        final JexlContext jc = new ObjectContext<>(jexl, new ThrowNPE());
+        try {
+            e.evaluate(jc);
+            Assert.fail("Should have thrown NPE");
+        } catch (final JexlException xany) {
+            final Throwable xth = xany.getCause();
+            Assert.assertEquals(NullPointerException.class, xth.getClass());
+        }
+    }
+    @Test
+    public void testWrappedExmore() throws Exception {
+        final JexlEngine jexl = new Engine();
+        final ThrowNPE npe = new ThrowNPE();
+        try {
+            final Object r = jexl.getProperty(npe, "foo");
+            Assert.fail("Should have thrown JexlException.Property");
+        } catch (final JexlException.Property xany) {
+            final Throwable xth = xany.getCause();
+            Assert.assertNull(xth);
+        }
+        try {
+            jexl.setProperty(npe, "foo", 42);
+            Assert.fail("Should have thrown JexlException.Property");
+        } catch (final JexlException.Property xany) {
+            final Throwable xth = xany.getCause();
+            Assert.assertNull(xth);
+        }
+
+        final boolean b = (Boolean) jexl.getProperty(npe, "fail");
+        Assert.assertFalse(b);
+        try {
+            jexl.setProperty(npe, "fail", false);
+            jexl.setProperty(npe, "fail", true);
+            Assert.fail("Should have thrown JexlException.Property");
+        } catch (final JexlException.Property xany) {
+            final Throwable xth = xany.getCause();
+            Assert.assertEquals(NullPointerException.class, xth.getClass());
+        }
+        try {
+            jexl.getProperty(npe, "fail");
+            Assert.fail("Should have thrown JexlException.Property");
+        } catch (final JexlException.Property xany) {
+            final Throwable xth = xany.getCause();
+            Assert.assertEquals(NullPointerException.class, xth.getClass());
+        }
+
+        try {
+            jexl.invokeMethod(npe, "foo", 42);
+            Assert.fail("Should have thrown JexlException.Method");
+        } catch (final JexlException.Method xany) {
+            final Throwable xth = xany.getCause();
+            Assert.assertNull(xth);
+        }
+        try {
+            jexl.invokeMethod(npe, "npe");
+            Assert.fail("Should have thrown NullPointerException");
+        } catch (final JexlException.Method xany) {
+            final Throwable xth = xany.getCause();
+            Assert.assertEquals(NullPointerException.class, xth.getClass());
         }
     }
 }

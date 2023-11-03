@@ -34,6 +34,24 @@ public class ArrayLiteralTest extends JexlTestCase {
     }
 
     @Test
+    public void testChangeThroughVariables() throws Exception {
+        final JexlContext jc = new MapContext();
+        final JexlExpression e147 = JEXL.createExpression("quux = [one, two]");
+
+        jc.set("one", 1);
+        jc.set("two", 2);
+        final int[] o1 = (int[]) e147.evaluate(jc);
+        Assert.assertEquals(1, o1[0]);
+        Assert.assertEquals(2, o1[1]);
+
+        jc.set("one", 10);
+        jc.set("two", 20);
+        final int[] o2 = (int[]) e147.evaluate(jc);
+        Assert.assertEquals(10, o2[0]);
+        Assert.assertEquals(20, o2[1]);
+    }
+
+    @Test
     public void testEmptyArrayLiteral() throws Exception {
         final JexlContext jc = new MapContext();
         Object o;
@@ -58,17 +76,6 @@ public class ArrayLiteralTest extends JexlTestCase {
     }
 
     @Test
-    public void testLiteralWithStrings() throws Exception {
-        final Object[] check = {"foo", "bar"};
-        final List<String> sources = Arrays.asList("[ 'foo' , 'bar' ]", "[ 'foo' , 'bar', ]");
-        for(final String src : sources) {
-            final JexlExpression e = JEXL.createExpression(src);
-            final Object o = e.evaluate(null);
-            Assert.assertArrayEquals(check, (Object[]) o);
-        }
-    }
-
-    @Test
     public void testLiteralWithElipsis() throws Exception {
         final JexlExpression e = JEXL.createExpression("[ 'foo' , 'bar', ... ]");
         final JexlContext jc = new MapContext();
@@ -86,25 +93,13 @@ public class ArrayLiteralTest extends JexlTestCase {
     }
 
     @Test
-    public void testLiteralWithOneEntry() throws Exception {
-        final Object[] check = {"foo"};
-        final List<String> sources = Arrays.asList("[ 'foo']", "[ 'foo' , ]");
-        for(final String src : sources) {
-            final JexlExpression e = JEXL.createExpression(src);
-            final Object o = e.evaluate(null);
-            Assert.assertArrayEquals(check, (Object[]) o);
-        }
-    }
-
-    @Test
-    public void testLiteralWithNumbers() throws Exception {
-        final JexlExpression e = JEXL.createExpression("[ 5.0 , 10 ]");
+    public void testLiteralWithIntegers() throws Exception {
+        final JexlExpression e = JEXL.createExpression("[ 5 , 10 ]");
         final JexlContext jc = new MapContext();
 
         final Object o = e.evaluate(jc);
-        final Object[] check = {Double.valueOf(5), Integer.valueOf(10)};
-        Assert.assertArrayEquals(check, (Object[]) o);
-        Assert.assertTrue(o.getClass().isArray() && o.getClass().getComponentType().equals(Number.class));
+        final int[] check = {5, 10};
+        Assert.assertArrayEquals(check, (int[]) o);
     }
 
     @Test
@@ -133,31 +128,36 @@ public class ArrayLiteralTest extends JexlTestCase {
     }
 
     @Test
-    public void testLiteralWithIntegers() throws Exception {
-        final JexlExpression e = JEXL.createExpression("[ 5 , 10 ]");
+    public void testLiteralWithNumbers() throws Exception {
+        final JexlExpression e = JEXL.createExpression("[ 5.0 , 10 ]");
         final JexlContext jc = new MapContext();
 
         final Object o = e.evaluate(jc);
-        final int[] check = {5, 10};
-        Assert.assertArrayEquals(check, (int[]) o);
+        final Object[] check = {Double.valueOf(5), Integer.valueOf(10)};
+        Assert.assertArrayEquals(check, (Object[]) o);
+        Assert.assertTrue(o.getClass().isArray() && o.getClass().getComponentType().equals(Number.class));
     }
 
     @Test
-    public void testSizeOfSimpleArrayLiteral() throws Exception {
-        final JexlExpression e = JEXL.createExpression("size([ 'foo' , 'bar' ])");
-        final JexlContext jc = new MapContext();
-
-        final Object o = e.evaluate(jc);
-        Assert.assertEquals(Integer.valueOf(2), o);
+    public void testLiteralWithOneEntry() throws Exception {
+        final Object[] check = {"foo"};
+        final List<String> sources = Arrays.asList("[ 'foo']", "[ 'foo' , ]");
+        for(final String src : sources) {
+            final JexlExpression e = JEXL.createExpression(src);
+            final Object o = e.evaluate(null);
+            Assert.assertArrayEquals(check, (Object[]) o);
+        }
     }
 
     @Test
-    public void testNotestCallingMethodsOnNewMapLiteral() throws Exception {
-        final JexlExpression e = JEXL.createExpression("size({ 'foo' : 'bar' }.values())");
-        final JexlContext jc = new MapContext();
-
-        final Object o = e.evaluate(jc);
-        Assert.assertEquals(Integer.valueOf(1), o);
+    public void testLiteralWithStrings() throws Exception {
+        final Object[] check = {"foo", "bar"};
+        final List<String> sources = Arrays.asList("[ 'foo' , 'bar' ]", "[ 'foo' , 'bar', ]");
+        for(final String src : sources) {
+            final JexlExpression e = JEXL.createExpression(src);
+            final Object o = e.evaluate(null);
+            Assert.assertArrayEquals(check, (Object[]) o);
+        }
     }
 
     @Test
@@ -170,20 +170,20 @@ public class ArrayLiteralTest extends JexlTestCase {
     }
 
     @Test
-    public void testChangeThroughVariables() throws Exception {
+    public void testNotestCallingMethodsOnNewMapLiteral() throws Exception {
+        final JexlExpression e = JEXL.createExpression("size({ 'foo' : 'bar' }.values())");
         final JexlContext jc = new MapContext();
-        final JexlExpression e147 = JEXL.createExpression("quux = [one, two]");
 
-        jc.set("one", 1);
-        jc.set("two", 2);
-        final int[] o1 = (int[]) e147.evaluate(jc);
-        Assert.assertEquals(1, o1[0]);
-        Assert.assertEquals(2, o1[1]);
+        final Object o = e.evaluate(jc);
+        Assert.assertEquals(Integer.valueOf(1), o);
+    }
 
-        jc.set("one", 10);
-        jc.set("two", 20);
-        final int[] o2 = (int[]) e147.evaluate(jc);
-        Assert.assertEquals(10, o2[0]);
-        Assert.assertEquals(20, o2[1]);
+    @Test
+    public void testSizeOfSimpleArrayLiteral() throws Exception {
+        final JexlExpression e = JEXL.createExpression("size([ 'foo' , 'bar' ])");
+        final JexlContext jc = new MapContext();
+
+        final Object o = e.evaluate(jc);
+        Assert.assertEquals(Integer.valueOf(2), o);
     }
 }

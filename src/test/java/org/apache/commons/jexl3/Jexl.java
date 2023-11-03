@@ -26,8 +26,6 @@ import org.apache.commons.jexl3.internal.Engine;
  * @since 1.0
  */
 public class Jexl {
-    private Jexl() {}
-
     public static void main(final String[] args) {
         final JexlEngine JEXL = new Engine();
         final Map<Object,Object> m = System.getProperties();
@@ -45,4 +43,6 @@ public class Jexl {
             e.printStackTrace();
         }
     }
+
+    private Jexl() {}
 }

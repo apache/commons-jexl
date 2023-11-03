@@ -29,15 +29,6 @@ import org.junit.Test;
 
 public class MiscIntrospectionTest {
     @Test
-    public void testEmptyContext() {
-        try {
-            JexlEngine.EMPTY_CONTEXT.set("nope", 42);
-            Assert.fail("empty context should be readonly");
-        } catch (final UnsupportedOperationException xun) {
-            Assert.assertNotNull(xun);
-        }
-    }
-    @Test
     public void testArrayIterator() {
         // not on lists
         try {
@@ -73,7 +64,6 @@ public class MiscIntrospectionTest {
             Assert.assertNotNull(no);
         }
     }
-
     @Test
     public void testArrayListWrapper() {
         ArrayListWrapper alw ;
@@ -87,6 +77,16 @@ public class MiscIntrospectionTest {
         alw = new ArrayListWrapper(ai);
         Assert.assertEquals(1, alw.indexOf(2));
         Assert.assertEquals(-1, alw.indexOf(null));
+    }
+
+    @Test
+    public void testEmptyContext() {
+        try {
+            JexlEngine.EMPTY_CONTEXT.set("nope", 42);
+            Assert.fail("empty context should be readonly");
+        } catch (final UnsupportedOperationException xun) {
+            Assert.assertNotNull(xun);
+        }
     }
 
 }

@@ -42,10 +42,14 @@ import com.sun.net.httpserver.HttpServer;
  */
 @SuppressWarnings({"AssertEqualsBetweenInconvertibleTypes"})
 public class ScriptTest extends JexlTestCase {
-    static final String TEST1 =  "src/test/scripts/test1.jexl";
-    static final String TEST_ADD =  "src/test/scripts/testAdd.jexl";
-    static final String TEST_JSON =  "src/test/scripts/httpPost.jexl";
-
+    /**
+     * An object to call from.
+     */
+    public static class HttpPostRequest {
+        public static String execute(final String url, final String data) throws IOException {
+            return httpPostRequest(url, data);
+        }
+    }
     // test class for testScriptUpdatesContext
     // making this class private static will cause the test to fail.
     // this is due to unusual code in ClassMap.getAccessibleMethods(Class)
@@ -60,132 +64,10 @@ public class ScriptTest extends JexlTestCase {
             code = c;
         }
     }
-    /**
-     * Create a new test case.
-     */
-    public ScriptTest() {
-        super("ScriptTest");
-    }
+    static final String TEST1 =  "src/test/scripts/test1.jexl";
 
-    /**
-     * Test creating a script from spaces.
-     */
-    @Test
-    public void testSpacesScript() {
-        final String code = " ";
-        final JexlScript s = JEXL.createScript(code);
-        Assert.assertNotNull(s);
-    }
-
-    /**
-     * Test creating a script from a string.
-     */
-    @Test
-    public void testSimpleScript() {
-        final String code = "while (x < 10) x = x + 1;";
-        final JexlScript s = JEXL.createScript(code);
-        final JexlContext jc = new MapContext();
-        jc.set("x",1);
-
-        final Object o = s.execute(jc);
-        Assert.assertEquals("Result is wrong", 10, o);
-        Assert.assertEquals("getText is wrong", code, s.getSourceText());
-    }
-
-
-    @Test
-    public void testScriptJsonFromFileJexl() {
-        HttpServer server = null;
-        try {
-            final String response = "{  \"id\": 101}";
-            server = createJsonServer(h -> response);
-            final File httprFile = new File(TEST_JSON);
-            final JexlScript httprScript = JEXL.createScript(httprFile);
-            final JexlContext jc = new MapContext();
-            final Object httpr = httprScript.execute(jc);
-            final JexlScript s = JEXL.createScript("(httpr,url)->httpr.execute(url, null)");
-            //jc.set("httpr", new HttpPostRequest());
-            final String url = "http:/"+server.getAddress().toString()+"/test";
-            final Object result = s.execute(jc, httpr,url);
-            Assert.assertNotNull(result);
-            Assert.assertEquals(response, result);
-        } catch (final IOException xio) {
-            Assert.fail(xio.getMessage());
-        } finally {
-            if (server != null) {
-                server.stop(0);
-            }
-        }
-    }
-
-    @Test
-    public void testScriptJsonFromFileJava() {
-        HttpServer server = null;
-        try {
-            final String response = "{  \"id\": 101}";
-            server = createJsonServer(h -> response);
-            final String url = "http:/"+server.getAddress().toString()+"/test";
-            final String testScript = "httpr.execute('"+url+"', null)";
-            final JexlScript s = JEXL.createScript(testScript);
-            final JexlContext jc = new MapContext();
-            jc.set("httpr", new HttpPostRequest());
-            final Object result = s.execute(jc);
-            Assert.assertNotNull(result);
-            Assert.assertEquals(response, result);
-        } catch (final IOException xio) {
-            Assert.fail(xio.getMessage());
-        } finally {
-            if (server != null) {
-                server.stop(0);
-            }
-        }
-    }
-
-    /**
-     * An object to call from.
-     */
-    public static class HttpPostRequest {
-        public static String execute(final String url, final String data) throws IOException {
-            return httpPostRequest(url, data);
-        }
-    }
-
-    /**
-     *  HTTP post.
-     * @param sURL the url
-     * @param jsonData some json data
-     * @return the result
-     * @throws IOException
-     */
-    private static String httpPostRequest(final String sURL, final String jsonData) throws IOException {
-        final URL url = new java.net.URL(sURL);
-        final HttpURLConnection con = (HttpURLConnection) url.openConnection();
-        con.setRequestMethod("POST");
-        con.setRequestProperty("Accept", "application/json");
-        // send data
-        if ( jsonData != null ) {
-            con.setRequestProperty("Content-Type", "application/json");
-            con.setDoOutput(true);
-
-            final OutputStream outputStream = con.getOutputStream();
-            final byte[] input = jsonData.getBytes(StandardCharsets.UTF_8);
-            outputStream.write(input, 0, input.length);
-        }
-        // read response
-        final int responseCode = con.getResponseCode();
-        InputStream inputStream = null;
-        inputStream =  con.getInputStream();
-        final StringBuilder response = new StringBuilder();
-        if (inputStream != null) {
-            try (BufferedReader in = new BufferedReader(new InputStreamReader(inputStream))) {
-                String inputLine = "";
-                while ((inputLine = in.readLine()) != null) {
-                    response.append(inputLine);
-                }
-            }
-        }
-        return response.toString();
-    }
+    static final String TEST_ADD =  "src/test/scripts/testAdd.jexl";
+    static final String TEST_JSON =  "src/test/scripts/httpPost.jexl";
 
     /**
      * Creates a simple local http server.
@@ -225,15 +107,49 @@ public class ScriptTest extends JexlTestCase {
         return server;
     }
 
-    @Test
-    public void testScriptFromFile() {
-        final File testScript = new File(TEST1);
-        final JexlScript s = JEXL.createScript(testScript);
-        final JexlContext jc = new MapContext();
-        jc.set("out", System.out);
-        final Object result = s.execute(jc);
-        Assert.assertNotNull("No result", result);
-        Assert.assertEquals("Wrong result", 7, result);
+    /**
+     *  HTTP post.
+     * @param sURL the url
+     * @param jsonData some json data
+     * @return the result
+     * @throws IOException
+     */
+    private static String httpPostRequest(final String sURL, final String jsonData) throws IOException {
+        final URL url = new java.net.URL(sURL);
+        final HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestMethod("POST");
+        con.setRequestProperty("Accept", "application/json");
+        // send data
+        if ( jsonData != null ) {
+            con.setRequestProperty("Content-Type", "application/json");
+            con.setDoOutput(true);
+
+            final OutputStream outputStream = con.getOutputStream();
+            final byte[] input = jsonData.getBytes(StandardCharsets.UTF_8);
+            outputStream.write(input, 0, input.length);
+        }
+        // read response
+        final int responseCode = con.getResponseCode();
+        InputStream inputStream = null;
+        inputStream =  con.getInputStream();
+        final StringBuilder response = new StringBuilder();
+        if (inputStream != null) {
+            try (BufferedReader in = new BufferedReader(new InputStreamReader(inputStream))) {
+                String inputLine = "";
+                while ((inputLine = in.readLine()) != null) {
+                    response.append(inputLine);
+                }
+            }
+        }
+        return response.toString();
+    }
+
+
+    /**
+     * Create a new test case.
+     */
+    public ScriptTest() {
+        super("ScriptTest");
     }
 
     @Test
@@ -248,6 +164,28 @@ public class ScriptTest extends JexlTestCase {
     }
 
     @Test
+    public void testArgScriptFromURL() throws Exception {
+        final URL testUrl = new File(TEST_ADD).toURI().toURL();
+        final JexlScript s = JEXL.createScript(testUrl,"x", "y");
+        final JexlContext jc = new MapContext();
+        jc.set("out", System.out);
+        final Object result = s.execute(jc, 13, 29);
+        Assert.assertNotNull("No result", result);
+        Assert.assertEquals("Wrong result", 42, result);
+    }
+
+    @Test
+    public void testScriptFromFile() {
+        final File testScript = new File(TEST1);
+        final JexlScript s = JEXL.createScript(testScript);
+        final JexlContext jc = new MapContext();
+        jc.set("out", System.out);
+        final Object result = s.execute(jc);
+        Assert.assertNotNull("No result", result);
+        Assert.assertEquals("Wrong result", 7, result);
+    }
+
+    @Test
     public void testScriptFromURL() throws Exception {
         final URL testUrl = new File(TEST1).toURI().toURL();
         final JexlScript s = JEXL.createScript(testUrl);
@@ -259,14 +197,51 @@ public class ScriptTest extends JexlTestCase {
     }
 
     @Test
-    public void testArgScriptFromURL() throws Exception {
-        final URL testUrl = new File(TEST_ADD).toURI().toURL();
-        final JexlScript s = JEXL.createScript(testUrl,"x", "y");
-        final JexlContext jc = new MapContext();
-        jc.set("out", System.out);
-        final Object result = s.execute(jc, 13, 29);
-        Assert.assertNotNull("No result", result);
-        Assert.assertEquals("Wrong result", 42, result);
+    public void testScriptJsonFromFileJava() {
+        HttpServer server = null;
+        try {
+            final String response = "{  \"id\": 101}";
+            server = createJsonServer(h -> response);
+            final String url = "http:/"+server.getAddress().toString()+"/test";
+            final String testScript = "httpr.execute('"+url+"', null)";
+            final JexlScript s = JEXL.createScript(testScript);
+            final JexlContext jc = new MapContext();
+            jc.set("httpr", new HttpPostRequest());
+            final Object result = s.execute(jc);
+            Assert.assertNotNull(result);
+            Assert.assertEquals(response, result);
+        } catch (final IOException xio) {
+            Assert.fail(xio.getMessage());
+        } finally {
+            if (server != null) {
+                server.stop(0);
+            }
+        }
+    }
+
+    @Test
+    public void testScriptJsonFromFileJexl() {
+        HttpServer server = null;
+        try {
+            final String response = "{  \"id\": 101}";
+            server = createJsonServer(h -> response);
+            final File httprFile = new File(TEST_JSON);
+            final JexlScript httprScript = JEXL.createScript(httprFile);
+            final JexlContext jc = new MapContext();
+            final Object httpr = httprScript.execute(jc);
+            final JexlScript s = JEXL.createScript("(httpr,url)->httpr.execute(url, null)");
+            //jc.set("httpr", new HttpPostRequest());
+            final String url = "http:/"+server.getAddress().toString()+"/test";
+            final Object result = s.execute(jc, httpr,url);
+            Assert.assertNotNull(result);
+            Assert.assertEquals(response, result);
+        } catch (final IOException xio) {
+            Assert.fail(xio.getMessage());
+        } finally {
+            if (server != null) {
+                server.stop(0);
+            }
+        }
     }
 
     @Test
@@ -285,6 +260,31 @@ public class ScriptTest extends JexlTestCase {
         resultatJexl.setCode("");
         s.execute(jc);
         Assert.assertEquals("OK", resultatJexl.getCode());
+    }
+
+    /**
+     * Test creating a script from a string.
+     */
+    @Test
+    public void testSimpleScript() {
+        final String code = "while (x < 10) x = x + 1;";
+        final JexlScript s = JEXL.createScript(code);
+        final JexlContext jc = new MapContext();
+        jc.set("x",1);
+
+        final Object o = s.execute(jc);
+        Assert.assertEquals("Result is wrong", 10, o);
+        Assert.assertEquals("getText is wrong", code, s.getSourceText());
+    }
+
+    /**
+     * Test creating a script from spaces.
+     */
+    @Test
+    public void testSpacesScript() {
+        final String code = " ";
+        final JexlScript s = JEXL.createScript(code);
+        Assert.assertNotNull(s);
     }
 
 }

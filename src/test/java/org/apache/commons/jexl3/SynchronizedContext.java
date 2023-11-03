@@ -53,13 +53,6 @@ public class SynchronizedContext extends MapContext implements JexlContext.Annot
     }
 
     @Override
-    public void set(final String name, final Object value) {
-        synchronized (this) {
-            super.set(name, value);
-        }
-    }
-
-    @Override
     public Object processAnnotation(final String name, final Object[] args, final Callable<Object> statement) throws Exception {
         if ("synchronized".equals(name)) {
             final Object arg = args[0];
@@ -68,6 +61,13 @@ public class SynchronizedContext extends MapContext implements JexlContext.Annot
             }
         }
         throw new IllegalArgumentException("unknown annotation " + name);
+    }
+
+    @Override
+    public void set(final String name, final Object value) {
+        synchronized (this) {
+            super.set(name, value);
+        }
     }
 
 }

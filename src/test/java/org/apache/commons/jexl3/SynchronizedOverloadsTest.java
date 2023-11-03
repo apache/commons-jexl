@@ -43,22 +43,22 @@ public class SynchronizedOverloadsTest extends JexlTestCase {
 
 
     @Test
+    public void testSynchronized() throws Exception {
+        final Map<String, Object> ns = new TreeMap<>();
+        final JexlContext jc = new SynchronizedContext(new MapContext());
+        final JexlEngine jexl = new JexlBuilder().namespaces(ns).create();
+        final JexlScript js0 = jexl.createScript("@synchronized(y) {return y.size(); }", "y");
+        final Object size = js0.execute(jc, "foobar");
+        Assert.assertEquals(6, size);
+    }
+
+    @Test
     public void testSynchronizer() throws Exception {
         final Map<String, Object> ns = new TreeMap<>();
         ns.put("synchronized", SynchronizedContext.class);
         final JexlContext jc = new MapContext();
         final JexlEngine jexl = new JexlBuilder().namespaces(ns).create();
         final JexlScript js0 = jexl.createScript("synchronized:call(x, (y)->{y.size()})", "x");
-        final Object size = js0.execute(jc, "foobar");
-        Assert.assertEquals(6, size);
-    }
-
-    @Test
-    public void testSynchronized() throws Exception {
-        final Map<String, Object> ns = new TreeMap<>();
-        final JexlContext jc = new SynchronizedContext(new MapContext());
-        final JexlEngine jexl = new JexlBuilder().namespaces(ns).create();
-        final JexlScript js0 = jexl.createScript("@synchronized(y) {return y.size(); }", "y");
         final Object size = js0.execute(jc, "foobar");
         Assert.assertEquals(6, size);
     }

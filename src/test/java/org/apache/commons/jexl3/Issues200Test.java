@@ -45,15 +45,85 @@ import org.junit.Test;
  */
 @SuppressWarnings({"boxing", "UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
 public class Issues200Test extends JexlTestCase {
-    public Issues200Test() {
-        super("Issues200Test", null);
+    public static class Arithmetic266 extends JexlArithmetic {
+        static final ThreadLocal<Deque<Iterator266>> TLS_FOREACH = new ThreadLocal<Deque<Iterator266>>() {
+            @Override
+            public Deque<Iterator266> initialValue() {
+                return new LinkedList<>();
+            }
+        };
+        static void closeIterator(final Iterator266 i266) {
+            final Deque<Iterator266> queue = TLS_FOREACH.get();
+            if (queue != null) {
+                queue.remove(i266);
+            }
+        }
+
+        public Arithmetic266(final boolean strict) {
+            super(strict);
+        }
+
+        public Iterator<?> forEach(final Iterable<?> collection) {
+            final Iterator266 it266 = new Iterator266((Iterator<Object>) collection.iterator());
+            final Deque<Iterator266> queue = TLS_FOREACH.get();
+            queue.addFirst(it266);
+            return it266;
+        }
+
+        public Iterator<?> forEach(final Map<?,?> collection) {
+            return forEach(collection.values());
+        }
+
+        public void remove() {
+            final Deque<Iterator266> queue = TLS_FOREACH.get();
+            final Iterator266 i266 = queue.getFirst();
+            if (i266 != null) {
+                i266.remove();
+                throw new JexlException.Continue(null);
+            }
+            throw new NoSuchElementException();
+        }
     }
 
-    @Before
-    @Override
-    public void setUp() throws Exception {
-        // ensure jul logging is only error to avoid warning in silent mode
-        java.util.logging.Logger.getLogger(JexlEngine.class.getName()).setLevel(java.util.logging.Level.SEVERE);
+    public static class Cls298 {
+        int sz = 42;
+
+        public boolean isEmpty() {
+            return sz <= 0;
+        }
+
+        public int size() {
+            return sz;
+        }
+
+        public int size(final int x) {
+            return sz + x;
+        }
+    }
+
+    public static class Context225 extends MapContext {
+        public String bar(){
+            return "bar";
+        }
+    }
+
+    public static class Context279 extends MapContext {
+        public Number identity(final Number x) {
+            return x;
+        }
+        public String identity(final String x) {
+            return x;
+        }
+        public String[] spread(final String str) {
+            if (str == null) {
+                return null;
+            }
+             final String[] a = new String[str.length()];
+             for(int i = 0; i < str.length(); ++i) {
+                 a[i] = "" + str.charAt(i);
+             }
+             return a;
+        }
     }
 
     public static class Eval {
@@ -66,6 +136,127 @@ public class Issues200Test extends JexlTestCase {
         void setJexl(final JexlEngine je) {
             jexl = je;
         }
+    }
+
+    public static class Foo245 {
+        private Object bar;
+
+        public Object getBar() {
+            return bar;
+        }
+
+        void setBar(final Object bar) {
+            this.bar = bar;
+        }
+    }
+
+    /**
+     * An iterator that implements Closeable (at least implements a close method).
+     */
+    public static class Iterator266 implements /*Closeable,*/ Iterator<Object> {
+        private Iterator<Object> iterator;
+
+        Iterator266(final Iterator<Object> ator) {
+            iterator = ator;
+        }
+
+        //@Override
+        public void close() {
+            if (iterator != null) {
+                Arithmetic266.closeIterator(this);
+                iterator = null;
+            }
+        }
+
+        @Override
+        protected void finalize() throws Throwable {
+            close();
+            super.finalize();
+        }
+
+        @Override
+        public boolean hasNext() {
+            if (iterator == null) {
+                return false;
+            }
+            final boolean n = iterator.hasNext();
+            if (!n) {
+                close();
+            }
+            return n;
+        }
+
+        @Override
+        public Object next() {
+            if (iterator == null) {
+                throw new NoSuchElementException();
+            }
+            return iterator.next();
+        }
+
+        @Override
+        public void remove() {
+            if (iterator != null) {
+                iterator.remove();
+            }
+        }
+    }
+
+    public static class JexlArithmetic224 extends JexlArithmetic {
+        public JexlArithmetic224(final boolean astrict) {
+            super(astrict);
+        }
+
+        public Object arrayGet(final Collection<?> c, final Number n) {
+            return nth(c, n.intValue());
+        }
+
+        public Object call(final Collection<?> c, final Number n) {
+            if (c instanceof List) {
+                return ((List) c).get(n.intValue());
+            }
+            return nth(c, n.intValue());
+        }
+
+        protected Object nth(final Collection<?> c, int i) {
+            if (c instanceof List) {
+                // tell engine to use default
+                return JexlEngine.TRY_FAILED;
+            }
+            for (final Object o : c) {
+                if (i-- == 0) {
+                    return o;
+                }
+            }
+            return null;
+        }
+
+        public Object propertyGet(final Collection<?> c, final Number n) {
+            return nth(c, n.intValue());
+        }
+    }
+
+    public static class T210 {
+        public void npe() {
+            throw new NullPointerException("NPE210");
+        }
+    }
+
+    private static void handle(final ExecutorService pool, final JexlScript script, final Map<String, Object> payload) {
+       pool.submit(() -> script.execute(new MapContext(payload)));
+    }
+
+
+    public Issues200Test() {
+        super("Issues200Test", null);
+    }
+
+
+    @Before
+    @Override
+    public void setUp() throws Exception {
+        // ensure jul logging is only error to avoid warning in silent mode
+        java.util.logging.Logger.getLogger(JexlEngine.class.getName()).setLevel(java.util.logging.Level.SEVERE);
     }
 
     @Test
@@ -107,12 +298,6 @@ public class Issues200Test extends JexlTestCase {
         final JexlScript e = jexl.createScript("var x = new('java.util.HashMap'); x['a'] = ()->{return 1}; x.a()");
         final Object r = e.execute(jc);
         Assert.assertEquals(1, r);
-    }
-
-    public static class T210 {
-        public void npe() {
-            throw new NullPointerException("NPE210");
-        }
     }
 
     @Test
@@ -178,41 +363,6 @@ public class Issues200Test extends JexlTestCase {
         Assert.assertEquals(1, r);
     }
 
-
-    public static class JexlArithmetic224 extends JexlArithmetic {
-        public JexlArithmetic224(final boolean astrict) {
-            super(astrict);
-        }
-
-        protected Object nth(final Collection<?> c, int i) {
-            if (c instanceof List) {
-                // tell engine to use default
-                return JexlEngine.TRY_FAILED;
-            }
-            for (final Object o : c) {
-                if (i-- == 0) {
-                    return o;
-                }
-            }
-            return null;
-        }
-
-        public Object propertyGet(final Collection<?> c, final Number n) {
-            return nth(c, n.intValue());
-        }
-
-        public Object arrayGet(final Collection<?> c, final Number n) {
-            return nth(c, n.intValue());
-        }
-
-        public Object call(final Collection<?> c, final Number n) {
-            if (c instanceof List) {
-                return ((List) c).get(n.intValue());
-            }
-            return nth(c, n.intValue());
-        }
-    }
-
     @Test
     public void test224() throws Exception {
         final List<String> a0 = Arrays.asList("one", "two");
@@ -237,12 +387,6 @@ public class Issues200Test extends JexlTestCase {
         Assert.assertEquals("two", r);
     }
 
-    public static class Context225 extends MapContext {
-        public String bar(){
-            return "bar";
-        }
-    }
-
     @Test
     public void test225() throws Exception {
         final Context225 df = new Context225();
@@ -254,8 +398,23 @@ public class Issues200Test extends JexlTestCase {
         Assert.assertEquals("bar", expression.evaluate(context));
     }
 
-    private static void handle(final ExecutorService pool, final JexlScript script, final Map<String, Object> payload) {
-       pool.submit(() -> script.execute(new MapContext(payload)));
+    @Test
+    public void test230() throws Exception {
+        final JexlEngine jexl = new JexlBuilder().cache(4).create();
+        final JexlContext ctxt = new MapContext();
+        final int[] foo = {42};
+        ctxt.set("fo o", foo);
+        Object value;
+        for (int l = 0; l < 2; ++l) {
+            value = jexl.createExpression("fo\\ o[0]").evaluate(ctxt);
+            Assert.assertEquals(42, value);
+            value = jexl.createExpression("fo\\ o[0] = 43").evaluate(ctxt);
+            Assert.assertEquals(43, value);
+            value = jexl.createExpression("fo\\ o.0").evaluate(ctxt);
+            Assert.assertEquals(43, value);
+            value = jexl.createExpression("fo\\ o.0 = 42").evaluate(ctxt);
+            Assert.assertEquals(42, value);
+        }
     }
 
     @Test
@@ -303,19 +462,6 @@ public class Issues200Test extends JexlTestCase {
             // ok
         }
     }
-
-    public static class Foo245 {
-        private Object bar;
-
-        void setBar(final Object bar) {
-            this.bar = bar;
-        }
-
-        public Object getBar() {
-            return bar;
-        }
-    }
-
     @Test
     public void test245() throws Exception {
         final MapContext ctx = new MapContext();
@@ -352,12 +498,6 @@ public class Issues200Test extends JexlTestCase {
     @Test
     public void test256() throws Exception {
         final MapContext ctx = new MapContext() {
-            @Override public void set(final String name, final Object value) {
-                if ("java".equals(name)) {
-                    throw new JexlException(null, "can not set " + name);
-                }
-                super.set(name, value);
-            }
             @Override public Object get(final String name) {
                 if ("java".equals(name)) {
                     return null;
@@ -369,6 +509,12 @@ public class Issues200Test extends JexlTestCase {
                     return false;
                 }
                 return super.has(name);
+            }
+            @Override public void set(final String name, final Object value) {
+                if ("java".equals(name)) {
+                    throw new JexlException(null, "can not set " + name);
+                }
+                super.set(name, value);
             }
         };
         ctx.set("java.version", 10);
@@ -383,25 +529,6 @@ public class Issues200Test extends JexlTestCase {
         }
         script = engine.createScript("java.version");
         Assert.assertEquals(10, script.execute(ctx));
-    }
-
-    @Test
-    public void test230() throws Exception {
-        final JexlEngine jexl = new JexlBuilder().cache(4).create();
-        final JexlContext ctxt = new MapContext();
-        final int[] foo = {42};
-        ctxt.set("fo o", foo);
-        Object value;
-        for (int l = 0; l < 2; ++l) {
-            value = jexl.createExpression("fo\\ o[0]").evaluate(ctxt);
-            Assert.assertEquals(42, value);
-            value = jexl.createExpression("fo\\ o[0] = 43").evaluate(ctxt);
-            Assert.assertEquals(43, value);
-            value = jexl.createExpression("fo\\ o.0").evaluate(ctxt);
-            Assert.assertEquals(43, value);
-            value = jexl.createExpression("fo\\ o.0 = 42").evaluate(ctxt);
-            Assert.assertEquals(42, value);
-        }
     }
 
     @Test
@@ -427,97 +554,6 @@ public class Issues200Test extends JexlTestCase {
         Assert.assertEquals(42, result);
     }
 
-
-    /**
-     * An iterator that implements Closeable (at least implements a close method).
-     */
-    public static class Iterator266 implements /*Closeable,*/ Iterator<Object> {
-        private Iterator<Object> iterator;
-
-        Iterator266(final Iterator<Object> ator) {
-            iterator = ator;
-        }
-
-        @Override
-        protected void finalize() throws Throwable {
-            close();
-            super.finalize();
-        }
-
-        //@Override
-        public void close() {
-            if (iterator != null) {
-                Arithmetic266.closeIterator(this);
-                iterator = null;
-            }
-        }
-
-        @Override
-        public boolean hasNext() {
-            if (iterator == null) {
-                return false;
-            }
-            final boolean n = iterator.hasNext();
-            if (!n) {
-                close();
-            }
-            return n;
-        }
-
-        @Override
-        public Object next() {
-            if (iterator == null) {
-                throw new NoSuchElementException();
-            }
-            return iterator.next();
-        }
-
-        @Override
-        public void remove() {
-            if (iterator != null) {
-                iterator.remove();
-            }
-        }
-    }
-    public static class Arithmetic266 extends JexlArithmetic {
-        static final ThreadLocal<Deque<Iterator266>> TLS_FOREACH = new ThreadLocal<Deque<Iterator266>>() {
-            @Override
-            public Deque<Iterator266> initialValue() {
-                return new LinkedList<>();
-            }
-        };
-        public Arithmetic266(final boolean strict) {
-            super(strict);
-        }
-
-        static void closeIterator(final Iterator266 i266) {
-            final Deque<Iterator266> queue = TLS_FOREACH.get();
-            if (queue != null) {
-                queue.remove(i266);
-            }
-        }
-
-        public Iterator<?> forEach(final Iterable<?> collection) {
-            final Iterator266 it266 = new Iterator266((Iterator<Object>) collection.iterator());
-            final Deque<Iterator266> queue = TLS_FOREACH.get();
-            queue.addFirst(it266);
-            return it266;
-        }
-
-        public Iterator<?> forEach(final Map<?,?> collection) {
-            return forEach(collection.values());
-        }
-
-        public void remove() {
-            final Deque<Iterator266> queue = TLS_FOREACH.get();
-            final Iterator266 i266 = queue.getFirst();
-            if (i266 != null) {
-                i266.remove();
-                throw new JexlException.Continue(null);
-            }
-            throw new NoSuchElementException();
-        }
-    }
 
     @Test
     public void test266() throws Exception {
@@ -566,7 +602,6 @@ public class Issues200Test extends JexlTestCase {
         result = script.execute(ctxt);
         Assert.assertTrue(result instanceof JexlScript);
     }
-
 
     @Test
     public void test274() throws Exception {
@@ -688,25 +723,6 @@ public class Issues200Test extends JexlTestCase {
             jc = jexl.createScript(src);
             value = jc.execute(ctxt);
             Assert.assertEquals(src, ctls[i], value);
-        }
-    }
-
-    public static class Context279 extends MapContext {
-        public String identity(final String x) {
-            return x;
-        }
-        public Number identity(final Number x) {
-            return x;
-        }
-        public String[] spread(final String str) {
-            if (str == null) {
-                return null;
-            }
-             final String[] a = new String[str.length()];
-             for(int i = 0; i < str.length(); ++i) {
-                 a[i] = "" + str.charAt(i);
-             }
-             return a;
         }
     }
 
@@ -993,6 +1009,29 @@ public class Issues200Test extends JexlTestCase {
     }
 
     @Test
+    public void test298() throws Exception {
+        final Cls298 c298 = new Cls298();
+        final JexlContext ctxt = new MapContext();
+        final JexlEngine jexl = new JexlBuilder().create();
+
+        String str = "c.size()";
+        JexlScript e = jexl.createScript(str, "c");
+        Object value = e.execute(ctxt, c298);
+        Assert.assertEquals(str, 42, value);
+
+        str = "size c";
+        e = jexl.createScript(str, "c");
+        value = e.execute(ctxt, c298);
+        Assert.assertEquals(str, 42, value);
+
+        str = "c.size(127)";
+        e = jexl.createScript(str, "c");
+        value = e.execute(ctxt, c298);
+        Assert.assertEquals(str, 169, value);
+
+    }
+
+    @Test
     public void testTemplate6565a() throws Exception {
         final JexlEngine jexl = new JexlBuilder().create();
         final JxltEngine jexlt = jexl.createJxltEngine();
@@ -1036,44 +1075,5 @@ public class Issues200Test extends JexlTestCase {
         final String refactored = dbg.debug(script) ? dbg.toString() : "";
         Assert.assertNotNull(refactored);
         Assert.assertEquals(source, refactored);
-    }
-
-    public static class Cls298 {
-        int sz = 42;
-
-        public int size() {
-            return sz;
-        }
-
-        public int size(final int x) {
-            return sz + x;
-        }
-
-        public boolean isEmpty() {
-            return sz <= 0;
-        }
-    }
-
-    @Test
-    public void test298() throws Exception {
-        final Cls298 c298 = new Cls298();
-        final JexlContext ctxt = new MapContext();
-        final JexlEngine jexl = new JexlBuilder().create();
-
-        String str = "c.size()";
-        JexlScript e = jexl.createScript(str, "c");
-        Object value = e.execute(ctxt, c298);
-        Assert.assertEquals(str, 42, value);
-
-        str = "size c";
-        e = jexl.createScript(str, "c");
-        value = e.execute(ctxt, c298);
-        Assert.assertEquals(str, 42, value);
-
-        str = "c.size(127)";
-        e = jexl.createScript(str, "c");
-        value = e.execute(ctxt, c298);
-        Assert.assertEquals(str, 169, value);
-
     }
 }

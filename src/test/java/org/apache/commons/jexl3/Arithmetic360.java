@@ -33,6 +33,74 @@ public class Arithmetic360 extends JexlArithmetic {
     }
 
     /**
+     * Performs a bitwise and.
+     *
+     * @param left  the left operand
+     * @param right the right operator
+     * @return left &amp; right
+     */
+    @Override
+    public Object and(final Object left, final Object right) {
+        final Number l = asLongNumber(left);
+        final Number r = asLongNumber(right);
+        if (l != null && r != null) {
+            return narrowLong(left, right, l.longValue() & r.longValue());
+        }
+        return toBigInteger(left).and(toBigInteger(right));
+    }
+
+    /**
+     * Checks if value class is a number that can be represented exactly in a long.
+     *
+     * @param value  argument
+     * @return true if argument can be represented by a long
+     */
+    protected Number asIntNumber(final Object value) {
+        return value instanceof Integer
+                || value instanceof Short
+                || value instanceof Byte
+                ? (Number) value
+                : null;
+    }
+    /**
+     * Casts to Long if possible.
+     * @param value the Long or else
+     * @return the Long or null
+     */
+    protected Long castLongNumber(final Object value) {
+        return value instanceof Long ? (Long) value : null;
+    }
+
+    /**
+     * Performs a bitwise complement.
+     *
+     * @param val the operand
+     * @return ~val
+     */
+    @Override
+    public Object complement(final Object val) {
+        final long l = toLong(val);
+        return narrowLong(val, ~l);
+    }
+
+    /**
+     * Given a long, attempt to narrow it to an int.
+     * <p>Narrowing will only occur if the initial operand is not a Long.
+     * @param operand  the operand that lead to the long result
+     * @param result the long result to narrow
+     * @return an Integer if narrowing is possible, the original Long otherwise
+     */
+    protected Number narrowLong(final Object operand, final long result) {
+        if (!(operand instanceof Long)) {
+            final int ir = (int) result;
+            if (result == ir) {
+                return ir;
+            }
+        }
+        return result;
+    }
+
+    /**
      * Given a long, attempt to narrow it to an int.
      * <p>Narrowing will only occur if no operand is a Long.
      * @param lhs  the left-hand side operand that lead to the long result
@@ -52,62 +120,6 @@ public class Arithmetic360 extends JexlArithmetic {
     }
 
     /**
-     * Given a long, attempt to narrow it to an int.
-     * <p>Narrowing will only occur if the initial operand is not a Long.
-     * @param operand  the operand that lead to the long result
-     * @param result the long result to narrow
-     * @return an Integer if narrowing is possible, the original Long otherwise
-     */
-    protected Number narrowLong(final Object operand, final long result) {
-        if (!(operand instanceof Long)) {
-            final int ir = (int) result;
-            if (result == ir) {
-                return ir;
-            }
-        }
-        return result;
-    }
-    /**
-     * Checks if value class is a number that can be represented exactly in a long.
-     *
-     * @param value  argument
-     * @return true if argument can be represented by a long
-     */
-    protected Number asIntNumber(final Object value) {
-        return value instanceof Integer
-                || value instanceof Short
-                || value instanceof Byte
-                ? (Number) value
-                : null;
-    }
-
-    /**
-     * Casts to Long if possible.
-     * @param value the Long or else
-     * @return the Long or null
-     */
-    protected Long castLongNumber(final Object value) {
-        return value instanceof Long ? (Long) value : null;
-    }
-
-    /**
-     * Performs a bitwise and.
-     *
-     * @param left  the left operand
-     * @param right the right operator
-     * @return left &amp; right
-     */
-    @Override
-    public Object and(final Object left, final Object right) {
-        final Number l = asLongNumber(left);
-        final Number r = asLongNumber(right);
-        if (l != null && r != null) {
-            return narrowLong(left, right, l.longValue() & r.longValue());
-        }
-        return toBigInteger(left).and(toBigInteger(right));
-    }
-
-    /**
      * Performs a bitwise or.
      *
      * @param left  the left operand
@@ -122,35 +134,6 @@ public class Arithmetic360 extends JexlArithmetic {
             return narrowLong(left, right, l.longValue() | r.longValue());
         }
         return toBigInteger(left).or(toBigInteger(right));
-    }
-
-    /**
-     * Performs a bitwise xor.
-     *
-     * @param left  the left operand
-     * @param right the right operator
-     * @return left ^ right
-     */
-    @Override
-    public Object xor(final Object left, final Object right) {
-        final Number l = asLongNumber(left);
-        final Number r = asLongNumber(right);
-        if (l != null && r != null) {
-            return narrowLong(left, right, l.longValue() ^ r.longValue());
-        }
-        return toBigInteger(left).xor(toBigInteger(right));
-    }
-
-    /**
-     * Performs a bitwise complement.
-     *
-     * @param val the operand
-     * @return ~val
-     */
-    @Override
-    public Object complement(final Object val) {
-        final long l = toLong(val);
-        return narrowLong(val, ~l);
     }
 
     /**
@@ -224,6 +207,23 @@ public class Arithmetic360 extends JexlArithmetic {
         }
         final BigInteger bl = toBigInteger(left);
         return bl.signum() < 0? bl.negate().shiftRight(r) : bl.shiftRight(r);
+    }
+
+    /**
+     * Performs a bitwise xor.
+     *
+     * @param left  the left operand
+     * @param right the right operator
+     * @return left ^ right
+     */
+    @Override
+    public Object xor(final Object left, final Object right) {
+        final Number l = asLongNumber(left);
+        final Number r = asLongNumber(right);
+        if (l != null && r != null) {
+            return narrowLong(left, right, l.longValue() ^ r.longValue());
+        }
+        return toBigInteger(left).xor(toBigInteger(right));
     }
 
 }

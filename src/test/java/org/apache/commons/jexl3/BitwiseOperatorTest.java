@@ -28,13 +28,6 @@ import org.junit.Test;
 public class BitwiseOperatorTest extends JexlTestCase {
     private Asserter asserter;
 
-    @Override
-    @Before
-    public void setUp() {
-        asserter = new Asserter(JEXL);
-        asserter.setStrict(false, false);
-    }
-
     /**
      * Create the named test.
      */
@@ -42,19 +35,11 @@ public class BitwiseOperatorTest extends JexlTestCase {
         super("BitwiseOperatorTest");
     }
 
-    @Test
-    public void testAndWithTwoNulls() throws Exception {
-        asserter.assertExpression("null & null", Long.valueOf(0));
-    }
-
-    @Test
-    public void testAndWithLeftNull() throws Exception {
-        asserter.assertExpression("null & 1", Long.valueOf(0));
-    }
-
-    @Test
-    public void testAndWithRightNull() throws Exception {
-        asserter.assertExpression("1 & null", Long.valueOf(0));
+    @Override
+    @Before
+    public void setUp() {
+        asserter = new Asserter(JEXL);
+        asserter.setStrict(false, false);
     }
 
     @Test
@@ -77,8 +62,18 @@ public class BitwiseOperatorTest extends JexlTestCase {
     }
 
     @Test
-    public void testComplementWithNull() throws Exception {
-        asserter.assertExpression("~null", Long.valueOf(-1));
+    public void testAndWithLeftNull() throws Exception {
+        asserter.assertExpression("null & 1", Long.valueOf(0));
+    }
+
+    @Test
+    public void testAndWithRightNull() throws Exception {
+        asserter.assertExpression("1 & null", Long.valueOf(0));
+    }
+
+    @Test
+    public void testAndWithTwoNulls() throws Exception {
+        asserter.assertExpression("null & null", Long.valueOf(0));
     }
 
     @Test
@@ -99,18 +94,8 @@ public class BitwiseOperatorTest extends JexlTestCase {
     }
 
     @Test
-    public void testOrWithTwoNulls() throws Exception {
-        asserter.assertExpression("null | null", Long.valueOf(0));
-    }
-
-    @Test
-    public void testOrWithLeftNull() throws Exception {
-        asserter.assertExpression("null | 1", Long.valueOf(1));
-    }
-
-    @Test
-    public void testOrWithRightNull() throws Exception {
-        asserter.assertExpression("1 | null", Long.valueOf(1));
+    public void testComplementWithNull() throws Exception {
+        asserter.assertExpression("~null", Long.valueOf(-1));
     }
 
     @Test
@@ -133,18 +118,25 @@ public class BitwiseOperatorTest extends JexlTestCase {
     }
 
     @Test
-    public void testXorWithTwoNulls() throws Exception {
-        asserter.assertExpression("null ^ null", Long.valueOf(0));
+    public void testOrWithLeftNull() throws Exception {
+        asserter.assertExpression("null | 1", Long.valueOf(1));
     }
 
     @Test
-    public void testXorWithLeftNull() throws Exception {
-        asserter.assertExpression("null ^ 1", Long.valueOf(1));
+    public void testOrWithRightNull() throws Exception {
+        asserter.assertExpression("1 | null", Long.valueOf(1));
     }
 
     @Test
-    public void testXorWithRightNull() throws Exception {
-        asserter.assertExpression("1 ^ null", Long.valueOf(1));
+    public void testOrWithTwoNulls() throws Exception {
+        asserter.assertExpression("null | null", Long.valueOf(0));
+    }
+
+    @Test
+    public void testParenthesized() throws Exception {
+        asserter.assertExpression("(2 | 1) & 3", Long.valueOf(3L));
+        asserter.assertExpression("(2 & 1) | 3", Long.valueOf(3L));
+        asserter.assertExpression("~(120 | 42)", Long.valueOf(~(120 | 42)));
     }
 
     @Test
@@ -167,10 +159,18 @@ public class BitwiseOperatorTest extends JexlTestCase {
     }
 
     @Test
-    public void testParenthesized() throws Exception {
-        asserter.assertExpression("(2 | 1) & 3", Long.valueOf(3L));
-        asserter.assertExpression("(2 & 1) | 3", Long.valueOf(3L));
-        asserter.assertExpression("~(120 | 42)", Long.valueOf(~(120 | 42)));
+    public void testXorWithLeftNull() throws Exception {
+        asserter.assertExpression("null ^ 1", Long.valueOf(1));
+    }
+
+    @Test
+    public void testXorWithRightNull() throws Exception {
+        asserter.assertExpression("1 ^ null", Long.valueOf(1));
+    }
+
+    @Test
+    public void testXorWithTwoNulls() throws Exception {
+        asserter.assertExpression("null ^ null", Long.valueOf(0));
     }
 
 }

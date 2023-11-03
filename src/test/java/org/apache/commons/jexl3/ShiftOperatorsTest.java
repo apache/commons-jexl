@@ -27,6 +27,35 @@ import org.junit.Test;
  */
 @SuppressWarnings({"UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
 public class ShiftOperatorsTest extends JexlTestCase {
+    public static class ShiftArithmetic extends JexlArithmetic {
+        ShiftArithmetic(final boolean flag) {
+            super(flag);
+        }
+
+        public Object shiftLeft(final StringBuilder c, final String value) {
+            c.append(value);
+            return c;
+        }
+
+        public Object shiftRight(final String value, final StringBuilder c) {
+            c.append(value);
+            return c;
+        }
+
+        public Object shiftRightUnsigned(final String value, final StringBuilder c) {
+            c.append(value.toLowerCase());
+            return c;
+        }
+    }
+
+    static BigInteger shiftRightUnsigned(final BigInteger bl, final int r) {
+        return bl.signum() < 0 ? bl.negate().shiftRight(r) : bl.shiftRight(r);
+    }
+
+    static BigInteger shiftRightUnsigned(final String bl, final int r) {
+        return shiftRightUnsigned(new BigInteger(bl), r);
+    }
+
     private final Asserter asserter;
 
     private final Asserter a360;
@@ -61,91 +90,11 @@ public class ShiftOperatorsTest extends JexlTestCase {
     }
 
     @Test
-    public void testRightShiftIntValue() throws Exception {
-        final String expr = "(x, y)-> x >> y";
-        asserter.assertExpression(expr, 42L >> 2, 42L, 2);
-        asserter.assertExpression(expr, 42L >> -2, 42L, -2);
-        asserter.assertExpression(expr, -42L >> 2, -42L, 2);
-        asserter.assertExpression(expr, -42L >> -2, -42L, -2);
-
-        a360.assertExpression(expr, 42L >> 2, 42L, 2);
-        a360.assertExpression(expr, 42L >> -2, 42L, -2);
-        a360.assertExpression(expr, -42L >> 2, -42L, 2);
-        a360.assertExpression(expr, -42L >> -2, -42L, -2);
-
-        a360.assertExpression(expr, 42 >> 2, 42, 2);
-        a360.assertExpression(expr, 42 >> -2, 42, -2);
-        a360.assertExpression(expr, -42 >> 2, -42, 2);
-        a360.assertExpression(expr, -42 >> -2, -42, -2);
-    }
-
-    @Test
-    public void testRightShiftUnsignedIntValue() throws Exception {
-        final String expr = "(x, y)-> x >>> y";
-        asserter.assertExpression(expr, 42L >>> 2, 42L, 2);
-        asserter.assertExpression(expr, 42L >>> -2, 42L, -2);
-        asserter.assertExpression(expr, -42L >>> 2, -42L, 2);
-        asserter.assertExpression(expr, -42L >>> -2, -42L, -2);
-    }
-
-    @Test
     public void testLeftShiftLongValue() throws Exception {
         a360.assertExpression("2147483648 << 2", 2147483648L << 2);
         a360.assertExpression("2147483648 << -2", 2147483648L << -2);
         a360.assertExpression("-2147483649 << 2", -2147483649L << 2);
         a360.assertExpression("-2147483649 << -2", -2147483649L << -2);
-    }
-
-    @Test
-    public void testRightShiftLongValue() throws Exception {
-        a360.assertExpression("8589934592 >> 2", 8589934592L >> 2);
-        a360.assertExpression("8589934592 >> -2", 8589934592L >> -2);
-        a360.assertExpression("-8589934592 >> 2", -8589934592L >> 2);
-        a360.assertExpression("-8589934592 >> -2", -8589934592L >> -2);
-    }
-
-    @Test
-    public void testRightShiftBigValue() throws Exception {
-        a360.assertExpression( "9223372036854775808 >> 2", new BigInteger("9223372036854775808").shiftRight(2));
-        a360.assertExpression("9223372036854775808 >> -2", new BigInteger("9223372036854775808").shiftRight(-2));
-        a360.assertExpression("-9223372036854775809 >> 2", new BigInteger("-9223372036854775809").shiftRight(2));
-        a360.assertExpression("-9223372036854775809 >> -2", new BigInteger("-9223372036854775809").shiftRight(-2));
-    }
-
-    static BigInteger shiftRightUnsigned(final String bl, final int r) {
-        return shiftRightUnsigned(new BigInteger(bl), r);
-    }
-    static BigInteger shiftRightUnsigned(final BigInteger bl, final int r) {
-        return bl.signum() < 0 ? bl.negate().shiftRight(r) : bl.shiftRight(r);
-    }
-
-    @Test
-    public void testRightShiftUnsignedBigValue() throws Exception {
-        a360.assertExpression( "9223372036854775808 >>> 2", shiftRightUnsigned("9223372036854775808", 2));
-        a360.assertExpression("9223372036854775808 >>> -2", shiftRightUnsigned("9223372036854775808",-2));
-        a360.assertExpression("-9223372036854775809 >>> 2", shiftRightUnsigned("-9223372036854775809", 2));
-        a360.assertExpression("-9223372036854775809 >>> -2", shiftRightUnsigned("-9223372036854775809",-2));
-    }
-
-    public static class ShiftArithmetic extends JexlArithmetic {
-        ShiftArithmetic(final boolean flag) {
-            super(flag);
-        }
-
-        public Object shiftLeft(final StringBuilder c, final String value) {
-            c.append(value);
-            return c;
-        }
-
-        public Object shiftRight(final String value, final StringBuilder c) {
-            c.append(value);
-            return c;
-        }
-
-        public Object shiftRightUnsigned(final String value, final StringBuilder c) {
-            c.append(value.toLowerCase());
-            return c;
-        }
     }
 
     @Test
@@ -184,6 +133,57 @@ public class ShiftOperatorsTest extends JexlTestCase {
         a360.assertExpression("40L + 2 << 1 + 1", 40L + 2L << 1 + 1);
         a360.assertExpression("40L + (2 << 1) + 1", 40L + (2L << 1) + 1);
         a360.assertExpression("(40L + 2) << (1 + 1)", 40L + 2L << 1 + 1);
+    }
+    @Test
+    public void testRightShiftBigValue() throws Exception {
+        a360.assertExpression( "9223372036854775808 >> 2", new BigInteger("9223372036854775808").shiftRight(2));
+        a360.assertExpression("9223372036854775808 >> -2", new BigInteger("9223372036854775808").shiftRight(-2));
+        a360.assertExpression("-9223372036854775809 >> 2", new BigInteger("-9223372036854775809").shiftRight(2));
+        a360.assertExpression("-9223372036854775809 >> -2", new BigInteger("-9223372036854775809").shiftRight(-2));
+    }
+
+    @Test
+    public void testRightShiftIntValue() throws Exception {
+        final String expr = "(x, y)-> x >> y";
+        asserter.assertExpression(expr, 42L >> 2, 42L, 2);
+        asserter.assertExpression(expr, 42L >> -2, 42L, -2);
+        asserter.assertExpression(expr, -42L >> 2, -42L, 2);
+        asserter.assertExpression(expr, -42L >> -2, -42L, -2);
+
+        a360.assertExpression(expr, 42L >> 2, 42L, 2);
+        a360.assertExpression(expr, 42L >> -2, 42L, -2);
+        a360.assertExpression(expr, -42L >> 2, -42L, 2);
+        a360.assertExpression(expr, -42L >> -2, -42L, -2);
+
+        a360.assertExpression(expr, 42 >> 2, 42, 2);
+        a360.assertExpression(expr, 42 >> -2, 42, -2);
+        a360.assertExpression(expr, -42 >> 2, -42, 2);
+        a360.assertExpression(expr, -42 >> -2, -42, -2);
+    }
+
+    @Test
+    public void testRightShiftLongValue() throws Exception {
+        a360.assertExpression("8589934592 >> 2", 8589934592L >> 2);
+        a360.assertExpression("8589934592 >> -2", 8589934592L >> -2);
+        a360.assertExpression("-8589934592 >> 2", -8589934592L >> 2);
+        a360.assertExpression("-8589934592 >> -2", -8589934592L >> -2);
+    }
+
+    @Test
+    public void testRightShiftUnsignedBigValue() throws Exception {
+        a360.assertExpression( "9223372036854775808 >>> 2", shiftRightUnsigned("9223372036854775808", 2));
+        a360.assertExpression("9223372036854775808 >>> -2", shiftRightUnsigned("9223372036854775808",-2));
+        a360.assertExpression("-9223372036854775809 >>> 2", shiftRightUnsigned("-9223372036854775809", 2));
+        a360.assertExpression("-9223372036854775809 >>> -2", shiftRightUnsigned("-9223372036854775809",-2));
+    }
+
+    @Test
+    public void testRightShiftUnsignedIntValue() throws Exception {
+        final String expr = "(x, y)-> x >>> y";
+        asserter.assertExpression(expr, 42L >>> 2, 42L, 2);
+        asserter.assertExpression(expr, 42L >>> -2, 42L, -2);
+        asserter.assertExpression(expr, -42L >>> 2, -42L, 2);
+        asserter.assertExpression(expr, -42L >>> -2, -42L, -2);
     }
 
 }

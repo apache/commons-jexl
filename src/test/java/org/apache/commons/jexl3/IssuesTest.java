@@ -31,29 +31,6 @@ import org.junit.Test;
  */
 @SuppressWarnings({"boxing", "UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
 public class IssuesTest extends JexlTestCase {
-    public IssuesTest() {
-        super("IssuesTest", null);
-    }
-
-    @Before
-    @Override
-    public void setUp() throws Exception {
-        // ensure jul logging is only error to avoid warning in silent mode
-        java.util.logging.Logger.getLogger(JexlEngine.class.getName()).setLevel(java.util.logging.Level.SEVERE);
-    }
-
-    // JEXL-49: blocks not parsed (fixed)
-    @Test
-    public void test49() throws Exception {
-        final JexlEngine jexl = new Engine();
-        final Map<String, Object> vars = new HashMap<>();
-        final JexlContext ctxt = new MapContext(vars);
-        final String stmt = "a = 'b'; c = 'd';";
-        final JexlScript expr = jexl.createScript(stmt);
-        /* Object value = */ expr.execute(ctxt);
-        Assert.assertTrue("JEXL-49 is not fixed", vars.get("a").equals("b") && vars.get("c").equals("d"));
-    }
-
     // JEXL-48: bad assignment detection
     public static class Another {
         public String name = "whatever";
@@ -66,82 +43,6 @@ public class IssuesTest extends JexlTestCase {
         public int goo() {
             return 100;
         }
-    }
-
-    public static class Foo {
-        private final Another inner;
-
-        Foo() {
-            inner = new Another();
-        }
-
-        public Another getInner() {
-            return inner;
-        }
-    }
-
-    @Test
-    public void test48() throws Exception {
-        final JexlEngine jexl = new Engine();
-        final JexlEvalContext jc = new JexlEvalContext();
-        final JexlOptions options = jc.getEngineOptions();
-        // ensure errors will throw
-        options.setStrict(true);
-        options.setSilent(false);
-        try {
-            final String jexlExp = "(foo.getInner().foo() eq true) and (foo.getInner().goo() = (foo.getInner().goo()+1-1))";
-            final JexlExpression e = jexl.createExpression(jexlExp);
-            jc.set("foo", new Foo());
-            /* Object o = */ e.evaluate(jc);
-            Assert.fail("Should have failed due to invalid assignment");
-        } catch (final JexlException.Assignment xparse) {
-            final String dbg = xparse.toString();
-        } catch (final JexlException xjexl) {
-            Assert.fail("Should have thrown a parse exception");
-        }
-    }
-
-    // JEXL-47: C style comments (single & multi line) (fixed in Parser.jjt)
-    // JEXL-44: comments don't allow double quotes (fixed in Parser.jjt)
-    @Test
-    public void test47() throws Exception {
-        final JexlEngine jexl = new Engine();
-        final JexlEvalContext ctxt = new JexlEvalContext();
-        final JexlOptions options = ctxt.getEngineOptions();
-        // ensure errors will throw
-        options.setSilent(false);
-
-        JexlExpression expr = jexl.createExpression("true//false\n");
-        Object value = expr.evaluate(ctxt);
-        Assert.assertTrue("should be true", (Boolean) value);
-
-        expr = jexl.createExpression("/*true*/false");
-        value = expr.evaluate(ctxt);
-        Assert.assertFalse("should be false", (Boolean) value);
-
-        expr = jexl.createExpression("/*\"true\"*/false");
-        value = expr.evaluate(ctxt);
-        Assert.assertFalse("should be false", (Boolean) value);
-    }
-
-    // JEXL-42: NullPointerException evaluating an expression
-    // fixed in JexlArithmetic by allowing add operator to deal with string, null
-    @Test
-    public void test42() throws Exception {
-        final JexlEngine jexl = new JexlBuilder().create();
-        final JxltEngine uel = jexl.createJxltEngine();
-        // ensure errors will throw
-        //jexl.setSilent(false);
-        final JexlEvalContext ctxt = new JexlEvalContext();
-        final JexlOptions options = ctxt.getEngineOptions();
-        options.set(jexl);
-        options.setStrict(false);
-        options.setStrictArithmetic(false);
-        ctxt.set("ax", "ok");
-
-        final JxltEngine.Expression expr = uel.createExpression("${ax+(bx)}");
-        final Object value = expr.evaluate(ctxt);
-        Assert.assertEquals("should be ok", "ok", value);
     }
 
     // JEXL-40: failed to discover all methods (non public class implements public method)
@@ -157,47 +58,33 @@ public class IssuesTest extends JexlTestCase {
         }
     }
 
-    @Test
-    public void test40() throws Exception {
-        final JexlEngine jexl = new Engine();
-        final JexlEvalContext ctxt = new JexlEvalContext();
-        final JexlOptions options = ctxt.getEngineOptions();
-        options.set(jexl);
-        // ensure errors will throw
-        options.setSilent(false);
-
-        ctxt.set("derived", new Derived());
-
-        final JexlExpression expr = jexl.createExpression("derived.foo()");
-        final Object value = expr.evaluate(ctxt);
-        Assert.assertTrue("should be true", (Boolean) value);
+    public static class fn98 {
+        public String replace(final String str, final String target, final String replacement) {
+            return str.replace(target, replacement);
+        }
     }
 
-    // JEXL-52: can be implemented by deriving Interpreter.{g,s}etAttribute; later
-    @Test
-    public void test52base() throws Exception {
-        final Engine jexl = (Engine) createEngine(false);
-        final Uberspect uber = (Uberspect) jexl.getUberspect();
-        // most likely, call will be in an Interpreter, getUberspect
-        String[] names = uber.getMethodNames(Another.class);
-        Assert.assertTrue("should find methods", names.length > 0);
-        int found = 0;
-        for (final String name : names) {
-            if ("foo".equals(name) || "goo".equals(name)) {
-                found += 1;
-            }
-        }
-        Assert.assertEquals("should have foo & goo", 2, found);
+    public static class Foo {
+        private final Another inner;
 
-        names = uber.getFieldNames(Another.class);
-        Assert.assertTrue("should find fields", names.length > 0);
-        found = 0;
-        for (final String name : names) {
-            if ("name".equals(name)) {
-                found += 1;
-            }
+        Foo() {
+            inner = new Another();
         }
-        Assert.assertEquals("should have name", 1, found);
+
+        public Another getInner() {
+            return inner;
+        }
+    }
+
+    public IssuesTest() {
+        super("IssuesTest", null);
+    }
+
+    @Before
+    @Override
+    public void setUp() throws Exception {
+        // ensure jul logging is only error to avoid warning in silent mode
+        java.util.logging.Logger.getLogger(JexlEngine.class.getName()).setLevel(java.util.logging.Level.SEVERE);
     }
 
     // JEXL-10/JEXL-11: variable checking, null operand is error
@@ -229,6 +116,144 @@ public class IssuesTest extends JexlTestCase {
                 // expected
             }
         }
+    }
+
+    @Test
+    public void test40() throws Exception {
+        final JexlEngine jexl = new Engine();
+        final JexlEvalContext ctxt = new JexlEvalContext();
+        final JexlOptions options = ctxt.getEngineOptions();
+        options.set(jexl);
+        // ensure errors will throw
+        options.setSilent(false);
+
+        ctxt.set("derived", new Derived());
+
+        final JexlExpression expr = jexl.createExpression("derived.foo()");
+        final Object value = expr.evaluate(ctxt);
+        Assert.assertTrue("should be true", (Boolean) value);
+    }
+
+    // JEXL-42: NullPointerException evaluating an expression
+    // fixed in JexlArithmetic by allowing add operator to deal with string, null
+    @Test
+    public void test42() throws Exception {
+        final JexlEngine jexl = new JexlBuilder().create();
+        final JxltEngine uel = jexl.createJxltEngine();
+        // ensure errors will throw
+        //jexl.setSilent(false);
+        final JexlEvalContext ctxt = new JexlEvalContext();
+        final JexlOptions options = ctxt.getEngineOptions();
+        options.set(jexl);
+        options.setStrict(false);
+        options.setStrictArithmetic(false);
+        ctxt.set("ax", "ok");
+
+        final JxltEngine.Expression expr = uel.createExpression("${ax+(bx)}");
+        final Object value = expr.evaluate(ctxt);
+        Assert.assertEquals("should be ok", "ok", value);
+    }
+
+    // JEXL-44
+    @Test
+    public void test44() throws Exception {
+        final JexlEngine jexl = createEngine(false);
+        final JexlEvalContext ctxt = new JexlEvalContext();
+        final JexlOptions options = ctxt.getEngineOptions();
+        // ensure errors will throw
+        options.setSilent(false);
+        JexlScript script;
+        script = jexl.createScript("'hello world!'//commented");
+        Assert.assertEquals("hello world!", script.execute(ctxt));
+        script = jexl.createScript("'hello world!';//commented\n'bye...'");
+        Assert.assertEquals("bye...", script.execute(ctxt));
+        script = jexl.createScript("'hello world!'## commented");
+        Assert.assertEquals("hello world!", script.execute(ctxt));
+        script = jexl.createScript("'hello world!';## commented\n'bye...'");
+        Assert.assertEquals("bye...", script.execute(ctxt));
+    }
+
+    // JEXL-47: C style comments (single & multi line) (fixed in Parser.jjt)
+    // JEXL-44: comments don't allow double quotes (fixed in Parser.jjt)
+    @Test
+    public void test47() throws Exception {
+        final JexlEngine jexl = new Engine();
+        final JexlEvalContext ctxt = new JexlEvalContext();
+        final JexlOptions options = ctxt.getEngineOptions();
+        // ensure errors will throw
+        options.setSilent(false);
+
+        JexlExpression expr = jexl.createExpression("true//false\n");
+        Object value = expr.evaluate(ctxt);
+        Assert.assertTrue("should be true", (Boolean) value);
+
+        expr = jexl.createExpression("/*true*/false");
+        value = expr.evaluate(ctxt);
+        Assert.assertFalse("should be false", (Boolean) value);
+
+        expr = jexl.createExpression("/*\"true\"*/false");
+        value = expr.evaluate(ctxt);
+        Assert.assertFalse("should be false", (Boolean) value);
+    }
+
+    @Test
+    public void test48() throws Exception {
+        final JexlEngine jexl = new Engine();
+        final JexlEvalContext jc = new JexlEvalContext();
+        final JexlOptions options = jc.getEngineOptions();
+        // ensure errors will throw
+        options.setStrict(true);
+        options.setSilent(false);
+        try {
+            final String jexlExp = "(foo.getInner().foo() eq true) and (foo.getInner().goo() = (foo.getInner().goo()+1-1))";
+            final JexlExpression e = jexl.createExpression(jexlExp);
+            jc.set("foo", new Foo());
+            /* Object o = */ e.evaluate(jc);
+            Assert.fail("Should have failed due to invalid assignment");
+        } catch (final JexlException.Assignment xparse) {
+            final String dbg = xparse.toString();
+        } catch (final JexlException xjexl) {
+            Assert.fail("Should have thrown a parse exception");
+        }
+    }
+
+    // JEXL-49: blocks not parsed (fixed)
+    @Test
+    public void test49() throws Exception {
+        final JexlEngine jexl = new Engine();
+        final Map<String, Object> vars = new HashMap<>();
+        final JexlContext ctxt = new MapContext(vars);
+        final String stmt = "a = 'b'; c = 'd';";
+        final JexlScript expr = jexl.createScript(stmt);
+        /* Object value = */ expr.execute(ctxt);
+        Assert.assertTrue("JEXL-49 is not fixed", vars.get("a").equals("b") && vars.get("c").equals("d"));
+    }
+
+    // JEXL-52: can be implemented by deriving Interpreter.{g,s}etAttribute; later
+    @Test
+    public void test52base() throws Exception {
+        final Engine jexl = (Engine) createEngine(false);
+        final Uberspect uber = (Uberspect) jexl.getUberspect();
+        // most likely, call will be in an Interpreter, getUberspect
+        String[] names = uber.getMethodNames(Another.class);
+        Assert.assertTrue("should find methods", names.length > 0);
+        int found = 0;
+        for (final String name : names) {
+            if ("foo".equals(name) || "goo".equals(name)) {
+                found += 1;
+            }
+        }
+        Assert.assertEquals("should have foo & goo", 2, found);
+
+        names = uber.getFieldNames(Another.class);
+        Assert.assertTrue("should find fields", names.length > 0);
+        found = 0;
+        for (final String name : names) {
+            if ("name".equals(name)) {
+                found += 1;
+            }
+        }
+        Assert.assertEquals("should have name", 1, found);
     }
 
     // JEXL-62
@@ -327,25 +352,6 @@ public class IssuesTest extends JexlTestCase {
         debuggerCheck(jexl);
     }
 
-    // JEXL-44
-    @Test
-    public void test44() throws Exception {
-        final JexlEngine jexl = createEngine(false);
-        final JexlEvalContext ctxt = new JexlEvalContext();
-        final JexlOptions options = ctxt.getEngineOptions();
-        // ensure errors will throw
-        options.setSilent(false);
-        JexlScript script;
-        script = jexl.createScript("'hello world!'//commented");
-        Assert.assertEquals("hello world!", script.execute(ctxt));
-        script = jexl.createScript("'hello world!';//commented\n'bye...'");
-        Assert.assertEquals("bye...", script.execute(ctxt));
-        script = jexl.createScript("'hello world!'## commented");
-        Assert.assertEquals("hello world!", script.execute(ctxt));
-        script = jexl.createScript("'hello world!';## commented\n'bye...'");
-        Assert.assertEquals("bye...", script.execute(ctxt));
-    }
-
     @Test
     public void test97() throws Exception {
         final JexlEngine jexl = createEngine(false);
@@ -369,12 +375,6 @@ public class IssuesTest extends JexlTestCase {
         final double millisec = (end - start) / 1e6;
         final double limit = 200.0; // Allow plenty of slack
         Assert.assertTrue("Expected parse to take less than " + limit + "ms, actual " + millisec, millisec < limit);
-    }
-
-    public static class fn98 {
-        public String replace(final String str, final String target, final String replacement) {
-            return str.replace(target, replacement);
-        }
     }
 
     @Test

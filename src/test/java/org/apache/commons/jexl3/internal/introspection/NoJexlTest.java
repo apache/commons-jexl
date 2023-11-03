@@ -36,17 +36,6 @@ public class NoJexlTest {
         public int method() { return 0; }
     }
 
-    @NoJexl
-    public interface InterNoJexl0 {
-        int method();
-    }
-
-    public interface InterNoJexl1 {
-        @NoJexl
-        int method();
-    }
-
-
     public static class A0 extends A implements InterNoJexl0 {
         @NoJexl public int i0;
         @NoJexl public A0() {}
@@ -58,6 +47,7 @@ public class NoJexlTest {
         @NoJexl public A1() {}
         @Override public int method() { return 2; }
     }
+
 
     @NoJexl
     public static class A2 extends A  {
@@ -74,6 +64,16 @@ public class NoJexlTest {
     public static class A5 implements InterNoJexl5 {
         public A5() {}
         @Override public int method() { return 0; }
+    }
+
+    @NoJexl
+    public interface InterNoJexl0 {
+        int method();
+    }
+
+    public interface InterNoJexl1 {
+        @NoJexl
+        int method();
     }
 
     @NoJexl

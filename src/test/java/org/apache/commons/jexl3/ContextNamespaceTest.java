@@ -30,8 +30,41 @@ import org.junit.Test;
 @SuppressWarnings({"AssertEqualsBetweenInconvertibleTypes"})
 public class ContextNamespaceTest extends JexlTestCase {
 
-    public ContextNamespaceTest() {
-        super("ContextNamespaceTest");
+    public static class Context346 extends MapContext {
+        public int func(final int y) { return 42 * y;}
+    }
+
+    public static class ContextNs348 extends MapContext implements JexlContext.NamespaceResolver {
+        ContextNs348() { }
+
+        @Override
+        public Object resolveNamespace(final String name) {
+            return "ns".equals(name)? new Ns348() : null;
+        }
+    }
+
+    public static class Ns348 {
+        public static int func(final int y) { return 42 * y;}
+    }
+
+    public static class NsNs {
+        private final int constVar;
+        public NsNs(final JexlContext ctxt) {
+            nsnsCtor.incrementAndGet();
+            final Object n = ctxt.get("NUMBER");
+            constVar = n instanceof Number ? ((Number) n).intValue() : -1;
+        }
+
+        public int callIt(final int n) {
+            return n + constVar;
+        }
+    }
+
+    public static class StaticNs {
+        public static int callIt(final int n) {
+            return n + 19;
+        }
+        private StaticNs() { }
     }
 
     /*
@@ -40,12 +73,12 @@ public class ContextNamespaceTest extends JexlTestCase {
     public static class Taxes {
         private final double vat;
 
-        public Taxes(final TaxesContext ctxt) {
-            vat = ctxt.getVAT();
-        }
-
         public Taxes(final double d) {
             vat = d;
+        }
+
+        public Taxes(final TaxesContext ctxt) {
+            vat = ctxt.getVAT();
         }
 
         public double vat(final double n) {
@@ -64,6 +97,10 @@ public class ContextNamespaceTest extends JexlTestCase {
             this.vat = vat;
         }
 
+        public double getVAT() {
+            return vat;
+        }
+
         @Override
         public Object resolveNamespace(final String name) {
             if ("taxes".equals(name)) {
@@ -74,131 +111,42 @@ public class ContextNamespaceTest extends JexlTestCase {
             }
             return null;
         }
+    }
+
+    public static class Vat {
+        private double vat;
+
+        Vat(final double vat) {
+            this.vat = vat;
+        }
+
+        public double getvat() {
+            throw new UnsupportedOperationException("no way");
+        }
 
         public double getVAT() {
             return vat;
         }
-    }
 
-    @Test
-    public void testThreadedContext() {
-        final JexlEngine jexl = new JexlBuilder().create();
-        final JexlContext context = new TaxesContext(18.6);
-        final String strs = "taxes:vat(1000)";
-        final JexlScript staxes = jexl.createScript(strs);
-        final Object result = staxes.execute(context);
-        Assert.assertEquals(186., result);
-    }
+        public void setvat(final double vat) {
+            throw new UnsupportedOperationException("no way");
+        }
 
-    @Test
-    public void testNamespacePragma() {
-        final JexlEngine jexl = new JexlBuilder().create();
-        final JexlContext context = new TaxesContext(18.6);
-        // local namespace tax declared
-        final String strs =
-                  "#pragma jexl.namespace.tax org.apache.commons.jexl3.ContextNamespaceTest$Taxes\n"
-                + "tax:vat(2000)";
-        final JexlScript staxes = jexl.createScript(strs);
-        final Object result = staxes.execute(context);
-        Assert.assertEquals(372., result);
-    }
-
-    public static class Context346 extends MapContext {
-        public int func(final int y) { return 42 * y;}
-    }
-
-    @Test
-    public void testNamespace346a() {
-        final JexlContext ctxt = new Context346();
-        final JexlEngine jexl = new JexlBuilder().safe(false).create();
-        final String src = "x != null ? x : func(y)";
-        final JexlScript script = jexl.createScript(src,"x","y");
-        Object result = script.execute(ctxt, null, 1);
-        Assert.assertEquals(42, result);
-        result = script.execute(ctxt, 169, -169);
-        Assert.assertEquals(169, result);
-    }
-
-    @Test
-    public void testNamespace346b() {
-        final JexlContext ctxt = new MapContext();
-        final Map<String, Object> ns = new HashMap<>();
-        ns.put("x", Math.class);
-        ns.put(null, Math.class);
-        final JexlEngine jexl = new JexlBuilder().safe(false).namespaces(ns).create();
-        final String src = "x != null ? x : abs(y)";
-        final JexlScript script = jexl.createScript(src,"x","y");
-        Object result = script.execute(ctxt, null, 42);
-        Assert.assertEquals(42, result);
-        result = script.execute(ctxt, 169, -169);
-        Assert.assertEquals(169, result);
-    }
-
-    public static class Ns348 {
-        public static int func(final int y) { return 42 * y;}
-    }
-
-    public static class ContextNs348 extends MapContext implements JexlContext.NamespaceResolver {
-        ContextNs348() { }
-
-        @Override
-        public Object resolveNamespace(final String name) {
-            return "ns".equals(name)? new Ns348() : null;
+        public void setVAT(final double vat) {
+            this.vat = vat;
         }
     }
 
-    @Test
-    public void testNamespace348a() {
-        final JexlContext ctxt = new MapContext();
-        final Map<String, Object> ns = new HashMap<>();
-        ns.put("ns", Ns348.class);
-        final JexlEngine jexl = new JexlBuilder().safe(false).namespaces(ns).create();
-        run348a(jexl, ctxt);
-        run348b(jexl, ctxt);
-        run348c(jexl, ctxt);
-        run348d(jexl, ctxt);
-    }
+    static AtomicInteger nsnsCtor = new AtomicInteger(0);
 
-    @Test
-    public void testNamespace348b() {
-        final JexlContext ctxt = new ContextNs348();
-        final JexlEngine jexl = new JexlBuilder().safe(false).create();
-        // no space for ns name as syntactic hint
-        run348a(jexl, ctxt, "ns:");
-        run348b(jexl, ctxt, "ns:");
-        run348c(jexl, ctxt, "ns:");
-        run348d(jexl, ctxt, "ns:");
-    }
-
-    @Test
-    public void testNamespace348c() {
-        final JexlContext ctxt = new ContextNs348();
-        final Map<String, Object> ns = new HashMap<>();
-        ns.put("ns", Ns348.class);
-        final JexlFeatures f = new JexlFeatures();
-        f.namespaceTest(n -> true);
-        final JexlEngine jexl = new JexlBuilder().namespaces(ns).features(f).safe(false).create();
-        run348a(jexl, ctxt);
-        run348b(jexl, ctxt);
-        run348c(jexl, ctxt);
-        run348d(jexl, ctxt);
-    }
-
-    @Test
-    public void testNamespace348d() {
-        final JexlContext ctxt = new ContextNs348();
-        final JexlFeatures f = new JexlFeatures();
-        f.namespaceTest(n -> true);
-        final JexlEngine jexl = new JexlBuilder().features(f).safe(false).create();
-        run348a(jexl, ctxt);
-        run348b(jexl, ctxt);
-        run348c(jexl, ctxt);
-        run348d(jexl, ctxt);
+    public ContextNamespaceTest() {
+        super("ContextNamespaceTest");
     }
 
     private void run348a(final JexlEngine jexl, final JexlContext ctxt) {
         run348a(jexl, ctxt, "ns : ");
     }
+
     private void run348a(final JexlEngine jexl, final JexlContext ctxt, final String ns) {
         final String src = "empty(x) ? "+ns+"func(y) : z";
         // local vars
@@ -212,6 +160,7 @@ public class ContextNamespaceTest extends JexlTestCase {
     private void run348b(final JexlEngine jexl, final JexlContext ctxt) {
         run348b(jexl, ctxt, "ns : ");
     }
+
     private void run348b(final JexlEngine jexl, final JexlContext ctxt, final String ns) {
         final String src = "empty(x) ? "+ns+"func(y) : z";
         // global vars
@@ -264,6 +213,118 @@ public class ContextNamespaceTest extends JexlTestCase {
         Assert.assertEquals(src,42, result);
     }
 
+    private void runNsNsContext(final Map<String,Object> nsMap) {
+        final JexlContext ctxt = new MapContext();
+        ctxt.set("NUMBER", 19);
+        final JexlEngine jexl = new JexlBuilder().strict(true).silent(false).cache(32)
+                .namespaces(nsMap).create();
+        final JexlScript script = jexl.createScript("x ->{ nsns:callIt(x); nsns:callIt(x); }");
+        Number result = (Number) script.execute(ctxt, 23);
+        Assert.assertEquals(42, result);
+        Assert.assertEquals(1, nsnsCtor.get());
+        result = (Number) script.execute(ctxt, 623);
+        Assert.assertEquals(642, result);
+        Assert.assertEquals(2, nsnsCtor.get());
+    }
+    private void runStaticNsContext(final Map<String,Object> nsMap) {
+        final JexlContext ctxt = new MapContext();
+        final JexlEngine jexl = new JexlBuilder().strict(true).silent(false).cache(32)
+                .namespaces(nsMap).create();
+        final JexlScript script = jexl.createScript("x ->{ sns:callIt(x); sns:callIt(x); }");
+        Number result = (Number) script.execute(ctxt, 23);
+        Assert.assertEquals(42, result);
+        result = (Number) script.execute(ctxt, 623);
+        Assert.assertEquals(642, result);
+    }
+
+    @Test
+    public void testNamespace346a() {
+        final JexlContext ctxt = new Context346();
+        final JexlEngine jexl = new JexlBuilder().safe(false).create();
+        final String src = "x != null ? x : func(y)";
+        final JexlScript script = jexl.createScript(src,"x","y");
+        Object result = script.execute(ctxt, null, 1);
+        Assert.assertEquals(42, result);
+        result = script.execute(ctxt, 169, -169);
+        Assert.assertEquals(169, result);
+    }
+    @Test
+    public void testNamespace346b() {
+        final JexlContext ctxt = new MapContext();
+        final Map<String, Object> ns = new HashMap<>();
+        ns.put("x", Math.class);
+        ns.put(null, Math.class);
+        final JexlEngine jexl = new JexlBuilder().safe(false).namespaces(ns).create();
+        final String src = "x != null ? x : abs(y)";
+        final JexlScript script = jexl.createScript(src,"x","y");
+        Object result = script.execute(ctxt, null, 42);
+        Assert.assertEquals(42, result);
+        result = script.execute(ctxt, 169, -169);
+        Assert.assertEquals(169, result);
+    }
+
+    @Test
+    public void testNamespace348a() {
+        final JexlContext ctxt = new MapContext();
+        final Map<String, Object> ns = new HashMap<>();
+        ns.put("ns", Ns348.class);
+        final JexlEngine jexl = new JexlBuilder().safe(false).namespaces(ns).create();
+        run348a(jexl, ctxt);
+        run348b(jexl, ctxt);
+        run348c(jexl, ctxt);
+        run348d(jexl, ctxt);
+    }
+
+    @Test
+    public void testNamespace348b() {
+        final JexlContext ctxt = new ContextNs348();
+        final JexlEngine jexl = new JexlBuilder().safe(false).create();
+        // no space for ns name as syntactic hint
+        run348a(jexl, ctxt, "ns:");
+        run348b(jexl, ctxt, "ns:");
+        run348c(jexl, ctxt, "ns:");
+        run348d(jexl, ctxt, "ns:");
+    }
+
+    @Test
+    public void testNamespace348c() {
+        final JexlContext ctxt = new ContextNs348();
+        final Map<String, Object> ns = new HashMap<>();
+        ns.put("ns", Ns348.class);
+        final JexlFeatures f = new JexlFeatures();
+        f.namespaceTest(n -> true);
+        final JexlEngine jexl = new JexlBuilder().namespaces(ns).features(f).safe(false).create();
+        run348a(jexl, ctxt);
+        run348b(jexl, ctxt);
+        run348c(jexl, ctxt);
+        run348d(jexl, ctxt);
+    }
+
+    @Test
+    public void testNamespace348d() {
+        final JexlContext ctxt = new ContextNs348();
+        final JexlFeatures f = new JexlFeatures();
+        f.namespaceTest(n -> true);
+        final JexlEngine jexl = new JexlBuilder().features(f).safe(false).create();
+        run348a(jexl, ctxt);
+        run348b(jexl, ctxt);
+        run348c(jexl, ctxt);
+        run348d(jexl, ctxt);
+    }
+
+    @Test
+    public void testNamespacePragma() {
+        final JexlEngine jexl = new JexlBuilder().create();
+        final JexlContext context = new TaxesContext(18.6);
+        // local namespace tax declared
+        final String strs =
+                  "#pragma jexl.namespace.tax org.apache.commons.jexl3.ContextNamespaceTest$Taxes\n"
+                + "tax:vat(2000)";
+        final JexlScript staxes = jexl.createScript(strs);
+        final Object result = staxes.execute(context);
+        Assert.assertEquals(372., result);
+    }
+
     @Test
     public void testNamespacePragmaString() {
         final JexlEngine jexl = new JexlBuilder().create();
@@ -277,28 +338,17 @@ public class ContextNamespaceTest extends JexlTestCase {
         Assert.assertEquals("0042", result);
     }
 
-    public static class Vat {
-        private double vat;
+    @Test
+    public void testNsNsContext0() {
+        nsnsCtor.set(0);
+        final String clsName = NsNs.class.getName();
+        runNsNsContext(Collections.singletonMap("nsns", clsName));
+    }
 
-        Vat(final double vat) {
-            this.vat = vat;
-        }
-
-        public double getVAT() {
-            return vat;
-        }
-
-        public void setVAT(final double vat) {
-            this.vat = vat;
-        }
-
-        public double getvat() {
-            throw new UnsupportedOperationException("no way");
-        }
-
-        public void setvat(final double vat) {
-            throw new UnsupportedOperationException("no way");
-        }
+    @Test
+    public void testNsNsContext1() {
+        nsnsCtor.set(0);
+        runNsNsContext(Collections.singletonMap("nsns", NsNs.class));
     }
 
     @Test
@@ -325,55 +375,6 @@ public class ContextNamespaceTest extends JexlTestCase {
         }
     }
 
-    static AtomicInteger nsnsCtor = new AtomicInteger(0);
-
-    public static class NsNs {
-        private final int constVar;
-        public NsNs(final JexlContext ctxt) {
-            nsnsCtor.incrementAndGet();
-            final Object n = ctxt.get("NUMBER");
-            constVar = n instanceof Number ? ((Number) n).intValue() : -1;
-        }
-
-        public int callIt(final int n) {
-            return n + constVar;
-        }
-    }
-
-    @Test
-    public void testNsNsContext0() {
-        nsnsCtor.set(0);
-        final String clsName = NsNs.class.getName();
-        runNsNsContext(Collections.singletonMap("nsns", clsName));
-    }
-
-    @Test
-    public void testNsNsContext1() {
-        nsnsCtor.set(0);
-        runNsNsContext(Collections.singletonMap("nsns", NsNs.class));
-    }
-
-    private void runNsNsContext(final Map<String,Object> nsMap) {
-        final JexlContext ctxt = new MapContext();
-        ctxt.set("NUMBER", 19);
-        final JexlEngine jexl = new JexlBuilder().strict(true).silent(false).cache(32)
-                .namespaces(nsMap).create();
-        final JexlScript script = jexl.createScript("x ->{ nsns:callIt(x); nsns:callIt(x); }");
-        Number result = (Number) script.execute(ctxt, 23);
-        Assert.assertEquals(42, result);
-        Assert.assertEquals(1, nsnsCtor.get());
-        result = (Number) script.execute(ctxt, 623);
-        Assert.assertEquals(642, result);
-        Assert.assertEquals(2, nsnsCtor.get());
-    }
-
-    public static class StaticNs {
-        private StaticNs() { }
-        public static int callIt(final int n) {
-            return n + 19;
-        }
-    }
-
     @Test
     public void testStaticNs0() {
         runStaticNsContext(Collections.singletonMap("sns", StaticNs.class));
@@ -384,14 +385,13 @@ public class ContextNamespaceTest extends JexlTestCase {
         runStaticNsContext(Collections.singletonMap("sns", StaticNs.class.getName()));
     }
 
-    private void runStaticNsContext(final Map<String,Object> nsMap) {
-        final JexlContext ctxt = new MapContext();
-        final JexlEngine jexl = new JexlBuilder().strict(true).silent(false).cache(32)
-                .namespaces(nsMap).create();
-        final JexlScript script = jexl.createScript("x ->{ sns:callIt(x); sns:callIt(x); }");
-        Number result = (Number) script.execute(ctxt, 23);
-        Assert.assertEquals(42, result);
-        result = (Number) script.execute(ctxt, 623);
-        Assert.assertEquals(642, result);
+    @Test
+    public void testThreadedContext() {
+        final JexlEngine jexl = new JexlBuilder().create();
+        final JexlContext context = new TaxesContext(18.6);
+        final String strs = "taxes:vat(1000)";
+        final JexlScript staxes = jexl.createScript(strs);
+        final Object result = staxes.execute(context);
+        Assert.assertEquals(186., result);
     }
 }

@@ -45,6 +45,216 @@ import org.junit.Test;
  * Test cases for reported issue between JEXL-300 and JEXL-399.
  */
 public class Issues300Test {
+    public static class Arithmetic383 extends JexlArithmetic {
+        public Arithmetic383(final boolean astrict) {
+            super(astrict);
+        }
+        @Override
+        public boolean isStrict(final JexlOperator op) {
+            switch(op) {
+                case NOT:
+                case CONDITION:
+                    return false;
+            }
+            return super.isStrict(op);
+        }
+    }
+
+    public static class Arithmetic384 extends JexlArithmetic {
+        public Arithmetic384(final boolean astrict) {
+            super(astrict);
+        }
+
+        @Override
+        public boolean isStrict(final JexlOperator op) {
+            if (JexlOperator.ADD == op) {
+                return false;
+            }
+            return super.isStrict(op);
+        }
+    }
+
+    public static class Arithmetic384c extends JexlArithmetic {
+        AtomicInteger cmp = new AtomicInteger(0);
+        public Arithmetic384c(final boolean astrict) {
+            super(astrict);
+        }
+        public Arithmetic384c(final boolean astrict, final MathContext bigdContext, final int bigdScale) {
+            super(astrict, bigdContext, bigdScale);
+        }
+        @Override
+        protected int compare(final Object l, final Object r, final String op) {
+            cmp.incrementAndGet();
+            return super.compare(l, r, op);
+        }
+        int getCmpCalls() {
+            return cmp.get();
+        }
+    }
+
+    public static class Arithmetic384d extends Arithmetic384c {
+        public Arithmetic384d(final boolean astrict) {
+            super(astrict);
+        }
+        public Arithmetic384d(final boolean astrict, final MathContext bigdContext, final int bigdScale) {
+            super(astrict, bigdContext, bigdScale);
+        }
+    }
+
+    static private class Class397 implements Interface397i {
+        @Override public String summary() {
+            return getClass().getName();
+        }
+    }
+
+    public static class Context0930 extends MapContext {
+        /**
+         * This allows using a JEXL lambda as a filter.
+         * @param stream the stream
+         * @param filter the lambda to use as filter
+         * @return the filtered stream
+         */
+        public Stream<?> filter(final Stream<?> stream, final JexlScript filter) {
+            return stream.filter(x -> Boolean.TRUE.equals(filter.execute(this, x)));
+        }
+    }
+
+    /**
+     * Mock driver.
+     */
+    public static class Driver0930 {
+        private final String name;
+        Driver0930(final String n) {
+            name = n;
+        }
+        public String getAttributeName() {
+            return name;
+        }
+    }
+
+    public interface Interface397i {
+        String summary();
+    }
+
+    public static class Session322 {
+        public User322 getUser() {
+            return new User322();
+        }
+    }
+
+    public static class TestObject374 {
+        private String name;
+        private TestObject374 nested;
+        public String getName() {
+            return name;
+        }
+        public TestObject374 getNested() {
+            return nested;
+        }
+        public void setName(final String pName) {
+            this.name = pName;
+        }
+        public void setNested(final TestObject374 pNested) {
+            nested = pNested;
+        }
+    }
+
+    public enum Type375 {
+        DELIVERY_ADDRESS,
+        DOMICILE
+    }
+
+    public static class User322 {
+        public String getName() {
+            return "user322";
+        }
+    }
+
+    public static class VaContext extends MapContext {
+        VaContext(final Map<String, Object> vars) {
+            super(vars);
+        }
+
+        public int cell(final List<?> l, final String... ms) {
+            return 42 + cell(ms);
+        }
+
+        public int cell(final String... ms) {
+            return ms.length;
+        }
+    }
+
+    public static class Var370 {
+        private String name;
+        public String getName() {
+            return name;
+        }
+        public void setName(final String s) {
+            name = s;
+        }
+    }
+
+    static JexlContext pragmaticContext() {
+        final JexlOptions opts = new JexlOptions();
+        opts.setFlags( "-strict", "-cancellable", "-lexical", "-lexicalShade", "+safe", "+sharedInstance");
+        return new JexlTestCase.PragmaticContext(opts);
+    }
+
+    <T> T createProxy(final JexlEngine jexl, final Object o, final Class[] clazzz) {
+        // a JEX-based delegating proxy
+        return (T) Proxy.newProxyInstance(getClass().getClassLoader(), clazzz,
+            (proxy, method, args) ->  jexl.invokeMethod(o, method.getName(), args)
+        );
+    }
+
+
+    private Object run361a(final JexlEngine jexl) {
+        final String src = "()-> { ()-> { if (versionFile != null) { return 'foo'; } else { return 'bar'; }} }";
+        final JexlScript script = jexl.createScript(src);
+        final Object result = script.execute(null);
+        final JexlScript rs = (JexlScript) result;
+        return rs.execute(null);
+    }
+
+    private Object run361b(final JexlEngine jexl) {
+        final String src = "()-> { ()-> {" +
+                "var voa = vaf.value;\n" +
+                "if (voa != NaN && voa <= 0)" +
+                "{ return 'foo'; } else { return 'bar'; }" +
+                "} }";
+        final JexlContext context = new MapContext();
+        final Map<String,Object> vaf = Collections.singletonMap("value", null);
+        context.set("vaf", vaf);
+        final JexlScript script = jexl.createScript(src);
+        final Object result = script.execute(null);
+        final JexlScript rs = (JexlScript) result;
+        return rs.execute(context);
+    }
+
+    private String run361c(final JexlEngine jexl) {
+        final String src = "$$var t = null;\n" +
+                "$$if (t < 0) {\n" +
+                "'foo'\n" +
+                "$$} else {\n" +
+                "'bar'\n" +
+                "$$}";
+        final JxltEngine jxlt = jexl.createJxltEngine();
+        final JexlContext context = new MapContext();
+        final Map<String,Object> vaf = Collections.singletonMap("value", null);
+        context.set("vaf", vaf);
+        final JxltEngine.Template template = jxlt.createTemplate(src);
+        final StringWriter strw = new StringWriter();
+        template.evaluate(context, strw);
+        return strw.toString();
+    }
+
+    private Object run361d(final JexlEngine jexl) {
+        final String src = "var foo = 42; var foo = 43;";
+        final JexlScript script = jexl.createScript(src);
+        final Object result = script.execute(null);
+        return result;
+    }
+
     @Test
     public void test301a() {
         final JexlEngine jexl = new JexlBuilder().safe(false).arithmetic(new JexlArithmetic(false)).create();
@@ -61,27 +271,6 @@ public class Issues300Test {
                 }
             } catch (final Exception ex) {
                 Assert.assertTrue(ex.getMessage().contains("x"));
-            }
-        }
-    }
-
-    @Test
-    public void tests301b() {
-        final JexlEngine jexl = new JexlBuilder().safe(false).arithmetic(new JexlArithmetic(false)).create();
-        final Object[] xs = {null, null, new Object[]{null, 1}};
-        final String[] srcs = {
-                "x.0", "x[0]", "x[0][0]"
-        };
-        final JexlContext ctxt = new MapContext();
-        for (int i = 0; i < xs.length; ++i) {
-            ctxt.set("x", xs[i]);
-            final String src = srcs[i];
-            final JexlScript s = jexl.createScript(src);
-            try {
-                final Object o = s.execute(null);
-                Assert.fail(src + ": Should have failed");
-            } catch (final Exception ex) {
-                //
             }
         }
     }
@@ -198,6 +387,7 @@ public class Issues300Test {
         Assert.assertEquals(2, o2);
     }
 
+
     @Test
     public void test306c() {
         final JexlEngine jexl = new JexlBuilder().safe(true).create();
@@ -277,20 +467,6 @@ public class Issues300Test {
         }
     }
 
-    public static class VaContext extends MapContext {
-        VaContext(final Map<String, Object> vars) {
-            super(vars);
-        }
-
-        public int cell(final String... ms) {
-            return ms.length;
-        }
-
-        public int cell(final List<?> l, final String... ms) {
-            return 42 + cell(ms);
-        }
-    }
-
     @Test
     public void test314() {
         final JexlEngine jexl = new JexlBuilder().strict(true).safe(false).create();
@@ -363,7 +539,6 @@ public class Issues300Test {
         Assert.assertEquals(52, result);
     }
 
-
     @Test
     public void test317() {
         final JexlEngine jexl = new JexlBuilder().strict(true).create();
@@ -412,18 +587,6 @@ public class Issues300Test {
             template.evaluate(context, strw);
             output = strw.toString();
             Assert.assertEquals(ctls[i], output);
-        }
-    }
-
-    public static class User322 {
-        public String getName() {
-            return "user322";
-        }
-    }
-
-    public static class Session322 {
-        public User322 getUser() {
-            return new User322();
         }
     }
 
@@ -599,6 +762,7 @@ public class Issues300Test {
         Assert.assertTrue(result.toString().contains("\n"));
     }
 
+
     @Test
     public void test347() {
         final String src = "A.B == 5";
@@ -632,7 +796,6 @@ public class Issues300Test {
         Assert.assertFalse((Boolean) result);
     }
 
-
     @Test public void test349() {
         final String text = "(A ? C.D : E)";
         final JexlEngine jexl = new JexlBuilder().safe(true).create();
@@ -640,47 +803,15 @@ public class Issues300Test {
         final JexlScript script = jexl.createScript(text);
     }
 
-    static JexlContext pragmaticContext() {
-        final JexlOptions opts = new JexlOptions();
-        opts.setFlags( "-strict", "-cancellable", "-lexical", "-lexicalShade", "+safe", "+sharedInstance");
-        return new JexlTestCase.PragmaticContext(opts);
-    }
-
-    @Test public void testPropagateOptions() {
-        final String src0 = "`${$options.strict?'+':'-'}strict"
-                + " ${$options.cancellable?'+':'-'}cancellable"
-                + " ${$options.lexical?'+':'-'}lexical"
-                + " ${$options.lexicalShade?'+':'-'}lexicalShade"
-                + " ${$options.sharedInstance?'+':'-'}sharedInstance"
-                + " ${$options.safe?'+':'-'}safe`";
-        final String text = "#pragma script.mode pro50\n" +
-                "()->{ ()->{ "+src0+"; } }";
-        final JexlEngine jexl = new JexlBuilder().safe(true).create();
-        final JexlScript script = jexl.createScript(text);
-        JexlContext context = pragmaticContext();
-        final JexlScript closure = (JexlScript) script.execute(context);
-        final JexlContext opts = new OptionsContext();
-        final Object result = closure.execute(opts);
-        Assert.assertEquals("+strict +cancellable +lexical +lexicalShade -sharedInstance -safe", result);
-
-        final String text0 = "#pragma script.mode pro50\n" +
-                "()->{ "+src0+"; }";
-        final JexlScript script0 = jexl.createScript(text0);
-        context = pragmaticContext();
-        final Object result0 = script0.execute(context);
-        Assert.assertEquals("+strict +cancellable +lexical +lexicalShade -sharedInstance -safe", result0);
-
-        final String text1 = "#pragma script.mode pro50\n"+src0;
-        final JexlScript script1 = jexl.createScript(text1);
-        context = pragmaticContext();
-        final Object result1 = script1.execute(context);
-        Assert.assertEquals("+strict +cancellable +lexical +lexicalShade -sharedInstance -safe", result1);
-
-        final String text2 = src0;
-        final JexlScript script2 = jexl.createScript(text2);
-        context = pragmaticContext();
-        final Object result2 = script2.execute(context);
-        Assert.assertEquals("-strict -cancellable -lexical -lexicalShade +sharedInstance +safe", result2);
+    @Test
+    public void test361_33() {
+        final JexlEngine jexl = new JexlBuilder().safe(false).strict(true).create();
+        try {
+            run361c(jexl);
+            Assert.fail("null arg should fail");
+        } catch (final JexlException xany) {
+            Assert.assertNotNull(xany);
+        }
     }
 
     @Test
@@ -701,12 +832,11 @@ public class Issues300Test {
         }
     }
 
-    private Object run361a(final JexlEngine jexl) {
-        final String src = "()-> { ()-> { if (versionFile != null) { return 'foo'; } else { return 'bar'; }} }";
-        final JexlScript script = jexl.createScript(src);
-        final Object result = script.execute(null);
-        final JexlScript rs = (JexlScript) result;
-        return rs.execute(null);
+    @Test
+    public void test361b_32() {
+        final JexlEngine jexl = new Engine32(new JexlBuilder().safe(false).strict(false));
+        final Object result = run361b(jexl);
+        Assert.assertNotNull(result);
     }
 
     @Test
@@ -720,61 +850,12 @@ public class Issues300Test {
         }
     }
 
-    @Test
-    public void test361b_32() {
-        final JexlEngine jexl = new Engine32(new JexlBuilder().safe(false).strict(false));
-        final Object result = run361b(jexl);
-        Assert.assertNotNull(result);
-    }
-
-    private Object run361b(final JexlEngine jexl) {
-        final String src = "()-> { ()-> {" +
-                "var voa = vaf.value;\n" +
-                "if (voa != NaN && voa <= 0)" +
-                "{ return 'foo'; } else { return 'bar'; }" +
-                "} }";
-        final JexlContext context = new MapContext();
-        final Map<String,Object> vaf = Collections.singletonMap("value", null);
-        context.set("vaf", vaf);
-        final JexlScript script = jexl.createScript(src);
-        final Object result = script.execute(null);
-        final JexlScript rs = (JexlScript) result;
-        return rs.execute(context);
-    }
-
-    @Test
-    public void test361_33() {
-        final JexlEngine jexl = new JexlBuilder().safe(false).strict(true).create();
-        try {
-            run361c(jexl);
-            Assert.fail("null arg should fail");
-        } catch (final JexlException xany) {
-            Assert.assertNotNull(xany);
-        }
-    }
 
     @Test
     public void test361c_32() {
         final JexlEngine jexl = new Engine32(new JexlBuilder().safe(false).strict(false));
         final String result = run361c(jexl);
         Assert.assertNotNull(result);
-    }
-
-    private String run361c(final JexlEngine jexl) {
-        final String src = "$$var t = null;\n" +
-                "$$if (t < 0) {\n" +
-                "'foo'\n" +
-                "$$} else {\n" +
-                "'bar'\n" +
-                "$$}";
-        final JxltEngine jxlt = jexl.createJxltEngine();
-        final JexlContext context = new MapContext();
-        final Map<String,Object> vaf = Collections.singletonMap("value", null);
-        context.set("vaf", vaf);
-        final JxltEngine.Template template = jxlt.createTemplate(src);
-        final StringWriter strw = new StringWriter();
-        template.evaluate(context, strw);
-        return strw.toString();
     }
 
     @Test
@@ -795,14 +876,6 @@ public class Issues300Test {
         }
     }
 
-    private Object run361d(final JexlEngine jexl) {
-        final String src = "var foo = 42; var foo = 43;";
-        final JexlScript script = jexl.createScript(src);
-        final Object result = script.execute(null);
-        return result;
-    }
-
-
     @Test public void test367() {
         final String text = "var toto; function foo(x) { x }; var tata = 3; foo(3)";
         final JexlEngine jexl = new JexlBuilder().safe(true).create();
@@ -812,16 +885,6 @@ public class Issues300Test {
         final String s0 = script.getParsedText();
         final String s1 = script.getSourceText();
         Assert.assertNotEquals(s0, s1);
-    }
-
-    public static class Var370 {
-        private String name;
-        public void setName(final String s) {
-            name = s;
-        }
-        public String getName() {
-            return name;
-        }
     }
 
     @Test public void test370() {
@@ -848,20 +911,17 @@ public class Issues300Test {
         }
     }
 
-    public static class TestObject374 {
-        private String name;
-        private TestObject374 nested;
-        public String getName() {
-            return name;
-        }
-        public void setName(final String pName) {
-            this.name = pName;
-        }
-        public TestObject374 getNested() {
-            return nested;
-        }
-        public void setNested(final TestObject374 pNested) {
-            nested = pNested;
+    @Test
+    public void test373b() {
+        final String src = "var i = ++1";
+        final JexlEngine jexl = new JexlBuilder().safe(true).create();
+        final JexlInfo info = new JexlInfo("badscript", 0, 0);
+        try {
+            final JexlScript script = jexl.createScript(info, src);
+            Assert.fail("should not parse");
+        } catch (final JexlException.Parsing xparse) {
+            final String msg = xparse.getMessage();
+            Assert.assertTrue(msg.contains("badscript"));
         }
     }
 
@@ -900,12 +960,6 @@ public class Issues300Test {
         Assert.assertEquals(Type375.DOMICILE, result);
     }
 
-    public enum Type375 {
-        DELIVERY_ADDRESS,
-        DOMICILE
-    }
-
-
     @Test
     public void test377() {
         final String text = "function add(x, y) { x + y } add(a, b)";
@@ -928,111 +982,6 @@ public class Issues300Test {
         Assert.assertTrue(result instanceof LinkedHashMap);
         Assert.assertEquals(1, ((Map) result).size());
     }
-
-    @Test
-    public void test373b() {
-        final String src = "var i = ++1";
-        final JexlEngine jexl = new JexlBuilder().safe(true).create();
-        final JexlInfo info = new JexlInfo("badscript", 0, 0);
-        try {
-            final JexlScript script = jexl.createScript(info, src);
-            Assert.fail("should not parse");
-        } catch (final JexlException.Parsing xparse) {
-            final String msg = xparse.getMessage();
-            Assert.assertTrue(msg.contains("badscript"));
-        }
-    }
-
-    @Test
-    public void testBackslashes() throws Exception {
-        final JexlEngine jexl = new JexlBuilder().safe(false).create();
-        final String src = "\"\b\t\f\"";
-        JexlScript s = jexl.createScript(src);
-        Assert.assertNotNull(s);
-        final String ctl = "\b\t\f";
-        Assert.assertEquals(ctl, s.execute(null));
-        String parsed = s.getParsedText();
-        Assert.assertEquals("'\\b\\t\\f'", parsed);
-        s = jexl.createScript(src);
-        Assert.assertNotNull(s);
-        Assert.assertEquals(ctl, s.execute(null));
-        parsed = s.getParsedText();
-        Assert.assertEquals("'\\b\\t\\f'", parsed);
-    }
-
-    /**
-     * Mock driver.
-     */
-    public static class Driver0930 {
-        private final String name;
-        Driver0930(final String n) {
-            name = n;
-        }
-        public String getAttributeName() {
-            return name;
-        }
-    }
-
-    public static class Context0930 extends MapContext {
-        /**
-         * This allows using a JEXL lambda as a filter.
-         * @param stream the stream
-         * @param filter the lambda to use as filter
-         * @return the filtered stream
-         */
-        public Stream<?> filter(final Stream<?> stream, final JexlScript filter) {
-            return stream.filter(x -> Boolean.TRUE.equals(filter.execute(this, x)));
-        }
-    }
-
-    @Test
-    public void testSO20220930() {
-        // fill some drivers in a list
-        final List<Driver0930> values = new ArrayList<>();
-        for(int i = 0; i < 8; ++i) {
-            values.add(new Driver0930("drvr" + Integer.toOctalString(i)));
-        }
-        for(int i = 0; i < 4; ++i) {
-            values.add(new Driver0930("favorite" + Integer.toOctalString(i)));
-        }
-        // Use a context that can filter and that exposes Collectors
-        final JexlEngine jexl = new JexlBuilder().safe(false).create();
-        final JexlContext context = new Context0930();
-        context.set("values", values);
-        context.set("Collectors", Collectors.class);
-        // The script with a JEXL 3.2 (lambda function) and 3.3 syntax (lambda expression)
-        final String src32 = "values.stream().filter((driver) ->{ driver.attributeName =^ 'favorite' }).collect(Collectors.toList())";
-        final String src33 = "values.stream().filter(driver -> driver.attributeName =^ 'favorite').collect(Collectors.toList())";
-        for(final String src : Arrays.asList(src32, src33)) {
-            final JexlExpression s = jexl.createExpression(src);
-            Assert.assertNotNull(s);
-
-            final Object r = s.evaluate(context);
-            Assert.assertNotNull(r);
-            // got a filtered list of 4 drivers whose attribute name starts with 'favorite'
-            final List<Driver0930> l = (List<Driver0930>) r;
-            Assert.assertEquals(4, l.size());
-            for (final Driver0930 d : l) {
-                Assert.assertTrue(d.getAttributeName().startsWith("favorite"));
-            }
-        }
-    }
-
-    public static class Arithmetic383 extends JexlArithmetic {
-        public Arithmetic383(final boolean astrict) {
-            super(astrict);
-        }
-        @Override
-        public boolean isStrict(final JexlOperator op) {
-            switch(op) {
-                case NOT:
-                case CONDITION:
-                    return false;
-            }
-            return super.isStrict(op);
-        }
-    }
-
     @Test public void test383() {
         final JexlEngine jexl = new JexlBuilder().safe(false).arithmetic(new Arithmetic383(true)).create();
         final String src0 =  "if (a) 1; else 2;";
@@ -1060,20 +1009,6 @@ public class Issues300Test {
         ctxt.set("a", null);
         Assert.assertEquals(2, s0.execute(ctxt, (Object) null));
         Assert.assertEquals(1, s1.execute(ctxt, (Object) null));
-    }
-
-    public static class Arithmetic384 extends JexlArithmetic {
-        public Arithmetic384(final boolean astrict) {
-            super(astrict);
-        }
-
-        @Override
-        public boolean isStrict(final JexlOperator op) {
-            if (JexlOperator.ADD == op) {
-                return false;
-            }
-            return super.isStrict(op);
-        }
     }
     @Test
     public void test384a() {
@@ -1155,54 +1090,6 @@ public class Issues300Test {
             Assert.assertEquals("ABC", s1.execute(ctxt, (Object) null));
         }
     }
-    @Test
-    public void test390() throws Exception {
-        final JexlEngine jexl = new JexlBuilder()
-                .safe(false)
-                .strict(true)
-                .debug(true)
-                .create();
-        JexlScript script = null;
-        String src;
-        src = "if (true) #pragma one 42";
-        try {
-            script = jexl.createScript(src);
-            Assert.fail("should have failed parsing");
-        } catch (final JexlException.Parsing xparse) {
-            Assert.assertTrue(xparse.getDetail().contains("pragma"));
-        }
-        src = "if (true) { #pragma one 42 }";
-        script = jexl.createScript(src);
-        final Object result = script.execute(null);
-        debuggerCheck(jexl);
-    }
-
-    public static class Arithmetic384c extends JexlArithmetic {
-        AtomicInteger cmp = new AtomicInteger(0);
-        int getCmpCalls() {
-            return cmp.get();
-        }
-        public Arithmetic384c(final boolean astrict) {
-            super(astrict);
-        }
-        public Arithmetic384c(final boolean astrict, final MathContext bigdContext, final int bigdScale) {
-            super(astrict, bigdContext, bigdScale);
-        }
-        @Override
-        protected int compare(final Object l, final Object r, final String op) {
-            cmp.incrementAndGet();
-            return super.compare(l, r, op);
-        }
-    }
-
-    public static class Arithmetic384d extends Arithmetic384c {
-        public Arithmetic384d(final boolean astrict) {
-            super(astrict);
-        }
-        public Arithmetic384d(final boolean astrict, final MathContext bigdContext, final int bigdScale) {
-            super(astrict, bigdContext, bigdScale);
-        }
-    }
 
     @Test
     public void test384c() {
@@ -1239,6 +1126,28 @@ public class Issues300Test {
     }
 
     @Test
+    public void test390() throws Exception {
+        final JexlEngine jexl = new JexlBuilder()
+                .safe(false)
+                .strict(true)
+                .debug(true)
+                .create();
+        JexlScript script = null;
+        String src;
+        src = "if (true) #pragma one 42";
+        try {
+            script = jexl.createScript(src);
+            Assert.fail("should have failed parsing");
+        } catch (final JexlException.Parsing xparse) {
+            Assert.assertTrue(xparse.getDetail().contains("pragma"));
+        }
+        src = "if (true) { #pragma one 42 }";
+        script = jexl.createScript(src);
+        final Object result = script.execute(null);
+        debuggerCheck(jexl);
+    }
+
+    @Test
     public void test393() {
         final String src = "const total = 0;\n" +
                 "if (true) {\n" +
@@ -1255,6 +1164,23 @@ public class Issues300Test {
         } catch (final JexlException.Parsing xparse) {
             Assert.assertTrue(xparse.getMessage().contains("total"));
         }
+    }
+
+    @Test
+    public void testBackslashes() throws Exception {
+        final JexlEngine jexl = new JexlBuilder().safe(false).create();
+        final String src = "\"\b\t\f\"";
+        JexlScript s = jexl.createScript(src);
+        Assert.assertNotNull(s);
+        final String ctl = "\b\t\f";
+        Assert.assertEquals(ctl, s.execute(null));
+        String parsed = s.getParsedText();
+        Assert.assertEquals("'\\b\\t\\f'", parsed);
+        s = jexl.createScript(src);
+        Assert.assertNotNull(s);
+        Assert.assertEquals(ctl, s.execute(null));
+        parsed = s.getParsedText();
+        Assert.assertEquals("'\\b\\t\\f'", parsed);
     }
 
     @Test public void testDow() {
@@ -1286,21 +1212,6 @@ public class Issues300Test {
         Assert.assertEquals("foo", x.toString());
     }
 
-    public interface Interface397i {
-        String summary();
-    }
-    static private class Class397 implements Interface397i {
-        @Override public String summary() {
-            return getClass().getName();
-        }
-    }
-    <T> T createProxy(final JexlEngine jexl, final Object o, final Class[] clazzz) {
-        // a JEX-based delegating proxy
-        return (T) Proxy.newProxyInstance(getClass().getClassLoader(), clazzz,
-            (proxy, method, args) ->  jexl.invokeMethod(o, method.getName(), args)
-        );
-    }
-
     @Test public void testIssue397() {
         String result;
         final String control = Class397.class.getName();
@@ -1320,6 +1231,109 @@ public class Issues300Test {
         result = (String) script.execute(null, proxy);
         Assert.assertEquals(control, result);
     }
+    @Test
+    public void testIssue398() {
+        final String src = "let m = {\n" +
+            "  \"foo\": 1,\n" +
+            "  \"bar\": 2,\n" +
+            "}";
+        final JexlEngine jexl = new JexlBuilder().create();
+        final JexlScript script = jexl.createScript(src);
+        final Object result = script.execute(null);
+        Assert.assertTrue(result instanceof Map);
+        final Map<?,?> map = (Map<?, ?>) result;
+        Assert.assertEquals(2, map.size());
+    }
+    @Test public void testPropagateOptions() {
+        final String src0 = "`${$options.strict?'+':'-'}strict"
+                + " ${$options.cancellable?'+':'-'}cancellable"
+                + " ${$options.lexical?'+':'-'}lexical"
+                + " ${$options.lexicalShade?'+':'-'}lexicalShade"
+                + " ${$options.sharedInstance?'+':'-'}sharedInstance"
+                + " ${$options.safe?'+':'-'}safe`";
+        final String text = "#pragma script.mode pro50\n" +
+                "()->{ ()->{ "+src0+"; } }";
+        final JexlEngine jexl = new JexlBuilder().safe(true).create();
+        final JexlScript script = jexl.createScript(text);
+        JexlContext context = pragmaticContext();
+        final JexlScript closure = (JexlScript) script.execute(context);
+        final JexlContext opts = new OptionsContext();
+        final Object result = closure.execute(opts);
+        Assert.assertEquals("+strict +cancellable +lexical +lexicalShade -sharedInstance -safe", result);
+
+        final String text0 = "#pragma script.mode pro50\n" +
+                "()->{ "+src0+"; }";
+        final JexlScript script0 = jexl.createScript(text0);
+        context = pragmaticContext();
+        final Object result0 = script0.execute(context);
+        Assert.assertEquals("+strict +cancellable +lexical +lexicalShade -sharedInstance -safe", result0);
+
+        final String text1 = "#pragma script.mode pro50\n"+src0;
+        final JexlScript script1 = jexl.createScript(text1);
+        context = pragmaticContext();
+        final Object result1 = script1.execute(context);
+        Assert.assertEquals("+strict +cancellable +lexical +lexicalShade -sharedInstance -safe", result1);
+
+        final String text2 = src0;
+        final JexlScript script2 = jexl.createScript(text2);
+        context = pragmaticContext();
+        final Object result2 = script2.execute(context);
+        Assert.assertEquals("-strict -cancellable -lexical -lexicalShade +sharedInstance +safe", result2);
+    }
+
+    @Test
+    public void tests301b() {
+        final JexlEngine jexl = new JexlBuilder().safe(false).arithmetic(new JexlArithmetic(false)).create();
+        final Object[] xs = {null, null, new Object[]{null, 1}};
+        final String[] srcs = {
+                "x.0", "x[0]", "x[0][0]"
+        };
+        final JexlContext ctxt = new MapContext();
+        for (int i = 0; i < xs.length; ++i) {
+            ctxt.set("x", xs[i]);
+            final String src = srcs[i];
+            final JexlScript s = jexl.createScript(src);
+            try {
+                final Object o = s.execute(null);
+                Assert.fail(src + ": Should have failed");
+            } catch (final Exception ex) {
+                //
+            }
+        }
+    }
+
+    @Test
+    public void testSO20220930() {
+        // fill some drivers in a list
+        final List<Driver0930> values = new ArrayList<>();
+        for(int i = 0; i < 8; ++i) {
+            values.add(new Driver0930("drvr" + Integer.toOctalString(i)));
+        }
+        for(int i = 0; i < 4; ++i) {
+            values.add(new Driver0930("favorite" + Integer.toOctalString(i)));
+        }
+        // Use a context that can filter and that exposes Collectors
+        final JexlEngine jexl = new JexlBuilder().safe(false).create();
+        final JexlContext context = new Context0930();
+        context.set("values", values);
+        context.set("Collectors", Collectors.class);
+        // The script with a JEXL 3.2 (lambda function) and 3.3 syntax (lambda expression)
+        final String src32 = "values.stream().filter((driver) ->{ driver.attributeName =^ 'favorite' }).collect(Collectors.toList())";
+        final String src33 = "values.stream().filter(driver -> driver.attributeName =^ 'favorite').collect(Collectors.toList())";
+        for(final String src : Arrays.asList(src32, src33)) {
+            final JexlExpression s = jexl.createExpression(src);
+            Assert.assertNotNull(s);
+
+            final Object r = s.evaluate(context);
+            Assert.assertNotNull(r);
+            // got a filtered list of 4 drivers whose attribute name starts with 'favorite'
+            final List<Driver0930> l = (List<Driver0930>) r;
+            Assert.assertEquals(4, l.size());
+            for (final Driver0930 d : l) {
+                Assert.assertTrue(d.getAttributeName().startsWith("favorite"));
+            }
+        }
+    }
 
     @Test
     public void testUnsolvableMethod() throws Exception {
@@ -1338,19 +1352,5 @@ public class Issues300Test {
         } catch (final JexlException.Method unsolvable) {
             Assert.assertEquals("myNonExistentFunction", unsolvable.getMethod());
         }
-    }
-
-    @Test
-    public void testIssue398() {
-        final String src = "let m = {\n" +
-            "  \"foo\": 1,\n" +
-            "  \"bar\": 2,\n" +
-            "}";
-        final JexlEngine jexl = new JexlBuilder().create();
-        final JexlScript script = jexl.createScript(src);
-        final Object result = script.execute(null);
-        Assert.assertTrue(result instanceof Map);
-        final Map<?,?> map = (Map<?, ?>) result;
-        Assert.assertEquals(2, map.size());
     }
 }

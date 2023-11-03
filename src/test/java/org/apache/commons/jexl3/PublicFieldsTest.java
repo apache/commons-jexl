@@ -25,17 +25,14 @@ import org.junit.Test;
  */
 @SuppressWarnings({"UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
 public class PublicFieldsTest extends JexlTestCase {
-    // some constants
-    private static final String LOWER42 = "fourty-two";
-    private static final String UPPER42 = "FOURTY-TWO";
+    public enum Gender { MALE, FEMALE }
     /**
      * An Inner class.
      */
     public static class Inner {
-        public double aDouble = 42.0;
         public static double NOT42 = -42.0;
+        public double aDouble = 42.0;
     }
-
     /**
      * A Struct, all fields public
      */
@@ -45,8 +42,13 @@ public class PublicFieldsTest extends JexlTestCase {
         public String aString = LOWER42;
     }
 
+    // some constants
+    private static final String LOWER42 = "fourty-two";
+
+    private static final String UPPER42 = "FOURTY-TWO";
     // a pub instance
     private Struct pub;
+
     // the JexlContext to use
     private JexlContext ctxt;
 
@@ -63,11 +65,63 @@ public class PublicFieldsTest extends JexlTestCase {
     }
 
     @Test
+    public void testGetEnum() throws Exception {
+        ctxt.set("com.jexl.gender", Gender.class);
+        final String src = "x = com.jexl.gender.FEMALE";
+        final JexlScript script = JEXL.createScript(src);
+        final Object result = script.execute(ctxt);
+        Assert.assertEquals(Gender.FEMALE, result);
+        Assert.assertEquals(Gender.FEMALE, ctxt.get("x"));
+    }
+
+    @Test
+    public void testGetInnerDouble() throws Exception {
+        final JexlExpression get = JEXL.createExpression("pub.inner.aDouble");
+        Assert.assertEquals(42.0, get.evaluate(ctxt));
+        JEXL.setProperty(pub, "inner.aDouble", -42);
+        Assert.assertEquals(-42.0, get.evaluate(ctxt));
+    }
+
+    @Test
     public void testGetInt() throws Exception {
         final JexlExpression get = JEXL.createExpression("pub.anInt");
         Assert.assertEquals(42, get.evaluate(ctxt));
         JEXL.setProperty(pub, "anInt", -42);
         Assert.assertEquals(-42, get.evaluate(ctxt));
+    }
+
+    @Test
+    public void testGetStaticField() throws Exception {
+        ctxt.set("com.jexl", Inner.class);
+        final String src = "x = com.jexl.NOT42";
+        final JexlScript script = JEXL.createScript(src);
+        final Object result = script.execute(ctxt);
+        Assert.assertEquals(Inner.NOT42, result);
+        Assert.assertEquals(Inner.NOT42, ctxt.get("x"));
+    }
+
+    @Test
+    public void testGetString() throws Exception {
+        final JexlExpression get = JEXL.createExpression("pub.aString");
+        Assert.assertEquals(LOWER42, get.evaluate(ctxt));
+        JEXL.setProperty(pub, "aString", UPPER42);
+        Assert.assertEquals(UPPER42, get.evaluate(ctxt));
+    }
+
+    @Test
+    public void testSetInnerDouble() throws Exception {
+        final JexlExpression set = JEXL.createExpression("pub.inner.aDouble = value");
+        ctxt.set("value", -42.0);
+        Assert.assertEquals(-42.0, set.evaluate(ctxt));
+        Assert.assertEquals(-42.0, JEXL.getProperty(pub, "inner.aDouble"));
+        ctxt.set("value", 42.0);
+        Assert.assertEquals(42.0, set.evaluate(ctxt));
+        Assert.assertEquals(42.0, JEXL.getProperty(pub, "inner.aDouble"));
+        try {
+            ctxt.set("value", UPPER42);
+            Assert.assertNull(set.evaluate(ctxt));
+            Assert.fail("should have thrown");
+        } catch (final JexlException xjexl) {}
     }
 
     @Test
@@ -87,14 +141,6 @@ public class PublicFieldsTest extends JexlTestCase {
     }
 
     @Test
-    public void testGetString() throws Exception {
-        final JexlExpression get = JEXL.createExpression("pub.aString");
-        Assert.assertEquals(LOWER42, get.evaluate(ctxt));
-        JEXL.setProperty(pub, "aString", UPPER42);
-        Assert.assertEquals(UPPER42, get.evaluate(ctxt));
-    }
-
-    @Test
     public void testSetString() throws Exception {
         final JexlExpression set = JEXL.createExpression("pub.aString = value");
         ctxt.set("value", UPPER42);
@@ -103,51 +149,5 @@ public class PublicFieldsTest extends JexlTestCase {
         ctxt.set("value", LOWER42);
         Assert.assertEquals(LOWER42, set.evaluate(ctxt));
         Assert.assertEquals(LOWER42, JEXL.getProperty(pub, "aString"));
-    }
-
-    @Test
-    public void testGetInnerDouble() throws Exception {
-        final JexlExpression get = JEXL.createExpression("pub.inner.aDouble");
-        Assert.assertEquals(42.0, get.evaluate(ctxt));
-        JEXL.setProperty(pub, "inner.aDouble", -42);
-        Assert.assertEquals(-42.0, get.evaluate(ctxt));
-    }
-
-    @Test
-    public void testSetInnerDouble() throws Exception {
-        final JexlExpression set = JEXL.createExpression("pub.inner.aDouble = value");
-        ctxt.set("value", -42.0);
-        Assert.assertEquals(-42.0, set.evaluate(ctxt));
-        Assert.assertEquals(-42.0, JEXL.getProperty(pub, "inner.aDouble"));
-        ctxt.set("value", 42.0);
-        Assert.assertEquals(42.0, set.evaluate(ctxt));
-        Assert.assertEquals(42.0, JEXL.getProperty(pub, "inner.aDouble"));
-        try {
-            ctxt.set("value", UPPER42);
-            Assert.assertNull(set.evaluate(ctxt));
-            Assert.fail("should have thrown");
-        } catch (final JexlException xjexl) {}
-    }
-
-    public enum Gender { MALE, FEMALE }
-
-    @Test
-    public void testGetEnum() throws Exception {
-        ctxt.set("com.jexl.gender", Gender.class);
-        final String src = "x = com.jexl.gender.FEMALE";
-        final JexlScript script = JEXL.createScript(src);
-        final Object result = script.execute(ctxt);
-        Assert.assertEquals(Gender.FEMALE, result);
-        Assert.assertEquals(Gender.FEMALE, ctxt.get("x"));
-    }
-
-    @Test
-    public void testGetStaticField() throws Exception {
-        ctxt.set("com.jexl", Inner.class);
-        final String src = "x = com.jexl.NOT42";
-        final JexlScript script = JEXL.createScript(src);
-        final Object result = script.execute(ctxt);
-        Assert.assertEquals(Inner.NOT42, result);
-        Assert.assertEquals(Inner.NOT42, ctxt.get("x"));
     }
 }

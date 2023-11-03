@@ -37,20 +37,6 @@ import org.junit.Test;
 
 public class OptionalTest {
 
-    public static class Thing {
-        String name = null;
-        public Optional<String> findName() {
-            return  Optional.ofNullable(name);
-        }
-
-        public Optional<List<String>> findNames() {
-            if (name == null) {
-                return Optional.empty();
-            }
-            return Optional.of(Collections.singletonList(name));
-        }
-    }
-
     public static class StreamContext extends MapContext {
         public Stream map(final Collection<Object> c, final JexlScript s) {
             final JexlContext context = JexlEngine.getThreadContext();
@@ -67,44 +53,18 @@ public class OptionalTest {
         }
     }
 
-    @Test
-    public void testStream0() {
-        final String src = "$0.map(x -> x * x).reduce((a, x) -> a + x)";
-        final JexlBuilder builder = new JexlBuilder();
-        final JexlUberspect uber = builder.create().getUberspect();
-        final JexlArithmetic jexla = new OptionalArithmetic(true);
-        final JexlEngine jexl = builder.uberspect(new ReferenceUberspect(uber)).arithmetic(jexla).safe(false).create();
-        final JexlInfo info = new JexlInfo("testStream", 1, 1);
-        final MapContext context = new StreamContext();
-        final JexlScript script = jexl.createScript(src, "$0");
-        final Object result = script.execute(context, Arrays.asList(1, 2, 3));
-        Assert.assertEquals(14, result);
-    }
+    public static class Thing {
+        String name = null;
+        public Optional<String> findName() {
+            return  Optional.ofNullable(name);
+        }
 
-    @Test
-    public void testStream1() {
-        final String src = "$0.map(x -> x * x).reduce((a, x) -> a + x)";
-        final JexlEngine jexl = new JexlBuilder().safe(false).create();
-        final JexlInfo info = new JexlInfo("testStream", 1, 1);
-        final MapContext context = new StreamContext();
-        final JexlScript script = jexl.createScript(src, "$0");
-        final Object result = script.execute(context, Arrays.asList(1, 2d, "3"));
-        Assert.assertEquals(14.0d, (double) result , 0.00001d);
-    }
-
-    @Test
-    public void testOptionalArgs() {
-        final JexlBuilder builder = new JexlBuilder();
-        final JexlArithmetic jexla = new OptionalArithmetic(true);
-        final JexlUberspect uber = builder.create().getUberspect();
-        final JexlEngine jexl = builder.uberspect(new ReferenceUberspect(uber)).arithmetic(jexla).safe(false).create();
-        final JexlInfo info = new JexlInfo("testStream", 1, 1);
-        final MapContext context = new StreamContext();
-        final String src = "x + x";
-        final JexlScript script = jexl.createScript(src, "x");
-        final Optional<Integer> x = Optional.of(21);
-        final Object result = script.execute(context, x);
-        Assert.assertEquals(42, result);
+        public Optional<List<String>> findNames() {
+            if (name == null) {
+                return Optional.empty();
+            }
+            return Optional.of(Collections.singletonList(name));
+        }
     }
 
     @Test
@@ -151,5 +111,45 @@ public class OptionalTest {
         script = jexl.createScript(info,"thing.names.size()", "thing");
         result = script.execute(null, thing);
         Assert.assertEquals(1, result);
+    }
+
+    @Test
+    public void testOptionalArgs() {
+        final JexlBuilder builder = new JexlBuilder();
+        final JexlArithmetic jexla = new OptionalArithmetic(true);
+        final JexlUberspect uber = builder.create().getUberspect();
+        final JexlEngine jexl = builder.uberspect(new ReferenceUberspect(uber)).arithmetic(jexla).safe(false).create();
+        final JexlInfo info = new JexlInfo("testStream", 1, 1);
+        final MapContext context = new StreamContext();
+        final String src = "x + x";
+        final JexlScript script = jexl.createScript(src, "x");
+        final Optional<Integer> x = Optional.of(21);
+        final Object result = script.execute(context, x);
+        Assert.assertEquals(42, result);
+    }
+
+    @Test
+    public void testStream0() {
+        final String src = "$0.map(x -> x * x).reduce((a, x) -> a + x)";
+        final JexlBuilder builder = new JexlBuilder();
+        final JexlUberspect uber = builder.create().getUberspect();
+        final JexlArithmetic jexla = new OptionalArithmetic(true);
+        final JexlEngine jexl = builder.uberspect(new ReferenceUberspect(uber)).arithmetic(jexla).safe(false).create();
+        final JexlInfo info = new JexlInfo("testStream", 1, 1);
+        final MapContext context = new StreamContext();
+        final JexlScript script = jexl.createScript(src, "$0");
+        final Object result = script.execute(context, Arrays.asList(1, 2, 3));
+        Assert.assertEquals(14, result);
+    }
+
+    @Test
+    public void testStream1() {
+        final String src = "$0.map(x -> x * x).reduce((a, x) -> a + x)";
+        final JexlEngine jexl = new JexlBuilder().safe(false).create();
+        final JexlInfo info = new JexlInfo("testStream", 1, 1);
+        final MapContext context = new StreamContext();
+        final JexlScript script = jexl.createScript(src, "$0");
+        final Object result = script.execute(context, Arrays.asList(1, 2d, "3"));
+        Assert.assertEquals(14.0d, (double) result , 0.00001d);
     }
 }

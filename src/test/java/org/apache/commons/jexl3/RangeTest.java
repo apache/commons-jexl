@@ -33,18 +33,16 @@ public class RangeTest extends JexlTestCase {
     }
 
     @Test
-    public void testIntegerRangeOne() throws Exception {
-        final JexlExpression e = JEXL.createExpression("(1..1)");
+    public void testIntegerContains() throws Exception {
+        final JexlScript e = JEXL.createScript("(x)->{ x =~ (1..10) }");
         final JexlContext jc = new MapContext();
 
-        final Object o = e.evaluate(jc);
-        Assert.assertTrue(o instanceof Collection<?>);
-        final Collection<?> c = (Collection<?>) o;
-        Assert.assertEquals(1, c.size());
-        final Object[] a = c.toArray();
-        Assert.assertEquals(1, a.length);
-        Assert.assertEquals(1, ((Number) a[0]).intValue());
-        Assert.assertFalse((Boolean) JEXL.createScript("empty x", "x").execute(null, e));
+        Object o = e.execute(jc, 5);
+        Assert.assertEquals(Boolean.TRUE, o);
+        o = e.execute(jc, 0);
+        Assert.assertEquals(Boolean.FALSE, o);
+        o = e.execute(jc, 100);
+        Assert.assertEquals(Boolean.FALSE, o);
     }
 
     @Test
@@ -92,6 +90,43 @@ public class RangeTest extends JexlTestCase {
         for (int l = 0; l < 32; ++l) {
             Assert.assertEquals(oaa[l], l + 1);
         }
+    }
+
+    @Test
+    public void testIntegerRangeOne() throws Exception {
+        final JexlExpression e = JEXL.createExpression("(1..1)");
+        final JexlContext jc = new MapContext();
+
+        final Object o = e.evaluate(jc);
+        Assert.assertTrue(o instanceof Collection<?>);
+        final Collection<?> c = (Collection<?>) o;
+        Assert.assertEquals(1, c.size());
+        final Object[] a = c.toArray();
+        Assert.assertEquals(1, a.length);
+        Assert.assertEquals(1, ((Number) a[0]).intValue());
+        Assert.assertFalse((Boolean) JEXL.createScript("empty x", "x").execute(null, e));
+    }
+
+    @Test
+    public void testIntegerSum() throws Exception {
+        final JexlScript e = JEXL.createScript("var s = 0; for(var i : (1..5)) { s = s + i; }; s");
+        final JexlContext jc = new MapContext();
+
+        final Object o = e.execute(jc);
+        Assert.assertEquals(15, ((Number) o).intValue());
+    }
+
+    @Test
+    public void testLongContains() throws Exception {
+        final JexlScript e = JEXL.createScript("(x)->{ x =~ (90000000001L..90000000010L) }");
+        final JexlContext jc = new MapContext();
+
+        Object o = e.execute(jc, 90000000005L);
+        Assert.assertEquals(Boolean.TRUE, o);
+        o = e.execute(jc, 0);
+        Assert.assertEquals(Boolean.FALSE, o);
+        o = e.execute(jc, 90000000011L);
+        Assert.assertEquals(Boolean.FALSE, o);
     }
 
     @Test
@@ -143,46 +178,11 @@ public class RangeTest extends JexlTestCase {
     }
 
     @Test
-    public void testIntegerSum() throws Exception {
-        final JexlScript e = JEXL.createScript("var s = 0; for(var i : (1..5)) { s = s + i; }; s");
-        final JexlContext jc = new MapContext();
-
-        final Object o = e.execute(jc);
-        Assert.assertEquals(15, ((Number) o).intValue());
-    }
-
-    @Test
-    public void testIntegerContains() throws Exception {
-        final JexlScript e = JEXL.createScript("(x)->{ x =~ (1..10) }");
-        final JexlContext jc = new MapContext();
-
-        Object o = e.execute(jc, 5);
-        Assert.assertEquals(Boolean.TRUE, o);
-        o = e.execute(jc, 0);
-        Assert.assertEquals(Boolean.FALSE, o);
-        o = e.execute(jc, 100);
-        Assert.assertEquals(Boolean.FALSE, o);
-    }
-
-    @Test
     public void testLongSum() throws Exception {
         final JexlScript e = JEXL.createScript("var s = 0; for(var i : (6789000001L..6789000001L)) { s = s + i; }; s");
         final JexlContext jc = new MapContext();
 
         final Object o = e.execute(jc);
         Assert.assertEquals(6789000001L, ((Number) o).longValue());
-    }
-
-    @Test
-    public void testLongContains() throws Exception {
-        final JexlScript e = JEXL.createScript("(x)->{ x =~ (90000000001L..90000000010L) }");
-        final JexlContext jc = new MapContext();
-
-        Object o = e.execute(jc, 90000000005L);
-        Assert.assertEquals(Boolean.TRUE, o);
-        o = e.execute(jc, 0);
-        Assert.assertEquals(Boolean.FALSE, o);
-        o = e.execute(jc, 90000000011L);
-        Assert.assertEquals(Boolean.FALSE, o);
     }
 }

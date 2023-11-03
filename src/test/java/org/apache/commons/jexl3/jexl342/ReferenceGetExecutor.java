@@ -58,9 +58,8 @@ public class ReferenceGetExecutor implements JexlPropertyGet {
     }
 
     @Override
-    public Object tryInvoke(final Object ref, final Object key) {
-        final Object obj = getReference(ref);
-        return obj == ref ? JexlEngine.TRY_FAILED : getter.tryInvoke(obj, key);
+    public boolean isCacheable() {
+        return getter.isCacheable();
     }
 
     @Override
@@ -69,7 +68,8 @@ public class ReferenceGetExecutor implements JexlPropertyGet {
     }
 
     @Override
-    public boolean isCacheable() {
-        return getter.isCacheable();
+    public Object tryInvoke(final Object ref, final Object key) {
+        final Object obj = getReference(ref);
+        return obj == ref ? JexlEngine.TRY_FAILED : getter.tryInvoke(obj, key);
     }
 }

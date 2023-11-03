@@ -81,15 +81,6 @@ public class MethodKeyTest {
     /** the list of keys we generated & test against */
     private static final MethodKey[] KEY_LIST;
 
-    /** * Creates & inserts a key into the BY_KEY & byString map */
-    private static void setUpKey(final String name, final Class<?>[] parms) {
-        final MethodKey key = new MethodKey(name, parms);
-        final String str = key.toString();
-        BY_KEY.put(key, str);
-        BY_STRING.put(str, key);
-
-    }
-
     /* Generate a list of method*(prims*), method(prims*, prims*), method*(prims*,prims*,prims*) */
     static {
         BY_KEY = new java.util.HashMap<>();
@@ -111,13 +102,22 @@ public class MethodKeyTest {
         KEY_LIST = BY_KEY.keySet().toArray(new MethodKey[0]);
     }
 
-    /** Builds a string key */
-    String makeStringKey(final String method, final Class<?>... params) {
-        final StringBuilder builder = new StringBuilder(method);
-        for (final Class<?> param : params) {
-            builder.append(MethodKey.primitiveClass(param).getName());
-        }
-        return builder.toString();
+    private static final int LOOP = 3;//00;
+
+    /** * Creates & inserts a key into the BY_KEY & byString map */
+    private static void setUpKey(final String name, final Class<?>[] parms) {
+        final MethodKey key = new MethodKey(name, parms);
+        final String str = key.toString();
+        BY_KEY.put(key, str);
+        BY_STRING.put(str, key);
+
+    }
+
+    /** Checks that a method key exists */
+    void checkKey(final String method, final Class<?>... params) {
+        final MethodKey key = makeKey(method, params);
+        final String out = BY_KEY.get(key);
+        Assert.assertNotNull(out);
     }
 
     /** Checks that a string key does exist */
@@ -132,11 +132,13 @@ public class MethodKeyTest {
         return new MethodKey(method, params);
     }
 
-    /** Checks that a method key exists */
-    void checkKey(final String method, final Class<?>... params) {
-        final MethodKey key = makeKey(method, params);
-        final String out = BY_KEY.get(key);
-        Assert.assertNotNull(out);
+    /** Builds a string key */
+    String makeStringKey(final String method, final Class<?>... params) {
+        final StringBuilder builder = new StringBuilder(method);
+        for (final Class<?> param : params) {
+            builder.append(MethodKey.primitiveClass(param).getName());
+        }
+        return builder.toString();
     }
 
     @Test
@@ -156,36 +158,12 @@ public class MethodKeyTest {
         }
 
     }
-
-    @Test
-    public void testStringKey() throws Exception {
-        for (final MethodKey ctl : KEY_LIST) {
-            final String key = makeStringKey(ctl.getMethod(), ctl.getParameters());
-            final MethodKey out = BY_STRING.get(key);
-            Assert.assertNotNull(out);
-            Assert.assertEquals(ctl.toString() + " != " + key, ctl, out);
-        }
-
-    }
-    private static final int LOOP = 3;//00;
-
     @Test
     public void testPerfKey() throws Exception {
         for (int l = 0; l < LOOP; ++l) {
             for (final MethodKey ctl : KEY_LIST) {
                 final MethodKey key = makeKey(ctl.getMethod(), ctl.getParameters());
                 final String out = BY_KEY.get(key);
-                Assert.assertNotNull(out);
-            }
-        }
-    }
-
-    @Test
-    public void testPerfString() throws Exception {
-        for (int l = 0; l < LOOP; ++l) {
-            for (final MethodKey ctl : KEY_LIST) {
-                final String key = makeStringKey(ctl.getMethod(), ctl.getParameters());
-                final MethodKey out = BY_STRING.get(key);
                 Assert.assertNotNull(out);
             }
         }
@@ -209,6 +187,17 @@ public class MethodKeyTest {
     }
 
     @Test
+    public void testPerfString() throws Exception {
+        for (int l = 0; l < LOOP; ++l) {
+            for (final MethodKey ctl : KEY_LIST) {
+                final String key = makeStringKey(ctl.getMethod(), ctl.getParameters());
+                final MethodKey out = BY_STRING.get(key);
+                Assert.assertNotNull(out);
+            }
+        }
+    }
+
+    @Test
     public void testPerfStringKey2() throws Exception {
         for (int l = 0; l < LOOP; ++l) {
             for (final String method : METHODS) {
@@ -223,5 +212,16 @@ public class MethodKeyTest {
                 }
             }
         }
+    }
+
+    @Test
+    public void testStringKey() throws Exception {
+        for (final MethodKey ctl : KEY_LIST) {
+            final String key = makeStringKey(ctl.getMethod(), ctl.getParameters());
+            final MethodKey out = BY_STRING.get(key);
+            Assert.assertNotNull(out);
+            Assert.assertEquals(ctl.toString() + " != " + key, ctl, out);
+        }
+
     }
 }

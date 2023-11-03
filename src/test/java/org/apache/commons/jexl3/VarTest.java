@@ -39,139 +39,166 @@ import org.junit.Test;
  */
 @SuppressWarnings({"UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
 public class VarTest extends JexlTestCase {
-    static final Log LOGGER = LogFactory.getLog(VarTest.class.getName());
-    public static final SimpleDateFormat SDF = new SimpleDateFormat("yyyy-MM-dd");
-    static {
-        SDF.setTimeZone(TimeZone.getTimeZone("UTC"));
-    }
-
-    public VarTest() {
-        super("VarTest");
-    }
-
-    @Test
-    public void testStrict() throws Exception {
-        final JexlEvalContext env = new JexlEvalContext();
-        final JexlOptions options = env.getEngineOptions();
-        final JexlContext ctxt = new ReadonlyContext(env, options);
-        options.setStrict(true);
-        options.setSilent(false);
-        options.setSafe(false);
-        JexlScript e;
-
-        e = JEXL.createScript("x");
-        try {
-            final Object o = e.execute(ctxt);
-            Assert.fail("should have thrown an unknown var exception");
-        } catch (final JexlException xjexl) {
-            // ok since we are strict and x does not exist
-        }
-        e = JEXL.createScript("x = 42");
-        try {
-            final Object o = e.execute(ctxt);
-            Assert.fail("should have thrown a readonly context exception");
-        } catch (final JexlException xjexl) {
-            // ok since we are strict and context is readonly
-        }
-
-        env.set("x", "fourty-two");
-        e = JEXL.createScript("x.theAnswerToEverything()");
-        try {
-            final Object o = e.execute(ctxt);
-            Assert.fail("should have thrown an unknown method exception");
-        } catch (final JexlException xjexl) {
-            // ok since we are strict and method does not exist
-        }
-    }
-
-    @Test
-    public void testLocalBasic() throws Exception {
-        final JexlScript e = JEXL.createScript("var x; x = 42");
-        final Object o = e.execute(null);
-        Assert.assertEquals("Result is not 42", Integer.valueOf(42), o);
-    }
-
-    @Test
-    public void testLocalSimple() throws Exception {
-        final JexlScript e = JEXL.createScript("var x = 21; x + x");
-        final Object o = e.execute(null);
-        Assert.assertEquals("Result is not 42", Integer.valueOf(42), o);
-    }
-
-    @Test
-    public void testLocalFor() throws Exception {
-        final JexlScript e = JEXL.createScript("var y  = 0; for(var x : [5, 17, 20]) { y = y + x; } y;");
-        final Object o = e.execute(null);
-        Assert.assertEquals("Result is not 42", Integer.valueOf(42), o);
-    }
-
     public static class NumbersContext extends MapContext implements JexlContext.NamespaceResolver {
+        public Object numbers() {
+            return new int[]{5, 17, 20};
+        }
+
         @Override
         public Object resolveNamespace(final String name) {
             return name == null ? this : null;
         }
+    }
+    public static class TheVarContext {
+        private int x;
+        private String color;
 
-        public Object numbers() {
-            return new int[]{5, 17, 20};
+        public String getColor() {
+            return color;
+        }
+
+        public int getX() {
+            return x;
+        }
+
+        public void setColor(final String color) {
+            this.color = color;
+        }
+
+        public void setX(final int x) {
+            this.x = x;
         }
     }
-
-    @Test
-    public void testLocalForFunc() throws Exception {
-        final JexlContext jc = new NumbersContext();
-        final JexlScript e = JEXL.createScript("var y  = 0; for(var x : numbers()) { y = y + x; } y;");
-        final Object o = e.execute(jc);
-        Assert.assertEquals("Result is not 42", Integer.valueOf(42), o);
-    }
-
-    @Test
-    public void testLocalForFuncReturn() throws Exception {
-        final JexlContext jc = new NumbersContext();
-        final JexlScript e = JEXL.createScript("var y  = 42; for(var x : numbers()) { if (x > 10) return x } y;");
-        final Object o = e.execute(jc);
-        Assert.assertEquals("Result is not 17", Integer.valueOf(17), o);
-
-        Assert.assertTrue(toString(e.getVariables()), e.getVariables().isEmpty());
-    }
-
     /**
-     * Generate a string representation of Set&lt;List&t;String>>, useful to dump script variables
-     * @param refs the variable reference set
-     * @return  the string representation
+     * Dates that can return multiple properties in one call.
      */
-    String toString(final Set<List<String>> refs) {
-        final StringBuilder strb = new StringBuilder("{");
-        int r = 0;
-        for (final List<String> strs : refs) {
-            if (r++ > 0) {
-                strb.append(", ");
-            }
-            strb.append("{");
-            for (int s = 0; s < strs.size(); ++s) {
-                if (s > 0) {
-                    strb.append(", ");
+    public static class VarDate {
+        private final Calendar cal;
+
+        public VarDate(final Date date) {
+            cal = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+            cal.setTime(date);
+            cal.setLenient(true);
+        }
+        public VarDate(final String date) throws Exception {
+            this(SDF.parse(date));
+        }
+
+        /**
+         * Gets a list of properties.
+         * @param keys the property names
+         * @return the property values
+         */
+        public List<String> get(final List<String> keys) {
+            final List<String> values = new ArrayList<>();
+            for(final String key : keys) {
+                final String value = get(key);
+                if (value != null) {
+                    values.add(value);
                 }
-                strb.append('"');
-                strb.append(strs.get(s));
-                strb.append('"');
             }
-            strb.append("}");
+            return values;
         }
-        strb.append("}");
-        return strb.toString();
+
+        /**
+         * Gets a map of properties.
+         * <p>Uses each map key as a property name and each value as an alias
+         * used to key the resulting property value.
+         * @param map a map of property name to alias
+         * @return the alia map
+         */
+        public Map<String,Object> get(final Map<String,String> map) {
+            final Map<String,Object> values = new LinkedHashMap<>();
+            for(final Map.Entry<String,String> entry : map.entrySet()) {
+                final String value = get(entry.getKey());
+                if (value != null) {
+                    values.put(entry.getValue(), value);
+                }
+            }
+            return values;
+        }
+
+        /**
+         * Gets a date property
+         * @param property yyyy or MM or dd
+         * @return the string representation of year, month or day
+         */
+        public String get(final String property) {
+            if ("yyyy".equals(property)) {
+                return Integer.toString(cal.get(Calendar.YEAR));
+            }
+            if ("MM".equals(property)) {
+                return Integer.toString(cal.get(Calendar.MONTH) + 1);
+            }
+
+            if ("dd".equals(property)) {
+                return Integer.toString(cal.get(Calendar.DAY_OF_MONTH));
+            }
+            return null;
+        }
+
+        /**
+         * Gets a list of properties.
+         * @param keys the property names
+         * @return the property values
+         */
+        public List<String> get(final String[] keys) {
+            return get(Arrays.asList(keys));
+        }
+    }
+
+    static final Log LOGGER = LogFactory.getLog(VarTest.class.getName());
+
+    public static final SimpleDateFormat SDF = new SimpleDateFormat("yyyy-MM-dd");
+
+    static {
+        SDF.setTimeZone(TimeZone.getTimeZone("UTC"));
     }
 
     /**
-     * Creates a variable reference set from an array of array of strings.
-     * @param refs the variable reference set
-     * @return the set of variables
+     * Getting properties from an array, set or map.
+     * @param str the stringified source
+     * @return the properties array
      */
-    Set<List<String>> mkref(final String[][] refs) {
-        final Set<List<String>> set = new HashSet<>();
-        for(final String[] ref : refs) {
-            set.add(Arrays.asList(ref));
+    private static String[] readIdentifiers(final String str) {
+        final List<String> ids = new ArrayList<>();
+        StringBuilder strb = null;
+        String id = null;
+        char kind = 0; // array, set or map kind using first char
+        for (int i = 0; i < str.length(); ++i) {
+            final char c = str.charAt(i);
+            // strb != null when array,set or map deteced
+            if (strb == null) {
+                if (c == '{' || c == '(' || c == '[') {
+                    strb = new StringBuilder();
+                    kind = c;
+                }
+                continue;
+            }
+            // identifier pending to be added (only add map keys)
+            if (id != null && c == ']' || c == ')'
+                || kind != '{' && c == ',' // array or set
+                || kind == '{' && c == ':') // map key
+            {
+                ids.add(id);
+                id = null;
+            }
+            else if (c == '\'' || c == '"') {
+                strb.append(c);
+                final int l = StringParser.readString(strb, str, i + 1, c);
+                if (l > 0) {
+                    id = strb.substring(1, strb.length() - 1);
+                    strb.delete(0, l + 1);
+                    i = l;
+                }
+            }
+            // discard all chars not in identifier
         }
-        return set;
+        return ids.toArray(new String[0]);
+    }
+
+    public VarTest() {
+        super("VarTest");
     }
 
     /**
@@ -196,6 +223,19 @@ public class VarTest extends JexlTestCase {
         return true;
     }
 
+    /**
+     * Creates a variable reference set from an array of array of strings.
+     * @param refs the variable reference set
+     * @return the set of variables
+     */
+    Set<List<String>> mkref(final String[][] refs) {
+        final Set<List<String>> set = new HashSet<>();
+        for(final String[] ref : refs) {
+            set.add(Arrays.asList(ref));
+        }
+        return set;
+    }
+
     List<String> stringify(final Set<List<String>> sls) {
         final List<String> ls = new ArrayList<>();
         for(final List<String> l : sls) {
@@ -208,6 +248,177 @@ public class VarTest extends JexlTestCase {
         }
         ls.sort(null);
         return ls;
+    }
+
+    @Test
+    public void testLiteral() throws Exception {
+        JexlBuilder builder = new JexlBuilder().collectMode(2);
+        Assert.assertEquals(2, builder.collectMode());
+        Assert.assertTrue(builder.collectAll());
+
+        JexlEngine jexld = builder.create();
+        JexlScript e = jexld.createScript("x.y[['z', 't']]");
+        Set<List<String>> vars = e.getVariables();
+        Assert.assertEquals(1, vars.size());
+        Assert.assertTrue(eq(mkref(new String[][]{{"x", "y", "[ 'z', 't' ]"}}), vars));
+
+        e = jexld.createScript("x.y[{'z': 't'}]");
+        vars = e.getVariables();
+        Assert.assertEquals(1, vars.size());
+        Assert.assertTrue(eq(mkref(new String[][]{{"x", "y", "{ 'z' : 't' }"}}), vars));
+
+        e = jexld.createScript("x.y.'{ \\'z\\' : \\'t\\' }'");
+        vars = e.getVariables();
+        Assert.assertEquals(1, vars.size());
+        Assert.assertTrue(eq(mkref(new String[][]{{"x", "y", "{ 'z' : 't' }"}}), vars));
+
+        // only string or number literals
+        builder = builder.collectAll(true);
+        Assert.assertEquals(1, builder.collectMode());
+        Assert.assertTrue(builder.collectAll());
+
+        jexld = builder.create();
+        e = jexld.createScript("x.y[{'z': 't'}]");
+        vars = e.getVariables();
+        Assert.assertEquals(1, vars.size());
+        Assert.assertTrue(eq(mkref(new String[][]{{"x", "y"}}), vars));
+
+        e = jexld.createScript("x.y[['z', 't']]");
+        vars = e.getVariables();
+        Assert.assertEquals(1, vars.size());
+        Assert.assertTrue(eq(mkref(new String[][]{{"x", "y"}}), vars));
+
+        e = jexld.createScript("x.y['z']");
+        vars = e.getVariables();
+        Assert.assertEquals(1, vars.size());
+        Assert.assertTrue(eq(mkref(new String[][]{{"x", "y", "z"}}), vars));
+
+        e = jexld.createScript("x.y[42]");
+        vars = e.getVariables();
+        Assert.assertEquals(1, vars.size());
+        Assert.assertTrue(eq(mkref(new String[][]{{"x", "y", "42"}}), vars));
+    }
+
+    @Test
+    public void testLocalBasic() throws Exception {
+        final JexlScript e = JEXL.createScript("var x; x = 42");
+        final Object o = e.execute(null);
+        Assert.assertEquals("Result is not 42", Integer.valueOf(42), o);
+    }
+
+    @Test
+    public void testLocalFor() throws Exception {
+        final JexlScript e = JEXL.createScript("var y  = 0; for(var x : [5, 17, 20]) { y = y + x; } y;");
+        final Object o = e.execute(null);
+        Assert.assertEquals("Result is not 42", Integer.valueOf(42), o);
+    }
+
+    @Test
+    public void testLocalForFunc() throws Exception {
+        final JexlContext jc = new NumbersContext();
+        final JexlScript e = JEXL.createScript("var y  = 0; for(var x : numbers()) { y = y + x; } y;");
+        final Object o = e.execute(jc);
+        Assert.assertEquals("Result is not 42", Integer.valueOf(42), o);
+    }
+
+    @Test
+    public void testLocalForFuncReturn() throws Exception {
+        final JexlContext jc = new NumbersContext();
+        final JexlScript e = JEXL.createScript("var y  = 42; for(var x : numbers()) { if (x > 10) return x } y;");
+        final Object o = e.execute(jc);
+        Assert.assertEquals("Result is not 17", Integer.valueOf(17), o);
+
+        Assert.assertTrue(toString(e.getVariables()), e.getVariables().isEmpty());
+    }
+
+    @Test
+    public void testLocalSimple() throws Exception {
+        final JexlScript e = JEXL.createScript("var x = 21; x + x");
+        final Object o = e.execute(null);
+        Assert.assertEquals("Result is not 42", Integer.valueOf(42), o);
+    }
+
+    @Test
+    public void testMix() throws Exception {
+        JexlScript e;
+        // x is a parameter, y a context variable, z a local variable
+        e = JEXL.createScript("if (x) { y } else { var z = 2 * x}", "x");
+        final Set<List<String>> vars = e.getVariables();
+        final String[] parms = e.getParameters();
+        final String[] locals = e.getLocalVariables();
+
+        Assert.assertTrue(eq(mkref(new String[][]{{"y"}}), vars));
+        Assert.assertEquals(1, parms.length);
+        Assert.assertEquals("x", parms[0]);
+        Assert.assertEquals(1, locals.length);
+        Assert.assertEquals("z", locals[0]);
+    }
+
+    @Test
+    public void testObjectContext() throws Exception {
+        final TheVarContext vars = new TheVarContext();
+        final JexlContext jc = new ObjectContext<>(JEXL, vars);
+        try {
+            JexlScript script;
+            Object result;
+            script = JEXL.createScript("x = 3");
+            result = script.execute(jc);
+            Assert.assertEquals(3, vars.getX());
+            Assert.assertEquals(3, result);
+            script = JEXL.createScript("x == 3");
+            result = script.execute(jc);
+            Assert.assertTrue((Boolean) result);
+            Assert.assertTrue(jc.has("x"));
+
+            script = JEXL.createScript("color = 'blue'");
+            result = script.execute(jc);
+            Assert.assertEquals("blue", vars.getColor());
+            Assert.assertEquals("blue", result);
+            script = JEXL.createScript("color == 'blue'");
+            result = script.execute(jc);
+            Assert.assertTrue((Boolean) result);
+            Assert.assertTrue(jc.has("color"));
+        } catch (final JexlException.Method ambiguous) {
+            Assert.fail("total() is solvable");
+        }
+    }
+
+    @Test
+    public void testReferenceLiteral() throws Exception {
+        final JexlEngine jexld = new JexlBuilder().collectMode(2).create();
+        JexlScript script;
+        List<String> result;
+        Set<List<String>> vars;
+        // in collectAll mode, the collector grabs all syntactic variations of
+        // constant variable references including map/arry/set literals
+        final JexlContext ctxt = new MapContext();
+        //d.yyyy = 1969; d.MM = 7; d.dd = 20
+        ctxt.set("moon.landing", new VarDate("1969-07-20"));
+
+        script = jexld.createScript("moon.landing[['yyyy', 'MM', 'dd']]");
+        result = (List<String>) script.execute(ctxt);
+        Assert.assertEquals(Arrays.asList("1969", "7", "20"), result);
+
+        vars = script.getVariables();
+        Assert.assertEquals(1, vars.size());
+        List<String> var = vars.iterator().next();
+        Assert.assertEquals("moon", var.get(0));
+        Assert.assertEquals("landing", var.get(1));
+        Assert.assertArrayEquals(new String[]{"yyyy", "MM", "dd"}, readIdentifiers(var.get(2)));
+
+        script = jexld.createScript("moon.landing[ { 'yyyy' : 'year', 'MM' : 'month', 'dd' : 'day' } ]");
+        final Map<String, String> mapr = (Map<String, String>) script.execute(ctxt);
+        Assert.assertEquals(3, mapr.size());
+        Assert.assertEquals("1969", mapr.get("year"));
+        Assert.assertEquals("7", mapr.get("month"));
+        Assert.assertEquals("20", mapr.get("day"));
+
+        vars = script.getVariables();
+        Assert.assertEquals(1, vars.size());
+        var = vars.iterator().next();
+        Assert.assertEquals("moon", var.get(0));
+        Assert.assertEquals("landing", var.get(1));
+        Assert.assertArrayEquals(new String[]{"yyyy", "MM", "dd"}, readIdentifiers(var.get(2)));
     }
 
     @Test
@@ -329,6 +540,49 @@ public class VarTest extends JexlTestCase {
     }
 
     @Test
+    public void testStrict() throws Exception {
+        final JexlEvalContext env = new JexlEvalContext();
+        final JexlOptions options = env.getEngineOptions();
+        final JexlContext ctxt = new ReadonlyContext(env, options);
+        options.setStrict(true);
+        options.setSilent(false);
+        options.setSafe(false);
+        JexlScript e;
+
+        e = JEXL.createScript("x");
+        try {
+            final Object o = e.execute(ctxt);
+            Assert.fail("should have thrown an unknown var exception");
+        } catch (final JexlException xjexl) {
+            // ok since we are strict and x does not exist
+        }
+        e = JEXL.createScript("x = 42");
+        try {
+            final Object o = e.execute(ctxt);
+            Assert.fail("should have thrown a readonly context exception");
+        } catch (final JexlException xjexl) {
+            // ok since we are strict and context is readonly
+        }
+
+        env.set("x", "fourty-two");
+        e = JEXL.createScript("x.theAnswerToEverything()");
+        try {
+            final Object o = e.execute(ctxt);
+            Assert.fail("should have thrown an unknown method exception");
+        } catch (final JexlException xjexl) {
+            // ok since we are strict and method does not exist
+        }
+    }
+
+    @Test
+    public void testSyntacticVariations() throws Exception {
+        final JexlScript script = JEXL.createScript("sum(TOTAL) - partial.sum() + partial['sub'].avg() - sum(partial.sub)");
+        final Set<List<String>> vars = script.getVariables();
+
+        Assert.assertEquals(3, vars.size());
+    }
+
+    @Test
     public void testVarCollectNotAll() throws Exception {
         JexlScript e;
         Set<List<String>> vars;
@@ -361,285 +615,31 @@ public class VarTest extends JexlTestCase {
         Assert.assertTrue(eq(expect, vars));
     }
 
-    @Test
-    public void testMix() throws Exception {
-        JexlScript e;
-        // x is a parameter, y a context variable, z a local variable
-        e = JEXL.createScript("if (x) { y } else { var z = 2 * x}", "x");
-        final Set<List<String>> vars = e.getVariables();
-        final String[] parms = e.getParameters();
-        final String[] locals = e.getLocalVariables();
-
-        Assert.assertTrue(eq(mkref(new String[][]{{"y"}}), vars));
-        Assert.assertEquals(1, parms.length);
-        Assert.assertEquals("x", parms[0]);
-        Assert.assertEquals(1, locals.length);
-        Assert.assertEquals("z", locals[0]);
-    }
-
     /**
-     * Dates that can return multiple properties in one call.
+     * Generate a string representation of Set&lt;List&t;String>>, useful to dump script variables
+     * @param refs the variable reference set
+     * @return  the string representation
      */
-    public static class VarDate {
-        private final Calendar cal;
-
-        public VarDate(final String date) throws Exception {
-            this(SDF.parse(date));
-        }
-        public VarDate(final Date date) {
-            cal = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
-            cal.setTime(date);
-            cal.setLenient(true);
-        }
-
-        /**
-         * Gets a date property
-         * @param property yyyy or MM or dd
-         * @return the string representation of year, month or day
-         */
-        public String get(final String property) {
-            if ("yyyy".equals(property)) {
-                return Integer.toString(cal.get(Calendar.YEAR));
+    String toString(final Set<List<String>> refs) {
+        final StringBuilder strb = new StringBuilder("{");
+        int r = 0;
+        for (final List<String> strs : refs) {
+            if (r++ > 0) {
+                strb.append(", ");
             }
-            if ("MM".equals(property)) {
-                return Integer.toString(cal.get(Calendar.MONTH) + 1);
-            }
-
-            if ("dd".equals(property)) {
-                return Integer.toString(cal.get(Calendar.DAY_OF_MONTH));
-            }
-            return null;
-        }
-
-        /**
-         * Gets a list of properties.
-         * @param keys the property names
-         * @return the property values
-         */
-        public List<String> get(final String[] keys) {
-            return get(Arrays.asList(keys));
-        }
-
-        /**
-         * Gets a list of properties.
-         * @param keys the property names
-         * @return the property values
-         */
-        public List<String> get(final List<String> keys) {
-            final List<String> values = new ArrayList<>();
-            for(final String key : keys) {
-                final String value = get(key);
-                if (value != null) {
-                    values.add(value);
+            strb.append("{");
+            for (int s = 0; s < strs.size(); ++s) {
+                if (s > 0) {
+                    strb.append(", ");
                 }
+                strb.append('"');
+                strb.append(strs.get(s));
+                strb.append('"');
             }
-            return values;
+            strb.append("}");
         }
-
-        /**
-         * Gets a map of properties.
-         * <p>Uses each map key as a property name and each value as an alias
-         * used to key the resulting property value.
-         * @param map a map of property name to alias
-         * @return the alia map
-         */
-        public Map<String,Object> get(final Map<String,String> map) {
-            final Map<String,Object> values = new LinkedHashMap<>();
-            for(final Map.Entry<String,String> entry : map.entrySet()) {
-                final String value = get(entry.getKey());
-                if (value != null) {
-                    values.put(entry.getValue(), value);
-                }
-            }
-            return values;
-        }
-    }
-
-    /**
-     * Getting properties from an array, set or map.
-     * @param str the stringified source
-     * @return the properties array
-     */
-    private static String[] readIdentifiers(final String str) {
-        final List<String> ids = new ArrayList<>();
-        StringBuilder strb = null;
-        String id = null;
-        char kind = 0; // array, set or map kind using first char
-        for (int i = 0; i < str.length(); ++i) {
-            final char c = str.charAt(i);
-            // strb != null when array,set or map deteced
-            if (strb == null) {
-                if (c == '{' || c == '(' || c == '[') {
-                    strb = new StringBuilder();
-                    kind = c;
-                }
-                continue;
-            }
-            // identifier pending to be added (only add map keys)
-            if (id != null && c == ']' || c == ')'
-                || kind != '{' && c == ',' // array or set
-                || kind == '{' && c == ':') // map key
-            {
-                ids.add(id);
-                id = null;
-            }
-            else if (c == '\'' || c == '"') {
-                strb.append(c);
-                final int l = StringParser.readString(strb, str, i + 1, c);
-                if (l > 0) {
-                    id = strb.substring(1, strb.length() - 1);
-                    strb.delete(0, l + 1);
-                    i = l;
-                }
-            }
-            // discard all chars not in identifier
-        }
-        return ids.toArray(new String[0]);
-    }
-
-    @Test
-    public void testReferenceLiteral() throws Exception {
-        final JexlEngine jexld = new JexlBuilder().collectMode(2).create();
-        JexlScript script;
-        List<String> result;
-        Set<List<String>> vars;
-        // in collectAll mode, the collector grabs all syntactic variations of
-        // constant variable references including map/arry/set literals
-        final JexlContext ctxt = new MapContext();
-        //d.yyyy = 1969; d.MM = 7; d.dd = 20
-        ctxt.set("moon.landing", new VarDate("1969-07-20"));
-
-        script = jexld.createScript("moon.landing[['yyyy', 'MM', 'dd']]");
-        result = (List<String>) script.execute(ctxt);
-        Assert.assertEquals(Arrays.asList("1969", "7", "20"), result);
-
-        vars = script.getVariables();
-        Assert.assertEquals(1, vars.size());
-        List<String> var = vars.iterator().next();
-        Assert.assertEquals("moon", var.get(0));
-        Assert.assertEquals("landing", var.get(1));
-        Assert.assertArrayEquals(new String[]{"yyyy", "MM", "dd"}, readIdentifiers(var.get(2)));
-
-        script = jexld.createScript("moon.landing[ { 'yyyy' : 'year', 'MM' : 'month', 'dd' : 'day' } ]");
-        final Map<String, String> mapr = (Map<String, String>) script.execute(ctxt);
-        Assert.assertEquals(3, mapr.size());
-        Assert.assertEquals("1969", mapr.get("year"));
-        Assert.assertEquals("7", mapr.get("month"));
-        Assert.assertEquals("20", mapr.get("day"));
-
-        vars = script.getVariables();
-        Assert.assertEquals(1, vars.size());
-        var = vars.iterator().next();
-        Assert.assertEquals("moon", var.get(0));
-        Assert.assertEquals("landing", var.get(1));
-        Assert.assertArrayEquals(new String[]{"yyyy", "MM", "dd"}, readIdentifiers(var.get(2)));
-    }
-
-    @Test
-    public void testLiteral() throws Exception {
-        JexlBuilder builder = new JexlBuilder().collectMode(2);
-        Assert.assertEquals(2, builder.collectMode());
-        Assert.assertTrue(builder.collectAll());
-
-        JexlEngine jexld = builder.create();
-        JexlScript e = jexld.createScript("x.y[['z', 't']]");
-        Set<List<String>> vars = e.getVariables();
-        Assert.assertEquals(1, vars.size());
-        Assert.assertTrue(eq(mkref(new String[][]{{"x", "y", "[ 'z', 't' ]"}}), vars));
-
-        e = jexld.createScript("x.y[{'z': 't'}]");
-        vars = e.getVariables();
-        Assert.assertEquals(1, vars.size());
-        Assert.assertTrue(eq(mkref(new String[][]{{"x", "y", "{ 'z' : 't' }"}}), vars));
-
-        e = jexld.createScript("x.y.'{ \\'z\\' : \\'t\\' }'");
-        vars = e.getVariables();
-        Assert.assertEquals(1, vars.size());
-        Assert.assertTrue(eq(mkref(new String[][]{{"x", "y", "{ 'z' : 't' }"}}), vars));
-
-        // only string or number literals
-        builder = builder.collectAll(true);
-        Assert.assertEquals(1, builder.collectMode());
-        Assert.assertTrue(builder.collectAll());
-
-        jexld = builder.create();
-        e = jexld.createScript("x.y[{'z': 't'}]");
-        vars = e.getVariables();
-        Assert.assertEquals(1, vars.size());
-        Assert.assertTrue(eq(mkref(new String[][]{{"x", "y"}}), vars));
-
-        e = jexld.createScript("x.y[['z', 't']]");
-        vars = e.getVariables();
-        Assert.assertEquals(1, vars.size());
-        Assert.assertTrue(eq(mkref(new String[][]{{"x", "y"}}), vars));
-
-        e = jexld.createScript("x.y['z']");
-        vars = e.getVariables();
-        Assert.assertEquals(1, vars.size());
-        Assert.assertTrue(eq(mkref(new String[][]{{"x", "y", "z"}}), vars));
-
-        e = jexld.createScript("x.y[42]");
-        vars = e.getVariables();
-        Assert.assertEquals(1, vars.size());
-        Assert.assertTrue(eq(mkref(new String[][]{{"x", "y", "42"}}), vars));
-    }
-
-    @Test
-    public void testSyntacticVariations() throws Exception {
-        final JexlScript script = JEXL.createScript("sum(TOTAL) - partial.sum() + partial['sub'].avg() - sum(partial.sub)");
-        final Set<List<String>> vars = script.getVariables();
-
-        Assert.assertEquals(3, vars.size());
-    }
-
-    public static class TheVarContext {
-        private int x;
-        private String color;
-
-        public void setX(final int x) {
-            this.x = x;
-        }
-
-        public void setColor(final String color) {
-            this.color = color;
-        }
-
-        public int getX() {
-            return x;
-        }
-
-        public String getColor() {
-            return color;
-        }
-    }
-
-    @Test
-    public void testObjectContext() throws Exception {
-        final TheVarContext vars = new TheVarContext();
-        final JexlContext jc = new ObjectContext<>(JEXL, vars);
-        try {
-            JexlScript script;
-            Object result;
-            script = JEXL.createScript("x = 3");
-            result = script.execute(jc);
-            Assert.assertEquals(3, vars.getX());
-            Assert.assertEquals(3, result);
-            script = JEXL.createScript("x == 3");
-            result = script.execute(jc);
-            Assert.assertTrue((Boolean) result);
-            Assert.assertTrue(jc.has("x"));
-
-            script = JEXL.createScript("color = 'blue'");
-            result = script.execute(jc);
-            Assert.assertEquals("blue", vars.getColor());
-            Assert.assertEquals("blue", result);
-            script = JEXL.createScript("color == 'blue'");
-            result = script.execute(jc);
-            Assert.assertTrue((Boolean) result);
-            Assert.assertTrue(jc.has("color"));
-        } catch (final JexlException.Method ambiguous) {
-            Assert.fail("total() is solvable");
-        }
+        strb.append("}");
+        return strb.toString();
     }
 
 }
