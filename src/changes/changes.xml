@@ -42,6 +42,9 @@
                 Allow 'trailing commas' or ellipsis while defining array, map and set literals
             </action>
             <!-- FIX -->
+            <action dev="henrib" type="fix" issue="JEXL-412" due-to="Xu Pengcheng" >
+                Ambiguous syntax between namespace function call and map object definition.
+            </action>action>
             <action dev="henrib" type="fix" issue="JEXL-410" due-to="sebb">
                 JexlFeatures: ctor does not enable all features
             </action>

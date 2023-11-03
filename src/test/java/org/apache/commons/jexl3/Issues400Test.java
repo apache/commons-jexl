@@ -16,8 +16,10 @@
  */
 package org.apache.commons.jexl3;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
@@ -211,6 +213,47 @@ public class Issues400Test {
       Assert.assertEquals(src0, "1*2*3*4", result);
       result = script1.execute(context, x);
       Assert.assertEquals(src1, "1*2*3*4", result);
+    }
+  }
+
+  @Test
+  public void test407() {
+    // Java version
+    double r = 99.0d + 7.82d -99.0d -7.82d;
+    Assert.assertEquals(0d, r, 8.e-15); // Not zero, IEEE 754
+    // jexl
+    final JexlEngine jexl = new JexlBuilder().create();
+    JexlScript script = jexl.createScript("a + b - a - b", "a", "b");
+    // using doubles, same as Java
+    Number result = (Number) script.execute(null, 99.0d, 7.82d);
+    Assert.assertEquals(0d, result.doubleValue(), 8.e-15);
+    // using BigdDecimal, more precise, still not zero
+    result = (Number) script.execute(null, new BigDecimal(99.0d), new BigDecimal(7.82d));
+    Assert.assertEquals(0d, result.doubleValue(), 3.e-32);
+  }
+
+
+  @Test
+  public void test412() {
+    Map<Object,Object> ctl = new HashMap<>();
+    ctl.put("one", 1);
+    ctl.put("two", 2);
+    String fnsrc = "function f(x) { x }\n" +
+        "let one = 'one', two = 'two';\n" +
+        "{ one : f(1), two:f(2) }";
+    final JexlContext jc = new MapContext();
+    final String[] sources = {
+       fnsrc
+    };
+    final JexlEngine jexl = new JexlBuilder().create();
+    try {
+      final JexlScript e = jexl.createScript(fnsrc);
+      final Object o = e.execute(jc);
+      Assert.assertTrue(o instanceof Map);
+      Map<?,?> map = (Map<?, ?>) o;
+      Assert.assertEquals(map, ctl);
+    } catch(JexlException.Parsing xparse) {
+      Assert.fail(fnsrc + " : " + xparse.getMessage());
     }
   }
 }

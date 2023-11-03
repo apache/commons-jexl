@@ -575,27 +575,51 @@ public abstract class JexlParser extends StringParser {
     }
 
     /**
-     * Checks whether a name identifies a declared namespace.
-     * @param token the namespace token
-     * @return true if the name qualifies a namespace
+     * Semantic check identifying whether a list of 4 tokens forms a namespace function call.
+     * <p>This is needed to disambiguate ternary operator, map entries and actual calls.</p>
+     * <p>Note that this check is performed before syntactic check so the expected parameters need to be
+     * verified.</p>
+     * @param ns the namespace token
+     * @param colon expected to be &quot;:&quot;
+     * @param fun the function name
+     * @param paren expected to be &quot;(&quot;
+     * @return true if the name qualifies a namespace function call
      */
-    protected boolean isDeclaredNamespace(final Token token, final Token colon) {
-        // syntactic hint, the namespace sticks to the colon
-        if (colon != null && ":".equals(colon.image) && colon.beginColumn - 1 == token.endColumn) {
+    protected boolean isNamespaceFuncall(final Token ns, final Token colon, final Token fun, final Token paren) {
+        // let's make sure this is a namespace function call
+        if (!":".equals(colon.image)) {
+            return false;
+        }
+        if (!"(".equals(paren.image)) {
+            return false;
+        }
+        // if namespace name is shared with a variable name, use syntactic hint
+        final String name = ns.image;
+        if (isVariable(name)) {
+            // the namespace sticks to the colon as in 'ns:fun()' (vs 'ns : fun()')
+            return colon.beginColumn - 1 == ns.endColumn && isNamespace(name);
+        }
+        return true;
+    }
+
+    /**
+     * Checks whether a name is a declared namespace.
+     * @param name the namespace name
+     * @return true if declared, false otherwise
+     */
+    private boolean isNamespace(String name) {
+        // templates
+        if ("jexl".equals(name) || "$jexl".equals(name)) {
             return true;
         }
-        // if name is shared with a variable name, use syntactic hint
-        final String name = token.image;
-        if (!isVariable(name)) {
-            final Set<String> ns = namespaces;
-            // declared through local pragma ?
-            if (ns != null && ns.contains(name)) {
-                return true;
-            }
-            // declared through engine features ?
-            if (getFeatures().namespaceTest().test(name)) {
-                return true;
-            }
+        final Set<String> ns = namespaces;
+        // declared through local pragma ?
+        if (ns != null && ns.contains(name)) {
+            return true;
+        }
+        // declared through engine features ?
+        if (getFeatures().namespaceTest().test(name)) {
+            return true;
         }
         return false;
     }
