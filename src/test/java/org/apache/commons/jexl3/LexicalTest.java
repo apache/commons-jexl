@@ -349,7 +349,7 @@ public class LexicalTest {
     }
 
     @Test
-    public void tesstCaptured0() {
+    public void testCaptured0() {
         final JexlFeatures f = new JexlFeatures();
         f.lexical(true);
         final JexlEngine jexl = new JexlBuilder().strict(true).features(f).create();
