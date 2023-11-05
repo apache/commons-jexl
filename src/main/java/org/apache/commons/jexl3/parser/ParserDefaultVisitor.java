@@ -20,4 +20,4 @@ package org.apache.commons.jexl3.parser;
  * This class only exists to prevent JJTree from generating it, since it
  * expects {@link ParserVisitor} to be an interface, not an abstract class.
  */
-class ParserDefaultVisitor { }
+final class ParserDefaultVisitor { }

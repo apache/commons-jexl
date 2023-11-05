@@ -173,7 +173,7 @@ public class SoftCache<K, V> {
  * @param <K> key type
  * @param <V> value type
  */
-class SoftCacheEntry<K, V> implements Map.Entry<K, V> {
+final class SoftCacheEntry<K, V> implements Map.Entry<K, V> {
     /**
      * The entry key.
      */

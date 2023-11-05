@@ -384,7 +384,7 @@ public interface JexlPermissions {
      * <p>Typical use case is to deny access to a package - and thus all its classes - but allow
      * a few specific classes.</p>
      */
-     class ClassPermissions extends JexlPermissions.Delegate {
+     final class ClassPermissions extends JexlPermissions.Delegate {
         /** The set of explicitly allowed classes, overriding the delegate permissions. */
         private final Set<String> allowedClasses;
 

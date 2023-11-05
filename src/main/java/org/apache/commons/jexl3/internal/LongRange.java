@@ -234,7 +234,7 @@ public abstract class LongRange implements Collection<Long> {
 /**
  * An iterator on a long range.
  */
-class AscLongIterator implements Iterator<Long> {
+final class AscLongIterator implements Iterator<Long> {
     /** The lower boundary. */
     private final long min;
     /** The upper boundary. */
@@ -275,7 +275,7 @@ class AscLongIterator implements Iterator<Long> {
 /**
  * An iterator on a long range.
  */
-class DescLongIterator implements Iterator<Long> {
+final class DescLongIterator implements Iterator<Long> {
     /** The lower boundary. */
     private final long min;
     /** The upper boundary. */

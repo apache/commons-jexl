@@ -232,7 +232,7 @@ public abstract class IntegerRange implements Collection<Integer> {
 /**
  * An ascending iterator on an integer range.
  */
-class AscIntegerIterator implements Iterator<Integer> {
+final class AscIntegerIterator implements Iterator<Integer> {
     /** The lower boundary. */
     private final int min;
     /** The upper boundary. */
@@ -272,7 +272,7 @@ class AscIntegerIterator implements Iterator<Integer> {
 /**
  * A descending iterator on an integer range.
  */
-class DescIntegerIterator implements Iterator<Integer> {
+final class DescIntegerIterator implements Iterator<Integer> {
     /** The lower boundary. */
     private final int min;
     /** The upper boundary. */

@@ -23,7 +23,7 @@ import org.apache.commons.jexl3.internal.ScriptVisitor;
 /**
  * Checks if node is an operator node.
  **/
-class OperatorController extends ScriptVisitor {
+final class OperatorController extends ScriptVisitor {
     static final OperatorController INSTANCE  = new OperatorController();
 
     /**

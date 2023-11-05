@@ -385,7 +385,7 @@ public final class TemplateEngine extends JxltEngine {
     }
 
     /** A constant unified expression. */
-    class ConstantExpression extends TemplateExpression {
+    final class ConstantExpression extends TemplateExpression {
         /** The constant held by this unified expression. */
         private final Object value;
 
@@ -484,7 +484,7 @@ public final class TemplateEngine extends JxltEngine {
     }
 
     /** An immediate unified expression: ${jexl}. */
-    class ImmediateExpression extends JexlBasedExpression {
+    final class ImmediateExpression extends JexlBasedExpression {
         /**
          * Creates an immediate unified expression.
          * @param expr   the unified expression as a string
@@ -509,7 +509,7 @@ public final class TemplateEngine extends JxltEngine {
     }
 
     /** A deferred unified expression: #{jexl}. */
-    class DeferredExpression extends JexlBasedExpression {
+    final class DeferredExpression extends JexlBasedExpression {
         /**
          * Creates a deferred unified expression.
          * @param expr   the unified expression as a string
@@ -546,7 +546,7 @@ public final class TemplateEngine extends JxltEngine {
      * #{...${jexl}...}
      * Note that the deferred syntax is JEXL's.
      */
-    class NestedExpression extends JexlBasedExpression {
+    final class NestedExpression extends JexlBasedExpression {
         /**
          * Creates a nested unified expression.
          * @param expr   the unified expression as a string
@@ -590,7 +590,7 @@ public final class TemplateEngine extends JxltEngine {
     }
 
     /** A composite unified expression: "... ${...} ... #{...} ...". */
-    class CompositeExpression extends TemplateExpression {
+    final class CompositeExpression extends TemplateExpression {
         /** Bit encoded (deferred count > 0) bit 1, (immediate count > 0) bit 0. */
         private final int meta;
         /** The list of sub-expression resulting from parsing. */

@@ -31,7 +31,7 @@ import org.apache.commons.jexl3.introspection.JexlUberspect;
  * package names as roots of import.
  * <p>This only keeps names of classes to avoid any class loading/reloading/permissions issue.</p>
  */
- class FqcnResolver implements JexlContext.ClassNameResolver {
+ final class FqcnResolver implements JexlContext.ClassNameResolver {
     /**
      * The class loader.
      */
