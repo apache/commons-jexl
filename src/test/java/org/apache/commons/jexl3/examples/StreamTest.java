@@ -20,7 +20,10 @@ import static java.lang.Boolean.TRUE;
 
 import java.net.URI;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -40,7 +43,7 @@ import org.junit.Test;
  */
 public class StreamTest {
     /**
-     * A MapContext that can operate on streams.
+     * A MapContext that can operate on streams and collections.
      */
     public static class StreamContext extends MapContext {
         /**
@@ -62,6 +65,31 @@ public class StreamTest {
         public Stream<?> map(final Stream<?> stream, final JexlScript mapper) {
             return stream.map( x -> mapper.execute(this, x));
         }
+
+        /**
+         * This allows using a JEXL lambda as a filter.
+         * @param collection the collection
+         * @param filter the lambda to use as filter
+         * @return the filtered result as a list
+         */
+        public List<?> filter(Collection<?> collection, final JexlScript filter) {
+            return collection.stream()
+                .filter(x -> x != null && TRUE.equals(filter.execute(this, x)))
+                .collect(Collectors.toList());
+        }
+
+        /**
+         * This allows using a JEXL lambda as a mapper.
+         * @param collection the collection
+         * @param mapper the lambda to use as mapper
+         * @return the mapped result as a list
+         */
+        public List<?> map(Collection<?> collection, final JexlScript mapper) {
+            return collection.stream()
+                .map(x -> mapper.execute(this, x))
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+        }
     }
 
     /** Our engine instance. */
@@ -76,13 +104,17 @@ public class StreamTest {
         // Restricted permissions to a safe set but with URI allowed
         final JexlPermissions permissions = new ClassPermissions(java.net.URI.class);
         // Create the engine
-        jexl = new JexlBuilder().features(features).permissions(permissions).create();
+        jexl = new JexlBuilder()
+            .features(features)
+            .permissions(permissions)
+            .namespaces(Collections.singletonMap("URI", java.net.URI.class))
+            .create();
     }
 
     @Test
-    public void testURIStream() throws Exception {
+    public void testURIStream() {
         // let's assume a collection of uris need to be processed and transformed to be simplified ;
-        // we want only http/https ones, only the host part and using an https scheme
+        // we want only http/https ones, only the host part and using a https scheme
         final List<URI> uris = Arrays.asList(
                 URI.create("http://user@www.apache.org:8000?qry=true"),
                 URI.create("https://commons.apache.org/releases/prepare.html"),
@@ -91,7 +123,7 @@ public class StreamTest {
         // Create the test control, the expected result of our script evaluation
         final List<?> control =  uris.stream()
                 .map(uri -> uri.getScheme().startsWith("http")? "https://" + uri.getHost() : null)
-                .filter(x -> x != null)
+                .filter(Objects::nonNull)
                 .collect(Collectors.toList());
         Assert.assertEquals(2, control.size());
 
@@ -113,5 +145,71 @@ public class StreamTest {
         final Object transformed = transform.execute(sctxt, uris);
         Assert.assertTrue(transformed instanceof List<?>);
         Assert.assertEquals(control, transformed);
+    }
+
+    /**
+     * A MapContext that can operate on streams and collections.
+     */
+    public static class CollectionContext extends MapContext {
+        /**
+         * This allows using a JEXL lambda as a filter.
+         * @param collection the collection
+         * @param filter the lambda to use as filter
+         * @return the filtered result as a list
+         */
+        public List<?> filter(Collection<?> collection, final JexlScript filter) {
+            return collection.stream()
+                .filter(x -> x != null && TRUE.equals(filter.execute(this, x)))
+                .collect(Collectors.toList());
+        }
+
+        /**
+         * This allows using a JEXL lambda as a mapper.
+         * @param collection the collection
+         * @param mapper the lambda to use as mapper
+         * @return the mapped result as a list
+         */
+        public List<?> map(Collection<?> collection, final JexlScript mapper) {
+            return collection.stream()
+                .map(x -> mapper.execute(this, x))
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+        }
+    }
+
+    @Test
+    public void testURICollection() {
+        // A collection map/filter aware context
+        final JexlContext sctxt = new CollectionContext();
+        // Some uris
+        final List<URI> uris = Arrays.asList(
+            URI.create("http://user@www.apache.org:8000?qry=true"),
+            URI.create("https://commons.apache.org/releases/prepare.html"),
+            URI.create("mailto:henrib@apache.org")
+        );
+
+        // filter, all results schemes start with 'http'
+        final JexlScript filter = jexl.createScript(
+            "list.filter(uri -> uri.scheme =^ 'http')",
+            "list");
+        final Object filtered = filter.execute(sctxt, uris);
+        Assert.assertTrue(filtered instanceof List<?>);
+        List<URI> result = (List<URI>) filtered;
+        Assert.assertEquals(2, result.size());
+        for(URI uri : result) {
+            Assert.assertTrue(uri.getScheme().startsWith("http"));
+        }
+
+        // map, all results scheme now 'https'
+        final JexlScript mapper = jexl.createScript(
+            "list.map(uri -> uri.scheme =^ 'http'? URI:create(`https://${uri.host}`) : null)",
+            "list");
+        final Object transformed = mapper.execute(sctxt, uris);
+        Assert.assertTrue(transformed instanceof List<?>);
+        result = (List<URI>) transformed;
+        Assert.assertEquals(2, result.size());
+        for(URI uri : result) {
+          Assert.assertEquals("https", uri.getScheme());
+        }
     }
 }
