@@ -235,25 +235,72 @@ public class Issues400Test {
 
   @Test
   public void test412() {
-    Map<Object,Object> ctl = new HashMap<>();
+    final Map<Object, Object> ctl = new HashMap<>();
     ctl.put("one", 1);
     ctl.put("two", 2);
-    String fnsrc = "function f(x) { x }\n" +
+    final String fnsrc = "function f(x) { x }\n" +
         "let one = 'one', two = 'two';\n" +
         "{ one : f(1), two:f(2) }";
     final JexlContext jc = new MapContext();
-    final String[] sources = {
-       fnsrc
-    };
     final JexlEngine jexl = new JexlBuilder().create();
     try {
       final JexlScript e = jexl.createScript(fnsrc);
       final Object o = e.execute(jc);
       Assert.assertTrue(o instanceof Map);
-      Map<?,?> map = (Map<?, ?>) o;
+      Map<?, ?> map = (Map<?, ?>) o;
       Assert.assertEquals(map, ctl);
-    } catch(JexlException.Parsing xparse) {
+    } catch (JexlException.Parsing xparse) {
       Assert.fail(fnsrc + " : " + xparse.getMessage());
+    }
+  }
+
+  @Test
+  public void test413a() {
+    final JexlBuilder builder = new JexlBuilder();
+    final JexlEngine jexl = builder.create();
+    final JexlScript script = jexl.createScript("var c = 42; var f = y -> c += y; f(z)", "z");
+    final Number result = (Number) script.execute(null, 12);
+    Assert.assertEquals(54, result);
+  }
+
+  @Test
+  public void test413b() {
+    final JexlBuilder builder = new JexlBuilder();
+    final JexlOptions options = builder.options();
+    options.setConstCapture(true);
+    options.setLexical(true);
+    final JexlEngine jexl = builder.create();
+    final JexlScript script = jexl.createScript("var c = 42; var f = y -> c += y; f(z)", "z");
+    try {
+      final Number result = (Number) script.execute(null, 12);
+      Assert.fail("c should be const");
+    } catch(JexlException.Variable xvar) {
+      Assert.assertEquals("c", xvar.getVariable());
+    }
+  }
+
+  @Test
+  public void test413c() {
+    final JexlBuilder builder = new JexlBuilder();
+    final JexlEngine jexl = builder.create();
+    final JexlScript script = jexl.createScript("#pragma jexl.options '+constCapture'\nvar c = 42; var f = y -> c += y; f(z)", "z");
+    try {
+      Number result = (Number) script.execute(null, 12);
+      Assert.fail("c should be const");
+    } catch(JexlException.Variable xvar) {
+      Assert.assertEquals("c", xvar.getVariable());
+    }
+  }
+
+  @Test
+  public void test413d() {
+    final JexlBuilder builder = new JexlBuilder().features(new JexlFeatures().constCapture(true));
+    final JexlEngine jexl = builder.create();
+    try {
+      final JexlScript script = jexl.createScript("var c = 42; var f = y -> c += y; f(z)", "z");
+      Assert.fail("c should be const");
+    } catch(JexlException.Parsing xvar) {
+      Assert.assertTrue(xvar.getMessage().contains("const"));
     }
   }
 }

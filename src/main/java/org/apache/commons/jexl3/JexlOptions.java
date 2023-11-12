@@ -42,6 +42,8 @@ import org.apache.commons.jexl3.internal.Engine;
  * @since 3.2
  */
 public final class JexlOptions {
+    /** The const capture bit. */
+    private static final int CONST_CAPTURE = 8;
     /** The shared instance bit. */
     private static final int SHARED = 7;
     /** The local shade bit. */
@@ -60,7 +62,7 @@ public final class JexlOptions {
     private static final int CANCELLABLE = 0;
     /** The flag names ordered. */
     private static final String[] NAMES = {
-        "cancellable", "strict", "silent", "safe", "lexical", "antish", "lexicalShade", "sharedInstance"
+        "cancellable", "strict", "silent", "safe", "lexical", "antish", "lexicalShade", "sharedInstance", "constCapture"
     };
     /** Default mask .*/
     private static int DEFAULT = 1 /*<< CANCELLABLE*/ | 1 << STRICT | 1 << ANTISH | 1 << SAFE;
@@ -297,6 +299,25 @@ public final class JexlOptions {
         if (flag) {
             flags = set(LEXICAL, flags, true);
         }
+    }
+
+    /**
+     * Sets whether lambda captured-variables are const or not.
+     * <p>
+     * When disabled, lambda-captured variables are implicitly converted to read-write local variable (let),
+     * when enabled, those are implicitly converted to read-only local variables (const).
+     * </p>
+     * @param flag true to enable, false to disable
+     */
+    public void setConstCapture(final boolean flag) {
+        flags = set(CONST_CAPTURE, flags, true);
+    }
+
+    /**
+     * @return true if lambda captured-variables are const, false otherwise
+     */
+    public boolean isConstCapture() {
+        return isSet(CONST_CAPTURE, flags);
     }
 
     /**

@@ -411,6 +411,9 @@ public class Engine extends JexlEngine {
             if (scriptFeatures.isLexicalShade()) {
                 opts.setLexicalShade(true);
             }
+            if (scriptFeatures.supportsConstCapture()) {
+                opts.setConstCapture(true);
+            }
         }
         if (script != null) {
            // process script pragmas if any

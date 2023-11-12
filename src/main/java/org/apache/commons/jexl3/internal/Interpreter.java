@@ -1486,13 +1486,18 @@ public class Interpreter extends InterpreterBase {
         if (left instanceof ASTIdentifier) {
             variable = (ASTIdentifier) left;
             symbol = variable.getSymbol();
-            if (symbol >= 0 && (variable.isLexical() || options.isLexical())) {
-                if (variable instanceof ASTVar) {
-                    if (!defineVariable((ASTVar) variable, block)) {
-                        return redefinedVariable(variable, variable.getName());
+            if (symbol >= 0) {
+                if  (variable.isLexical() || options.isLexical()) {
+                    if (variable instanceof ASTVar) {
+                        if (!defineVariable((ASTVar) variable, block)) {
+                            return redefinedVariable(variable, variable.getName());
+                        }
+                    } else if (variable.isShaded() && (variable.isLexical() || options.isLexicalShade())) {
+                        return undefinedVariable(variable, variable.getName());
                     }
-                } else if (variable.isShaded() && (variable.isLexical() || options.isLexicalShade())) {
-                    return undefinedVariable(variable, variable.getName());
+                }
+                if (variable.isCaptured() && options.isConstCapture()) {
+                    return constVariable(variable, variable.getName());
                 }
             }
         } else {

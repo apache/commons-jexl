@@ -477,6 +477,16 @@ public abstract class InterpreterBase extends ParserVisitor {
     }
 
     /**
+     * Triggered when a captured variable is const and assignment is attempted.
+     * @param node  the node where the error originated from
+     * @param var   the variable name
+     * @return throws JexlException if strict and not silent, null otherwise
+     */
+    protected Object constVariable(final JexlNode node, final String var) {
+        return variableError(node, var, VariableIssue.CONST);
+    }
+
+    /**
      * Check if a null evaluated expression is protected by a ternary expression.
      * <p>
      * The rationale is that the ternary / elvis expressions are meant for the user to explicitly take control

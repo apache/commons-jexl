@@ -504,7 +504,9 @@ public class JexlException extends RuntimeException {
         /** The variable is already declared. */
         REDEFINED,
         /** The variable has a null value. */
-        NULLVALUE;
+        NULLVALUE,
+        /** THe variable is const and an attempt is made to assign it*/
+        CONST;
 
         /**
          * Stringifies the variable issue.
@@ -515,6 +517,7 @@ public class JexlException extends RuntimeException {
             switch(this) {
                 case NULLVALUE : return VARQUOTE + var + "' is null";
                 case REDEFINED : return VARQUOTE + var + "' is already defined";
+                case CONST : return VARQUOTE + var + "' is const";
                 case UNDEFINED :
                 default: return VARQUOTE + var + "' is undefined";
             }
