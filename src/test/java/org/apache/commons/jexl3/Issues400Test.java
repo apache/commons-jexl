@@ -303,4 +303,27 @@ public class Issues400Test {
       Assert.assertTrue(xvar.getMessage().contains("const"));
     }
   }
+
+  @Test
+  public void test415() {
+    final JexlBuilder builder = new JexlBuilder().features(new JexlFeatures().constCapture(true));
+    final JexlEngine jexl = builder.create();
+    JexlScript script;
+    Object result;
+    script = jexl.createScript("`#${c}`", "c");
+    result = script.execute(null, 42);
+    Assert.assertEquals("#42",result.toString() );
+    script = jexl.createScript("`$${c}`", "c");
+    result = script.execute(null, 42);
+    Assert.assertEquals("$42",result.toString() );
+    script = jexl.createScript("`$#{c}`", "c");
+    result = script.execute(null, 42);
+    Assert.assertEquals("$42",result.toString() );
+    script = jexl.createScript("`##{c}`", "c");
+    result = script.execute(null, 42);
+    Assert.assertEquals("#42",result.toString() );
+    script = jexl.createScript("`--##{c}`", "c");
+    result = script.execute(null, 42);
+    Assert.assertEquals("--#42",result.toString() );
+  }
 }

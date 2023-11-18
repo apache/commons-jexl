@@ -838,8 +838,10 @@ public final class TemplateEngine extends JxltEngine {
                     } else {
                         // revert to CONST
                         strb.append(immediateChar);
-                        strb.append(c);
                         state = ParseState.CONST;
+                        // 'unread' the current character
+                        column -= 1;
+                        continue;
                     }
                     break;
                 case DEFERRED0: // #
@@ -854,8 +856,10 @@ public final class TemplateEngine extends JxltEngine {
                     } else {
                         // revert to CONST
                         strb.append(deferredChar);
-                        strb.append(c);
                         state = ParseState.CONST;
+                        // 'unread' the current character
+                        column -= 1;
+                        continue;
                     }
                     break;
                 case IMMEDIATE1: // ${...
@@ -884,59 +888,57 @@ public final class TemplateEngine extends JxltEngine {
                     break;
                 case DEFERRED1: // #{...
                     // skip inner strings (for '}')
-
                     // nested immediate in deferred; need to balance count of '{' & '}'
-
                     // closing '}'
                     switch (c) {
-                case '"':
-                case '\'':
-                    strb.append(c);
-                    column = StringParser.readString(strb, expr, column + 1, c);
-                    continue;
-                case '{':
-                    if (expr.charAt(column - 1) == immediateChar) {
-                        inner1 += 1;
-                        strb.deleteCharAt(strb.length() - 1);
-                        nested = true;
-                    } else {
-                        deferred1 += 1;
-                        strb.append(c);
-                    }
-                    continue;
-                case '}':
-                    // balance nested immediate
-                    if (deferred1 > 0) {
-                        deferred1 -= 1;
-                        strb.append(c);
-                    } else if (inner1 > 0) {
-                        inner1 -= 1;
-                    } else  {
-                        // materialize the nested/deferred expr
-                        final String src = strb.toString();
-                        TemplateExpression dexpr;
-                        if (nested) {
-                            dexpr = new NestedExpression(
-                                    expr.substring(inested, column + 1),
-                                    jexl.parse(info.at(lineno, column), noscript, src, scope),
-                                    null);
-                        } else {
-                            dexpr = new DeferredExpression(
-                                    strb.toString(),
-                                    jexl.parse(info.at(lineno, column), noscript, src, scope),
-                                    null);
+                        case '"':
+                        case '\'':
+                            strb.append(c);
+                            column = StringParser.readString(strb, expr, column + 1, c);
+                            continue;
+                        case '{':
+                            if (expr.charAt(column - 1) == immediateChar) {
+                                inner1 += 1;
+                                strb.deleteCharAt(strb.length() - 1);
+                                nested = true;
+                            } else {
+                                deferred1 += 1;
+                                strb.append(c);
+                            }
+                            continue;
+                        case '}':
+                            // balance nested immediate
+                            if (deferred1 > 0) {
+                                deferred1 -= 1;
+                                strb.append(c);
+                            } else if (inner1 > 0) {
+                                inner1 -= 1;
+                            } else  {
+                                // materialize the nested/deferred expr
+                                final String src = strb.toString();
+                                TemplateExpression dexpr;
+                                if (nested) {
+                                    dexpr = new NestedExpression(
+                                            expr.substring(inested, column + 1),
+                                            jexl.parse(info.at(lineno, column), noscript, src, scope),
+                                            null);
+                                } else {
+                                    dexpr = new DeferredExpression(
+                                            strb.toString(),
+                                            jexl.parse(info.at(lineno, column), noscript, src, scope),
+                                            null);
+                                }
+                                builder.add(dexpr);
+                                strb.delete(0, Integer.MAX_VALUE);
+                                nested = false;
+                                state = ParseState.CONST;
+                            }
+                            break;
+                        default:
+                            // do buildup expr
+                            column = append(strb, expr, column, c);
+                            break;
                         }
-                        builder.add(dexpr);
-                        strb.delete(0, Integer.MAX_VALUE);
-                        nested = false;
-                        state = ParseState.CONST;
-                    }
-                    break;
-                default:
-                    // do buildup expr
-                    column = append(strb, expr, column, c);
-                    break;
-                }
                     break;
                 case ESCAPE:
                     if (c == deferredChar) {
