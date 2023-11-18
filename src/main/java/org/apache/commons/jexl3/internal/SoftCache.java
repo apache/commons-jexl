@@ -16,8 +16,6 @@
  */
 package org.apache.commons.jexl3.internal;
 
-import org.apache.commons.jexl3.JexlCache;
-
 import java.lang.ref.SoftReference;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -25,6 +23,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import org.apache.commons.jexl3.JexlCache;
 
 /**
  * A soft referenced cache.
