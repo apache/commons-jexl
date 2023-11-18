@@ -525,9 +525,18 @@ public class CacheTest extends JexlTestCase {
         3, 3, 3, 4, 4, 4, 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 2, 2, 3, 3, 0
     };
 
-    private static final JexlEngine jexlCache = new JexlBuilder().cache(1024).debug(true).strict(true).create();
+    private static final JexlEngine jexlCache = new JexlBuilder()
+        .cache(1024)
+        .cacheFactory(JexlCache.createSynchronized())
+        .debug(true)
+        .strict(true)
+        .create();
 
-    private static final JexlEngine jexlNoCache = new JexlBuilder().cache(0).debug(true).strict(true).create();
+    private static final JexlEngine jexlNoCache = new JexlBuilder()
+        .cache(0)
+        .debug(true)
+        .strict(true)
+        .create();
 
     private static JexlEngine jexl = jexlCache;
 

@@ -21,6 +21,7 @@ import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
+import java.util.function.IntFunction;
 
 import org.apache.commons.jexl3.internal.Engine;
 import org.apache.commons.jexl3.introspection.JexlPermissions;
@@ -131,6 +132,9 @@ public class JexlBuilder {
 
     /** The cache size. */
     private int cache = -1;
+
+    /** The cache class factory. */
+    private IntFunction<JexlCache<?,?>> cacheFactory = JexlCache.createConcurrent();
 
     /** The stack overflow limit. */
     private int stackOverflow = Integer.MAX_VALUE;
@@ -616,10 +620,28 @@ public class JexlBuilder {
     }
 
     /**
+     * Sets the expression cache size the engine will use.
+     *
+     * @param factory the function to produce a cache.
+     * @return this builder
+     */
+    public JexlBuilder cacheFactory(final IntFunction<JexlCache<?, ?>> factory) {
+      this.cacheFactory = factory;
+      return this;
+    }
+
+    /**
      * @return the cache size
      */
     public int cache() {
-        return cache;
+      return cache;
+    }
+
+    /**
+     * @return the cache factory
+     */
+    public IntFunction<JexlCache<?, ?>> cacheFactory() {
+      return this.cacheFactory;
     }
 
     /**

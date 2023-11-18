@@ -31,8 +31,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
+import java.util.function.IntFunction;
 import java.util.function.Predicate;
 
+import org.apache.commons.jexl3.JexlCache;
 import org.apache.commons.jexl3.JexlArithmetic;
 import org.apache.commons.jexl3.JexlBuilder;
 import org.apache.commons.jexl3.JexlContext;
@@ -160,7 +162,7 @@ public class Engine extends JexlEngine {
     /**
      * The expression cache.
      */
-    protected final SoftCache<Source, ASTJexlScript> cache;
+    protected final JexlCache<Source, ASTJexlScript> cache;
     /**
      * The default jxlt engine.
      */
@@ -173,6 +175,10 @@ public class Engine extends JexlEngine {
      * A cached version of the options.
      */
     protected final JexlOptions options;
+    /**
+     * The cache factory method.
+     */
+    protected final IntFunction<JexlCache<?, ?>> cacheFactory;
 
     /**
      * Creates an engine with default arguments.
@@ -229,7 +235,9 @@ public class Engine extends JexlEngine {
         this.scriptFeatures = new JexlFeatures(features).script(true).namespaceTest(nsTest);
         this.charset = conf.charset();
         // caching:
-        this.cache = conf.cache() <= 0 ? null : new SoftCache<>(conf.cache());
+        IntFunction<JexlCache<?, ?>> factory = conf.cacheFactory();
+        this.cacheFactory = factory == null ? SoftCache::new : factory;
+        this.cache = (JexlCache<Source, ASTJexlScript>) (conf.cache() > 0 ? factory.apply(conf.cache()) : null);
         this.cacheThreshold = conf.cacheThreshold();
         if (uberspect == null) {
             throw new IllegalArgumentException("uberspect can not be null");
