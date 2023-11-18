@@ -16,13 +16,13 @@
  */
 package org.apache.commons.jexl3.internal;
 
-import java.lang.ref.SoftReference;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.lang.ref.SoftReference;
 
 import org.apache.commons.jexl3.JexlCache;
 

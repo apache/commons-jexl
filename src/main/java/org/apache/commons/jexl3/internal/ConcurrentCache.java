@@ -16,10 +16,10 @@
  */
 package org.apache.commons.jexl3.internal;
 
-import java.lang.ref.SoftReference;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
+import java.lang.ref.SoftReference;
 
 import com.googlecode.concurrentlinkedhashmap.ConcurrentLinkedHashMap;
 
