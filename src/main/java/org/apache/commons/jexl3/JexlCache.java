@@ -55,6 +55,7 @@ public interface JexlCache<K, V> {
    *
    * @param key    the cache entry key
    * @param script the cache entry value
+   * @return the previously associated value if any
    */
   V put(K key, V script);
 
