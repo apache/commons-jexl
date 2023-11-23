@@ -17,12 +17,9 @@
 package org.apache.commons.jexl3.internal;
 
 import java.lang.ref.SoftReference;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.commons.jexl3.JexlCache;
 
@@ -34,8 +31,13 @@ import org.apache.commons.jexl3.JexlCache;
  * </p>
  * <p>
  *   Note that the underlying map is a synchronized LinkedHashMap.
- *   The reason is that a get() will  reorder elements (the LRU queue) and thus
- *   needs to be guarded to be thread-safe.
+ *   The reason is that a get() will reorder elements (the LRU queue) and thus
+ *   needs synchronization to ensure thread-safety.
+ * </p>
+ * <p>
+ *   When caching JEXL scripts or expressions, one should expect the execution cost of those
+ *   to be several fold the cost of the cache handling; after some (synthetic) tests, measures indicate
+ *   cache handling is a marginal latency factor.
  * </p>
  *
  * @param <K> the cache key entry type
@@ -45,11 +47,11 @@ public class SoftCache<K, V> implements JexlCache<K, V> {
     /**
      * The default cache load factor.
      */
-    private static final float LOAD_FACTOR = 0.75f;
+    protected static final float LOAD_FACTOR = 0.75f;
     /**
-     * The cache size.
+     * The cache capacity.
      */
-    protected final int size;
+    protected final int capacity;
     /**
      * The soft reference to the cache map.
      */
@@ -61,21 +63,29 @@ public class SoftCache<K, V> implements JexlCache<K, V> {
      * @param theSize the cache size
      */
     public SoftCache(final int theSize) {
-        size = theSize;
+        capacity = theSize;
     }
 
     /**
-     * Returns the cache size.
-     *
-     * @return the cache size
+     * {@inheritDoc}
+     */
+    @Override
+    public int capacity() {
+        return capacity;
+    }
+
+    /**
+     * {@inheritDoc}
      */
     @Override
     public int size() {
-        return size;
+        final SoftReference<Map<K, V>> ref = reference;
+        final Map<K, V> map = ref != null ? ref.get() : null;
+        return map != null ? map.size() : 0;
     }
 
     /**
-     * Clears the cache.
+     * {@inheritDoc}
      */
     @Override
     public void clear() {
@@ -90,10 +100,7 @@ public class SoftCache<K, V> implements JexlCache<K, V> {
     }
 
     /**
-     * Gets a value from cache.
-     *
-     * @param key the cache entry key
-     * @return the cache entry value
+     * {@inheritDoc}
      */
     @Override
     public V get(final K key) {
@@ -103,10 +110,7 @@ public class SoftCache<K, V> implements JexlCache<K, V> {
     }
 
     /**
-     * Puts a value in cache.
-     *
-     * @param key the cache entry key
-     * @param script the cache entry value
+     * {@inheritDoc}
      */
     @Override
     public V put(final K key, final V script) {
@@ -117,7 +121,7 @@ public class SoftCache<K, V> implements JexlCache<K, V> {
                 ref = reference;
                 map = ref != null ? ref.get() : null;
                 if (map == null) {
-                    map = createMap(size);
+                    map = createMap(capacity);
                     reference = new SoftReference<>(map);
                 }
             }
@@ -126,94 +130,50 @@ public class SoftCache<K, V> implements JexlCache<K, V> {
     }
 
     /**
-     * Produces the cache entry set.
-     * <p>
-     * For testing only, perform deep copy of cache entries
-     *
-     * @return the cache entry list
+     * {@inheritDoc}
      */
     @Override
     public Collection<Map.Entry<K, V>> entries() {
         final SoftReference<Map<K, V>> ref = reference;
         final Map<K, V> map = ref != null ? ref.get() : null;
-        if (map == null) {
-            return Collections.emptyList();
-        }
-        synchronized(map) {
-            final Set<Map.Entry<K, V>> set = map.entrySet();
-            final List<Map.Entry<K, V>> entries = new ArrayList<>(set.size());
-            for (final Map.Entry<K, V> e : set) {
-                entries.add(new SoftCacheEntry<>(e));
-            }
-            return entries;
-        }
+        return map == null? Collections.emptyList() : map.entrySet();
     }
 
     /**
-     * Creates the cache store.
+     * Creates a cache store.
      *
-     * @param <K> the key type
-     * @param <V> the value type
+     * @param <KT> the key type
+     * @param <VT> the value type
      * @param cacheSize the cache size, must be &gt; 0
      * @return a Map usable as a cache bounded to the given size
      */
-    public <K, V> Map<K, V> createMap(final int cacheSize) {
-        return Collections.synchronizedMap(
-            new java.util.LinkedHashMap<K, V>(cacheSize, LOAD_FACTOR, true) {
-                /**
-                 * Serial version UID.
-                 */
-                private static final long serialVersionUID = 1L;
+    protected <KT, VT> Map<KT, VT> createMap(final int cacheSize) {
+        return createSynchronizedLinkedHashMap(cacheSize);
+    }
 
-                @Override
-                protected boolean removeEldestEntry(final Map.Entry<K, V> eldest) {
-                    return super.size() > cacheSize;
-                }
+    /**
+     * Creates a synchronized LinkedHashMap.
+     * @param capacity the map capacity
+     * @return the map instance
+     * @param <K> key type
+     * @param <V> value type
+     */
+    public static <K, V> Map<K, V> createSynchronizedLinkedHashMap(final int capacity) {
+        return Collections.synchronizedMap(new java.util.LinkedHashMap<K, V>(capacity, LOAD_FACTOR, true) {
+            /**
+             * Serial version UID.
+             */
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            protected boolean removeEldestEntry(final Map.Entry<K, V> eldest) {
+                return super.size() > capacity;
             }
-        );
+        });
     }
 }
 
-/**
- * A soft cache entry.
- *
- * @param <K> key type
- * @param <V> value type
- */
-final class SoftCacheEntry<K, V> implements Map.Entry<K, V> {
-    /**
-     * The entry key.
-     */
-    private final K key;
-    /**
-     * The entry value.
-     */
-    private final V value;
 
-    /**
-     * Creates an entry clone.
-     *
-     * @param e the entry to clone
-     */
-    SoftCacheEntry(final Map.Entry<K, V> e) {
-        key = e.getKey();
-        value = e.getValue();
-    }
 
-    @Override
-    public K getKey() {
-        return key;
-    }
-
-    @Override
-    public V getValue() {
-        return value;
-    }
-
-    @Override
-    public V setValue(final V v) {
-        throw new UnsupportedOperationException("Not supported.");
-    }
-}
 
 

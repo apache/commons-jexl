@@ -45,6 +45,9 @@
             <action dev="henrib" type="fix" issue="JEXL-415" due-to="Xu Pengcheng" >
                 Incorrect template eval result.
             </action>
+            <action dev="henrib" type="fix" issue="JEXL-414" due-to="Holger Sunke" >
+                SoftCache may suffer from race conditions
+            </action>
             <action dev="henrib" type="fix" issue="JEXL-412" due-to="Xu Pengcheng" >
                 Ambiguous syntax between namespace function call and map object definition.
             </action>

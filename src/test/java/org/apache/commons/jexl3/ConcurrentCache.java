@@ -14,14 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.commons.jexl3.internal;
+package org.apache.commons.jexl3;
 
-import java.lang.ref.SoftReference;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.Map;
 
 import com.googlecode.concurrentlinkedhashmap.ConcurrentLinkedHashMap;
+import org.apache.commons.jexl3.internal.SoftCache;
 
 /**
  * A cache whose underlying map is a ConcurrentLinkedHashMap.
@@ -40,14 +38,7 @@ public class ConcurrentCache<K, V>  extends SoftCache<K, V> {
   }
 
   @Override
-  public Collection<Map.Entry<K, V>> entries() {
-    final SoftReference<Map<K, V>> ref = reference;
-    final Map<K, V> map = ref != null ? ref.get() : null;
-    return map == null? Collections.emptyList() : map.entrySet();
-  }
-
-  @Override
-  public <K, V> Map<K, V> createMap(final int cacheSize) {
+  protected <K, V> Map<K, V> createMap(final int cacheSize) {
     return  new ConcurrentLinkedHashMap.Builder<K, V>()
         .concurrencyLevel(Runtime.getRuntime().availableProcessors())
         .maximumWeightedCapacity(cacheSize)

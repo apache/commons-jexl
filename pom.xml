@@ -126,6 +126,7 @@
             <groupId>com.googlecode.concurrentlinkedhashmap</groupId>
             <artifactId>concurrentlinkedhashmap-lru</artifactId>
             <version>1.4.2</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 

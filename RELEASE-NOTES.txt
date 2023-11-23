@@ -38,6 +38,7 @@ New Features in 3.3.1:
 Bugs Fixed in 3.3.1:
 ===================
 * JEXL-415:     Incorrect template eval result
+* JEXL-414:     SoftCache may suffer from race conditions
 * JEXL-412:     Ambiguous syntax between namespace function call and map object definition.
 * JEXL-410:     JexlFeatures: ctor does not enable all features
 * JEXL-409:     Disable LEXICAL should disable LEXICAL_SHADE

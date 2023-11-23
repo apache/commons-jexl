@@ -145,7 +145,7 @@ public class CacheTest extends JexlTestCase {
     /**
      * A set of classes that define different getter/setter methods for the same properties.
      * The goal is to verify that the cached JexlPropertyGet / JexlPropertySet in the AST Nodes are indeed
-     * volatile and do not generate errors even when multiple threads concurently hammer them.
+     * volatile and do not generate errors even when multiple threads concurrently hammer them.
      */
     public static class Cached {
         public static String COMPUTE(final int arg) {
@@ -527,7 +527,6 @@ public class CacheTest extends JexlTestCase {
 
     private static final JexlEngine jexlCache = new JexlBuilder()
         .cache(1024)
-        .cacheFactory(JexlCache.createSynchronized())
         .debug(true)
         .strict(true)
         .create();

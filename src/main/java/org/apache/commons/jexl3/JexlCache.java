@@ -21,7 +21,6 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.function.IntFunction;
 
-import org.apache.commons.jexl3.internal.ConcurrentCache;
 import org.apache.commons.jexl3.internal.SoftCache;
 
 /**
@@ -31,7 +30,14 @@ import org.apache.commons.jexl3.internal.SoftCache;
  */
 public interface JexlCache<K, V> {
   /**
- * Returns the cache size.
+   * Returns the cache capacity, the maximum number of elements it can contain.
+   *
+   * @return the cache capacity
+   */
+  int capacity();
+
+  /**
+ * Returns the cache size, the actual number of elements it contains.
  *
  * @return the cache size
  */
@@ -68,19 +74,5 @@ public interface JexlCache<K, V> {
    */
   default Collection<Map.Entry<K, V>> entries() {
     return Collections.emptyList();
-  }
-
-  /**
-   * @return a synchronized cache factory amenable to low concurrency usage
-   */
-  static IntFunction<JexlCache<?,?>> createSynchronized() {
-    return SoftCache::new;
-  }
-
-  /**
-   * @return a concurrent cache factory amenable to high concurrency usage
-   */
-  static IntFunction<JexlCache<?,?>> createConcurrent() {
-    return ConcurrentCache::new;
   }
 }
