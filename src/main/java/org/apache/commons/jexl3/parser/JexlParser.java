@@ -562,16 +562,20 @@ public abstract class JexlParser extends StringParser {
             }
         }
         // merge new value into a set created on the fly if key is already mapped
-        pragmas.merge(key, value, (previous, newValue)->{
-            if (previous instanceof Set<?>) {
-                ((Set<Object>) previous).add(newValue);
-                return previous;
-            }
-            final Set<Object> values = new LinkedHashSet<>();
-            values.add(previous);
-            values.add(newValue);
-            return values;
-        });
+        if (value == null) {
+            pragmas.putIfAbsent(key, null);
+        } else {
+            pragmas.merge(key, value, (previous, newValue) -> {
+                if (previous instanceof Set<?>) {
+                    ((Set<Object>) previous).add(newValue);
+                    return previous;
+                }
+                final Set<Object> values = new LinkedHashSet<>();
+                values.add(previous);
+                values.add(newValue);
+                return values;
+            });
+        }
     }
 
     /**

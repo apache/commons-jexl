@@ -376,4 +376,13 @@ public class PragmaTest extends JexlTestCase {
         final Object result = script.execute(jc);
         Assert.assertEquals(42, result);
     }
+
+    @Test
+    public void testIssue416() {
+        final JexlEngine jexl = new JexlBuilder().create();
+        JexlScript script = jexl.createScript("#pragma myNull null\n");
+        Map<String, Object> pragmas = script.getPragmas();
+        Assert.assertTrue("pragma key present?", pragmas.containsKey("myNull"));
+        Assert.assertNull("expected null value", pragmas.get("myNull"));
+    }
 }
