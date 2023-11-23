@@ -124,7 +124,7 @@ public class CachePerformanceTest {
             for (int c = 0; c < CACHED; ++c) {
               final int ctl = rnd.nextInt(SCRIPTS);
               for (int r = 0; r < HIT; ++r) {
-                JexlScript script = jexl.createScript(Integer.toString(ctl) + " + 42 - 42");
+                JexlScript script = jexl.createScript(Integer.toString(ctl));
                 Object result = script.execute(null);
                 assert ((Number) result).intValue() == ctl;
                 count += 1;
