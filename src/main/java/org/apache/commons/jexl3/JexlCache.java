@@ -19,9 +19,6 @@ package org.apache.commons.jexl3;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
-import java.util.function.IntFunction;
-
-import org.apache.commons.jexl3.internal.SoftCache;
 
 /**
  * Caching scripts or templates interface.
