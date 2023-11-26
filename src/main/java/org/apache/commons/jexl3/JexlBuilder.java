@@ -669,7 +669,7 @@ public class JexlBuilder {
 
     /**
      * Sets the number of script/expression evaluations that can be stacked.
-     * @param size if not strictly positive, limit is reached when java StackOverflow is thrown.
+     * @param size if not strictly positive, limit is reached when Java StackOverflow is thrown.
      * @return this builder
      */
     public JexlBuilder stackOverflow(final int size) {

@@ -951,7 +951,7 @@ public class JexlArithmetic {
     /**
      * Given a Number, return the value using the smallest type the result
      * will fit into.
-     * <p>This works hand in hand with parameter 'widening' in java
+     * <p>This works hand in hand with parameter 'widening' in Java
      * method calls, e.g. a call to substring(int,int) with an int and a long
      * will fail, but a call to substring(int,int) with an int and a short will
      * succeed.</p>

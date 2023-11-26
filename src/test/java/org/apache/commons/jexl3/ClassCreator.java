@@ -45,7 +45,7 @@ public class ClassCreator {
     static final String GEN_PATH = "/" + GEN_PACKAGE.replace(".", "/");///org/apache/commons/jexl3/generated";
     static final String GEN_CLASS = GEN_PACKAGE + ".";
     /**
-     * Check if we can invoke Sun's java compiler.
+     * Check if we can invoke Sun's Java compiler.
      *
      * @return true if it is possible, false otherwise
      */
