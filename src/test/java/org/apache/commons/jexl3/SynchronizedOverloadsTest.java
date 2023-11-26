@@ -23,7 +23,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-
 /**
  * Test cases for synchronized calls.
  * <p>May be a base for synchronized calls.
@@ -40,7 +39,6 @@ public class SynchronizedOverloadsTest extends JexlTestCase {
         // ensure jul logging is only error to avoid warning in silent mode
         java.util.logging.Logger.getLogger(JexlEngine.class.getName()).setLevel(java.util.logging.Level.SEVERE);
     }
-
 
     @Test
     public void testSynchronized() throws Exception {

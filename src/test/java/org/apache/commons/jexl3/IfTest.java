@@ -317,7 +317,6 @@ public class IfTest extends JexlTestCase {
         }
     }
 
-
     /**
      * Ternary operator condition undefined or null evaluates to false
      * independently of engine flags; same for null coalescing operator.

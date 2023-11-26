@@ -16,7 +16,6 @@
  */
 package org.apache.commons.jexl3;
 
-
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -246,11 +245,9 @@ public class Issues200Test extends JexlTestCase {
        pool.submit(() -> script.execute(new MapContext(payload)));
     }
 
-
     public Issues200Test() {
         super("Issues200Test", null);
     }
-
 
     @Before
     @Override
@@ -344,7 +341,6 @@ public class Issues200Test extends JexlTestCase {
         r = e.execute(jc);
         Assert.assertNull("oob adverted", r);
     }
-
 
     @Test
     public void test221() throws Exception {
@@ -450,7 +446,6 @@ public class Issues200Test extends JexlTestCase {
         Assert.assertEquals(Double.doubleToLongBits(e) + " != " + Double.doubleToLongBits(c), a + b, e, 0.0);
     }
 
-
     @Test
     public void test243a() throws Exception {
         final JexlEngine jexl = new JexlBuilder().cache(32).create();
@@ -553,7 +548,6 @@ public class Issues200Test extends JexlTestCase {
         result = script.execute(ctxt);
         Assert.assertEquals(42, result);
     }
-
 
     @Test
     public void test266() throws Exception {

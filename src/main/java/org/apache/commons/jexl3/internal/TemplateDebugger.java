@@ -99,7 +99,6 @@ public class TemplateDebugger extends Debugger {
         return end > 0;
     }
 
-
     @Override
     protected Object visit(final ASTBlock node, final Object data) {
         // if not really a template, must use super impl

@@ -244,7 +244,6 @@ public class Engine extends JexlEngine {
         }
     }
 
-
     /**
      * Gets the default instance of Uberspect.
      * <p>This is lazily initialized to avoid building a default instance if there

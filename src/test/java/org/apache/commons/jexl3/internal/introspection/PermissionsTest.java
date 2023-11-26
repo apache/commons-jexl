@@ -41,13 +41,11 @@ import org.apache.commons.jexl3.introspection.JexlUberspect;
 import org.junit.Assert;
 import org.junit.Test;
 
-
 /**
  * Checks the CacheMap.MethodKey implementation
  */
 
 public class PermissionsTest {
-
 
     public static class A {
         public int i;
@@ -330,7 +328,6 @@ public class PermissionsTest {
     public void testPermissions0() throws Exception {
         runTestPermissions(permissions0());
     }
-
 
     @Test
     public void testPermissions1() throws Exception {

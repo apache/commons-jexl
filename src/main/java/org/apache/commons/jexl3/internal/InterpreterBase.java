@@ -16,7 +16,6 @@
  */
 package org.apache.commons.jexl3.internal;
 
-
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;

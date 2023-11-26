@@ -20,7 +20,6 @@ import org.apache.commons.jexl3.JexlEngine;
 import org.apache.commons.jexl3.JexlException;
 import org.apache.commons.jexl3.introspection.JexlMethod;
 
-
 /**
  * Wraps a reference or optional method executor.
  */

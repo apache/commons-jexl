@@ -72,7 +72,6 @@ public class SandboxTest extends JexlTestCase {
         }
     }
 
-
     @NoJexl
     public interface CantCallMe {
         void tryMe();

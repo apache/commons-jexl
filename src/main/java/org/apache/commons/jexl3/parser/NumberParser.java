@@ -61,7 +61,6 @@ public final class NumberParser implements Serializable {
         return strb.toString();
     }
 
-
     Class<? extends Number> getLiteralClass() {
         return clazz;
     }

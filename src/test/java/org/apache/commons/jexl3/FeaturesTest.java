@@ -279,7 +279,6 @@ public class FeaturesTest extends JexlTestCase {
         checkFeature(f, scripts);
     }
 
-
     @Test
     public void testNoLoop() throws Exception {
         final JexlFeatures f = new JexlFeatures().loops(false);

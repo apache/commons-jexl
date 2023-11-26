@@ -25,7 +25,6 @@ import org.apache.commons.jexl3.junit.Asserter;
 import org.junit.Before;
 import org.junit.Test;
 
-
 /**
  * Tests for array access operator []
  *
@@ -282,7 +281,6 @@ public class ArrayAccessTest extends JexlTestCase {
         asserter.assertExpression("foo.'0'.'1'", "two");
         asserter.assertExpression("foo.'0'.'1' = 'three'", "three");
         asserter.assertExpression("foo.'0'.'1'", "three");
-
 
         foo[0][0] = "one";
         foo[0][1] = "two";

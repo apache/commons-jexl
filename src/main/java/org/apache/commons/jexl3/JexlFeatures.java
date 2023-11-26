@@ -792,7 +792,6 @@ public final class JexlFeatures {
         return getFeature(IMPORT_PRAGMA);
     }
 
-
     /**
      * Sets whether annotation constructs are enabled.
      * <p>
@@ -857,7 +856,6 @@ public final class JexlFeatures {
         return this;
     }
 
-
     /** @return whether lexical scope feature is enabled */
     public boolean isLexical() {
         return getFeature(LEXICAL);
@@ -876,7 +874,6 @@ public final class JexlFeatures {
         }
         return this;
     }
-
 
     /** @return whether lexical shade feature is enabled */
     public boolean isLexicalShade() {

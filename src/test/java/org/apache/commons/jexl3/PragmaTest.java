@@ -240,7 +240,6 @@ public class PragmaTest extends JexlTestCase {
         Assert.assertEquals(src, parsed);
     }
 
-
     @Test
     @SuppressWarnings("AssertEqualsBetweenInconvertibleTypes")
     public void testJxltPragmas() {

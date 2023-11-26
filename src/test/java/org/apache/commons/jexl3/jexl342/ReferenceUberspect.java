@@ -354,7 +354,6 @@ public class ReferenceUberspect implements JexlUberspect {
         return pojoStrategy;
     }
 
-
     @Override
     public int getVersion() {
         return uberspect.getVersion();

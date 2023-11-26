@@ -110,7 +110,6 @@ public final class MethodExecutor extends AbstractExecutor.Method {
         return JexlEngine.TRY_FAILED;
     }
 
-
     /**
      * Reassembles arguments if the method is a vararg method.
      * @param args The actual arguments being passed to this method
@@ -154,5 +153,4 @@ public final class MethodExecutor extends AbstractExecutor.Method {
         return actual;
     }
 }
-
 

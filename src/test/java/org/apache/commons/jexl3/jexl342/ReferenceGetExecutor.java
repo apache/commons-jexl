@@ -19,7 +19,6 @@ package org.apache.commons.jexl3.jexl342;
 import org.apache.commons.jexl3.JexlEngine;
 import org.apache.commons.jexl3.introspection.JexlPropertyGet;
 
-
 /**
  * Wraps a reference or optional property get executor.
  */

@@ -278,7 +278,6 @@ public class CacheTest extends JexlTestCase {
         }
     }
 
-
     public static class Cached3 extends java.util.TreeMap<String, Object> {
         private static final long serialVersionUID = 1L;
         boolean flag = false;

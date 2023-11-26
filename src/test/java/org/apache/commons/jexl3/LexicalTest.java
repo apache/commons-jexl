@@ -872,7 +872,6 @@ public class LexicalTest {
         Assert.assertEquals(0, o);
     }
 
-
     @Test
     public void testLexical6d() {
         final String str = "i = 0; for (var i : [42]) i; i";

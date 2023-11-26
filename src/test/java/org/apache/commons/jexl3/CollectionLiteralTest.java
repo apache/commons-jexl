@@ -56,7 +56,6 @@ public class CollectionLiteralTest extends JexlTestCase {
         }
     }
 
-
     static class CountingArrayBuilder extends ArrayBuilder {
         final AtomicInteger count;
 

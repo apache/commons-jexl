@@ -92,7 +92,6 @@ public class Issues100Test extends JexlTestCase {
         }
     }
 
-
     public static class C192 {
         public static Integer callme(final Integer n) {
             if (n == null) {

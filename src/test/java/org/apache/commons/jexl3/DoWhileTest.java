@@ -152,7 +152,6 @@ public class DoWhileTest extends JexlTestCase {
         o = e.execute(jc);
         Assert.assertEquals(23, o);
 
-
         jc.set("x", 1);
         e = JEXL.createScript("do x += 1; while (x < 23); return 42;");
         o = e.execute(jc);

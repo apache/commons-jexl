@@ -49,7 +49,6 @@ public class JexlException extends RuntimeException {
     /** Maximum number of characters around exception location. */
     private static final int MAX_EXCHARLOC = 42;
 
-
     /**
      * Creates a new JexlException.
      *
@@ -771,7 +770,6 @@ public class JexlException extends RuntimeException {
             this(info, name, args, null);
         }
 
-
         /**
          * Creates a new Method exception instance.
          *
@@ -1064,7 +1062,6 @@ public class JexlException extends RuntimeException {
                 ? (JexlException) cause
                 : new JexlException.TryFailed(xinvoke); // fail
     }
-
 
     /**
      * Detailed info message about this error.

@@ -857,5 +857,4 @@ public class MethodTest extends JexlTestCase {
         Assert.assertEquals(42, jexl.createScript("zzzz(4)").execute(zjc));
     }
 
-
 }

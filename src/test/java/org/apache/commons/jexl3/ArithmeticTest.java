@@ -346,7 +346,6 @@ public class ArithmeticTest extends JexlTestCase {
 
     private final Asserter asserter;
 
-
     private final JexlArithmetic jexla;
 
     private final JexlArithmetic jexlb;

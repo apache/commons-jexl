@@ -115,7 +115,6 @@ public class MethodPropertyTest {
 
     }
 
-
     /**
      * Command line entry point.
      * @param args command line arguments

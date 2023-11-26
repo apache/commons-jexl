@@ -92,7 +92,6 @@ public class TokenMgrException extends RuntimeException implements JavaccError {
                 + "after : " + StringParser.escapeString(after, '"');
     }
 
-
     /** Constructor with message and reason. */
     public TokenMgrException(final String message, final int reason) {
         super(message);

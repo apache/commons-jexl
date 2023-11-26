@@ -144,7 +144,6 @@ public class ScriptTest extends JexlTestCase {
         return response.toString();
     }
 
-
     /**
      * Create a new test case.
      */

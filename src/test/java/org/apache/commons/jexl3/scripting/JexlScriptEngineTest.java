@@ -265,7 +265,6 @@ public class JexlScriptEngineTest {
         Assert.assertEquals(System.class,engine.eval("JEXL.System"));
     }
 
-
     @Test
     public void testScriptingGetBy() throws Exception {
         final ScriptEngineManager manager = new ScriptEngineManager();

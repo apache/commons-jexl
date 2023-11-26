@@ -68,7 +68,6 @@ public abstract class IntegerRange implements Collection<Integer> {
         return max;
     }
 
-
     @Override
     public int hashCode() {
         int hash = getClass().hashCode();

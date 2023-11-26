@@ -16,7 +16,6 @@
  */
 package org.apache.commons.jexl3.internal;
 
-
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
@@ -435,7 +434,6 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
         return value;
     }
 
-
     /**
      * Checks if a terminal node is the cause to debug &amp; adds its representation to the rebuilt expression.
      * @param node  the child node
@@ -742,7 +740,6 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     protected Object visit(final ASTBreak node, final Object data) {
         return check(node, "break", data);
     }
-
 
     @Override
     protected Object visit(final ASTForeachStatement node, final Object data) {

@@ -126,8 +126,6 @@ public final class TemplateEngine extends JxltEngine {
         }
     }
 
-
-
     /**
      * A helper class to build expressions.
      * Keeps count of sub-expressions by type.
@@ -687,7 +685,6 @@ public final class TemplateEngine extends JxltEngine {
             return value;
         }
     }
-
 
     @Override
     public JxltEngine.Expression createExpression(final JexlInfo jexlInfo, final String expression) {

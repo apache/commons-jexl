@@ -134,7 +134,6 @@ public class JexlScriptEngine extends AbstractScriptEngine implements Compilable
         return engine;
     }
 
-
     /** The logger. */
     static final Log LOG = LogFactory.getLog(JexlScriptEngine.class);
 
@@ -255,7 +254,6 @@ public class JexlScriptEngine extends AbstractScriptEngine implements Compilable
             return LOG;
         }
     }
-
 
     /**
      * Create a scripting engine using the supplied factory.

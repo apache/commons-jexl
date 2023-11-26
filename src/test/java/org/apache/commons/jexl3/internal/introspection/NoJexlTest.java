@@ -48,7 +48,6 @@ public class NoJexlTest {
         @Override public int method() { return 2; }
     }
 
-
     @NoJexl
     public static class A2 extends A  {
         public A2() {}

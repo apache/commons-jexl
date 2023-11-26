@@ -16,7 +16,6 @@
  */
 package org.apache.commons.jexl3.parser;
 
-
 /**
  * Identifiers, variables and registers.
  */

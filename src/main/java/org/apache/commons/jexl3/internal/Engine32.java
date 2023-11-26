@@ -16,7 +16,6 @@
  */
 package org.apache.commons.jexl3.internal;
 
-
 import org.apache.commons.jexl3.JexlBuilder;
 import org.apache.commons.jexl3.JexlContext;
 import org.apache.commons.jexl3.JexlOptions;

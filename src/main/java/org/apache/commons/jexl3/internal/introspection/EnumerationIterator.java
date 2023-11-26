@@ -17,7 +17,6 @@
 
 package org.apache.commons.jexl3.internal.introspection;
 
-
 import java.util.Enumeration;
 import java.util.Iterator;
 

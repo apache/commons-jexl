@@ -113,7 +113,6 @@ public class Foo {
         return true;
     }
 
-
     public String repeat(final String str) {
         return "Repeat : " + str;
     }

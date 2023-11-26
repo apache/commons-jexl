@@ -124,7 +124,6 @@ public interface JexlUberspect {
             JexlResolver.CONTAINER
     ));
 
-
     /**
      * A resolver types list tailored for Maps, favors '[]' over '.'.
      */

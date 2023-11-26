@@ -142,7 +142,6 @@ public class JXLTTest extends JexlTestCase {
                   new JexlBuilder().silent(false).cache(128).strict(true));
        }
 
-
    private static String refactor(final TemplateDebugger td, final JxltEngine.Template ts) {
     final boolean dbg = td.debug(ts);
     if (dbg) {

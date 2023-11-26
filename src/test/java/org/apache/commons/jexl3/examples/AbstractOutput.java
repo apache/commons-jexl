@@ -51,7 +51,6 @@ public abstract class AbstractOutput {
         // nothing to do
     }
 
-
     /**
      * Outputs the actual and value or checks the actual equals the expected value.
      * @param expr the message to output

@@ -37,7 +37,6 @@ import org.apache.commons.jexl3.JexlInfo;
 import org.apache.commons.jexl3.internal.LexicalScope;
 import org.apache.commons.jexl3.internal.Scope;
 
-
 /**
  * The base class for parsing, manages the parameter/local variable frame.
  */

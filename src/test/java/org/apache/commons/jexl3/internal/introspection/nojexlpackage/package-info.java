@@ -18,4 +18,3 @@
 package org.apache.commons.jexl3.internal.introspection.nojexlpackage;
 import org.apache.commons.jexl3.annotations.NoJexl;
 
-

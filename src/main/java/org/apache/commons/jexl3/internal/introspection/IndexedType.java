@@ -17,7 +17,6 @@
 
 package org.apache.commons.jexl3.internal.introspection;
 
-
 import java.beans.IntrospectionException;
 import java.lang.reflect.Method;
 

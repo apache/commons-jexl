@@ -28,7 +28,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-
 /**
  * Tests for property access operator '.'
  * @since 3.0
@@ -173,7 +172,6 @@ public class PropertyAccessTest extends JexlTestCase {
         }
     }
 
-
     private Asserter asserter;
 
     public PropertyAccessTest() {
@@ -251,7 +249,6 @@ public class PropertyAccessTest extends JexlTestCase {
         }
     }
 
-
     @Test
     public void test275a() throws Exception {
         final JexlEngine jexl = new JexlBuilder().strict(true).safe(false).create();
@@ -317,7 +314,6 @@ public class PropertyAccessTest extends JexlTestCase {
 
         result = script.execute(ctxt, "stuff");
         Assert.assertEquals(42, result);
-
 
         // unprotected navigation
         script = jexl.createScript("$in.`${p}`.intValue()", "p");

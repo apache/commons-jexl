@@ -232,7 +232,6 @@ public class Issues400Test {
     Assert.assertEquals(0d, result.doubleValue(), 3.e-32);
   }
 
-
   @Test
   public void test412() {
     final Map<Object, Object> ctl = new HashMap<>();

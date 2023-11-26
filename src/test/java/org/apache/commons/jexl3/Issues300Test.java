@@ -207,7 +207,6 @@ public class Issues300Test {
         );
     }
 
-
     private Object run361a(final JexlEngine jexl) {
         final String src = "()-> { ()-> { if (versionFile != null) { return 'foo'; } else { return 'bar'; }} }";
         final JexlScript script = jexl.createScript(src);
@@ -386,7 +385,6 @@ public class Issues300Test {
         final Object o2 = e.execute(null);
         Assert.assertEquals(2, o2);
     }
-
 
     @Test
     public void test306c() {
@@ -762,7 +760,6 @@ public class Issues300Test {
         Assert.assertTrue(result.toString().contains("\n"));
     }
 
-
     @Test
     public void test347() {
         final String src = "A.B == 5";
@@ -849,7 +846,6 @@ public class Issues300Test {
             Assert.assertNotNull(xany);
         }
     }
-
 
     @Test
     public void test361c_32() {

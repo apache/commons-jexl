@@ -442,7 +442,6 @@ public class VarTest extends JexlTestCase {
         expect = mkref(new String[][]{{"e"},{"f"}});
         Assert.assertTrue(eq(expect, vars));
 
-
         e = JEXL.createScript("e[f][g]");
         vars = e.getVariables();
         expect = mkref(new String[][]{{"e"},{"f"},{"g"}});

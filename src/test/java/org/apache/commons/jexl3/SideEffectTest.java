@@ -33,7 +33,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-
 /**
  * Tests for array access operator []
  *
@@ -469,7 +468,6 @@ public class SideEffectTest extends JexlTestCase {
     public void test246b() throws Exception {
         run246(new Arithmetic246b(true));
     }
-
 
     @Test
     public void test248() throws Exception {
