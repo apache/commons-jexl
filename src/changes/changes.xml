@@ -42,6 +42,9 @@
                 Allow 'trailing commas' or ellipsis while defining array, map and set literals
             </action>
             <!-- FIX -->
+            <action dev="henrib" type="fix" issue="JEXL-417" due-to="Robert Lucas" >
+                JexlArithmetic looses precision during arithmetic operator execution
+            </action>
             <action dev="henrib" type="fix" issue="JEXL-416" due-to="William Price" >
                 Null-valued pragma throws NPE in 3.3
             </action>

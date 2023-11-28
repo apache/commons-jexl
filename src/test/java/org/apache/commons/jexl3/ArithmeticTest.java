@@ -917,6 +917,17 @@ public class ArithmeticTest extends JexlTestCase {
         Assert.assertEquals(BigDecimal.valueOf(10), ja.toBigDecimal("10"));
         Assert.assertEquals(BigDecimal.valueOf(1.), ja.toBigDecimal(true));
         Assert.assertEquals(BigDecimal.valueOf(0.), ja.toBigDecimal(false));
+        // BigDecimal precision is kept when used as argument
+        BigDecimal a42 = BigDecimal.valueOf(42);
+        BigDecimal a49 = BigDecimal.valueOf(49);
+        JexlScript bde = JEXL.createScript("a * 6 / 7", "a");
+        Assert.assertEquals(a42, bde.execute(null, a49));
+        bde = JEXL.createScript("(a - 12) / 12", "a");
+        MathContext mc = ja.getMathContext();
+        BigDecimal b56 = BigDecimal.valueOf(56);
+        BigDecimal b12 = BigDecimal.valueOf(12);
+        BigDecimal b3dot666 = b56.subtract(b12, mc).divide(b12, mc);
+        Assert.assertEquals(b3dot666, bde.execute(null, b56));
     }
 
     @Test
@@ -1564,26 +1575,38 @@ public class ArithmeticTest extends JexlTestCase {
     }
 
     @Test
-    public void testNarrowBig() throws Exception {
+    public void testNarrowBigInteger() throws Exception {
         final List<String> ls = Arrays.asList("zero", "one", "two");
         asserter.setVariable("list",ls);
-        asserter.setVariable("aBigDecimal", new BigDecimal("1"));
-        asserter.setVariable("aBigInteger", new BigDecimal("1"));
-        asserter.assertExpression("list.get(aBigDecimal)", "one");
-        asserter.assertExpression("list.get(aBigInteger)", "one");
+        asserter.assertExpression("a -> list.get(a)", "zero", BigInteger.ZERO);
+        asserter.assertExpression("a -> list.get(a)", "one", BigInteger.ONE);
+        asserter.assertExpression("a -> list.get(2H)", "two");
+        BigInteger b42 = BigInteger.valueOf(42);
+        asserter.setVariable("bi10", BigInteger.valueOf(10));
+        asserter.setVariable("bi420", BigInteger.valueOf(420));
+        asserter.assertExpression("420 / bi10", b42);
+        asserter.assertExpression("420l / bi10", b42);
+        asserter.assertExpression("bi420 / 420", BigInteger.ONE);
+        asserter.assertExpression("bi420 / 420l", BigInteger.ONE);
+        asserter.assertExpression("bi420 / 420H", BigInteger.ONE);
     }
 
     @Test
     public void testNarrowBigDecimal() throws Exception {
-        asserter.setVariable("bi420", BigInteger.valueOf(420));
-        asserter.setVariable("bi10", BigInteger.valueOf(10));
-        asserter.setVariable("bd420", new BigDecimal("420"));
-        asserter.setVariable("bd10", new BigDecimal("10"));
-        asserter.assertExpression("420 / bi10", 42);
-        asserter.assertExpression("420l / bi10", 42L);
-        asserter.assertExpression("bi420 / 420", 1);
-        asserter.assertExpression("bi420 / 420l", 1L);
-        asserter.assertExpression("bd420 / 10", new BigDecimal("42"));
+        final List<String> ls = Arrays.asList("zero", "one", "two");
+        asserter.setVariable("list", ls);
+        asserter.assertExpression("a -> list.get(a.intValue())", "zero", BigDecimal.ZERO);
+        asserter.assertExpression("a -> list.get(a.intValue())", "one", BigDecimal.ONE);
+        asserter.assertExpression("a -> list.get(2B.intValue())", "two");
+        BigDecimal bd42 = BigDecimal.valueOf(42);
+        asserter.setVariable("bd10", BigDecimal.valueOf(10d));
+        asserter.setVariable("bd420",BigDecimal.valueOf(420d));
+        asserter.assertExpression("420 / bd10", bd42);
+        asserter.assertExpression("420l / bd10", bd42);
+        asserter.assertExpression("420H / bd10", bd42);
+        asserter.assertExpression("bd420 / 10", bd42);
+        asserter.assertExpression("bd420 / 10H", bd42);
+        asserter.assertExpression("bd420 / 10B", bd42);
     }
 
     @Test

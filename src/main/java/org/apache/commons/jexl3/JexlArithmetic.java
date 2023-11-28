@@ -29,6 +29,7 @@ import java.math.MathContext;
 import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -1062,14 +1063,14 @@ public class JexlArithmetic {
     protected Number narrowBigInteger(final Object lhs, final Object rhs, final BigInteger bigi) {
         //coerce to long if possible
         if ((isNumberable(lhs) || isNumberable(rhs))
-                && bigi.compareTo(BIGI_LONG_MAX_VALUE) <= 0
-                && bigi.compareTo(BIGI_LONG_MIN_VALUE) >= 0) {
+            && bigi.compareTo(BIGI_LONG_MAX_VALUE) <= 0
+            && bigi.compareTo(BIGI_LONG_MIN_VALUE) >= 0) {
             // coerce to int if possible
             final long l = bigi.longValue();
             // coerce to int when possible (int being so often used in method parms)
             if (!(lhs instanceof Long || rhs instanceof Long)
-                    && l <= Integer.MAX_VALUE
-                    && l >= Integer.MIN_VALUE) {
+                && l <= Integer.MAX_VALUE
+                && l >= Integer.MIN_VALUE) {
                 return (int) l;
             }
             return l;
@@ -1079,7 +1080,7 @@ public class JexlArithmetic {
 
     /**
      * Given a BigDecimal, attempt to narrow it to an Integer or Long if it fits and
-     * one of the arguments is a numberable.
+     * one of the arguments is numberable.
      *
      * @param lhs  the left-hand side operand that lead to the bigd result
      * @param rhs  the right-hand side operand that lead to the bigd result
@@ -1144,17 +1145,42 @@ public class JexlArithmetic {
 
     /**
      * Checks if value class is a number that can be represented exactly in a long.
+     * <p>For convenience, booleans are converted as 1/0 (true/false).</p>
      *
      * @param value  argument
      * @return true if argument can be represented by a long
      */
     protected Number asLongNumber(final Object value) {
-        return value instanceof Long
-                || value instanceof Integer
-                || value instanceof Short
-                || value instanceof Byte
-                        ? (Number) value
-                        : null;
+        return asLongNumber(strict, value);
+    }
+
+    /**
+     * Checks if value class is a number that can be represented exactly in a long.
+     * <p>For convenience, booleans are converted as 1/0 (true/false).</p>
+     *
+     * @param strict whether null argument is converted as 0 or remains null
+     * @param value  argument
+     * @return a non-null value if argument can be represented by a long
+     */
+    protected Number asLongNumber(final boolean strict, final Object value) {
+        if (value instanceof Long
+            || value instanceof Integer
+            || value instanceof Short
+            || value instanceof Byte) {
+            return (Number) value;
+        }
+        if (value instanceof Boolean) {
+            Boolean b = (Boolean) value;
+            return b ? 1L : 0L;
+        }
+        if (value instanceof AtomicBoolean) {
+            AtomicBoolean b = (AtomicBoolean) value;
+            return b.get() ? 1L : 0L;
+        }
+        if (value == null && !strict) {
+            return 0L;
+        }
+        return null;
     }
 
     /**
@@ -1234,9 +1260,10 @@ public class JexlArithmetic {
                             : left instanceof String && right instanceof String;
         if (!strconcat) {
             try {
+                final boolean strictCast = isStrict(JexlOperator.ADD);
                 // if both (non-null) args fit as long
-                final Number ln = asLongNumber(left);
-                final Number rn = asLongNumber(right);
+                final Number ln = asLongNumber(strictCast, left);
+                final Number rn = asLongNumber(strictCast, right);
                 if (ln != null && rn != null) {
                     final long x = ln.longValue();
                     final long y = rn.longValue();
@@ -1247,21 +1274,19 @@ public class JexlArithmetic {
                     }
                     return narrowLong(left, right, result);
                 }
-                final boolean strictCast = isStrict(JexlOperator.ADD);
-                // if either are bigdecimal use that type
+                // if either are BigDecimal, use that type
                 if (left instanceof BigDecimal || right instanceof BigDecimal) {
                     final BigDecimal l = toBigDecimal(strictCast, left);
                     final BigDecimal r = toBigDecimal(strictCast, right);
-                    final BigDecimal result = l.add(r, getMathContext());
-                    return narrowBigDecimal(left, right, result);
+                    return l.add(r, getMathContext());
                 }
-                // if either are floating point (double or float) use double
+                // if either are floating point (double or float), use double
                 if (isFloatingPointNumber(left) || isFloatingPointNumber(right)) {
                     final double l = toDouble(strictCast, left);
                     final double r = toDouble(strictCast, right);
                     return l + r;
                 }
-                // otherwise treat as (big) integers
+                // otherwise treat as BigInteger
                 final BigInteger l = toBigInteger(strictCast, left);
                 final BigInteger r = toBigInteger(strictCast, right);
                 final BigInteger result = l.add(r);
@@ -1285,9 +1310,10 @@ public class JexlArithmetic {
         if (left == null && right == null) {
             return controlNullNullOperands(JexlOperator.DIVIDE);
         }
+        final boolean strictCast = isStrict(JexlOperator.DIVIDE);
         // if both (non-null) args fit as long
-        final Number ln = asLongNumber(left);
-        final Number rn = asLongNumber(right);
+        final Number ln = asLongNumber(strictCast, left);
+        final Number rn = asLongNumber(strictCast, right);
         if (ln != null && rn != null) {
             final long x = ln.longValue();
             final long y = rn.longValue();
@@ -1297,18 +1323,16 @@ public class JexlArithmetic {
             final long result = x  / y;
             return narrowLong(left, right, result);
         }
-        final boolean strictCast = isStrict(JexlOperator.DIVIDE);
-        // if either are bigdecimal use that type
+        // if either are BigDecimal, use that type
         if (left instanceof BigDecimal || right instanceof BigDecimal) {
             final BigDecimal l = toBigDecimal(strictCast, left);
             final BigDecimal r = toBigDecimal(strictCast, right);
             if (BigDecimal.ZERO.equals(r)) {
                 throw new ArithmeticException("/");
             }
-            final BigDecimal result = l.divide(r, getMathContext());
-            return narrowBigDecimal(left, right, result);
+            return l.divide(r, getMathContext());
         }
-        // if either are floating point (double or float) use double
+        // if either are floating point (double or float), use double
         if (isFloatingPointNumber(left) || isFloatingPointNumber(right)) {
             final double l = toDouble(strictCast, left);
             final double r = toDouble(strictCast, right);
@@ -1317,7 +1341,7 @@ public class JexlArithmetic {
             }
             return l / r;
         }
-        // otherwise treat as integers
+        // otherwise treat as BigInteger
         final BigInteger l = toBigInteger(strictCast, left);
         final BigInteger r = toBigInteger(strictCast, right);
         if (BigInteger.ZERO.equals(r)) {
@@ -1339,9 +1363,10 @@ public class JexlArithmetic {
         if (left == null && right == null) {
             return controlNullNullOperands(JexlOperator.MOD);
         }
+        final boolean strictCast = isStrict(JexlOperator.MOD);
         // if both (non-null) args fit as long
-        final Number ln = asLongNumber(left);
-        final Number rn = asLongNumber(right);
+        final Number ln = asLongNumber(strictCast, left);
+        final Number rn = asLongNumber(strictCast, right);
         if (ln != null && rn != null) {
             final long x = ln.longValue();
             final long y = rn.longValue();
@@ -1351,18 +1376,16 @@ public class JexlArithmetic {
             final long result = x % y;
             return narrowLong(left, right,  result);
         }
-        final boolean strictCast = isStrict(JexlOperator.MOD);
-        // if either are bigdecimal use that type
+        // if either are BigDecimal, use that type
         if (left instanceof BigDecimal || right instanceof BigDecimal) {
             final BigDecimal l = toBigDecimal(strictCast, left);
             final BigDecimal r = toBigDecimal(strictCast, right);
             if (BigDecimal.ZERO.equals(r)) {
                 throw new ArithmeticException("%");
             }
-            final BigDecimal remainder = l.remainder(r, getMathContext());
-            return narrowBigDecimal(left, right, remainder);
+            return l.remainder(r, getMathContext());
         }
-        // if either are floating point (double or float) use double
+        // if either are floating point (double or float), use double
         if (isFloatingPointNumber(left) || isFloatingPointNumber(right)) {
             final double l = toDouble(strictCast, left);
             final double r = toDouble(strictCast, right);
@@ -1371,7 +1394,7 @@ public class JexlArithmetic {
             }
             return l % r;
         }
-        // otherwise treat as integers
+        // otherwise treat as BigInteger
         final BigInteger l = toBigInteger(strictCast, left);
         final BigInteger r = toBigInteger(strictCast, right);
         if (BigInteger.ZERO.equals(r)) {
@@ -1412,9 +1435,10 @@ public class JexlArithmetic {
         if (left == null && right == null) {
             return controlNullNullOperands(JexlOperator.MULTIPLY);
         }
-        // if both (non-null) args fit as int
-        final Number ln = asLongNumber(left);
-        final Number rn = asLongNumber(right);
+        final boolean strictCast = isStrict(JexlOperator.MULTIPLY);
+        // if both (non-null) args fit as long
+        final Number ln = asLongNumber(strictCast, left);
+        final Number rn = asLongNumber(strictCast, right);
         if (ln != null && rn != null) {
             final long x = ln.longValue();
             final long y = rn.longValue();
@@ -1425,21 +1449,19 @@ public class JexlArithmetic {
             }
             return narrowLong(left, right, result);
         }
-        final boolean strictCast = isStrict(JexlOperator.MULTIPLY);
-        // if either are bigdecimal use that type
+        // if either are BigDecimal, use that type
         if (left instanceof BigDecimal || right instanceof BigDecimal) {
             final BigDecimal l = toBigDecimal(strictCast, left);
             final BigDecimal r = toBigDecimal(strictCast, right);
-            final BigDecimal result = l.multiply(r, getMathContext());
-            return narrowBigDecimal(left, right, result);
+            return l.multiply(r, getMathContext());
         }
-        // if either are floating point (double or float) use double
+        // if either are floating point (double or float), use double
         if (isFloatingPointNumber(left) || isFloatingPointNumber(right)) {
             final double l = toDouble(strictCast, left);
             final double r = toDouble(strictCast, right);
             return l * r;
         }
-        // otherwise treat as integers
+        // otherwise treat as BigInteger
         final BigInteger l = toBigInteger(strictCast, left);
         final BigInteger r = toBigInteger(strictCast, right);
         final BigInteger result = l.multiply(r);
@@ -1457,9 +1479,10 @@ public class JexlArithmetic {
         if (left == null && right == null) {
             return controlNullNullOperands(JexlOperator.SUBTRACT);
         }
+        final boolean strictCast = isStrict(JexlOperator.SUBTRACT);
         // if both (non-null) args fit as long
-        final Number ln = asLongNumber(left);
-        final Number rn = asLongNumber(right);
+        final Number ln = asLongNumber(strictCast, left);
+        final Number rn = asLongNumber(strictCast, right);
         if (ln != null && rn != null) {
             final long x = ln.longValue();
             final long y = rn.longValue();
@@ -1470,21 +1493,19 @@ public class JexlArithmetic {
             }
             return narrowLong(left, right, result);
         }
-        final boolean strictCast = isStrict(JexlOperator.SUBTRACT);
-        // if either are bigdecimal use that type
+        // if either are BigDecimal, use that type
         if (left instanceof BigDecimal || right instanceof BigDecimal) {
             final BigDecimal l = toBigDecimal(strictCast, left);
             final BigDecimal r = toBigDecimal(strictCast, right);
-            final BigDecimal result = l.subtract(r, getMathContext());
-            return narrowBigDecimal(left, right, result);
+            return l.subtract(r, getMathContext());
         }
-        // if either are floating point (double or float) use double
+        // if either are floating point (double or float), use double
         if (isFloatingPointNumber(left) || isFloatingPointNumber(right)) {
             final double l = toDouble(strictCast, left);
             final double r = toDouble(strictCast, right);
             return l - r;
         }
-        // otherwise treat as integers
+        // otherwise treat as BigInteger
         final BigInteger l = toBigInteger(strictCast, left);
         final BigInteger r = toBigInteger(strictCast, right);
         final BigInteger result = l.subtract(r);
