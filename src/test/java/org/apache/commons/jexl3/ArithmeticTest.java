@@ -1314,6 +1314,12 @@ public class ArithmeticTest extends JexlTestCase {
 
         evaluate = jexl.createExpression("math:abs(-42)").evaluate(null);
         Assert.assertEquals(42, evaluate);
+
+        evaluate =  jexl.createExpression("42B / 7").evaluate(null);
+        Assert.assertEquals(6, evaluate);
+
+        evaluate =  jexl.createExpression("42.7B / 7").evaluate(null);
+        Assert.assertEquals(BigDecimal.valueOf(6.1d), evaluate);
     }
 
     @Test
@@ -1595,9 +1601,9 @@ public class ArithmeticTest extends JexlTestCase {
     public void testNarrowBigDecimal() throws Exception {
         final List<String> ls = Arrays.asList("zero", "one", "two");
         asserter.setVariable("list", ls);
-        asserter.assertExpression("a -> list.get(a.intValue())", "zero", BigDecimal.ZERO);
-        asserter.assertExpression("a -> list.get(a.intValue())", "one", BigDecimal.ONE);
-        asserter.assertExpression("a -> list.get(2B.intValue())", "two");
+        asserter.assertExpression("a -> list.get(a)", "zero", BigDecimal.ZERO);
+        asserter.assertExpression("a -> list.get(a)", "one", BigDecimal.ONE);
+        asserter.assertExpression("a -> list.get(2B)", "two");
         BigDecimal bd42 = BigDecimal.valueOf(42);
         asserter.setVariable("bd10", BigDecimal.valueOf(10d));
         asserter.setVariable("bd420",BigDecimal.valueOf(420d));

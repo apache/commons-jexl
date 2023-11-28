@@ -41,15 +41,14 @@ import org.apache.commons.jexl3.introspection.JexlMethod;
  *
  * <p>The 5 base arithmetic operators (+, - , *, /, %) follow the same evaluation rules regarding their arguments.</p>
  * <ol>
- *   <li>If both are null, result is 0</li>
- *   <li>If either is a BigDecimal, coerce both to BigDecimal and perform operation</li>
- *   <li>If either is a floating point number, coerce both to Double and perform operation</li>
- *   <li>Else treat as BigInteger, perform operation and attempt to narrow result:
- *     <ol>
- *       <li>if both arguments can be narrowed to Integer, narrow result to Integer</li>
- *       <li>if both arguments can be narrowed to Long, narrow result to Long</li>
- *       <li>Else return result as BigInteger</li>
- *     </ol>
+ *   <li>If both are null, result is 0 if arithmetic (or operator) is non-strict, ArithmeticException is thrown
+ *   otherwise</li>
+ *   <li>If both arguments are numberable - any kind of integer including boolean -, coerce both to Long and coerce
+ *   result to the most precise argument class (boolean &lt; byte &lt; short &lt; int &lt; long);
+ *   if long operation would cause overflow, return a BigInteger</li>
+ *   <li>If either argument is a BigDecimal, coerce both to BigDecimal, operator returns BigDecimal</li>
+ *   <li>If either argument is a floating point number, coerce both to Double, operator returns Double</li>
+ *   <li>Else treat as BigInteger, perform operation and narrow result to the most precise argument class
  *   </li>
  * </ol>
  *
@@ -68,8 +67,8 @@ public class JexlArithmetic {
     /** Double.MAX_VALUE as BigDecimal. */
     protected static final BigDecimal BIGD_DOUBLE_MAX_VALUE = BigDecimal.valueOf(Double.MAX_VALUE);
 
-    /** Double.MIN_VALUE as BigDecimal. */
-    protected static final BigDecimal BIGD_DOUBLE_MIN_VALUE = BigDecimal.valueOf(Double.MIN_VALUE);
+    /** -Double.MAX_VALUE as BigDecimal. */
+    protected static final BigDecimal BIGD_DOUBLE_MIN_VALUE = BigDecimal.valueOf(-Double.MAX_VALUE);
 
     /** Long.MAX_VALUE as BigInteger. */
     protected static final BigInteger BIGI_LONG_MAX_VALUE = BigInteger.valueOf(Long.MAX_VALUE);
@@ -975,6 +974,18 @@ public class JexlArithmetic {
     }
 
     /**
+     * Narrows a double to a float if there is no information loss.
+     * @param value the double value
+     * @param narrow the target narrow class
+     * @return the narrowed or initial number
+     */
+    private Number narrow(final Class<?> narrow, double value) {
+        return narrowAccept(narrow, Float.class) && (float) value == value
+            ? (float) value
+            : value;
+    }
+
+    /**
      * Given a Number, return the value attempting to narrow it to a target class.
      *
      * @param original the original number
@@ -982,67 +993,55 @@ public class JexlArithmetic {
      * @return the narrowed number or the source if no narrowing was possible
      */
     public Number narrowNumber(final Number original, final Class<?> narrow) {
-        if (original == null) {
-            return null;
-        }
-        Number result = original;
-        if (original instanceof BigDecimal) {
-            final BigDecimal bigd = (BigDecimal) original;
-            // if it is bigger than a double, it can not be narrowed
-            if (bigd.compareTo(BIGD_DOUBLE_MAX_VALUE) > 0
-                || bigd.compareTo(BIGD_DOUBLE_MIN_VALUE) < 0) {
-                return original;
-            }
-            try {
-                final long l = bigd.longValueExact();
-                // coerce to int when possible (int being so often used in method parms)
-                if (narrowAccept(narrow, Integer.class)
-                        && l <= Integer.MAX_VALUE
-                        && l >= Integer.MIN_VALUE) {
-                    return (int) l;
+        if (original != null) {
+            final long value;
+            if (original instanceof BigDecimal) {
+                final BigDecimal big = (BigDecimal) original;
+                try {
+                    // can it be represented as a long?
+                    value = big.longValueExact();
+                    // continue in sequence to try and further reduce
+                } catch (final ArithmeticException xa) {
+                    // if it is bigger than a double, it can not be narrowed
+                    if (big.compareTo(BIGD_DOUBLE_MAX_VALUE) > 0
+                        || big.compareTo(BIGD_DOUBLE_MIN_VALUE) < 0) {
+                        return original;
+                    }
+                    // represent as double
+                    return narrow(narrow, original.doubleValue());
                 }
-                if (narrowAccept(narrow, Long.class)) {
-                    return l;
+                // this continues with value as long
+            } else {
+                if (isFloatingPoint(original)) {
+                    final double doubleValue = original.doubleValue();
+                    // if it is not equivalent to a Long...
+                    if ((long) doubleValue != doubleValue) {
+                        return narrow(narrow, doubleValue);
+                    }
+                    // else it can be represented as a long
+                } else if (original instanceof BigInteger) {
+                    final BigInteger bigi = (BigInteger) original;
+                    // if it is bigger than a Long, it can not be narrowed
+                    if (!BigInteger.valueOf(bigi.longValue()).equals(bigi)) {
+                        return original;
+                    }
+                    // else it can be represented as a long
                 }
-            } catch (final ArithmeticException xa) {
-                // ignore, no exact value possible
+                value = original.longValue();
             }
-        }
-        if (original instanceof Double || original instanceof Float) {
-            final double value = original.doubleValue();
-            if (narrowAccept(narrow, Float.class)
-                    && value <= Float.MAX_VALUE
-                    && value >= Float.MIN_VALUE) {
-                result = result.floatValue();
-            }
-            // else it fits in a double only
-        } else {
-            if (original instanceof BigInteger) {
-                final BigInteger bigi = (BigInteger) original;
-                // if it is bigger than a Long, it can not be narrowed
-                if (bigi.compareTo(BIGI_LONG_MAX_VALUE) > 0
-                        || bigi.compareTo(BIGI_LONG_MIN_VALUE) < 0) {
-                    return original;
-                }
-            }
-            final long value = original.longValue();
-            if (narrowAccept(narrow, Byte.class)
-                    && value <= Byte.MAX_VALUE
-                    && value >= Byte.MIN_VALUE) {
+            // it can be represented as a long; determine the smallest possible numberable representation
+            if (narrowAccept(narrow, Byte.class) && (byte) value == value) {
                 // it will fit in a byte
-                result = (byte) value;
-            } else if (narrowAccept(narrow, Short.class)
-                    && value <= Short.MAX_VALUE
-                    && value >= Short.MIN_VALUE) {
-                result = (short) value;
-            } else if (narrowAccept(narrow, Integer.class)
-                    && value <= Integer.MAX_VALUE
-                    && value >= Integer.MIN_VALUE) {
-                result = (int) value;
+                return (byte) value;
             }
-            // else it fits in a long
+            if (narrowAccept(narrow, Short.class) && (short) value == value) {
+                return (short) value;
+            }
+            if (narrowAccept(narrow, Integer.class) && (int) value == value) {
+                return (int) value;
+            }
         }
-        return result;
+        return original;
     }
 
     /**
@@ -1056,25 +1055,23 @@ public class JexlArithmetic {
      *
      * @param lhs  the left-hand side operand that lead to the bigi result
      * @param rhs  the right-hand side operand that lead to the bigi result
-     * @param bigi the BigInteger to narrow
+     * @param big the BigInteger to narrow
      * @return an Integer or Long if narrowing is possible, the original BigInteger otherwise
      */
-    protected Number narrowBigInteger(final Object lhs, final Object rhs, final BigInteger bigi) {
-        //coerce to long if possible
-        if ((isNumberable(lhs) || isNumberable(rhs))
-            && bigi.compareTo(BIGI_LONG_MAX_VALUE) <= 0
-            && bigi.compareTo(BIGI_LONG_MIN_VALUE) >= 0) {
-            // coerce to int if possible
-            final long l = bigi.longValue();
-            // coerce to int when possible (int being so often used in method parms)
-            if (!(lhs instanceof Long || rhs instanceof Long)
-                && l <= Integer.MAX_VALUE
-                && l >= Integer.MIN_VALUE) {
-                return (int) l;
+    protected Number narrowBigInteger(final Object lhs, final Object rhs, final BigInteger big) {
+        if (isNumberable(lhs) || isNumberable(rhs)) {
+            try {
+                final long l = big.longValueExact();
+                // coerce to int when possible (int being so often used in method parms)
+                if ((int) l == l) {
+                    return (int) l;
+                }
+                return l;
+            } catch (final ArithmeticException xa) {
+                // ignore, no exact value possible
             }
-            return l;
         }
-        return bigi;
+        return big;
     }
 
     /**
@@ -1083,15 +1080,15 @@ public class JexlArithmetic {
      *
      * @param lhs  the left-hand side operand that lead to the bigd result
      * @param rhs  the right-hand side operand that lead to the bigd result
-     * @param bigd the BigDecimal to narrow
+     * @param big the BigDecimal to narrow
      * @return an Integer or Long if narrowing is possible, the original BigDecimal otherwise
      */
-    protected Number narrowBigDecimal(final Object lhs, final Object rhs, final BigDecimal bigd) {
+    protected Number narrowBigDecimal(final Object lhs, final Object rhs, final BigDecimal big) {
         if (isNumberable(lhs) || isNumberable(rhs)) {
             try {
-                final long l = bigd.longValueExact();
+                final long l = big.longValueExact();
                 // coerce to int when possible (int being so often used in method parms)
-                if (l <= Integer.MAX_VALUE && l >= Integer.MIN_VALUE) {
+                if ((int) l == l) {
                     return (int) l;
                 }
                 return l;
@@ -1099,7 +1096,7 @@ public class JexlArithmetic {
                 // ignore, no exact value possible
             }
         }
-        return bigd;
+        return big;
     }
 
     /**
