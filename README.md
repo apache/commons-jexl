@@ -56,7 +56,7 @@ Documentation
 
 More information can be found on the [Apache Commons JEXL homepage](https://commons.apache.org/proper/commons-jexl).
 The [Javadoc](https://commons.apache.org/proper/commons-jexl/apidocs) can be browsed.
-Questions related to the usage of Apache Commons JEXL should be posted to the [user mailing list][ml].
+Questions related to the usage of Apache Commons JEXL should be posted to the [user mailing list](https://commons.apache.org/mail-lists.html).
 
 Where can I get the latest release?
 -----------------------------------
