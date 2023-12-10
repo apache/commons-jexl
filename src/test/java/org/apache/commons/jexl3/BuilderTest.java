@@ -17,6 +17,7 @@
 package org.apache.commons.jexl3;
 
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 import org.apache.commons.jexl3.internal.introspection.SandboxUberspect;
 import org.apache.commons.jexl3.introspection.JexlSandbox;
@@ -56,7 +57,7 @@ public class BuilderTest {
     public void testOther() {
         final ClassLoader cls = getClass().getClassLoader().getParent();
         Assert.assertEquals(cls, builder().loader(cls).loader());
-        final Charset cs = Charset.forName("UTF16");
+        final Charset cs = StandardCharsets.UTF_16;
         Assert.assertEquals(cs, builder().charset(cs).charset());
         Assert.assertEquals(cs, builder().loader(cs).charset());
         final JexlUberspect u0 = builder().create().getUberspect();
