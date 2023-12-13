@@ -207,7 +207,7 @@ public abstract class JexlParser extends StringParser {
     }
 
     /**
-     * Disables pragma feature is pragma-anywhere feature is disabled.
+     * Disables pragma feature if pragma-anywhere feature is disabled.
      */
     protected void controlPragmaAnywhere() {
         final JexlFeatures features = getFeatures();
@@ -411,7 +411,7 @@ public abstract class JexlParser extends StringParser {
     /**
      * Declares a local function.
      * @param variable the identifier used to declare
-     * @param token      the variable name toekn
+     * @param token      the variable name token
      */
     protected void declareFunction(final ASTVar variable, final Token token) {
         final String name = token.image;
@@ -545,19 +545,21 @@ public abstract class JexlParser extends StringParser {
         if (pragmas == null) {
             pragmas = new TreeMap<>();
         }
-        // declaring a namespace
-        final Predicate<String> ns = features.namespaceTest();
-        if (ns != null && key.startsWith(PRAGMA_JEXLNS)) {
-            if (!features.supportsNamespacePragma()) {
-                throwFeatureException(JexlFeatures.NS_PRAGMA, getToken(0));
-            }
-            // jexl.namespace.***
-            final String nsname = key.substring(PRAGMA_JEXLNS.length());
-            if (!nsname.isEmpty()) {
-                if (namespaces == null) {
-                    namespaces = new HashSet<>();
+        // declaring a namespace or module
+        final String[] nsprefixes = { PRAGMA_JEXLNS, PRAGMA_MODULE };
+        for(String nsprefix : nsprefixes) {
+            if (key.startsWith(nsprefix)) {
+                if (!features.supportsNamespacePragma()) {
+                    throwFeatureException(JexlFeatures.NS_PRAGMA, getToken(0));
                 }
-                namespaces.add(nsname);
+                final String nsname = key.substring(nsprefix.length());
+                if (!nsname.isEmpty()) {
+                    if (namespaces == null) {
+                        namespaces = new HashSet<>();
+                    }
+                    namespaces.add(nsname);
+                }
+                break;
             }
         }
         // merge new value into a set created on the fly if key is already mapped
