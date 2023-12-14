@@ -25,13 +25,13 @@ import org.apache.commons.jexl3.internal.Script;
  */
 public class JexlInfo {
 
-    /** line number. */
+    /** Line number. */
     private final int line;
 
-    /** column number. */
+    /** Column number. */
     private final int column;
 
-    /** name. */
+    /** Name. */
     private final String name;
 
     /**

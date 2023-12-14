@@ -136,7 +136,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     protected int indentLevel;
     /** Perform indentation?. */
     protected int indent = 2;
-    /** accept() relative depth. */
+    /** Accept() relative depth. */
     protected int depth = Integer.MAX_VALUE;
     /** Arrow symbol. */
     protected String arrow = "->";

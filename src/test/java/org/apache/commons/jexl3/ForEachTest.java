@@ -33,7 +33,7 @@ import org.junit.Test;
 @SuppressWarnings({"UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
 public class ForEachTest extends JexlTestCase {
 
-    /** create a named test */
+    /** Create a named test */
     public ForEachTest() {
         super("ForEachTest");
     }

@@ -46,7 +46,7 @@ public class ExceptionTest extends JexlTestCase {
         }
     }
 
-    /** create a named test */
+    /** Create a named test */
     public ExceptionTest() {
         super("ExceptionTest");
     }

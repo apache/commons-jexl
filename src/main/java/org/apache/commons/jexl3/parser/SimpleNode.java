@@ -42,7 +42,7 @@ public class SimpleNode implements Node {
     private JexlNode[] children;
     /** The node type id. */
     protected final int id;
-    /** volatile value so it can be used as a last evaluation cache. */
+    /** Volatile value so it can be used as a last evaluation cache. */
     private transient volatile Object value;
 
     /**

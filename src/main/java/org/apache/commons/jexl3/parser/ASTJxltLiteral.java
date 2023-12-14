@@ -19,7 +19,7 @@ package org.apache.commons.jexl3.parser;
 import org.apache.commons.jexl3.JxltEngine;
 
 public final class ASTJxltLiteral extends JexlNode {
-    /** serial uid.*/
+    /** Serial uid.*/
     private static final long serialVersionUID = 1L;
     /** The actual literal value. */
     private String literal;
