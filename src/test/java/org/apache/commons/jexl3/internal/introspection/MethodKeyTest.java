@@ -78,7 +78,7 @@ public class MethodKeyTest {
     private static final java.util.Map< MethodKey, String> BY_KEY;
     /** form string to key */
     private static final java.util.Map<String, MethodKey> BY_STRING;
-    /** the list of keys we generated & test against */
+    /** The list of keys we generated & test against */
     private static final MethodKey[] KEY_LIST;
 
     /* Generate a list of method*(prims*), method(prims*, prims*), method*(prims*,prims*,prims*) */
