@@ -754,7 +754,7 @@ public abstract class InterpreterBase extends ParserVisitor {
         /** The JexlMethod to delegate the call to. */
         protected final JexlMethod me;
         /**
-         * Constructor.
+         * Constructs a new instance.
          * @param jme  the method
          * @param flag the narrow flag
          */
@@ -781,7 +781,7 @@ public abstract class InterpreterBase extends ParserVisitor {
      */
     protected static class ArithmeticFuncall extends Funcall {
         /**
-         * Constructor.
+         * Constructs a new instance.
          * @param jme  the method
          * @param flag the narrow flag
          */
@@ -800,7 +800,7 @@ public abstract class InterpreterBase extends ParserVisitor {
      */
     protected static class ContextFuncall extends Funcall {
         /**
-         * Constructor.
+         * Constructs a new instance.
          * @param jme  the method
          * @param flag the narrow flag
          */
@@ -819,7 +819,7 @@ public abstract class InterpreterBase extends ParserVisitor {
      */
     protected static class ContextualCtor extends Funcall {
         /**
-         * Constructor.
+         * Constructs a new instance.
          * @param jme the method
          * @param flag the narrow flag
          */

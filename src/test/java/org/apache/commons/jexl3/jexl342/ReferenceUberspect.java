@@ -177,7 +177,7 @@ public class ReferenceUberspect implements JexlUberspect {
     private final List<PropertyResolver> mapStrategy;
 
     /**
-     * Constructor.
+     * Constructs a new instance.
      * @param jexlUberspect the uberspect to delegate to
      */
     public ReferenceUberspect(final JexlUberspect jexlUberspect) {

@@ -194,7 +194,7 @@ public abstract class IntegerRange implements Collection<Integer> {
      */
     public static class Ascending extends IntegerRange {
         /**
-         * Constructor.
+         * Constructs a new instance.
          * @param from lower boundary
          * @param to upper boundary
          */
@@ -213,7 +213,7 @@ public abstract class IntegerRange implements Collection<Integer> {
      */
     public static class Descending extends IntegerRange {
         /**
-         * Constructor.
+         * Constructs a new instance.
          * @param from upper boundary
          * @param to lower boundary
          */

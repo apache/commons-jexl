@@ -843,7 +843,7 @@ public class Engine extends JexlEngine {
         final int mode;
 
         /**
-         * Constructor.
+         * Constructs a new instance.
          * @param constaa whether constant array-access is considered equivalent to dot-access
          */
         protected VarCollector(final int constaa) {

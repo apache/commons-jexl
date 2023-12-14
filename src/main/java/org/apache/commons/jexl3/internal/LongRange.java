@@ -197,7 +197,7 @@ public abstract class LongRange implements Collection<Long> {
      */
     public static class Ascending extends LongRange {
         /**
-         * Constructor.
+         * Constructs a new instance.
          * @param from lower boundary
          * @param to upper boundary
          */
@@ -216,7 +216,7 @@ public abstract class LongRange implements Collection<Long> {
      */
     public static class Descending extends LongRange {
         /**
-         * Constructor.
+         * Constructs a new instance.
          * @param from upper boundary
          * @param to lower boundary
          */

@@ -39,7 +39,7 @@ public class Operators {
     protected final JexlArithmetic.Uberspect operators;
 
     /**
-     * Constructor.
+     * Constructs a new instance.
      * @param owner the owning interpreter
      */
     protected Operators(final InterpreterBase owner) {
