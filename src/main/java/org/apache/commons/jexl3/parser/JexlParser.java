@@ -28,8 +28,8 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.function.Predicate;
 
+import org.apache.commons.jexl3.JexlContext;
 import org.apache.commons.jexl3.JexlEngine;
 import org.apache.commons.jexl3.JexlException;
 import org.apache.commons.jexl3.JexlFeatures;
@@ -602,7 +602,7 @@ public abstract class JexlParser extends StringParser {
         final String name = ns.image;
         if (isVariable(name)) {
             // the namespace sticks to the colon as in 'ns:fun()' (vs 'ns : fun()')
-            return colon.beginColumn - 1 == ns.endColumn && isNamespace(name);
+            return colon.beginColumn - 1 == ns.endColumn && ((colon.endColumn == fun.beginColumn - 1) || isNamespace(name));
         }
         return true;
     }

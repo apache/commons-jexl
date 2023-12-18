@@ -890,6 +890,8 @@ void MapLiteral() : {}
 
 void MapEntry() : {}
 {
+    Identifier(true) <COLON> Expression()
+    |
     Expression() <COLON> Expression()
 }
 

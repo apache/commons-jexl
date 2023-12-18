@@ -237,19 +237,27 @@ public class Issues400Test {
     final Map<Object, Object> ctl = new HashMap<>();
     ctl.put("one", 1);
     ctl.put("two", 2);
-    final String fnsrc = "function f(x) { x }\n" +
-        "let one = 'one', two = 'two';\n" +
-        "{ one : f(1), two:f(2) }";
-    final JexlContext jc = new MapContext();
-    final JexlEngine jexl = new JexlBuilder().create();
-    try {
-      final JexlScript e = jexl.createScript(fnsrc);
-      final Object o = e.execute(jc);
-      Assert.assertTrue(o instanceof Map);
-      Map<?, ?> map = (Map<?, ?>) o;
-      Assert.assertEquals(map, ctl);
-    } catch (JexlException.Parsing xparse) {
-      Assert.fail(fnsrc + " : " + xparse.getMessage());
+    final String fnsrc0 = "function f(x) { x }\n" +
+        "let one = 'one', two = 'two';\n";
+    for(String map0 : Arrays.asList(
+        "{ one : f(1), two:f(2) }",
+        "{ one: f(1), two: f(2) }",
+        "{ one: f(1), two:f(2) }",
+        "{ one :f(1), two:f(2) }")) {
+      final String fnsrc = fnsrc0 + map0;
+      final JexlContext jc = new MapContext();
+      final JexlEngine jexl = new JexlBuilder().create();
+      try {
+        final JexlScript e = jexl.createScript(fnsrc);
+        final Object o = e.execute(jc);
+        Assert.assertTrue(o instanceof Map);
+        Map<?, ?> map = (Map<?, ?>) o;
+        Assert.assertEquals(map, ctl);
+      } catch (JexlException.Parsing xparse) {
+        Assert.fail(fnsrc + " : " + xparse.getMessage());
+      } catch (JexlException xother) {
+        Assert.fail(fnsrc + " : " + xother.getMessage());
+      }
     }
   }
 

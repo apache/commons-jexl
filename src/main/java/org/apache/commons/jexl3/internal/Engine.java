@@ -997,9 +997,6 @@ public class Engine extends JexlEngine {
     protected ASTJexlScript parse(final JexlInfo info, final JexlFeatures parsingf, final String src, final Scope scope) {
         final boolean cached = src.length() < cacheThreshold && cache != null;
         final JexlFeatures features = parsingf != null ? parsingf : DEFAULT_FEATURES;
-       // if (features.getNameSpaces().isEmpty() && !functions.isEmpty()) {
-       //     features = new JexlFeatures(features).nameSpaces(functions.keySet());
-       // }
         final Source source = cached? new Source(features, src) : null;
         ASTJexlScript script;
         if (source != null) {
