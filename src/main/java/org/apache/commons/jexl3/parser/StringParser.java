@@ -126,7 +126,7 @@ public class StringParser {
                             strb.append('\\').append(c);
                         } else {
                             switch (c) {
-                                // http://es5.github.io/x7.html#x7.8.4
+                                // https://es5.github.io/x7.html#x7.8.4
                                 case 'b':
                                     strb.append('\b');
                                     break; // backspace \u0008

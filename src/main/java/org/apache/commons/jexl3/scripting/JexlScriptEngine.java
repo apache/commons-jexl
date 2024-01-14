@@ -59,7 +59,7 @@ import org.apache.commons.logging.LogFactory;
  * class {@link JexlScriptObject} for access to utility methods and variables.
  * </p>
  * See
- * <a href="http://java.sun.com/javase/6/docs/api/javax/script/package-summary.html">Java Scripting API</a>
+ * <a href="https://java.sun.com/javase/6/docs/api/javax/script/package-summary.html">Java Scripting API</a>
  * Javadoc.
  *
  * @since 2.0

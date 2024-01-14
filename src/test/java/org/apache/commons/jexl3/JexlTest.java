@@ -268,7 +268,7 @@ public final class JexlTest extends JexlTestCase {
     }
 
     /**
-     * Attempts to recreate bug http://jira.werken.com/ViewIssue.jspa?key=JELLY-8
+     * Attempts to recreate bug https://jira.werken.com/ViewIssue.jspa?key=JELLY-8
      */
     @Test
     public void testCharAtBug() throws Exception {
