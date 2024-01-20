@@ -27,7 +27,6 @@ import org.junit.Test;
  * {@link org.apache.commons.jexl3.JexlEngine#createScript(String)} should throw
  * {@link org.apache.commons.jexl3.JexlException}s).
  *
- * @since 1.1
  */
 public class ParseFailuresTest extends JexlTestCase {
 

@@ -27,7 +27,6 @@ import org.junit.Test;
 /**
  *  Simple example to show how to access method and properties.
  *
- *  @since 1.0
  */
 public class MethodPropertyTest {
     /**

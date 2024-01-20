@@ -28,7 +28,6 @@ import org.junit.Test;
 
 /**
  * Tests for the foreach statement
- * @since 1.1
  */
 @SuppressWarnings({"UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
 public class ForEachTest extends JexlTestCase {

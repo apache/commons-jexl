@@ -25,7 +25,6 @@ import org.junit.Test;
 
 /**
  * Tests do while statement.
- * @since 3.2
  */
 @SuppressWarnings({"UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
 public class DoWhileTest extends JexlTestCase {

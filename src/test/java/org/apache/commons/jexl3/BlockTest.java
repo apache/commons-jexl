@@ -21,7 +21,6 @@ import org.junit.Test;
 
 /**
  * Tests for blocks
- * @since 1.1
  */
 @SuppressWarnings({"UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
 public class BlockTest extends JexlTestCase {

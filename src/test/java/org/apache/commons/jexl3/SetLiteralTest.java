@@ -27,7 +27,6 @@ import org.junit.Test;
 
 /**
  * Tests for set literals
- * @since 3.0
  */
 @SuppressWarnings({"UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
 public class SetLiteralTest extends JexlTestCase {

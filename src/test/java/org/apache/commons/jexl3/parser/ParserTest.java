@@ -22,7 +22,6 @@ import org.junit.Assert;
 import org.junit.Test;
 
 /**
- * @since 1.0
  */
 public class ParserTest {
     static final JexlFeatures FEATURES = new JexlFeatures();

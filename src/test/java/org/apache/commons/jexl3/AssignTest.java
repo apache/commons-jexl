@@ -24,7 +24,6 @@ import org.junit.Test;
 /**
  * Test cases for assignment.
  *
- * @since 1.1
  */
 @SuppressWarnings({"UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
 public class AssignTest extends JexlTestCase {

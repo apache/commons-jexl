@@ -27,7 +27,6 @@ import org.junit.Test;
 
 /**
  * Tests for map literals
- * @since 1.2
  */
 @SuppressWarnings({"UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
 public class MapLiteralTest extends JexlTestCase {

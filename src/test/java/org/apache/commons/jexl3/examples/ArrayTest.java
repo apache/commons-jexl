@@ -30,7 +30,6 @@ import org.junit.Test;
 /**
  *  Simple example to show how to access arrays.
  *
- *  @since 1.0
  */
 public class ArrayTest {
     /**

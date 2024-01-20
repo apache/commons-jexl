@@ -29,7 +29,6 @@ import org.junit.Test;
 
 /**
  * Test cases for annotations.
- * @since 3.1
  */
 @SuppressWarnings({"UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
 

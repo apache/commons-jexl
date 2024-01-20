@@ -24,7 +24,6 @@ import org.junit.Test;
 
 /**
  * Tests for array literals.
- * @since 2.0
  */
 @SuppressWarnings({"UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
 public class ArrayLiteralTest extends JexlTestCase {

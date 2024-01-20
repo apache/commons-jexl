@@ -26,7 +26,6 @@ import static org.apache.commons.jexl3.JexlFeatures.CONST_CAPTURE;
 
 /**
  * Tests for blocks
- * @since 1.1
  */
 @SuppressWarnings({"AssertEqualsBetweenInconvertibleTypes"})
 public class FeaturesTest extends JexlTestCase {

@@ -29,7 +29,6 @@ import org.junit.Test;
 /**
  * Test cases for the if statement.
  *
- * @since 1.1
  */
 @SuppressWarnings({"UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
 public class StrategyTest extends JexlTestCase {

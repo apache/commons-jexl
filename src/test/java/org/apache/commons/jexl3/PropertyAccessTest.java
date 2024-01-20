@@ -30,7 +30,6 @@ import org.junit.Test;
 
 /**
  * Tests for property access operator '.'
- * @since 3.0
  */
 @SuppressWarnings({"UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
 public class PropertyAccessTest extends JexlTestCase {

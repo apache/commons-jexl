@@ -22,7 +22,6 @@ import org.junit.Test;
 
 /**
  * Tests for the bitwise operators.
- * @since 1.1
  */
 @SuppressWarnings({"UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
 public class BitwiseOperatorTest extends JexlTestCase {

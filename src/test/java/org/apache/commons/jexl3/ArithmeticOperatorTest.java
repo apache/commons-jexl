@@ -41,7 +41,6 @@ import org.junit.Test;
 
 /**
  * Tests for the startsWith, endsWith, match and range operators.
- * @since 3.0
  */
 @SuppressWarnings({"UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
 public class ArithmeticOperatorTest extends JexlTestCase {

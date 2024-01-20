@@ -37,7 +37,6 @@ import org.junit.Test;
 /**
  * Simple test cases.
  *
- * @since 1.0
  */
 @SuppressWarnings({"UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
 public final class JexlTest extends JexlTestCase {

@@ -23,7 +23,6 @@ import org.junit.Test;
 
 /**
  * Tests for ranges.
- * @since 3.0
  */
 @SuppressWarnings({"UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
 public class RangeTest extends JexlTestCase {
