@@ -35,7 +35,6 @@ import org.junit.Test;
 
 /**
  * Tests for array access operator []
- *
  */
 @SuppressWarnings({"UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
 public class SideEffectTest extends JexlTestCase {

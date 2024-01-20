@@ -32,7 +32,6 @@ import org.junit.Test;
 
 /**
  * Tests for checking introspection discovery.
- *
  */
 public class DiscoveryTest extends JexlTestCase {
     public static class Bean {

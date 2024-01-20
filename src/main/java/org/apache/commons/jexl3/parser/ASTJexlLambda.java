@@ -21,7 +21,6 @@ package org.apache.commons.jexl3.parser;
  */
 public final class ASTJexlLambda extends ASTJexlScript {
     /**
-     *
      */
     private static final long serialVersionUID = 1L;
 

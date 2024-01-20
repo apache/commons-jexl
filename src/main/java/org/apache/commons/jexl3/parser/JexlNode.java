@@ -29,7 +29,6 @@ import org.apache.commons.jexl3.introspection.JexlPropertySet;
  */
 public abstract class JexlNode extends SimpleNode {
     /**
-     *
      */
     private static final long serialVersionUID = 1L;
     // line + column encoded: up to 4096 columns (ie 20 bits for line + 12 bits for column)

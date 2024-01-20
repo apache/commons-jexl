@@ -29,7 +29,6 @@ import org.junit.Test;
 
 /**
  *  Simple example to show how to access arrays.
- *
  */
 public class ArrayTest {
     /**

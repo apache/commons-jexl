@@ -21,7 +21,6 @@ import org.junit.Test;
 
 /**
  * Test cases for the if statement.
- *
  */
 @SuppressWarnings({"UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
 public class IfTest extends JexlTestCase {

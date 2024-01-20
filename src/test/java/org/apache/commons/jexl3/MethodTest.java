@@ -32,7 +32,6 @@ import org.junit.Test;
 
 /**
  * Tests for calling methods on objects
- *
  */
 @SuppressWarnings({"UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
 public class MethodTest extends JexlTestCase {

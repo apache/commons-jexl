@@ -23,7 +23,6 @@ import org.junit.Test;
 
 /**
  * Test cases for assignment.
- *
  */
 @SuppressWarnings({"UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
 public class AssignTest extends JexlTestCase {
@@ -91,7 +90,6 @@ public class AssignTest extends JexlTestCase {
 
     /**
      * Make sure bean assignment works
-     *
      */
     @Test
     public void testAntish() {
