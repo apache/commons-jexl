@@ -28,7 +28,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -1227,8 +1229,9 @@ public class Issues300Test {
         result = (String) script.execute(null, proxy);
         Assert.assertEquals(control, result);
     }
+
     @Test
-    public void testIssue398() {
+    public void testIssue398a() {
         final String src = "let m = {\n" +
             "  \"foo\": 1,\n" +
             "  \"bar\": 2,\n" +
@@ -1240,6 +1243,49 @@ public class Issues300Test {
         final Map<?,?> map = (Map<?, ?>) result;
         Assert.assertEquals(2, map.size());
     }
+
+    @Test
+    public void testIssue398b() {
+        Map<String,Object> foo = Collections.singletonMap("X", "x");
+        Map<String,Object> bar = Collections.singletonMap("Y", "y");
+        JexlContext ctxt = new MapContext();
+        ctxt.set("foo", foo);
+        ctxt.set("bar", bar);
+        final String src = "let m = {\n" +
+                "  foo.X: 1,\n" +
+                "  bar.Y: 2,\n" +
+                "}";
+        final JexlEngine jexl = new JexlBuilder().create();
+        JexlScript script = jexl.createScript(src);
+        Object result = script.execute(ctxt);
+        Assert.assertTrue(result instanceof Map);
+        Map<?,?> map = (Map<?, ?>) result;
+        Assert.assertEquals(2, map.size());
+        Assert.assertEquals(1, map.get("x"));
+        Assert.assertEquals(2, map.get("y"));
+
+        script = jexl.createScript(src, "foo", "bar");
+        result = script.execute(null, foo, bar);
+        Assert.assertTrue(result instanceof Map);
+        map = (Map<?, ?>) result;
+        Assert.assertEquals(2, map.size());
+        Assert.assertEquals(1, map.get("x"));
+        Assert.assertEquals(2, map.get("y"));
+    }
+
+    @Test
+    public void testIssue398c() {
+        final JexlEngine jexl = new JexlBuilder().create();
+        Object empty = jexl.createScript("[,...]").execute(null);
+        Assert.assertNotNull(empty);
+        Assert.assertTrue(jexl.createScript("[1]").execute(null) instanceof int[]);
+        Assert.assertTrue(jexl.createScript("[1,...]").execute(null) instanceof ArrayList<?>);
+        Assert.assertTrue(jexl.createScript("{1}").execute(null) instanceof HashSet<?>);
+        Assert.assertTrue(jexl.createScript("{1,...}").execute(null) instanceof LinkedHashSet<?>);
+        Assert.assertTrue(jexl.createScript("{'one': 1}").execute(null) instanceof HashMap<?,?>);
+        Assert.assertTrue(jexl.createScript("{'one': 1,...}").execute(null) instanceof LinkedHashMap<?,?>);
+    }
+
     @Test public void testPropagateOptions() {
         final String src0 = "`${$options.strict?'+':'-'}strict"
                 + " ${$options.cancellable?'+':'-'}cancellable"
