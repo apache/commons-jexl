@@ -284,12 +284,13 @@ public class JexlArithmetic {
      * @return the array builder
      */
     public ArrayBuilder arrayBuilder(final int size, final boolean extended) {
-        return new org.apache.commons.jexl3.internal.ArrayBuilder(size);
+        return new org.apache.commons.jexl3.internal.ArrayBuilder(size, extended);
     }
-    @Deprecated
+
     /**
      * @deprecated since 3.3.1
      */
+    @Deprecated
     public ArrayBuilder arrayBuilder(final int size) {
         return arrayBuilder(size, false);
     }
@@ -322,12 +323,13 @@ public class JexlArithmetic {
      * @return the array builder
      */
     public SetBuilder setBuilder(final int size, final boolean extended) {
-        return new org.apache.commons.jexl3.internal.SetBuilder(size);
+        return new org.apache.commons.jexl3.internal.SetBuilder(size, extended);
     }
-    @Deprecated
+
     /**
      * @deprecated since 3.3.1
      */
+    @Deprecated
     public SetBuilder setBuilder(final int size) {
         return setBuilder(size, false);
     }
@@ -361,12 +363,13 @@ public class JexlArithmetic {
      * @return the map builder
      */
     public MapBuilder mapBuilder(final int size, final boolean extended) {
-        return new org.apache.commons.jexl3.internal.MapBuilder(size);
+        return new org.apache.commons.jexl3.internal.MapBuilder(size, extended);
     }
-    @Deprecated
+
     /**
      * @deprecated since 3.3.1
      */
+    @Deprecated
     public MapBuilder mapBuilder(final int size) {
         return mapBuilder(size, false);
     }
@@ -683,7 +686,7 @@ public class JexlArithmetic {
         }
         if (val instanceof String) {
             final String string = (String) val;
-            if ("".equals(string)) {
+            if (string.isEmpty()) {
                 return BigDecimal.ZERO;
             }
             return roundBigDecimal(new BigDecimal(string, getMathContext()));
@@ -1144,7 +1147,7 @@ public class JexlArithmetic {
      * <p>For convenience, booleans are converted as 1/0 (true/false).</p>
      *
      * @param value  argument
-     * @return true if argument can be represented by a long
+     * @return a non-null value if argument can be represented by a long
      */
     protected Number asLongNumber(final Object value) {
         return asLongNumber(strict, value);

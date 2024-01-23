@@ -869,7 +869,7 @@ void ArrayLiteral() : {}
 {
    <LBRACKET>
    (
-        ExtendedLiteral()
+        (<COMMA>)? ExtendedLiteral()
     |
         (Expression() (LOOKAHEAD(2) <COMMA> Expression())*
             (<COMMA> (ExtendedLiteral() { jjtThis.setExtended(true); })? )? )?
@@ -890,7 +890,7 @@ void MapLiteral() : {}
 
 void MapEntry() : {}
 {
-    Identifier(true) <COLON> Expression()
+    LOOKAHEAD(2) Identifier(true) <COLON> Expression()
     |
     Expression() <COLON> Expression()
 }
