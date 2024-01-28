@@ -16,16 +16,25 @@
  */
 package org.apache.commons.jexl3;
 
+import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicLong;
 
+import org.apache.commons.jexl3.internal.introspection.Permissions;
+import org.apache.commons.jexl3.introspection.JexlPermissions;
+import org.apache.commons.jexl3.introspection.JexlSandbox;
 import org.junit.Assert;
 import org.junit.Test;
+
+import static org.apache.commons.jexl3.introspection.JexlPermissions.RESTRICTED;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 /**
  * Test cases for reported issue between JEXL-300 and JEXL-399.
@@ -332,5 +341,37 @@ public class Issues400Test {
     script = jexl.createScript("`--##{c}`", "c");
     result = script.execute(null, 42);
     Assert.assertEquals("--#42",result.toString() );
+  }
+
+  @Test
+  public void test419() throws NoSuchMethodException {
+    // check RESTRICTED permissions denies call to System::currentTimeMillis()
+    Method currentTimeMillis = System.class.getMethod("currentTimeMillis");
+    Assert.assertFalse(RESTRICTED.allow(currentTimeMillis));
+    // compose using a positive class permission to allow just System::currentTimeMillis()
+    JexlPermissions permissions = RESTRICTED.compose("java.lang { +System { currentTimeMillis(); } }");
+    // check no side effect on compose
+    Assert.assertTrue(permissions.allow(currentTimeMillis));
+    Assert.assertFalse(RESTRICTED.allow(currentTimeMillis));
+
+    // An engine with the System class as namespace and the positive permissions
+    JexlEngine jexl = new JexlBuilder()
+        .namespaces(Collections.singletonMap("sns", System.class))
+        .permissions(permissions)
+        .create();
+
+    AtomicLong result = new AtomicLong();
+    Assert.assertEquals(0, result.get());
+    long now = System.currentTimeMillis();
+    // calling System::currentTimeMillis() is allowed and behaves as expected
+    jexl.createScript("result.set(sns:currentTimeMillis())", "result").execute(null, result);
+    Assert.assertTrue(result.get() >= now);
+
+    // we still cant call anything else
+    try {
+      jexl.createScript("sns:gc()").execute(null);
+    } catch(JexlException.Method method) {
+      Assert.assertEquals("gc", method.getMethod());
+    }
   }
 }

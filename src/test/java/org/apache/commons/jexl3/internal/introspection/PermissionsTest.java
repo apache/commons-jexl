@@ -41,6 +41,8 @@ import org.apache.commons.jexl3.introspection.JexlUberspect;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.apache.commons.jexl3.introspection.JexlPermissions.RESTRICTED;
+
 /**
  * Checks the CacheMap.MethodKey implementation
  */
@@ -229,7 +231,7 @@ public class PermissionsTest {
     }
 
     @Test
-    public void testParsePermissions0() throws Exception {
+    public void testParsePermissions0a() throws Exception {
         final String src = "java.lang { Runtime { exit(); exec(); } }\njava.net { URL {} }";
         final Permissions p = (Permissions) JexlPermissions.parse(src);
         final Map<String, Permissions.NoJexlPackage> nojexlmap = p.getPackages();
@@ -242,8 +244,91 @@ public class PermissionsTest {
         final Method exec = getMethod(java.lang.Runtime.class,"exec");
         Assert.assertNotNull(exec);
         Assert.assertFalse(p.allow(exec));
+        final Method avp = getMethod(java.lang.Runtime.class,"availableProcessors");
+        Assert.assertNotNull(avp);
+        Assert.assertTrue(p.allow(avp));
         final JexlUberspect uber = new Uberspect(null, null, p);
         Assert.assertNull(uber.getClassByName("java.net.URL"));
+    }
+
+    @Test
+    public void testParsePermissions0b() throws Exception {
+        final String src = "java.lang { -Runtime { exit(); } }";
+        final Permissions p = (Permissions) JexlPermissions.parse(src);
+        final Method exit = getMethod(java.lang.Runtime.class,"exit");
+        Assert.assertNotNull(exit);
+        Assert.assertFalse(p.allow(exit));
+    }
+
+    @Test
+    public void testParsePermissions0c() throws Exception {
+        final String src = "java.lang { +Runtime { availableProcessorCount(); } }";
+        final Permissions p = (Permissions) JexlPermissions.parse(src);
+        final Method exit = getMethod(java.lang.Runtime.class,"exit");
+        Assert.assertNotNull(exit);
+        Assert.assertFalse(p.allow(exit));
+    }
+
+    @Test
+    public void testParsePermissions0d() throws Exception {
+        final String src = "java.lang { +System { currentTimeMillis(); } }";
+        final JexlPermissions p = RESTRICTED.compose(src);
+        final Field in = System.class.getField("in");
+        Assert.assertNotNull(in);
+        Assert.assertFalse(p.allow(in));
+        final Method ctm = getMethod(java.lang.System.class,"currentTimeMillis");
+        Assert.assertNotNull(ctm);
+        Assert.assertTrue(p.allow(ctm));
+    }
+
+    @Test
+    public void testParsePermissions0e() throws Exception {
+        final String src = "java.lang { +System { in; } }";
+        final JexlPermissions p = RESTRICTED.compose(src);
+        final Field in = System.class.getField("in");
+        Assert.assertNotNull(in);
+        Assert.assertTrue(p.allow(in));
+        final Method ctm = getMethod(java.lang.System.class,"currentTimeMillis");
+        Assert.assertNotNull(ctm);
+        Assert.assertFalse(p.allow(ctm));
+    }
+
+    @Test
+    public void testParsePermissions0f() throws Exception {
+        final String src = "java.lang { +Class { getName(); getSimpleName(); } }";
+        final JexlPermissions p = RESTRICTED.compose(src);
+        final Method getName = getMethod(java.lang.Class.class,"getName");
+        Assert.assertNotNull(getName);
+        Assert.assertTrue(p.allow(getName));
+        Assert.assertFalse(RESTRICTED.allow(getName));
+        final Method getSimpleName = getMethod(java.lang.Class.class,"getSimpleName");
+        Assert.assertNotNull(getSimpleName);
+        Assert.assertTrue(p.allow(getSimpleName));
+        Assert.assertFalse(RESTRICTED.allow(getSimpleName));
+
+        final Method getMethod = getMethod(java.lang.Class.class,"getMethod");
+        Assert.assertNotNull(getMethod);
+        Assert.assertFalse(p.allow(getMethod));
+
+        final Method exit = getMethod(java.lang.Runtime.class,"exit");
+        Assert.assertNotNull(exit);
+        Assert.assertFalse(p.allow(exit));
+    }
+
+    @Test
+    public void testParsePermissions0g() throws Exception {
+        final String src = "java.lang { +Class {  } }";
+        final JexlPermissions p = RESTRICTED.compose(src);
+        final Method getName = getMethod(java.lang.Class.class,"getName");
+        Assert.assertNotNull(getName);
+        Assert.assertTrue(p.allow(getName));
+        final Method getMethod = getMethod(java.lang.Class.class,"getMethod");
+        Assert.assertNotNull(getMethod);
+        Assert.assertTrue(p.allow(getMethod));
+
+        final Method exit = getMethod(java.lang.Runtime.class,"exit");
+        Assert.assertNotNull(exit);
+        Assert.assertFalse(p.allow(exit));
     }
 
     @Test

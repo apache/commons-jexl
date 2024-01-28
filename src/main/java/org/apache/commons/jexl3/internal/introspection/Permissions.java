@@ -56,21 +56,21 @@ public class Permissions implements JexlPermissions {
      */
     static class NoJexlPackage {
         // the NoJexl class names
-        protected Map<String, NoJexlClass> nojexl;
+        protected final Map<String, NoJexlClass> nojexl;
 
         /**
          * Ctor.
          * @param map the map of NoJexl classes
          */
         NoJexlPackage(final Map<String, NoJexlClass> map) {
-            this.nojexl = map;
+            this.nojexl = new ConcurrentHashMap<>(map == null ? Collections.emptyMap() : map);
         }
 
         /**
          * Default ctor.
          */
         NoJexlPackage() {
-            this(new ConcurrentHashMap<>());
+            this(null);
         }
 
         boolean isEmpty() { return nojexl.isEmpty(); }
@@ -80,7 +80,11 @@ public class Permissions implements JexlPermissions {
         }
 
         void addNoJexl(final String key, final NoJexlClass njc) {
-            nojexl.put(key, njc);
+            if (njc == null) {
+                nojexl.remove(key);
+            } else {
+                nojexl.put(key, njc);
+            }
         }
     }
 
@@ -120,12 +124,13 @@ public class Permissions implements JexlPermissions {
 
     /**
      * Equivalent of @NoJexl on a ctor, a method or a field in a class.
+     * <p>Field or method that are named are denied access.</p>
      */
     static class NoJexlClass {
         // the NoJexl method names (including ctor, name of class)
-        protected Set<String> methodNames;
+        protected final Set<String> methodNames;
         // the NoJexl field names
-        protected Set<String> fieldNames;
+        protected final Set<String> fieldNames;
 
         NoJexlClass(final Set<String> methods, final Set<String> fields) {
             methodNames = methods;
@@ -149,6 +154,16 @@ public class Permissions implements JexlPermissions {
         boolean deny(final Constructor<?> method) {
             return methodNames.contains(method.getDeclaringClass().getSimpleName());
         }
+    }
+
+    /**
+     * A positive NoJexl construct that defines what is denied by absence in the set.
+     * <p>Field or method that are named are the only one allowed access.</p>
+     */
+    static class JexlClass extends NoJexlClass {
+        @Override boolean deny(final Field field) { return !super.deny(field); }
+        @Override boolean deny(final Method method) { return !super.deny(method); }
+        @Override boolean deny(final Constructor<?> method) { return !super.deny(method); }
     }
 
     /** Marker for whole NoJexl class. */
@@ -501,7 +516,6 @@ public class Permissions implements JexlPermissions {
         }
         // let's walk all super classes
         clazz = clazz.getSuperclass();
-        // walk all superclasses
         while (clazz != null) {
             if (!allow(clazz, method, explicit)) {
                 return false;

@@ -147,11 +147,16 @@ public interface JexlPermissions {
      *  <li>Syntax for restrictions is a list of package restrictions.</li>
      *  <li>A package restriction is a package name followed by a block (as in curly-bracket block {})
      *  that contains a list of class restrictions.</li>
-     *  <li>A class restriction is a class name followed by a block of member restrictions.</li>
+     *  <li>A class restriction is a class name prefixed by an optional <code>-</code> or <code>+</code> sign
+     *  followed by a block of member restrictions.</li>
      *  <li>A member restriction can be a class restriction - to restrict
      *  nested classes -, a field which is the Java field name suffixed with <code>;</code>, a method composed of
      *  its Java name suffixed with <code>();</code>. Constructor restrictions are specified like methods using the
      *  class name as method name.</li>
+     *  <li>By default or when prefixed with a <code>-</code>, a class restriction is explicitly denying the members
+     *  declared in its block (or the whole class)</li>
+     *  <li>When prefixed with a <code>+</code>, a class restriction is explicitly allowing the members
+     *  declared in its block (or the whole class)</li>
      *  </ul>
      *  <p>
      *  All overrides and overloads of a constructors or method are allowed or restricted at the same time,
@@ -165,6 +170,7 @@ public interface JexlPermissions {
      *  # nojexl like restrictions
      *  my.package.internal {} # the whole package is hidden
      *  my.package {
+     *   +class4 { theMethod(); } # only theMethod can be called in class4
      *   class0 {
      *     class1 {} # the whole class1 is hidden
      *     class2 {
@@ -293,30 +299,16 @@ public interface JexlPermissions {
      * @return true if constructor is not null and public, false otherwise
      */
     default boolean validate(final Constructor<?> constructor) {
-        if (constructor == null) {
-            return false;
-        }
-        // field must be public
-        if (!Modifier.isPublic(constructor.getModifiers())) {
-            return false;
-        }
-        return true;
+        return constructor != null && Modifier.isPublic(constructor.getModifiers());
     }
 
     /**
      * Checks that a method is valid for permission check.
      * @param method the method
-     * @return true if method is not null, public, ,ot-synthetic, not-bridge, false otherwise
+     * @return true if method is not null and public, false otherwise
      */
     default boolean validate(final Method method) {
-        if (method == null) {
-            return false;
-        }
-        // method must be public
-        if (!Modifier.isPublic(method.getModifiers())) {
-            return false;
-        }
-        return true;
+        return method != null && Modifier.isPublic(method.getModifiers());
     }
 
     /**
@@ -325,14 +317,7 @@ public interface JexlPermissions {
      * @return true if field is not null and public, false otherwise
      */
     default boolean validate(final Field field) {
-        if (field == null) {
-            return false;
-        }
-        // field must be public
-        if (!Modifier.isPublic(field.getModifiers())) {
-            return false;
-        }
-        return true;
+        return field != null && Modifier.isPublic(field.getModifiers());
     }
 
     /**
@@ -383,6 +368,8 @@ public interface JexlPermissions {
      * set of classes.
      * <p>Typical use case is to deny access to a package - and thus all its classes - but allow
      * a few specific classes.</p>
+     * <p>Note that the newer positive restriction syntax is preferable as in:
+     * <code>RESTRICTED.compose("java.lang { +Class {} }")</code>.</p>
      */
      final class ClassPermissions extends JexlPermissions.Delegate {
         /** The set of explicitly allowed classes, overriding the delegate permissions. */

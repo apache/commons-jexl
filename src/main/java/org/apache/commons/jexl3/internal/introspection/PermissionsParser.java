@@ -45,9 +45,12 @@ import java.util.concurrent.ConcurrentHashMap;
  *     }
  *     # and eol comment
  *     class0(); # constructors
- *     method(); # method
+ *     method(); # method is not allowed
  *     field; # field
  *   } # end class0
+ *   +class1 {
+ *     method(); // only allowed method of class1
+ *   }
  * } # end package my.package
  * </pre>
  */
@@ -65,6 +68,7 @@ public class PermissionsParser {
      * Basic ctor.
      */
     public PermissionsParser() {
+        // nothing besides default member initialization
     }
 
     /**
@@ -98,13 +102,12 @@ public class PermissionsParser {
             }
             this.packages = packages;
             this.wildcards = wildcards;
-            for (final String src : srcs) {
-                this.src = src;
-                this.size = src.length();
+            for (final String source : srcs) {
+                this.src = source;
+                this.size = source.length();
                 readPackages();
             }
-            final Permissions permissions = new Permissions(wildcards, packages);
-            return permissions;
+            return new Permissions(wildcards, packages);
         } finally {
             clear();
         }
@@ -239,7 +242,7 @@ public class PermissionsParser {
                     pname = temp.toString();
                     temp.setLength(0);
                     i = next;
-                    // consume it if it is a wildcard decl
+                    // consume it if it is a wildcard declaration
                     if (pname.endsWith(".*")) {
                         wildcards.add(pname);
                         pname = null;
@@ -250,8 +253,9 @@ public class PermissionsParser {
             // package mode
             if (njpackage == null) {
                 if (c == '{') {
-                    njpackage = new Permissions.NoJexlPackage();
-                    packages.put(pname, njpackage);
+                    njpackage = packages.compute(pname,
+                        (n, p) -> new Permissions.NoJexlPackage(p == null? null : p.nojexl)
+                    );
                     i += 1;
                 }
             } else if (c == '}') {
@@ -263,7 +267,7 @@ public class PermissionsParser {
                 pname = null;
                 i += 1;
             } else {
-                i = readClass(njpackage, null, null, i);
+                i = readClass(njpackage, true,null, null, i);
             }
         }
     }
@@ -271,16 +275,18 @@ public class PermissionsParser {
     /**
      * Reads a class permission.
      * @param njpackage the owning package
+     * @param nojexl whether the restriction is explicitly denying (true) or allowing (false) members
      * @param outer the outer class (if any)
      * @param inner the inner class name (if any)
      * @param offset the initial parsing position in the source
      * @return the new parsing position
      */
-    private int readClass(final Permissions.NoJexlPackage njpackage, final String outer, final String inner, final int offset) {
+    private int readClass(final Permissions.NoJexlPackage njpackage, final boolean nojexl, final String outer, final String inner, final int offset) {
         final StringBuilder temp = new StringBuilder();
         Permissions.NoJexlClass njclass = null;
         String njname = null;
         String identifier = inner;
+        boolean deny = nojexl;
         int i = offset;
         int j = -1;
         boolean isMethod = false;
@@ -303,15 +309,18 @@ public class PermissionsParser {
             }
             // end of class ?
             if (njclass != null && c == '}') {
-                // restrict the whole class
-                if (njclass.isEmpty()) {
-                    njpackage.addNoJexl(njname, Permissions.NOJEXL_CLASS);
-                }
                 i += 1;
                 break;
             }
             // read an identifier, the class name
             if (identifier == null) {
+                // negative or positive set ?
+                if (c == '-') {
+                    i += 1;
+                } else if (c == '+') {
+                    deny = false;
+                    i += 1;
+                }
                 final int next = readIdentifier(temp, i);
                 if (i != next) {
                     identifier = temp.toString();
@@ -327,7 +336,7 @@ public class PermissionsParser {
                     throw new IllegalStateException(unexpected(c, i));
                 }
                 // if we have a class, it has a name
-                njclass = new Permissions.NoJexlClass();
+                njclass = deny ? new Permissions.NoJexlClass() : new Permissions.JexlClass();
                 njname = outer != null ? outer + "$" + identifier : identifier;
                 njpackage.addNoJexl(njname, njclass);
                 identifier = null;
@@ -335,7 +344,7 @@ public class PermissionsParser {
                 // class member mode
                 if (c == '{') {
                     // inner class
-                    i = readClass(njpackage, njname, identifier, i - 1);
+                    i = readClass(njpackage, deny, njname, identifier, i - 1);
                     identifier = null;
                     continue;
                 }
@@ -357,6 +366,13 @@ public class PermissionsParser {
                 }
             }
             i += 1;
+        }
+        // empty class means allow or deny all
+        if (njname != null && njclass.isEmpty()) {
+            njpackage.addNoJexl(njname, njclass instanceof Permissions.JexlClass
+                ? Permissions.JEXL_CLASS
+                : Permissions.NOJEXL_CLASS);
+
         }
         return i;
     }

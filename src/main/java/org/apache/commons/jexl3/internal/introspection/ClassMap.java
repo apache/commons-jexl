@@ -262,8 +262,7 @@ final class ClassMap {
         }
         // now that we've got all methods keyed in, lets organize them by name
         if (!cache.byKey.isEmpty()) {
-            final List<Method> lm = new ArrayList<>(cache.byKey.size());
-            lm.addAll(cache.byKey.values());
+            final List<Method> lm = new ArrayList<>(cache.byKey.values());
             // sort all methods by name
             lm.sort(Comparator.comparing(Method::getName));
             // put all lists of methods with same name in byName cache
