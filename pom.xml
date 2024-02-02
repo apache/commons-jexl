@@ -79,6 +79,7 @@
         <project.build.sourceEncoding>${commons.encoding}</project.build.sourceEncoding>
         <!-- This is used by reporting plugins -->
         <project.reporting.outputEncoding>${commons.encoding}</project.reporting.outputEncoding>
+        <project.build.outputTimestamp>2024-01-01T00:00:00Z</project.build.outputTimestamp>
 
         <!-- Commons release plugin -->
         <commons.bc.version>3.3</commons.bc.version>
