@@ -44,6 +44,7 @@
             <action dev="henrib" type="add" issue="JEXL-398" due-to="Xu Pengcheng">
                 Allow 'trailing commas' or ellipsis while defining array, map and set literals
             </action>
+            <action type="add" dev="ggregory" due-to="Gary Gregory">Add Maven property project.build.outputTimestamp for build reproducibility.</action>
             <!-- FIX -->
             <action dev="henrib" type="fix" issue="JEXL-417" due-to="Robert Lucas" >
                 JexlArithmetic looses precision during arithmetic operator execution
