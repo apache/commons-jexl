@@ -83,7 +83,7 @@
                 Bump github actions.
             </action>
             <action dev="ggregory" type="update" due-to="Gary Gregory, Dependabot">
-                Bump commons-parent from 57 to 65 #213.
+                Bump commons-parent from 57 to 66.
             </action>
             <action dev="ggregory" type="update" due-to="dependabot">
                 Bump org.ow2.asm:asm from 9.5 to 9.6 #200.
