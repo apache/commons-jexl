@@ -46,6 +46,9 @@
             </action>
             <action type="add" dev="ggregory" due-to="Gary Gregory">Add Maven property project.build.outputTimestamp for build reproducibility.</action>
             <!-- FIX -->
+            <action dev="henrib" type="fix" issue="JEXL-420" due-to="Xu Pengcheng">
+                Error while comparing float and string value
+            </action>
             <action dev="henrib" type="fix" issue="JEXL-417" due-to="Robert Lucas" >
                 JexlArithmetic looses precision during arithmetic operator execution
             </action>

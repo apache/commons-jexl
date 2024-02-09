@@ -38,6 +38,7 @@ New Features in 3.3.1:
 
 Bugs Fixed in 3.3.1:
 ===================
+* JEXL-420:     Error while comparing float and string value
 * JEXL-417:     JexlArithmetic looses precision during arithmetic operator execution
 * JEXL-416:     Null-valued pragma throws NPE in 3.3
 * JEXL-415:     Incorrect template eval result

@@ -18,6 +18,7 @@
 package org.apache.commons.jexl3;
 
 import static java.lang.StrictMath.floor;
+import static org.apache.commons.jexl3.JexlOperator.EQ;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
@@ -58,10 +59,22 @@ import org.apache.commons.jexl3.introspection.JexlMethod;
  * @since 2.0
  */
 public class JexlArithmetic {
-
     /** Marker class for null operand exceptions. */
     public static class NullOperand extends ArithmeticException {
         private static final long serialVersionUID = 4720876194840764770L;
+    }
+
+    /** Marker class for coercion operand exceptions. */
+    public static class CoercionException extends ArithmeticException {
+        private static final long serialVersionUID = 202402081150L;
+
+        /**
+         * Simple ctor.
+         * @param msg the exception message
+         */
+        public CoercionException(String msg) {
+            super(msg);
+        }
     }
 
     /** Double.MAX_VALUE as BigDecimal. */
@@ -525,7 +538,7 @@ public class JexlArithmetic {
         if (val == null) {
             return controlNullOperand(strict, 0);
         }
-        throw new ArithmeticException("Integer coercion: "
+        throw new CoercionException("Integer coercion: "
                 + val.getClass().getName() + ":(" + val + ")");
     }
 
@@ -576,7 +589,7 @@ public class JexlArithmetic {
         if (val == null) {
             return controlNullOperand(strict, 0L);
         }
-        throw new ArithmeticException("Long coercion: "
+        throw new CoercionException("Long coercion: "
                 + val.getClass().getName() + ":(" + val + ")");
     }
 
@@ -637,7 +650,7 @@ public class JexlArithmetic {
         if (val == null) {
             return controlNullOperand(strict, BigInteger.ZERO);
         }
-        throw new ArithmeticException("BigInteger coercion: "
+        throw new CoercionException("BigInteger coercion: "
                 + val.getClass().getName() + ":(" + val + ")");
     }
 
@@ -676,7 +689,7 @@ public class JexlArithmetic {
             return roundBigDecimal(new BigDecimal(val.toString(), getMathContext()));
         }
         if (val instanceof Number) {
-            return roundBigDecimal(new BigDecimal(val.toString(), getMathContext()));
+            return roundBigDecimal(parseBigDecimal(val.toString()));
         }
         if (val instanceof Boolean) {
             return BigDecimal.valueOf((Boolean) val ? 1. : 0.);
@@ -685,20 +698,15 @@ public class JexlArithmetic {
             return BigDecimal.valueOf(((AtomicBoolean) val).get() ? 1L : 0L);
         }
         if (val instanceof String) {
-            final String string = (String) val;
-            if (string.isEmpty()) {
-                return BigDecimal.ZERO;
-            }
-            return roundBigDecimal(new BigDecimal(string, getMathContext()));
+            return roundBigDecimal(parseBigDecimal((String) val));
         }
         if (val instanceof Character) {
-            final int i = (Character) val;
-            return new BigDecimal(i);
+            return new BigDecimal((Character) val);
         }
         if (val == null) {
             return controlNullOperand(strict, BigDecimal.ZERO);
         }
-        throw new ArithmeticException("BigDecimal coercion: "
+        throw new CoercionException("BigDecimal coercion: "
                 + val.getClass().getName() + ":(" + val + ")");
     }
 
@@ -731,9 +739,7 @@ public class JexlArithmetic {
             return (Double) val;
         }
         if (val instanceof Number) {
-            //The below construct is used rather than ((Number)val).doubleValue() to ensure
-            //equality between comparing new Double( 6.4 / 3 ) and the jexl expression of 6.4 / 3
-            return Double.parseDouble(String.valueOf(val));
+            return ((Number) val).doubleValue();
         }
         if (val instanceof Boolean) {
             return (Boolean) val ? 1. : 0.;
@@ -750,7 +756,7 @@ public class JexlArithmetic {
         if (val == null) {
             return controlNullOperand(strict, 0.d);
         }
-        throw new ArithmeticException("Double coercion: "
+        throw new CoercionException("Double coercion: "
                 + val.getClass().getName() + ":(" + val + ")");
     }
 
@@ -1937,7 +1943,7 @@ public class JexlArithmetic {
             operator = JexlOperator.valueOf(symbol);
         } catch (final IllegalArgumentException xill) {
             // ignore
-            operator = JexlOperator.EQ;
+            operator = EQ;
         }
         return doCompare(left, right, operator);
     }
@@ -1982,54 +1988,54 @@ public class JexlArithmetic {
     private int doCompare(final Object left, final Object right, final JexlOperator operator) {
         final boolean strictCast = isStrict(operator);
         if (left != null && right != null) {
-            if (left instanceof BigDecimal || right instanceof BigDecimal) {
-                final BigDecimal l = toBigDecimal(strictCast, left);
-                final BigDecimal r = toBigDecimal(strictCast, right);
-                return l.compareTo(r);
-            }
-            if (left instanceof BigInteger || right instanceof BigInteger) {
-                try {
+            try {
+                if (left instanceof BigDecimal || right instanceof BigDecimal) {
+                    final BigDecimal l = toBigDecimal(strictCast, left);
+                    final BigDecimal r = toBigDecimal(strictCast, right);
+                    return l.compareTo(r);
+                }
+                if (left instanceof BigInteger || right instanceof BigInteger) {
                     final BigInteger l = toBigInteger(strictCast, left);
                     final BigInteger r = toBigInteger(strictCast, right);
                     return l.compareTo(r);
-                } catch (final ArithmeticException xconvert) {
-                    // ignore it, continue in sequence
                 }
-            }
-            if (isFloatingPoint(left) || isFloatingPoint(right)) {
-                final double lhs = toDouble(strictCast, left);
-                final double rhs = toDouble(strictCast, right);
-                if (Double.isNaN(lhs)) {
-                    if (Double.isNaN(rhs)) {
-                        return 0;
+                if (isFloatingPoint(left) || isFloatingPoint(right)) {
+                    final double lhs = toDouble(strictCast, left);
+                    final double rhs = toDouble(strictCast, right);
+                    if (Double.isNaN(lhs)) {
+                        if (Double.isNaN(rhs)) {
+                            return 0;
+                        }
+                        return -1;
                     }
-                    return -1;
+                    if (Double.isNaN(rhs)) {
+                        // lhs is not NaN
+                        return +1;
+                    }
+                    return Double.compare(lhs, rhs);
                 }
-                if (Double.isNaN(rhs)) {
-                    // lhs is not NaN
-                    return +1;
-                }
-                return Double.compare(lhs, rhs);
-            }
-            if (isNumberable(left) || isNumberable(right)) {
-                try {
+                if (isNumberable(left) || isNumberable(right)) {
                     final long lhs = toLong(strictCast, left);
                     final long rhs = toLong(strictCast, right);
                     return Long.compare(lhs, rhs);
-                } catch (final ArithmeticException xconvert) {
-                    // ignore it, continue in sequence
                 }
+                if (left instanceof String || right instanceof String) {
+                    return toString(left).compareTo(toString(right));
+                }
+            } catch (final CoercionException ignore) {
+                // ignore it, continue in sequence
             }
-            if (left instanceof String || right instanceof String) {
-                return toString(left).compareTo(toString(right));
-            }
-            if (JexlOperator.EQ == operator) {
+            if (EQ == operator) {
                 return left.equals(right) ? 0 : -1;
             }
             if (left instanceof Comparable<?>) {
                 @SuppressWarnings("unchecked") // OK because of instanceof check above
                 final Comparable<Object> comparable = (Comparable<Object>) left;
-                return comparable.compareTo(right);
+                try {
+                    return comparable.compareTo(right);
+                } catch(ClassCastException castException) {
+                    // ignore it, continue in sequence
+                }
             }
         }
         throw new ArithmeticException("Object comparison:(" + left + " " + operator + " " + right + ")");
@@ -2049,11 +2055,11 @@ public class JexlArithmetic {
         if (left == null || right == null) {
             return false;
         }
-        final boolean strictCast = isStrict(JexlOperator.EQ);
+        final boolean strictCast = isStrict(EQ);
         if (left instanceof Boolean || right instanceof Boolean) {
             return toBoolean(left) == toBoolean(strictCast, right);
         }
-        return compare(left, right, JexlOperator.EQ) == 0;
+        return compare(left, right, EQ) == 0;
     }
 
     /**
@@ -2130,7 +2136,7 @@ public class JexlArithmetic {
         try {
             return arg.isEmpty()? Double.NaN : Double.parseDouble(arg);
         } catch (final NumberFormatException e) {
-            final ArithmeticException arithmeticException = new ArithmeticException("Double coercion: ("+ arg +")");
+            final ArithmeticException arithmeticException = new CoercionException("Double coercion: ("+ arg +")");
             arithmeticException.initCause(e);
             throw arithmeticException;
         }
@@ -2152,7 +2158,7 @@ public class JexlArithmetic {
         if (d == f) {
             return (long) d;
         }
-        throw new ArithmeticException("Long coercion: ("+ arg +")");
+        throw new CoercionException("Long coercion: ("+ arg +")");
     }
 
     /**
@@ -2168,7 +2174,7 @@ public class JexlArithmetic {
         if (i == l) {
             return i;
         }
-        throw new ArithmeticException("Int coercion: ("+ arg +")");
+        throw new CoercionException("Int coercion: ("+ arg +")");
     }
 
     /**
@@ -2179,15 +2185,30 @@ public class JexlArithmetic {
      * @throws ArithmeticException if the string can not be coerced into a big integer
      */
     private BigInteger parseBigInteger(final String arg) throws ArithmeticException {
-        if (arg.isEmpty()) {
-            return BigInteger.ZERO;
-        }
         try {
-            return new BigInteger(arg);
-        } catch (final NumberFormatException xformat) {
-            // ignore, try harder
+            return arg.isEmpty()? BigInteger.ZERO : new BigInteger(arg);
+        } catch (final NumberFormatException e) {
+            final ArithmeticException arithmeticException = new CoercionException("BigDecimal coercion: ("+ arg +")");
+            arithmeticException.initCause(e);
+            throw arithmeticException;
         }
-        return BigInteger.valueOf(parseLong(arg));
+    }
+
+    /**
+     * Convert a string to a BigDecimal.
+     * <>Empty string is considered as 0.</>
+     * @param arg the arg
+     * @return a BigDecimal
+     * @throws CoercionException if the string can not be coerced into a BigDecimal
+     */
+    private BigDecimal parseBigDecimal(final String arg) throws ArithmeticException {
+        try {
+            return arg.isEmpty()? BigDecimal.ZERO : new BigDecimal(arg, getMathContext());
+        } catch (final NumberFormatException e) {
+            final ArithmeticException arithmeticException = new CoercionException("BigDecimal coercion: ("+ arg +")");
+            arithmeticException.initCause(e);
+            throw arithmeticException;
+        }
     }
 
     /**

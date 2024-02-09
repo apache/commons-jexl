@@ -1089,6 +1089,12 @@ public class ArithmeticTest extends JexlTestCase {
                 "'1.00000001' == 1h", false,
                 "1.0 >= '1'", true,
                 "1.0 > '1'", false,
+                "1.0 == 'a'", false,
+                "10 == 'a'", false,
+                "10 > 'a'", ArithmeticException.class,
+                "10.0 > 'a'", ArithmeticException.class,
+                "'a' <= 10b", ArithmeticException.class,
+                "'a' >= 1h", ArithmeticException.class
         };
         final JexlEngine jexl = new JexlBuilder().create();
         final JexlContext jc = new EmptyTestContext();
@@ -1098,8 +1104,15 @@ public class ArithmeticTest extends JexlTestCase {
             final String stext = (String) EXPRESSIONS[e];
             final Object expected = EXPRESSIONS[e + 1];
             expression = jexl.createExpression(stext);
-            final Object result = expression.evaluate(jc);
-            Assert.assertEquals("failed on " + stext, expected, result);
+            try {
+                final Object result = expression.evaluate(jc);
+                Assert.assertEquals("failed on " + stext, expected, result);
+            } catch(JexlException jexlException) {
+                Throwable cause = jexlException.getCause();
+                if (cause == null || !cause.getClass().equals(expected)) {
+                    Assert.fail(stext);
+                }
+            }
         }
     }
 
@@ -1769,7 +1782,7 @@ public class ArithmeticTest extends JexlTestCase {
     }
 
     @Test
-    public void testRealCoercionEdges() {
+    public void testRealCoercionEdges() throws Exception {
         assertNullOperand(() -> jexla.toDouble(null));
         Assert.assertEquals(0.0d, jexlb.toDouble(null), EPSILON);
         Assert.assertEquals(32.0d, jexlb.toDouble((char) 32), EPSILON);
@@ -1789,6 +1802,14 @@ public class ArithmeticTest extends JexlTestCase {
         Assert.assertEquals(BigDecimal.ZERO, jexla.toBigDecimal(Double.NaN));
         Assert.assertEquals(BigDecimal.ZERO, jexla.toBigDecimal(""));
         Assert.assertEquals(BigDecimal.ZERO, jexla.toBigDecimal((char) 0));
+
+        Double d64d3 = new Double( 6.4 / 3 );
+        Assert.assertEquals(d64d3, ((Number) JEXL.createExpression("6.4 / 3").evaluate(null)).doubleValue(), EPSILON);
+        asserter.assertExpression("6.4 / 3", d64d3);
+        Assert.assertEquals(d64d3, ((Number) JEXL.createExpression("6.4 / 3d").evaluate(null)).doubleValue(), EPSILON);
+        asserter.assertExpression("6.4 / 3d", d64d3);
+        Assert.assertEquals(64d / 3, ((Number) JEXL.createExpression("64d / 3").evaluate(null)).doubleValue(), EPSILON);
+        asserter.assertExpression("64 / 3d", 64 / 3d);
     }
 
     @Test
