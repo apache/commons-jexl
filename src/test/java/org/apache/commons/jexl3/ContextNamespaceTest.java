@@ -137,7 +137,7 @@ public class ContextNamespaceTest extends JexlTestCase {
         }
     }
 
-    static AtomicInteger nsnsCtor = new AtomicInteger(0);
+    static AtomicInteger nsnsCtor = new AtomicInteger();
 
     public ContextNamespaceTest() {
         super("ContextNamespaceTest");

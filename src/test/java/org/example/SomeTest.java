@@ -64,7 +64,7 @@ public class SomeTest {
   }
 
   /** Counting the number of node interpretation calls. */
-  static AtomicInteger CALL406 = new AtomicInteger(0);
+  static AtomicInteger CALL406 = new AtomicInteger();
 
   @Test
   public void test406b() {

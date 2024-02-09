@@ -37,9 +37,9 @@ import org.junit.Test;
  */
 public class CollectionLiteralTest extends JexlTestCase {
     public static class Arithmetic363 extends JexlArithmetic {
-        final AtomicInteger maps = new AtomicInteger(0);
-        final AtomicInteger sets = new AtomicInteger(0);
-        final AtomicInteger arrays = new AtomicInteger(0);
+        final AtomicInteger maps = new AtomicInteger();
+        final AtomicInteger sets = new AtomicInteger();
+        final AtomicInteger arrays = new AtomicInteger();
 
         public Arithmetic363(final boolean strict) {
             super(strict);

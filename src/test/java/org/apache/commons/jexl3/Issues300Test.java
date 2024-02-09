@@ -77,7 +77,7 @@ public class Issues300Test {
     }
 
     public static class Arithmetic384c extends JexlArithmetic {
-        AtomicInteger cmp = new AtomicInteger(0);
+        AtomicInteger cmp = new AtomicInteger();
         public Arithmetic384c(final boolean astrict) {
             super(astrict);
         }

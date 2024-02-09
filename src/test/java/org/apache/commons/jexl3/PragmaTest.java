@@ -35,7 +35,7 @@ import org.junit.Test;
 public class PragmaTest extends JexlTestCase {
     public static class CachingModuleContext extends ModuleContext implements JexlContext.ModuleProcessor {
         private final ConcurrentMap<String, Object> modules = new ConcurrentHashMap<>();
-        private final AtomicInteger count = new AtomicInteger(0);
+        private final AtomicInteger count = new AtomicInteger();
 
         CachingModuleContext() {
         }

@@ -93,7 +93,7 @@ public class Uberspect implements JexlUberspect {
         ref = new SoftReference<>(null);
         loader = new SoftReference<>(getClass().getClassLoader());
         operatorMap = new ConcurrentHashMap<>();
-        version = new AtomicInteger(0);
+        version = new AtomicInteger();
     }
 
     /**
