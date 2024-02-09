@@ -149,7 +149,7 @@ public class Engine extends JexlEngine {
     /**
      * The atomic parsing flag; true whilst parsing.
      */
-    protected final AtomicBoolean parsing = new AtomicBoolean(false);
+    protected final AtomicBoolean parsing = new AtomicBoolean();
     /**
      * The {@link Parser}; when parsing expressions, this engine uses the parser if it
      * is not already in use otherwise it will create a new temporary one.

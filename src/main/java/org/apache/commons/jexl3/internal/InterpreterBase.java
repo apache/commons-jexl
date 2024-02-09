@@ -112,7 +112,7 @@ public abstract class InterpreterBase extends ParserVisitor {
         if (this.context instanceof JexlContext.CancellationHandle) {
             acancel = ((JexlContext.CancellationHandle) context).getCancellation();
         }
-        this.cancelled = acancel != null ? acancel : new AtomicBoolean(false);
+        this.cancelled = acancel != null ? acancel : new AtomicBoolean();
         this.functions = options.getNamespaces();
         this.functors = null;
         this.operators = new Operators(this);
