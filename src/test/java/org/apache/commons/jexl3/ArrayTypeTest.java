@@ -104,8 +104,10 @@ public class ArrayTypeTest {
 
     Set<Class<?>> sset = ClassMisc.getSuperClasses(ArrayList.class, ArrayDeque.class);
     Assert.assertFalse(sset.isEmpty());
+    // in java 21, a SequenceCollection interface is added to the sset
     List<Class<?>> expected = Arrays.asList(AbstractCollection.class, Collection.class, Iterable.class, Cloneable.class, Serializable.class);
-    Assert.assertEquals(expected, new ArrayList(sset));
+    Assert.assertTrue(sset.containsAll(expected));
+
     Class<?> collection = ClassMisc.getCommonSuperClass(ArrayList.class, Collections.emptyList().getClass());
     Assert.assertEquals(AbstractList.class, collection);
     collection = ClassMisc.getSuperClasses(ArrayList.class, Collections.emptyList().getClass())
