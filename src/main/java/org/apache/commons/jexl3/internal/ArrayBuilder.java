@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.jexl3.JexlArithmetic;
+import org.apache.commons.jexl3.internal.introspection.ClassMisc;
 
 /**
  * Helper class to create typed arrays.
@@ -68,6 +69,17 @@ public class ArrayBuilder implements JexlArithmetic.ArrayBuilder {
     protected final boolean extended;
 
     /**
+     * Computes the best super class/super interface.
+     * <p>Used to try and maintain type safe arrays.</p>
+     * @param baseClass the baseClass
+     * @param other another class
+     * @return a common ancestor, class or interface, worst case being class Object
+     */
+    protected Class<?> getCommonSuperClass(final Class<?> baseClass, final Class<?> other) {
+        return ClassMisc.getCommonSuperClass(baseClass, other);
+    }
+
+    /**
      * Creates a new builder.
      * @param size the exact array size
      */
@@ -97,19 +109,13 @@ public class ArrayBuilder implements JexlArithmetic.ArrayBuilder {
                 if (commonClass == null) {
                     commonClass = eclass;
                     isNumber = isNumber && Number.class.isAssignableFrom(commonClass);
-                } else if (!commonClass.equals(eclass)) {
+                } else if (!commonClass.isAssignableFrom(eclass)) {
                     // if both are numbers...
                     if (isNumber && Number.class.isAssignableFrom(eclass)) {
                         commonClass = Number.class;
                     } else {
-                        // attempt to find valid superclass
-                        do {
-                            eclass = eclass.getSuperclass();
-                            if (eclass == null) {
-                                commonClass = Object.class;
-                                break;
-                            }
-                        } while (!commonClass.isAssignableFrom(eclass));
+                        isNumber = false;
+                        commonClass = getCommonSuperClass(commonClass, eclass);
                     }
                 }
             }
@@ -120,21 +126,32 @@ public class ArrayBuilder implements JexlArithmetic.ArrayBuilder {
         untyped[added++] = value;
     }
 
+    /**
+     * Creates a new list (aka extended array)/
+     * @param clazz the class
+     * @param size the size
+     * @return the instance
+     * @param <T> the type
+     */
+    protected <T> List<T> newList(Class<? extends T> clazz, int size) {
+        return new ArrayList<>(size);
+    }
+
     @Override
     public Object create(final boolean e) {
         if (untyped == null) {
             return new Object[0];
         }
+        final int size = added;
         if (extended || e) {
-            final List<Object> list = new ArrayList<>(added);
-            list.addAll(Arrays.asList(untyped).subList(0, added));
+            final List<Object> list = newList(commonClass, size);
+            list.addAll(Arrays.asList(untyped).subList(0, size));
             return list;
         }
         // convert untyped array to the common class if not Object.class
         if (commonClass == null || Object.class.equals(commonClass)) {
             return untyped.clone();
         }
-        final int size = added;
         // if the commonClass is a number, it has an equivalent primitive type, get it
         if (unboxing) {
             commonClass = unboxingClass(commonClass);

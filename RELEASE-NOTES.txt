@@ -30,6 +30,7 @@ Version 3.3.1 is source and binary compatible with 3.3.
 
 New Features in 3.3.1:
 ====================
+* JEXL-421:     ArrayBuilder: array type should reflect common class of its entries
 * JEXL-419:     Add permission syntax to allow class/method/field
 * JEXL-408:     Using JexlFeatures is tedious
 * JEXL-404:     Support array-access safe navigation (x?[y])

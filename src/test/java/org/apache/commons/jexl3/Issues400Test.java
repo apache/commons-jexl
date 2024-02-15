@@ -22,19 +22,15 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.apache.commons.jexl3.internal.introspection.Permissions;
 import org.apache.commons.jexl3.introspection.JexlPermissions;
-import org.apache.commons.jexl3.introspection.JexlSandbox;
 import org.junit.Assert;
 import org.junit.Test;
 
 import static org.apache.commons.jexl3.introspection.JexlPermissions.RESTRICTED;
-import static org.hamcrest.MatcherAssert.assertThat;
 
 /**
  * Test cases for reported issue between JEXL-300 and JEXL-399.

@@ -29,6 +29,9 @@
     <body>
         <release version="3.3.1" date="20YY-MM-DD">
             <!-- ADD -->
+            <action dev="henrib" type="add" issue="JEXL-421">
+                ArrayBuilder: array type should reflect common class of its entries
+            </action>
             <action dev="henrib" type="add" issue="JEXL-419">
                 Add permission syntax to allow class/method/field
             </action>
