@@ -695,10 +695,10 @@ public class Interpreter extends InterpreterBase {
      */
     private Object evalTry(JexlNode tryVar, JexlNode tryExpression, JexlNode tryBody, final Object data) {
         boolean lexical = false;
+        Object tryResult = null;
         try {
             final ASTIdentifier tryVariable;
             final int symbol;
-            Object tryResult = null;
             /* Capture try variable if any. */
             if (tryVar instanceof ASTReference) {
                 tryVariable = (ASTIdentifier) tryVar.jjtGetChild(0);
@@ -734,6 +734,7 @@ public class Interpreter extends InterpreterBase {
             // evaluate the body
             return tryBody.jjtAccept(this, data);
         } finally {
+            closeIfSupported(tryResult);
             // restore lexical frame
             if (lexical) {
                 block = block.pop();
