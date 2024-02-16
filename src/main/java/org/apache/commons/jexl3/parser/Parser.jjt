@@ -29,8 +29,8 @@ options
    TRACK_TOKENS=true;
    CACHE_TOKENS=true;
    ERROR_REPORTING=false;
-  // DEBUG_PARSER=true;
-   //DEBUG_TOKEN_MANAGER=true;
+//   DEBUG_PARSER=true;
+//   DEBUG_TOKEN_MANAGER=true;
 }
 
 PARSER_BEGIN(Parser)
@@ -219,6 +219,11 @@ TOKEN_MGR_DECLS : {
     | < NULL : "null" >
     | < TRUE : "true" >
     | < FALSE : "false" >
+    | < THROW : "throw" >
+    | < TRY : "try" >
+    | < CATCH : "catch" >
+    | < FINALLY : "finally" >
+
 }
 
 /***************************************
@@ -379,6 +384,8 @@ void StatementNoVar() #void : {}
     | LOOKAHEAD(<RETURN>) ReturnStatement()
     | LOOKAHEAD(<CONTINUE>) Continue()
     | LOOKAHEAD(<BREAK>) Break()
+    | LOOKAHEAD(<THROW>) ThrowStatement()
+    | LOOKAHEAD(<TRY>) TryStatement()
     | LOOKAHEAD(Expression()) ExpressionStatement()
     | Block()
     | LOOKAHEAD(<VAR>, {!getFeatures().isLexical()} ) Var()
@@ -407,6 +414,22 @@ void IfStatement() : {}
     ( LOOKAHEAD(1) <ELSE>  (LOOKAHEAD(1) Block() | StatementNoVar()) )?
 }
 
+void TryStatement() : {
+ int tryForm = 0;}
+{
+    {
+        pushUnit(jjtThis);
+    }
+    <TRY> (<LPAREN> (LOOKAHEAD(3) InlineVar() <assign> { tryForm |= 1; })? Expression() <RPAREN> { tryForm |= 2; })?
+     ((LOOKAHEAD(1) Block() | StatementNoVar())  { tryForm |= 4; })
+     (LOOKAHEAD(1) <CATCH> <LPAREN> InlineVar() <RPAREN>  (LOOKAHEAD(1) Block() | StatementNoVar()) { tryForm |= 8; })?
+     (LOOKAHEAD(1) <FINALLY>  (LOOKAHEAD(1) Block() | StatementNoVar()) { tryForm |= 16; })?
+    {
+        jjtThis.setTryForm(tryForm);
+        popUnit(jjtThis);
+    }
+}
+
 void WhileStatement() : {}
 {
     <WHILE> <LPAREN> Expression() <RPAREN>  { loopCount += 1; }  (LOOKAHEAD(1) Block() | StatementNoVar()) { loopCount -= 1; }
@@ -420,6 +443,11 @@ void DoWhileStatement() : {}
 void ReturnStatement() : {}
 {
     <RETURN> (LOOKAHEAD(2) ExpressionStatement() )?
+}
+
+void ThrowStatement() : {}
+{
+    <THROW> (LOOKAHEAD(2) ExpressionStatement() )?
 }
 
 void Continue() #Continue : {
@@ -445,7 +473,7 @@ void ForeachStatement() : {
     }
     <FOR> <LPAREN>
     (
-        LOOKAHEAD(3) ForEachVar() <COLON> Expression() { loopForm = 0; }
+        LOOKAHEAD(3) InlineVar() <COLON> Expression() { loopForm = 0; }
     |
         ((LOOKAHEAD(1) Var() | Expression()) { loopForm = 1; })? <SEMICOL>
         (Expression() { loopForm |= 2; })? <SEMICOL>
@@ -463,7 +491,7 @@ void ForeachStatement() : {
     }
 }
 
-void ForEachVar() #Reference : {}
+void InlineVar() #Reference : {}
 {
     <VAR> DeclareVar(false, false)
 |

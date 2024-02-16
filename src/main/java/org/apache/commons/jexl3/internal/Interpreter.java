@@ -33,94 +33,7 @@ import org.apache.commons.jexl3.JexlScript;
 import org.apache.commons.jexl3.JxltEngine;
 import org.apache.commons.jexl3.introspection.JexlMethod;
 import org.apache.commons.jexl3.introspection.JexlPropertyGet;
-import org.apache.commons.jexl3.parser.ASTAddNode;
-import org.apache.commons.jexl3.parser.ASTAndNode;
-import org.apache.commons.jexl3.parser.ASTAnnotatedStatement;
-import org.apache.commons.jexl3.parser.ASTAnnotation;
-import org.apache.commons.jexl3.parser.ASTArguments;
-import org.apache.commons.jexl3.parser.ASTArrayAccess;
-import org.apache.commons.jexl3.parser.ASTArrayLiteral;
-import org.apache.commons.jexl3.parser.ASTAssignment;
-import org.apache.commons.jexl3.parser.ASTBitwiseAndNode;
-import org.apache.commons.jexl3.parser.ASTBitwiseComplNode;
-import org.apache.commons.jexl3.parser.ASTBitwiseOrNode;
-import org.apache.commons.jexl3.parser.ASTBitwiseXorNode;
-import org.apache.commons.jexl3.parser.ASTBlock;
-import org.apache.commons.jexl3.parser.ASTBreak;
-import org.apache.commons.jexl3.parser.ASTConstructorNode;
-import org.apache.commons.jexl3.parser.ASTContinue;
-import org.apache.commons.jexl3.parser.ASTDecrementGetNode;
-import org.apache.commons.jexl3.parser.ASTDefineVars;
-import org.apache.commons.jexl3.parser.ASTDivNode;
-import org.apache.commons.jexl3.parser.ASTDoWhileStatement;
-import org.apache.commons.jexl3.parser.ASTEQNode;
-import org.apache.commons.jexl3.parser.ASTERNode;
-import org.apache.commons.jexl3.parser.ASTEWNode;
-import org.apache.commons.jexl3.parser.ASTEmptyFunction;
-import org.apache.commons.jexl3.parser.ASTExtendedLiteral;
-import org.apache.commons.jexl3.parser.ASTFalseNode;
-import org.apache.commons.jexl3.parser.ASTForeachStatement;
-import org.apache.commons.jexl3.parser.ASTFunctionNode;
-import org.apache.commons.jexl3.parser.ASTGENode;
-import org.apache.commons.jexl3.parser.ASTGTNode;
-import org.apache.commons.jexl3.parser.ASTGetDecrementNode;
-import org.apache.commons.jexl3.parser.ASTGetIncrementNode;
-import org.apache.commons.jexl3.parser.ASTIdentifier;
-import org.apache.commons.jexl3.parser.ASTIdentifierAccess;
-import org.apache.commons.jexl3.parser.ASTIdentifierAccessJxlt;
-import org.apache.commons.jexl3.parser.ASTIfStatement;
-import org.apache.commons.jexl3.parser.ASTIncrementGetNode;
-import org.apache.commons.jexl3.parser.ASTJexlLambda;
-import org.apache.commons.jexl3.parser.ASTJexlScript;
-import org.apache.commons.jexl3.parser.ASTJxltLiteral;
-import org.apache.commons.jexl3.parser.ASTLENode;
-import org.apache.commons.jexl3.parser.ASTLTNode;
-import org.apache.commons.jexl3.parser.ASTMapEntry;
-import org.apache.commons.jexl3.parser.ASTMapLiteral;
-import org.apache.commons.jexl3.parser.ASTMethodNode;
-import org.apache.commons.jexl3.parser.ASTModNode;
-import org.apache.commons.jexl3.parser.ASTMulNode;
-import org.apache.commons.jexl3.parser.ASTNENode;
-import org.apache.commons.jexl3.parser.ASTNEWNode;
-import org.apache.commons.jexl3.parser.ASTNRNode;
-import org.apache.commons.jexl3.parser.ASTNSWNode;
-import org.apache.commons.jexl3.parser.ASTNotNode;
-import org.apache.commons.jexl3.parser.ASTNullLiteral;
-import org.apache.commons.jexl3.parser.ASTNullpNode;
-import org.apache.commons.jexl3.parser.ASTNumberLiteral;
-import org.apache.commons.jexl3.parser.ASTOrNode;
-import org.apache.commons.jexl3.parser.ASTQualifiedIdentifier;
-import org.apache.commons.jexl3.parser.ASTRangeNode;
-import org.apache.commons.jexl3.parser.ASTReference;
-import org.apache.commons.jexl3.parser.ASTReferenceExpression;
-import org.apache.commons.jexl3.parser.ASTRegexLiteral;
-import org.apache.commons.jexl3.parser.ASTReturnStatement;
-import org.apache.commons.jexl3.parser.ASTSWNode;
-import org.apache.commons.jexl3.parser.ASTSetAddNode;
-import org.apache.commons.jexl3.parser.ASTSetAndNode;
-import org.apache.commons.jexl3.parser.ASTSetDivNode;
-import org.apache.commons.jexl3.parser.ASTSetLiteral;
-import org.apache.commons.jexl3.parser.ASTSetModNode;
-import org.apache.commons.jexl3.parser.ASTSetMultNode;
-import org.apache.commons.jexl3.parser.ASTSetOrNode;
-import org.apache.commons.jexl3.parser.ASTSetShiftLeftNode;
-import org.apache.commons.jexl3.parser.ASTSetShiftRightNode;
-import org.apache.commons.jexl3.parser.ASTSetShiftRightUnsignedNode;
-import org.apache.commons.jexl3.parser.ASTSetSubNode;
-import org.apache.commons.jexl3.parser.ASTSetXorNode;
-import org.apache.commons.jexl3.parser.ASTShiftLeftNode;
-import org.apache.commons.jexl3.parser.ASTShiftRightNode;
-import org.apache.commons.jexl3.parser.ASTShiftRightUnsignedNode;
-import org.apache.commons.jexl3.parser.ASTSizeFunction;
-import org.apache.commons.jexl3.parser.ASTStringLiteral;
-import org.apache.commons.jexl3.parser.ASTSubNode;
-import org.apache.commons.jexl3.parser.ASTTernaryNode;
-import org.apache.commons.jexl3.parser.ASTTrueNode;
-import org.apache.commons.jexl3.parser.ASTUnaryMinusNode;
-import org.apache.commons.jexl3.parser.ASTUnaryPlusNode;
-import org.apache.commons.jexl3.parser.ASTVar;
-import org.apache.commons.jexl3.parser.ASTWhileStatement;
-import org.apache.commons.jexl3.parser.JexlNode;
+import org.apache.commons.jexl3.parser.*;
 
 /**
  * An interpreter of JEXL syntax.
@@ -698,6 +611,179 @@ public class Interpreter extends InterpreterBase {
     @Override
     protected Object visit(final ASTBreak node, final Object data) {
         throw new JexlException.Break(node);
+    }
+
+    @Override
+    protected Object visit(final ASTTryStatement node, final Object data) {
+        int form = node.getTryForm();
+        int nc = 0;
+        JexlNode tryVar = (form & 1) != 0 ? node.jjtGetChild(nc++) : null;
+        JexlNode tryExpression = (form & 2) != 0 ? node.jjtGetChild(nc++) : null;
+        JexlNode tryBody = (form & 4) != 0 ? node.jjtGetChild(nc++) : null;
+        JexlNode catchVar = (form & 8) != 0 ? node.jjtGetChild(nc++) : null;
+        JexlNode catchBody = (form & 8) != 0 ? node.jjtGetChild(nc++) : null;
+        JexlNode finallyBody = (form & 16) != 0 ? node.jjtGetChild(nc) : null;
+        JexlException caught = null;
+        JexlException flowControl = null;
+        Object result = null;
+        try {
+            // evaluate the try
+            result = evalTry(tryVar, tryExpression, tryBody, data);
+        } catch(JexlException.Return | JexlException.Cancel xflow) {
+            // flow control exceptions do not trigger the catch clause
+            flowControl = xflow;
+        } catch(JexlException xany) {
+            caught = xany;
+            result = null;
+        }
+        // if we caught an exception and have a catch body, evaluate it
+        JexlException thrownByCatch = null;
+        if (caught != null && catchBody != null) {
+            try {
+                // evaluate the catch
+                evalCatch(catchVar, catchBody, caught,  data);
+            } catch(JexlException.Break | JexlException.Continue |
+                    JexlException.Return | JexlException.Cancel alterFlow) {
+                flowControl = alterFlow;
+            } catch (JexlException exception) {
+                // catching an exception thrown from catch body; can be a (re)throw
+                thrownByCatch = exception;
+            }
+        }
+        // if we have a 'finally' block, no matter what, evaluate it: its control flow will
+        // take precedence over what the 'catch' block might have thrown.
+        if (finallyBody != null) {
+            try {
+                finallyBody.jjtAccept(this, data);
+            } catch (JexlException.Break | JexlException.Continue  | JexlException.Return flowException) {
+                // potentially swallow previous, even return but not cancel
+                if (!(flowControl instanceof JexlException.Cancel)) {
+                    flowControl = flowException;
+                }
+            } catch (JexlException.Cancel cancelException) {
+                // cancel swallows everything
+                flowControl = cancelException;
+            } catch (JexlException exception) {
+                // catching an exception thrown in finally body
+                if (jexl.logger.isDebugEnabled()) {
+                    jexl.logger.debug("exception thrown in finally", thrownByCatch);
+                }
+                // swallow the caught one
+                thrownByCatch = exception;
+            }
+        }
+        if (flowControl != null) {
+            if (thrownByCatch != null && jexl.logger.isDebugEnabled()) {
+                jexl.logger.debug("finally swallowed exception thrown by catch", thrownByCatch);
+            }
+            throw flowControl;
+        }
+        if (thrownByCatch != null) {
+            throw thrownByCatch;
+        }
+        return result;
+    }
+
+    /**
+     * Evaluate the try/try-with resource a try/catch/finally.
+     *
+     * @param tryVar the try-with-resource variable (if any)
+     * @param tryExpression the try-with-resource expression
+     * @param tryBody the try body
+     * @param data the data
+     * @return the result of body evaluation
+     */
+    private Object evalTry(JexlNode tryVar, JexlNode tryExpression, JexlNode tryBody, final Object data) {
+        boolean lexical = false;
+        try {
+            final ASTIdentifier tryVariable;
+            final int symbol;
+            Object tryResult = null;
+            /* Capture try variable if any. */
+            if (tryVar instanceof ASTReference) {
+                tryVariable = (ASTIdentifier) tryVar.jjtGetChild(0);
+                symbol = tryVariable.getSymbol();
+                lexical = tryVariable.isLexical() || options.isLexical();
+                if (lexical) {
+                    // create lexical frame
+                    final LexicalFrame locals = new LexicalFrame(frame, block);
+                    // it may be a local previously declared
+                    final boolean trySymbol = symbol >= 0 && tryVariable instanceof ASTVar;
+                    if (trySymbol && !defineVariable((ASTVar) tryVariable, locals)) {
+                        return redefinedVariable(tryVar.jjtGetParent(), tryVariable.getName());
+                    }
+                    block = locals;
+                }
+            } else {
+                tryVariable = null;
+                symbol = -1;
+                lexical = false;
+            }
+            // evaluate try expression if any
+            if (tryExpression != null) {
+                tryResult = tryExpression.jjtAccept(this, data);
+                // assign try variable if declared
+                if (tryVariable != null) {
+                    if (symbol < 0) {
+                        setContextVariable(tryVar.jjtGetParent(), tryVariable.getName(), tryResult);
+                    } else {
+                        frame.set(symbol, tryResult);
+                    }
+                }
+            }
+            // evaluate the body
+            return tryBody.jjtAccept(this, data);
+        } finally {
+            // restore lexical frame
+            if (lexical) {
+                block = block.pop();
+            }
+        }
+    }
+
+    /**
+     * Evaluate the catch a try/catch/finally.
+     *
+     * @param catchVar the variable containing the exception
+     * @param catchBody the body
+     * @param caught the caught exception
+     * @param data the data
+     * @return the result of body evaluation
+     */
+    private Object evalCatch(JexlNode catchVar, JexlNode catchBody, JexlException caught, Object data) {
+        final int symbol;
+        final ASTIdentifier catchVariable;
+        boolean lexical = false;
+        try {
+            // declare catch variable and assign with caught exception
+            if (catchVar instanceof ASTReference) {
+                catchVariable = (ASTIdentifier) catchVar.jjtGetChild(0);
+                symbol = catchVariable.getSymbol();
+                lexical = catchVariable.isLexical() || options.isLexical();
+                if (lexical) {
+                    // create lexical frame
+                    final LexicalFrame locals = new LexicalFrame(frame, block);
+                    // it may be a local previously declared
+                    final boolean trySymbol = symbol >= 0 && catchVariable instanceof ASTVar;
+                    if (trySymbol && !defineVariable((ASTVar) catchVariable, locals)) {
+                        return redefinedVariable(catchVar.jjtGetParent(), catchVariable.getName());
+                    }
+                    block = locals;
+                }
+                if (symbol < 0) {
+                    setContextVariable(catchVar.jjtGetParent(), catchVariable.getName(), caught);
+                } else {
+                    frame.set(symbol, caught);
+                }
+            }
+            // evaluate body
+            return catchBody.jjtAccept(this, data);
+        } finally {
+            // restore lexical frame
+            if (lexical) {
+                block = block.pop();
+            }
+        }
     }
 
     @Override
