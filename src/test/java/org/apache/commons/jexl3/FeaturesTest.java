@@ -97,7 +97,7 @@ public class FeaturesTest extends JexlTestCase {
         for(String varName : reserved) {
             String src = "var " + varName;
             //JexlScript script = jexl.createScript(src);
-            Assert.assertThrows(JexlException.Feature.class, () -> jexl.createScript(src));
+            Assert.assertThrows(src, JexlException.Feature.class, () -> jexl.createScript(src));
         }
         final String[] cmpNameScripts = {
             "1 eq 1",
