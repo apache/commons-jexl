@@ -58,6 +58,10 @@ public abstract class ParserVisitor {
 
     protected abstract Object visit(ASTTryStatement node, Object data);
 
+    protected abstract Object visit(ASTTryResources node, Object data);
+
+    protected abstract Object visit( ASTThrowStatement node, Object data);
+
     protected abstract Object visit(ASTReturnStatement node, Object data);
 
     protected abstract Object visit(ASTAssignment node, Object data);

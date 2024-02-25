@@ -107,6 +107,16 @@ public class ScriptVisitor extends ParserVisitor {
     }
 
     @Override
+    protected Object visit(final ASTTryResources node, final Object data) {
+        return visitNode(node, data);
+    }
+
+    @Override
+    protected Object visit(final ASTThrowStatement node, final Object data) {
+        return visitNode(node, data);
+    }
+    @Override
+
     protected Object visit(final ASTReturnStatement node, final Object data) {
         return visitNode(node, data);
     }

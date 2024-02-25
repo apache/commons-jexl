@@ -17,27 +17,15 @@
 package org.apache.commons.jexl3.parser;
 
 /**
- * Declares a try/catch/finally statement.
+ * Declares a try-with-resources scope.
  */
-public class ASTTryStatement extends JexlNode {
+public class ASTTryResources extends JexlLexicalNode {
     private static final long serialVersionUID = 1L;
-    /** try {}=0; try(expr()) &=2; try(let x = expr()); &=1 . */
-    /** catch() &= 4, finally &= 8. */
-    private int tryForm;
-
-    void setTryForm(final int form) {
-        tryForm = form;
-    }
-
-    public int getTryForm() {
-        return tryForm;
-    }
-
-    public ASTTryStatement(final int id) {
+    public ASTTryResources(final int id) {
         super(id);
     }
 
-    public ASTTryStatement(final Parser p, final int id) {
+    public ASTTryResources(final Parser p, final int id) {
         super(p, id);
     }
 
@@ -45,5 +33,4 @@ public class ASTTryStatement extends JexlNode {
     public Object jjtAccept(final ParserVisitor visitor, final Object data) {
         return visitor.visit(this, data);
     }
-
 }

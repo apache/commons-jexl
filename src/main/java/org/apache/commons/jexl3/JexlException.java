@@ -1034,6 +1034,36 @@ public class JexlException extends RuntimeException {
     }
 
     /**
+     * Thrown to throw a value.
+     *
+     * @since 3.3.1
+     */
+    public static class Throw extends JexlException {
+        private static final long serialVersionUID = 20210606124102L;
+
+        /** The thrown value. */
+        private final transient Object result;
+
+        /**
+         * Creates a new instance of Throw.
+         *
+         * @param node  the throw node
+         * @param value the thrown value
+         */
+        public Throw(final JexlNode node, final Object value) {
+            super(node, null, null, false);
+            this.result = value;
+        }
+
+        /**
+         * @return the thrown value
+         */
+        public Object getValue() {
+            return result;
+        }
+    }
+
+    /**
      * Thrown when method/ctor invocation fails.
      * <p>These wrap InvocationTargetException as runtime exception
      * allowing to go through without signature modifications.
