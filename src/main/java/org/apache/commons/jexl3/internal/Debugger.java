@@ -699,37 +699,35 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     }
 
     @Override
+    protected Object visit(ASTTryResources node, Object data) {
+        int tryBody = node.jjtGetNumChildren() - 1;
+        builder.append('(');
+        accept(node.jjtGetChild(0), data);
+        for(int c = 1; c < tryBody; ++c) {
+            builder.append("; ");
+            accept(node.jjtGetChild(c), data);
+        }
+        builder.append(')');
+        accept(node.jjtGetChild(tryBody), data);
+        return data;
+    }
+
+
+    @Override
     protected Object visit(final ASTTryStatement node, final Object data) {
         final int form = node.getTryForm();
         builder.append("try");
         int nc = 0;
-        // try with-resource named
-        if ((form & 1) != 0) {
-            builder.append('(');
-           accept(node.jjtGetChild(nc++), data);
-           if ((form & 2) != 0) {
-               builder.append(" = ");
-               accept(node.jjtGetChild(nc++), data);
-           }
-           builder.append(')');
-        } else if ((form & 2) != 0) {
-            // try with-resource un-named
-            builder.append('(');
-            accept(node.jjtGetChild(nc++), data);
-            builder.append(')');
-        }
-        // try-body
-        if ((form & 4) != 0) {
-            accept(node.jjtGetChild(nc++), data);
-        }
+        // try-body (with or without resources)
+        accept(node.jjtGetChild(nc++), data);
         // catch-body
-        if ((form & 8) != 0) {
+        if ((form & 1) != 0) {
             builder.append(" catch(");
             accept(node.jjtGetChild(nc++), data);
             builder.append(')');
         }
         // finally-body
-        if ((form & 16) != 0) {
+        if ((form & 2) != 0) {
             builder.append(" finally ");
             accept(node.jjtGetChild(nc++), data);
         }
@@ -1117,6 +1115,13 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
             accept(node.jjtGetChild(i), data);
             builder.append("]");
         }
+        return data;
+    }
+
+    @Override
+    protected Object visit(final ASTThrowStatement node, final Object data) {
+        builder.append("throw ");
+        accept(node.jjtGetChild(0), data);
         return data;
     }
 

@@ -427,17 +427,28 @@ void IfStatement() : {}
 }
 
 void TryStatement() : {
- int tryForm = 0;}
+ int tryForm = 0;
+}
+{
+     <TRY> (LOOKAHEAD(1) (TryResources() ) | Block())
+     (LOOKAHEAD(1) <CATCH> <LPAREN> InlineVar() <RPAREN> Block() { tryForm |= 1; })?
+     (LOOKAHEAD(1) <FINALLY>  Block() { tryForm |= 2; })?
+    {
+        jjtThis.setTryForm(tryForm);
+    }
+}
+
+void TryResources() : {}
 {
     {
         pushUnit(jjtThis);
     }
-     <TRY> (LOOKAHEAD(2) <LPAREN> (LOOKAHEAD(3) InlineVar() <assign> { tryForm |= 1; })? Expression() <RPAREN> { tryForm |= 2; })?
-     ((LOOKAHEAD(1) Block() | StatementNoVar())  { tryForm |= 4; })
-     (LOOKAHEAD(1) <CATCH> <LPAREN> InlineVar() <RPAREN>  (LOOKAHEAD(1) Block() | StatementNoVar()) { tryForm |= 8; })?
-     (LOOKAHEAD(1) <FINALLY>  (LOOKAHEAD(1) Block() | StatementNoVar()) { tryForm |= 16; })?
+<LPAREN>
+    (LOOKAHEAD(2) Var() | Identifier(true))
+      (LOOKAHEAD(1) <SEMICOL> TryResources())*
+<RPAREN>
+    Block()
     {
-        jjtThis.setTryForm(tryForm);
         popUnit(jjtThis);
     }
 }
@@ -508,6 +519,8 @@ void InlineVar() #Reference : {}
     <VAR> DeclareVar(false, false)
 |
     <LET> DeclareVar(true, false)
+|
+    <CONST> DeclareVar(true, true)
 |
     Identifier(true)
 }

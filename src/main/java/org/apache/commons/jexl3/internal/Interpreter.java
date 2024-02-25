@@ -17,8 +17,11 @@
 //CSOFF: FileLength
 package org.apache.commons.jexl3.internal;
 
+import java.util.ArrayDeque;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.Objects;
+import java.util.Queue;
 import java.util.concurrent.Callable;
 import java.util.function.Consumer;
 
@@ -593,6 +596,11 @@ public class Interpreter extends InterpreterBase {
         }
         return result;
     }
+    @Override
+    protected Object visit(final ASTThrowStatement node, final Object data) {
+        Object thrown = node.jjtGetChild(0).jjtAccept(this, data);
+        throw new JexlException.Throw(node, thrown);
+    }
 
     @Override
     protected Object visit(final ASTReturnStatement node, final Object data) {
@@ -617,37 +625,37 @@ public class Interpreter extends InterpreterBase {
     protected Object visit(final ASTTryStatement node, final Object data) {
         int form = node.getTryForm();
         int nc = 0;
-        JexlNode tryVar = (form & 1) != 0 ? node.jjtGetChild(nc++) : null;
-        JexlNode tryExpression = (form & 2) != 0 ? node.jjtGetChild(nc++) : null;
-        JexlNode tryBody = (form & 4) != 0 ? node.jjtGetChild(nc++) : null;
-        JexlNode catchVar = (form & 8) != 0 ? node.jjtGetChild(nc++) : null;
-        JexlNode catchBody = (form & 8) != 0 ? node.jjtGetChild(nc++) : null;
-        JexlNode finallyBody = (form & 16) != 0 ? node.jjtGetChild(nc) : null;
-        JexlException caught = null;
+        JexlNode tryBody = node.jjtGetChild(nc++);
+        JexlNode catchVar = (form & 1) != 0 ? node.jjtGetChild(nc++) : null;
+        JexlNode catchBody = (form & 1) != 0 ? node.jjtGetChild(nc++) : null;
+        JexlNode finallyBody = (form & 2) != 0 ? node.jjtGetChild(nc) : null;
+        JexlException rethrow = null;
         JexlException flowControl = null;
         Object result = null;
         try {
             // evaluate the try
-            result = evalTry(tryVar, tryExpression, tryBody, data);
+            result = tryBody.jjtAccept(this, data);
         } catch(JexlException.Return | JexlException.Cancel xflow) {
             // flow control exceptions do not trigger the catch clause
             flowControl = xflow;
         } catch(JexlException xany) {
-            caught = xany;
+            rethrow = xany;
             result = null;
         }
         // if we caught an exception and have a catch body, evaluate it
         JexlException thrownByCatch = null;
-        if (caught != null && catchBody != null) {
+        if (rethrow != null && catchBody != null) {
             try {
                 // evaluate the catch
-                evalCatch(catchVar, catchBody, caught,  data);
+                result = evalCatch(catchVar, catchBody, rethrow,  data);
+                // if catch body evaluates, do not rethrow
+                rethrow = null;
             } catch(JexlException.Break | JexlException.Continue |
                     JexlException.Return | JexlException.Cancel alterFlow) {
                 flowControl = alterFlow;
             } catch (JexlException exception) {
                 // catching an exception thrown from catch body; can be a (re)throw
-                thrownByCatch = exception;
+                rethrow = thrownByCatch = exception;
             }
         }
         // if we have a 'finally' block, no matter what, evaluate it: its control flow will
@@ -666,10 +674,10 @@ public class Interpreter extends InterpreterBase {
             } catch (JexlException exception) {
                 // catching an exception thrown in finally body
                 if (jexl.logger.isDebugEnabled()) {
-                    jexl.logger.debug("exception thrown in finally", thrownByCatch);
+                    jexl.logger.debug("exception thrown in finally", exception);
                 }
                 // swallow the caught one
-                thrownByCatch = exception;
+                rethrow = exception;
             }
         }
         if (flowControl != null) {
@@ -678,56 +686,32 @@ public class Interpreter extends InterpreterBase {
             }
             throw flowControl;
         }
-        if (thrownByCatch != null) {
-            throw thrownByCatch;
+        if (rethrow != null) {
+            throw rethrow;
         }
         return result;
     }
 
-    /**
-     * Evaluate the try/try-with resource a try/catch/finally.
-     *
-     * @param tryVar the try-with-resource variable (if any)
-     * @param tryExpression the try-with-resource expression
-     * @param tryBody the try body
-     * @param data the data
-     * @return the result of body evaluation
-     */
-    private Object evalTry(JexlNode tryVar, JexlNode tryExpression, JexlNode tryBody, final Object data) {
-        boolean lexical = false;
-        Object tryResult = null;
+    @Override
+    protected Object visit(final ASTTryResources node, final Object data) {
+        int bodyChild = node.jjtGetNumChildren() - 1;
+        JexlNode tryBody = node.jjtGetChild(bodyChild);
+        Queue<Object> tryResult = null;
+        LexicalFrame locals = null;
         try {
-            final ASTIdentifier tryVariable;
-            final int symbol;
-            /* Capture try variable if any. */
-            if (tryVar instanceof ASTReference) {
-                tryVariable = (ASTIdentifier) tryVar.jjtGetChild(0);
-                symbol = tryVariable.getSymbol();
-                lexical = tryVariable.isLexical() || options.isLexical();
-                if (lexical) {
-                    // create lexical frame
-                    final LexicalFrame locals = new LexicalFrame(frame, block);
-                    // it may be a local previously declared
-                    final boolean trySymbol = symbol >= 0 && tryVariable instanceof ASTVar;
-                    if (trySymbol && !defineVariable((ASTVar) tryVariable, locals)) {
-                        return redefinedVariable(tryVar.jjtGetParent(), tryVariable.getName());
-                    }
-                    block = locals;
-                }
-            } else {
-                tryVariable = null;
-                symbol = -1;
-                lexical = false;
+            // sequence of var declarations with/without assignment or expressions
+            if (node.getSymbolCount() > 0) {
+                locals = new LexicalFrame(frame, block);
+                block = locals;
             }
-            // evaluate try expression if any
-            if (tryExpression != null) {
-                tryResult = tryExpression.jjtAccept(this, data);
-                // assign try variable if declared
-                if (tryVariable != null) {
-                    if (symbol < 0) {
-                        setContextVariable(tryVar.jjtGetParent(), tryVariable.getName(), tryResult);
+            for(int c = 0; c < bodyChild; ++c) {
+                final JexlNode tryResource = node.jjtGetChild(c);
+                Object result = tryResource.jjtAccept(this, data);
+                if (result != null) {
+                    if (tryResult == null) {
+                        tryResult = new ArrayDeque<>(Collections.singletonList(result));
                     } else {
-                        frame.set(symbol, tryResult);
+                        tryResult.add(result);
                     }
                 }
             }
@@ -736,7 +720,7 @@ public class Interpreter extends InterpreterBase {
         } finally {
             closeIfSupported(tryResult);
             // restore lexical frame
-            if (lexical) {
+            if (locals != null) {
                 block = block.pop();
             }
         }
