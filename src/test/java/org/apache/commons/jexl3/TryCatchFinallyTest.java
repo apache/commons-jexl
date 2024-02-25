@@ -45,6 +45,30 @@ public class TryCatchFinallyTest extends JexlTestCase {
     Object result = script.execute(null);
     Assert.assertEquals(42, result);
   }
+  @Test
+  public void testForm0x2b() {
+    String src = "try(let x = 19, y = 23) { x + y; } finally { 169; }";
+    JexlScript script = JEXL.createScript(src);
+    Assert.assertNotNull(script);
+    Object result = script.execute(null);
+    Assert.assertEquals(42, result);
+  }
+  @Test
+  public void testForm0x2c() {
+    String src = "try(const x = 19; let y = 23; ) { x + y; } finally { 169; }";
+    JexlScript script = JEXL.createScript(src);
+    Assert.assertNotNull(script);
+    Object result = script.execute(null);
+    Assert.assertEquals(42, result);
+  }
+  @Test
+  public void testForm0x2d() {
+    String src = "try(var x = 19; const y = 23;) { x + y; } finally { 169; }";
+    JexlScript script = JEXL.createScript(src);
+    Assert.assertNotNull(script);
+    Object result = script.execute(null);
+    Assert.assertEquals(42, result);
+  }
 
   @Test
   public void testThrow0x2a() {

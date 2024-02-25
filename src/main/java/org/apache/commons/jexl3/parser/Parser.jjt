@@ -444,13 +444,17 @@ void TryResources() : {}
         pushUnit(jjtThis);
     }
 <LPAREN>
-    (LOOKAHEAD(2) Var() | Identifier(true))
-      (LOOKAHEAD(1) <SEMICOL> TryResources())*
+    TryResource() ( LOOKAHEAD(2) <SEMICOL> TryResource() )* (<SEMICOL>)?
 <RPAREN>
     Block()
     {
         popUnit(jjtThis);
     }
+}
+
+void TryResource() #void : {}
+{
+(LOOKAHEAD(2) Var() | Identifier(true))
 }
 
 void WhileStatement() : {}
