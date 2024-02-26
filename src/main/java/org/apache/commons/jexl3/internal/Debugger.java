@@ -296,7 +296,9 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
                 || child instanceof ASTTryStatement
                 || child instanceof ASTWhileStatement
                 || child instanceof ASTDoWhileStatement
-                || child instanceof ASTAnnotation;
+                || child instanceof ASTAnnotation
+                || child instanceof ASTTryStatement
+                || child instanceof ASTThrowStatement;
     }
 
     /**
@@ -707,7 +709,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
             builder.append("; ");
             accept(node.jjtGetChild(c), data);
         }
-        builder.append(')');
+        builder.append(") ");
         accept(node.jjtGetChild(tryBody), data);
         return data;
     }
@@ -722,13 +724,24 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
         accept(node.jjtGetChild(nc++), data);
         // catch-body
         if ((form & 1) != 0) {
-            builder.append(" catch(");
+            if (indent > 0) {
+                builder.append(lf);
+            } else {
+                builder.append(' ');
+            }
+            builder.append("catch(");
             accept(node.jjtGetChild(nc++), data);
-            builder.append(')');
+            builder.append(") ");
+            accept(node.jjtGetChild(nc++), data);
         }
         // finally-body
         if ((form & 2) != 0) {
-            builder.append(" finally ");
+            if (indent > 0) {
+                builder.append(lf);
+            } else {
+                builder.append(' ');
+            }
+            builder.append("finally ");
             accept(node.jjtGetChild(nc++), data);
         }
         return data;
