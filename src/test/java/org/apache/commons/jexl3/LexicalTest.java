@@ -550,8 +550,8 @@ public class LexicalTest {
         ctxt.set("options", options);
         final JexlScript runner = jexl.createScript(
                 "options.lexical = flag; options.lexicalShade = flag;"
-              + "tryCatch(test, catch, 42);",
-                "flag", "test", "catch");
+              + "tryCatch(test, catcher, 42);",
+                "flag", "test", "catcher");
         final JexlScript tested = jexl.createScript("(y)->{ {var x = y;} x }");
         final JexlScript catchFn = jexl.createScript("(xany)-> { xany }");
         Object result;

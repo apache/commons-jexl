@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Queue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.commons.jexl3.JexlArithmetic;
@@ -159,6 +160,17 @@ public abstract class InterpreterBase extends ParserVisitor {
                     logger.warn(xignore);
                 }
             }
+        }
+    }
+
+    /**
+     * Attempt to call close() if supported.
+     * <p>This is used when dealing with auto-closeable (duck-like) objects
+     * @param closeables the object queue we'd like to close
+     */
+    protected void closeIfSupported(final Queue<Object> closeables) {
+        for(Object closeable : closeables) {
+            closeIfSupported(closeable);
         }
     }
 

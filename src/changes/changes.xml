@@ -35,6 +35,9 @@
             <action dev="henrib" type="add" issue="JEXL-419">
                 Add permission syntax to allow class/method/field
             </action>
+            <action dev="henrib" type="add" issue="JEXL-418" due-to="Xu Pengcheng">
+                Add try-catch support
+            </action>
             <action dev="henrib" type="add" issue="JEXL-408" due-to="sebb">
                 Using JexlFeatures is tedious
             </action>

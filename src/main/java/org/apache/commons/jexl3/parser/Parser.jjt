@@ -29,8 +29,8 @@ options
    TRACK_TOKENS=true;
    CACHE_TOKENS=true;
    ERROR_REPORTING=false;
-  // DEBUG_PARSER=true;
-   //DEBUG_TOKEN_MANAGER=true;
+//   DEBUG_PARSER=true;
+//   DEBUG_TOKEN_MANAGER=true;
 }
 
 PARSER_BEGIN(Parser)
@@ -38,6 +38,7 @@ PARSER_BEGIN(Parser)
 package org.apache.commons.jexl3.parser;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.LinkedList;
 
 import org.apache.commons.jexl3.JexlInfo;
@@ -82,6 +83,7 @@ PARSER_END(Parser)
 
 TOKEN_MGR_DECLS : {
     boolean comparatorNames = false;
+    boolean jexl331 = true;
 }
 
 /***************************************
@@ -221,6 +223,14 @@ TOKEN_MGR_DECLS : {
     | < FALSE : "false" >
 }
 
+<NEVER> TOKEN : /* Exception handling. */
+{
+      < THROW : "throw" >
+    | < TRY : "try" >
+    | < CATCH : "catch" >
+    | < FINALLY : "finally" >
+}
+
 /***************************************
  *     Identifier & String tokens
  ***************************************/
@@ -244,7 +254,8 @@ TOKEN_MGR_DECLS : {
   < IDENTIFIER: <LETTER> (<LETTER>|<DIGIT>|<ESCAPE>)* >
   {
       matchedToken.image = StringParser.unescapeIdentifier(matchedToken.image);
-      if (comparatorNames && matchedToken.image.length() == 2) {
+      final int length = matchedToken.image.length();
+      if (comparatorNames && length == 2) {
           switch (matchedToken.image) {
              case "ne" : matchedToken.kind = NE; break;
              case "eq" : matchedToken.kind = EQ; break;
@@ -252,6 +263,13 @@ TOKEN_MGR_DECLS : {
              case "le" : matchedToken.kind = LE; break;
              case "gt" : matchedToken.kind = GT; break;
              case "ge" : matchedToken.kind = GE; break;
+          }
+      } else if (jexl331 && length >= 3 && length <= 7) {
+          switch (matchedToken.image) {
+             case "try" : matchedToken.kind = TRY; break;
+             case "catch" : matchedToken.kind = CATCH; break;
+             case "finally" : matchedToken.kind = FINALLY; break;
+             case "throw" : matchedToken.kind = THROW; break;
           }
       }
   }
@@ -379,6 +397,8 @@ void StatementNoVar() #void : {}
     | LOOKAHEAD(<RETURN>) ReturnStatement()
     | LOOKAHEAD(<CONTINUE>) Continue()
     | LOOKAHEAD(<BREAK>) Break()
+    | LOOKAHEAD(<THROW>) ThrowStatement()
+    | LOOKAHEAD(<TRY>) TryStatement()
     | LOOKAHEAD(Expression()) ExpressionStatement()
     | Block()
     | LOOKAHEAD(<VAR>, {!getFeatures().isLexical()} ) Var()
@@ -407,6 +427,32 @@ void IfStatement() : {}
     ( LOOKAHEAD(1) <ELSE>  (LOOKAHEAD(1) Block() | StatementNoVar()) )?
 }
 
+void TryStatement() : {}
+{
+     <TRY> (LOOKAHEAD(1) (TryResources() ) | Block())
+     (LOOKAHEAD(1) <CATCH> <LPAREN> InlineVar() <RPAREN> Block() { jjtThis.catchClause(); })?
+     (LOOKAHEAD(1) <FINALLY>  Block() { jjtThis.finallyClause(); })?
+}
+
+void TryResources() : {}
+{
+    {
+        pushUnit(jjtThis);
+    }
+<LPAREN>
+    TryResource() ( LOOKAHEAD(2) <SEMICOL> TryResource() )* (<SEMICOL>)?
+<RPAREN>
+    Block()
+    {
+        popUnit(jjtThis);
+    }
+}
+
+void TryResource() #void : {}
+{
+(LOOKAHEAD(2) Var() | Identifier(true))
+}
+
 void WhileStatement() : {}
 {
     <WHILE> <LPAREN> Expression() <RPAREN>  { loopCount += 1; }  (LOOKAHEAD(1) Block() | StatementNoVar()) { loopCount -= 1; }
@@ -420,6 +466,11 @@ void DoWhileStatement() : {}
 void ReturnStatement() : {}
 {
     <RETURN> (LOOKAHEAD(2) ExpressionStatement() )?
+}
+
+void ThrowStatement() : {}
+{
+    <THROW> (LOOKAHEAD(2) ExpressionStatement() )?
 }
 
 void Continue() #Continue : {
@@ -445,7 +496,7 @@ void ForeachStatement() : {
     }
     <FOR> <LPAREN>
     (
-        LOOKAHEAD(3) ForEachVar() <COLON> Expression() { loopForm = 0; }
+        LOOKAHEAD(3) InlineVar() <COLON> Expression() { loopForm = 0; }
     |
         ((LOOKAHEAD(1) Var() | Expression()) { loopForm = 1; })? <SEMICOL>
         (Expression() { loopForm |= 2; })? <SEMICOL>
@@ -463,11 +514,13 @@ void ForeachStatement() : {
     }
 }
 
-void ForEachVar() #Reference : {}
+void InlineVar() #Reference : {}
 {
     <VAR> DeclareVar(false, false)
 |
     <LET> DeclareVar(true, false)
+|
+    <CONST> DeclareVar(true, true)
 |
     Identifier(true)
 }
@@ -520,7 +573,7 @@ void Pragma() #void :
 <PRAGMA> pragmaKey(lstr)  value=pragmaValue() { declarePragma(stringify(lstr), value); }
 }
 
-void pragmaKey(LinkedList<String> lstr) #void :
+void pragmaKey(List<String> lstr) #void :
 {
     Token t;
 }

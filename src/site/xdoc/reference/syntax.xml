@@ -44,6 +44,9 @@
                     <li>
                         <a href="#Conditional">Conditional Statements</a>
                     </li>
+                    <li>
+                        <a href="#Control Flow">Flow Control</a>
+                    </li>
                 </ol>
             </p>
             <p>
@@ -1045,16 +1048,127 @@
                             } while (x &lt; 10)</code>
                     </td>
                 </tr>
+            </table>
+        </section>
+
+        <section name="Control Flow">
+            <table>
+                <tr>
+                    <th width="15%">Statement</th>
+                    <th>Description</th>
+                </tr>
+                <tr>
+                    <td>if</td>
+                    <td>
+                        Classic, if/else statement, e.g.
+                        <br/>
+                        <code>if ((x * 2) == 5) {
+                            y = 1;
+                            } else {
+                            y = 2;
+                            }</code>
+                    </td>
+                </tr>
                 <tr>
                     <td>continue</td>
                     <td>
-                        Within loops (do/while/for), allows to skip to the next iteration.
+                        Within loops (do/while/for), terminates execution of the statements in the current iteration
+                        and skips to the next loop iteration.
+                        <br/>
+                    <code>
+                        let text = '';
+                        for (let i : (4..2)) {
+                        if (i === 3) {
+                        continue;
+                        }
+                        text += i;
+                        }
+                        text;
+                    </code>
+                    Will evaluate as "42".
                     </td>
                 </tr>
                 <tr>
                     <td>break</td>
                     <td>
-                        Allows to break from a loop (do/while/for) unconditionally.
+                        Within loops (do/while/for), terminates execution of the statements in the current iteration
+                        and exits the loop.
+                        <br/>
+                    <code>
+                        let i = 33;
+                        while (i &lt; 66) {
+                        if (i == 42) {
+                        break;
+                        }
+                        i += 1;
+                        }
+                        i;
+                    </code>
+                    Will evaluate as 42.
+                    </td>
+                </tr>
+                <tr>
+                    <td>return</td>
+                    <td>
+                        The return statement ends execution and specifies a value to be returned to the script
+                        or lambda caller.
+                        <br/>
+                        <code>
+                            function f(x) {
+                                if (x == 42) {
+                                    return "The answer to life, the universe, and everything";
+                                }
+                                return x
+                            }
+                            f(41);
+                        </code>
+                        Will evaluate as 41.
+                    </td>
+                </tr>
+                <tr>
+                    <td>throw</td>
+                    <td>
+                        The throw statement throws an object. Execution of the current script will stop
+                        (the statements after throw won't be executed), and control will be passed to the first catch
+                        block in the call stack. If no catch block exists among caller functions, script execution will
+                        terminate.
+                    </td>
+                </tr>
+                <tr>
+                <td>try/catch/finally</td>
+                <td>The try...catch statement is comprised of a try block and either a catch block, a finally block,
+                    or both. The code in the try block is executed first, and if it throws an exception, the code in
+                    the catch block will be executed.
+                    The code in the finally block will always be executed before control flow exits the entire construct.
+                    <br/>
+                <code>try {
+                    return 42/0;
+                    } catch (let e) {
+                     // handle the error
+                    } </code>
+                    <br/>
+                    <p>The following syntax is also supported:</p>
+                    <code>try {
+                        return 42/0;
+                        } catch (var e) {
+                        // handle the error
+                        }
+                    </code>
+                </td>
+                </tr>
+                <tr>
+                    <td>try-with-resources</td>
+                    <td>The try-with-resources statement is a try statement that declares one or more resources.
+                        The try-with-resources statement ensures that each resource is closed at
+                        the end of the statement; any object that exposes a <code>close()</code> method will see that
+                        method invoked.
+                        <br/>
+                        <code>
+                            let g = open("g");
+                            try(let f = open("f"), g) {
+                                // more code
+                            }
+                        </code>
                     </td>
                 </tr>
             </table>
