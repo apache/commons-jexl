@@ -297,7 +297,6 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
                 || child instanceof ASTWhileStatement
                 || child instanceof ASTDoWhileStatement
                 || child instanceof ASTAnnotation
-                || child instanceof ASTTryStatement
                 || child instanceof ASTThrowStatement;
     }
 
@@ -717,30 +716,20 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
 
     @Override
     protected Object visit(final ASTTryStatement node, final Object data) {
-        final int form = node.getTryForm();
         builder.append("try");
         int nc = 0;
         // try-body (with or without resources)
         accept(node.jjtGetChild(nc++), data);
         // catch-body
-        if ((form & 1) != 0) {
-            if (indent > 0) {
-                builder.append(lf);
-            } else {
-                builder.append(' ');
-            }
+        if (node.hasCatchClause()) {
             builder.append("catch(");
             accept(node.jjtGetChild(nc++), data);
             builder.append(") ");
             accept(node.jjtGetChild(nc++), data);
         }
         // finally-body
-        if ((form & 2) != 0) {
-            if (indent > 0) {
-                builder.append(lf);
-            } else {
-                builder.append(' ');
-            }
+        if (node.hasFinallyClause()) {
+            builder.append(indent > 0? lf : ' ');
             builder.append("finally ");
             accept(node.jjtGetChild(nc++), data);
         }

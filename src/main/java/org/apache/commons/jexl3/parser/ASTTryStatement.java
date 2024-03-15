@@ -21,16 +21,23 @@ package org.apache.commons.jexl3.parser;
  */
 public class ASTTryStatement extends JexlNode {
     private static final long serialVersionUID = 1L;
-    /** try {}=0; try(expr()) &=2; try(let x = expr()); &=1 . */
-    /** catch() &= 4, finally &= 8. */
+    /** catch() &= 1, finally &= 2. */
     private int tryForm;
 
-    void setTryForm(final int form) {
-        tryForm = form;
+    public void catchClause() {
+        tryForm |= 1;
     }
 
-    public int getTryForm() {
-        return tryForm;
+    public boolean hasCatchClause() {
+        return (tryForm & 1) != 0;
+    }
+
+    public void finallyClause() {
+        tryForm |= 2;
+    }
+
+    public boolean hasFinallyClause() {
+        return (tryForm & 2) != 0;
     }
 
     public ASTTryStatement(final int id) {

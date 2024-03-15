@@ -38,6 +38,7 @@ PARSER_BEGIN(Parser)
 package org.apache.commons.jexl3.parser;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.LinkedList;
 
 import org.apache.commons.jexl3.JexlInfo;
@@ -426,16 +427,11 @@ void IfStatement() : {}
     ( LOOKAHEAD(1) <ELSE>  (LOOKAHEAD(1) Block() | StatementNoVar()) )?
 }
 
-void TryStatement() : {
- int tryForm = 0;
-}
+void TryStatement() : {}
 {
      <TRY> (LOOKAHEAD(1) (TryResources() ) | Block())
-     (LOOKAHEAD(1) <CATCH> <LPAREN> InlineVar() <RPAREN> Block() { tryForm |= 1; })?
-     (LOOKAHEAD(1) <FINALLY>  Block() { tryForm |= 2; })?
-    {
-        jjtThis.setTryForm(tryForm);
-    }
+     (LOOKAHEAD(1) <CATCH> <LPAREN> InlineVar() <RPAREN> Block() { jjtThis.catchClause(); })?
+     (LOOKAHEAD(1) <FINALLY>  Block() { jjtThis.finallyClause(); })?
 }
 
 void TryResources() : {}
@@ -577,7 +573,7 @@ void Pragma() #void :
 <PRAGMA> pragmaKey(lstr)  value=pragmaValue() { declarePragma(stringify(lstr), value); }
 }
 
-void pragmaKey(LinkedList<String> lstr) #void :
+void pragmaKey(List<String> lstr) #void :
 {
     Token t;
 }

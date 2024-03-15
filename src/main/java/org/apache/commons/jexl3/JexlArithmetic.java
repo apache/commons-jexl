@@ -300,10 +300,10 @@ public class JexlArithmetic {
         return new org.apache.commons.jexl3.internal.ArrayBuilder(size, extended);
     }
 
-    @Deprecated
     /**
      * @deprecated since 3.3.1
      */
+    @Deprecated
     public ArrayBuilder arrayBuilder(final int size) {
         return arrayBuilder(size, false);
     }
@@ -339,10 +339,10 @@ public class JexlArithmetic {
         return new org.apache.commons.jexl3.internal.SetBuilder(size, extended);
     }
 
-    @Deprecated
     /**
      * @deprecated since 3.3.1
      */
+    @Deprecated
     public SetBuilder setBuilder(final int size) {
         return setBuilder(size, false);
     }
@@ -379,10 +379,10 @@ public class JexlArithmetic {
         return new org.apache.commons.jexl3.internal.MapBuilder(size, extended);
     }
 
-    @Deprecated
     /**
      * @deprecated since 3.3.1
      */
+    @Deprecated
     public MapBuilder mapBuilder(final int size) {
         return mapBuilder(size, false);
     }
@@ -845,7 +845,7 @@ public class JexlArithmetic {
     }
 
     /**
-     * The BigDecimal scale used for comparison and coericion operations.
+     * The BigDecimal scale used for comparison and coercion operations.
      *
      * @return the scale
      */
