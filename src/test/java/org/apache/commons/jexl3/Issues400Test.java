@@ -370,4 +370,25 @@ public class Issues400Test {
       Assert.assertEquals("gc", method.getMethod());
     }
   }
+
+  @Test public void testDocBreakContinue() {
+    final JexlBuilder builder = new JexlBuilder().features(new JexlFeatures().constCapture(true));
+    final JexlEngine jexl = builder.create();
+    JexlScript script;
+    Object result;
+    String srcContinue = "let text = '';\n" +
+        "for (let i : (4..2)) { if (i == 3) continue; text += i; }\n" +
+        "text;";
+    script = jexl.createScript(srcContinue);
+    result = script.execute(null);
+    Assert.assertEquals("42", result);
+
+    String srcBreak = "let i = 33;\n" +
+        "while (i < 66) { if (i == 42) { break; } i += 1; }\n" +
+        "i;";
+    script = jexl.createScript(srcBreak);
+    result = script.execute(null);
+    Assert.assertEquals(42, result);
+  }
+
 }
