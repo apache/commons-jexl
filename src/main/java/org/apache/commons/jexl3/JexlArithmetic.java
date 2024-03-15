@@ -301,6 +301,9 @@ public class JexlArithmetic {
     }
 
     /**
+     * Creates an array builder.
+     * @param size the number of elements in the array
+     * @return an array builder instance
      * @deprecated since 3.3.1
      */
     @Deprecated
@@ -340,6 +343,9 @@ public class JexlArithmetic {
     }
 
     /**
+     * Creates a set-builder.
+     * @param size the number of elements in the set
+     * @return a set-builder instance
      * @deprecated since 3.3.1
      */
     @Deprecated
@@ -380,7 +386,9 @@ public class JexlArithmetic {
     }
 
     /**
-     * @deprecated since 3.3.1
+     * Creates a map-builder.
+     * @param size the number of elements in the map
+     * @return a map-builder instance
      */
     @Deprecated
     public MapBuilder mapBuilder(final int size) {
