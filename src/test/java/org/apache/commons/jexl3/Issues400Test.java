@@ -161,11 +161,11 @@ public class Issues400Test {
     script = jexl.createScript("a?['B']?['C']", "a");
     result = script.execute(null, a);
     Assert.assertEquals(script.getSourceText(), script.getParsedText());
-    Assert.assertEquals(null, result);
+    Assert.assertNull(result);
     script = jexl.createScript("a?['b']?['C']", "a");
     Assert.assertEquals(script.getSourceText(), script.getParsedText());
     result = script.execute(null, a);
-    Assert.assertEquals(null, result);
+    Assert.assertNull(result);
     script = jexl.createScript("a?['b']?['c']", "a");
     Assert.assertEquals(script.getSourceText(), script.getParsedText());
     result = script.execute(null, a);
