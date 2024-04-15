@@ -399,6 +399,7 @@ void StatementNoVar() #void : {}
     | LOOKAHEAD(<BREAK>) Break()
     | LOOKAHEAD(<THROW>) ThrowStatement()
     | LOOKAHEAD(<TRY>) TryStatement()
+    | LOOKAHEAD(LambdaLookahead()) Lambda()
     | LOOKAHEAD(Expression()) ExpressionStatement()
     | Block()
     | LOOKAHEAD(<VAR>, {!getFeatures().isLexical()} ) Var()

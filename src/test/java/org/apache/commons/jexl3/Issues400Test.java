@@ -391,4 +391,26 @@ public class Issues400Test {
     Assert.assertEquals(42, result);
   }
 
+  public static class VinzContext extends MapContext {
+    public String member(String m, String u) {
+      return m + '.' + u;
+    }
+  }
+
+  @Test
+  public void testNamespaceVsTernary() {
+    VinzContext ctxt = new VinzContext();
+    ctxt.set("Users", "USERS");
+    final JexlEngine jexl = new JexlBuilder().safe(false).strict(true).silent(false).create();
+    JexlScript script = jexl.createScript("() -> {\n"
+            + "  var fn = (user) -> {\n"
+            + "     user ? user : member(Users, 'user');\n"
+            + "  }\n"
+            + "}");
+    Object r = script.execute(ctxt);
+    Assert.assertNotNull(r);
+    script = (JexlScript) r;
+    r = script.execute(ctxt);
+    Assert.assertEquals("USERS.user", r);
+  }
 }
