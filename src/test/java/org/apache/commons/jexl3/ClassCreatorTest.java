@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.SystemProperties;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.After;
@@ -179,7 +180,7 @@ public class ClassCreatorTest extends JexlTestCase {
     @Before
     @Override
     public void setUp() throws Exception {
-        base = new File(System.getProperty("java.io.tmpdir"), "jexl" + System.currentTimeMillis());
+        base = new File(SystemProperties.getJavaIoTmpdir(), "jexl" + System.currentTimeMillis());
         jexl = JEXL;
 
     }

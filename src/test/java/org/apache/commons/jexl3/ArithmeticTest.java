@@ -33,6 +33,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.apache.commons.jexl3.junit.Asserter;
+import org.apache.commons.lang3.SystemProperties;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -330,7 +331,7 @@ public class ArithmeticTest extends JexlTestCase {
      * @return the Java version as an int value (8, 9, etc.)
      */
     private static int getJavaVersion() {
-        String version = System.getProperty("java.version");
+        String version = SystemProperties.getJavaVersion();
         if (version.startsWith("1.")) {
             version = version.substring(2);
         }
