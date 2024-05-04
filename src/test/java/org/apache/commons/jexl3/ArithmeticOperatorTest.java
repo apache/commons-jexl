@@ -81,7 +81,7 @@ public class ArithmeticOperatorTest extends JexlTestCase {
                     return cal.get(Calendar.DAY_OF_MONTH);
                 }
                 // Otherwise treat as format mask
-                final SimpleDateFormat df = new SimpleDateFormat(key);//, dfs);
+                final SimpleDateFormat df = new SimpleDateFormat(key); //, dfs);
                 return df.format(date);
 
             } catch (final Exception ex) {

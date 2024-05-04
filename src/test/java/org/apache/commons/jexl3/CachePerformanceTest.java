@@ -49,11 +49,11 @@ import java.util.concurrent.Future;
  */
 public class CachePerformanceTest {
   /** Number of test loops. */
-  private static final int LOOPS = 10;//0;
+  private static final int LOOPS = 10; //0;
   /** Number of different scripts. */
-  private static final int SCRIPTS = 800;//0;
+  private static final int SCRIPTS = 800; //0;
   /** Cache capacity. */
-  private static final int CACHED = 500;//0;
+  private static final int CACHED = 500; //0;
   /** Number of times each script is evaluated. */
   private static final int HIT = 5;
   /** Number of concurrent threads. */

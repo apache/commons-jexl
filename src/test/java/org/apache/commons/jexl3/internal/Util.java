@@ -142,7 +142,7 @@ public class Util {
      * @return an indented version of the AST
      */
     protected static String flattenedStr(final JexlScript e) {
-        return "";//e.getText() + "\n" + flattenedStr(((Script)e).script);
+        return ""; //e.getText() + "\n" + flattenedStr(((Script)e).script);
     }
 
     private static String indent(JexlNode node) {

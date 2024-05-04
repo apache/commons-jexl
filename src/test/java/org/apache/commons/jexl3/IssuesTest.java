@@ -165,7 +165,7 @@ public class IssuesTest extends JexlTestCase {
         JexlScript script;
         script = jexl.createScript("'hello world!'//commented");
         Assert.assertEquals("hello world!", script.execute(ctxt));
-        script = jexl.createScript("'hello world!';//commented\n'bye...'");
+        script = jexl.createScript("'hello world!'; //commented\n'bye...'");
         Assert.assertEquals("bye...", script.execute(ctxt));
         script = jexl.createScript("'hello world!'## commented");
         Assert.assertEquals("hello world!", script.execute(ctxt));
@@ -264,7 +264,7 @@ public class IssuesTest extends JexlTestCase {
         final JexlEvalContext ctxt = new JexlEvalContext(vars);
         final JexlOptions options = ctxt.getEngineOptions();
         options.setStrict(true);
-        options.setSilent(true);// to avoid throwing JexlException on null method call
+        options.setSilent(true); // to avoid throwing JexlException on null method call
 
         JexlScript jscript;
 

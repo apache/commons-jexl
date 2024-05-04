@@ -105,7 +105,7 @@ public class PropertySetExecutor extends AbstractExecutor.Set {
             try {
                 return invoke(o, value);
             } catch (IllegalAccessException | IllegalArgumentException xill) {
-                return TRY_FAILED;// fail
+                return TRY_FAILED; // fail
             } catch (final InvocationTargetException xinvoke) {
                 throw JexlException.tryFailed(xinvoke); // throw
             }

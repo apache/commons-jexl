@@ -81,7 +81,7 @@ public final class DuckGetExecutor extends AbstractExecutor.Get {
                 final Object[] args = {property};
                 return method.invoke(obj, args);
             } catch (IllegalAccessException | IllegalArgumentException xill) {
-                return TRY_FAILED;// fail
+                return TRY_FAILED; // fail
             } catch (final InvocationTargetException xinvoke) {
                 throw JexlException.tryFailed(xinvoke); // throw
             }

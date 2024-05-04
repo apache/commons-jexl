@@ -102,7 +102,7 @@ public class MethodKeyTest {
         KEY_LIST = BY_KEY.keySet().toArray(new MethodKey[0]);
     }
 
-    private static final int LOOP = 3;//00;
+    private static final int LOOP = 3; //00;
 
     /** * Creates & inserts a key into the BY_KEY & byString map */
     private static void setUpKey(final String name, final Class<?>[] parms) {

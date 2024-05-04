@@ -722,7 +722,7 @@ public class Issues200Test extends JexlTestCase {
 
     @Test
     public void test279() throws Exception {
-        final Log logger = null;//LogFactory.getLog(Issues200Test.class);
+        final Log logger = null; //LogFactory.getLog(Issues200Test.class);
         Object result;
         JexlScript script;
         final JexlContext ctxt = new Context279();

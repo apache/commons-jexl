@@ -240,7 +240,7 @@ public class JexlScriptEngineTest {
         final ScriptEngine engine = manager.getEngineByName("jexl3");
         final Integer initialValue = 123;
         Assert.assertEquals(initialValue,engine.eval("123"));
-        Assert.assertEquals(initialValue,engine.eval("0;123"));// multiple statements
+        Assert.assertEquals(initialValue,engine.eval("0;123")); // multiple statements
         try {
             final Long time2 = (Long) engine.eval(
                     "sys=context.class.forName(\"java.lang.System\");"

@@ -76,7 +76,7 @@ public final class BooleanGetExecutor extends AbstractExecutor.Get {
             try {
                 return method.invoke(obj, (Object[]) null);
             } catch (final IllegalAccessException xill) {
-                return TRY_FAILED;// fail
+                return TRY_FAILED; // fail
             } catch (final InvocationTargetException xinvoke) {
                 throw JexlException.tryFailed(xinvoke); // throw
             }
