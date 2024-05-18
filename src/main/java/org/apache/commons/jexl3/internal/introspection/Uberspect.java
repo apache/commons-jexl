@@ -41,7 +41,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * Implementation of Uberspect to provide the default introspective
+ * Implements Uberspect to provide the default introspective
  * functionality of JEXL.
  * <p>
  * This is the class to derive to customize introspection.</p>
