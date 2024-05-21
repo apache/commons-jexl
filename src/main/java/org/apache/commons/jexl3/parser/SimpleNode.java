@@ -54,7 +54,7 @@ public class SimpleNode implements Node {
 
     /**
      * Creates a SimpleNode instance.
-     * @param p the parser instance
+     * @param p not used.
      * @param i the node type identifier
      */
     public SimpleNode(final Parser p, final int i) {
