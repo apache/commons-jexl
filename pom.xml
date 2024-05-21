@@ -24,7 +24,7 @@
     </parent>
 
     <artifactId>commons-jexl3</artifactId>
-    <version>3.3.1-SNAPSHOT</version>
+    <version>3.4.0-SNAPSHOT</version>
     <name>Apache Commons JEXL</name>
     <description>JEXL is a library intended to facilitate the implementation of scripting features in
         applications and frameworks written in Java.</description>
@@ -40,7 +40,7 @@
         <commons.scmPubUrl>https://svn.apache.org/repos/infra/websites/production/commons/content/proper/commons-jexl</commons.scmPubUrl>
         <commons.scmPubCheckoutDirectory>site-content</commons.scmPubCheckoutDirectory>
         <!-- The RC version used in the staging repository URL. -->
-        <commons.rc.version>RC2</commons.rc.version>
+        <commons.rc.version>RC1</commons.rc.version>
         <commons.release.2.version>2.1.1</commons.release.2.version>
         <!-- Override the default, which is ${project.artifactId}-${commons.release.[23].version} -->
         <commons.release.name>commons-jexl-${commons.release.version}</commons.release.name>
@@ -81,7 +81,7 @@
 
         <!-- Commons release plugin -->
         <commons.bc.version>3.3</commons.bc.version>
-        <commons.release.version>3.3.1</commons.release.version>
+        <commons.release.version>3.4.0</commons.release.version>
         <commons.release.isDistModule>true</commons.release.isDistModule>
         <commons.distSvnStagingUrl>scm:svn:https://dist.apache.org/repos/dist/dev/commons/${commons.componentid}</commons.distSvnStagingUrl>
     </properties>

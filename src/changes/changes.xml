@@ -27,7 +27,7 @@
         <author email="dev@commons.apache.org">Commons Developers</author>
     </properties>
     <body>
-        <release version="3.3.1" date="20YY-MM-DD">
+        <release version="3.4.0" date="YYYY-MM-DD">
             <!-- ADD -->
             <action dev="henrib" type="add" issue="JEXL-421">
                 ArrayBuilder: array type should reflect common class of its entries
