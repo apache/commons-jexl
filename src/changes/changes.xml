@@ -91,6 +91,12 @@
             <action dev="ggregory" type="fix" due-to="PMD, Gary Gregory">
                 Guard logging calls.
             </action>
+            <action dev="ggregory" type="fix" due-to="PMD, Gary Gregory">
+                Deprecate SimpleNode.SimpleNode(Parser, int) in favor of SimpleNode.SimpleNode(int).
+            </action>
+            <action dev="ggregory" type="fix" due-to="PMD, Gary Gregory">
+                Deprecate JexlNode.JexlNode(Parser, int) in favor of JexlNode.JexlNode(int).
+            </action>
             <!-- UPDATE -->
             <action dev="henrib" type="update" due-to="dependabot">
                 Bump github actions.

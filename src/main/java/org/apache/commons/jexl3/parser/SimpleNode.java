@@ -53,10 +53,13 @@ public class SimpleNode implements Node {
     }
 
     /**
-     * Creates a SimpleNode instance.
+     * Constructs a SimpleNode instance.
+     *
      * @param p not used.
      * @param i the node type identifier
+     * @deprecated Use {@link #SimpleNode(int)}.
      */
+    @Deprecated
     public SimpleNode(final Parser p, final int i) {
         this(i);
     }

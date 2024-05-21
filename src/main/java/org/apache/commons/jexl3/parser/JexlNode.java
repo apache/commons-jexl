@@ -46,6 +46,14 @@ public abstract class JexlNode extends SimpleNode {
         super(id);
     }
 
+    /**
+     * Constructs a new instance.
+     *
+     * @param p not used.
+     * @param id the node type identifier
+     * @deprecated Use {@link #JexlNode(int)}.
+     */
+    @Deprecated
     public JexlNode(final Parser p, final int id) {
         super(p, id);
     }
