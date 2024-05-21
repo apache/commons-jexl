@@ -131,6 +131,7 @@ public abstract class JexlNode extends SimpleNode {
      * even when arithmetic is in strict mode.
      * The default cases are equals and not equals.
      *
+     * @param arithmetic the node to test
      * @return true if node accepts null arguments, false otherwise
      */
     public boolean isStrictOperator(final JexlArithmetic arithmetic) {
