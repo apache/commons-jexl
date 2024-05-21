@@ -506,7 +506,8 @@ public abstract class InterpreterBase extends ParserVisitor {
      * </p>
      * @return true if nullable variable, false otherwise
      */
-    protected boolean isTernaryProtected(JexlNode node) {
+    protected boolean isTernaryProtected(final JexlNode startNode) {
+        JexlNode node = startNode;
         for (JexlNode walk = node.jjtGetParent(); walk != null; walk = walk.jjtGetParent()) {
             // protect only the condition part of the ternary
             if (walk instanceof ASTTernaryNode

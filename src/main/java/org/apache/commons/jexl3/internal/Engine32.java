@@ -43,7 +43,7 @@ public class Engine32 extends Engine {
     /**
      * Static delegation of isTernaryProtected.
      * @param ii the interpreter (unused)
-     * @param node the node
+     * @param startNode the node
      * @return true if node is navigation-safe, false otherwise
      */
     static boolean isTernaryProtected(final Interpreter ii, final JexlNode startNode) {
