@@ -1075,7 +1075,7 @@ public class JexlException extends RuntimeException {
          * Creates a new instance.
          * @param xany the original invocation target exception
          */
-        private TryFailed(final InvocationTargetException xany) {
+        TryFailed(final InvocationTargetException xany) {
             super((JexlInfo) null, "tryFailed", xany.getCause());
         }
     }
