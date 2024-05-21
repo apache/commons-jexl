@@ -83,7 +83,8 @@ public final class MethodExecutor extends AbstractExecutor.Method {
     }
 
     @Override
-    public Object invoke(final Object o, Object... args) throws IllegalAccessException, InvocationTargetException {
+    public Object invoke(final Object o, final Object... oArgs) throws IllegalAccessException, InvocationTargetException {
+        Object[] args = oArgs;
         if (vaClass != null && args != null) {
             args = handleVarArg(args);
         }
