@@ -289,7 +289,7 @@ public final class JexlSandbox {
     /**
      * The pass-thru name set.
      */
-    private static final Names ALLOW_NAMES = new Names() {
+    static final Names ALLOW_NAMES = new Names() {
         @Override
         public boolean add(final String name) {
             return false;
