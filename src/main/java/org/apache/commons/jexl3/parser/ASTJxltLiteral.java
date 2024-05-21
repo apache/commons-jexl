@@ -30,10 +30,6 @@ public final class ASTJxltLiteral extends JexlNode {
         super(id);
     }
 
-    ASTJxltLiteral(final Parser p, final int id) {
-        super(p, id);
-    }
-
     void setLiteral(final String literal) {
         this.literal = literal;
     }

@@ -29,10 +29,6 @@ public class ASTQualifiedIdentifier extends JexlNode {
         super(id);
     }
 
-    ASTQualifiedIdentifier(final Parser p, final int id) {
-        super(p, id);
-    }
-
     @Override
     public String toString() {
         return name;

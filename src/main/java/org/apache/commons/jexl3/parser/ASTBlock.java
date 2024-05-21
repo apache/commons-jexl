@@ -27,7 +27,7 @@ public class ASTBlock extends JexlLexicalNode {
     }
 
     public ASTBlock(final Parser p, final int id) {
-        super(p, id);
+        super(id);
     }
 
     @Override

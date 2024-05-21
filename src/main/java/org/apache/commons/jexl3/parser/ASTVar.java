@@ -29,7 +29,7 @@ public class ASTVar extends ASTIdentifier {
     }
 
     public ASTVar(final Parser p, final int id) {
-        super(p, id);
+        super(id);
     }
 
     @Override

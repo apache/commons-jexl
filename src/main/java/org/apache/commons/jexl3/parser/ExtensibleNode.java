@@ -33,10 +33,6 @@ public class ExtensibleNode extends JexlNode {
     super(id);
   }
 
-  public ExtensibleNode(final Parser p, final int id) {
-    super(p, id);
-  }
-
   public void setExtended(final boolean e) {
     this.extended = e;
   }

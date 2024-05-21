@@ -24,10 +24,6 @@ public final class ASTMapLiteral extends ExtensibleNode {
         super(id);
     }
 
-    ASTMapLiteral(final Parser p, final int id) {
-        super(p, id);
-    }
-
     @Override
     public Object jjtAccept(final ParserVisitor visitor, final Object data) {
         return visitor.visit(this, data);

@@ -29,10 +29,6 @@ public class ASTIdentifierAccessSafe extends ASTIdentifierAccess {
         super(id);
     }
 
-    ASTIdentifierAccessSafe(final Parser p, final int id) {
-        super(p, id);
-    }
-
     @Override
     public boolean isSafe() {
         return true;

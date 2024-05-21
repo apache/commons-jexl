@@ -28,11 +28,6 @@ public final class ASTNumberLiteral extends JexlNode implements JexlNode.Constan
         nlp = new NumberParser();
     }
 
-    ASTNumberLiteral(final Parser p, final int id) {
-        super(p, id);
-        nlp = new NumberParser();
-    }
-
     @Override
     public String toString() {
         return nlp.toString();

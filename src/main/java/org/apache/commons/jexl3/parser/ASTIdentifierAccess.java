@@ -30,10 +30,6 @@ public class ASTIdentifierAccess extends JexlNode {
         super(id);
     }
 
-    ASTIdentifierAccess(final Parser p, final int id) {
-        super(p, id);
-    }
-
     void setIdentifier(final String id) {
         name = id;
         identifier = parseIdentifier(id);

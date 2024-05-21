@@ -40,7 +40,7 @@ public class ASTJexlScript extends JexlLexicalNode  {
     }
 
     public ASTJexlScript(final Parser p, final int id) {
-        super(p, id);
+        super(id);
     }
 
     /**

@@ -33,7 +33,7 @@ public class ASTArrayAccess extends JexlLexicalNode {
   }
 
   public ASTArrayAccess(final Parser p, final int id) {
-    super(p, id);
+    super(id);
   }
 
   void setSafe(final long s) {

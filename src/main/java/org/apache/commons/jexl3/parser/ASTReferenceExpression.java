@@ -25,10 +25,6 @@ public final class ASTReferenceExpression extends JexlNode {
         super(id);
     }
 
-    ASTReferenceExpression(final Parser p, final int id) {
-        super(p, id);
-    }
-
     /** Accept the visitor. **/
     @Override
     public Object jjtAccept(final ParserVisitor visitor, final Object data) {

@@ -27,10 +27,6 @@ public final class ASTStringLiteral extends JexlNode implements JexlNode.Constan
         super(id);
     }
 
-    ASTStringLiteral(final Parser p, final int id) {
-        super(p, id);
-    }
-
     @Override
     public String toString() {
         return this.literal;

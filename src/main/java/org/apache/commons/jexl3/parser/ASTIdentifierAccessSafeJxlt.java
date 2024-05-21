@@ -29,10 +29,6 @@ public class ASTIdentifierAccessSafeJxlt extends ASTIdentifierAccessJxlt {
         super(id);
     }
 
-    ASTIdentifierAccessSafeJxlt(final Parser p, final int id) {
-        super(p, id);
-    }
-
     @Override
     public boolean isSafe() {
         return true;

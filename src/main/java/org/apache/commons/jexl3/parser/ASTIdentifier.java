@@ -42,10 +42,6 @@ public class ASTIdentifier extends JexlNode {
         super(id);
     }
 
-    ASTIdentifier(final Parser p, final int id) {
-        super(p, id);
-    }
-
     @Override
     public String toString() {
         return name;

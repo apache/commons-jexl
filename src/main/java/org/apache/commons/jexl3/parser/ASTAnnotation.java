@@ -29,10 +29,6 @@ public class ASTAnnotation extends JexlNode {
         super(id);
     }
 
-    ASTAnnotation(final Parser p, final int id) {
-        super(p, id);
-    }
-
     @Override
     public String toString() {
         return name;

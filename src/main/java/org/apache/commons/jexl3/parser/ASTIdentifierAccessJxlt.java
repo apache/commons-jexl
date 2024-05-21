@@ -29,10 +29,6 @@ public class ASTIdentifierAccessJxlt extends ASTIdentifierAccess {
         super(id);
     }
 
-    ASTIdentifierAccessJxlt(final Parser p, final int id) {
-        super(p, id);
-    }
-
     @Override
     public boolean isExpression() {
         return true;

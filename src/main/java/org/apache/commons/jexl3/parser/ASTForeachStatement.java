@@ -37,7 +37,7 @@ public class ASTForeachStatement extends JexlLexicalNode {
     }
 
     public ASTForeachStatement(final Parser p, final int id) {
-        super(p, id);
+        super(id);
     }
 
     @Override

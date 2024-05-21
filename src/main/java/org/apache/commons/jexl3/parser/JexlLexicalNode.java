@@ -31,10 +31,6 @@ public abstract class JexlLexicalNode extends JexlNode implements JexlParser.Lex
         super(id);
     }
 
-    public JexlLexicalNode(final Parser p, final int id) {
-        super(p, id);
-    }
-
     @Override
     public boolean declareSymbol(final int symbol) {
         if (lexicalScope == null) {

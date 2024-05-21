@@ -28,10 +28,6 @@ public final class ASTJexlLambda extends ASTJexlScript {
         super(id);
     }
 
-    ASTJexlLambda(final Parser p, final int id) {
-        super(p, id);
-    }
-
     /**
      * @return true if outermost script.
      */

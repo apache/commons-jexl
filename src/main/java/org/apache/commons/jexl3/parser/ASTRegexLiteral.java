@@ -31,10 +31,6 @@ public final class ASTRegexLiteral extends JexlNode implements JexlNode.Constant
         super(id);
     }
 
-    ASTRegexLiteral(final Parser p, final int id) {
-        super(p, id);
-    }
-
     @Override
     public String toString() {
         return literal != null ? literal.toString() : "";
