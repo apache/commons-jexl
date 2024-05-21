@@ -88,6 +88,9 @@
             <action dev="ggregory" type="fix" due-to="step-security-bot, Gary Gregory">
                 [StepSecurity] ci: Harden GitHub Actions #180.
             </action>
+            <action dev="ggregory" type="fix" due-to="PMD, Gary Gregory">
+                Guard logging calls.
+            </action>
             <!-- UPDATE -->
             <action dev="henrib" type="update" due-to="dependabot">
                 Bump github actions.

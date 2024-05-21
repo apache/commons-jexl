@@ -517,13 +517,17 @@ public class Engine extends JexlEngine {
                 final String nsclass = value.toString();
                 final Class<?> clazz = uberspect.getClassByName(nsclass);
                 if (clazz == null) {
-                    logger.warn(key + ": unable to find class " + nsclass);
+                    if (logger.isWarnEnabled()) {
+                        logger.warn(key + ": unable to find class " + nsclass);
+                    }
                 } else {
                     ns.put(namespaceName, clazz);
                 }
             }
         } else {
-            logger.warn(key + ": ambiguous declaration " + value);
+            if (logger.isWarnEnabled()) {
+                logger.warn(key + ": ambiguous declaration " + value);
+            }
         }
     }
 
@@ -543,11 +547,15 @@ public class Engine extends JexlEngine {
         // jexl.module.***
         final String module = key.substring(PRAGMA_MODULE.length());
         if (module.isEmpty()) {
-            logger.warn(module + ": invalid module declaration");
+            if (logger.isWarnEnabled()) {
+                logger.warn(module + ": invalid module declaration");
+            }
         } else {
             withValueSet(value, o -> {
                 if (!(o instanceof CharSequence)) {
-                    logger.warn(module + ": unable to define module from " + value);
+                    if (logger.isWarnEnabled()) {
+                        logger.warn(module + ": unable to define module from " + value);
+                    }
                 } else {
                     final String moduleSrc = o.toString();
                     final Object functor;
