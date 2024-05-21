@@ -328,6 +328,11 @@ public interface JexlPermissions {
          /** The permissions we delegate to. */
         protected final JexlPermissions base;
 
+        /**
+         * Constructs a new instance.
+         *
+         * @param delegate the delegate.
+         */
         protected Delegate(final JexlPermissions delegate) {
             base = delegate;
         }
