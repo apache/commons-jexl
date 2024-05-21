@@ -46,7 +46,8 @@ public class Engine32 extends Engine {
      * @param node the node
      * @return true if node is navigation-safe, false otherwise
      */
-    static boolean isTernaryProtected(final Interpreter ii, JexlNode node) {
+    static boolean isTernaryProtected(final Interpreter ii, final JexlNode startNode) {
+        JexlNode node = startNode;
         for (JexlNode walk = node.jjtGetParent(); walk != null; walk = walk.jjtGetParent()) {
             // protect only the condition part of the ternary
             if (walk instanceof ASTTernaryNode
