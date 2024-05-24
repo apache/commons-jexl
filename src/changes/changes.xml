@@ -27,7 +27,7 @@
         <author email="dev@commons.apache.org">Commons Developers</author>
     </properties>
     <body>
-        <release version="3.4.0" date="YYYY-MM-DD">
+        <release version="3.4" date="YYYY-MM-DD">
             <!-- ADD -->
             <action dev="henrib" type="add" issue="JEXL-421">
                 ArrayBuilder: array type should reflect common class of its entries
@@ -50,7 +50,9 @@
             <action dev="henrib" type="add" issue="JEXL-398" due-to="Xu Pengcheng">
                 Allow 'trailing commas' or ellipsis while defining array, map and set literals
             </action>
-            <action type="add" dev="ggregory" due-to="Gary Gregory">Add Maven property project.build.outputTimestamp for build reproducibility.</action>
+            <action type="add" dev="ggregory" due-to="Gary Gregory">
+                Add Maven property project.build.outputTimestamp for build reproducibility.
+            </action>
             <!-- FIX -->
             <action dev="henrib" type="fix" issue="JEXL-420" due-to="Xu Pengcheng">
                 Error while comparing float and string value
@@ -98,6 +100,9 @@
                 Deprecate JexlNode.JexlNode(Parser, int) in favor of JexlNode.JexlNode(int).
             </action>
             <!-- UPDATE -->
+            <action dev="henrib" type="update" due-to="dependabot">
+                Bump commons-parent from 67 to 69.
+            </action>
             <action dev="henrib" type="update" due-to="dependabot">
                 Bump github actions.
             </action>

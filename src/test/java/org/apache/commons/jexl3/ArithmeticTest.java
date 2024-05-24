@@ -1045,6 +1045,8 @@ public class ArithmeticTest extends JexlTestCase {
         final Object[] EXPRESSIONS = {
                 // Basic compare
                 "1 == 1", true,
+                "1 === 1", true,
+                "1.d === 1", false,
                 "1 != 1", false,
                 "1 != 2", true,
                 "1 > 2", false,
@@ -1058,11 +1060,13 @@ public class ArithmeticTest extends JexlTestCase {
                 "1.1 < 2", true,
                 // Big Decimal <-> Big Integer Coercion
                 "1.0b == 1h", true,
+                "1.0b !== 1h", true,
                 "1h == 1.0b", true,
                 "1.1b != 1h", true,
                 "1.1b < 2h", true,
                 // Mix all type of numbers
                 "1l == 1.0", true, // long and int
+                "1l !== 1.0", true, // long and int
                 "1.0d == 1.0f", true, // double and float
                 "1l == 1.0b", true,
                 "1l == 1h", true,
@@ -1183,7 +1187,7 @@ public class ArithmeticTest extends JexlTestCase {
                     try {
                         final JexlExpression zexpr = jexl.createExpression(expr);
                         final Object nan = zexpr.evaluate(context);
-                        // check we have a zero & incremement zero count
+                        // check we have a zero & increment zero count
                         if (nan instanceof Number) {
                             final double zero = ((Number) nan).doubleValue();
                             if (zero == 0.0) {
@@ -1928,6 +1932,25 @@ public class ArithmeticTest extends JexlTestCase {
     @Test
     public void testUndefinedVar() throws Exception {
         asserter.failExpression("objects[1].status", ".*variable 'objects' is undefined.*");
+    }
+
+    @Test
+    public void testInstanceOf() throws Exception {
+        final JexlEngine jexl = new JexlBuilder().strict(true).safe(false).imports("java.lang").create();
+        Object r = jexl.createExpression("3.0 instanceof 'Double'").evaluate(null);
+        Assert.assertTrue((Boolean) r);
+        r = jexl.createExpression("'3.0' !instanceof 'Double'").evaluate(null);
+        Assert.assertTrue((Boolean) r);
+        JexlScript script = jexl.createScript("x instanceof y", "x", "y");
+        r = script.execute(null, "foo", String.class);
+        Assert.assertTrue((Boolean) r);
+        r = script.execute(null, 42.0, Double.class);
+        Assert.assertTrue((Boolean) r);
+        script = jexl.createScript("x !instanceof y", "x", "y");
+        r = script.execute(null, "foo", Double.class);
+        Assert.assertTrue((Boolean) r);
+        r = script.execute(null, 42.0, String.class);
+        Assert.assertTrue((Boolean) r);
     }
 
     /**

@@ -115,11 +115,17 @@ public class ScriptVisitor extends ParserVisitor {
     protected Object visit(final ASTThrowStatement node, final Object data) {
         return visitNode(node, data);
     }
-    @Override
 
+    @Override
     protected Object visit(final ASTReturnStatement node, final Object data) {
         return visitNode(node, data);
     }
+
+    @Override
+    protected Object visit(final ASTInstanceOf node, final Object data) { return visitNode(node, data); }
+
+    @Override
+    protected Object visit(final ASTNotInstanceOf node, final Object data) { return visitNode(node, data); }
 
     @Override
     protected Object visit(final ASTAssignment node, final Object data) {
@@ -195,9 +201,17 @@ public class ScriptVisitor extends ParserVisitor {
     protected Object visit(final ASTEQNode node, final Object data) {
         return visitNode(node, data);
     }
-
+    @Override
+    protected Object visit(final ASTEQSNode node, final Object data) {
+        return visitNode(node, data);
+    }
     @Override
     protected Object visit(final ASTNENode node, final Object data) {
+        return visitNode(node, data);
+    }
+
+    @Override
+    protected Object visit(final ASTNESNode node, final Object data) {
         return visitNode(node, data);
     }
 

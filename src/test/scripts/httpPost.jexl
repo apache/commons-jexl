@@ -38,7 +38,7 @@
         // read response
         let responseCode = con.getResponseCode();
         let inputStream = con.getInputStream();
-        let response = new StringBuffer();
+        let response = new StringBuilder();
         if (inputStream != null) {
             let in = new BufferedReader(new InputStreamReader(inputStream));
             var inputLine = "";

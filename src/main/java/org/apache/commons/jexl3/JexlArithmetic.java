@@ -828,6 +828,7 @@ public class JexlArithmetic {
         if (operator != null) {
             switch (operator) {
                 case EQ:
+                case EQSTRICT:
                 case ARRAY_GET:
                 case ARRAY_SET:
                 case PROPERTY_GET:
@@ -2068,6 +2069,27 @@ public class JexlArithmetic {
             return toBoolean(left) == toBoolean(strictCast, right);
         }
         return compare(left, right, EQ) == 0;
+    }
+
+    /**
+     * Test if left and right are strictly equal.
+     * <p>They must have the same class, comparable and the comparison returns 0.</p>
+     *
+     * @param left  left argument
+     * @param right right argument
+     * @return the test result
+     */
+    public boolean strictEquals(final Object left, final Object right) {
+        if (left == right) {
+            return true;
+        }
+        if (left == null || right == null) {
+            return false;
+        }
+        if (left.getClass().equals(right.getClass()) && left instanceof Comparable<?>) {
+            return ((Comparable) left).compareTo((Comparable) right) == 0;
+        }
+        return false;
     }
 
     /**

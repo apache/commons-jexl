@@ -1,6 +1,6 @@
 
                             Apache Commons JEXL
-                                Version 3.3
+                                Version 3.4
                                Release Notes
 
 
@@ -19,16 +19,24 @@ Its goal is to expose scripting features usable by technical operatives or consu
   https://commons.apache.org/jexl/
 
 ========================================================================================================================
-Release 3.3.1
+Release 3.4
 ========================================================================================================================
 
-Version 3.3.1 is a maintenance release.
+Version 3.4 is a minor release.
 
 Compatibility with previous releases
 ====================================
-Version 3.3.1 is source and binary compatible with 3.3.
+Version 3.4 is source and binary compatible with 3.3.
 
-New Features in 3.3.1:
+
+What's new in 3.4:
+==================
+Features and permissions are easier to define through new methods.
+Some new syntaxes are introduced (thus the new minor); try/catch/finally (including with resources),
+an array-access safe navigation ((x?[y]), strict equality/inequality operators (===, !==) and
+more permissive structured literals. See the JIRA tickets for more details.
+
+New Features in 3.4:
 ====================
 * JEXL-421:     ArrayBuilder: array type should reflect common class of its entries
 * JEXL-419:     Add permission syntax to allow class/method/field
@@ -38,8 +46,8 @@ New Features in 3.3.1:
 * JEXL-401:     Captured variables should be read-only
 * JEXL-398:     Allow 'trailing commas' or ellipsis while defining array, map and set literals
 
-Bugs Fixed in 3.3.1:
-===================
+Bugs Fixed in 3.4:
+==================
 * JEXL-420:     Error while comparing float and string value
 * JEXL-417:     JexlArithmetic looses precision during arithmetic operator execution
 * JEXL-416:     Null-valued pragma throws NPE in 3.3

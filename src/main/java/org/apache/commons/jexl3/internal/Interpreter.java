@@ -316,6 +316,18 @@ public class Interpreter extends InterpreterBase {
     }
 
     @Override
+    protected Object visit(final ASTEQSNode node, final Object data) {
+        final Object left = node.jjtGetChild(0).jjtAccept(this, data);
+        final Object right = node.jjtGetChild(1).jjtAccept(this, data);
+        try {
+            final Object result = operators.tryOverload(node, JexlOperator.EQSTRICT, left, right);
+            return result != JexlEngine.TRY_FAILED ? result : arithmetic.strictEquals(left, right);
+        } catch (final ArithmeticException xrt) {
+            throw new JexlException(findNullOperand(node, left, right), "=== error", xrt);
+        }
+    }
+
+    @Override
     protected Object visit(final ASTNENode node, final Object data) {
         final Object left = node.jjtGetChild(0).jjtAccept(this, data);
         final Object right = node.jjtGetChild(1).jjtAccept(this, data);
@@ -326,6 +338,20 @@ public class Interpreter extends InterpreterBase {
                    : !arithmetic.equals(left, right);
         } catch (final ArithmeticException xrt) {
             throw new JexlException(findNullOperand(node, left, right), "!= error", xrt);
+        }
+    }
+
+    @Override
+    protected Object visit(final ASTNESNode node, final Object data) {
+        final Object left = node.jjtGetChild(0).jjtAccept(this, data);
+        final Object right = node.jjtGetChild(1).jjtAccept(this, data);
+        try {
+            final Object result = operators.tryOverload(node, JexlOperator.EQSTRICT, left, right);
+            return result != JexlEngine.TRY_FAILED
+                ? !arithmetic.toBoolean(result)
+                : !arithmetic.strictEquals(left, right);
+        } catch (final ArithmeticException xrt) {
+            throw new JexlException(findNullOperand(node, left, right), "!== error", xrt);
         }
     }
 
@@ -525,6 +551,36 @@ public class Interpreter extends InterpreterBase {
     }
 
     @Override
+    protected Object visit(final ASTInstanceOf node, final Object data) {
+        final Object left = node.jjtGetChild(0).jjtAccept(this, data);
+        final Object right = node.jjtGetChild(1).jjtAccept(this, data);
+        return isInstance(left, right);
+    }
+    @Override
+
+    protected Object visit(final ASTNotInstanceOf node, final Object data) {
+        final Object left = node.jjtGetChild(0).jjtAccept(this, data);
+        final Object right = node.jjtGetChild(1).jjtAccept(this, data);
+        return !isInstance(left, right);
+    }
+
+    /**
+     * Determines if the specified Object is assignment-compatible with the object represented by the Class.
+     * @param object the Object
+     * @param clazz the Class
+     * @return the result of isInstance call
+     */
+    private boolean isInstance(final Object object, final Object clazz) {
+        if (object == null || clazz == null) {
+            return false;
+        }
+        Class<?> c = clazz instanceof Class<?>
+            ? (Class<?>) clazz
+            : uberspect.getClassByName(resolveClassName(clazz.toString()));
+        return c != null && c.isInstance(object);
+    }
+
+    @Override
     protected Object visit(final ASTIfStatement node, final Object data) {
         final int n = 0;
         final int numChildren = node.jjtGetNumChildren();
@@ -541,7 +597,7 @@ public class Interpreter extends InterpreterBase {
             }
             // if odd...
             if ((numChildren & 1) == 1) {
-                // if there is an else, there are an odd number of children in the statement and it is the last child,
+                // If there is an else, it is the last child of an odd number of children in the statement,
                 // execute it.
                 result = node.jjtGetChild(numChildren - 1).jjtAccept(this, null);
             }
@@ -751,7 +807,8 @@ public class Interpreter extends InterpreterBase {
         if (symbol < 0) {
             setContextVariable(catchVar.jjtGetParent(), catchVariable.getName(), caught);
         } else {
-            frame.set(symbol, caught);
+            Throwable cause  = caught.getCause();
+            frame.set(symbol, cause == null? caught : cause);
         }
         try {
             // evaluate body
@@ -1275,7 +1332,15 @@ public class Interpreter extends InterpreterBase {
 
     @Override
     protected Object visit(final ASTQualifiedIdentifier node, final Object data) {
-        final String name = node.getName();
+        return resolveClassName(node.getName());
+    }
+
+    /**
+     * Resolves a class name.
+     * @param name the simple class name
+     * @return the fully qualified class name or the name
+     */
+    private String resolveClassName(final String name) {
         // try with local solver
         String fqcn = fqcnSolver.resolveClassName(name);
         if (fqcn != null) {

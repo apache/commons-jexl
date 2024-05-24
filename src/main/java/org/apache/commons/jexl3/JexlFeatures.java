@@ -233,7 +233,7 @@ public final class JexlFeatures {
     private static final Set<String> RESERVED_WORDS =
         Collections.unmodifiableSet(
             new HashSet<>((Arrays.asList(
-                "switch", "case", "default", "class", "instanceof", "jexl", "$jexl"))));
+                "switch", "case", "default", "class", "jexl", "$jexl"))));
 
     /**
      * The modern scripting features set.
@@ -307,6 +307,9 @@ public final class JexlFeatures {
         }
         final JexlFeatures other = (JexlFeatures) obj;
         if (this.flags != other.flags) {
+            return false;
+        }
+        if (this.nameSpaces != other.nameSpaces) {
             return false;
         }
         if (!Objects.equals(this.reservedNames, other.reservedNames)) {

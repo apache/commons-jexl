@@ -50,7 +50,7 @@ public class JexlScriptEngineFactory implements ScriptEngineFactory {
 
     @Override
     public String getEngineVersion() {
-        return "3.3"; // ensure this is updated if function changes are made to this class
+        return "3.4"; // ensure this is updated if function changes are made to this class
     }
 
     @Override
@@ -60,7 +60,7 @@ public class JexlScriptEngineFactory implements ScriptEngineFactory {
 
     @Override
     public String getLanguageVersion() {
-        return "3.3"; // this should be derived from the actual version
+        return "3.4"; // this should be derived from the actual version
     }
 
     @Override

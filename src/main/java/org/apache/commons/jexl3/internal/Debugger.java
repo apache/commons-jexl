@@ -616,6 +616,26 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     }
 
     @Override
+    protected Object visit(final ASTEQSNode node, final Object data) {
+        return infixChildren(node, " === ", false, data);
+    }
+
+    @Override
+    protected Object visit(final ASTNESNode node, final Object data) {
+        return infixChildren(node, " !== ", false, data);
+    }
+
+    @Override
+    protected Object visit(final ASTInstanceOf node, final Object data) {
+        return infixChildren(node, " instanceof ", false, data);
+    }
+
+    @Override
+    protected Object visit(final ASTNotInstanceOf node, final Object data) {
+        return infixChildren(node, " !instanceof ", false, data);
+    }
+
+    @Override
     protected Object visit(final ASTERNode node, final Object data) {
         return infixChildren(node, " =~ ", false, data);
     }
@@ -731,7 +751,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
         if (node.hasFinallyClause()) {
             builder.append(indent > 0? lf : ' ');
             builder.append("finally ");
-            accept(node.jjtGetChild(nc++), data);
+            accept(node.jjtGetChild(nc), data);
         }
         return data;
     }

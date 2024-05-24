@@ -102,6 +102,19 @@ TOKEN_MGR_DECLS : {
     | <"//" (~["\n","\r"])* ("\n" | "\r" | "\r\n")? >
 }
 
+<NEVER> TOKEN : /* Exception handling. */
+{
+      < THROW : "throw" >
+    | < TRY : "try" >
+    | < CATCH : "catch" >
+    | < FINALLY : "finally" >
+}
+
+<NEVER> TOKEN : /* Type check. */
+{
+      < ISA : "instanceof" >
+}
+
 <*> TOKEN : { /* SEPARATORS */
       < LPAREN : "(">
     | < RPAREN : ")">
@@ -124,6 +137,7 @@ TOKEN_MGR_DECLS : {
     | < NULLP : "??" >
     | < AND : "&&" >
     | < OR : "||" >
+    | < NISA : "!instanceof">
 }
 
 <DEFAULT> TOKEN : { /* CONDITIONALS */
@@ -144,6 +158,8 @@ TOKEN_MGR_DECLS : {
     | < eeq : "=$" > // ends equal
     | < sne : "!^" > // start not equal
     | < ene : "!$" > // ends not equal
+    | < eqstrict : "===" > // strict equal
+    | < neqstrict : "!==" > // strict not equal
 }
 
 <NEVER> TOKEN : { /* COMPARISONS */
@@ -223,13 +239,6 @@ TOKEN_MGR_DECLS : {
     | < FALSE : "false" >
 }
 
-<NEVER> TOKEN : /* Exception handling. */
-{
-      < THROW : "throw" >
-    | < TRY : "try" >
-    | < CATCH : "catch" >
-    | < FINALLY : "finally" >
-}
 
 /***************************************
  *     Identifier & String tokens
@@ -264,12 +273,14 @@ TOKEN_MGR_DECLS : {
              case "gt" : matchedToken.kind = GT; break;
              case "ge" : matchedToken.kind = GE; break;
           }
-      } else if (jexl331 && length >= 3 && length <= 7) {
+      } else if (jexl331 && length >= 3 && length <= 10) {
           switch (matchedToken.image) {
              case "try" : matchedToken.kind = TRY; break;
              case "catch" : matchedToken.kind = CATCH; break;
              case "finally" : matchedToken.kind = FINALLY; break;
              case "throw" : matchedToken.kind = THROW; break;
+             case "instanceof": matchedToken.kind = ISA; break;
+             case "!instanceof": matchedToken.kind = NISA; break;
           }
       }
   }
@@ -701,6 +712,10 @@ void EqualityExpression() #void : {}
    |
      (<ne> | <NE>) RelationalExpression() #NENode(2)
    |
+     (<eqstrict>) RelationalExpression() #EQSNode(2)
+   |
+     (<neqstrict>) RelationalExpression() #NESNode(2)
+   |
      <range> RelationalExpression() #RangeNode(2) // range
   ) )?
 }
@@ -728,6 +743,10 @@ void RelationalExpression() #void : {}
     <eeq> ShiftExpression() #EWNode(2) // ends with
    |
     <ene> ShiftExpression() #NEWNode(2) // not ends with
+   |
+    <ISA> ShiftExpression() #InstanceOf(2) // instanceof
+   |
+    <NISA> ShiftExpression() #NotInstanceOf(2) // not instanceof
   ) )?
 }
 

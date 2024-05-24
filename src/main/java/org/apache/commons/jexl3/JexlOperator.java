@@ -145,6 +145,14 @@ public enum JexlOperator {
     EQ("==", "equals", 2),
 
     /**
+     * Equal-strict operator.
+     * <br><strong>Syntax:</strong> <code>x === y</code>
+     * <br><strong>Method:</strong> <code>boolean strictEquals(L x, R y);</code>.
+     * @see JexlArithmetic#strictEquals(Object, Object)
+     */
+    EQSTRICT("===", "strictEquals", 2),
+
+    /**
      * Less-than operator.
      * <br><strong>Syntax:</strong> <code>x &lt; y</code>
      * <br><strong>Method:</strong> <code>boolean lessThan(L x, R y);</code>.

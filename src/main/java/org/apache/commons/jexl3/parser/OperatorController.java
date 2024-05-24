@@ -143,8 +143,18 @@ final class OperatorController extends ScriptVisitor {
     }
 
     @Override
+    protected JexlOperator visit(final ASTEQSNode node, final Object data) {
+        return JexlOperator.EQSTRICT;
+    }
+
+    @Override
     protected JexlOperator visit(final ASTNENode node, final Object data) {
         return JexlOperator.EQ;
+    }
+
+    @Override
+    protected JexlOperator visit(final ASTNESNode node, final Object data) {
+        return JexlOperator.EQSTRICT;
     }
 
     @Override

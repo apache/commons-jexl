@@ -58,7 +58,7 @@
         <commons.jacoco.haltOnFailure>true</commons.jacoco.haltOnFailure>
         <commons.jacoco.classRatio>0.96</commons.jacoco.classRatio>
         <commons.jacoco.instructionRatio>0.89</commons.jacoco.instructionRatio>
-        <commons.jacoco.methodRatio>0.90</commons.jacoco.methodRatio>
+        <commons.jacoco.methodRatio>0.89</commons.jacoco.methodRatio>
         <commons.jacoco.branchRatio>0.80</commons.jacoco.branchRatio>
         <commons.jacoco.lineRatio>0.89</commons.jacoco.lineRatio>
         <commons.jacoco.complexityRatio>0.75</commons.jacoco.complexityRatio>

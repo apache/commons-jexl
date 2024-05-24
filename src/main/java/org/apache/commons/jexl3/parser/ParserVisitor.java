@@ -64,6 +64,10 @@ public abstract class ParserVisitor {
 
     protected abstract Object visit(ASTReturnStatement node, Object data);
 
+    protected abstract Object visit(final ASTInstanceOf node, final Object data);
+
+    protected abstract Object visit(final ASTNotInstanceOf node, final Object data);
+
     protected abstract Object visit(ASTAssignment node, Object data);
 
     protected abstract Object visit(ASTVar node, Object data);
@@ -94,7 +98,11 @@ public abstract class ParserVisitor {
 
     protected abstract Object visit(ASTEQNode node, Object data);
 
+    protected abstract Object visit(ASTEQSNode node, Object data);
+
     protected abstract Object visit(ASTNENode node, Object data);
+
+    protected abstract Object visit(ASTNESNode node, Object data);
 
     protected abstract Object visit(ASTLTNode node, Object data);
 
