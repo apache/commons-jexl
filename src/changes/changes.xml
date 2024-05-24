@@ -29,6 +29,12 @@
     <body>
         <release version="3.4" date="YYYY-MM-DD">
             <!-- ADD -->
+            <action dev="henrib" type="add" issue="JEXL-423">
+                Add support for instanceof / !instanceof
+            </action>
+            <action dev="henrib" type="add" issue="JEXL-422">
+                Add strict equality (===) and inequality (!==) operators
+            </action>
             <action dev="henrib" type="add" issue="JEXL-421">
                 ArrayBuilder: array type should reflect common class of its entries
             </action>

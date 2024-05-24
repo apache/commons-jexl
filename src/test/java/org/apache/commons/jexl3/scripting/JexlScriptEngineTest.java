@@ -18,6 +18,7 @@
 package org.apache.commons.jexl3.scripting;
 
 import java.io.Reader;
+import java.io.StringReader;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -71,7 +72,7 @@ public class JexlScriptEngineTest {
         final JexlScriptEngine engine = (JexlScriptEngine) manager.getEngineByName("JEXL");
         final ScriptContext ctxt = engine.getContext();
         final String str = null;
-        final String reader = null;
+        final Reader reader = null;
         try {
             final CompiledScript script0 = engine.compile(str);
             Assert.fail("should have thrown npe");
@@ -83,6 +84,20 @@ public class JexlScriptEngineTest {
             Assert.fail("should have thrown npe");
         } catch (final NullPointerException npe) {
             Assert.assertNotNull(npe);
+        }
+        try {
+            final CompiledScript script0 = engine.compile(new StringReader("3 + 4"));
+            Assert.assertEquals(engine, script0.getEngine());
+            Object result = script0.eval();
+            Assert.assertEquals(7, result);
+            result = script0.eval();
+            Assert.assertEquals(7, result);
+            result = engine.eval(new StringReader("38 + 4"));
+            Assert.assertEquals(42, result);
+            result = engine.eval("38 + 4");
+            Assert.assertEquals(42, result);
+        } catch (final ScriptException xscript) {
+            Assert.assertTrue(xscript.getCause() instanceof NullPointerException);
         }
         try {
             final CompiledScript script0 = engine.compile("3 + 4");

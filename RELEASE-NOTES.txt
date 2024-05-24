@@ -38,6 +38,8 @@ more permissive structured literals. See the JIRA tickets for more details.
 
 New Features in 3.4:
 ====================
+* JEXL-423:     Add support for instanceof / !instanceof
+* JEXL-422      Add strict equality (===) and inequality (!==) operators
 * JEXL-421:     ArrayBuilder: array type should reflect common class of its entries
 * JEXL-419:     Add permission syntax to allow class/method/field
 * JEXL-418:     Add try-catch-finally support

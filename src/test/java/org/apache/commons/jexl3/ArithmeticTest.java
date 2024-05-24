@@ -27,6 +27,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -246,6 +247,196 @@ public class ArithmeticTest extends JexlTestCase {
             return new Var(lhs.value ^ rhs.value);
         }
     }
+
+    // an arithmetic that fail systematically with vars
+    public static class ArithmeticFail extends JexlArithmetic {
+        public ArithmeticFail(final boolean strict) {
+            super(strict);
+        }
+
+        @Override
+        public Object add(final Object lhs, final Object rhs) {
+            throw new ArithmeticException(lhs + " o " + rhs);
+        }
+
+        @Override
+        public Object and(final Object lhs, final Object rhs) {
+            throw new ArithmeticException(lhs + " o " + rhs);
+        }
+
+        @Override
+        public Object complement(final Object arg) {
+            throw new ArithmeticException(Objects.toString(arg));
+        }
+
+        @Override
+        public Object decrement(final Object arg) {
+            throw new ArithmeticException(Objects.toString(arg));
+        }
+
+        @Override
+        public Object increment(final Object arg) {
+            throw new ArithmeticException(Objects.toString(arg));
+        }
+
+        @Override
+        public Boolean contains(final Object lhs, final Object rhs) {
+            throw new ArithmeticException(lhs + " o " + rhs);
+        }
+
+        @Override
+        public Object divide(final Object lhs, final Object rhs) {
+            throw new ArithmeticException(lhs + " o " + rhs);
+        }
+
+        @Override
+        public Boolean endsWith(final Object lhs, final Object rhs) {
+            throw new ArithmeticException(lhs + " o " + rhs);
+        }
+
+        @Override
+        public boolean equals(final Object lhs, final Object rhs) {
+            throw new ArithmeticException(lhs + " o " + rhs);
+        }
+
+        @Override
+        public boolean strictEquals(final Object lhs, final Object rhs) {
+            throw new ArithmeticException(lhs + " o " + rhs);
+        }
+
+        @Override
+        public boolean greaterThan(final Object lhs, final Object rhs) {
+            throw new ArithmeticException(lhs + " o " + rhs);
+        }
+
+        @Override
+        public boolean greaterThanOrEqual(final Object lhs, final Object rhs) {
+            throw new ArithmeticException(lhs + " o " + rhs);
+        }
+
+        @Override
+        public boolean lessThan(final Object lhs, final Object rhs) {
+            throw new ArithmeticException(lhs + " o " + rhs);
+        }
+
+        @Override
+        public boolean lessThanOrEqual(final Object lhs, final Object rhs) {
+            throw new ArithmeticException(lhs + " o " + rhs);
+        }
+
+        @Override
+        public Object mod(final Object lhs, final Object rhs) {
+            throw new ArithmeticException(lhs + " o " + rhs);
+        }
+
+        @Override
+        public Object multiply(final Object lhs, final Object rhs) {
+            throw new ArithmeticException(lhs + " o " + rhs);
+        }
+
+        @Override
+        public Object negate(final Object arg) {
+            throw new ArithmeticException(Objects.toString(arg));
+        }
+
+        @Override
+        public Object not(final Object arg) {
+            throw new ArithmeticException(Objects.toString(arg));
+        }
+
+        @Override
+        public Object or(final Object lhs, final Object rhs) {
+            throw new ArithmeticException(lhs + " o " + rhs);
+        }
+
+        @Override
+        public Object shiftLeft(final Object lhs, final Object rhs) {
+            throw new ArithmeticException(lhs + " o " + rhs);
+        }
+
+        @Override
+        public Object shiftRight(final Object lhs, final Object rhs) {
+            throw new ArithmeticException(lhs + " o " + rhs);
+        }
+
+        @Override
+        public Object shiftRightUnsigned(final Object lhs, final Object rhs) {
+            throw new ArithmeticException(lhs + " o " + rhs);
+        }
+
+        @Override
+        public Boolean startsWith(final Object lhs, final Object rhs) {
+            throw new ArithmeticException(lhs + " o " + rhs);
+        }
+
+        @Override
+        public Object subtract(final Object lhs, final Object rhs) {
+            throw new ArithmeticException(lhs + " o " + rhs);
+        }
+
+        @Override
+        public Object xor(final Object lhs, final Object rhs) {
+            throw new ArithmeticException(lhs + " o " + rhs);
+        }
+
+        @Override
+        public boolean toBoolean(Object x) {
+            throw new ArithmeticException(Objects.toString(x));
+        }
+    }
+
+    @Test
+    public void testFailAllOperators() {
+        String[] scripts = new String[]{
+            "(x, y)->{ x < y }",
+            "(x, y)->{ x <= y }",
+            "(x, y)->{ x > y }",
+            "(x, y)->{ x >= y }",
+            "(x, y)->{ x == y }",
+            "(x, y)->{ x != y }",
+            "(x, y)->{ x === y }",
+            "(x, y)->{ x !== y }",
+            "(x, y)->{ x % y }",
+            "(x, y)->{ x * y }",
+            "(x, y)->{ x + y }",
+            "(x, y)->{ x - y }",
+            "(x, y)->{ x ^ y }",
+            "(x, y)->bitwiseXor(x,y)",
+            "(x, y)->{ x || y }",
+            "(x, y)->{ x | y }",
+            "(x, y)->bitwiseOr(x,y)",
+            "(x, y)->{ x << y }",
+            "(x, y)->{ x >> y }",
+            "(x, y)->{ x >>> y }",
+            "(x, y)->{ x & y }",
+            "(x, y)->{ x && y }",
+            "(x, y)->bitwiseAnd(x,y)",
+            "(x, y)->{ x =^ y }",
+            "(x, y)->{ x !^ y }",
+            "(x, y)->{ x =$ y }",
+            "(x, y)->{ x !$ y }",
+            "(x, y)->{ x =~ y }",
+            "(x, y)->{ x !~ y }",
+            "(x, ignore)->{ -x }",
+            "(x, ignore)->{ +x }",
+            "(x, ignore)->{ --x }",
+            "(x, ignore)->{ ++x }",
+            "(x, ignore)->{ x-- }",
+            "(x, ignore)->{ x++ }"
+        };
+        final JexlEngine jexl = new JexlBuilder().cache(64).arithmetic(new ArithmeticFail(true)).create();
+        final JexlContext jc = new EmptyTestContext();
+        for(String src : scripts) {
+            JexlScript script = jexl.createScript(src);
+            try {
+                Object result = script.execute(jc, new Var(42), new Var(43));
+                Assert.fail(src);
+            } catch(JexlException xjexl) {
+                Assert.assertNotNull(jexl);
+            }
+        }
+    }
+
     public static class Callable173 {
         public Object call(final Integer... arg) {
             return arg[0] * arg[1];
@@ -1934,22 +2125,43 @@ public class ArithmeticTest extends JexlTestCase {
         asserter.failExpression("objects[1].status", ".*variable 'objects' is undefined.*");
     }
 
+    public static class InstanceofContext extends MapContext implements JexlContext.ClassNameResolver {
+        @Override
+        public String resolveClassName(String name) {
+            if ("Double".equals(name)) {
+                return Double.class.getName();
+            }
+            return null;
+        }
+    }
+
     @Test
-    public void testInstanceOf() throws Exception {
+    public void testInstanceOf0() throws Exception {
+        final JexlEngine jexl = new JexlBuilder().strict(true).safe(false).create();
+        final JexlContext ctxt = new InstanceofContext();
+        runInstanceof(jexl, ctxt);
+    }
+
+    @Test
+    public void testInstanceOf1() throws Exception {
         final JexlEngine jexl = new JexlBuilder().strict(true).safe(false).imports("java.lang").create();
-        Object r = jexl.createExpression("3.0 instanceof 'Double'").evaluate(null);
+        runInstanceof(jexl, null);
+    }
+
+    private void runInstanceof(JexlEngine jexl, JexlContext ctxt) {
+        Object r = jexl.createExpression("3.0 instanceof 'Double'").evaluate(ctxt);
         Assert.assertTrue((Boolean) r);
-        r = jexl.createExpression("'3.0' !instanceof 'Double'").evaluate(null);
+        r = jexl.createExpression("'3.0' !instanceof 'Double'").evaluate(ctxt);
         Assert.assertTrue((Boolean) r);
         JexlScript script = jexl.createScript("x instanceof y", "x", "y");
-        r = script.execute(null, "foo", String.class);
+        r = script.execute(ctxt, "foo", String.class);
         Assert.assertTrue((Boolean) r);
-        r = script.execute(null, 42.0, Double.class);
+        r = script.execute(ctxt, 42.0, Double.class);
         Assert.assertTrue((Boolean) r);
         script = jexl.createScript("x !instanceof y", "x", "y");
-        r = script.execute(null, "foo", Double.class);
+        r = script.execute(ctxt, "foo", Double.class);
         Assert.assertTrue((Boolean) r);
-        r = script.execute(null, 42.0, String.class);
+        r = script.execute(ctxt, 42.0, String.class);
         Assert.assertTrue((Boolean) r);
     }
 

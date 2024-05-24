@@ -265,11 +265,6 @@ final class AscLongIterator implements Iterator<Long> {
         }
         throw new NoSuchElementException();
     }
-
-    @Override
-    public void remove() {
-        throw new UnsupportedOperationException();
-    }
 }
 
 /**
@@ -305,10 +300,5 @@ final class DescLongIterator implements Iterator<Long> {
             return cursor--;
         }
         throw new NoSuchElementException();
-    }
-
-    @Override
-    public void remove() {
-        throw new UnsupportedOperationException();
     }
 }

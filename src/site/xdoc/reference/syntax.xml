@@ -707,10 +707,9 @@
                 <tr>
                     <td>Equality</td>
                     <td>
-                        The usual <code>==</code> operator can be used as well as the abbreviation <code>eq</code>.
-                        For example
-                        <code>val1 == val2</code> and
-                        <code>val1 eq val2</code> are equivalent.
+                        The equality <code>==</code> operator checks whether its two operands are equal, returning a
+                        Boolean result. Unlike the strict equality operator, it attempts to convert and compare
+                        operands that are of different types.
                         <ol>
                             <li>
                                 <code>null</code> is only ever equal to null, that is if you compare null
@@ -723,10 +722,24 @@
                 <tr>
                     <td>Inequality</td>
                     <td>
-                        The usual <code>!=</code> operator can be used as well as the abbreviation <code>ne</code>.
-                        For example
-                        <code>val1 != val2</code> and
-                        <code>val1 ne val2</code> are equivalent.
+                        The inequality <code>!=</code> operator checks whether its two operands are not equal,
+                        returning a Boolean result. Unlike the strict inequality operator, it attempts to convert and
+                        compare operands that are of different types.
+                    </td>
+                </tr>
+                <tr>
+                    <td>Strict-Equality</td>
+                    <td>The strict equality <code>===</code> operator checks whether its two operands are equal,
+                        returning a Boolean result. Unlike the equality operator, the strict equality operator always
+                        considers operands of different types to be different.
+                    </td>
+                </tr>
+                <tr>
+                    <td>Strict Inequality</td>
+                    <td>
+                        The strict inequality <code>!==</code> operator checks whether its two operands are not equal,
+                        returning a Boolean result. Unlike the inequality operator, the strict inequality operator
+                        always considers operands of different types to be different
                     </td>
                 </tr>
                 <tr>
@@ -916,6 +929,13 @@
                     <td>
                         The unary <code>size</code> operator behaves exactly as the corresponding function <code>size()</code>.
                         For example <code>size [1,2,3]</code> and <code>size([1,2,3])</code> are equivalent
+                    </td>
+                </tr>
+                <tr>
+                    <td>instanceof/!instanceof</td>
+                    <td>The instanceof operator allows to check whether an object belongs to a certain class.
+                        It is using Class.isInstance to perform the check. As a convenience, {{ !instanceof }} is
+                        supported as well.
                     </td>
                 </tr>
             </table>

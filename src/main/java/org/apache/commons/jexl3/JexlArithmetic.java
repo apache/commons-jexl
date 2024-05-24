@@ -2086,8 +2086,8 @@ public class JexlArithmetic {
         if (left == null || right == null) {
             return false;
         }
-        if (left.getClass().equals(right.getClass()) && left instanceof Comparable<?>) {
-            return ((Comparable) left).compareTo((Comparable) right) == 0;
+        if (left.getClass().equals(right.getClass())) {
+            return left.equals(right);
         }
         return false;
     }

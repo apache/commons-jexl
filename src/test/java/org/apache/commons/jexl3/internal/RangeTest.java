@@ -20,6 +20,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
+import org.apache.commons.jexl3.JexlFeatures;
 import org.apache.commons.jexl3.JexlTestCase;
 import org.junit.After;
 import org.junit.Assert;
@@ -169,7 +170,73 @@ public class RangeTest extends JexlTestCase {
         } catch (final NoSuchElementException xns) {
             // ok
         }
+    }
 
+    @Test
+    public void testAscIterator() {
+        Iterator<Integer> ii = new AscIntegerIterator(3, 5);
+        Integer i = 3;
+        while(ii.hasNext()) {
+            Assert.assertEquals(i, ii.next());
+            i += 1;
+        }
+        try {
+            ii.next();
+            Assert.fail("iterator exhausted");
+        } catch(NoSuchElementException e) {
+            Assert.assertNotNull(e);
+        }
+        try {
+            ii.remove();
+            Assert.fail("remove not implemented");
+        } catch(UnsupportedOperationException e) {
+            Assert.assertNotNull(e);
+        }
+    }
+
+    @Test
+    public void testAscLongIterator() {
+        Iterator<Long> ii = new AscLongIterator(3L, 5L);
+        Long i = 3L;
+        while(ii.hasNext()) {
+            Assert.assertEquals(i, ii.next());
+            i += 1;
+        }
+        try {
+            ii.next();
+            Assert.fail("iterator exhausted");
+        } catch(NoSuchElementException e) {
+            Assert.assertNotNull(e);
+        }
+        try {
+            ii.remove();
+            Assert.fail("remove not implemented");
+        } catch(UnsupportedOperationException e) {
+            Assert.assertNotNull(e);
+        }
+    }
+
+
+    @Test
+    public void testSource() {
+        JexlFeatures features = JexlFeatures.createDefault();
+        Source src0 = new Source(features, "x -> -x");
+        Source src0b = new Source(features, "x -> -x");
+        Source src1 = new Source(features, "x -> +x");
+        Assert.assertEquals(7, src0.length());
+        Assert.assertEquals(src0, src0);
+        Assert.assertEquals(src0, src0b);
+        Assert.assertNotEquals(src0, src1);
+        Assert.assertEquals(src0.hashCode(), src0b.hashCode());
+        Assert.assertNotEquals(src0.hashCode(), src1.hashCode());
+        Assert.assertTrue(src0.compareTo(src0b) == 0);
+        Assert.assertTrue(src0.compareTo(src1) > 0);
+        Assert.assertTrue(src1.compareTo(src0) < 0);
+    }
+
+    @Test public void testMisc() {
+        Assert.assertEquals("?", Scope.UNDEFINED.toString());
+        Assert.assertEquals("??", Scope.UNDECLARED.toString());
     }
 }
 

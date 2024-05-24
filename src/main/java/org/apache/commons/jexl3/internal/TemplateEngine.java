@@ -1036,21 +1036,6 @@ public final class TemplateEngine extends JxltEngine {
             return body;
         }
 
-        @Override
-        public String toString() {
-            if (BlockType.VERBATIM.equals(type)) {
-                return body;
-            }
-            // CHECKSTYLE:OFF
-            final StringBuilder strb = new StringBuilder(64); // CSOFF: MagicNumber
-            // CHECKSTYLE:ON
-            final Iterator<CharSequence> lines = readLines(new StringReader(body));
-            while (lines.hasNext()) {
-                strb.append("$$").append(lines.next());
-            }
-            return strb.toString();
-        }
-
         /**
          * Appends this block string representation to a builder.
          * @param strb   the string builder to append to
@@ -1136,11 +1121,6 @@ public final class TemplateEngine extends JxltEngine {
                     next = doNext();
                 }
                 return current;
-            }
-
-            @Override
-            public void remove() {
-                throw new UnsupportedOperationException("Not supported.");
             }
         };
     }

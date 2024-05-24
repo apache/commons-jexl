@@ -299,7 +299,7 @@ public class Interpreter extends InterpreterBase {
             final Object result = operators.tryOverload(node, JexlOperator.SHIFTRIGHTU, left, right);
             return result != JexlEngine.TRY_FAILED ? result : arithmetic.shiftRightUnsigned(left, right);
         } catch (final ArithmeticException xrt) {
-            throw new JexlException(findNullOperand(node, left, right), ">> error", xrt);
+            throw new JexlException(findNullOperand(node, left, right), ">>> error", xrt);
         }
     }
 
@@ -519,7 +519,7 @@ public class Interpreter extends InterpreterBase {
             }
             return number;
         } catch (final ArithmeticException xrt) {
-            throw new JexlException(valNode, "- error", xrt);
+            throw new JexlException(valNode, "+ error", xrt);
         }
     }
 

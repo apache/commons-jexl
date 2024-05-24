@@ -261,11 +261,6 @@ final class AscIntegerIterator implements Iterator<Integer> {
         }
         throw new NoSuchElementException();
     }
-
-    @Override
-    public void remove() {
-        throw new UnsupportedOperationException("Not supported.");
-    }
 }
 
 /**
@@ -300,10 +295,5 @@ final class DescIntegerIterator implements Iterator<Integer> {
             return cursor--;
         }
         throw new NoSuchElementException();
-    }
-
-    @Override
-    public void remove() {
-        throw new UnsupportedOperationException("Not supported.");
     }
 }
