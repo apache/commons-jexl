@@ -50,9 +50,4 @@ public class EnumerationIterator<T> implements Iterator<T> {
     public boolean hasNext() {
         return enumeration.hasMoreElements();
     }
-
-    @Override
-    public void remove() {
-        // not implemented
-    }
 }
