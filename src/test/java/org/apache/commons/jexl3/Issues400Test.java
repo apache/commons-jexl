@@ -397,8 +397,18 @@ public class Issues400Test {
     }
   }
 
+  public static class VinzCaller {
+    private final JexlContext context;
+    VinzCaller(JexlContext context) {
+      this.context = context;
+    }
+    public Object execute(JexlScript script) {
+      return script.execute(context);
+    }
+  }
+
   @Test
-  public void testNamespaceVsTernary() {
+  public void testNamespaceVsTernary0() {
     VinzContext ctxt = new VinzContext();
     ctxt.set("Users", "USERS");
     final JexlEngine jexl = new JexlBuilder().safe(false).strict(true).silent(false).create();
@@ -412,5 +422,24 @@ public class Issues400Test {
     script = (JexlScript) r;
     r = script.execute(ctxt);
     Assert.assertEquals("USERS.user", r);
+  }
+
+  @Test
+  public void testNamespaceVsTernary1() {
+    VinzContext ctxt = new VinzContext();
+    ctxt.set("Users", "USERS");
+    ctxt.set("vinz", new VinzCaller(ctxt));
+    final JexlEngine jexl = new JexlBuilder().safe(false).strict(true).silent(false).create();
+    JexlScript script = jexl.createScript(
+ "vinz.execute(() -> {\n"
+        + "  var test = 42;\n"
+        + "  var user = useTest ? test : member(Users, 'user');\n"
+        + "})\n" , "useTest");
+    Object r = script.execute(ctxt, false);
+    Assert.assertNotNull(r);
+    Assert.assertEquals("USERS.user", r);
+    r = script.execute(ctxt, true);
+    Assert.assertNotNull(r);
+    Assert.assertEquals(42, r);
   }
 }

@@ -1142,9 +1142,16 @@ void MethodCall() #void : {}
     (MemberAccess() (LOOKAHEAD(<LPAREN>) Arguments())+) #MethodNode(>1)
 }
 
+
+void MethodCallLookahead() #void : {}
+{
+    MemberAccess() <LPAREN>
+}
+
+
 void MemberExpression() #void : {}
 {
-    LOOKAHEAD(MethodCall()) MethodCall() | MemberAccess()
+    LOOKAHEAD(MethodCallLookahead()) MethodCall() | MemberAccess()
 }
 
 void ValueExpression() #void : {}
