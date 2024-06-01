@@ -64,8 +64,8 @@ public class DoWhileTest extends JexlTestCase {
 
     @Test
     public void testForEachContinueInsideFunction() throws Exception {
-        final JexlException.Parsing xparse = assertThrows(JexlException.Parsing.class, () -> JEXL.createScript("for (i : 1..2) {  y = function() { continue; } }"),
-                "break is out of loop!");
+        final JexlException.Parsing xparse = assertThrows(JexlException.Parsing.class,
+                () -> JEXL.createScript("for (i : 1..2) {  y = function() { continue; } }"), "break is out of loop!");
         final String str = xparse.detailedMessage();
         assertTrue(str.contains("continue"));
     }
