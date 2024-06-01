@@ -16,7 +16,9 @@
  */
 package org.apache.commons.jexl3;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.Serializable;
 import java.util.AbstractCollection;
@@ -31,7 +33,6 @@ import java.util.Set;
 
 import org.apache.commons.jexl3.internal.ArrayBuilder;
 import org.apache.commons.jexl3.internal.introspection.ClassMisc;
-import org.junit.Assert;
 import org.junit.Test;
 
 /**
