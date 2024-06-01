@@ -1328,13 +1328,9 @@ public class JXLTTest extends JexlTestCase {
         // @formatter:on
         final JxltEngine.Template tmplt = JXLT.createTemplate("$$", new StringReader(src));
         final Writer strw = new StringWriter();
-        try {
-            tmplt.evaluate(ctxt, strw);
-            fail("tab var is null");
-        } catch (final JexlException.Variable xvar) {
-            assertEquals("tab", xvar.getVariable());
-            assertFalse(xvar.isUndefined());
-        }
+        final JexlException.Variable xvar = assertThrows(JexlException.Variable.class, () -> tmplt.evaluate(ctxt, strw));
+        assertEquals("tab", xvar.getVariable());
+        assertFalse(xvar.isUndefined());
     }
 
     @ParameterizedTest
