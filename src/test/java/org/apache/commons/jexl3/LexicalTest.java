@@ -57,7 +57,7 @@ public class LexicalTest {
         public Object processAnnotation(final String name, final Object[] args, final Callable<Object> statement) throws Exception {
             // transient side effect for strict
             if ("scale".equals(name)) {
-                final JexlOptions options = this.getEngineOptions();
+                final JexlOptions options = getEngineOptions();
                 final int scale = options.getMathScale();
                 final int newScale = (Integer) args[0];
                 options.setMathScale(newScale);
