@@ -168,12 +168,6 @@ public class JXLTTest extends JexlTestCase {
         super("JXLTTest");
     }
 
-    private void init(final JexlBuilder builder) {
-        BUILDER = builder;
-        ENGINE = BUILDER.create();
-        JXLT = ENGINE.createJxltEngine();
-    }
-
     boolean contains(final Set<List<String>> set, final List<String> list) {
         for (final List<String> sl : set) {
             if (sl.equals(list)) {
@@ -196,6 +190,12 @@ public class JXLTTest extends JexlTestCase {
         }
         return tostring;
 
+    }
+
+    private void init(final JexlBuilder builder) {
+        BUILDER = builder;
+        ENGINE = BUILDER.create();
+        JXLT = ENGINE.createJxltEngine();
     }
 
     private boolean isLexicalShade() {
