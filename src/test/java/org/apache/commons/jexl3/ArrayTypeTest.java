@@ -37,12 +37,6 @@ import org.junit.Test;
  * from its entries when possible.
  */
 public class ArrayTypeTest {
-  // A dependency tree with some complexity follows:
-  public interface Inter0 {}
-  public interface InterA {}
-  public interface InterB {}
-  public interface InterC {}
-  public interface InterX extends InterB {}
   public abstract static class Class0 implements Inter0 {
     private int value;
     public Class0(int v) {
@@ -55,9 +49,6 @@ public class ArrayTypeTest {
   public static class ClassA extends Class0 implements InterA {
     public ClassA(int v) { super(v); }
   }
-  public static class ClassX extends Class0 implements InterX {
-    public ClassX(int v) { super(v); }
-  }
   public static class ClassB extends ClassA implements InterB {
     public ClassB(int v) { super(v); }
   }
@@ -69,6 +60,15 @@ public class ArrayTypeTest {
       return getClass().getSimpleName() + "{" + Integer.toHexString(hashCode()) + "}";
     }
   }
+  public static class ClassX extends Class0 implements InterX {
+    public ClassX(int v) { super(v); }
+  }
+  // A dependency tree with some complexity follows:
+  public interface Inter0 {}
+  public interface InterA {}
+  public interface InterB {}
+  public interface InterC {}
+  public interface InterX extends InterB {}
 
   @Test
   public void testArrayTypes() {
