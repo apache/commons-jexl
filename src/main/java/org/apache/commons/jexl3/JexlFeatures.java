@@ -123,7 +123,7 @@ public final class JexlFeatures {
      * All features.
      * N.B. ensure this is updated if additional features are added.
      */
-    private static final long ALL_FEATURES = (1L << (CONST_CAPTURE + 1)) - 1L; // MUST REMAIN PRIVATE
+    private static final long ALL_FEATURES = (1L << CONST_CAPTURE + 1) - 1L; // MUST REMAIN PRIVATE
     /**
      * The default features flag mask.
      * <p>Meant for compatibility with scripts written before 3.3.1</p>
@@ -165,11 +165,11 @@ public final class JexlFeatures {
      */
     private static final Set<String> RESERVED_WORDS =
         Collections.unmodifiableSet(
-            new HashSet<>((Arrays.asList(
-                "switch", "case", "default", "class", "jexl", "$jexl"))));
+            new HashSet<>(Arrays.asList(
+                "switch", "case", "default", "class", "jexl", "$jexl")));
 
     /*
-     * *WARNING* 
+     * *WARNING*
      * Static fields may be inlined by the Java compiler, so their _values_ effectively form part of the external API.
      * Classes that reference them need to be recompiled to pick up new values.
      * This means that changes in value are not binary compatible.
