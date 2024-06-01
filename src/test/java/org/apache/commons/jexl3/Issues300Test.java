@@ -760,12 +760,7 @@ public class Issues300Test {
     @Test
     public void test361_33() {
         final JexlEngine jexl = new JexlBuilder().safe(false).strict(true).create();
-        try {
-            run361c(jexl);
-            fail("null arg should fail");
-        } catch (final JexlException xany) {
-            assertNotNull(xany);
-        }
+        assertThrows(JexlException.class, () -> run361c(jexl), "null arg should fail");
     }
 
     @Test
@@ -778,12 +773,7 @@ public class Issues300Test {
     @Test
     public void test361a_33() {
         final JexlEngine jexl = new JexlBuilder().safe(false).strict(true).create();
-        try {
-            final Object result = run361a(jexl);
-            fail("null arg should fail");
-        } catch (final JexlException xany) {
-            assertNotNull(xany);
-        }
+        assertThrows(JexlException.class, () -> run361a(jexl), "null arg should fail");
     }
 
     @Test
@@ -796,12 +786,7 @@ public class Issues300Test {
     @Test
     public void test361b_33() {
         final JexlEngine jexl = new JexlBuilder().safe(false).strict(true).create();
-        try {
-            final Object result = run361b(jexl);
-            fail("null arg should fail");
-        } catch (final JexlException xany) {
-            assertNotNull(xany);
-        }
+        assertThrows(JexlException.class, () -> run361b(jexl), "null arg should fail");
     }
 
     @Test
@@ -821,12 +806,7 @@ public class Issues300Test {
     @Test
     public void test361d_33() {
         final JexlEngine jexl = new JexlBuilder().lexical(true).lexicalShade(true).safe(false).strict(true).create();
-        try {
-            final Object result = run361d(jexl);
-            fail("null arg should fail");
-        } catch (final JexlException xany) {
-            assertNotNull(xany);
-        }
+        assertThrows(JexlException.class, () -> run361d(jexl), "null arg should fail");
     }
 
     @Test public void test367() {
