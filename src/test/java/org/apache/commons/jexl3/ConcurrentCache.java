@@ -18,8 +18,9 @@ package org.apache.commons.jexl3;
 
 import java.util.Map;
 
-import com.googlecode.concurrentlinkedhashmap.ConcurrentLinkedHashMap;
 import org.apache.commons.jexl3.internal.SoftCache;
+
+import com.googlecode.concurrentlinkedhashmap.ConcurrentLinkedHashMap;
 
 /**
  * A cache whose underlying map is a ConcurrentLinkedHashMap.
