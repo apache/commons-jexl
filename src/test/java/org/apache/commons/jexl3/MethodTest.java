@@ -684,12 +684,8 @@ public class MethodTest extends JexlTestCase {
         assertEquals("foo + 42", result);
         // tryInvoke fails
         func.setKill(true);
-        try {
-            /*result = */method.tryInvoke("over", func, "foo", 42);
-            fail("should throw TryFailed");
-        } catch (final JexlException.TryFailed xfail) {
-            assertEquals(UnsupportedOperationException.class, xfail.getCause().getClass());
-        }
+        JexlException.TryFailed xfail = assertThrows(JexlException.TryFailed.class, () -> method.tryInvoke("over", func, "foo", 42));
+        assertEquals(UnsupportedOperationException.class, xfail.getCause().getClass());
 
         func.setKill(false);
         final JexlPropertySet setter = uber.getPropertySet(func, "under", "42");
@@ -703,23 +699,16 @@ public class MethodTest extends JexlTestCase {
         assertEquals("42", result);
 
         func.setKill(true);
-        try {
-            /*result = */setter.tryInvoke(func, "under", "42");
-            fail("should throw TryFailed");
-        } catch (final JexlException.TryFailed xfail) {
-            assertEquals(UnsupportedOperationException.class, xfail.getCause().getClass());
-        }
+        xfail = assertThrows(JexlException.TryFailed.class, () -> setter.tryInvoke(func, "under", "42"), "should throw TryFailed");
+        assertEquals(UnsupportedOperationException.class, xfail.getCause().getClass());
+
         func.setKill(false);
         result = setter.tryInvoke(func, "under", "-42");
         assertEquals("-42", result);
 
         func.setKill(true);
-        try {
-            /*result = */getter.tryInvoke(func, "under");
-            fail("should throw TryFailed");
-        } catch (final JexlException.TryFailed xfail) {
-            assertEquals(UnsupportedOperationException.class, xfail.getCause().getClass());
-        }
+        xfail = assertThrows(JexlException.TryFailed.class, () -> getter.tryInvoke(func, "under"), "should throw TryFailed");
+        assertEquals(UnsupportedOperationException.class, xfail.getCause().getClass());
 
         func.setKill(false);
         result = getter.tryInvoke(func, "under");
