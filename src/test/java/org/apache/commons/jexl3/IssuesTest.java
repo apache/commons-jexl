@@ -18,6 +18,7 @@ package org.apache.commons.jexl3;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -203,15 +204,9 @@ public class IssuesTest extends JexlTestCase {
         // ensure errors will throw
         options.setStrict(true);
         options.setSilent(false);
-        try {
-            final String jexlExp = "(foo.getInner().foo() eq true) and (foo.getInner().goo() = (foo.getInner().goo()+1-1))";
-            final JexlExpression e = jexl.createExpression(jexlExp);
-            jc.set("foo", new Foo());
-            /* Object o = */ e.evaluate(jc);
-            fail("Should have failed due to invalid assignment");
-        } catch (final JexlException.Assignment xparse) {
-            final String dbg = xparse.toString();
-        }
+        final String jexlExp = "(foo.getInner().foo() eq true) and (foo.getInner().goo() = (foo.getInner().goo()+1-1))";
+        jc.set("foo", new Foo());
+        assertNotNull(assertThrows(JexlException.Assignment.class, () -> jexl.createExpression(jexlExp)).toString());
     }
 
     // JEXL-49: blocks not parsed (fixed)
