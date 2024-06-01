@@ -18,6 +18,7 @@ package org.apache.commons.jexl3.introspection;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -43,11 +44,10 @@ import org.junit.jupiter.api.Test;
 /**
  * Tests sandbox features.
  */
-@SuppressWarnings({"UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
+@SuppressWarnings({ "UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes" })
 public class SandboxTest extends JexlTestCase {
     public abstract static class AbstractCallMeNot {
-        public @NoJexl
-        String NONO = "should not be accessible!";
+        public @NoJexl String NONO = "should not be accessible!";
 
         public String allowInherit() {
             return "this is allowed";
@@ -62,12 +62,15 @@ public class SandboxTest extends JexlTestCase {
     public static class Arithmetic350 extends JexlArithmetic {
         // cheat and keep the map builder around
         MapBuilder mb = new org.apache.commons.jexl3.internal.MapBuilder(3);
+
         public Arithmetic350(final boolean astrict) {
             super(astrict);
         }
-        Map<?,?> getLastMap() {
-            return (Map<Object,Object>) mb.create();
+
+        Map<?, ?> getLastMap() {
+            return (Map<Object, Object>) mb.create();
         }
+
         @Override
         public MapBuilder mapBuilder(final int size, final boolean extended) {
             return mb;
@@ -94,8 +97,7 @@ public class SandboxTest extends JexlTestCase {
             this.alias = name + "-alias";
         }
 
-        public @NoJexl
-        Foo(final String name, final String notcallable) {
+        public @NoJexl Foo(final String name, final String notcallable) {
             throw new UnsupportedOperationException("should not be callable!");
         }
 
@@ -161,11 +163,13 @@ public class SandboxTest extends JexlTestCase {
 
     public abstract static class Operation {
         protected final int base;
+
         public Operation(final int sz) {
-         base = sz;
+            base = sz;
         }
 
         public abstract int nonCallable(int y);
+
         public abstract int someOp(int x);
     }
 
@@ -220,14 +224,10 @@ public class SandboxTest extends JexlTestCase {
 
         jc.set("foo", new CantSeeMe());
         script = sjexl.createScript(expr);
-        try {
-            result = script.execute(jc);
-            fail("should have failed, doIt()");
-        } catch (final JexlException xany) {
-            //
-        }
+        assertThrows(JexlException.class, () -> script.execute(jc));
+
         jc.set("foo", new Foo("42"));
-            result = script.execute(jc);
+        result = script.execute(jc);
         assertEquals(42, ((Integer) result).intValue());
     }
 
@@ -249,7 +249,7 @@ public class SandboxTest extends JexlTestCase {
     @Test
     public void testCtorBlock() throws Exception {
         final String expr = "new('" + Foo.class.getName() + "', '42')";
-        JexlScript script = JEXL.createScript(expr);
+        final JexlScript script = JEXL.createScript(expr);
         Object result;
         result = script.execute(null);
         assertEquals("42", ((Foo) result).getName());
@@ -258,14 +258,9 @@ public class SandboxTest extends JexlTestCase {
         sandbox.block(Foo.class.getName()).execute("");
         final JexlEngine sjexl = new JexlBuilder().sandbox(sandbox).strict(true).safe(false).create();
 
-        script = sjexl.createScript(expr);
-        try {
-            result = script.execute(null);
-            fail("ctor should not be accessible");
-        } catch (final JexlException.Method xmethod) {
-            // ok, ctor should not have been accessible
-            LOGGER.debug(xmethod.toString());
-        }
+        final JexlScript script2 = sjexl.createScript(expr);
+        assertThrows(JexlException.Method.class, () -> script2.execute(null), "ctor should not be accessible");
+
     }
 
     @Test
@@ -302,14 +297,8 @@ public class SandboxTest extends JexlTestCase {
         sandbox.block(Foo.class.getName()).read("alias");
         final JexlEngine sjexl = new JexlBuilder().sandbox(sandbox).strict(true).safe(false).create();
 
-        script = sjexl.createScript(expr, "foo");
-        try {
-            result = script.execute(null, foo);
-            fail("alias should not be accessible");
-        } catch (final JexlException.Property xvar) {
-            // ok, alias should not have been accessible
-            LOGGER.debug(xvar.toString());
-        }
+        final JexlScript script2 = sjexl.createScript(expr, "foo");
+        assertThrows(JexlException.Property.class, () -> script2.execute(null, foo), "alias should not be accessible");
     }
 
     @Test
@@ -319,6 +308,7 @@ public class SandboxTest extends JexlTestCase {
         final Object o = expression.evaluate(null);
         assertEquals("foo", o);
     }
+
     @Test
     public void testGetNullKeyAllowed1() throws Exception {
         final JexlSandbox sandbox = new JexlSandbox(true, true);
@@ -326,18 +316,14 @@ public class SandboxTest extends JexlTestCase {
         p.read().add("quux");
         final JexlEngine jexl = new JexlBuilder().sandbox(sandbox).create();
         // cant read quux
-        final String q = "'quux'"; //quotes are important!
-        JexlExpression expression = jexl.createExpression("{"+q+" : 'foo'}["+q+"]");
-        try {
-            final Object o = expression.evaluate(null);
-            fail("should have blocked " + q);
-        } catch (final JexlException.Property xp) {
-            assertTrue(xp.getMessage().contains("undefined"));
-        }
+        final String q = "'quux'"; // quotes are important!
+        final JexlExpression expression = jexl.createExpression("{" + q + " : 'foo'}[" + q + "]");
+        assertTrue(assertThrows(JexlException.Property.class, () -> expression.evaluate(null), "should have blocked " + q).getMessage().contains("undefined"));
+
         // can read foo, null
-        for(final String k : Arrays.asList("'foo'", "null")) {
-            expression = jexl.createExpression("{"+k+" : 'foo'}["+k+"]");
-            final Object o = expression.evaluate(null);
+        for (final String k : Arrays.asList("'foo'", "null")) {
+            final JexlExpression expression2 = jexl.createExpression("{" + k + " : 'foo'}[" + k + "]");
+            final Object o = expression2.evaluate(null);
             assertEquals("foo", o);
         }
     }
@@ -354,16 +340,13 @@ public class SandboxTest extends JexlTestCase {
         final Object r0 = e0.evaluate(null);
         assertEquals("foo", r0);
         // can not read quux, null
-        for(final String k : Arrays.asList("'quux'", "null")) {
-            final JexlExpression expression = jexl.createExpression("{"+k+" : 'foo'}["+k+"]");
-            try {
-                final Object o = expression.evaluate(null);
-                fail("should have blocked " + k);
-            } catch (final JexlException.Property xp) {
-                assertTrue(xp.getMessage().contains("undefined"));
-            }
+        for (final String k : Arrays.asList("'quux'", "null")) {
+            final JexlExpression expression = jexl.createExpression("{" + k + " : 'foo'}[" + k + "]");
+            assertTrue(
+                    assertThrows(JexlException.Property.class, () -> expression.evaluate(null), "should have blocked " + k).getMessage().contains("undefined"));
         }
     }
+
     @Test
     public void testInheritedPermission0() {
         final Foo386 foo = new Foo386();
@@ -373,6 +356,7 @@ public class SandboxTest extends JexlTestCase {
         final JexlScript someOp = sjexl.createScript("foo.bar()", "foo");
         assertEquals(42, someOp.execute(null, foo));
     }
+
     @Test
     public void testInheritedPermission1() {
         final Quux386 foo = new Quux386();
@@ -398,6 +382,7 @@ public class SandboxTest extends JexlTestCase {
         result = script.execute(null, foo);
         assertEquals(foo.Quux(), result);
     }
+
     @Test
     public void testMethodBlock() throws Exception {
         final String expr = "foo.Quux()";
@@ -411,53 +396,35 @@ public class SandboxTest extends JexlTestCase {
         sandbox.block(Foo.class.getName()).execute("Quux");
         final JexlEngine sjexl = new JexlBuilder().sandbox(sandbox).strict(true).safe(false).create();
 
-        script = sjexl.createScript(expr, "foo");
-        try {
-            result = script.execute(null, foo);
-            fail("Quux should not be accessible");
-        } catch (final JexlException.Method xmethod) {
-            // ok, Quux should not have been accessible
-            LOGGER.debug(xmethod.toString());
-        }
+        JexlScript script2 = sjexl.createScript(expr, "foo");
+        assertThrows(JexlException.Method.class, () -> script2.execute(null, foo), "Quux should not be accessible");
     }
+
     @Test
     public void testMethodNoJexl() throws Exception {
         final Foo foo = new Foo("42");
-        final String[] exprs = {
-            "foo.cantCallMe()",
-            "foo.tryMe()",
-            "foo.tryMeARiver()",
-            "foo.callMeNot()",
-            "foo.NONO",
-            "new('org.apache.commons.jexl3.SandboxTest$Foo', 'one', 'two')"
-        };
-        JexlScript script;
-        Object result;
-
+        // @formatter:off
+        final String[] exprs = { 
+                "foo.cantCallMe()",
+                "foo.tryMe()",
+                "foo.tryMeARiver()",
+                "foo.callMeNot()",
+                "foo.NONO",
+                "new('org.apache.commons.jexl3.SandboxTest$Foo', 'one', 'two')" };
+        // @formatter:off
         final JexlEngine sjexl = new JexlBuilder().strict(true).safe(false).create();
         for (final String expr : exprs) {
-            script = sjexl.createScript(expr, "foo");
-            try {
-                result = script.execute(null, foo);
-                fail("should have not been possible");
-            } catch (JexlException.Method | JexlException.Property xjm) {
-                // ok
-                LOGGER.debug(xjm.toString());
-            }
+            final JexlScript script = sjexl.createScript(expr, "foo");
+            assertThrows(JexlException.class, () -> script.execute(null, foo), "should have not been possible");
         }
     }
+
     @Test
     public void testNoJexl312() throws Exception {
         final JexlContext ctxt = new MapContext();
-
         final JexlEngine sjexl = new JexlBuilder().safe(false).strict(true).create();
         final JexlScript foo = sjexl.createScript("x.getFoo()", "x");
-        try {
-            foo.execute(ctxt, new Foo44());
-            fail("should have thrown");
-        } catch (final JexlException xany) {
-            assertNotNull(xany);
-        }
+        assertThrows(JexlException.class, () -> foo.execute(ctxt, new Foo44()));
     }
 
     @Test
@@ -467,14 +434,7 @@ public class SandboxTest extends JexlTestCase {
         sandbox.permissions(SomeInterface.class.getName(), false, true, true, true);
         final JexlEngine sjexl = new JexlBuilder().sandbox(sandbox).safe(false).strict(true).create();
         final JexlScript someOp = sjexl.createScript("foo.bar()", "foo");
-
-        try {
-            someOp.execute(null, foo);
-            fail("should not be possible");
-        } catch (final JexlException e) {
-            // ok
-            LOGGER.debug(e.toString());
-        }
+        assertThrows(JexlException.class, () -> someOp.execute(null, foo), "should not be possible");
     }
 
     @Test
@@ -484,14 +444,7 @@ public class SandboxTest extends JexlTestCase {
         sandbox.permissions(Foo386.class.getName(), false, true, true, true);
         final JexlEngine sjexl = new JexlBuilder().sandbox(sandbox).safe(false).strict(true).create();
         final JexlScript someOp = sjexl.createScript("foo.bar()", "foo");
-
-        try {
-            someOp.execute(null, foo);
-            fail("should not be possible");
-        } catch (final JexlException e) {
-            // ok
-            LOGGER.debug(e.toString());
-        }
+        assertThrows(JexlException.class, () -> someOp.execute(null, foo), "should not be possible");
     }
 
     @Test
@@ -503,50 +456,21 @@ public class SandboxTest extends JexlTestCase {
         sandbox.allow(System.class.getName()).execute("currentTimeMillis");
         // can not create a new file
         sandbox.block(java.io.File.class.getName()).execute("");
-
-        final JexlEngine sjexl = new JexlBuilder()
-                .permissions(JexlPermissions.UNRESTRICTED)
-                .sandbox(sandbox)
-                .safe(false)
-                .strict(true)
-                .create();
-
-        String expr;
-        JexlScript script;
+        final JexlEngine sjexl = new JexlBuilder().permissions(JexlPermissions.UNRESTRICTED).sandbox(sandbox).safe(false).strict(true).create();
         Object result;
-
-        script = sjexl.createScript("System.exit()");
-        try {
-            result = script.execute(context);
-            fail("should not allow calling exit!");
-        } catch (final JexlException xjexl) {
-            LOGGER.debug(xjexl.toString());
-        }
-
-        script = sjexl.createScript("System.exit(1)");
-        try {
-            result = script.execute(context);
-            fail("should not allow calling exit!");
-        } catch (final JexlException xjexl) {
-            LOGGER.debug(xjexl.toString());
-        }
-
-        script = sjexl.createScript("new('java.io.File', '/tmp/should-not-be-created')");
-        try {
-            result = script.execute(context);
-            fail("should not allow creating a file");
-        } catch (final JexlException xjexl) {
-            LOGGER.debug(xjexl.toString());
-        }
-
-        expr = "System.currentTimeMillis()";
-        script = sjexl.createScript("System.currentTimeMillis()");
-        result = script.execute(context);
+        final JexlScript script1 = sjexl.createScript("System.exit()");
+        assertThrows(JexlException.class, () -> script1.execute(context), "should not allow calling exit!");
+        final JexlScript script2 = sjexl.createScript("System.exit(1)");
+        assertThrows(JexlException.class, () -> script2.execute(context), "should not allow calling exit!");
+        final JexlScript script3 = sjexl.createScript("new('java.io.File', '/tmp/should-not-be-created')");
+        assertThrows(JexlException.class, () -> script3.execute(context), "should not allow creating a file");
+        final JexlScript script4 = sjexl.createScript("System.currentTimeMillis()");
+        result = script4.execute(context);
         assertNotNull(result);
     }
 
     @Test
-       public void testSandboxInherit0() throws Exception {
+    public void testSandboxInherit0() throws Exception {
         Object result;
         final JexlContext ctxt = null;
         final List<String> foo = new ArrayList<>();
@@ -580,19 +504,13 @@ public class SandboxTest extends JexlTestCase {
         final JexlSandbox sandbox = new JexlSandbox(false, true);
         sandbox.allow(Operation.class.getName());
         sandbox.block(Operation.class.getName()).execute("nonCallable");
-        //sandbox.block(Foo.class.getName()).execute();
+        // sandbox.block(Foo.class.getName()).execute();
         final JexlEngine sjexl = new JexlBuilder().sandbox(sandbox).safe(false).strict(true).create();
         final JexlScript someOp = sjexl.createScript("foo.someOp(y)", "foo", "y");
         result = someOp.execute(ctxt, foo, 30);
         assertEquals(42, result);
         final JexlScript nonCallable = sjexl.createScript("foo.nonCallable(y)", "foo", "y");
-        try {
-            result = nonCallable.execute(null, foo, 0);
-            fail("should not be possible");
-        } catch (final JexlException xjm) {
-            // ok
-            LOGGER.debug(xjm.toString());
-        }
+        assertThrows(JexlException.class, () -> nonCallable.execute(null, foo, 0));
     }
 
     @Test
@@ -615,24 +533,19 @@ public class SandboxTest extends JexlTestCase {
     @Test
     public void testSetBlock() throws Exception {
         final String expr = "foo.alias = $0";
-        JexlScript script = JEXL.createScript(expr, "foo", "$0");
+        final JexlScript script1 = JEXL.createScript(expr, "foo", "$0");
         final Foo foo = new Foo("42");
         Object result;
-        result = script.execute(null, foo, "43");
+        result = script1.execute(null, foo, "43");
         assertEquals("43", result);
 
         final JexlSandbox sandbox = new JexlSandbox();
         sandbox.block(Foo.class.getName()).write("alias");
         final JexlEngine sjexl = new JexlBuilder().sandbox(sandbox).strict(true).safe(false).create();
 
-        script = sjexl.createScript(expr, "foo", "$0");
-        try {
-            result = script.execute(null, foo, "43");
-            fail("alias should not be accessible");
-        } catch (final JexlException.Property xvar) {
-            // ok, alias should not have been accessible
-            LOGGER.debug(xvar.toString());
-        }
+        JexlScript script2 = sjexl.createScript(expr, "foo", "$0");
+        assertThrows(JexlException.class, () -> script2.execute(null, foo, "43"), "alias should not be accessible");
+
     }
 
     @Test
@@ -642,7 +555,7 @@ public class SandboxTest extends JexlTestCase {
         final JexlContext jc = new MapContext();
         final JexlExpression expression = jexl.createExpression("{null : 'foo'}[null] = 'bar'");
         expression.evaluate(jc);
-        final Map<?,?> map = a350.getLastMap();
+        final Map<?, ?> map = a350.getLastMap();
         assertEquals("bar", map.get(null));
     }
 
@@ -654,22 +567,17 @@ public class SandboxTest extends JexlTestCase {
         p.write().add("quux");
         final JexlEngine jexl = new JexlBuilder().arithmetic(a350).sandbox(sandbox).create();
         // can not write quux
-        final String q = "'quux'"; //quotes are important!
-        JexlExpression expression = jexl.createExpression("{"+q+" : 'foo'}["+q+"] = '42'");
-        try {
-            final Object o = expression.evaluate(null);
-            fail("should have blocked " + q);
-        } catch (final JexlException.Property xp) {
-            assertTrue(xp.getMessage().contains("undefined"));
-        }
+        final String q = "'quux'"; // quotes are important!
+        final JexlExpression expression1 = jexl.createExpression("{" + q + " : 'foo'}[" + q + "] = '42'");
+        assertTrue(assertThrows(JexlException.Property.class, () -> expression1.evaluate(null), "should have blocked " + q).getMessage().contains("undefined"));
         // can write bar, null
-        expression = jexl.createExpression("{'bar' : 'foo'}['bar'] = '42'");
-        expression.evaluate(null);
+        JexlExpression expression2 = jexl.createExpression("{'bar' : 'foo'}['bar'] = '42'");
+        expression2.evaluate(null);
         Map<?, ?> map = a350.getLastMap();
         assertEquals("42", map.get("bar"));
         map.clear();
-        expression = jexl.createExpression("{null : 'foo'}[null] = '42'");
-        expression.evaluate(null);
+        expression2 = jexl.createExpression("{null : 'foo'}[null] = '42'");
+        expression2.evaluate(null);
         map = a350.getLastMap();
         assertEquals("42", map.get(null));
     }
@@ -685,17 +593,12 @@ public class SandboxTest extends JexlTestCase {
         // can write bar
         JexlExpression expression = jexl.createExpression("{'bar' : 'foo'}['bar'] = '42'");
         expression.evaluate(null);
-        final Map<?,?> map = a350.getLastMap();
+        final Map<?, ?> map = a350.getLastMap();
         assertEquals("42", map.get("bar"));
         // can not write quux, null
-        for(final String k : Arrays.asList("'quux'", "null")) {
-            expression = jexl.createExpression("{"+k+" : 'foo'}["+k+"] = '42'");
-            try {
-                final Object o = expression.evaluate(null);
-                fail("should have blocked " + k);
-            } catch (final JexlException.Property xp) {
-                assertTrue(xp.getMessage().contains("undefined"));
-            }
+        for (final String k : Arrays.asList("'quux'", "null")) {
+            final JexlExpression expression2 = jexl.createExpression("{" + k + " : 'foo'}[" + k + "] = '42'");
+            assertTrue(assertThrows(JexlException.Property.class, () -> expression2.evaluate(null), "should have blocked " + k).getMessage().contains("undefined"));
         }
     }
 }
