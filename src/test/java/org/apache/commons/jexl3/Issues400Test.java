@@ -45,16 +45,16 @@ public class Issues400Test {
 
   public static class VinzCaller {
     private final JexlContext context;
-    VinzCaller(JexlContext context) {
+    VinzCaller(final JexlContext context) {
       this.context = context;
     }
-    public Object execute(JexlScript script) {
+    public Object execute(final JexlScript script) {
       return script.execute(context);
     }
   }
 
   public static class VinzContext extends MapContext {
-    public String member(String m, String u) {
+    public String member(final String m, final String u) {
       return m + '.' + u;
     }
   }
@@ -65,19 +65,19 @@ public class Issues400Test {
    */
   public static class XuContext extends MapContext {
 
-    public String join(int[] list, String str) {
+    public String join(final int[] list, final String str) {
       return join(Arrays.stream(list).iterator(), str);
     }
 
-    public String join(Iterable<?> list, String str) {
+    public String join(final Iterable<?> list, final String str) {
       return join(list.iterator(), str);
     }
 
-    public String join(Iterator<?> iterator, String str) {
+    public String join(final Iterator<?> iterator, final String str) {
       if (!iterator.hasNext()) {
         return "";
       }
-      StringBuilder strb = new StringBuilder(256);
+      final StringBuilder strb = new StringBuilder(256);
       strb.append(iterator.next().toString());
       while(iterator.hasNext()) {
         strb.append(str);
@@ -216,24 +216,24 @@ public class Issues400Test {
         .safe(false)
         .create();
 
-    JexlContext context = new XuContext();
-    for(String src : Arrays.asList(
+    final JexlContext context = new XuContext();
+    for(final String src : Arrays.asList(
         "[1, 2, 3, 4, ...].join('-')", // List<Integer>
         "[1, 2, 3, 4,].join('-')", // int[]
         "(1 .. 4).join('-')", // iterable<Integer>
         "join([1, 2, 3, 4, ...], '-')",
         "join([1, 2, 3, 4], '-')",
         "join((1 .. 4), '-')")) {
-      JexlScript script = jexl.createScript(src);
-      Object result = script.execute(context);
+      final JexlScript script = jexl.createScript(src);
+      final Object result = script.execute(context);
       assertEquals("1-2-3-4", result, src);
     }
 
-    String src0 = "x.join('*')";
-    JexlScript script0 = jexl.createScript(src0, "x");
-    String src1 = "join(x, '*')";
-    JexlScript script1 = jexl.createScript(src1, "x");
-    for(Object x : Arrays.asList(
+    final String src0 = "x.join('*')";
+    final JexlScript script0 = jexl.createScript(src0, "x");
+    final String src1 = "join(x, '*')";
+    final JexlScript script1 = jexl.createScript(src1, "x");
+    for(final Object x : Arrays.asList(
         Arrays.asList(1, 2, 3, 4),
         new int[]{1, 2, 3, 4})) {
       Object result = script0.execute(context, x);
@@ -246,11 +246,11 @@ public class Issues400Test {
   @Test
   public void test407() {
     // Java version
-    double r = 99.0d + 7.82d -99.0d -7.82d;
+    final double r = 99.0d + 7.82d -99.0d -7.82d;
     assertEquals(0d, r, 8.e-15); // Not zero, IEEE 754
     // jexl
     final JexlEngine jexl = new JexlBuilder().create();
-    JexlScript script = jexl.createScript("a + b - a - b", "a", "b");
+    final JexlScript script = jexl.createScript("a + b - a - b", "a", "b");
     // using doubles, same as Java
     Number result = (Number) script.execute(null, 99.0d, 7.82d);
     assertEquals(0d, result.doubleValue(), 8.e-15);
@@ -266,7 +266,7 @@ public class Issues400Test {
     ctl.put("two", 2);
     final String fnsrc0 = "function f(x) { x }\n" +
         "let one = 'one', two = 'two';\n";
-    for(String map0 : Arrays.asList(
+    for(final String map0 : Arrays.asList(
         "{ one : f(1), two:f(2) }",
         "{ one: f(1), two: f(2) }",
         "{ one: f(1), two:f(2) }",
@@ -278,11 +278,11 @@ public class Issues400Test {
         final JexlScript e = jexl.createScript(fnsrc);
         final Object o = e.execute(jc);
         assertTrue(o instanceof Map);
-        Map<?, ?> map = (Map<?, ?>) o;
+        final Map<?, ?> map = (Map<?, ?>) o;
         assertEquals(map, ctl);
-      } catch (JexlException.Parsing xparse) {
+      } catch (final JexlException.Parsing xparse) {
         fail(fnsrc + " : " + xparse.getMessage());
-      } catch (JexlException xother) {
+      } catch (final JexlException xother) {
         fail(fnsrc + " : " + xother.getMessage());
       }
     }
@@ -308,7 +308,7 @@ public class Issues400Test {
     try {
       final Number result = (Number) script.execute(null, 12);
       fail("c should be const");
-    } catch(JexlException.Variable xvar) {
+    } catch(final JexlException.Variable xvar) {
       assertEquals("c", xvar.getVariable());
     }
   }
@@ -319,9 +319,9 @@ public class Issues400Test {
     final JexlEngine jexl = builder.create();
     final JexlScript script = jexl.createScript("#pragma jexl.options '+constCapture'\nvar c = 42; var f = y -> c += y; f(z)", "z");
     try {
-      Number result = (Number) script.execute(null, 12);
+      final Number result = (Number) script.execute(null, 12);
       fail("c should be const");
-    } catch(JexlException.Variable xvar) {
+    } catch(final JexlException.Variable xvar) {
       assertEquals("c", xvar.getVariable());
     }
   }
@@ -333,7 +333,7 @@ public class Issues400Test {
     try {
       final JexlScript script = jexl.createScript("var c = 42; var f = y -> c += y; f(z)", "z");
       fail("c should be const");
-    } catch(JexlException.Parsing xvar) {
+    } catch(final JexlException.Parsing xvar) {
       assertTrue(xvar.getMessage().contains("const"));
     }
   }
@@ -364,23 +364,23 @@ public class Issues400Test {
   @Test
   public void test419() throws NoSuchMethodException {
     // check RESTRICTED permissions denies call to System::currentTimeMillis()
-    Method currentTimeMillis = System.class.getMethod("currentTimeMillis");
+    final Method currentTimeMillis = System.class.getMethod("currentTimeMillis");
     assertFalse(RESTRICTED.allow(currentTimeMillis));
     // compose using a positive class permission to allow just System::currentTimeMillis()
-    JexlPermissions permissions = RESTRICTED.compose("java.lang { +System { currentTimeMillis(); } }");
+    final JexlPermissions permissions = RESTRICTED.compose("java.lang { +System { currentTimeMillis(); } }");
     // check no side effect on compose
     assertTrue(permissions.allow(currentTimeMillis));
     assertFalse(RESTRICTED.allow(currentTimeMillis));
 
     // An engine with the System class as namespace and the positive permissions
-    JexlEngine jexl = new JexlBuilder()
+    final JexlEngine jexl = new JexlBuilder()
         .namespaces(Collections.singletonMap("sns", System.class))
         .permissions(permissions)
         .create();
 
-    AtomicLong result = new AtomicLong();
+    final AtomicLong result = new AtomicLong();
     assertEquals(0, result.get());
-    long now = System.currentTimeMillis();
+    final long now = System.currentTimeMillis();
     // calling System::currentTimeMillis() is allowed and behaves as expected
     jexl.createScript("result.set(sns:currentTimeMillis())", "result").execute(null, result);
     assertTrue(result.get() >= now);
@@ -388,7 +388,7 @@ public class Issues400Test {
     // we still cant call anything else
     try {
       jexl.createScript("sns:gc()").execute(null);
-    } catch(JexlException.Method method) {
+    } catch(final JexlException.Method method) {
       assertEquals("gc", method.getMethod());
     }
   }
@@ -398,14 +398,14 @@ public class Issues400Test {
     final JexlEngine jexl = builder.create();
     JexlScript script;
     Object result;
-    String srcContinue = "let text = '';\n" +
+    final String srcContinue = "let text = '';\n" +
         "for (let i : (4..2)) { if (i == 3) continue; text += i; }\n" +
         "text;";
     script = jexl.createScript(srcContinue);
     result = script.execute(null);
     assertEquals("42", result);
 
-    String srcBreak = "let i = 33;\n" +
+    final String srcBreak = "let i = 33;\n" +
         "while (i < 66) { if (i == 42) { break; } i += 1; }\n" +
         "i;";
     script = jexl.createScript(srcBreak);
@@ -415,7 +415,7 @@ public class Issues400Test {
 
   @Test
   public void testNamespaceVsTernary0() {
-    VinzContext ctxt = new VinzContext();
+    final VinzContext ctxt = new VinzContext();
     ctxt.set("Users", "USERS");
     final JexlEngine jexl = new JexlBuilder().safe(false).strict(true).silent(false).create();
     JexlScript script = jexl.createScript("() -> {\n"
@@ -432,11 +432,11 @@ public class Issues400Test {
 
   @Test
   public void testNamespaceVsTernary1() {
-    VinzContext ctxt = new VinzContext();
+    final VinzContext ctxt = new VinzContext();
     ctxt.set("Users", "USERS");
     ctxt.set("vinz", new VinzCaller(ctxt));
     final JexlEngine jexl = new JexlBuilder().safe(false).strict(true).silent(false).create();
-    JexlScript script = jexl.createScript(
+    final JexlScript script = jexl.createScript(
  "vinz.execute(() -> {\n"
         + "  var test = 42;\n"
         + "  var user = useTest ? test : member(Users, 'user');\n"
