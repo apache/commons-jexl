@@ -16,9 +16,9 @@
  */
 package org.apache.commons.jexl3.internal.introspection;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 /**
