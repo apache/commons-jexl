@@ -241,6 +241,15 @@ public class PragmaTest extends JexlTestCase {
     }
 
     @Test
+    public void testIssue416() {
+        final JexlEngine jexl = new JexlBuilder().create();
+        JexlScript script = jexl.createScript("#pragma myNull null\n");
+        Map<String, Object> pragmas = script.getPragmas();
+        Assert.assertTrue("pragma key present?", pragmas.containsKey("myNull"));
+        Assert.assertNull("expected null value", pragmas.get("myNull"));
+    }
+
+    @Test
     @SuppressWarnings("AssertEqualsBetweenInconvertibleTypes")
     public void testJxltPragmas() {
         final JxltEngine engine = new JexlBuilder().create().createJxltEngine();
@@ -266,7 +275,6 @@ public class PragmaTest extends JexlTestCase {
         final String parsed = script.getParsedText();
         Assert.assertEquals(src, parsed);
     }
-
     @Test
     @SuppressWarnings("AssertEqualsBetweenInconvertibleTypes")
     public void testNamespacePragmaCtl() {
@@ -302,6 +310,7 @@ public class PragmaTest extends JexlTestCase {
         final ModuleContext ctxt = new ModuleContext();
         runPragmaModule(ctxt, null);
     }
+
     @Test
     public void testPragmaOptions1() {
         final String str = "i; #pragma jexl.options '-strict'\n";
@@ -374,14 +383,5 @@ public class PragmaTest extends JexlTestCase {
                 + "42");
         final Object result = script.execute(jc);
         Assert.assertEquals(42, result);
-    }
-
-    @Test
-    public void testIssue416() {
-        final JexlEngine jexl = new JexlBuilder().create();
-        JexlScript script = jexl.createScript("#pragma myNull null\n");
-        Map<String, Object> pragmas = script.getPragmas();
-        Assert.assertTrue("pragma key present?", pragmas.containsKey("myNull"));
-        Assert.assertNull("expected null value", pragmas.get("myNull"));
     }
 }
