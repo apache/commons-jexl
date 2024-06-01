@@ -17,8 +17,7 @@
 package org.apache.commons.jexl3;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
-
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -357,20 +356,8 @@ public class ContextNamespaceTest extends JexlTestCase {
         assertEquals(18.6d, (Double) ctxt.get("VAT"), 0.0001d);
         ctxt.set("VAT", 20.0d);
         assertEquals(20.0d, (Double) ctxt.get("VAT"), 0.0001d);
-
-        try {
-            ctxt.get("vat");
-            fail("should have failed");
-        } catch (final JexlException.Property xprop) {
-            //
-        }
-
-        try {
-            ctxt.set("vat", 33.0d);
-            fail("should have failed");
-        } catch (final JexlException.Property xprop) {
-            //
-        }
+        assertThrows(JexlException.Property.class, () -> ctxt.get("vat"));
+        assertThrows(JexlException.Property.class, () -> ctxt.set("vat", 33.0d));
     }
 
     @Test
