@@ -665,10 +665,11 @@ public class Issues200Test extends JexlTestCase {
 
     @Test
     public void test279() throws Exception {
-        final Log logger = null; //LogFactory.getLog(Issues200Test.class);
+        final Log logger = null; // LogFactory.getLog(Issues200Test.class);
         Object result;
         JexlScript script;
         final JexlContext ctxt = new Context279();
+        // @formatter:off
         final String[] srcs = {
             "var z = null; identity(z[0]);",
              "var z = null; z.0;",
@@ -690,8 +691,9 @@ public class Issues200Test extends JexlTestCase {
              "var z = { 'y' : [null, null] }; z.y[1].foo()",
              "var z = { 'y' : [null, null] }; z.y.1.foo()"
         };
+        // @formatter:on
         for (int i = 0; i < 2; ++i) {
-            for (final boolean strict : new boolean[]{true, false}) {
+            for (final boolean strict : new boolean[] { true, false }) {
                 final JexlEngine jexl = new JexlBuilder().safe(false).strict(strict).create();
                 for (final String src : srcs) {
                     script = jexl.createScript(src);
@@ -741,12 +743,7 @@ public class Issues200Test extends JexlTestCase {
         script = jexl.createScript(src);
         result = script.execute(ctxt, "abc");
         assertEquals("a", result);
-        result = null;
-        try {
-            result = script.execute(ctxt, (Object) null);
-        } catch (final JexlException xany) {
-            assertNotNull(xany.getMessage());
-        }
+        result = script.execute(ctxt, (Object) null);
         assertNull(result);
     }
 
@@ -755,6 +752,7 @@ public class Issues200Test extends JexlTestCase {
         final List<String> out = new ArrayList<>(6);
         final JexlContext ctxt = new MapContext();
         ctxt.set("$out", out);
+        // @formatter:off
         final String src = "for(var b: ['g','h','i']) {\n"
                 + "  var c = b;\n"
                 + "  $out.add(c);\n"
@@ -765,7 +763,7 @@ public class Issues200Test extends JexlTestCase {
                 + "}"
                 + " \n"
                 + "$out.size()";
-
+        // @formatter:on
         final JexlFeatures features = new JexlFeatures();
         features.lexical(true);
         final JexlEngine jexl = new JexlBuilder()
