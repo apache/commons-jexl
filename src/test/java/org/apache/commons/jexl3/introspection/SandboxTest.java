@@ -16,7 +16,10 @@
  */
 package org.apache.commons.jexl3.introspection;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -35,7 +38,6 @@ import org.apache.commons.jexl3.MapContext;
 import org.apache.commons.jexl3.annotations.NoJexl;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.junit.Assert;
 import org.junit.Test;
 
 /**
