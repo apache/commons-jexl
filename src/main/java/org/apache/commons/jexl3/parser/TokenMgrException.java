@@ -47,92 +47,6 @@ public class TokenMgrException extends RuntimeException implements JavaccError {
      */
     public static final int LOOP_DETECTED = 3;
     /**
-     * Indicates the reason why the exception is thrown. It will have
-     * one of the above 4 values.
-     */
-    private final int errorCode;
-    /**
-     * The lexer state.
-     */
-    @SuppressWarnings("unused") // not read currently
-    private int state;
-    /**
-     * The current character.
-     */
-    private char current;
-    /**
-     * Last correct input before error occurs.
-     */
-    private String after;
-    /**
-     * Whether eof was reached whilst expecting more input.
-     */
-    private boolean eof;
-    /**
-     * Error line.
-     */
-    private int line;
-    /**
-     * Error column.
-     */
-    private int column;
-
-    /**
-     * Returns a detailed message for the Error when it is thrown by the
-     * token manager to indicate a lexical error.
-     * @return the message
-     */
-    @Override
-    public String getMessage() {
-        return "Lexical error at line "
-                + line + ", column "
-                + column + ".  Encountered: "
-                + (eof ? "<EOF> "
-                   : StringParser.escapeString(String.valueOf(current), '"') + " (" + (int) current + "), ")
-                + "after : " + StringParser.escapeString(after, '"');
-    }
-
-    /** Constructor with message and reason. */
-    public TokenMgrException(final String message, final int reason) {
-        super(message);
-        errorCode = reason;
-    }
-
-    /** Full Constructor. */
-    public TokenMgrException(final boolean EOFSeen, final int lexState, final int errorLine, final int errorColumn, final String errorAfter, final int curChar, final int reason) {
-        eof = EOFSeen;
-        state = lexState;
-        line = errorLine;
-        column = errorColumn;
-        after = errorAfter;
-        current = (char) curChar;
-        errorCode = reason;
-    }
-
-    /**
-     * Gets the reason why the exception is thrown.
-     * @return one of the 4 lexical error codes
-     */
-    public int getErrorCode() {
-        return errorCode;
-    }
-
-    @Override
-    public int getLine() {
-        return line;
-    }
-
-    @Override
-    public int getColumn() {
-        return column;
-    }
-
-    @Override
-    public String getAfter() {
-        return after;
-    }
-
-     /**
       * Replaces unprintable characters by their espaced (or unicode escaped)
       * equivalents in the given string
       */
@@ -180,4 +94,90 @@ public class TokenMgrException extends RuntimeException implements JavaccError {
         }
         return retval.toString();
      }
+    /**
+     * Indicates the reason why the exception is thrown. It will have
+     * one of the above 4 values.
+     */
+    private final int errorCode;
+    /**
+     * The lexer state.
+     */
+    @SuppressWarnings("unused") // not read currently
+    private int state;
+    /**
+     * The current character.
+     */
+    private char current;
+    /**
+     * Last correct input before error occurs.
+     */
+    private String after;
+    /**
+     * Whether eof was reached whilst expecting more input.
+     */
+    private boolean eof;
+    /**
+     * Error line.
+     */
+    private int line;
+
+    /**
+     * Error column.
+     */
+    private int column;
+
+    /** Full Constructor. */
+    public TokenMgrException(final boolean EOFSeen, final int lexState, final int errorLine, final int errorColumn, final String errorAfter, final int curChar, final int reason) {
+        eof = EOFSeen;
+        state = lexState;
+        line = errorLine;
+        column = errorColumn;
+        after = errorAfter;
+        current = (char) curChar;
+        errorCode = reason;
+    }
+
+    /** Constructor with message and reason. */
+    public TokenMgrException(final String message, final int reason) {
+        super(message);
+        errorCode = reason;
+    }
+
+    @Override
+    public String getAfter() {
+        return after;
+    }
+
+    @Override
+    public int getColumn() {
+        return column;
+    }
+
+    /**
+     * Gets the reason why the exception is thrown.
+     * @return one of the 4 lexical error codes
+     */
+    public int getErrorCode() {
+        return errorCode;
+    }
+
+    @Override
+    public int getLine() {
+        return line;
+    }
+
+     /**
+     * Returns a detailed message for the Error when it is thrown by the
+     * token manager to indicate a lexical error.
+     * @return the message
+     */
+    @Override
+    public String getMessage() {
+        return "Lexical error at line "
+                + line + ", column "
+                + column + ".  Encountered: "
+                + (eof ? "<EOF> "
+                   : StringParser.escapeString(String.valueOf(current), '"') + " (" + (int) current + "), ")
+                + "after : " + StringParser.escapeString(after, '"');
+    }
 }
