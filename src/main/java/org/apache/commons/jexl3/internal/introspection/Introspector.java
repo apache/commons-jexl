@@ -58,6 +58,24 @@ public final class Introspector {
      */
     private static final Constructor<?> CTOR_MISS = CacheMiss.class.getConstructors()[0];
     /**
+     * Checks whether a class is loaded through a given class loader or one of its ascendants.
+     * @param loader the class loader
+     * @param clazz  the class to check
+     * @return true if clazz was loaded through the loader, false otherwise
+     */
+    private static boolean isLoadedBy(final ClassLoader loader, final Class<?> clazz) {
+        if (loader != null) {
+            ClassLoader cloader = clazz.getClassLoader();
+            while (cloader != null) {
+                if (cloader.equals(loader)) {
+                    return true;
+                }
+                cloader = cloader.getParent();
+            }
+        }
+        return false;
+    }
+    /**
      * the logger.
      */
     private final Log logger;
@@ -81,6 +99,7 @@ public final class Introspector {
      * Holds the map of classes ctors we know about as well as unknown ones.
      */
     private final Map<MethodKey, Constructor<?>> constructorsMap = new HashMap<>();
+
     /**
      * Holds the set of classes we have introspected.
      */
@@ -119,102 +138,6 @@ public final class Introspector {
         } catch (final ClassNotFoundException xignore) {
             return null;
         }
-    }
-
-    /**
-     * Gets a method defined by a class, a name and a set of parameters.
-     * @param c      the class
-     * @param name   the method name
-     * @param params the method parameters
-     * @return the desired method object
-     * @throws MethodKey.AmbiguousException if no unambiguous method could be found through introspection
-     */
-    public Method getMethod(final Class<?> c, final String name, final Object... params) {
-        return getMethod(c, new MethodKey(name, params));
-    }
-
-    /**
-     * Gets the method defined by the <code>MethodKey</code> for the class <code>c</code>.
-     *
-     * @param c   Class in which the method search is taking place
-     * @param key Key of the method being searched for
-     * @return The desired method object
-     * @throws MethodKey.AmbiguousException if no unambiguous method could be found through introspection
-     */
-    public Method getMethod(final Class<?> c, final MethodKey key) {
-        try {
-            return getMap(c).getMethod(key);
-        } catch (final MethodKey.AmbiguousException xambiguous) {
-            // whoops. Ambiguous and not benign. Make a nice log message and return null...
-            if (logger != null && xambiguous.isSevere() && logger.isInfoEnabled()) {
-                logger.info("ambiguous method invocation: "
-                        + c.getName() + "."
-                        + key.debugString(), xambiguous);
-            }
-            return null;
-        }
-    }
-
-    /**
-     * Gets the field named by <code>key</code> for the class <code>c</code>.
-     *
-     * @param c   Class in which the field search is taking place
-     * @param key Name of the field being searched for
-     * @return the desired field or null if it does not exist or is not accessible
-     */
-    public Field getField(final Class<?> c, final String key) {
-        return getMap(c).getField(key);
-    }
-
-    /**
-     * Gets the array of accessible field names known for a given class.
-     * @param c the class
-     * @return the class field names
-     */
-    public String[] getFieldNames(final Class<?> c) {
-        if (c == null) {
-            return new String[0];
-        }
-        final ClassMap classMap = getMap(c);
-        return classMap.getFieldNames();
-    }
-
-    /**
-     * Gets the array of accessible methods names known for a given class.
-     * @param c the class
-     * @return the class method names
-     */
-    public String[] getMethodNames(final Class<?> c) {
-        if (c == null) {
-            return new String[0];
-        }
-        final ClassMap classMap = getMap(c);
-        return classMap.getMethodNames();
-    }
-
-    /**
-     * Gets the array of accessible method known for a given class.
-     * @param c          the class
-     * @param methodName the method name
-     * @return the array of methods (null or not empty)
-     */
-    public Method[] getMethods(final Class<?> c, final String methodName) {
-        if (c == null) {
-            return null;
-        }
-        final ClassMap classMap = getMap(c);
-        return classMap.getMethods(methodName);
-    }
-
-    /**
-     * Gets the constructor defined by the <code>MethodKey</code>.
-     *
-     * @param key Key of the constructor being searched for
-     * @return The desired constructor object
-     * or null if no unambiguous constructor could be found through introspection.
-     */
-    public Constructor<?> getConstructor(final MethodKey key) {
-        return getConstructor(null, key);
     }
 
     /**
@@ -293,6 +216,49 @@ public final class Introspector {
     }
 
     /**
+     * Gets the constructor defined by the <code>MethodKey</code>.
+     *
+     * @param key Key of the constructor being searched for
+     * @return The desired constructor object
+     * or null if no unambiguous constructor could be found through introspection.
+     */
+    public Constructor<?> getConstructor(final MethodKey key) {
+        return getConstructor(null, key);
+    }
+
+    /**
+     * Gets the field named by <code>key</code> for the class <code>c</code>.
+     *
+     * @param c   Class in which the field search is taking place
+     * @param key Name of the field being searched for
+     * @return the desired field or null if it does not exist or is not accessible
+     */
+    public Field getField(final Class<?> c, final String key) {
+        return getMap(c).getField(key);
+    }
+
+    /**
+     * Gets the array of accessible field names known for a given class.
+     * @param c the class
+     * @return the class field names
+     */
+    public String[] getFieldNames(final Class<?> c) {
+        if (c == null) {
+            return new String[0];
+        }
+        final ClassMap classMap = getMap(c);
+        return classMap.getFieldNames();
+    }
+
+    /**
+     * Gets the class loader used by this introspector.
+     * @return the class loader
+     */
+    public ClassLoader getLoader() {
+        return loader;
+    }
+
+    /**
      * Gets the ClassMap for a given class.
      * @param c the class
      * @return the class map
@@ -322,6 +288,67 @@ public final class Introspector {
 
         }
         return classMap;
+    }
+
+    /**
+     * Gets the method defined by the <code>MethodKey</code> for the class <code>c</code>.
+     *
+     * @param c   Class in which the method search is taking place
+     * @param key Key of the method being searched for
+     * @return The desired method object
+     * @throws MethodKey.AmbiguousException if no unambiguous method could be found through introspection
+     */
+    public Method getMethod(final Class<?> c, final MethodKey key) {
+        try {
+            return getMap(c).getMethod(key);
+        } catch (final MethodKey.AmbiguousException xambiguous) {
+            // whoops. Ambiguous and not benign. Make a nice log message and return null...
+            if (logger != null && xambiguous.isSevere() && logger.isInfoEnabled()) {
+                logger.info("ambiguous method invocation: "
+                        + c.getName() + "."
+                        + key.debugString(), xambiguous);
+            }
+            return null;
+        }
+    }
+
+    /**
+     * Gets a method defined by a class, a name and a set of parameters.
+     * @param c      the class
+     * @param name   the method name
+     * @param params the method parameters
+     * @return the desired method object
+     * @throws MethodKey.AmbiguousException if no unambiguous method could be found through introspection
+     */
+    public Method getMethod(final Class<?> c, final String name, final Object... params) {
+        return getMethod(c, new MethodKey(name, params));
+    }
+
+    /**
+     * Gets the array of accessible methods names known for a given class.
+     * @param c the class
+     * @return the class method names
+     */
+    public String[] getMethodNames(final Class<?> c) {
+        if (c == null) {
+            return new String[0];
+        }
+        final ClassMap classMap = getMap(c);
+        return classMap.getMethodNames();
+    }
+
+    /**
+     * Gets the array of accessible method known for a given class.
+     * @param c          the class
+     * @param methodName the method name
+     * @return the array of methods (null or not empty)
+     */
+    public Method[] getMethods(final Class<?> c, final String methodName) {
+        if (c == null) {
+            return null;
+        }
+        final ClassMap classMap = getMap(c);
+        return classMap.getMethods(methodName);
     }
 
     /**
@@ -360,32 +387,5 @@ public final class Introspector {
                 lock.writeLock().unlock();
             }
         }
-    }
-
-    /**
-     * Gets the class loader used by this introspector.
-     * @return the class loader
-     */
-    public ClassLoader getLoader() {
-        return loader;
-    }
-
-    /**
-     * Checks whether a class is loaded through a given class loader or one of its ascendants.
-     * @param loader the class loader
-     * @param clazz  the class to check
-     * @return true if clazz was loaded through the loader, false otherwise
-     */
-    private static boolean isLoadedBy(final ClassLoader loader, final Class<?> clazz) {
-        if (loader != null) {
-            ClassLoader cloader = clazz.getClassLoader();
-            while (cloader != null) {
-                if (cloader.equals(loader)) {
-                    return true;
-                }
-                cloader = cloader.getParent();
-            }
-        }
-        return false;
     }
 }
