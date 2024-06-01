@@ -19,6 +19,7 @@ package org.apache.commons.jexl3;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -125,12 +126,7 @@ public class MapLiteralTest extends JexlTestCase {
             final Object o = e.evaluate(null);
             assertEquals(Collections.singletonMap("foo", "bar"), o);
         }
-        try {
-            final Object ff = JEXL.createExpression("{  : , }");
-            fail(ff.toString());
-        } catch(final JexlException.Parsing parsing) {
-            assertNotNull(parsing);
-        }
+        assertThrows(JexlException.Parsing.class, () -> JEXL.createExpression("{  : , }"));
     }
 
     @Test
