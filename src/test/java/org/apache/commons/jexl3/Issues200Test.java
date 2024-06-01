@@ -592,14 +592,9 @@ public class Issues200Test extends JexlTestCase {
         final JexlContext ctxt = new MapContext();
         ctxt.set("out", System.out);
         final JexlEngine jexl = new JexlBuilder().strict(true).safe(true).create();
-
         final JexlScript e = jexl.createScript("out.println(xyz)");
-        try {
-            final Object o = e.execute(ctxt);
-            fail("should have thrown");
-        } catch (final JexlException.Variable xvar) {
-            assertEquals("xyz", xvar.getVariable());
-        }
+        final JexlException.Variable xvar = assertThrows(JexlException.Variable.class, () -> e.execute(ctxt));
+        assertEquals("xyz", xvar.getVariable());
     }
 
     @Test
