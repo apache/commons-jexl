@@ -57,7 +57,7 @@ public class ClassMisc {
    * @param clazz    the root class.
    */
   private static void addSuperInterfaces(final Set<Class<?>> superSet, final Class<?> clazz) {
-    for (Class<?> inter : clazz.getInterfaces()) {
+    for (final Class<?> inter : clazz.getInterfaces()) {
       superSet.add(inter);
       addSuperInterfaces(superSet, inter);
     }
@@ -78,7 +78,7 @@ public class ClassMisc {
     if (baseClass != Object.class && other != Object.class) {
       final Set<Class<?>> superSet = new LinkedHashSet<>();
       addSuperClasses(superSet, baseClass);
-      for (Class<?> superClass : superSet) {
+      for (final Class<?> superClass : superSet) {
         if (superClass.isAssignableFrom(other)) {
           return superClass;
         }
@@ -105,7 +105,7 @@ public class ClassMisc {
     addSuperClasses(superSet, baseClass);
     // intersect otherClasses
     if (otherClasses.length > 0) {
-      for (Class<?> other : otherClasses) {
+      for (final Class<?> other : otherClasses) {
         // remove classes from $superSet that $other is not assignable to
         final Iterator<Class<?>> superClass = superSet.iterator();
         while (superClass.hasNext()) {
