@@ -20,8 +20,8 @@ package org.apache.commons.jexl3.scripting;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.Reader;
 import java.io.StringReader;
@@ -73,56 +73,35 @@ public class JexlScriptEngineTest {
         final ScriptContext ctxt = engine.getContext();
         final String str = null;
         final Reader reader = null;
-        try {
-            final CompiledScript script0 = engine.compile(str);
-            fail("should have thrown npe");
-        } catch (final NullPointerException npe) {
-            assertNotNull(npe);
-        }
-        try {
-            final CompiledScript script0 = engine.compile(reader);
-            fail("should have thrown npe");
-        } catch (final NullPointerException npe) {
-            assertNotNull(npe);
-        }
-        try {
-            final CompiledScript script0 = engine.compile(new StringReader("3 + 4"));
-            assertEquals(engine, script0.getEngine());
-            Object result = script0.eval();
-            assertEquals(7, result);
-            result = script0.eval();
-            assertEquals(7, result);
-            result = engine.eval(new StringReader("38 + 4"));
-            assertEquals(42, result);
-            result = engine.eval("38 + 4");
-            assertEquals(42, result);
-        } catch (final ScriptException xscript) {
-            assertTrue(xscript.getCause() instanceof NullPointerException);
-        }
-        try {
-            final CompiledScript script0 = engine.compile("3 + 4");
-            assertEquals(engine, script0.getEngine());
-            Object result = script0.eval();
-            assertEquals(7, result);
-            result = script0.eval();
-            assertEquals(7, result);
-        } catch (final ScriptException xscript) {
-            assertTrue(xscript.getCause() instanceof NullPointerException);
-        }
-        try {
-            ctxt.setAttribute("x", 20, ScriptContext.ENGINE_SCOPE);
-            ctxt.setAttribute("y", 22, ScriptContext.ENGINE_SCOPE);
-            final CompiledScript script0 = engine.compile("x + y");
-            Object result = script0.eval();
-            assertEquals(42, result);
-            ctxt.setAttribute("x", -20, ScriptContext.ENGINE_SCOPE);
-            ctxt.setAttribute("y", -22, ScriptContext.ENGINE_SCOPE);
-            result = script0.eval();
-            assertEquals(-42, result);
-        } catch (final ScriptException xscript) {
-            assertTrue(xscript.getCause() instanceof NullPointerException);
-        }
-
+        assertThrows(NullPointerException.class, () -> engine.compile(str));
+        assertThrows(NullPointerException.class, () -> engine.compile(reader));
+        final CompiledScript script0 = engine.compile(new StringReader("3 + 4"));
+        assertEquals(engine, script0.getEngine());
+        Object result = script0.eval();
+        assertEquals(7, result);
+        result = script0.eval();
+        assertEquals(7, result);
+        result = engine.eval(new StringReader("38 + 4"));
+        assertEquals(42, result);
+        result = engine.eval("38 + 4");
+        assertEquals(42, result);
+        // next test
+        final CompiledScript script1 = engine.compile("3 + 4");
+        assertEquals(engine, script1.getEngine());
+        Object result1 = script1.eval();
+        assertEquals(7, result1);
+        result1 = script1.eval();
+        assertEquals(7, result1);
+        // next test
+        ctxt.setAttribute("x", 20, ScriptContext.ENGINE_SCOPE);
+        ctxt.setAttribute("y", 22, ScriptContext.ENGINE_SCOPE);
+        final CompiledScript script2 = engine.compile("x + y");
+        Object result2 = script2.eval();
+        assertEquals(42, result2);
+        ctxt.setAttribute("x", -20, ScriptContext.ENGINE_SCOPE);
+        ctxt.setAttribute("y", -22, ScriptContext.ENGINE_SCOPE);
+        result2 = script2.eval();
+        assertEquals(-42, result2);
     }
 
     @Test
@@ -152,28 +131,12 @@ public class JexlScriptEngineTest {
         final JexlScriptEngine engine = (JexlScriptEngine) manager.getEngineByName("JEXL");
         final ScriptContext ctxt = engine.getContext();
         engine.put("errors", new Errors());
-        try {
-            engine.eval("errors.npe()");
-        } catch (final ScriptException xscript) {
-            assertTrue(xscript.getCause() instanceof NullPointerException);
-        }
-        try {
-            engine.eval("errors.illegal()", ctxt);
-        } catch (final ScriptException xscript) {
-            assertTrue(xscript.getCause() instanceof IllegalArgumentException);
-        }
+        assertTrue(assertThrows(ScriptException.class, () -> engine.eval("errors.npe()")).getCause() instanceof NullPointerException);
+        assertTrue(assertThrows(ScriptException.class, () -> engine.eval("errors.illegal()")).getCause() instanceof IllegalArgumentException);
         final CompiledScript script0 = engine.compile("errors.npe()");
-        try {
-            script0.eval();
-        } catch (final ScriptException xscript) {
-            assertTrue(xscript.getCause() instanceof NullPointerException);
-        }
+        assertTrue(assertThrows(ScriptException.class, () -> script0.eval()).getCause() instanceof NullPointerException);
         final CompiledScript script1 = engine.compile("errors.illegal()");
-        try {
-            script1.eval(ctxt);
-        } catch (final ScriptException xscript) {
-            assertTrue(xscript.getCause() instanceof IllegalArgumentException);
-        }
+        assertTrue(assertThrows(ScriptException.class, () -> script1.eval()).getCause() instanceof IllegalArgumentException);
     }
 
     @Test
@@ -183,31 +146,11 @@ public class JexlScriptEngineTest {
         final ScriptEngine engine = manager.getEngineByName("jexl3");
         assertNotNull(engine, "Engine should not be null (name)");
         assertNotNull(engine.getFactory());
-        try {
-            engine.eval((String) null);
-            fail("Should have caused NPE");
-        } catch (final NullPointerException e) {
-            // NOOP
-        }
-        try {
-            engine.eval((Reader) null);
-            fail("Should have caused NPE");
-        } catch (final NullPointerException e) {
-            // NOOP
-        }
+        assertThrows(NullPointerException.class, () -> engine.eval((String) null));
+        assertThrows(NullPointerException.class, () -> engine.eval((Reader) null));
         final ScriptContext ctxt = null;
-        try {
-            engine.eval((String) null, ctxt);
-            fail("Should have caused NPE");
-        } catch (final NullPointerException e) {
-            //NOOP
-        }
-        try {
-            engine.eval((Reader) null, ctxt);
-            fail("Should have caused NPE");
-        } catch (final NullPointerException e) {
-            //NOOP
-        }
+        assertThrows(NullPointerException.class, () -> engine.eval((String) null, ctxt));
+        assertThrows(NullPointerException.class, () -> engine.eval((Reader) null, ctxt));
     }
 
     @Test
@@ -254,30 +197,24 @@ public class JexlScriptEngineTest {
         assertNotNull(manager, "Manager should not be null");
         final ScriptEngine engine = manager.getEngineByName("jexl3");
         final Integer initialValue = 123;
-        assertEquals(initialValue,engine.eval("123"));
-        assertEquals(initialValue,engine.eval("0;123")); // multiple statements
-        try {
-            final Long time2 = (Long) engine.eval(
-                    "sys=context.class.forName(\"java.lang.System\");"
-                            + "now=sys.currentTimeMillis();"
-            );
-            fail("default engine no longer accesses System classes");
-        } catch (final ScriptException xscript) {
-            final JexlException.Method xjexl = (JexlException.Method) xscript.getCause();
-            assertEquals("forName", xjexl.getMethod());
-        }
+        assertEquals(initialValue, engine.eval("123"));
+        assertEquals(initialValue, engine.eval("0;123")); // multiple statements
+        final ScriptException xscript = assertThrows(ScriptException.class,
+                () -> engine.eval("sys=context.class.forName(\"java.lang.System\");now=sys.currentTimeMillis();"));
+        final JexlException.Method xjexl = (JexlException.Method) xscript.getCause();
+        assertEquals("forName", xjexl.getMethod());
         engine.put("value", initialValue);
-        assertEquals(initialValue,engine.get("value"));
+        assertEquals(initialValue, engine.get("value"));
         final Integer newValue = 124;
-        assertEquals(newValue,engine.eval("old=value;value=value+1"));
-        assertEquals(initialValue,engine.get("old"));
-        assertEquals(newValue,engine.get("value"));
-        assertEquals(engine.getContext(),engine.get(JexlScriptEngine.CONTEXT_KEY));
+        assertEquals(newValue, engine.eval("old=value;value=value+1"));
+        assertEquals(initialValue, engine.get("old"));
+        assertEquals(newValue, engine.get("value"));
+        assertEquals(engine.getContext(), engine.get(JexlScriptEngine.CONTEXT_KEY));
         // Check behavior of JEXL object
-        assertEquals(engine.getContext().getReader(),engine.eval("JEXL.in"));
-        assertEquals(engine.getContext().getWriter(),engine.eval("JEXL.out"));
-        assertEquals(engine.getContext().getErrorWriter(),engine.eval("JEXL.err"));
-        assertEquals(System.class,engine.eval("JEXL.System"));
+        assertEquals(engine.getContext().getReader(), engine.eval("JEXL.in"));
+        assertEquals(engine.getContext().getWriter(), engine.eval("JEXL.out"));
+        assertEquals(engine.getContext().getErrorWriter(), engine.eval("JEXL.err"));
+        assertEquals(System.class, engine.eval("JEXL.System"));
     }
 
     @Test
