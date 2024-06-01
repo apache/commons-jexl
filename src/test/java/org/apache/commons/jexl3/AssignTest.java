@@ -18,7 +18,7 @@ package org.apache.commons.jexl3;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -80,17 +80,8 @@ public class AssignTest extends JexlTestCase {
         final JexlContext jc = new MapContext();
         final Froboz froboz = new Froboz(-169);
         jc.set("froboz", froboz);
-        Object o = null;
-        try {
-            o = assign.evaluate(jc);
-        }
-        catch (final RuntimeException xrt) {
-            final String str = xrt.toString();
-            assertTrue(str.contains("nosuchbean"));
-        }
-        finally {
-            assertNull(o);
-        }
+        RuntimeException xrt = assertThrows(RuntimeException.class, () -> assign.evaluate(jc));
+        assertTrue(xrt.toString().contains("nosuchbean"));
     }
 
     /**
