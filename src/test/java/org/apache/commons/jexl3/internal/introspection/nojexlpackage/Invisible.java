@@ -16,8 +16,6 @@
  */
 package org.apache.commons.jexl3.internal.introspection.nojexlpackage;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 public class Invisible {
     public String uncallable() { return "!"; }
 }
