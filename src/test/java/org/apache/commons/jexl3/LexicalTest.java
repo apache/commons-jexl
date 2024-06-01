@@ -435,11 +435,10 @@ public class LexicalTest {
 
     @Test
     public void testConst2b() {
-        final JexlFeatures f = new JexlFeatures();
         final JexlEngine jexl = new JexlBuilder().strict(true).create();
         for (final String op : Arrays.asList("=", "+=", "-=", "/=", "*=", "%=", "<<=", ">>=", ">>>=", "^=", "&=", "|=")) {
-            final JexlException.Parsing xparse = assertThrows(JexlException.Parsing.class, () -> jexl.createScript("const foo = 42;  if (true) { foo " + op + " 1; }"),
-                    "should fail, const precludes assignment");
+            final JexlException.Parsing xparse = assertThrows(JexlException.Parsing.class,
+                    () -> jexl.createScript("const foo = 42;  if (true) { foo " + op + " 1; }"), "should fail, const precludes assignment");
             assertTrue(xparse.getMessage().contains("foo"));
         }
     }
