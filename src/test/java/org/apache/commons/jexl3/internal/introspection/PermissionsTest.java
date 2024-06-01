@@ -16,6 +16,8 @@
  */
 package org.apache.commons.jexl3.internal.introspection;
 
+import static org.apache.commons.jexl3.introspection.JexlPermissions.RESTRICTED;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -40,8 +42,6 @@ import org.apache.commons.jexl3.introspection.JexlPermissions;
 import org.apache.commons.jexl3.introspection.JexlUberspect;
 import org.junit.Assert;
 import org.junit.Test;
-
-import static org.apache.commons.jexl3.introspection.JexlPermissions.RESTRICTED;
 
 /**
  * Checks the CacheMap.MethodKey implementation
