@@ -18,8 +18,7 @@ package org.apache.commons.jexl3;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.fail;
-
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import java.io.File;
 import java.io.FileReader;
 import java.util.Collections;
@@ -57,28 +56,20 @@ public class ComposePermissionsTest extends JexlTestCase {
 
         // will fail if gson package is denied
         JexlEngine j1 = createEngine(false, p.compose("com.google.gson.internal {}"));
-        JexlScript s1 = j1.createScript("json.pageInfo.pagePic", "json");
-        try {
-            final Object r1 = s1.execute(null, json);
-            fail("gson restricted");
-        } catch (final JexlException.Property xproperty) {
-            assertEquals("pageInfo", xproperty.getProperty());
-        }
+        final JexlScript s1 = j1.createScript("json.pageInfo.pagePic", "json");
+        JexlException.Property xproperty = assertThrows(JexlException.Property.class, () -> s1.execute(null, json));
+        assertEquals("pageInfo", xproperty.getProperty());
 
         // will fail since gson package is denied
         j1 = createEngine(false, p.compose("com.google.gson.internal { LinkedTreeMap {} }"));
-        s1 = j1.createScript("json.pageInfo.pagePic", "json");
-        try {
-            final Object r1 = s1.execute(null, json);
-            fail("gson LinkTreeMap restricted");
-        } catch (final JexlException.Property xproperty) {
-            assertEquals("pageInfo", xproperty.getProperty());
-        }
+        final JexlScript s2 = j1.createScript("json.pageInfo.pagePic", "json");
+        xproperty = assertThrows(JexlException.Property.class, () -> s2.execute(null, json));
+        assertEquals("pageInfo", xproperty.getProperty());
 
         // will not fail since gson objects
         j1 = createEngine(false, JexlPermissions.RESTRICTED);
-        s1 = j1.createScript("json.pageInfo.pagePic", "json");
-        final Object r1 = s1.execute(null, json);
+        final JexlScript s3 = j1.createScript("json.pageInfo.pagePic", "json");
+        final Object r1 = s3.execute(null, json);
         assertEquals(check, r0);
     }
 
