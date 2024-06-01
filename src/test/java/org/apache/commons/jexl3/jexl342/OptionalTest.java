@@ -54,7 +54,7 @@ public class OptionalTest {
     }
 
     public static class Thing {
-        String name = null;
+        String name;
         public Optional<String> findName() {
             return  Optional.ofNullable(name);
         }
