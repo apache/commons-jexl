@@ -26,11 +26,6 @@ import org.apache.commons.jexl3.introspection.JexlPropertyGet;
  */
 public final class FieldGetExecutor implements JexlPropertyGet {
     /**
-     * The public field.
-     */
-    private final Field field;
-
-    /**
      * Attempts to discover a FieldGetExecutor.
      *
      * @param is the introspector
@@ -47,6 +42,11 @@ public final class FieldGetExecutor implements JexlPropertyGet {
         }
         return null;
     }
+
+    /**
+     * The public field.
+     */
+    private final Field field;
     /**
      * Creates a new instance of FieldPropertyGet.
      * @param theField the class public field
@@ -61,6 +61,16 @@ public final class FieldGetExecutor implements JexlPropertyGet {
     }
 
     @Override
+    public boolean isCacheable() {
+        return true;
+    }
+
+    @Override
+    public boolean tryFailed(final Object rval) {
+        return rval == Uberspect.TRY_FAILED;
+    }
+
+    @Override
     public Object tryInvoke(final Object obj, final Object key) {
         if (obj.getClass().equals(field.getDeclaringClass()) && key.equals(field.getName())) {
             try {
@@ -70,16 +80,6 @@ public final class FieldGetExecutor implements JexlPropertyGet {
             }
         }
         return Uberspect.TRY_FAILED;
-    }
-
-    @Override
-    public boolean tryFailed(final Object rval) {
-        return rval == Uberspect.TRY_FAILED;
-    }
-
-    @Override
-    public boolean isCacheable() {
-        return true;
     }
 
 }
