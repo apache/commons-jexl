@@ -282,15 +282,11 @@ public class Issues400Test {
             final String fnsrc = fnsrc0 + map0;
             final JexlContext jc = new MapContext();
             final JexlEngine jexl = new JexlBuilder().create();
-            try {
-                final JexlScript e = jexl.createScript(fnsrc);
-                final Object o = e.execute(jc);
-                assertTrue(o instanceof Map);
-                final Map<?, ?> map = (Map<?, ?>) o;
-                assertEquals(map, ctl);
-            } catch (final JexlException xother) {
-                fail(fnsrc + " : " + xother.getMessage());
-            }
+            final JexlScript e = jexl.createScript(fnsrc);
+            final Object o = e.execute(jc);
+            assertTrue(o instanceof Map);
+            final Map<?, ?> map = (Map<?, ?>) o;
+            assertEquals(map, ctl);
         }
     }
 
