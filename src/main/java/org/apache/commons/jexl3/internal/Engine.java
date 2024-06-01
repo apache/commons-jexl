@@ -360,7 +360,7 @@ public class Engine extends JexlEngine {
         this.scriptFeatures = new JexlFeatures(features).script(true).namespaceTest(nsTest);
         this.charset = conf.charset();
         // caching:
-        IntFunction<JexlCache<?, ?>> factory = conf.cacheFactory();
+        final IntFunction<JexlCache<?, ?>> factory = conf.cacheFactory();
         this.cacheFactory = factory == null ? SoftCache::new : factory;
         this.cache = (JexlCache<Source, ASTJexlScript>) (conf.cache() > 0 ? factory.apply(conf.cache()) : null);
         this.cacheThreshold = conf.cacheThreshold();
