@@ -30,9 +30,6 @@ public final class ListSetExecutor extends AbstractExecutor.Set {
     /** The java.util.obj.set method used as an active marker in ListSet. */
     private static final java.lang.reflect.Method LIST_SET =
             initMarker(List.class, "set", Integer.TYPE, Object.class);
-    /** The property. */
-    private final Integer property;
-
     /**
      * Attempts to discover a ListSetExecutor.
      *
@@ -65,6 +62,9 @@ public final class ListSetExecutor extends AbstractExecutor.Set {
         }
         return null;
     }
+
+    /** The property. */
+    private final Integer property;
 
     /**
      * Creates an instance.
