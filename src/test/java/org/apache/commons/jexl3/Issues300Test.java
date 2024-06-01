@@ -449,23 +449,21 @@ public class Issues300Test {
 
     @Test
     public void test309c() {
+        // @formatter:off
         final String src = "<html lang=\"en\">\n"
                 + "  <body>\n"
                 + "    <h1>Hello World!</h1>\n"
                 + "$$ var i =12;\n"
                 + "  </body>\n"
                 + "</html>";
+        // @formatter:on
         final JexlEngine jexl = new JexlBuilder().safe(true).create();
         final JxltEngine jxlt = jexl.createJxltEngine();
         final JexlInfo info = new JexlInfo("template", 1, 1);
-        try {
-            final JxltEngine.Template tmplt = jxlt.createTemplate(info, src);
-            final String src1 = tmplt.asString();
-            final String src2 = tmplt.toString();
-            assertEquals(src1, src2);
-        } catch (final JexlException.Parsing xerror) {
-            assertEquals(4, xerror.getInfo().getLine());
-        }
+        final JxltEngine.Template tmplt = jxlt.createTemplate(info, src);
+        final String src1 = tmplt.asString();
+        final String src2 = tmplt.toString();
+        assertEquals(src1, src2);
     }
 
     @Test
