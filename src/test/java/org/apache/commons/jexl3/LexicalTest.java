@@ -349,6 +349,17 @@ public class LexicalTest {
     }
 
     @Test
+    public void testAnnotation() {
+        final JexlFeatures f = new JexlFeatures();
+        f.lexical(true);
+        final JexlEngine jexl = new JexlBuilder().strict(true).features(f).create();
+        final JexlScript script = jexl.createScript("@scale(13) @test var i = 42");
+        final JexlContext jc = new OptAnnotationContext();
+        final Object result = script.execute(jc);
+        Assert.assertEquals(42, result);
+    }
+
+    @Test
     public void testCaptured0() {
         final JexlFeatures f = new JexlFeatures();
         f.lexical(true);
@@ -356,17 +367,6 @@ public class LexicalTest {
         final JexlScript script = jexl.createScript(
                 "var x = 10; (b->{ x + b })(32)");
         final JexlContext jc = new MapContext();
-        final Object result = script.execute(jc);
-        Assert.assertEquals(42, result);
-    }
-
-    @Test
-    public void testAnnotation() {
-        final JexlFeatures f = new JexlFeatures();
-        f.lexical(true);
-        final JexlEngine jexl = new JexlBuilder().strict(true).features(f).create();
-        final JexlScript script = jexl.createScript("@scale(13) @test var i = 42");
-        final JexlContext jc = new OptAnnotationContext();
         final Object result = script.execute(jc);
         Assert.assertEquals(42, result);
     }
