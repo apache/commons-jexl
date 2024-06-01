@@ -44,74 +44,6 @@ public class ASTJexlScript extends JexlLexicalNode  {
     }
 
     /**
-     * Consider script with no parameters that return lambda as parametric-scripts.
-     * @return the script
-     */
-    public ASTJexlScript script() {
-        if (scope == null && jjtGetNumChildren() == 1 && jjtGetChild(0) instanceof ASTJexlLambda) {
-            final ASTJexlLambda lambda = (ASTJexlLambda) jjtGetChild(0);
-            lambda.jjtSetParent(null);
-            return lambda;
-        }
-        return this;
-    }
-
-    @Override
-    public Object jjtAccept(final ParserVisitor visitor, final Object data) {
-        return visitor.visit(this, data);
-    }
-
-    /**
-     * Sets this script pragmas.
-     * @param thePragmas the pragmas
-     */
-    public void setPragmas(final Map<String, Object> thePragmas) {
-        this.pragmas = thePragmas;
-    }
-
-    /**
-     * @return this script pragmas.
-     */
-    public Map<String, Object> getPragmas() {
-        return pragmas;
-    }
-
-    /**
-     * Sets this script features.
-     * @param theFeatures the features
-     */
-    public void setFeatures(final JexlFeatures theFeatures) {
-        this.features = theFeatures;
-    }
-
-    /**
-     * @return this script scope
-     */
-    public JexlFeatures getFeatures() {
-        return features;
-    }
-
-    /**
-     * Sets this script scope.
-     * @param theScope the scope
-     */
-    public void setScope(final Scope theScope) {
-        this.scope = theScope;
-        if (theScope != null) {
-            for(int a = 0; a < theScope.getArgCount(); ++a) {
-                this.declareSymbol(a);
-            }
-        }
-    }
-
-    /**
-     * @return this script scope
-     */
-    public Scope getScope() {
-        return scope;
-    }
-
-    /**
      * Creates an array of arguments by copying values up to the number of parameters.
      * @param caller the calling frame
      * @param values the argument values
@@ -139,19 +71,18 @@ public class ASTJexlScript extends JexlLexicalNode  {
     }
 
     /**
-     * Gets this script symbols, i.e. parameters and local variables.
-     * @return the symbol names
+     * Gets this script captured variable, i.e. symbols captured from outer scopes.
+     * @return the captured variable names
      */
-    public String[] getSymbols() {
-        return scope != null ? scope.getSymbols() : null;
+    public String[] getCapturedVariables() {
+        return scope != null ? scope.getCapturedVariables() : null;
     }
 
     /**
-     * Gets this script parameters, i.e. symbols assigned before creating local variables.
-     * @return the parameter names
+     * @return this script scope
      */
-    public String[] getParameters() {
-        return scope != null ? scope.getParameters() : null;
+    public JexlFeatures getFeatures() {
+        return features;
     }
 
     /**
@@ -163,6 +94,36 @@ public class ASTJexlScript extends JexlLexicalNode  {
     }
 
     /**
+     * Gets this script parameters, i.e. symbols assigned before creating local variables.
+     * @return the parameter names
+     */
+    public String[] getParameters() {
+        return scope != null ? scope.getParameters() : null;
+    }
+
+    /**
+     * @return this script pragmas.
+     */
+    public Map<String, Object> getPragmas() {
+        return pragmas;
+    }
+
+    /**
+     * @return this script scope
+     */
+    public Scope getScope() {
+        return scope;
+    }
+
+    /**
+     * Gets this script symbols, i.e. parameters and local variables.
+     * @return the symbol names
+     */
+    public String[] getSymbols() {
+        return scope != null ? scope.getSymbols() : null;
+    }
+
+    /**
      * Checks whether a given symbol is captured.
      * @param symbol the symbol number
      * @return true if captured, false otherwise
@@ -171,11 +132,50 @@ public class ASTJexlScript extends JexlLexicalNode  {
         return scope != null && scope.isCapturedSymbol(symbol);
     }
 
+    @Override
+    public Object jjtAccept(final ParserVisitor visitor, final Object data) {
+        return visitor.visit(this, data);
+    }
+
     /**
-     * Gets this script captured variable, i.e. symbols captured from outer scopes.
-     * @return the captured variable names
+     * Consider script with no parameters that return lambda as parametric-scripts.
+     * @return the script
      */
-    public String[] getCapturedVariables() {
-        return scope != null ? scope.getCapturedVariables() : null;
+    public ASTJexlScript script() {
+        if (scope == null && jjtGetNumChildren() == 1 && jjtGetChild(0) instanceof ASTJexlLambda) {
+            final ASTJexlLambda lambda = (ASTJexlLambda) jjtGetChild(0);
+            lambda.jjtSetParent(null);
+            return lambda;
+        }
+        return this;
+    }
+
+    /**
+     * Sets this script features.
+     * @param theFeatures the features
+     */
+    public void setFeatures(final JexlFeatures theFeatures) {
+        this.features = theFeatures;
+    }
+
+    /**
+     * Sets this script pragmas.
+     * @param thePragmas the pragmas
+     */
+    public void setPragmas(final Map<String, Object> thePragmas) {
+        this.pragmas = thePragmas;
+    }
+
+    /**
+     * Sets this script scope.
+     * @param theScope the scope
+     */
+    public void setScope(final Scope theScope) {
+        this.scope = theScope;
+        if (theScope != null) {
+            for(int a = 0; a < theScope.getArgCount(); ++a) {
+                this.declareSymbol(a);
+            }
+        }
     }
 }
