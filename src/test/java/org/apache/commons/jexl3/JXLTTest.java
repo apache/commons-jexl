@@ -1304,13 +1304,9 @@ public class JXLTTest extends JexlTestCase {
         }
         opts.setStrict(true);
         opts.setSafe(false);
-        try {
-            tmplt.evaluate(ctxt, strw);
-            fail("tab var is undefined");
-        } catch (final JexlException.Variable xvar) {
-            assertTrue("tab".equals(xvar.getVariable()));
-            assertTrue(xvar.isUndefined());
-        }
+        final JexlException.Variable xvar = assertThrows(JexlException.Variable.class, () -> tmplt.evaluate(ctxt, strw));
+        assertTrue("tab".equals(xvar.getVariable()));
+        assertTrue(xvar.isUndefined());
     }
 
     @ParameterizedTest
