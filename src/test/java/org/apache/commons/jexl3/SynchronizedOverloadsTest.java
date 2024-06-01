@@ -16,12 +16,12 @@
  */
 package org.apache.commons.jexl3;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
