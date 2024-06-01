@@ -16,13 +16,13 @@
  */
 package org.apache.commons.jexl3;
 
+import static org.apache.commons.jexl3.JexlFeatures.CONST_CAPTURE;
+
 import java.util.Arrays;
 import java.util.Collection;
 
 import org.junit.Assert;
 import org.junit.Test;
-
-import static org.apache.commons.jexl3.JexlFeatures.CONST_CAPTURE;
 
 /**
  * Tests for blocks
