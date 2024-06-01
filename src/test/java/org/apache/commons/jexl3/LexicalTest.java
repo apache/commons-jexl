@@ -518,7 +518,7 @@ public class LexicalTest {
 
     @Test
     public void testContextualOptions0() {
-        final JexlFeatures f= new JexlFeatures();
+        final JexlFeatures f = new JexlFeatures();
         final JexlEngine jexl = new JexlBuilder().features(f).strict(true).create();
         final JexlEvalContext ctxt = new JexlEvalContext();
         final JexlOptions options = ctxt.getEngineOptions();
@@ -527,12 +527,7 @@ public class LexicalTest {
         options.setLexicalShade(true);
         ctxt.set("options", options);
         final JexlScript script = jexl.createScript("{var x = 42;} options.lexical = false; options.lexicalShade=false; x");
-        try {
-        final Object result = script.execute(ctxt);
-        fail("setting options.lexical should have no effect during execution");
-        } catch (final JexlException xf) {
-            assertNotNull(xf);
-        }
+        assertThrows(JexlException.class, () -> script.execute(ctxt), "setting options.lexical should have no effect during execution");
     }
 
     @Test
