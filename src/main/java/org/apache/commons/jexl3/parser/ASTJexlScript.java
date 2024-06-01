@@ -174,7 +174,7 @@ public class ASTJexlScript extends JexlLexicalNode  {
         this.scope = theScope;
         if (theScope != null) {
             for(int a = 0; a < theScope.getArgCount(); ++a) {
-                this.declareSymbol(a);
+                declareSymbol(a);
             }
         }
     }
