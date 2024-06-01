@@ -204,33 +204,6 @@ public abstract class JxltEngine {
     }
 
     /**
-     * Creates a {@link Expression} from an expression string.
-     * Uses and fills up the expression cache if any.
-     *
-     * <p>If the underlying JEXL engine is silent, errors will be logged through its logger as warnings.</p>
-     *
-     * @param expression the {@link Template} string expression
-     * @return the {@link Expression}, null if silent and an error occurred
-     * @throws Exception if an error occurs and the {@link JexlEngine} is not silent
-     */
-    public Expression createExpression(final String expression) {
-        return createExpression(null, expression);
-    }
-
-    /**
-     * Creates a {@link Expression} from an expression string.
-     * Uses and fills up the expression cache if any.
-     *
-     * <p>If the underlying JEXL engine is silent, errors will be logged through its logger as warnings.</p>
-     *
-     * @param info the {@link JexlInfo} source information
-     * @param expression the {@link Template} string expression
-     * @return the {@link Expression}, null if silent and an error occurred
-     * @throws Exception if an error occurs and the {@link JexlEngine} is not silent
-     */
-    public abstract Expression createExpression(JexlInfo info, String expression);
-
-    /**
      * A template is a JEXL script that evaluates by writing its content through a Writer.
      * <p>
      * The source text is parsed considering each line beginning with '$$' (as default pattern) as JEXL script code
@@ -303,24 +276,6 @@ public abstract class JxltEngine {
         void evaluate(JexlContext context, Writer writer, Object... args);
 
         /**
-         * Prepares this template by expanding any contained deferred TemplateExpression.
-         *
-         * @param context the context to prepare against
-         * @return the prepared version of the template
-         */
-        Template prepare(JexlContext context);
-
-        /**
-         * Gets the list of variables accessed by this template.
-         * <p>This method will visit all nodes of the sub-expressions and extract all variables whether they
-         * are written in 'dot' or 'bracketed' notation. (a.b is equivalent to a['b']).</p>
-         *
-         * @return the set of variables, each as a list of strings (ant-ish variables use more than 1 string)
-         * or the empty set if no variables are used
-         */
-        Set<List<String>> getVariables();
-
-        /**
          * Gets the list of parameters expected by this template.
          *
          * @return the parameter names array
@@ -334,6 +289,67 @@ public abstract class JxltEngine {
          * @since 3.1
          */
         Map<String, Object> getPragmas();
+
+        /**
+         * Gets the list of variables accessed by this template.
+         * <p>This method will visit all nodes of the sub-expressions and extract all variables whether they
+         * are written in 'dot' or 'bracketed' notation. (a.b is equivalent to a['b']).</p>
+         *
+         * @return the set of variables, each as a list of strings (ant-ish variables use more than 1 string)
+         * or the empty set if no variables are used
+         */
+        Set<List<String>> getVariables();
+
+        /**
+         * Prepares this template by expanding any contained deferred TemplateExpression.
+         *
+         * @param context the context to prepare against
+         * @return the prepared version of the template
+         */
+        Template prepare(JexlContext context);
+    }
+
+    /**
+     * Clears the cache.
+     */
+    public abstract void clearCache();
+
+    /**
+     * Creates a {@link Expression} from an expression string.
+     * Uses and fills up the expression cache if any.
+     *
+     * <p>If the underlying JEXL engine is silent, errors will be logged through its logger as warnings.</p>
+     *
+     * @param info the {@link JexlInfo} source information
+     * @param expression the {@link Template} string expression
+     * @return the {@link Expression}, null if silent and an error occurred
+     * @throws Exception if an error occurs and the {@link JexlEngine} is not silent
+     */
+    public abstract Expression createExpression(JexlInfo info, String expression);
+
+    /**
+     * Creates a {@link Expression} from an expression string.
+     * Uses and fills up the expression cache if any.
+     *
+     * <p>If the underlying JEXL engine is silent, errors will be logged through its logger as warnings.</p>
+     *
+     * @param expression the {@link Template} string expression
+     * @return the {@link Expression}, null if silent and an error occurred
+     * @throws Exception if an error occurs and the {@link JexlEngine} is not silent
+     */
+    public Expression createExpression(final String expression) {
+        return createExpression(null, expression);
+    }
+
+    /**
+     * Creates a new template.
+     *
+     * @param info the source info
+     * @param source the source
+     * @return the template
+     */
+    public Template createTemplate(final JexlInfo info, final String source) {
+        return createTemplate(info, "$$", new StringReader(source), (String[]) null);
     }
 
     /**
@@ -362,12 +378,11 @@ public abstract class JxltEngine {
     /**
      * Creates a new template.
      *
-     * @param info the source info
      * @param source the source
      * @return the template
      */
-    public Template createTemplate(final JexlInfo info, final String source) {
-        return createTemplate(info, "$$", new StringReader(source), (String[]) null);
+    public Template createTemplate(final String source) {
+        return createTemplate(null, source);
     }
 
     /**
@@ -394,24 +409,9 @@ public abstract class JxltEngine {
     }
 
     /**
-     * Creates a new template.
-     *
-     * @param source the source
-     * @return the template
-     */
-    public Template createTemplate(final String source) {
-        return createTemplate(null, source);
-    }
-
-    /**
      * Gets the {@link JexlEngine} underlying this template engine.
      *
      * @return the JexlEngine
      */
     public abstract JexlEngine getEngine();
-
-    /**
-     * Clears the cache.
-     */
-    public abstract void clearCache();
 }
