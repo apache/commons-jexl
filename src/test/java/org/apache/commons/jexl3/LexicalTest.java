@@ -446,15 +446,10 @@ public class LexicalTest {
 
     @Test
     public void testConst2c() {
-        final JexlFeatures f = new JexlFeatures();
         final JexlEngine jexl = new JexlBuilder().strict(true).create();
-        for(final String op : Arrays.asList("=", "+=", "-=", "/=", "*=", "%=", "<<=", ">>=", ">>>=", "^=", "&=", "|=")) {
-            try {
-                final JexlScript script = jexl.createScript("{ const foo = 42; } { let foo  = 0; foo " + op + " 1; }");
-                assertNotNull(script);
-            } catch (final JexlException.Parsing xparse) {
-                fail(xparse.toString());
-            }
+        for (final String op : Arrays.asList("=", "+=", "-=", "/=", "*=", "%=", "<<=", ">>=", ">>>=", "^=", "&=", "|=")) {
+            final JexlScript script = jexl.createScript("{ const foo = 42; } { let foo  = 0; foo " + op + " 1; }");
+            assertNotNull(script);
         }
     }
 
