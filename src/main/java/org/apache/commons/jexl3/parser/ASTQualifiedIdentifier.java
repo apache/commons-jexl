@@ -29,15 +29,6 @@ public class ASTQualifiedIdentifier extends JexlNode {
         super(id);
     }
 
-    @Override
-    public String toString() {
-        return name;
-    }
-
-    public void setName(final String qualified) {
-        this.name = qualified;
-    }
-
     public String getName() {
         return name;
     }
@@ -45,5 +36,14 @@ public class ASTQualifiedIdentifier extends JexlNode {
     @Override
     public Object jjtAccept(final ParserVisitor visitor, final Object data) {
         return visitor.visit(this, data);
+    }
+
+    public void setName(final String qualified) {
+        this.name = qualified;
+    }
+
+    @Override
+    public String toString() {
+        return name;
     }
 }
