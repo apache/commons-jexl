@@ -16,9 +16,13 @@
  */
 package org.apache.commons.jexl3.internal.introspection;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 import static org.apache.commons.jexl3.introspection.JexlPermissions.RESTRICTED;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -42,7 +46,6 @@ import org.apache.commons.jexl3.MapContext;
 import org.apache.commons.jexl3.internal.introspection.nojexlpackage.Invisible;
 import org.apache.commons.jexl3.introspection.JexlPermissions;
 import org.apache.commons.jexl3.introspection.JexlUberspect;
-import org.junit.Assert;
 import org.junit.Test;
 
 /**
