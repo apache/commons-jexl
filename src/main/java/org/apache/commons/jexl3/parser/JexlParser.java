@@ -29,7 +29,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-import org.apache.commons.jexl3.JexlContext;
 import org.apache.commons.jexl3.JexlEngine;
 import org.apache.commons.jexl3.JexlException;
 import org.apache.commons.jexl3.JexlFeatures;
@@ -632,8 +631,9 @@ public abstract class JexlParser extends StringParser {
     /**
      * Default implementation does nothing but is overridden by generated code.
      * @param top whether the identifier is beginning an l/r value
-     * @throws ParseException subclasses may throw this
+     * @throws ParseException subclasses may throw ParseException
      */
+    @SuppressWarnings("unused") // subclasses may throw ParseException
     protected void Identifier(final boolean top) throws ParseException {
         // Overridden by generated code
     }

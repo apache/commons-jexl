@@ -57,7 +57,7 @@ public class SideEffectTest extends JexlTestCase {
             return c;
         }
 
-        public Object selfAdd(final Collection<String> c, final String item) throws IOException {
+        public Object selfAdd(final Collection<String> c, final String item) {
             c.add(item);
             return c;
         }

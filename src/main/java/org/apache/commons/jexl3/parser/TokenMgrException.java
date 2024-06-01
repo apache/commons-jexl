@@ -132,7 +132,7 @@ public class TokenMgrException extends RuntimeException implements JavaccError {
         return after;
     }
 
-     /***
+     /**
       * Replaces unprintable characters by their espaced (or unicode escaped)
       * equivalents in the given string
       */

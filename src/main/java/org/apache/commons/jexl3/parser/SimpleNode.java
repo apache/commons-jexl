@@ -83,6 +83,7 @@ public class SimpleNode implements Node {
 
     /**
      * Gets this node's parent.
+     *
      * @return the parent node
      */
     @Override
@@ -90,7 +91,9 @@ public class SimpleNode implements Node {
         return parent;
     }
 
-    /** Adds a child node.
+    /**
+     * Adds a child node.
+     *
      * @param n the child node
      * @param i the child offset
      */
@@ -113,6 +116,7 @@ public class SimpleNode implements Node {
 
     /**
      * Gets a child of this node.
+     *
      * @param i the child offset
      * @return the child node
      */
@@ -123,6 +127,7 @@ public class SimpleNode implements Node {
 
     /**
      * Gets this node number of children.
+     *
      * @return the number of children
      */
     @Override
@@ -130,14 +135,18 @@ public class SimpleNode implements Node {
         return children == null ? 0 : children.length;
     }
 
-    /** Sets this node value.
-     * @param value
+    /**
+     * Sets this node value.
+     *
+     * @param value this node value.
      */
     public void jjtSetValue(final Object value) {
         this.value = value;
     }
 
-    /** Gets this node value.
+    /**
+     * Gets this node value.
+     *
      * @return value
      */
     public Object jjtGetValue() {
@@ -145,7 +154,8 @@ public class SimpleNode implements Node {
     }
 
     /**
-     * Accept the visitor.
+     * Accepts the visitor.
+     *
      * @param visitor the visitor
      * @param data contextual data
      * @return result of visit
@@ -156,7 +166,8 @@ public class SimpleNode implements Node {
     }
 
     /**
-     * Accept the visitor on all this node's children.
+     * Accepts the visitor on all this node's children.
+     *
      * @param visitor the visitor
      * @param data contextual data
      * @return result of visit
