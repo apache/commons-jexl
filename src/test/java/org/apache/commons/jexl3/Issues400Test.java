@@ -37,6 +37,22 @@ import org.junit.Test;
  */
 public class Issues400Test {
 
+  public static class VinzCaller {
+    private final JexlContext context;
+    VinzCaller(JexlContext context) {
+      this.context = context;
+    }
+    public Object execute(JexlScript script) {
+      return script.execute(context);
+    }
+  }
+
+  public static class VinzContext extends MapContext {
+    public String member(String m, String u) {
+      return m + '.' + u;
+    }
+  }
+
   /**
    * Any function in a context can be used as a method of its first parameter.
    * Overloads are respected.
@@ -389,22 +405,6 @@ public class Issues400Test {
     script = jexl.createScript(srcBreak);
     result = script.execute(null);
     Assert.assertEquals(42, result);
-  }
-
-  public static class VinzContext extends MapContext {
-    public String member(String m, String u) {
-      return m + '.' + u;
-    }
-  }
-
-  public static class VinzCaller {
-    private final JexlContext context;
-    VinzCaller(JexlContext context) {
-      this.context = context;
-    }
-    public Object execute(JexlScript script) {
-      return script.execute(context);
-    }
   }
 
   @Test
