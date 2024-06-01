@@ -54,7 +54,7 @@ public class StreamTest {
          * @param filter the lambda to use as filter
          * @return the filtered result as a list
          */
-        public List<?> filter(Collection<?> collection, final JexlScript filter) {
+        public List<?> filter(final Collection<?> collection, final JexlScript filter) {
             return collection.stream()
                 .filter(x -> x != null && TRUE.equals(filter.execute(this, x)))
                 .collect(Collectors.toList());
@@ -66,7 +66,7 @@ public class StreamTest {
          * @param mapper the lambda to use as mapper
          * @return the mapped result as a list
          */
-        public List<?> map(Collection<?> collection, final JexlScript mapper) {
+        public List<?> map(final Collection<?> collection, final JexlScript mapper) {
             return collection.stream()
                 .map(x -> mapper.execute(this, x))
                 .filter(Objects::nonNull)
@@ -137,7 +137,7 @@ public class StreamTest {
         assertTrue(filtered instanceof List<?>);
         List<URI> result = (List<URI>) filtered;
         assertEquals(2, result.size());
-        for(URI uri : result) {
+        for(final URI uri : result) {
             assertTrue(uri.getScheme().startsWith("http"));
         }
 
@@ -149,7 +149,7 @@ public class StreamTest {
         assertTrue(transformed instanceof List<?>);
         result = (List<URI>) transformed;
         assertEquals(2, result.size());
-        for(URI uri : result) {
+        for(final URI uri : result) {
           assertEquals("https", uri.getScheme());
         }
     }
