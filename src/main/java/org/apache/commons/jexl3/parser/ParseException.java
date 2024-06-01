@@ -39,6 +39,23 @@ public class ParseException extends Exception implements JavaccError {
     private int column = -1;
 
     /**
+     * Constructs a new exception with {@code null} as its detail message. The cause is not initialized, and may subsequently be initialized by a call to
+     * {@link #initCause}.
+     */
+    public ParseException() {
+    }
+
+    /**
+     * Constructs a new exception with the specified detail message. The cause is not initialized, and may subsequently be initialized by a call to
+     * {@link #initCause}.
+     *
+     * @param message the detail message. The detail message is saved for later retrieval by the {@link #getMessage()} method.
+     */
+    public ParseException(final String message) {
+        super(message);
+    }
+
+    /**
      * This constructor is used by the method "generateParseException"
      * in the generated parser.  Calling this constructor generates
      * a new object of this type with the fields "currentToken",
@@ -61,26 +78,9 @@ public class ParseException extends Exception implements JavaccError {
         column = tok.beginColumn;
     }
 
-    /**
-     * Constructs a new exception with {@code null} as its detail message. The cause is not initialized, and may subsequently be initialized by a call to
-     * {@link #initCause}.
-     */
-    public ParseException() {
-    }
-
-    /**
-     * Constructs a new exception with the specified detail message. The cause is not initialized, and may subsequently be initialized by a call to
-     * {@link #initCause}.
-     *
-     * @param message the detail message. The detail message is saved for later retrieval by the {@link #getMessage()} method.
-     */
-    public ParseException(final String message) {
-        super(message);
-    }
-
     @Override
-    public int getLine() {
-        return line;
+    public String getAfter() {
+        return after;
     }
 
     @Override
@@ -89,7 +89,7 @@ public class ParseException extends Exception implements JavaccError {
     }
 
     @Override
-    public String getAfter() {
-        return after;
+    public int getLine() {
+        return line;
     }
 }
