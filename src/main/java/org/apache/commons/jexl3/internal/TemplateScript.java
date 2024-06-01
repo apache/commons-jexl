@@ -43,14 +43,60 @@ import org.apache.commons.jexl3.parser.JexlNode;
  * A Template instance.
  */
 public final class TemplateScript implements JxltEngine.Template {
+    /**
+     * Collects the scope surrounding a call to jexl:print(i).
+     * <p>This allows to later parse the blocks with the known symbols
+     * in the frame visible to the parser.
+     * @param node the visited node
+     * @param minfo the map of printed expression number to node info
+     */
+    private static void collectPrintScope(final JexlNode node, final Map<Integer, JexlNode.Info> minfo) {
+        final int nc = node.jjtGetNumChildren();
+        if (node instanceof ASTFunctionNode && nc == 2) {
+            // 0 must be the prefix jexl:
+            final ASTIdentifier nameNode = (ASTIdentifier) node.jjtGetChild(0);
+            if ("print".equals(nameNode.getName()) && "jexl".equals(nameNode.getNamespace())) {
+                final ASTArguments argNode = (ASTArguments) node.jjtGetChild(1);
+                if (argNode.jjtGetNumChildren() == 1) {
+                    // seek the epression number
+                    final JexlNode arg0 = argNode.jjtGetChild(0);
+                    if (arg0 instanceof ASTNumberLiteral) {
+                        final int exprNumber = ((ASTNumberLiteral) arg0).getLiteral().intValue();
+                        minfo.put(exprNumber, new JexlNode.Info(nameNode));
+                        return;
+                    }
+                }
+            }
+        }
+        for (int c = 0; c < nc; ++c) {
+            collectPrintScope(node.jjtGetChild(c), minfo);
+        }
+    }
+    /**
+     * Gets the scope from an info.
+     * @param info the node info
+     * @return the scope
+     */
+    private static Scope scopeOf(final JexlNode.Info info) {
+        JexlNode walk = info.getNode();
+        while(walk != null) {
+            if (walk instanceof ASTJexlScript) {
+                return ((ASTJexlScript) walk).getScope();
+            }
+            walk = walk.jjtGetParent();
+        }
+        return null;
+    }
     /** The prefix marker. */
     private final String prefix;
     /** The array of source blocks. */
     private final Block[] source;
     /** The resulting script. */
     private final ASTJexlScript script;
+
     /** The TemplateEngine expressions called by the script. */
     private final TemplateExpression[] exprs;
+
     /** The engine. */
     private final TemplateEngine jxlt;
 
@@ -170,75 +216,6 @@ public final class TemplateScript implements JxltEngine.Template {
         exprs = theExprs;
     }
 
-    /**
-     * Gets the scope from an info.
-     * @param info the node info
-     * @return the scope
-     */
-    private static Scope scopeOf(final JexlNode.Info info) {
-        JexlNode walk = info.getNode();
-        while(walk != null) {
-            if (walk instanceof ASTJexlScript) {
-                return ((ASTJexlScript) walk).getScope();
-            }
-            walk = walk.jjtGetParent();
-        }
-        return null;
-    }
-
-    /**
-     * Collects the scope surrounding a call to jexl:print(i).
-     * <p>This allows to later parse the blocks with the known symbols
-     * in the frame visible to the parser.
-     * @param node the visited node
-     * @param minfo the map of printed expression number to node info
-     */
-    private static void collectPrintScope(final JexlNode node, final Map<Integer, JexlNode.Info> minfo) {
-        final int nc = node.jjtGetNumChildren();
-        if (node instanceof ASTFunctionNode && nc == 2) {
-            // 0 must be the prefix jexl:
-            final ASTIdentifier nameNode = (ASTIdentifier) node.jjtGetChild(0);
-            if ("print".equals(nameNode.getName()) && "jexl".equals(nameNode.getNamespace())) {
-                final ASTArguments argNode = (ASTArguments) node.jjtGetChild(1);
-                if (argNode.jjtGetNumChildren() == 1) {
-                    // seek the epression number
-                    final JexlNode arg0 = argNode.jjtGetChild(0);
-                    if (arg0 instanceof ASTNumberLiteral) {
-                        final int exprNumber = ((ASTNumberLiteral) arg0).getLiteral().intValue();
-                        minfo.put(exprNumber, new JexlNode.Info(nameNode));
-                        return;
-                    }
-                }
-            }
-        }
-        for (int c = 0; c < nc; ++c) {
-            collectPrintScope(node.jjtGetChild(c), minfo);
-        }
-    }
-
-    /**
-     * @return script
-     */
-    ASTJexlScript getScript() {
-        return script;
-    }
-
-    /**
-     * @return exprs
-     */
-    TemplateExpression[] getExpressions() {
-        return exprs;
-    }
-
-    @Override
-    public String toString() {
-        final StringBuilder strb = new StringBuilder();
-        for (final Block block : source) {
-            block.toString(strb, prefix);
-        }
-        return strb.toString();
-    }
-
     @Override
     public String asString() {
         final StringBuilder strb = new StringBuilder();
@@ -252,6 +229,60 @@ public final class TemplateScript implements JxltEngine.Template {
             }
         }
         return strb.toString();
+    }
+
+    @Override
+    public void evaluate(final JexlContext context, final Writer writer) {
+        evaluate(context, writer, (Object[]) null);
+    }
+
+    @Override
+    public void evaluate(final JexlContext context, final Writer writer, final Object... args) {
+        final Engine jexl = jxlt.getEngine();
+        final JexlOptions options = jexl.evalOptions(script, context);
+        final Frame frame = script.createFrame(args);
+        final TemplateInterpreter.Arguments targs = new TemplateInterpreter
+                .Arguments(jexl)
+                .context(context)
+                .options(options)
+                .frame(frame)
+                .expressions(exprs)
+                .writer(writer);
+        final Interpreter interpreter = jexl.createTemplateInterpreter(targs);
+        interpreter.interpret(script);
+    }
+
+    /**
+     * @return exprs
+     */
+    TemplateExpression[] getExpressions() {
+        return exprs;
+    }
+
+    @Override
+    public String[] getParameters() {
+        return script.getParameters();
+    }
+
+    @Override
+    public Map<String, Object> getPragmas() {
+        return script.getPragmas();
+    }
+
+    /**
+     * @return script
+     */
+    ASTJexlScript getScript() {
+        return script;
+    }
+
+    @Override
+    public Set<List<String>> getVariables() {
+        final Engine.VarCollector collector = jxlt.getEngine().varCollector();
+        for (final TemplateExpression expr : exprs) {
+            expr.getVariables(collector);
+        }
+        return collector.collected();
     }
 
     @Override
@@ -284,42 +315,11 @@ public final class TemplateScript implements JxltEngine.Template {
     }
 
     @Override
-    public void evaluate(final JexlContext context, final Writer writer) {
-        evaluate(context, writer, (Object[]) null);
-    }
-
-    @Override
-    public void evaluate(final JexlContext context, final Writer writer, final Object... args) {
-        final Engine jexl = jxlt.getEngine();
-        final JexlOptions options = jexl.evalOptions(script, context);
-        final Frame frame = script.createFrame(args);
-        final TemplateInterpreter.Arguments targs = new TemplateInterpreter
-                .Arguments(jexl)
-                .context(context)
-                .options(options)
-                .frame(frame)
-                .expressions(exprs)
-                .writer(writer);
-        final Interpreter interpreter = jexl.createTemplateInterpreter(targs);
-        interpreter.interpret(script);
-    }
-
-    @Override
-    public Set<List<String>> getVariables() {
-        final Engine.VarCollector collector = jxlt.getEngine().varCollector();
-        for (final TemplateExpression expr : exprs) {
-            expr.getVariables(collector);
+    public String toString() {
+        final StringBuilder strb = new StringBuilder();
+        for (final Block block : source) {
+            block.toString(strb, prefix);
         }
-        return collector.collected();
-    }
-
-    @Override
-    public String[] getParameters() {
-        return script.getParameters();
-    }
-
-    @Override
-    public Map<String, Object> getPragmas() {
-        return script.getPragmas();
+        return strb.toString();
     }
 }
