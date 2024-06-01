@@ -37,30 +37,6 @@ import java.util.concurrent.Callable;
  */
 public interface JexlExpression {
     /**
-     * Evaluates the expression with the variables contained in the
-     * supplied {@link JexlContext}.
-     *
-     * @param context A JexlContext containing variables.
-     * @return The result of this evaluation
-     * @throws JexlException on any error
-     */
-    Object evaluate(JexlContext context);
-
-    /**
-     * Returns the source text of this expression.
-     *
-     * @return the source text
-     */
-    String getSourceText();
-
-    /**
-     * Recreates the source text of this expression from the internal syntactic tree.
-     *
-     * @return the source text
-     */
-    String getParsedText();
-
-    /**
      * Creates a Callable from this expression.
      *
      * <p>This allows to submit it to an executor pool and provides support for asynchronous calls.</p>
@@ -71,4 +47,28 @@ public interface JexlExpression {
      * @since 3.1
      */
     Callable<Object> callable(JexlContext context);
+
+    /**
+     * Evaluates the expression with the variables contained in the
+     * supplied {@link JexlContext}.
+     *
+     * @param context A JexlContext containing variables.
+     * @return The result of this evaluation
+     * @throws JexlException on any error
+     */
+    Object evaluate(JexlContext context);
+
+    /**
+     * Recreates the source text of this expression from the internal syntactic tree.
+     *
+     * @return the source text
+     */
+    String getParsedText();
+
+    /**
+     * Returns the source text of this expression.
+     *
+     * @return the source text
+     */
+    String getSourceText();
 }
