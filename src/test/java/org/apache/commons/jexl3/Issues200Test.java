@@ -610,18 +610,14 @@ public class Issues200Test extends JexlTestCase {
     @Test
     public void test275c() throws Exception {
         final JexlContext ctxt = new MapContext();
-        //ctxt.set("out", System.out);
+        // ctxt.set("out", System.out);
         final JexlEngine jexl = new JexlBuilder().strict(true).safe(true).silent(true).create();
         JexlScript e;
         Object r;
         e = jexl.createScript("(s, v)->{  var x = y ; 42; }");
         // wont make an error
-        try {
-            r = e.execute(ctxt, false, true);
-            assertEquals(42, r);
-        } catch (final JexlException.Variable xjexl) {
-            fail("should not have thrown");
-        }
+        r = e.execute(ctxt, false, true);
+        assertEquals(42, r);
     }
 
     @Test
@@ -629,14 +625,9 @@ public class Issues200Test extends JexlTestCase {
         final JexlContext ctxt = new MapContext();
         ctxt.set("out", System.out);
         final JexlEngine jexl = new JexlBuilder().strict(true).safe(true).create();
-
         final JexlScript e = jexl.createScript("{ var xyz = 42 } out.println(xyz)");
-        try {
-            final Object o = e.execute(ctxt);
-            assertNull(o);
-        } catch (final JexlException.Variable xvar) {
-            fail("should not have thrown" + xvar);
-        }
+        final Object o = e.execute(ctxt);
+        assertNull(o);
     }
 
     @Test
