@@ -778,16 +778,10 @@ public class LexicalTest {
     public void testLexical5() {
         final JexlEngine jexl = new JexlBuilder().strict(true).lexical(true).create();
         final JexlContext ctxt = new DebugContext();
-        JexlScript script;
         Object result;
-            script = jexl.createScript("var x = 42; var y = () -> { {var x = debug(-42); }; return x; }; y()");
-        try {
-            result = script.execute(ctxt);
-            assertEquals(42, result);
-        } catch (final JexlException xany) {
-            final String ww = xany.toString();
-            fail(ww);
-        }
+        JexlScript script = jexl.createScript("var x = 42; var y = () -> { {var x = debug(-42); }; return x; }; y()");
+        result = script.execute(ctxt);
+        assertEquals(42, result);
     }
 
     @Test
