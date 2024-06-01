@@ -40,10 +40,7 @@ public class Dumper {
         final int num = node.jjtGetNumChildren();
         indent();
         strb.append(node.getClass().getSimpleName());
-        if (node instanceof ASTIdentifier) {
-            strb.append("@");
-            strb.append(node.toString());
-        } else if (node instanceof ASTIdentifierAccess) {
+        if (node instanceof ASTIdentifier || node instanceof ASTIdentifierAccess) {
             strb.append("@");
             strb.append(node.toString());
         }
