@@ -24,14 +24,6 @@ public class ASTForeachStatement extends JexlLexicalNode {
     /** For(:)=0 vs for(;;)=1|2|4 form. */
     private int loopForm;
 
-    void setLoopForm(final int form) {
-        loopForm = form;
-    }
-
-    public int getLoopForm() {
-        return loopForm;
-    }
-
     public ASTForeachStatement(final int id) {
         super(id);
     }
@@ -40,9 +32,17 @@ public class ASTForeachStatement extends JexlLexicalNode {
         super(id);
     }
 
+    public int getLoopForm() {
+        return loopForm;
+    }
+
     @Override
     public Object jjtAccept(final ParserVisitor visitor, final Object data) {
         return visitor.visit(this, data);
+    }
+
+    void setLoopForm(final int form) {
+        loopForm = form;
     }
 
 }
