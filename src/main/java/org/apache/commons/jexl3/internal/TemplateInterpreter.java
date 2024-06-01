@@ -39,11 +39,6 @@ import org.apache.commons.jexl3.parser.JexlNode;
  * <p>public for introspection purpose.</p>
  */
 public class TemplateInterpreter extends Interpreter {
-    /** The array of template expressions. */
-    final TemplateExpression[] exprs;
-    /** The writer used to output. */
-    final Writer writer;
-
     /**
      * Helper ctor.
      * <p>Stores the different properties required to create a Template interpreter.
@@ -70,30 +65,12 @@ public class TemplateInterpreter extends Interpreter {
             this.jexl = e;
         }
         /**
-         * Sets the options.
-         * @param o the options
-         * @return this instance
-         */
-        Arguments options(final JexlOptions o) {
-            this.options = o;
-            return this;
-        }
-        /**
          * Sets the context.
          * @param j the context
          * @return this instance
          */
         Arguments context(final JexlContext j) {
             this.jcontext = j;
-            return this;
-        }
-        /**
-         * Sets the frame.
-         * @param f the frame
-         * @return this instance
-         */
-        Arguments frame(final Frame f) {
-            this.jframe = f;
             return this;
         }
         /**
@@ -106,6 +83,24 @@ public class TemplateInterpreter extends Interpreter {
             return this;
         }
         /**
+         * Sets the frame.
+         * @param f the frame
+         * @return this instance
+         */
+        Arguments frame(final Frame f) {
+            this.jframe = f;
+            return this;
+        }
+        /**
+         * Sets the options.
+         * @param o the options
+         * @return this instance
+         */
+        Arguments options(final JexlOptions o) {
+            this.options = o;
+            return this;
+        }
+        /**
          * Sets the writer.
          * @param o the writer
          * @return this instance
@@ -115,6 +110,11 @@ public class TemplateInterpreter extends Interpreter {
             return this;
         }
     }
+    /** The array of template expressions. */
+    final TemplateExpression[] exprs;
+
+    /** The writer used to output. */
+    final Writer writer;
 
     /**
      * Creates a template interpreter instance.
@@ -125,6 +125,38 @@ public class TemplateInterpreter extends Interpreter {
         exprs = args.expressions;
         writer = args.out;
         block = new LexicalFrame(frame, null);
+    }
+
+    /**
+     * Prints to output.
+     * <p>
+     * This will dynamically try to find the best suitable method in the writer through uberspection.
+     * Subclassing Writer by adding 'print' methods should be the preferred way to specialize output.
+     * </p>
+     * @param info the source info
+     * @param arg  the argument to print out
+     */
+    private void doPrint(final JexlInfo info, final Object arg) {
+        try {
+            if (writer != null) {
+                if (arg instanceof CharSequence) {
+                    writer.write(arg.toString());
+                } else if (arg != null) {
+                    final Object[] value = {arg};
+                    final JexlUberspect uber = jexl.getUberspect();
+                    final JexlMethod method = uber.getMethod(writer, "print", value);
+                    if (method != null) {
+                        method.invoke(writer, value);
+                    } else {
+                        writer.write(arg.toString());
+                    }
+                }
+            }
+        } catch (final java.io.IOException xio) {
+            throw TemplateEngine.createException(info, "call print", null, xio);
+        } catch (final java.lang.Exception xany) {
+            throw TemplateEngine.createException(info, "invoke print", null, xany);
+        }
     }
 
     /**
@@ -170,50 +202,9 @@ public class TemplateInterpreter extends Interpreter {
         }
     }
 
-    /**
-     * Prints to output.
-     * <p>
-     * This will dynamically try to find the best suitable method in the writer through uberspection.
-     * Subclassing Writer by adding 'print' methods should be the preferred way to specialize output.
-     * </p>
-     * @param info the source info
-     * @param arg  the argument to print out
-     */
-    private void doPrint(final JexlInfo info, final Object arg) {
-        try {
-            if (writer != null) {
-                if (arg instanceof CharSequence) {
-                    writer.write(arg.toString());
-                } else if (arg != null) {
-                    final Object[] value = {arg};
-                    final JexlUberspect uber = jexl.getUberspect();
-                    final JexlMethod method = uber.getMethod(writer, "print", value);
-                    if (method != null) {
-                        method.invoke(writer, value);
-                    } else {
-                        writer.write(arg.toString());
-                    }
-                }
-            }
-        } catch (final java.io.IOException xio) {
-            throw TemplateEngine.createException(info, "call print", null, xio);
-        } catch (final java.lang.Exception xany) {
-            throw TemplateEngine.createException(info, "invoke print", null, xany);
-        }
-    }
-
     @Override
     protected Object resolveNamespace(final String prefix, final JexlNode node) {
         return "jexl".equals(prefix)? this : super.resolveNamespace(prefix, node);
-    }
-
-    @Override
-    protected Object visit(final ASTIdentifier node, final Object data) {
-        final String name = node.getName();
-        if ("$jexl".equals(name)) {
-            return writer;
-        }
-        return super.visit(node, data);
     }
 
     /**
@@ -253,6 +244,15 @@ public class TemplateInterpreter extends Interpreter {
                 // fail safe
                 throw new JxltEngine.Exception(node.jexlInfo(), "no callable template function " + functionName, null);
             }
+        }
+        return super.visit(node, data);
+    }
+
+    @Override
+    protected Object visit(final ASTIdentifier node, final Object data) {
+        final String name = node.getName();
+        if ("$jexl".equals(name)) {
+            return writer;
         }
         return super.visit(node, data);
     }
