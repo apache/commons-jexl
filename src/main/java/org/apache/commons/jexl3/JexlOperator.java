@@ -484,24 +484,6 @@ public enum JexlOperator {
     }
 
     /**
-     * Gets this operator symbol.
-     *
-     * @return the symbol
-     */
-    public final String getOperatorSymbol() {
-        return operator;
-    }
-
-    /**
-     * Gets this operator method name in a JexlArithmetic.
-     *
-     * @return the method name
-     */
-    public final String getMethodName() {
-        return methodName;
-    }
-
-    /**
      * Gets this operator number of parameters.
      *
      * @return the method arity
@@ -517,6 +499,24 @@ public enum JexlOperator {
      */
     public final JexlOperator getBaseOperator() {
         return base;
+    }
+
+    /**
+     * Gets this operator method name in a JexlArithmetic.
+     *
+     * @return the method name
+     */
+    public final String getMethodName() {
+        return methodName;
+    }
+
+    /**
+     * Gets this operator symbol.
+     *
+     * @return the symbol
+     */
+    public final String getOperatorSymbol() {
+        return operator;
     }
 
 }
