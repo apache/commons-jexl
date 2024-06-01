@@ -47,9 +47,11 @@ public class MapContext implements JexlContext {
         map = vars == null ? new HashMap<>() : vars;
     }
 
-    @Override
-    public boolean has(final String name) {
-        return map.containsKey(name);
+    /**
+     * Clears all variables.
+     */
+    public void clear() {
+        map.clear();
     }
 
     @Override
@@ -58,14 +60,12 @@ public class MapContext implements JexlContext {
     }
 
     @Override
-    public void set(final String name, final Object value) {
-        map.put(name, value);
+    public boolean has(final String name) {
+        return map.containsKey(name);
     }
 
-    /**
-     * Clears all variables.
-     */
-    public void clear() {
-        map.clear();
+    @Override
+    public void set(final String name, final Object value) {
+        map.put(name, value);
     }
 }
