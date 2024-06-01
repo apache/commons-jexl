@@ -312,6 +312,7 @@ public class IssuesTest extends JexlTestCase {
         // ensure errors will throw
         options.setSilent(false);
         // ';' is necessary between expressions
+        // @formatter:off
         final String[] fexprs = {
             "a=3 b=4",
             "while(a) while(a)",
@@ -319,15 +320,12 @@ public class IssuesTest extends JexlTestCase {
             "if (true) 2; 3 {}",
             "while (x) 1 if (y) 2 3"
         };
+        // @formatter:on
         for (final String fexpr : fexprs) {
-            try {
-                jexl.createScript(fexpr);
-                fail(fexpr + ": Should have failed in parse");
-            } catch (final JexlException xany) {
-                // expected to fail in createExpression
-            }
+            assertThrows(JexlException.class, () -> jexl.createScript(fexpr));
         }
         // ';' is necessary between expressions and only expressions
+        // @formatter:off
         final String[] exprs = {
             "if (x) {1} if (y) {2}",
             "if (x) 1 if (y) 2",
@@ -335,6 +333,7 @@ public class IssuesTest extends JexlTestCase {
             "for(z : [3, 4, 5]) { z } y ? 2 : 1",
             "for(z : [3, 4, 5]) { z } if (y) 2 else 1"
         };
+        // @formatter:on
         ctxt.set("x", Boolean.FALSE);
         ctxt.set("y", Boolean.TRUE);
         for (final String expr : exprs) {
