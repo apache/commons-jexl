@@ -460,7 +460,7 @@ public abstract class InterpreterBase extends ParserVisitor {
      * @param closeables the object queue we'd like to close
      */
     protected void closeIfSupported(final Queue<Object> closeables) {
-        for(Object closeable : closeables) {
+        for(final Object closeable : closeables) {
             closeIfSupported(closeable);
         }
     }
