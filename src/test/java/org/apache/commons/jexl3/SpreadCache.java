@@ -17,8 +17,6 @@
 
 package org.apache.commons.jexl3;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 import java.util.AbstractMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
