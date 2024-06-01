@@ -30,10 +30,6 @@ import java.util.Set;
  */
 public class ClassMisc {
   /**
-   * Lets not instantiate it.
-   */
-  private ClassMisc() {}
-  /**
    * Collect super classes and interfaces in super-order.
    * <p>This orders from stronger to weaker abstraction in the sense that
    * Integer is a stronger abstraction than Number.</p>
@@ -52,7 +48,6 @@ public class ClassMisc {
       addSuperInterfaces(superSet, clazz);
     }
   }
-
   /**
    * Recursively add super-interfaces in super-order.
    * <p>On the premise that a class also tends to enumerate interface in the order of weaker abstraction and
@@ -125,4 +120,9 @@ public class ClassMisc {
     }
     return superSet;
   }
+
+  /**
+   * Lets not instantiate it.
+   */
+  private ClassMisc() {}
 }
