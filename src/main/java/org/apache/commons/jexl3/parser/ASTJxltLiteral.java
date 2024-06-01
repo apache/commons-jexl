@@ -30,14 +30,6 @@ public final class ASTJxltLiteral extends JexlNode {
         super(id);
     }
 
-    void setLiteral(final String literal) {
-        this.literal = literal;
-    }
-
-    public void setExpression(final JxltEngine.Expression e) {
-        this.jxltExpression = e;
-    }
-
     public JxltEngine.Expression getExpression() {
         return jxltExpression;
     }
@@ -51,12 +43,20 @@ public final class ASTJxltLiteral extends JexlNode {
     }
 
     @Override
-    public String toString() {
-        return this.literal;
+    public Object jjtAccept(final ParserVisitor visitor, final Object data) {
+        return visitor.visit(this, data);
+    }
+
+    public void setExpression(final JxltEngine.Expression e) {
+        this.jxltExpression = e;
+    }
+
+    void setLiteral(final String literal) {
+        this.literal = literal;
     }
 
     @Override
-    public Object jjtAccept(final ParserVisitor visitor, final Object data) {
-        return visitor.visit(this, data);
+    public String toString() {
+        return this.literal;
     }
 }
