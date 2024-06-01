@@ -20,6 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -258,16 +259,12 @@ public static class Foo125 {
         assertNotNull(value);
         options.setMathContext(MathContext.UNLIMITED);
         options.setMathScale(2);
-        try {
-            jexl.createExpression("a / b").evaluate(context);
-            fail("should fail");
-        } catch (final JexlException xjexl) {
-            // ok to fail
-        }
+        assertThrows(JexlException.class, () -> jexl.createExpression("a / b").evaluate(context));
     }
 
     @Test
     public void test107() throws Exception {
+        // @formatter:off
         final String[] exprs = {
             "'Q4'.toLowerCase()", "q4",
             "(Q4).toLowerCase()", "q4",
@@ -278,7 +275,7 @@ public static class Foo125 {
             "({ 'q' : 'Q4'})['q'].toLowerCase()", "q4",
             "(['Q4'])[0].toLowerCase()", "q4"
         };
-
+        // @formatter:on
         final JexlContext context = new MapContext();
         context.set("Q4", "Q4");
         final JexlEngine jexl = new Engine();
