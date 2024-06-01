@@ -221,7 +221,7 @@ public class PragmaTest extends JexlTestCase {
         final JexlEngine jexl = new JexlBuilder().features(features).create();
         try {
             final JexlScript script = jexl.createScript(src);
-        } catch (JexlException.Parsing xparse) {
+        } catch (final JexlException.Parsing xparse) {
             assertTrue(xparse.getMessage().contains("import pragma"));
         }
     }
@@ -248,8 +248,8 @@ public class PragmaTest extends JexlTestCase {
     @Test
     public void testIssue416() {
         final JexlEngine jexl = new JexlBuilder().create();
-        JexlScript script = jexl.createScript("#pragma myNull null\n");
-        Map<String, Object> pragmas = script.getPragmas();
+        final JexlScript script = jexl.createScript("#pragma myNull null\n");
+        final Map<String, Object> pragmas = script.getPragmas();
         assertTrue(pragmas.containsKey("myNull"), "pragma key present?");
         assertNull(pragmas.get("myNull"), "expected null value");
     }
@@ -303,7 +303,7 @@ public class PragmaTest extends JexlTestCase {
                             + "sleeper:sleep(100);"
                             + "42");
             fail("should have thrown syntax exception");
-        } catch (JexlException.Parsing xparse) {
+        } catch (final JexlException.Parsing xparse) {
             assertTrue(xparse.getMessage().contains("namespace pragma"));
         }
     }
