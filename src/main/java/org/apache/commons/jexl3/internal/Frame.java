@@ -43,6 +43,61 @@ public final class Frame {
     }
 
     /**
+     * Assign values to this frame.
+     * @param values the values
+     * @return this frame
+     */
+    Frame assign(final Object... values) {
+        if (stack != null) {
+            final int nparm = scope.getArgCount();
+            final Object[] copy = stack.clone();
+            int ncopy = 0;
+            if (values != null && values.length > 0) {
+                ncopy = Math.min(nparm - curried, Math.min(nparm, values.length));
+                System.arraycopy(values, 0, copy, curried, ncopy);
+            }
+            // unbound parameters are defined as null
+            Arrays.fill(copy, curried + ncopy, nparm, null);
+            return new Frame(scope, copy, curried + ncopy);
+        }
+        return this;
+    }
+
+    /**
+     * Gets a value.
+     * @param s the offset in this frame
+     * @return the stacked value
+     */
+    Object get(final int s) {
+        return stack[s];
+    }
+
+    /**
+     * Gets the scope.
+     * @return this frame scope
+     */
+    public Scope getScope() {
+        return scope;
+    }
+
+    /**
+     * Gets this script unbound parameters, i.e. parameters not bound through curry().
+     * @return the parameter names
+     */
+    public String[] getUnboundParameters() {
+        return scope.getParameters(curried);
+    }
+
+    /**
+     * Whether this frame defines a symbol, ie declared it and assigned it a value.
+     * @param s the offset in this frame
+     * @return true if this symbol has been assigned a value, false otherwise
+     */
+    boolean has(final int s) {
+        return s >= 0 && s < stack.length && stack[s] != Scope.UNDECLARED;
+    }
+
+    /**
      * Replace any instance of a closure in this stack by its (fuzzy encoded) offset in it.
      * <p>This is to avoid the cyclic dependency between the closure and its frame stack that
      * may point back to it that occur with recursive function definitions.</p>
@@ -64,67 +119,12 @@ public final class Frame {
     }
 
     /**
-     * Gets this script unbound parameters, i.e. parameters not bound through curry().
-     * @return the parameter names
-     */
-    public String[] getUnboundParameters() {
-        return scope.getParameters(curried);
-    }
-
-    /**
-     * Gets the scope.
-     * @return this frame scope
-     */
-    public Scope getScope() {
-        return scope;
-    }
-
-    /**
-     * Gets a value.
-     * @param s the offset in this frame
-     * @return the stacked value
-     */
-    Object get(final int s) {
-        return stack[s];
-    }
-
-    /**
-     * Whether this frame defines a symbol, ie declared it and assigned it a value.
-     * @param s the offset in this frame
-     * @return true if this symbol has been assigned a value, false otherwise
-     */
-    boolean has(final int s) {
-        return s >= 0 && s < stack.length && stack[s] != Scope.UNDECLARED;
-    }
-
-    /**
      * Sets a value.
      * @param r the offset in this frame
      * @param value the value to set in this frame
      */
     void set(final int r, final Object value) {
         stack[r] = value;
-    }
-
-    /**
-     * Assign values to this frame.
-     * @param values the values
-     * @return this frame
-     */
-    Frame assign(final Object... values) {
-        if (stack != null) {
-            final int nparm = scope.getArgCount();
-            final Object[] copy = stack.clone();
-            int ncopy = 0;
-            if (values != null && values.length > 0) {
-                ncopy = Math.min(nparm - curried, Math.min(nparm, values.length));
-                System.arraycopy(values, 0, copy, curried, ncopy);
-            }
-            // unbound parameters are defined as null
-            Arrays.fill(copy, curried + ncopy, nparm, null);
-            return new Frame(scope, copy, curried + ncopy);
-        }
-        return this;
     }
 
 }
