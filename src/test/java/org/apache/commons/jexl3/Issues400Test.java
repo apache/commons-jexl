@@ -280,8 +280,6 @@ public class Issues400Test {
         assertTrue(o instanceof Map);
         final Map<?, ?> map = (Map<?, ?>) o;
         assertEquals(map, ctl);
-      } catch (final JexlException.Parsing xparse) {
-        fail(fnsrc + " : " + xparse.getMessage());
       } catch (final JexlException xother) {
         fail(fnsrc + " : " + xother.getMessage());
       }
