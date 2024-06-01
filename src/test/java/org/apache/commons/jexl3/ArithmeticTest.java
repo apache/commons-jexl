@@ -1486,7 +1486,7 @@ public class ArithmeticTest extends JexlTestCase {
 
     @Test
     public void testFailAllOperators() {
-        final String[] scripts = new String[]{
+        final String[] scripts = {
             "(x, y)->{ x < y }",
             "(x, y)->{ x <= y }",
             "(x, y)->{ x > y }",
