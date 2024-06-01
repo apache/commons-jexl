@@ -43,5 +43,3 @@ import static org.junit.jupiter.api.Assertions.*;
  * </pre>
  */
 package org.apache.commons.jexl3.junit;
-
-import static org.junit.jupiter.api.Assertions.*;
