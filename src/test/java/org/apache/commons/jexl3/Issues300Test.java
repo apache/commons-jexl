@@ -820,28 +820,25 @@ public class Issues300Test {
         assertNotEquals(s0, s1);
     }
 
-    @Test public void test370() {
+    @Test
+    public void test370() {
         final Var370 var370 = new Var370();
         final JexlEngine jexl = new JexlBuilder().safe(true).create();
         final ObjectContext<Var370> ctxt = new ObjectContext<>(jexl, var370);
-        JexlExpression get = jexl.createExpression("name");
+        final JexlExpression get = jexl.createExpression("name");
         // not null
         var370.setName("John");
-        assertEquals("John",get.evaluate(ctxt));
+        assertEquals("John", get.evaluate(ctxt));
         assertTrue(ctxt.has("name"));
         // null
         var370.setName(null);
         assertNull(get.evaluate(ctxt));
         assertTrue(ctxt.has("name"));
         // undefined
-        get = jexl.createExpression("phone");
+        final JexlExpression get1 = jexl.createExpression("phone");
         assertFalse(ctxt.has("phone"));
-        try {
-            get.evaluate(ctxt);
-            fail("phone should be undefined!");
-        } catch (final JexlException.Variable xvar) {
-            assertEquals("phone", xvar.getVariable());
-        }
+        final JexlException.Variable xvar = assertThrows(JexlException.Variable.class, () -> get1.evaluate(ctxt), "phone should be undefined!");
+        assertEquals("phone", xvar.getVariable());
     }
 
     @Test
