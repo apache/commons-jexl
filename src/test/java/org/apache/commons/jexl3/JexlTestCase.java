@@ -17,7 +17,7 @@
 
 package org.apache.commons.jexl3;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
@@ -29,7 +29,6 @@ import org.apache.commons.jexl3.internal.Util;
 import org.apache.commons.jexl3.internal.introspection.Uberspect;
 import org.apache.commons.jexl3.introspection.JexlPermissions;
 import org.junit.After;
-import org.junit.Assert;
 
 /**
  * Implements runTest methods to dynamically instantiate and invoke a test,
