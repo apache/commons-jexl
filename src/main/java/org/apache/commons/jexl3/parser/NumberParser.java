@@ -30,85 +30,24 @@ public final class NumberParser implements Serializable {
     /**
      */
     private static final long serialVersionUID = 1L;
-    /** The type literal value. */
-    private Number literal;
-    /** The expected class. */
-    private Class<? extends Number> clazz;
     /** JEXL locale-neutral big decimal format. */
     static final DecimalFormat BIGDF = new DecimalFormat("0.0b", new DecimalFormatSymbols(Locale.ENGLISH));
-
-    @Override
-    public String toString() {
-        if (literal == null || clazz == null || Double.isNaN(literal.doubleValue())) {
-            return "NaN";
-        }
-        if (BigDecimal.class.equals(clazz)) {
-            synchronized (BIGDF) {
-                return BIGDF.format(literal);
-            }
-        }
-        final StringBuilder strb = new StringBuilder(literal.toString());
-        if (Float.class.equals(clazz)) {
-            strb.append('f');
-        } else if (Double.class.equals(clazz)) {
-            strb.append('d');
-        } else if (BigInteger.class.equals(clazz)) {
-            strb.append('h');
-        } else if (Long.class.equals(clazz)) {
-            strb.append('l');
-        }
-        return strb.toString();
-    }
-
-    Class<? extends Number> getLiteralClass() {
-        return clazz;
-    }
-
-    boolean isInteger() {
-        return Integer.class.equals(clazz);
-    }
-
-    Number getLiteralValue() {
-        return literal;
-    }
-
     private static boolean isNegative(final Token token) {
         return token != null && "-".equals(token.image);
+    }
+    static Number parseDouble(final Token negative, final Token s) {
+        return new NumberParser().assignReal(isNegative(negative), s.image).getLiteralValue();
     }
 
     static Number parseInteger(final Token negative, final Token s) {
         return new NumberParser().assignNatural(isNegative(negative), s.image).getLiteralValue();
     }
 
-    static Number parseDouble(final Token negative, final Token s) {
-        return new NumberParser().assignReal(isNegative(negative), s.image).getLiteralValue();
-    }
+    /** The type literal value. */
+    private Number literal;
 
-    /**
-     * Sets this node as an (optionally) signed natural literal.
-     * Originally from OGNL.
-     * @param str the natural as string
-     * @return this parser instance
-     */
-    NumberParser assignNatural(final String str) {
-        String s;
-        // determine negative sign if any, ignore +
-        final boolean negative;
-        switch (str.charAt(0)) {
-            case '-':
-                negative = true;
-                s = str.substring(1);
-                break;
-            case '+':
-                negative = false;
-                s = str.substring(1);
-                break;
-            default:
-                negative = false;
-                s = str;
-        }
-        return assignNatural(negative, s);
-    }
+    /** The expected class. */
+    private Class<? extends Number> clazz;
 
     /**
      * Sets this node as a natural literal.
@@ -173,12 +112,12 @@ public final class NumberParser implements Serializable {
     }
 
     /**
-     * Sets this node as an (optionally) signed real literal.
+     * Sets this node as an (optionally) signed natural literal.
      * Originally from OGNL.
-     * @param str the real as string
+     * @param str the natural as string
      * @return this parser instance
      */
-    NumberParser assignReal(final String str) {
+    NumberParser assignNatural(final String str) {
         String s;
         // determine negative sign if any, ignore +
         final boolean negative;
@@ -195,7 +134,7 @@ public final class NumberParser implements Serializable {
                 negative = false;
                 s = str;
         }
-        return assignReal(negative, s);
+        return assignNatural(negative, s);
     }
 
     /**
@@ -251,6 +190,67 @@ public final class NumberParser implements Serializable {
         literal = result;
         clazz = rclass;
         return this;
+    }
+
+    /**
+     * Sets this node as an (optionally) signed real literal.
+     * Originally from OGNL.
+     * @param str the real as string
+     * @return this parser instance
+     */
+    NumberParser assignReal(final String str) {
+        String s;
+        // determine negative sign if any, ignore +
+        final boolean negative;
+        switch (str.charAt(0)) {
+            case '-':
+                negative = true;
+                s = str.substring(1);
+                break;
+            case '+':
+                negative = false;
+                s = str.substring(1);
+                break;
+            default:
+                negative = false;
+                s = str;
+        }
+        return assignReal(negative, s);
+    }
+
+    Class<? extends Number> getLiteralClass() {
+        return clazz;
+    }
+
+    Number getLiteralValue() {
+        return literal;
+    }
+
+    boolean isInteger() {
+        return Integer.class.equals(clazz);
+    }
+
+    @Override
+    public String toString() {
+        if (literal == null || clazz == null || Double.isNaN(literal.doubleValue())) {
+            return "NaN";
+        }
+        if (BigDecimal.class.equals(clazz)) {
+            synchronized (BIGDF) {
+                return BIGDF.format(literal);
+            }
+        }
+        final StringBuilder strb = new StringBuilder(literal.toString());
+        if (Float.class.equals(clazz)) {
+            strb.append('f');
+        } else if (Double.class.equals(clazz)) {
+            strb.append('d');
+        } else if (BigInteger.class.equals(clazz)) {
+            strb.append('h');
+        } else if (Long.class.equals(clazz)) {
+            strb.append('l');
+        }
+        return strb.toString();
     }
 
 }
