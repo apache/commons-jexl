@@ -19,10 +19,8 @@ package org.apache.commons.jexl3;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
-
 import java.util.Arrays;
 import java.util.List;
 
@@ -66,18 +64,8 @@ public class ArrayLiteralTest extends JexlTestCase {
         o = JEXL.createExpression("[...]").evaluate(jc);
         assertTrue(o instanceof List<?>);
         assertEquals(0, ((List<?>) o).size());
-        try {
-            final Object ff = JEXL.createExpression("[ , ]");
-            fail(ff.toString());
-        } catch(final JexlException.Parsing parsing) {
-            assertNotNull(parsing);
-        }
-        try {
-            final Object ff = JEXL.createExpression("[ ... , ]");
-            fail(ff.toString());
-        } catch(final JexlException.Parsing parsing) {
-            assertNotNull(parsing);
-        }
+        assertThrows(JexlException.Parsing.class, () -> JEXL.createExpression("[ , ]"));
+        assertThrows(JexlException.Parsing.class, () -> JEXL.createExpression("[ ... , ]"));
     }
 
     @Test
@@ -86,15 +74,10 @@ public class ArrayLiteralTest extends JexlTestCase {
         final JexlContext jc = new MapContext();
 
         final Object o = e.evaluate(jc);
-        final Object[] check = {"foo", "bar"};
+        final Object[] check = { "foo", "bar" };
         assertEquals(Arrays.asList(check), o);
         assertEquals(2, ((List<?>) o).size());
-        try {
-            JEXL.createExpression("[ 'foo' , 'bar', ... , ]");
-            fail("syntax");
-        } catch(final JexlException.Parsing parsing) {
-            assertNotNull(parsing);
-        }
+        assertThrows(JexlException.Parsing.class, () -> JEXL.createExpression("[ 'foo' , 'bar', ... , ]"));
     }
 
     @Test
