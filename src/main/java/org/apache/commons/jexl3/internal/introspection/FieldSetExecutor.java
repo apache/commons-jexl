@@ -27,11 +27,6 @@ import org.apache.commons.jexl3.introspection.JexlPropertySet;
  */
 public final class FieldSetExecutor implements JexlPropertySet {
     /**
-     * The public field.
-     */
-    private final Field field;
-
-    /**
      * Attempts to discover a FieldSetExecutor.
      *
      * @param is the introspector
@@ -56,6 +51,11 @@ public final class FieldSetExecutor implements JexlPropertySet {
     }
 
     /**
+     * The public field.
+     */
+    private final Field field;
+
+    /**
      * Creates a new instance of FieldPropertySet.
      * @param theField the class public field
      */
@@ -67,6 +67,16 @@ public final class FieldSetExecutor implements JexlPropertySet {
     public Object invoke(final Object obj, final Object arg) throws Exception {
         field.set(obj, arg);
         return arg;
+    }
+
+    @Override
+    public boolean isCacheable() {
+        return true;
+    }
+
+    @Override
+    public boolean tryFailed(final Object rval) {
+        return rval == Uberspect.TRY_FAILED;
     }
 
     @Override
@@ -82,15 +92,5 @@ public final class FieldSetExecutor implements JexlPropertySet {
             }
         }
         return Uberspect.TRY_FAILED;
-    }
-
-    @Override
-    public boolean tryFailed(final Object rval) {
-        return rval == Uberspect.TRY_FAILED;
-    }
-
-    @Override
-    public boolean isCacheable() {
-        return true;
     }
 }
