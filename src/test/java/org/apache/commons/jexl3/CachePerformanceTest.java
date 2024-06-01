@@ -48,58 +48,6 @@ import org.junit.Test;
  * </p>
  */
 public class CachePerformanceTest {
-  /** Number of test loops. */
-  private static final int LOOPS = 10; //0;
-  /** Number of different scripts. */
-  private static final int SCRIPTS = 800; //0;
-  /** Cache capacity. */
-  private static final int CACHED = 500; //0;
-  /** Number of times each script is evaluated. */
-  private static final int HIT = 5;
-  /** Number of concurrent threads. */
-  private static final int THREADS = 8;
-  /** Teh logger. */
-  Log LOGGER = LogFactory.getLog(getClass());
-
-  public static class Timer {
-    long begin;
-    long end;
-
-    void start() {
-      begin = System.currentTimeMillis();
-    }
-    void stop() {
-      end = System.currentTimeMillis();
-    }
-
-    String elapse() {
-      long delta = end - begin;
-      NumberFormat fmt = new DecimalFormat("#.###");
-      return fmt.format(delta / 1000.d);
-    }
-  }
-
-  @Test
-  public void testSpread() throws Exception {
-    final JexlBuilder builder = new JexlBuilder().cacheFactory(SpreadCache::new).cache(CACHED);
-    final JexlEngine jexl = builder.create();
-    runTest("testSpread", jexl);
-  }
-
-  @Test
-  public void testConcurrent() throws Exception {
-    final JexlBuilder builder = new JexlBuilder().cacheFactory(ConcurrentCache::new).cache(CACHED);
-    final JexlEngine jexl = builder.create();
-    runTest("testConcurrent", jexl);
-  }
-
-  @Test
-  public void testSynchronized() throws Exception {
-    final JexlBuilder builder = new JexlBuilder().cache(CACHED);
-    final JexlEngine jexl = builder.create();
-    runTest("testSynchronized", jexl);
-  }
-
   /**
    * A task randomly chooses to run scripts (CACHED * HIT times).
    * Tasks will be run
@@ -138,6 +86,37 @@ public class CachePerformanceTest {
       }
     }
   }
+  public static class Timer {
+    long begin;
+    long end;
+
+    String elapse() {
+      long delta = end - begin;
+      NumberFormat fmt = new DecimalFormat("#.###");
+      return fmt.format(delta / 1000.d);
+    }
+    void start() {
+      begin = System.currentTimeMillis();
+    }
+
+    void stop() {
+      end = System.currentTimeMillis();
+    }
+  }
+  /** Number of test loops. */
+  private static final int LOOPS = 10; //0;
+  /** Number of different scripts. */
+  private static final int SCRIPTS = 800; //0;
+  /** Cache capacity. */
+  private static final int CACHED = 500; //0;
+  /** Number of times each script is evaluated. */
+  private static final int HIT = 5;
+
+  /** Number of concurrent threads. */
+  private static final int THREADS = 8;
+
+  /** Teh logger. */
+  Log LOGGER = LogFactory.getLog(getClass());
 
   /**
    * Launches the tasks in parallel.
@@ -175,5 +154,26 @@ public class CachePerformanceTest {
     tt.stop();
     Assert.assertEquals(total, LOOPS * CACHED * THREADS * HIT);
     LOGGER.info(name+ " : " + tt.elapse());
+  }
+
+  @Test
+  public void testConcurrent() throws Exception {
+    final JexlBuilder builder = new JexlBuilder().cacheFactory(ConcurrentCache::new).cache(CACHED);
+    final JexlEngine jexl = builder.create();
+    runTest("testConcurrent", jexl);
+  }
+
+  @Test
+  public void testSpread() throws Exception {
+    final JexlBuilder builder = new JexlBuilder().cacheFactory(SpreadCache::new).cache(CACHED);
+    final JexlEngine jexl = builder.create();
+    runTest("testSpread", jexl);
+  }
+
+  @Test
+  public void testSynchronized() throws Exception {
+    final JexlBuilder builder = new JexlBuilder().cache(CACHED);
+    final JexlEngine jexl = builder.create();
+    runTest("testSynchronized", jexl);
   }
 }
