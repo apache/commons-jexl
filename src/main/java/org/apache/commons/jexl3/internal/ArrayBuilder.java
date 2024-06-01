@@ -69,23 +69,13 @@ public class ArrayBuilder implements JexlArithmetic.ArrayBuilder {
     protected final boolean extended;
 
     /**
-     * Computes the best super class/super interface.
-     * <p>Used to try and maintain type safe arrays.</p>
-     * @param baseClass the baseClass
-     * @param other another class
-     * @return a common ancestor, class or interface, worst case being class Object
-     */
-    protected Class<?> getCommonSuperClass(final Class<?> baseClass, final Class<?> other) {
-        return ClassMisc.getCommonSuperClass(baseClass, other);
-    }
-
-    /**
      * Creates a new builder.
      * @param size the exact array size
      */
     public ArrayBuilder(final int size) {
         this(size, false);
     }
+
     /**
      * Creates a new builder.
      * @param size the exact array size
@@ -95,7 +85,6 @@ public class ArrayBuilder implements JexlArithmetic.ArrayBuilder {
         this.untyped = new Object[size];
         this.extended = extended;
     }
-
     @Override
     public void add(final Object value) {
         // for all children after first...
@@ -126,17 +115,6 @@ public class ArrayBuilder implements JexlArithmetic.ArrayBuilder {
         untyped[added++] = value;
     }
 
-    /**
-     * Creates a new list (aka extended array)/
-     * @param clazz the class
-     * @param size the size
-     * @return the instance
-     * @param <T> the type
-     */
-    protected <T> List<T> newList(Class<? extends T> clazz, int size) {
-        return new ArrayList<>(size);
-    }
-
     @Override
     public Object create(final boolean e) {
         if (untyped == null) {
@@ -162,5 +140,27 @@ public class ArrayBuilder implements JexlArithmetic.ArrayBuilder {
             Array.set(typed, i, untyped[i]);
         }
         return typed;
+    }
+
+    /**
+     * Computes the best super class/super interface.
+     * <p>Used to try and maintain type safe arrays.</p>
+     * @param baseClass the baseClass
+     * @param other another class
+     * @return a common ancestor, class or interface, worst case being class Object
+     */
+    protected Class<?> getCommonSuperClass(final Class<?> baseClass, final Class<?> other) {
+        return ClassMisc.getCommonSuperClass(baseClass, other);
+    }
+
+    /**
+     * Creates a new list (aka extended array)/
+     * @param clazz the class
+     * @param size the size
+     * @return the instance
+     * @param <T> the type
+     */
+    protected <T> List<T> newList(Class<? extends T> clazz, int size) {
+        return new ArrayList<>(size);
     }
 }
