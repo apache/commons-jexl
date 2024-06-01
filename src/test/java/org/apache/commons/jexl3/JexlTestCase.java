@@ -150,7 +150,7 @@ public class JexlTestCase {
      * @throws Exception
      */
     public static void runTest(final String tname, final String mname) throws Exception {
-        final String testClassName = "org.apache.commons.jexl3."+tname;
+        final String testClassName = "org.apache.commons.jexl3." + tname;
         Class<JexlTestCase> clazz = null;
         JexlTestCase test = null;
         // find the class
@@ -160,18 +160,15 @@ public class JexlTestCase {
         try {
             ctor = clazz.getConstructor(STRING_PARM);
             test = ctor.newInstance("debug");
-        }
-        catch (final NoSuchMethodException xctor) {
+        } catch (final NoSuchMethodException xctor) {
             // instantiate default class ctor
             try {
                 test = clazz.getConstructor().newInstance();
-            }
-            catch (final Exception xany) {
+            } catch (final Exception xany) {
                 fail("cant instantiate test: " + xany);
                 return;
             }
-        }
-        catch (final Exception xany) {
+        } catch (final Exception xany) {
             fail("cant instantiate test: " + xany);
             return;
         }
