@@ -66,103 +66,99 @@ import org.apache.commons.logging.LogFactory;
  */
 public class JexlScriptEngine extends AbstractScriptEngine implements Compilable {
     /**
-     * The shared engine instance.
-     * <p>A single soft-reference JEXL engine and JexlUberspect is shared by all instances of JexlScriptEngine.</p>
+     * Holds singleton JexlScriptEngineFactory (IODH).
      */
-    private static Reference<JexlEngine> ENGINE;
+    private static final class FactorySingletonHolder {
+        /** The engine factory singleton instance. */
+        static final JexlScriptEngineFactory DEFAULT_FACTORY = new JexlScriptEngineFactory();
 
-    /**
-     * The permissions used to create the script engine.
-     */
-    private static JexlPermissions PERMISSIONS;
-    /**
-     * Sets the permissions instance used to create the script engine.
-     * <p>Calling this method will force engine instance re-creation.</p>
-     * <p>To restore 3.2 script behavior:</p>
-     * <code>
-     *         JexlScriptEngine.setPermissions(JexlPermissions.UNRESTRICTED);
-     * </code>
-     * @param permissions the permissions instance to use or null to use the {@link JexlBuilder} default
-     * @since 3.3
-     */
-    public static void setPermissions(final JexlPermissions permissions) {
-        PERMISSIONS = permissions;
-        ENGINE = null; // will force recreation
+        /** Non instantiable. */
+        private FactorySingletonHolder() {}
     }
 
     /**
-     * Sets the shared instance used for the script engine.
-     * <p>This should be called early enough to have an effect, ie before any
-     * {@link javax.script.ScriptEngineManager} features.</p>
-     * <p>To restore 3.2 script behavior:</p>
-     * <code>
-     *         JexlScriptEngine.setInstance(new JexlBuilder()
-     *                 .cache(512)
-     *                 .logger(LogFactory.getLog(JexlScriptEngine.class))
-     *                 .permissions(JexlPermissions.UNRESTRICTED)
-     *                 .create());
-     * </code>
-     * @param engine the JexlEngine instance to use
-     * @since 3.3
+     * Wrapper to help convert a JEXL JexlScript into a JSR-223 CompiledScript.
      */
-    public static void setInstance(final JexlEngine engine) {
-        ENGINE = new SoftReference<>(engine);
-    }
+    private final class JexlCompiledScript extends CompiledScript {
+        /** The underlying JEXL expression instance. */
+        private final JexlScript script;
 
-    /**
-     * @return the shared JexlEngine instance, create it if necessary
-     */
-    private static JexlEngine getEngine() {
-        JexlEngine engine = ENGINE != null ? ENGINE.get() : null;
-        if (engine == null) {
-            synchronized (JexlScriptEngineFactory.class) {
-                engine = ENGINE != null ? ENGINE.get() : null;
-                if (engine == null) {
-                    final JexlBuilder builder = new JexlBuilder()
-                            .strict(true)
-                            .safe(false)
-                            .logger(JexlScriptEngine.LOG)
-                            .cache(JexlScriptEngine.CACHE_SIZE);
-                    if (PERMISSIONS != null ) {
-                        builder.permissions(PERMISSIONS);
-                    }
-                    engine = builder.create();
-                    ENGINE = new SoftReference<>(engine);
-                }
+        /**
+         * Creates an instance.
+         *
+         * @param theScript to wrap
+         */
+        JexlCompiledScript(final JexlScript theScript) {
+            script = theScript;
+        }
+
+        @Override
+        public Object eval(final ScriptContext context) throws ScriptException {
+            // This is mandated by JSR-223 (end of section SCR.4.3.4.1.2 - JexlScript Execution)
+            context.setAttribute(CONTEXT_KEY, context, ScriptContext.ENGINE_SCOPE);
+            try {
+                final JexlContext ctxt = new JexlContextWrapper(context);
+                return script.execute(ctxt);
+            } catch (final Exception e) {
+                throw scriptException(e);
             }
         }
-        return engine;
+
+        @Override
+        public ScriptEngine getEngine() {
+            return JexlScriptEngine.this;
+        }
+
+        @Override
+        public String toString() {
+            return script.getSourceText();
+        }
     }
-
-    /** The logger. */
-    static final Log LOG = LogFactory.getLog(JexlScriptEngine.class);
-
-    /** The shared expression cache size. */
-    static final int CACHE_SIZE = 512;
-
-    /** Reserved key for context (mandated by JSR-223). */
-    public static final String CONTEXT_KEY = "context";
-
-    /** Reserved key for JexlScriptObject. */
-    public static final String JEXL_OBJECT_KEY = "JEXL";
-
-    /** The JexlScriptObject instance. */
-    final JexlScriptObject jexlObject;
-
-    /** The factory which created this instance. */
-    final ScriptEngineFactory parentFactory;
-
-    /** The JEXL EL engine. */
-    final JexlEngine jexlEngine;
-
     /**
-     * Default constructor.
+     * Wrapper to help convert a JSR-223 ScriptContext into a JexlContext.
      *
-     * <p>Only intended for use when not using a factory.
-     * Sets the factory to {@link JexlScriptEngineFactory}.</p>
+     * Current implementation only gives access to ENGINE_SCOPE binding.
      */
-    public JexlScriptEngine() {
-        this(FactorySingletonHolder.DEFAULT_FACTORY);
+    private final class JexlContextWrapper implements JexlContext {
+        /** The wrapped script context. */
+        final ScriptContext scriptContext;
+
+        /**
+         * Creates a context wrapper.
+         *
+         * @param theContext the engine context.
+         */
+        JexlContextWrapper (final ScriptContext theContext){
+            scriptContext = theContext;
+        }
+
+        @Override
+        public Object get(final String name) {
+            final Object o = scriptContext.getAttribute(name);
+            if (JEXL_OBJECT_KEY.equals(name)) {
+                if (o != null) {
+                    LOG.warn("JEXL is a reserved variable name, user-defined value is ignored");
+                }
+                return jexlObject;
+            }
+            return o;
+        }
+
+        @Override
+        public boolean has(final String name) {
+            final Bindings bnd = scriptContext.getBindings(ScriptContext.ENGINE_SCOPE);
+            return bnd.containsKey(name);
+        }
+
+        @Override
+        public void set(final String name, final Object value) {
+            int scope = scriptContext.getAttributesScope(name);
+            if (scope == -1) { // not found, default to engine
+                scope = ScriptContext.ENGINE_SCOPE;
+            }
+            scriptContext.getBindings(scope).put(name , value);
+        }
+
     }
 
     /**
@@ -196,22 +192,6 @@ public class JexlScriptEngine extends AbstractScriptEngine implements Compilable
         }
 
         /**
-         * Gives access to the engine scope output writer (defaults to System.out).
-         *
-         * @return the engine output writer
-         */
-        public PrintWriter getOut() {
-            final Writer out = context.getWriter();
-            if (out instanceof PrintWriter) {
-                return (PrintWriter) out;
-            }
-            if (out != null) {
-                return new PrintWriter(out, true);
-            }
-            return null;
-        }
-
-        /**
          * Gives access to the engine scope error writer (defaults to System.err).
          *
          * @return the engine error writer
@@ -237,15 +217,6 @@ public class JexlScriptEngine extends AbstractScriptEngine implements Compilable
         }
 
         /**
-         * Gives access to System class.
-         *
-         * @return System.class
-         */
-        public Class<System> getSystem() {
-            return System.class;
-        }
-
-        /**
          * Gives access to the engine logger.
          *
          * @return the JexlScriptEngine logger
@@ -253,6 +224,171 @@ public class JexlScriptEngine extends AbstractScriptEngine implements Compilable
         public Log getLogger() {
             return LOG;
         }
+
+        /**
+         * Gives access to the engine scope output writer (defaults to System.out).
+         *
+         * @return the engine output writer
+         */
+        public PrintWriter getOut() {
+            final Writer out = context.getWriter();
+            if (out instanceof PrintWriter) {
+                return (PrintWriter) out;
+            }
+            if (out != null) {
+                return new PrintWriter(out, true);
+            }
+            return null;
+        }
+
+        /**
+         * Gives access to System class.
+         *
+         * @return System.class
+         */
+        public Class<System> getSystem() {
+            return System.class;
+        }
+    }
+
+    /**
+     * The shared engine instance.
+     * <p>A single soft-reference JEXL engine and JexlUberspect is shared by all instances of JexlScriptEngine.</p>
+     */
+    private static Reference<JexlEngine> ENGINE;
+
+    /**
+     * The permissions used to create the script engine.
+     */
+    private static JexlPermissions PERMISSIONS;
+
+    /** The logger. */
+    static final Log LOG = LogFactory.getLog(JexlScriptEngine.class);
+
+    /** The shared expression cache size. */
+    static final int CACHE_SIZE = 512;
+
+    /** Reserved key for context (mandated by JSR-223). */
+    public static final String CONTEXT_KEY = "context";
+
+    /** Reserved key for JexlScriptObject. */
+    public static final String JEXL_OBJECT_KEY = "JEXL";
+
+    /**
+     * @return the shared JexlEngine instance, create it if necessary
+     */
+    private static JexlEngine getEngine() {
+        JexlEngine engine = ENGINE != null ? ENGINE.get() : null;
+        if (engine == null) {
+            synchronized (JexlScriptEngineFactory.class) {
+                engine = ENGINE != null ? ENGINE.get() : null;
+                if (engine == null) {
+                    final JexlBuilder builder = new JexlBuilder()
+                            .strict(true)
+                            .safe(false)
+                            .logger(JexlScriptEngine.LOG)
+                            .cache(JexlScriptEngine.CACHE_SIZE);
+                    if (PERMISSIONS != null ) {
+                        builder.permissions(PERMISSIONS);
+                    }
+                    engine = builder.create();
+                    ENGINE = new SoftReference<>(engine);
+                }
+            }
+        }
+        return engine;
+    }
+
+    /**
+     * Read from a reader into a local buffer and return a String with
+     * the contents of the reader.
+     *
+     * @param scriptReader to be read.
+     * @return the contents of the reader as a String.
+     * @throws ScriptException on any error reading the reader.
+     */
+    private static String readerToString(final Reader scriptReader) throws ScriptException {
+        final StringBuilder buffer = new StringBuilder();
+        BufferedReader reader;
+        if (scriptReader instanceof BufferedReader) {
+            reader = (BufferedReader) scriptReader;
+        } else {
+            reader = new BufferedReader(scriptReader);
+        }
+        try {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                buffer.append(line).append('\n');
+            }
+            return buffer.toString();
+        } catch (final IOException e) {
+            throw new ScriptException(e);
+        }
+    }
+
+    static ScriptException scriptException(final Exception e) {
+        Exception xany = e;
+        // unwrap a jexl exception
+        if (xany instanceof JexlException) {
+            final Throwable cause = xany.getCause();
+            if (cause instanceof Exception) {
+                xany = (Exception) cause;
+            }
+        }
+        return new ScriptException(xany);
+    }
+
+    /**
+     * Sets the shared instance used for the script engine.
+     * <p>This should be called early enough to have an effect, ie before any
+     * {@link javax.script.ScriptEngineManager} features.</p>
+     * <p>To restore 3.2 script behavior:</p>
+     * <code>
+     *         JexlScriptEngine.setInstance(new JexlBuilder()
+     *                 .cache(512)
+     *                 .logger(LogFactory.getLog(JexlScriptEngine.class))
+     *                 .permissions(JexlPermissions.UNRESTRICTED)
+     *                 .create());
+     * </code>
+     * @param engine the JexlEngine instance to use
+     * @since 3.3
+     */
+    public static void setInstance(final JexlEngine engine) {
+        ENGINE = new SoftReference<>(engine);
+    }
+
+    /**
+     * Sets the permissions instance used to create the script engine.
+     * <p>Calling this method will force engine instance re-creation.</p>
+     * <p>To restore 3.2 script behavior:</p>
+     * <code>
+     *         JexlScriptEngine.setPermissions(JexlPermissions.UNRESTRICTED);
+     * </code>
+     * @param permissions the permissions instance to use or null to use the {@link JexlBuilder} default
+     * @since 3.3
+     */
+    public static void setPermissions(final JexlPermissions permissions) {
+        PERMISSIONS = permissions;
+        ENGINE = null; // will force recreation
+    }
+
+    /** The JexlScriptObject instance. */
+    final JexlScriptObject jexlObject;
+
+    /** The factory which created this instance. */
+    final ScriptEngineFactory parentFactory;
+
+    /** The JEXL EL engine. */
+    final JexlEngine jexlEngine;
+
+    /**
+     * Default constructor.
+     *
+     * <p>Only intended for use when not using a factory.
+     * Sets the factory to {@link JexlScriptEngineFactory}.</p>
+     */
+    public JexlScriptEngine() {
+        this(FactorySingletonHolder.DEFAULT_FACTORY);
     }
 
     /**
@@ -268,6 +404,29 @@ public class JexlScriptEngine extends AbstractScriptEngine implements Compilable
         parentFactory = factory;
         jexlEngine = getEngine();
         jexlObject = new JexlScriptObject();
+    }
+
+    @Override
+    public CompiledScript compile(final Reader script) throws ScriptException {
+        // This is mandated by JSR-223
+        if (script == null) {
+            throw new NullPointerException("script must be non-null");
+        }
+        return compile(readerToString(script));
+    }
+
+    @Override
+    public CompiledScript compile(final String script) throws ScriptException {
+        // This is mandated by JSR-223
+        if (script == null) {
+            throw new NullPointerException("script must be non-null");
+        }
+        try {
+            final JexlScript jexlScript = jexlEngine.createScript(script);
+            return new JexlCompiledScript(jexlScript);
+        } catch (final Exception e) {
+            throw scriptException(e);
+        }
     }
 
     @Override
@@ -304,164 +463,5 @@ public class JexlScriptEngine extends AbstractScriptEngine implements Compilable
     @Override
     public ScriptEngineFactory getFactory() {
         return parentFactory;
-    }
-
-    @Override
-    public CompiledScript compile(final String script) throws ScriptException {
-        // This is mandated by JSR-223
-        if (script == null) {
-            throw new NullPointerException("script must be non-null");
-        }
-        try {
-            final JexlScript jexlScript = jexlEngine.createScript(script);
-            return new JexlCompiledScript(jexlScript);
-        } catch (final Exception e) {
-            throw scriptException(e);
-        }
-    }
-
-    static ScriptException scriptException(final Exception e) {
-        Exception xany = e;
-        // unwrap a jexl exception
-        if (xany instanceof JexlException) {
-            final Throwable cause = xany.getCause();
-            if (cause instanceof Exception) {
-                xany = (Exception) cause;
-            }
-        }
-        return new ScriptException(xany);
-    }
-
-    @Override
-    public CompiledScript compile(final Reader script) throws ScriptException {
-        // This is mandated by JSR-223
-        if (script == null) {
-            throw new NullPointerException("script must be non-null");
-        }
-        return compile(readerToString(script));
-    }
-
-    /**
-     * Read from a reader into a local buffer and return a String with
-     * the contents of the reader.
-     *
-     * @param scriptReader to be read.
-     * @return the contents of the reader as a String.
-     * @throws ScriptException on any error reading the reader.
-     */
-    private static String readerToString(final Reader scriptReader) throws ScriptException {
-        final StringBuilder buffer = new StringBuilder();
-        BufferedReader reader;
-        if (scriptReader instanceof BufferedReader) {
-            reader = (BufferedReader) scriptReader;
-        } else {
-            reader = new BufferedReader(scriptReader);
-        }
-        try {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                buffer.append(line).append('\n');
-            }
-            return buffer.toString();
-        } catch (final IOException e) {
-            throw new ScriptException(e);
-        }
-    }
-
-    /**
-     * Holds singleton JexlScriptEngineFactory (IODH).
-     */
-    private static final class FactorySingletonHolder {
-        /** Non instantiable. */
-        private FactorySingletonHolder() {}
-
-        /** The engine factory singleton instance. */
-        static final JexlScriptEngineFactory DEFAULT_FACTORY = new JexlScriptEngineFactory();
-    }
-
-    /**
-     * Wrapper to help convert a JSR-223 ScriptContext into a JexlContext.
-     *
-     * Current implementation only gives access to ENGINE_SCOPE binding.
-     */
-    private final class JexlContextWrapper implements JexlContext {
-        /** The wrapped script context. */
-        final ScriptContext scriptContext;
-
-        /**
-         * Creates a context wrapper.
-         *
-         * @param theContext the engine context.
-         */
-        JexlContextWrapper (final ScriptContext theContext){
-            scriptContext = theContext;
-        }
-
-        @Override
-        public Object get(final String name) {
-            final Object o = scriptContext.getAttribute(name);
-            if (JEXL_OBJECT_KEY.equals(name)) {
-                if (o != null) {
-                    LOG.warn("JEXL is a reserved variable name, user-defined value is ignored");
-                }
-                return jexlObject;
-            }
-            return o;
-        }
-
-        @Override
-        public void set(final String name, final Object value) {
-            int scope = scriptContext.getAttributesScope(name);
-            if (scope == -1) { // not found, default to engine
-                scope = ScriptContext.ENGINE_SCOPE;
-            }
-            scriptContext.getBindings(scope).put(name , value);
-        }
-
-        @Override
-        public boolean has(final String name) {
-            final Bindings bnd = scriptContext.getBindings(ScriptContext.ENGINE_SCOPE);
-            return bnd.containsKey(name);
-        }
-
-    }
-
-    /**
-     * Wrapper to help convert a JEXL JexlScript into a JSR-223 CompiledScript.
-     */
-    private final class JexlCompiledScript extends CompiledScript {
-        /** The underlying JEXL expression instance. */
-        private final JexlScript script;
-
-        /**
-         * Creates an instance.
-         *
-         * @param theScript to wrap
-         */
-        JexlCompiledScript(final JexlScript theScript) {
-            script = theScript;
-        }
-
-        @Override
-        public String toString() {
-            return script.getSourceText();
-        }
-
-        @Override
-        public Object eval(final ScriptContext context) throws ScriptException {
-            // This is mandated by JSR-223 (end of section SCR.4.3.4.1.2 - JexlScript Execution)
-            context.setAttribute(CONTEXT_KEY, context, ScriptContext.ENGINE_SCOPE);
-            try {
-                final JexlContext ctxt = new JexlContextWrapper(context);
-                return script.execute(ctxt);
-            } catch (final Exception e) {
-                throw scriptException(e);
-            }
-        }
-
-        @Override
-        public ScriptEngine getEngine() {
-            return JexlScriptEngine.this;
-        }
     }
 }
