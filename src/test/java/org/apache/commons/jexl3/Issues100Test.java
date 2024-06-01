@@ -22,7 +22,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.File;
 import java.math.BigDecimal;
@@ -560,15 +559,9 @@ public static class Foo125 {
     public void test144() throws Exception {
         final JexlEngine jexl = new Engine();
         final JexlContext jc = new MapContext();
-        JexlScript script;
-        Object result;
-        script = jexl.createScript("var total = 10; total('tt')");
-        try {
-            result = script.execute(jc);
-            fail("total() is not solvable");
-        } catch (final JexlException.Method ambiguous) {
-            assertEquals("total", ambiguous.getMethod());
-        }
+        final JexlScript script = jexl.createScript("var total = 10; total('tt')");
+        final JexlException.Method ambiguous = assertThrows(JexlException.Method.class, () -> script.execute(jc));
+        assertEquals("total", ambiguous.getMethod());
     }
 
     @Test
@@ -607,13 +600,9 @@ public static class Foo125 {
 
         // test with an empty array on the overloaded setter for different types.
         // so, the assignment should fail with logging 'The ambiguous property, arr2, should have failed.'
-        try {
-            assignArray = jexl.createExpression("quux.arr2 = [ ]");
-            o = assignArray.evaluate(jc);
-            fail("The arr2 property shouldn't be set due to its ambiguity (overloaded setters with different types).");
-        } catch (final JexlException.Property e) {
-            //System.out.println("Expected ambiguous property setting exception: " + e);
-        }
+        final JexlExpression assignArray2 = jexl.createExpression("quux.arr2 = [ ]");
+        assertThrows(JexlException.Property.class, () -> assignArray2.evaluate(jc),
+                "The arr2 property shouldn't be set due to its ambiguity (overloaded setters with different types).");
         assertNull(quux.arr2, "The arr2 property value should remain as null, not an empty array.");
     }
 
