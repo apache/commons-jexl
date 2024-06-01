@@ -700,8 +700,9 @@ public class Issues300Test {
     @Test
     public void test330() {
         final JexlEngine jexl = new JexlBuilder().create();
-        // Extended form of: 'literal' + VARIABLE   'literal'
+        // Extended form of: 'literal' + VARIABLE 'literal'
         // missing + operator here ---------------^
+        // @formatter:off
         final String longExpression = ""
                 + //
                 "'THIS IS A VERY VERY VERY VERY VERY VERY VERY "
@@ -709,12 +710,10 @@ public class Issues300Test {
                 "VERY VERY LONG STRING CONCATENATION ' + VARIABLE ' <--- "
                 + //
                 "error: missing + between VARIABLE and literal'";
-        try {
-            jexl.createExpression(longExpression);
-            fail("parsing malformed expression did not throw exception");
-        } catch (final JexlException.Parsing exception) {
-            assertTrue(exception.getMessage().contains("VARIABLE"));
-        }
+        // @formatter:on
+        final JexlException.Parsing xparse = assertThrows(JexlException.Parsing.class, () -> jexl.createExpression(longExpression),
+                "parsing malformed expression did not throw exception");
+        assertTrue(xparse.getMessage().contains("VARIABLE"));
     }
 
     @Test
