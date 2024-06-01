@@ -19,7 +19,7 @@ package org.apache.commons.jexl3.internal;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -88,44 +88,24 @@ public class RangeTest extends JexlTestCase {
     public void testAscIterator() {
         final Iterator<Integer> ii = new AscIntegerIterator(3, 5);
         Integer i = 3;
-        while(ii.hasNext()) {
+        while (ii.hasNext()) {
             assertEquals(i, ii.next());
             i += 1;
         }
-        try {
-            ii.next();
-            fail("iterator exhausted");
-        } catch(final NoSuchElementException e) {
-            assertNotNull(e);
-        }
-        try {
-            ii.remove();
-            fail("remove not implemented");
-        } catch(final UnsupportedOperationException e) {
-            assertNotNull(e);
-        }
+        assertThrows(NoSuchElementException.class, ii::next, "iterator exhausted");
+        assertThrows(UnsupportedOperationException.class, ii::remove, "remove not implemented");
     }
 
     @Test
     public void testAscLongIterator() {
         final Iterator<Long> ii = new AscLongIterator(3L, 5L);
         Long i = 3L;
-        while(ii.hasNext()) {
+        while (ii.hasNext()) {
             assertEquals(i, ii.next());
             i += 1;
         }
-        try {
-            ii.next();
-            fail("iterator exhausted");
-        } catch(final NoSuchElementException e) {
-            assertNotNull(e);
-        }
-        try {
-            ii.remove();
-            fail("remove not implemented");
-        } catch(final UnsupportedOperationException e) {
-            assertNotNull(e);
-        }
+        assertThrows(NoSuchElementException.class, ii::next, "iterator exhausted");
+        assertThrows(UnsupportedOperationException.class, ii::remove, "remove not implemented");
     }
 
     @Test public void testMisc() {
@@ -193,12 +173,7 @@ public class RangeTest extends JexlTestCase {
             lc0 -= 1;
         }
         assertEquals(9L, lc0);
-        try {
-            il0.next();
-            fail();
-        } catch (final NoSuchElementException xns) {
-            // ok
-        }
+        assertThrows(NoSuchElementException.class, il0::next);
 
         int ic0 = 20;
         final Iterator<Integer> ii0 = ir0.iterator();
@@ -220,12 +195,7 @@ public class RangeTest extends JexlTestCase {
             ic0 -= 1;
         }
         assertEquals(9, ic0);
-        try {
-            ii0.next();
-            fail();
-        } catch (final NoSuchElementException xns) {
-            // ok
-        }
+        assertThrows(NoSuchElementException.class, ii0::next);
     }
 
     @Test
