@@ -33,37 +33,6 @@ import org.apache.commons.jexl3.parser.JexlNode;
  * An Engine that behaves like JEXL 3.2, bugs included.
  */
 public class Engine32 extends Engine {
-    public Engine32(final JexlBuilder conf) {
-        super(conf);
-    }
-
-    public Engine32() {
-    }
-
-    /**
-     * Static delegation of isTernaryProtected.
-     * @param ii the interpreter (unused)
-     * @param startNode the node
-     * @return true if node is navigation-safe, false otherwise
-     */
-    static boolean isTernaryProtected(final Interpreter ii, final JexlNode startNode) {
-        JexlNode node = startNode;
-        for (JexlNode walk = node.jjtGetParent(); walk != null; walk = walk.jjtGetParent()) {
-            // protect only the condition part of the ternary
-            if (walk instanceof ASTTernaryNode
-                    || walk instanceof ASTNullpNode
-                    || walk instanceof ASTEQNode
-                    || walk instanceof ASTNENode) {
-                return node == walk.jjtGetChild(0);
-            }
-            if (!(walk instanceof ASTReference || walk instanceof ASTArrayAccess)) {
-                break;
-            }
-            node = walk;
-        }
-        return false;
-    }
-
     /**
      * Static delegation of getVariable.
      * @param ii the interpreter
@@ -100,9 +69,45 @@ public class Engine32 extends Engine {
         return value;
     }
 
+    /**
+     * Static delegation of isTernaryProtected.
+     * @param ii the interpreter (unused)
+     * @param startNode the node
+     * @return true if node is navigation-safe, false otherwise
+     */
+    static boolean isTernaryProtected(final Interpreter ii, final JexlNode startNode) {
+        JexlNode node = startNode;
+        for (JexlNode walk = node.jjtGetParent(); walk != null; walk = walk.jjtGetParent()) {
+            // protect only the condition part of the ternary
+            if (walk instanceof ASTTernaryNode
+                    || walk instanceof ASTNullpNode
+                    || walk instanceof ASTEQNode
+                    || walk instanceof ASTNENode) {
+                return node == walk.jjtGetChild(0);
+            }
+            if (!(walk instanceof ASTReference || walk instanceof ASTArrayAccess)) {
+                break;
+            }
+            node = walk;
+        }
+        return false;
+    }
+
+    public Engine32() {
+    }
+
+    public Engine32(final JexlBuilder conf) {
+        super(conf);
+    }
+
     @Override
     protected Interpreter createInterpreter(final JexlContext context, final Frame frame, final JexlOptions opts) {
         return new Interpreter(this, opts, context, frame) {
+            @Override
+            protected Object getVariable(final Frame frame, final LexicalScope block, final ASTIdentifier identifier) {
+                return Engine32.getVariable(this, frame, block, identifier);
+            }
+
             @Override
             protected boolean isStrictOperand(final JexlNode node) {
                 return false;
@@ -111,11 +116,6 @@ public class Engine32 extends Engine {
             @Override
             protected boolean isTernaryProtected( final JexlNode node) {
                 return Engine32.isTernaryProtected(this, node);
-            }
-
-            @Override
-            protected Object getVariable(final Frame frame, final LexicalScope block, final ASTIdentifier identifier) {
-                return Engine32.getVariable(this, frame, block, identifier);
             }
         };
     }
@@ -124,6 +124,11 @@ public class Engine32 extends Engine {
     protected Interpreter createTemplateInterpreter(final TemplateInterpreter.Arguments args) {
         return new TemplateInterpreter(args) {
             @Override
+            protected Object getVariable(final Frame frame, final LexicalScope block, final ASTIdentifier identifier) {
+                return Engine32.getVariable(this, frame, block, identifier);
+            }
+
+            @Override
             protected boolean isStrictOperand(final JexlNode node) {
                 return false;
             }
@@ -131,11 +136,6 @@ public class Engine32 extends Engine {
             @Override
             protected boolean isTernaryProtected( final JexlNode node) {
                 return Engine32.isTernaryProtected(this, node);
-            }
-
-            @Override
-            protected Object getVariable(final Frame frame, final LexicalScope block, final ASTIdentifier identifier) {
-                return Engine32.getVariable(this, frame, block, identifier);
             }
         };
     }
