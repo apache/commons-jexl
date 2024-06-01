@@ -21,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -468,14 +469,8 @@ public class JXLTTest extends JexlTestCase {
         init(builder);
         final JxltEngine.Expression expr = JXLT.createExpression("#{${hi}+'.world'}");
         final JexlContext none = null;
-        try {
-            expr.evaluate(none);
-            fail("should be malformed");
-        } catch (final JxltEngine.Exception xjexl) {
-            // expected
-            final String xmsg = xjexl.getMessage();
-            LOGGER.debug(xmsg);
-        }
+        final JxltEngine.Exception xjexl = assertThrows(JxltEngine.Exception.class, () -> expr.evaluate(none), "should be malformed");
+        LOGGER.debug(xjexl.getMessage());
     }
 
     @ParameterizedTest
@@ -879,49 +874,24 @@ public class JXLTTest extends JexlTestCase {
     @MethodSource("engines")
     public void testMalformed(final JexlBuilder builder) throws Exception {
         init(builder);
-        try {
-            final JxltEngine.Expression expr = JXLT.createExpression("${'world'");
-            final JexlContext none = null;
-            expr.evaluate(none);
-            fail("should be malformed");
-        } catch (final JxltEngine.Exception xjexl) {
-            // expected
-            final String xmsg = xjexl.getMessage();
-            LOGGER.debug(xmsg);
-        }
+        final JxltEngine.Exception xjexl = assertThrows(JxltEngine.Exception.class, () -> JXLT.createExpression("${'world'"), "should be malformed");
+        LOGGER.debug(xjexl.getMessage());
     }
 
     @ParameterizedTest
     @MethodSource("engines")
     public void testMalformedNested(final JexlBuilder builder) throws Exception {
         init(builder);
-        try {
-            final JxltEngine.Expression expr = JXLT.createExpression("#{${hi} world}");
-            final JexlContext none = null;
-            expr.evaluate(none);
-            fail("should be malformed");
-        } catch (final JxltEngine.Exception xjexl) {
-            // expected
-            final String xmsg = xjexl.getMessage();
-            LOGGER.debug(xmsg);
-        }
+        final JxltEngine.Exception xjexl = assertThrows(JxltEngine.Exception.class, () -> JXLT.createExpression("#{${hi} world}"), "should be malformed");
+        LOGGER.debug(xjexl.getMessage());
     }
 
     @ParameterizedTest
     @MethodSource("engines")
     public void testMalformedNested2(final JexlBuilder builder) throws Exception {
         init(builder);
-        try {
-            final JxltEngine.Expression expr = JXLT.createExpression("#{${hi} world}");
-            final JexlContext ctxt = new MapContext();
-            ctxt.set("hi", "hello");
-            expr.evaluate(ctxt);
-            fail("should be malformed");
-        } catch (final JxltEngine.Exception xjexl) {
-            // expected
-            final String xmsg = xjexl.getMessage();
-            LOGGER.debug(xmsg);
-        }
+        final JxltEngine.Exception xjexl = assertThrows(JxltEngine.Exception.class, () -> JXLT.createExpression("#{${hi} world}"), "should be malformed");
+        LOGGER.debug(xjexl.getMessage());
     }
 
     @ParameterizedTest
