@@ -211,8 +211,6 @@ public class IssuesTest extends JexlTestCase {
             fail("Should have failed due to invalid assignment");
         } catch (final JexlException.Assignment xparse) {
             final String dbg = xparse.toString();
-        } catch (final JexlException xjexl) {
-            fail("Should have thrown a parse exception");
         }
     }
 
