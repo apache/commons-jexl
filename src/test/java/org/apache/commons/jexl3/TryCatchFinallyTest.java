@@ -236,14 +236,14 @@ public class TryCatchFinallyTest extends JexlTestCase {
     public void testEdgeTry() throws Exception {
         int i = 0;
         while (i++ < 5) {
-            System.out.println("i: " + i);
+            // System.out.println("i: " + i);
             try {
                 throw new JexlException.Continue(null);
             } finally {
                 continue;
             }
         }
-        System.out.println("iii: " + i);
+        // System.out.println("iii: " + i);
 
         // int x = 0;
         try (AutoCloseable x = new Circuit()) {

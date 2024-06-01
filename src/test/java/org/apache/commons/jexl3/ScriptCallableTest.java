@@ -16,6 +16,7 @@
  */
 package org.apache.commons.jexl3;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CancellationException;
@@ -30,6 +31,7 @@ import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.commons.jexl3.internal.Script;
+import org.apache.commons.lang3.ThreadUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -194,11 +196,7 @@ public class ScriptCallableTest extends JexlTestCase {
             try {
                 final Future<Object> fc = exec.submit(ssleep.callable(ctxt));
                 final Runnable cancels = () -> {
-                    try {
-                        Thread.sleep(200L);
-                    } catch (final Exception xignore) {
-
-                    }
+                    ThreadUtils.sleepQuietly(Duration.ofMillis(200));
                     fc.cancel(true);
                 };
                 exec.submit(cancels);
@@ -225,11 +223,7 @@ public class ScriptCallableTest extends JexlTestCase {
             try {
                 final Future<Object> fc = exec.submit(swhile.callable(ctxt));
                 final Runnable cancels = () -> {
-                    try {
-                        Thread.sleep(200L);
-                    } catch (final Exception xignore) {
-
-                    }
+                    ThreadUtils.sleepQuietly(Duration.ofMillis(200));
                     fc.cancel(true);
                 };
                 exec.submit(cancels);
