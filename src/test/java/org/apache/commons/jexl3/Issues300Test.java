@@ -1251,9 +1251,9 @@ public class Issues300Test {
 
     @Test
     public void testIssue398b() {
-        Map<String,Object> foo = Collections.singletonMap("X", "x");
-        Map<String,Object> bar = Collections.singletonMap("Y", "y");
-        JexlContext ctxt = new MapContext();
+        final Map<String,Object> foo = Collections.singletonMap("X", "x");
+        final Map<String,Object> bar = Collections.singletonMap("Y", "y");
+        final JexlContext ctxt = new MapContext();
         ctxt.set("foo", foo);
         ctxt.set("bar", bar);
         final String src = "let m = {\n" +
@@ -1281,7 +1281,7 @@ public class Issues300Test {
     @Test
     public void testIssue398c() {
         final JexlEngine jexl = new JexlBuilder().create();
-        Object empty = jexl.createScript("[,...]").execute(null);
+        final Object empty = jexl.createScript("[,...]").execute(null);
         assertNotNull(empty);
         assertTrue(jexl.createScript("[1]").execute(null) instanceof int[]);
         assertTrue(jexl.createScript("[1,...]").execute(null) instanceof ArrayList<?>);
