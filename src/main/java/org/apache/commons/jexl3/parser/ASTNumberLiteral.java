@@ -29,13 +29,12 @@ public final class ASTNumberLiteral extends JexlNode implements JexlNode.Constan
     }
 
     @Override
-    public String toString() {
-        return nlp.toString();
-    }
-
-    @Override
     public Number getLiteral() {
         return nlp.getLiteralValue();
+    }
+
+    public Class<? extends Number> getLiteralClass() {
+        return nlp.getLiteralClass();
     }
 
     @Override
@@ -43,12 +42,13 @@ public final class ASTNumberLiteral extends JexlNode implements JexlNode.Constan
         return true;
     }
 
-    public Class<? extends Number> getLiteralClass() {
-        return nlp.getLiteralClass();
-    }
-
     public boolean isInteger() {
         return nlp.isInteger();
+    }
+
+    @Override
+    public Object jjtAccept(final ParserVisitor visitor, final Object data) {
+        return visitor.visit(this, data);
     }
 
     /**
@@ -70,7 +70,7 @@ public final class ASTNumberLiteral extends JexlNode implements JexlNode.Constan
     }
 
     @Override
-    public Object jjtAccept(final ParserVisitor visitor, final Object data) {
-        return visitor.visit(this, data);
+    public String toString() {
+        return nlp.toString();
     }
 }
