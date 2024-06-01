@@ -19,6 +19,7 @@ package org.apache.commons.jexl3;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -308,13 +309,9 @@ public class Issues200Test extends JexlTestCase {
         jc.set("v210", new T210());
         final JexlEngine jexl = new JexlBuilder().strict(false).silent(false).create();
         final JexlScript e = jexl.createScript("v210.npe()");
-        try {
-            e.execute(jc);
-            fail("should have thrown an exception");
-        } catch (final JexlException xjexl) {
-            final Throwable th = xjexl.getCause();
-            assertEquals("NPE210", th.getMessage());
-        }
+        final JexlException xjexl = assertThrows(JexlException.class, () -> e.execute(jc));
+        final Throwable th = xjexl.getCause();
+        assertEquals("NPE210", th.getMessage());
     }
 
     @Test
@@ -334,13 +331,8 @@ public class Issues200Test extends JexlTestCase {
         jc.set("foo", new int[]{0, 1});
         options.setStrict(true);
         assertTrue(options.isStrict());
-        try {
-            r = e.execute(jc);
-            fail("should have thrown an exception");
-        } catch (final JexlException xjexl) {
-            final Throwable th = xjexl.getCause();
-            assertEquals(ArrayIndexOutOfBoundsException.class, th.getClass());
-        }
+        final JexlException xjexl = assertThrows(JexlException.class, () -> e.execute(jc));
+        assertEquals(ArrayIndexOutOfBoundsException.class, xjexl.getCause().getClass());
         //
         options.setStrict(false);
         r = e.execute(jc);
@@ -454,12 +446,7 @@ public class Issues200Test extends JexlTestCase {
     public void test243a() throws Exception {
         final JexlEngine jexl = new JexlBuilder().cache(32).create();
         final JexlScript script = jexl.createScript("while(true);");
-        try {
-            final JexlExpression expr = jexl.createExpression("while(true);");
-            fail("should have failed!, expr do not allow 'while' statement");
-        } catch (final JexlException xparse) {
-            // ok
-        }
+        assertThrows(JexlException.class, () -> jexl.createExpression("while(true);"), "expr do not allow 'while' statement");
     }
     @Test
     public void test245() throws Exception {
@@ -473,43 +460,38 @@ public class Issues200Test extends JexlTestCase {
         final JexlExpression foobarbaz = engine.createExpression("foo.bar.baz");
         // add ambiguity with null & not-null
         final Object[] args = { null, 245 };
-        for(final Object arg : args ){
+        for (final Object arg : args) {
             foo245.setBar(arg);
             // ok
             assertEquals(foo245.getBar(), foobar.evaluate(ctx));
             // fail level 1
-            try {
-                foobaz.evaluate(ctx);
-                fail("foo.baz is not solvable, exception expected");
-            } catch (final JexlException xp) {
-                assertTrue(xp instanceof JexlException.Property);
-            }
+            assertThrows(JexlException.Property.class, () -> foobaz.evaluate(ctx), "foo.baz is not solvable, exception expected");
             // fail level 2
-            try {
-                foobarbaz.evaluate(ctx);
-                fail("foo.bar.baz is not solvable, exception expected");
-            } catch (final JexlException xp) {
-                assertTrue(xp instanceof JexlException.Property);
-            }
+            assertThrows(JexlException.Property.class, () -> foobarbaz.evaluate(ctx), "foo.bar.baz is not solvable, exception expected");
         }
     }
 
     @Test
     public void test256() throws Exception {
         final MapContext ctx = new MapContext() {
-            @Override public Object get(final String name) {
+            @Override
+            public Object get(final String name) {
                 if ("java".equals(name)) {
                     return null;
                 }
                 return super.get(name);
             }
-            @Override public boolean has(final String name) {
+
+            @Override
+            public boolean has(final String name) {
                 if ("java".equals(name)) {
                     return false;
                 }
                 return super.has(name);
             }
-            @Override public void set(final String name, final Object value) {
+
+            @Override
+            public void set(final String name, final Object value) {
                 if ("java".equals(name)) {
                     throw new JexlException(null, "can not set " + name);
                 }
@@ -518,16 +500,9 @@ public class Issues200Test extends JexlTestCase {
         };
         ctx.set("java.version", 10);
         final JexlEngine engine = new JexlBuilder().strict(true).silent(false).create();
-        JexlScript script;
-        script = engine.createScript("java = 3");
-        try {
-             script.execute(ctx);
-             fail("should have failed!");
-        } catch (final JexlException xjexl) {
-            // expected
-        }
-        script = engine.createScript("java.version");
-        assertEquals(10, script.execute(ctx));
+        final JexlScript script = engine.createScript("java = 3");
+        assertThrows(JexlException.class, () -> script.execute(ctx));
+        assertEquals(10, engine.createScript("java.version").execute(ctx));
     }
 
     @Test
@@ -537,11 +512,7 @@ public class Issues200Test extends JexlTestCase {
         ctxt.set("x", 42);
         Object result;
         JexlScript script;
-        try {
-            script = jexl.createScript("(true) ? x : abs(1)");
-        } catch (final JexlException.Parsing xparse) {
-            // ambiguous, parsing fails
-        }
+        assertThrows(JexlException.Parsing.class, () -> jexl.createScript("(true) ? x : abs(1)"), "ambiguous, parsing should fail");
         script = jexl.createScript("(true) ? (x) : abs(2)");
         result = script.execute(ctxt);
         assertEquals(42, result);
