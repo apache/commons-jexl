@@ -19,6 +19,7 @@ package org.apache.commons.jexl3;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -343,21 +344,13 @@ public class MethodTest extends JexlTestCase {
         result = JEXL.invokeMethod(func, "over", "foo", 42);
         assertEquals("foo + 42", result);
         // ambiguous call fails
-        try {
-            JEXL.invokeMethod(func, "over", "not null", null);
-            fail("should be ambiguous");
-        } catch (final JexlException.Method xinvoke) {
-            assertEquals("over(String, Object)", xinvoke.getMethodSignature());
-        }
+        JexlException.Method xinvoke = assertThrows(JexlException.Method.class, () -> JEXL.invokeMethod(func, "over", "not null", null));
+        assertEquals("over(String, Object)", xinvoke.getMethodSignature());
 
         // another ambiguous call fails
-        try {
-            final String[] arg2 = {"more", "than", "one"};
-            JEXL.invokeMethod(func, "over", "not null", arg2);
-            fail("should be ambiguous");
-        } catch (final JexlException.Method xinvoke) {
-            assertEquals("over(String, String[])", xinvoke.getMethodSignature());
-        }
+        final String[] arg2 = { "more", "than", "one" };
+        xinvoke = assertThrows(JexlException.Method.class, () -> JEXL.invokeMethod(func, "over", "not null", arg2));
+        assertEquals("over(String, String[])", xinvoke.getMethodSignature());
     }
 
     @Test
