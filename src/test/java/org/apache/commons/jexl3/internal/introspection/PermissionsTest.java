@@ -21,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -372,28 +373,19 @@ public class PermissionsTest {
         final Method callMeNot = getMethod(Outer.Inner.class, "callMeNot");
         assertNotNull(callMeNot);
         assertFalse(p.allow(callMeNot));
-        JexlScript script = jexl.createScript("o.callMeNot()", "o");
-        try {
-            final Object result = script.execute(null, new Outer.Inner());
-            fail("callMeNot should be uncallable");
-        } catch (final JexlException.Method xany) {
-            assertEquals("callMeNot", xany.getMethod());
-        }
+        final JexlScript script = jexl.createScript("o.callMeNot()", "o");
+        assertEquals("callMeNot", assertThrows(JexlException.Method.class, () -> script.execute(null, new Outer.Inner())).getMethod());
         final Method uncallable = getMethod(Invisible.class, "uncallable");
         assertFalse(p.allow(uncallable));
         final Package ip = Invisible.class.getPackage();
         assertFalse(p.allow(ip));
-        script = jexl.createScript("o.uncallable()", "o");
-        try {
-            final Object result = script.execute(null, new Invisible());
-            fail("uncallable should be uncallable");
-        } catch (final JexlException.Method xany) {
-            assertEquals("uncallable", xany.getMethod());
-        }
+        final JexlScript script2 = jexl.createScript("o.uncallable()", "o");
+        assertEquals("uncallable", assertThrows(JexlException.Method.class, () -> script2.execute(null, new Invisible())).getMethod());
     }
 
     @Test
     public void testParsePermissionsFailures() {
+        // @formatter:off
         final String[] srcs = {
                 "java.lang.*.*",
                 "java.math.*.",
@@ -403,13 +395,9 @@ public class PermissionsTest {
                 "java.io { Text File {} }",
                 "java.io { File { m.x } }"
         };
-        for(final String src : srcs) {
-            try {
-                final Permissions p = (Permissions) JexlPermissions.parse(src);
-                fail(src);
-            } catch (final IllegalStateException xill) {
-                assertNotNull(xill);
-            }
+        // @formatter:on
+        for (final String src : srcs) {
+            assertThrows(IllegalStateException.class, () -> JexlPermissions.parse(src));
         }
     }
 
@@ -448,16 +436,10 @@ public class PermissionsTest {
         final Foo2 foo3 = new Foo3();
         final JexlEngine jexl = new JexlBuilder().safe(false).create();
         // call public override of protected, nok
-        Foo2 foo2 = new Foo2();
+        final Foo2 foo2 = new Foo2();
         script = jexl.createScript("x.protectedMethod()", "x");
-        try {
-            r = script.execute(null, foo2);
-            fail("protectedMethod() is not public through superclass Foo2");
-        } catch (final JexlException xjexl) {
-            assertNotNull(xjexl);
-        }
+        assertThrows(JexlException.class, () -> script.execute(null, foo2), "protectedMethod() is not public through superclass Foo2");
         // call public override, ok
-        foo2 = new Foo3();
         r = script.execute(null, foo3);
         assertEquals("foo3",r);
     }
