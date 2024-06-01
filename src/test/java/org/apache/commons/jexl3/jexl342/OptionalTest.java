@@ -16,7 +16,10 @@
  */
 package org.apache.commons.jexl3.jexl342;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -34,7 +37,6 @@ import org.apache.commons.jexl3.JexlInfo;
 import org.apache.commons.jexl3.JexlScript;
 import org.apache.commons.jexl3.MapContext;
 import org.apache.commons.jexl3.introspection.JexlUberspect;
-import org.junit.Assert;
 import org.junit.Test;
 
 public class OptionalTest {
