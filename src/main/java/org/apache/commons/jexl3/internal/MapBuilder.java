@@ -32,27 +32,27 @@ public class MapBuilder implements JexlArithmetic.MapBuilder {
     /**
      * Creates a new builder.
      * @param size the expected map size
+     */
+    public MapBuilder(final int size) {
+        this(size, false);
+    }
+
+    /**
+     * Creates a new builder.
+     * @param size the expected map size
      * @param extended whether the map is extended
      */
     public MapBuilder(final int size, final boolean extended) {
         map = extended? new LinkedHashMap<>(size) : new HashMap<>(size);
     }
 
-    /**
-     * Creates a new builder.
-     * @param size the expected map size
-     */
-    public MapBuilder(final int size) {
-        this(size, false);
+    @Override
+    public Map<Object,Object> create() {
+        return map;
     }
 
     @Override
     public void put(final Object key, final Object value) {
         map.put(key, value);
-    }
-
-    @Override
-    public Map<Object,Object> create() {
-        return map;
     }
 }
