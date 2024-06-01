@@ -753,13 +753,8 @@ public class ArithmeticTest extends JexlTestCase {
         result = script.execute(jc, new Var(15), new Var(3155));
         assertFalse((Boolean) result);
 
-        script = jexl.createScript("(x)->{ !x }");
-        try {
-            result = script.execute(jc, new Var(-42));
-            fail("should fail");
-        } catch (final JexlException xany) {
-            assertTrue(xany instanceof JexlException.Operator);
-        }
+        final JexlScript script1 = jexl.createScript("(x)->{ !x }");
+        assertThrows(JexlException.Operator.class, () -> script1.execute(jc, new Var(-42)));
     }
 
     @BeforeEach
