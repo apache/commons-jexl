@@ -247,7 +247,7 @@ public class TryCatchFinallyTest extends JexlTestCase {
 
         // int x = 0;
         try (AutoCloseable x = new Circuit()) {
-
+            // empty
         }
     }
 
