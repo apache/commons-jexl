@@ -41,8 +41,8 @@ import org.junit.jupiter.api.Test;
  */
 public class ArrayTypeTest {
   public abstract static class Class0 implements Inter0 {
-    private int value;
-    public Class0(int v) {
+    private final int value;
+    public Class0(final int v) {
       value = v;
     }
     @Override public String toString() {
@@ -50,13 +50,13 @@ public class ArrayTypeTest {
     }
   }
   public static class ClassA extends Class0 implements InterA {
-    public ClassA(int v) { super(v); }
+    public ClassA(final int v) { super(v); }
   }
   public static class ClassB extends ClassA implements InterB {
-    public ClassB(int v) { super(v); }
+    public ClassB(final int v) { super(v); }
   }
   public static class ClassC extends ClassB implements InterC, InterX {
-    public ClassC(int v) { super(v); }
+    public ClassC(final int v) { super(v); }
   }
   public static class ClassD implements InterB, Inter0 {
     @Override public String toString() {
@@ -64,7 +64,7 @@ public class ArrayTypeTest {
     }
   }
   public static class ClassX extends Class0 implements InterX {
-    public ClassX(int v) { super(v); }
+    public ClassX(final int v) { super(v); }
   }
   // A dependency tree with some complexity follows:
   public interface Inter0 {}
@@ -75,22 +75,22 @@ public class ArrayTypeTest {
 
   @Test
   public void testArrayTypes() {
-    ArrayBuilder ab = new ArrayBuilder(1);
+    final ArrayBuilder ab = new ArrayBuilder(1);
     // An engine for expressions with args
-    JexlFeatures features = JexlFeatures.createScript().script(false);
-    JexlEngine jexl = new JexlBuilder()
+    final JexlFeatures features = JexlFeatures.createScript().script(false);
+    final JexlEngine jexl = new JexlBuilder()
         .features(features)
         .create();
     // Super for ClassC
-    Set<Class<?>> superSet = ClassMisc.getSuperClasses(ClassC.class);
+    final Set<Class<?>> superSet = ClassMisc.getSuperClasses(ClassC.class);
     assertTrue(superSet.size() > 0);
     // verify the order
-    List<Class<?>> ordered = Arrays.asList(
+    final List<Class<?>> ordered = Arrays.asList(
         ClassB.class, ClassA.class, Class0.class,
         InterC.class, InterX.class, InterB.class,
         InterA.class, Inter0.class);
     int i = 0;
-    for(Class<?> clazz : superSet) {
+    for(final Class<?> clazz : superSet) {
       assertEquals(clazz, ordered.get(i++), "order " + i);
     }
     // intersect ClassC, ClassX -> Class0
@@ -102,13 +102,13 @@ public class ArrayTypeTest {
     assertEquals(ClassB.class, inter);
 
     // intersect ArrayList, ArrayDeque -> AbstractCollection
-    Class<?> list = ClassMisc.getCommonSuperClass(ArrayList.class, ArrayDeque.class);
+    final Class<?> list = ClassMisc.getCommonSuperClass(ArrayList.class, ArrayDeque.class);
     assertEquals(list, AbstractCollection.class);
 
-    Set<Class<?>> sset = ClassMisc.getSuperClasses(ArrayList.class, ArrayDeque.class);
+    final Set<Class<?>> sset = ClassMisc.getSuperClasses(ArrayList.class, ArrayDeque.class);
     assertFalse(sset.isEmpty());
     // in java 21, a SequenceCollection interface is added to the sset
-    List<Class<?>> expected = Arrays.asList(AbstractCollection.class, Collection.class, Iterable.class, Cloneable.class, Serializable.class);
+    final List<Class<?>> expected = Arrays.asList(AbstractCollection.class, Collection.class, Iterable.class, Cloneable.class, Serializable.class);
     assertTrue(sset.containsAll(expected));
 
     Class<?> collection = ClassMisc.getCommonSuperClass(ArrayList.class, Collections.emptyList().getClass());
@@ -117,10 +117,10 @@ public class ArrayTypeTest {
                           .stream().findFirst().orElse(Object.class);
 
     // apply on objects
-    Object a = new ClassA(1);
-    Object b = new ClassB(2);
-    Object c = new ClassC(3);
-    Object x = new ClassX(4);
+    final Object a = new ClassA(1);
+    final Object b = new ClassB(2);
+    final Object c = new ClassC(3);
+    final Object x = new ClassX(4);
     JexlScript script;
     Object result;
 
@@ -141,7 +141,7 @@ public class ArrayTypeTest {
         & result.getClass().getComponentType().equals(Class0.class));
 
     // intersect a, b, c, d -> inter0
-    Object d = new ClassD();
+    final Object d = new ClassD();
     result = script.execute(null, a, b, c, d);
     assertTrue(result.getClass().isArray()
         && result.getClass().getComponentType().equals(Inter0.class));
