@@ -64,6 +64,16 @@ public class ArrayIterator implements Iterator<Object> {
     }
 
     /**
+     * Check to see if there is another element in the array.
+     *
+     * @return Whether there is another element.
+     */
+    @Override
+    public boolean hasNext() {
+        return pos < size;
+    }
+
+    /**
      * Move to next element in the array.
      *
      * @return The next object in the array.
@@ -76,15 +86,5 @@ public class ArrayIterator implements Iterator<Object> {
         // we screwed up...
         throw new NoSuchElementException("No more elements: " + pos
                                          + " / " + size);
-    }
-
-    /**
-     * Check to see if there is another element in the array.
-     *
-     * @return Whether there is another element.
-     */
-    @Override
-    public boolean hasNext() {
-        return pos < size;
     }
 }
