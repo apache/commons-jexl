@@ -16,6 +16,8 @@
  */
 package org.apache.commons.jexl3;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import java.util.Collection;
 
 import org.junit.Assert;
@@ -37,11 +39,11 @@ public class RangeTest extends JexlTestCase {
         final JexlContext jc = new MapContext();
 
         Object o = e.execute(jc, 5);
-        Assert.assertEquals(Boolean.TRUE, o);
+        assertEquals(Boolean.TRUE, o);
         o = e.execute(jc, 0);
-        Assert.assertEquals(Boolean.FALSE, o);
+        assertEquals(Boolean.FALSE, o);
         o = e.execute(jc, 100);
-        Assert.assertEquals(Boolean.FALSE, o);
+        assertEquals(Boolean.FALSE, o);
     }
 
     @Test
@@ -51,43 +53,43 @@ public class RangeTest extends JexlTestCase {
 
         final Object o0 = e.evaluate(jc);
         final Object o = e.evaluate(jc);
-        Assert.assertTrue(o instanceof Collection<?>);
+        assertTrue(o instanceof Collection<?>);
         final Collection<?> c = (Collection<?>) o;
-        Assert.assertEquals(32, c.size());
+        assertEquals(32, c.size());
 
-        Assert.assertNotSame(o0, o);
-        Assert.assertEquals(o0.hashCode(), o.hashCode());
-        Assert.assertEquals(o0, o);
+        assertNotSame(o0, o);
+        assertEquals(o0.hashCode(), o.hashCode());
+        assertEquals(o0, o);
 
         int i = 0;
         for (final Object v : c) {
             i += 1;
-            Assert.assertEquals(i, ((Number) v).intValue());
+            assertEquals(i, ((Number) v).intValue());
         }
-        Assert.assertEquals(32, i);
+        assertEquals(32, i);
 
         Integer[] aa = c.<Integer>toArray(new Integer[32]);
-        Assert.assertEquals(32, aa.length);
+        assertEquals(32, aa.length);
         for (int l = 0; l < 32; ++l) {
-            Assert.assertEquals((int) aa[l], l + 1);
+            assertEquals((int) aa[l], l + 1);
         }
 
         aa = c.<Integer>toArray(new Integer[2]);
-        Assert.assertEquals(32, aa.length);
+        assertEquals(32, aa.length);
         for (int l = 0; l < 32; ++l) {
-            Assert.assertEquals((int) aa[l], l + 1);
+            assertEquals((int) aa[l], l + 1);
         }
 
         aa = c.<Integer>toArray(new Integer[34]);
-        Assert.assertEquals(34, aa.length);
+        assertEquals(34, aa.length);
         for (int l = 0; l < 32; ++l) {
-            Assert.assertEquals((int) aa[l], l + 1);
+            assertEquals((int) aa[l], l + 1);
         }
 
         final Object[] oaa = c.toArray();
-        Assert.assertEquals(32, oaa.length);
+        assertEquals(32, oaa.length);
         for (int l = 0; l < 32; ++l) {
-            Assert.assertEquals(oaa[l], l + 1);
+            assertEquals(oaa[l], l + 1);
         }
     }
 
@@ -97,13 +99,13 @@ public class RangeTest extends JexlTestCase {
         final JexlContext jc = new MapContext();
 
         final Object o = e.evaluate(jc);
-        Assert.assertTrue(o instanceof Collection<?>);
+        assertTrue(o instanceof Collection<?>);
         final Collection<?> c = (Collection<?>) o;
-        Assert.assertEquals(1, c.size());
+        assertEquals(1, c.size());
         final Object[] a = c.toArray();
-        Assert.assertEquals(1, a.length);
-        Assert.assertEquals(1, ((Number) a[0]).intValue());
-        Assert.assertFalse((Boolean) JEXL.createScript("empty x", "x").execute(null, e));
+        assertEquals(1, a.length);
+        assertEquals(1, ((Number) a[0]).intValue());
+        assertFalse((Boolean) JEXL.createScript("empty x", "x").execute(null, e));
     }
 
     @Test
@@ -112,7 +114,7 @@ public class RangeTest extends JexlTestCase {
         final JexlContext jc = new MapContext();
 
         final Object o = e.execute(jc);
-        Assert.assertEquals(15, ((Number) o).intValue());
+        assertEquals(15, ((Number) o).intValue());
     }
 
     @Test
@@ -121,11 +123,11 @@ public class RangeTest extends JexlTestCase {
         final JexlContext jc = new MapContext();
 
         Object o = e.execute(jc, 90000000005L);
-        Assert.assertEquals(Boolean.TRUE, o);
+        assertEquals(Boolean.TRUE, o);
         o = e.execute(jc, 0);
-        Assert.assertEquals(Boolean.FALSE, o);
+        assertEquals(Boolean.FALSE, o);
         o = e.execute(jc, 90000000011L);
-        Assert.assertEquals(Boolean.FALSE, o);
+        assertEquals(Boolean.FALSE, o);
     }
 
     @Test
@@ -135,44 +137,44 @@ public class RangeTest extends JexlTestCase {
 
         final Object o0 = e.evaluate(jc);
         final Object o = e.evaluate(jc);
-        Assert.assertTrue(o instanceof Collection<?>);
+        assertTrue(o instanceof Collection<?>);
         final Collection<?> c = (Collection<?>) o;
-        Assert.assertEquals(32, c.size());
-        Assert.assertFalse((Boolean) JEXL.createScript("empty x", "x").execute(null, e));
+        assertEquals(32, c.size());
+        assertFalse((Boolean) JEXL.createScript("empty x", "x").execute(null, e));
 
-        Assert.assertNotSame(o0, o);
-        Assert.assertEquals(o0.hashCode(), o.hashCode());
-        Assert.assertEquals(o0, o);
+        assertNotSame(o0, o);
+        assertEquals(o0.hashCode(), o.hashCode());
+        assertEquals(o0, o);
 
         long i = 6789000000L;
         for (final Object v : c) {
             i += 1;
-            Assert.assertEquals(i, ((Number) v).longValue());
+            assertEquals(i, ((Number) v).longValue());
         }
-        Assert.assertEquals(6789000032L, i);
+        assertEquals(6789000032L, i);
 
         Long[] aa = c.<Long>toArray(new Long[32]);
-        Assert.assertEquals(32, aa.length);
+        assertEquals(32, aa.length);
         for (int l = 0; l < 32; ++l) {
-            Assert.assertEquals((long) aa[l], 6789000001L + l);
+            assertEquals((long) aa[l], 6789000001L + l);
         }
 
         aa = c.<Long>toArray(new Long[2]);
-        Assert.assertEquals(32, aa.length);
+        assertEquals(32, aa.length);
         for (int l = 0; l < 32; ++l) {
-            Assert.assertEquals((long) aa[l], 6789000001L + l);
+            assertEquals((long) aa[l], 6789000001L + l);
         }
 
         aa = c.<Long>toArray(new Long[34]);
-        Assert.assertEquals(34, aa.length);
+        assertEquals(34, aa.length);
         for (int l = 0; l < 32; ++l) {
-            Assert.assertEquals((long) aa[l], 6789000001L + l);
+            assertEquals((long) aa[l], 6789000001L + l);
         }
 
         final Object[] oaa = c.toArray();
-        Assert.assertEquals(32, oaa.length);
+        assertEquals(32, oaa.length);
         for (int l = 0; l < 32; ++l) {
-            Assert.assertEquals(oaa[l], 6789000001L + l);
+            assertEquals(oaa[l], 6789000001L + l);
         }
     }
 
@@ -182,6 +184,6 @@ public class RangeTest extends JexlTestCase {
         final JexlContext jc = new MapContext();
 
         final Object o = e.execute(jc);
-        Assert.assertEquals(6789000001L, ((Number) o).longValue());
+        assertEquals(6789000001L, ((Number) o).longValue());
     }
 }

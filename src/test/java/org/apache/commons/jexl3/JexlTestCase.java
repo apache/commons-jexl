@@ -17,6 +17,8 @@
 
 package org.apache.commons.jexl3;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -156,7 +158,7 @@ public class JexlTestCase {
             clazz = (Class<JexlTestCase>) Class.forName(testClassName);
         }
         catch (final ClassNotFoundException xclass) {
-            Assert.fail("no such class: " + testClassName);
+            fail("no such class: " + testClassName);
             return;
         }
         // find ctor & instantiate
@@ -171,12 +173,12 @@ public class JexlTestCase {
                 test = clazz.getConstructor().newInstance();
             }
             catch (final Exception xany) {
-                Assert.fail("cant instantiate test: " + xany);
+                fail("cant instantiate test: " + xany);
                 return;
             }
         }
         catch (final Exception xany) {
-            Assert.fail("cant instantiate test: " + xany);
+            fail("cant instantiate test: " + xany);
             return;
         }
         // Run the test
@@ -215,7 +217,7 @@ public class JexlTestCase {
             method = this.getClass().getDeclaredMethod(name, NO_PARMS);
         }
         catch (final Exception xany) {
-            Assert.fail("no such test: " + name);
+            fail("no such test: " + name);
             return;
         }
         try {

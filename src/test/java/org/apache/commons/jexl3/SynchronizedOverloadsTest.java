@@ -16,6 +16,8 @@
  */
 package org.apache.commons.jexl3;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -47,7 +49,7 @@ public class SynchronizedOverloadsTest extends JexlTestCase {
         final JexlEngine jexl = new JexlBuilder().namespaces(ns).create();
         final JexlScript js0 = jexl.createScript("@synchronized(y) {return y.size(); }", "y");
         final Object size = js0.execute(jc, "foobar");
-        Assert.assertEquals(6, size);
+        assertEquals(6, size);
     }
 
     @Test
@@ -58,7 +60,7 @@ public class SynchronizedOverloadsTest extends JexlTestCase {
         final JexlEngine jexl = new JexlBuilder().namespaces(ns).create();
         final JexlScript js0 = jexl.createScript("synchronized:call(x, (y)->{y.size()})", "x");
         final Object size = js0.execute(jc, "foobar");
-        Assert.assertEquals(6, size);
+        assertEquals(6, size);
     }
 
     @Test
@@ -72,12 +74,12 @@ public class SynchronizedOverloadsTest extends JexlTestCase {
         final JexlEngine jexl = new JexlBuilder().arithmetic(new SynchronizedArithmetic(abstractMonitor, true)).create();
         final JexlScript js0 = jexl.createScript("x['four'] = 4; var t = 0.0; for(var z: x) { t += z; }; call(t, (y)->{return y});", "x");
         Object t = js0.execute(jc, foo);
-        Assert.assertEquals(10.0d, t);
-        Assert.assertTrue(abstractMonitor.isBalanced());
-        Assert.assertEquals(2, abstractMonitor.getCount());
+        assertEquals(10.0d, t);
+        assertTrue(abstractMonitor.isBalanced());
+        assertEquals(2, abstractMonitor.getCount());
         t = js0.execute(jc, foo);
-        Assert.assertEquals(10.0d, t);
-        Assert.assertTrue(abstractMonitor.isBalanced());
-        Assert.assertEquals(4, abstractMonitor.getCount());
+        assertEquals(10.0d, t);
+        assertTrue(abstractMonitor.isBalanced());
+        assertEquals(4, abstractMonitor.getCount());
     }
 }

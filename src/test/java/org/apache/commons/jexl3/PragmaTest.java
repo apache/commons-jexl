@@ -16,6 +16,8 @@
  */
 package org.apache.commons.jexl3;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Collections;
@@ -141,27 +143,27 @@ public class PragmaTest extends JexlTestCase {
         Object result ;
         script = JEXL.createScript("#pragma jexl.module.m0 \"script('module0')\"\n m0:f42(10);");
         result = script.execute(ctxt);
-        Assert.assertEquals(52, result);
+        assertEquals(52, result);
         if (cmCtxt != null) {
-            Assert.assertEquals(1, cmCtxt.getCountCompute());
+            assertEquals(1, cmCtxt.getCountCompute());
         }
         result = script.execute(ctxt);
-        Assert.assertEquals(52, result);
+        assertEquals(52, result);
         if (cmCtxt != null) {
-            Assert.assertEquals(1, cmCtxt.getCountCompute());
+            assertEquals(1, cmCtxt.getCountCompute());
         }
         script = JEXL.createScript("#pragma jexl.module.m0 \"script('module0')\"\n m0:f43(10);");
         result = script.execute(ctxt);
-        Assert.assertEquals(53, result);
+        assertEquals(53, result);
         if (cmCtxt != null) {
-            Assert.assertEquals(1, cmCtxt.getCountCompute());
+            assertEquals(1, cmCtxt.getCountCompute());
         }
         try {
             script = JEXL.createScript("#pragma jexl.module.m0 ''\n#pragma jexl.module.m0 \"fubar('module0')\"\n m0:f43(10);");
             result = script.execute(ctxt);
-            Assert.fail("fubar sshoud fail");
+            fail("fubar sshoud fail");
         } catch (final JexlException.Method xmethod) {
-            Assert.assertEquals("fubar", xmethod.getMethod());
+            assertEquals("fubar", xmethod.getMethod());
         }
     }
 
@@ -198,10 +200,10 @@ public class PragmaTest extends JexlTestCase {
         for(final Map.Entry<String, Number> e : values.entrySet()) {
             final String text = "#pragma number " + e.getKey();
             final JexlScript script = jexl.createScript(text);
-            Assert.assertNotNull(script);
+            assertNotNull(script);
             final Map<String, Object> pragmas = script.getPragmas();
-            Assert.assertNotNull(pragmas);
-            Assert.assertEquals(e.getKey(), e.getValue(), pragmas.get("number"));
+            assertNotNull(pragmas);
+            assertEquals(e.getValue(), pragmas.get("number"), e::getKey);
         }
     }
     @Test
@@ -217,7 +219,7 @@ public class PragmaTest extends JexlTestCase {
         try {
             final JexlScript script = jexl.createScript(src);
         } catch (JexlException.Parsing xparse) {
-            Assert.assertTrue(xparse.getMessage().contains("import pragma"));
+            assertTrue(xparse.getMessage().contains("import pragma"));
         }
     }
     @Test
@@ -230,14 +232,14 @@ public class PragmaTest extends JexlTestCase {
         final JexlScript script = JEXL.createScript(src);
         final Map<String, Object> pragmas = script.getPragmas();
         final Object importz = pragmas.get("jexl.import");
-        Assert.assertTrue(importz instanceof Set<?>);
+        assertTrue(importz instanceof Set<?>);
         final Set<String> importzz = (Set<String>) importz;
-        Assert.assertTrue(importzz.contains("java.util"));
-        Assert.assertTrue(importzz.contains("java.io"));
-        Assert.assertTrue(importzz.contains("java.net"));
-        Assert.assertEquals(3, importzz.size());
+        assertTrue(importzz.contains("java.util"));
+        assertTrue(importzz.contains("java.io"));
+        assertTrue(importzz.contains("java.net"));
+        assertEquals(3, importzz.size());
         final String parsed = script.getParsedText();
-        Assert.assertEquals(src, parsed);
+        assertEquals(src, parsed);
     }
 
     @Test
@@ -245,8 +247,8 @@ public class PragmaTest extends JexlTestCase {
         final JexlEngine jexl = new JexlBuilder().create();
         JexlScript script = jexl.createScript("#pragma myNull null\n");
         Map<String, Object> pragmas = script.getPragmas();
-        Assert.assertTrue("pragma key present?", pragmas.containsKey("myNull"));
-        Assert.assertNull("expected null value", pragmas.get("myNull"));
+        assertTrue(pragmas.containsKey("myNull"), "pragma key present?");
+        assertNull(pragmas.get("myNull"), "expected null value");
     }
 
     @Test
@@ -254,11 +256,11 @@ public class PragmaTest extends JexlTestCase {
     public void testJxltPragmas() {
         final JxltEngine engine = new JexlBuilder().create().createJxltEngine();
         final JxltEngine.Template tscript = engine.createTemplate("$$ #pragma one 1\n$$ #pragma the.very.hard 'truth'\n2;");
-        Assert.assertNotNull(tscript);
+        assertNotNull(tscript);
         final Map<String, Object> pragmas = tscript.getPragmas();
-        Assert.assertEquals(2, pragmas.size());
-        Assert.assertEquals(1, pragmas.get("one"));
-        Assert.assertEquals("truth", pragmas.get("the.very.hard"));
+        assertEquals(2, pragmas.size());
+        assertEquals(1, pragmas.get("one"));
+        assertEquals("truth", pragmas.get("the.very.hard"));
     }
 
     @Test
@@ -271,9 +273,9 @@ public class PragmaTest extends JexlTestCase {
                         + "42;\n";
         final JexlScript script = JEXL.createScript(src);
         final Object result = script.execute(jc);
-        Assert.assertEquals(42, result);
+        assertEquals(42, result);
         final String parsed = script.getParsedText();
-        Assert.assertEquals(src, parsed);
+        assertEquals(src, parsed);
     }
     @Test
     @SuppressWarnings("AssertEqualsBetweenInconvertibleTypes")
@@ -285,7 +287,7 @@ public class PragmaTest extends JexlTestCase {
                 "sleeper:sleep(100);"
                 + "42");
         final Object result = script.execute(jc);
-        Assert.assertEquals(42, result);
+        assertEquals(42, result);
     }
     @Test
     public void testNamespacePragmaDisabled() {
@@ -297,9 +299,9 @@ public class PragmaTest extends JexlTestCase {
                     "#pragma jexl.namespace.sleeper " + StaticSleeper.class.getName() + "\n"
                             + "sleeper:sleep(100);"
                             + "42");
-            Assert.fail("should have thrown syntax exception");
+            fail("should have thrown syntax exception");
         } catch (JexlException.Parsing xparse) {
-            Assert.assertTrue(xparse.getMessage().contains("namespace pragma"));
+            assertTrue(xparse.getMessage().contains("namespace pragma"));
         }
     }
     @Test public void testPragmaModuleCache() {
@@ -320,9 +322,9 @@ public class PragmaTest extends JexlTestCase {
         final JexlContext ctxt = new MapContext();
         try {
             final JexlScript e = jexl.createScript(str);
-            Assert.fail("i should not be resolved");
+            fail("i should not be resolved");
         } catch (final JexlException xany) {
-            Assert.assertNotNull(xany);
+            assertNotNull(xany);
         }
     }
 
@@ -333,11 +335,11 @@ public class PragmaTest extends JexlTestCase {
     @SuppressWarnings("AssertEqualsBetweenInconvertibleTypes")
     public void testPragmas() {
         final JexlScript script = JEXL.createScript("#pragma one 1\n#pragma the.very.hard 'truth'\n2;");
-        Assert.assertNotNull(script);
+        assertNotNull(script);
         final Map<String, Object> pragmas = script.getPragmas();
-        Assert.assertEquals(2, pragmas.size());
-        Assert.assertEquals(1, pragmas.get("one"));
-        Assert.assertEquals("truth", pragmas.get("the.very.hard"));
+        assertEquals(2, pragmas.size());
+        assertEquals(1, pragmas.get("one"));
+        assertEquals("truth", pragmas.get("the.very.hard"));
     }
 
     @Test
@@ -346,15 +348,15 @@ public class PragmaTest extends JexlTestCase {
         SafeContext jc = new SafeContext();
         jc.set("foo", null);
         final JexlScript script = JEXL.createScript("#pragma jexl.safe true\nfoo.bar;");
-        Assert.assertNotNull(script);
+        assertNotNull(script);
         jc.processPragmas(script.getPragmas());
         final Object result = script.execute(jc);
-        Assert.assertNull(result);
+        assertNull(result);
         jc = new SafeContext();
         jc.set("foo", null);
         try {
             script.execute(jc);
-            Assert.fail("should have thrown");
+            fail("should have thrown");
         } catch (final JexlException xvar) {
             // ok, expected
         }
@@ -369,7 +371,7 @@ public class PragmaTest extends JexlTestCase {
                 + "sleeper:sleep(100);"
                 + "42");
         final Object result = script.execute(jc);
-        Assert.assertEquals(42, result);
+        assertEquals(42, result);
     }
 
     @Test
@@ -382,6 +384,6 @@ public class PragmaTest extends JexlTestCase {
                 "sleeper:sleep(100);"
                 + "42");
         final Object result = script.execute(jc);
-        Assert.assertEquals(42, result);
+        assertEquals(42, result);
     }
 }

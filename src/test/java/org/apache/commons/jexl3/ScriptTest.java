@@ -16,6 +16,8 @@
  */
 package org.apache.commons.jexl3;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -157,8 +159,8 @@ public class ScriptTest extends JexlTestCase {
         final JexlContext jc = new MapContext();
         jc.set("out", System.out);
         final Object result = s.execute(jc, 13, 29);
-        Assert.assertNotNull("No result", result);
-        Assert.assertEquals("Wrong result", 42, result);
+        assertNotNull(result, "No result");
+        assertEquals(42, result, "Wrong result");
     }
 
     @Test
@@ -168,8 +170,8 @@ public class ScriptTest extends JexlTestCase {
         final JexlContext jc = new MapContext();
         jc.set("out", System.out);
         final Object result = s.execute(jc, 13, 29);
-        Assert.assertNotNull("No result", result);
-        Assert.assertEquals("Wrong result", 42, result);
+        assertNotNull(result, "No result");
+        assertEquals(42, result, "Wrong result");
     }
 
     @Test
@@ -179,8 +181,8 @@ public class ScriptTest extends JexlTestCase {
         final JexlContext jc = new MapContext();
         jc.set("out", System.out);
         final Object result = s.execute(jc);
-        Assert.assertNotNull("No result", result);
-        Assert.assertEquals("Wrong result", 7, result);
+        assertNotNull(result, "No result");
+        assertEquals(7, result, "Wrong result");
     }
 
     @Test
@@ -190,8 +192,8 @@ public class ScriptTest extends JexlTestCase {
         final JexlContext jc = new MapContext();
         jc.set("out", System.out);
         final Object result = s.execute(jc);
-        Assert.assertNotNull("No result", result);
-        Assert.assertEquals("Wrong result", 7, result);
+        assertNotNull(result, "No result");
+        assertEquals(7, result, "Wrong result");
     }
 
     @Test
@@ -206,10 +208,10 @@ public class ScriptTest extends JexlTestCase {
             final JexlContext jc = new MapContext();
             jc.set("httpr", new HttpPostRequest());
             final Object result = s.execute(jc);
-            Assert.assertNotNull(result);
-            Assert.assertEquals(response, result);
+            assertNotNull(result);
+            assertEquals(response, result);
         } catch (final IOException xio) {
-            Assert.fail(xio.getMessage());
+            fail(xio.getMessage());
         } finally {
             if (server != null) {
                 server.stop(0);
@@ -231,10 +233,10 @@ public class ScriptTest extends JexlTestCase {
             //jc.set("httpr", new HttpPostRequest());
             final String url = "http:/"+server.getAddress().toString()+"/test";
             final Object result = s.execute(jc, httpr,url);
-            Assert.assertNotNull(result);
-            Assert.assertEquals(response, result);
+            assertNotNull(result);
+            assertEquals(response, result);
         } catch (final IOException xio) {
-            Assert.fail(xio.getMessage());
+            fail(xio.getMessage());
         } finally {
             if (server != null) {
                 server.stop(0);
@@ -254,10 +256,10 @@ public class ScriptTest extends JexlTestCase {
 
         resultatJexl.setCode("");
         e.evaluate(jc);
-        Assert.assertEquals("OK", resultatJexl.getCode());
+        assertEquals("OK", resultatJexl.getCode());
         resultatJexl.setCode("");
         s.execute(jc);
-        Assert.assertEquals("OK", resultatJexl.getCode());
+        assertEquals("OK", resultatJexl.getCode());
     }
 
     /**
@@ -271,8 +273,8 @@ public class ScriptTest extends JexlTestCase {
         jc.set("x",1);
 
         final Object o = s.execute(jc);
-        Assert.assertEquals("Result is wrong", 10, o);
-        Assert.assertEquals("getText is wrong", code, s.getSourceText());
+        assertEquals(10, o, "Result is wrong");
+        assertEquals(code, s.getSourceText(), "getText is wrong");
     }
 
     /**
@@ -282,7 +284,7 @@ public class ScriptTest extends JexlTestCase {
     public void testSpacesScript() {
         final String code = " ";
         final JexlScript s = JEXL.createScript(code);
-        Assert.assertNotNull(s);
+        assertNotNull(s);
     }
 
 }

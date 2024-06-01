@@ -16,6 +16,8 @@
  */
 package org.apache.commons.jexl3;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -152,9 +154,9 @@ public class ContextNamespaceTest extends JexlTestCase {
         // local vars
         final JexlScript script = jexl.createScript(src, "x", "y", "z");
         Object result = script.execute(ctxt, null, 1, 169);
-        Assert.assertEquals(42, result);
+        assertEquals(42, result);
         result = script.execute(ctxt, "42", 1, 169);
-        Assert.assertEquals(169, result);
+        assertEquals(169, result);
     }
 
     private void run348b(final JexlEngine jexl, final JexlContext ctxt) {
@@ -169,13 +171,13 @@ public class ContextNamespaceTest extends JexlTestCase {
         ctxt.set("y", 1);
         ctxt.set("z", 169);
         Object result = script.execute(ctxt);
-        Assert.assertEquals(42, result);
+        assertEquals(42, result);
         ctxt.set("x", "42");
         result = script.execute(ctxt);
-        Assert.assertEquals(169, result);
+        assertEquals(169, result);
         //ctxt.set("x", "42");
         result = script.execute(ctxt);
-        Assert.assertEquals(169, result);
+        assertEquals(169, result);
     }
 
     private void run348c(final JexlEngine jexl, final JexlContext ctxt) {
@@ -186,9 +188,9 @@ public class ContextNamespaceTest extends JexlTestCase {
         // local vars
         final JexlScript script = jexl.createScript(src, "x", "z", "y");
         Object result = script.execute(ctxt, null, 169, 1);
-        Assert.assertEquals(src, 169, result);
+        assertEquals(169, result, src);
         result = script.execute(ctxt, "42", 169, 1);
-        Assert.assertEquals(src, 42, result);
+        assertEquals(42, result, src);
     }
 
     private void run348d(final JexlEngine jexl, final JexlContext ctxt) {
@@ -201,16 +203,16 @@ public class ContextNamespaceTest extends JexlTestCase {
         try {
            script = jexl.createScript(src);
         } catch (final JexlException.Parsing xparse) {
-            Assert.fail(src);
+            fail(src);
         }
         ctxt.set("x", null);
         ctxt.set("z", 169);
         ctxt.set("y", 1);
         Object result = script.execute(ctxt);
-        Assert.assertEquals(src, 169, result);
+        assertEquals(169, result, src);
         ctxt.set("x", "42");
         result = script.execute(ctxt);
-        Assert.assertEquals(src,42, result);
+        assertEquals(42, result, src);
     }
 
     private void runNsNsContext(final Map<String,Object> nsMap) {
@@ -220,11 +222,11 @@ public class ContextNamespaceTest extends JexlTestCase {
                 .namespaces(nsMap).create();
         final JexlScript script = jexl.createScript("x ->{ nsns:callIt(x); nsns:callIt(x); }");
         Number result = (Number) script.execute(ctxt, 23);
-        Assert.assertEquals(42, result);
-        Assert.assertEquals(1, nsnsCtor.get());
+        assertEquals(42, result);
+        assertEquals(1, nsnsCtor.get());
         result = (Number) script.execute(ctxt, 623);
-        Assert.assertEquals(642, result);
-        Assert.assertEquals(2, nsnsCtor.get());
+        assertEquals(642, result);
+        assertEquals(2, nsnsCtor.get());
     }
     private void runStaticNsContext(final Map<String,Object> nsMap) {
         final JexlContext ctxt = new MapContext();
@@ -232,9 +234,9 @@ public class ContextNamespaceTest extends JexlTestCase {
                 .namespaces(nsMap).create();
         final JexlScript script = jexl.createScript("x ->{ sns:callIt(x); sns:callIt(x); }");
         Number result = (Number) script.execute(ctxt, 23);
-        Assert.assertEquals(42, result);
+        assertEquals(42, result);
         result = (Number) script.execute(ctxt, 623);
-        Assert.assertEquals(642, result);
+        assertEquals(642, result);
     }
 
     @Test
@@ -244,9 +246,9 @@ public class ContextNamespaceTest extends JexlTestCase {
         final String src = "x != null ? x : func(y)";
         final JexlScript script = jexl.createScript(src,"x","y");
         Object result = script.execute(ctxt, null, 1);
-        Assert.assertEquals(42, result);
+        assertEquals(42, result);
         result = script.execute(ctxt, 169, -169);
-        Assert.assertEquals(169, result);
+        assertEquals(169, result);
     }
     @Test
     public void testNamespace346b() {
@@ -258,9 +260,9 @@ public class ContextNamespaceTest extends JexlTestCase {
         final String src = "x != null ? x : abs(y)";
         final JexlScript script = jexl.createScript(src,"x","y");
         Object result = script.execute(ctxt, null, 42);
-        Assert.assertEquals(42, result);
+        assertEquals(42, result);
         result = script.execute(ctxt, 169, -169);
-        Assert.assertEquals(169, result);
+        assertEquals(169, result);
     }
 
     @Test
@@ -322,7 +324,7 @@ public class ContextNamespaceTest extends JexlTestCase {
                 + "tax:vat(2000)";
         final JexlScript staxes = jexl.createScript(strs);
         final Object result = staxes.execute(context);
-        Assert.assertEquals(372., result);
+        assertEquals(372., result);
     }
 
     @Test
@@ -335,7 +337,7 @@ public class ContextNamespaceTest extends JexlTestCase {
                 + "str:format('%04d', 42)";
         final JexlScript staxes = jexl.createScript(strs);
         final Object result = staxes.execute(context);
-        Assert.assertEquals("0042", result);
+        assertEquals("0042", result);
     }
 
     @Test
@@ -356,20 +358,20 @@ public class ContextNamespaceTest extends JexlTestCase {
         final JexlEngine jexl = new JexlBuilder().strict(true).silent(false).create();
         final Vat vat = new Vat(18.6);
         final ObjectContext<Vat> ctxt = new ObjectContext<>(jexl, vat);
-        Assert.assertEquals(18.6d, (Double) ctxt.get("VAT"), 0.0001d);
+        assertEquals(18.6d, (Double) ctxt.get("VAT"), 0.0001d);
         ctxt.set("VAT", 20.0d);
-        Assert.assertEquals(20.0d, (Double) ctxt.get("VAT"), 0.0001d);
+        assertEquals(20.0d, (Double) ctxt.get("VAT"), 0.0001d);
 
         try {
             ctxt.get("vat");
-            Assert.fail("should have failed");
+            fail("should have failed");
         } catch (final JexlException.Property xprop) {
             //
         }
 
         try {
             ctxt.set("vat", 33.0d);
-            Assert.fail("should have failed");
+            fail("should have failed");
         } catch (final JexlException.Property xprop) {
             //
         }
@@ -392,6 +394,6 @@ public class ContextNamespaceTest extends JexlTestCase {
         final String strs = "taxes:vat(1000)";
         final JexlScript staxes = jexl.createScript(strs);
         final Object result = staxes.execute(context);
-        Assert.assertEquals(186., result);
+        assertEquals(186., result);
     }
 }

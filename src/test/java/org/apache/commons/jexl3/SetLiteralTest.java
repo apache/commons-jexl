@@ -16,6 +16,8 @@
  */
 package org.apache.commons.jexl3;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -48,7 +50,7 @@ public class SetLiteralTest extends JexlTestCase {
 
             final Object o = e.evaluate(jc);
             final Set<?> check = createSet("foo");
-            Assert.assertEquals(check, o);
+            assertEquals(check, o);
         }
     }
 
@@ -58,7 +60,7 @@ public class SetLiteralTest extends JexlTestCase {
         final JexlContext jc = new MapContext();
 
         final Object o = e.evaluate(jc);
-        Assert.assertFalse((Boolean) o);
+        assertFalse((Boolean) o);
     }
 
     @Test
@@ -83,7 +85,7 @@ public class SetLiteralTest extends JexlTestCase {
         for (int t = 0; t < exprs.length; ++t) {
             final JexlScript e = JEXL.createScript(exprs[t]);
             final Object o = e.execute(jc);
-            Assert.assertEquals(exprs[t], checks[t], o);
+            assertEquals(checks[t], o, exprs[t]);
         }
 
     }
@@ -95,7 +97,7 @@ public class SetLiteralTest extends JexlTestCase {
 
         final Object o = e.evaluate(jc);
         final Set<?> check = createSet(Double.valueOf(5.0), Integer.valueOf(10));
-        Assert.assertEquals(check, o);
+        assertEquals(check, o);
     }
 
     @Test
@@ -105,7 +107,7 @@ public class SetLiteralTest extends JexlTestCase {
 
         final Object o = e.execute(jc);
         final Set<?> check = createSet("foo");
-        Assert.assertEquals(check, o);
+        assertEquals(check, o);
     }
 
     @Test
@@ -115,7 +117,7 @@ public class SetLiteralTest extends JexlTestCase {
 
         final Object o = e.execute(jc);
         final Set<?> check = createSet("foo");
-        Assert.assertEquals(check, o);
+        assertEquals(check, o);
     }
 
     @Test
@@ -125,7 +127,7 @@ public class SetLiteralTest extends JexlTestCase {
 
         final Object o = e.execute(jc);
         final Set<?> check = createSet(createSet("foo"));
-        Assert.assertEquals(check, o);
+        assertEquals(check, o);
     }
 
     @Test
@@ -137,13 +139,13 @@ public class SetLiteralTest extends JexlTestCase {
 
             final Object o = e.evaluate(jc);
             final Set<?> check = createSet("foo", "bar");
-            Assert.assertEquals(check, o);
+            assertEquals(check, o);
         }
         try {
             JEXL.createExpression("{ , }");
-            Assert.fail("syntax");
+            fail("syntax");
         } catch(final JexlException.Parsing parsing) {
-            Assert.assertNotNull(parsing);
+            assertNotNull(parsing);
         }
     }
 
@@ -154,7 +156,7 @@ public class SetLiteralTest extends JexlTestCase {
 
         final Object o = e.execute(jc);
         final Set<?> check = createSet("foo", "bar");
-        Assert.assertEquals(check, o);
+        assertEquals(check, o);
     }
 
     @Test
@@ -163,7 +165,7 @@ public class SetLiteralTest extends JexlTestCase {
         final JexlContext jc = new MapContext();
 
         final Object o = e.evaluate(jc);
-        Assert.assertEquals(Integer.valueOf(2), o);
+        assertEquals(Integer.valueOf(2), o);
     }
 
 }

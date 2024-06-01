@@ -16,6 +16,8 @@
  */
 package org.apache.commons.jexl3.jexl342;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -78,39 +80,39 @@ public class OptionalTest {
 
         script = jexl.createScript(info.at(53, 1),"thing.name.length()", "thing");
         Object result = script.execute(null, thing);
-        Assert.assertNull(result);
+        assertNull(result);
 
         thing.name = "foo";
         result = script.execute(null, thing);
-        Assert.assertEquals(3, result);
+        assertEquals(3, result);
 
         try {
             script = jexl.createScript(info.at(62, 1), "thing.name.size()", "thing");
             result = script.execute(null, thing);
-            Assert.fail("should have thrown");
+            fail("should have thrown");
         } catch (final JexlException.Method xmethod) {
-            Assert.assertEquals("size", xmethod.getDetail());
-            Assert.assertEquals("test352@62:11 unsolvable function/method 'size'", xmethod.getMessage());
+            assertEquals("size", xmethod.getDetail());
+            assertEquals("test352@62:11 unsolvable function/method 'size'", xmethod.getMessage());
         }
 
         try {
             script = jexl.createScript(info.at(71, 1), "thing.name?.size()", "thing");
             result = script.execute(null, thing);
         } catch (final JexlException.Method xmethod) {
-            Assert.fail("should not have thrown");
+            fail("should not have thrown");
         }
 
         thing.name = null;
         script = jexl.createScript(info,"thing.names.size()", "thing");
         result = script.execute(null, thing);
-        Assert.assertNull(result);
+        assertNull(result);
         thing.name = "froboz";
         script = jexl.createScript(info,"thing.names", "thing");
         result = script.execute(null, thing);
-        Assert.assertNotNull(result);
+        assertNotNull(result);
         script = jexl.createScript(info,"thing.names.size()", "thing");
         result = script.execute(null, thing);
-        Assert.assertEquals(1, result);
+        assertEquals(1, result);
     }
 
     @Test
@@ -125,7 +127,7 @@ public class OptionalTest {
         final JexlScript script = jexl.createScript(src, "x");
         final Optional<Integer> x = Optional.of(21);
         final Object result = script.execute(context, x);
-        Assert.assertEquals(42, result);
+        assertEquals(42, result);
     }
 
     @Test
@@ -139,7 +141,7 @@ public class OptionalTest {
         final MapContext context = new StreamContext();
         final JexlScript script = jexl.createScript(src, "$0");
         final Object result = script.execute(context, Arrays.asList(1, 2, 3));
-        Assert.assertEquals(14, result);
+        assertEquals(14, result);
     }
 
     @Test
@@ -150,6 +152,6 @@ public class OptionalTest {
         final MapContext context = new StreamContext();
         final JexlScript script = jexl.createScript(src, "$0");
         final Object result = script.execute(context, Arrays.asList(1, 2d, "3"));
-        Assert.assertEquals(14.0d, (double) result , 0.00001d);
+        assertEquals(14.0d, (double) result , 0.00001d);
     }
 }

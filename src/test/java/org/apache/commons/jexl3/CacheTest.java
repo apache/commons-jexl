@@ -16,6 +16,8 @@
  */
 package org.apache.commons.jexl3;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -61,10 +63,10 @@ public class CacheTest extends JexlTestCase {
                 vars.put("cache", args.ca[mix]);
                 vars.put("value", args.value[0]);
                 result = cacheSetValue.evaluate(jc);
-                Assert.assertEquals(cacheSetValue.toString(), args.value[0], result);
+                assertEquals(args.value[0], result, cacheSetValue::toString);
 
                 result = cacheGetValue.evaluate(jc);
-                Assert.assertEquals(cacheGetValue.toString(), args.value[0], result);
+                assertEquals(args.value[0], result, cacheSetValue::toString);
 
             }
 
@@ -106,10 +108,10 @@ public class CacheTest extends JexlTestCase {
                 vars.put("cache", args.ca[mix]);
                 vars.put("value", args.value[0]);
                 result = cacheSetValue.evaluate(jc);
-                Assert.assertEquals(cacheSetValue.toString(), args.value[0], result);
+                assertEquals(args.value[0], result, cacheSetValue::toString);
 
                 result = cacheGetValue.evaluate(jc);
-                Assert.assertEquals(cacheGetValue.toString(), args.value[0], result);
+                assertEquals(args.value[0], result, cacheGetValue::toString);
             }
 
             return Integer.valueOf(loops);
@@ -373,17 +375,17 @@ public class CacheTest extends JexlTestCase {
                     vars.put("a1", Integer.valueOf(9));
                     expected = "Cached" + mix + "@i#7,i#9";
                 } else {
-                    Assert.fail("unexpected value type");
+                    fail("unexpected value type");
                 }
                 result = compute2.evaluate(jc);
-                Assert.assertEquals(compute2.toString(), expected, result);
+                assertEquals(expected, result, compute2::toString);
 
                 if (value instanceof Integer) {
                     try {
                         vars.put("a0", Short.valueOf((short) 17));
                         vars.put("a1", Short.valueOf((short) 19));
                         result = ambiguous.evaluate(jc);
-                        Assert.fail("should have thrown an exception");
+                        fail("should have thrown an exception");
                     } catch (final JexlException xany) {
                         // throws due to ambiguous exception
                     }
@@ -396,21 +398,21 @@ public class CacheTest extends JexlTestCase {
                     vars.put("a0", Integer.valueOf(5));
                     expected = "Cached" + mix + "@i#5";
                 } else {
-                    Assert.fail("unexpected value type");
+                    fail("unexpected value type");
                 }
                 result = compute1.evaluate(jc);
-                Assert.assertEquals(compute1.toString(), expected, result);
+                assertEquals(expected, result, compute1::toString);
 
                 try {
                     vars.put("a0", null);
                     result = compute1null.evaluate(jc);
-                    Assert.fail("should have thrown an exception");
+                    fail("should have thrown an exception");
                 } catch (final JexlException xany) {
                     // throws due to ambiguous exception
                     final String sany = xany.getMessage();
                     final String tname = getClass().getName();
                     if (!sany.startsWith(tname)) {
-                        Assert.fail("debug mode should carry caller information, "
+                        fail("debug mode should carry caller information, "
                                 + sany + ", "
                                 + tname);
                     }
@@ -480,16 +482,16 @@ public class CacheTest extends JexlTestCase {
                 vars.put("value", args.value[0]);
                 result = cacheSetValue.evaluate(jc);
                 if (args.value[0] == null) {
-                    Assert.assertNull(cacheSetValue.toString(), result);
+                    assertNull(result);
                 } else {
-                    Assert.assertEquals(cacheSetValue.toString(), args.value[0], result);
+                    assertEquals(args.value[0], result, cacheSetValue::toString);
                 }
 
                 result = cacheGetValue.evaluate(jc);
                 if (args.value[0] == null) {
-                    Assert.assertEquals(cacheGetValue.toString(), "Cached" + mix + ":na", result);
+                    assertEquals("Cached" + mix + ":na", result, cacheGetValue::toString);
                 } else {
-                    Assert.assertEquals(cacheGetValue.toString(), "Cached" + mix + ":" + args.value[0], result);
+                    assertEquals("Cached" + mix + ":" + args.value[0], result, cacheGetValue::toString);
                 }
 
             }
@@ -577,10 +579,10 @@ public class CacheTest extends JexlTestCase {
                 vars.put("a1", Integer.valueOf(9));
                 expected = "CACHED@i#7,i#9";
             } else {
-                Assert.fail("unexpected value type");
+                fail("unexpected value type");
             }
             result = compute2.evaluate(jc);
-            Assert.assertEquals(compute2.toString(), expected, result);
+            assertEquals(expected, result, compute2::toString);
 
             if (value instanceof String) {
                 vars.put("a0", "X0");
@@ -589,10 +591,10 @@ public class CacheTest extends JexlTestCase {
                 vars.put("a0", Integer.valueOf(5));
                 expected = "CACHED@i#5";
             } else {
-                Assert.fail("unexpected value type");
+                fail("unexpected value type");
             }
             result = compute1.evaluate(jc);
-            Assert.assertEquals(compute1.toString(), expected, result);
+            assertEquals(expected, result, compute1::toString);
         }
     }
 
@@ -622,7 +624,7 @@ public class CacheTest extends JexlTestCase {
         final List<Future<Integer>> futures = execs.invokeAll(tasks, 60, TimeUnit.SECONDS);
         // check that all returned loops
         for (final Future<Integer> future : futures) {
-            Assert.assertEquals(Integer.valueOf(loops), future.get());
+            assertEquals(Integer.valueOf(loops), future.get());
         }
     }
 

@@ -16,6 +16,8 @@
  */
 package org.apache.commons.jexl3;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import static org.apache.commons.jexl3.introspection.JexlPermissions.RESTRICTED;
 
 import java.lang.reflect.Method;
@@ -85,12 +87,12 @@ public class Issues400Test {
     try {
       final JexlScript script = jexl.createScript(src, "a", "b");
       if (!src.endsWith(";")) {
-        Assert.assertEquals(script.getSourceText(), script.getParsedText());
+        assertEquals(script.getSourceText(), script.getParsedText());
       }
       final Object result = script.execute(null, a);
-      Assert.assertEquals(42, result);
+      assertEquals(42, result);
     } catch(final JexlException.Parsing xparse) {
-      Assert.fail(src);
+      fail(src);
     }
   }
 
@@ -106,7 +108,7 @@ public class Issues400Test {
     for (final String source : sources) {
       final JexlScript e = jexl.createScript(source);
       final Object o = e.execute(jc);
-      Assert.assertNull(o);
+      assertNull(o);
     }
   }
 
@@ -128,11 +130,11 @@ public class Issues400Test {
       final JexlScript script = jexl.createScript(src);
       for (int i = 0; i < 2; ++i) {
         final Object result = script.execute(null);
-        Assert.assertTrue(result instanceof Map);
+        assertTrue(result instanceof Map);
         final Map<?, ?> map = (Map<?, ?>) result;
-        Assert.assertEquals(1, map.size());
-        Assert.assertTrue(map.containsKey(1));
-        Assert.assertTrue(map.containsValue(1));
+        assertEquals(1, map.size());
+        assertTrue(map.containsKey(1));
+        assertTrue(map.containsValue(1));
       }
     }
   }
@@ -176,30 +178,30 @@ public class Issues400Test {
     Object result = -42;
     script = jexl.createScript("a?['B']?['C']", "a");
     result = script.execute(null, a);
-    Assert.assertEquals(script.getSourceText(), script.getParsedText());
-    Assert.assertNull(result);
+    assertEquals(script.getSourceText(), script.getParsedText());
+    assertNull(result);
     script = jexl.createScript("a?['b']?['C']", "a");
-    Assert.assertEquals(script.getSourceText(), script.getParsedText());
+    assertEquals(script.getSourceText(), script.getParsedText());
     result = script.execute(null, a);
-    Assert.assertNull(result);
+    assertNull(result);
     script = jexl.createScript("a?['b']?['c']", "a");
-    Assert.assertEquals(script.getSourceText(), script.getParsedText());
+    assertEquals(script.getSourceText(), script.getParsedText());
     result = script.execute(null, a);
-    Assert.assertEquals(42, result);
+    assertEquals(42, result);
     script = jexl.createScript("a?['B']?['C']?: 1042", "a");
-    Assert.assertEquals(script.getSourceText(), script.getParsedText());
+    assertEquals(script.getSourceText(), script.getParsedText());
     result = script.execute(null, a);
-    Assert.assertEquals(1042, result);
+    assertEquals(1042, result);
     // can still do ternary, note the space between ? and [
     script = jexl.createScript("a? ['B']:['C']", "a");
     result = script.execute(null, a);
-    Assert.assertArrayEquals(new String[]{"B"}, (String[]) result);
+    assertArrayEquals(new String[]{"B"}, (String[]) result);
     script = jexl.createScript("a?['b'] ?: ['C']", "a");
     result = script.execute(null, a);
-    Assert.assertEquals(b, result);
+    assertEquals(b, result);
     script = jexl.createScript("a?['B'] ?: ['C']", "a");
     result = script.execute(null, a);
-    Assert.assertArrayEquals(new String[]{"C"}, (String[]) result);
+    assertArrayEquals(new String[]{"C"}, (String[]) result);
   }
 
   @Test
@@ -220,7 +222,7 @@ public class Issues400Test {
         "join((1 .. 4), '-')")) {
       JexlScript script = jexl.createScript(src);
       Object result = script.execute(context);
-      Assert.assertEquals(src,"1-2-3-4", result);
+      assertEquals("1-2-3-4", result, src);
     }
 
     String src0 = "x.join('*')";
@@ -231,9 +233,9 @@ public class Issues400Test {
         Arrays.asList(1, 2, 3, 4),
         new int[]{1, 2, 3, 4})) {
       Object result = script0.execute(context, x);
-      Assert.assertEquals(src0, "1*2*3*4", result);
+      assertEquals("1*2*3*4", result, src0);
       result = script1.execute(context, x);
-      Assert.assertEquals(src1, "1*2*3*4", result);
+      assertEquals("1*2*3*4", result, src1);
     }
   }
 
@@ -241,16 +243,16 @@ public class Issues400Test {
   public void test407() {
     // Java version
     double r = 99.0d + 7.82d -99.0d -7.82d;
-    Assert.assertEquals(0d, r, 8.e-15); // Not zero, IEEE 754
+    assertEquals(0d, r, 8.e-15); // Not zero, IEEE 754
     // jexl
     final JexlEngine jexl = new JexlBuilder().create();
     JexlScript script = jexl.createScript("a + b - a - b", "a", "b");
     // using doubles, same as Java
     Number result = (Number) script.execute(null, 99.0d, 7.82d);
-    Assert.assertEquals(0d, result.doubleValue(), 8.e-15);
+    assertEquals(0d, result.doubleValue(), 8.e-15);
     // using BigdDecimal, more precise, still not zero
     result = (Number) script.execute(null, new BigDecimal(99.0d), new BigDecimal(7.82d));
-    Assert.assertEquals(0d, result.doubleValue(), 3.e-32);
+    assertEquals(0d, result.doubleValue(), 3.e-32);
   }
 
   @Test
@@ -271,13 +273,13 @@ public class Issues400Test {
       try {
         final JexlScript e = jexl.createScript(fnsrc);
         final Object o = e.execute(jc);
-        Assert.assertTrue(o instanceof Map);
+        assertTrue(o instanceof Map);
         Map<?, ?> map = (Map<?, ?>) o;
-        Assert.assertEquals(map, ctl);
+        assertEquals(map, ctl);
       } catch (JexlException.Parsing xparse) {
-        Assert.fail(fnsrc + " : " + xparse.getMessage());
+        fail(fnsrc + " : " + xparse.getMessage());
       } catch (JexlException xother) {
-        Assert.fail(fnsrc + " : " + xother.getMessage());
+        fail(fnsrc + " : " + xother.getMessage());
       }
     }
   }
@@ -288,7 +290,7 @@ public class Issues400Test {
     final JexlEngine jexl = builder.create();
     final JexlScript script = jexl.createScript("var c = 42; var f = y -> c += y; f(z)", "z");
     final Number result = (Number) script.execute(null, 12);
-    Assert.assertEquals(54, result);
+    assertEquals(54, result);
   }
 
   @Test
@@ -301,9 +303,9 @@ public class Issues400Test {
     final JexlScript script = jexl.createScript("var c = 42; var f = y -> c += y; f(z)", "z");
     try {
       final Number result = (Number) script.execute(null, 12);
-      Assert.fail("c should be const");
+      fail("c should be const");
     } catch(JexlException.Variable xvar) {
-      Assert.assertEquals("c", xvar.getVariable());
+      assertEquals("c", xvar.getVariable());
     }
   }
 
@@ -314,9 +316,9 @@ public class Issues400Test {
     final JexlScript script = jexl.createScript("#pragma jexl.options '+constCapture'\nvar c = 42; var f = y -> c += y; f(z)", "z");
     try {
       Number result = (Number) script.execute(null, 12);
-      Assert.fail("c should be const");
+      fail("c should be const");
     } catch(JexlException.Variable xvar) {
-      Assert.assertEquals("c", xvar.getVariable());
+      assertEquals("c", xvar.getVariable());
     }
   }
 
@@ -326,9 +328,9 @@ public class Issues400Test {
     final JexlEngine jexl = builder.create();
     try {
       final JexlScript script = jexl.createScript("var c = 42; var f = y -> c += y; f(z)", "z");
-      Assert.fail("c should be const");
+      fail("c should be const");
     } catch(JexlException.Parsing xvar) {
-      Assert.assertTrue(xvar.getMessage().contains("const"));
+      assertTrue(xvar.getMessage().contains("const"));
     }
   }
 
@@ -340,31 +342,31 @@ public class Issues400Test {
     Object result;
     script = jexl.createScript("`#${c}`", "c");
     result = script.execute(null, 42);
-    Assert.assertEquals("#42",result.toString() );
+    assertEquals("#42",result.toString() );
     script = jexl.createScript("`$${c}`", "c");
     result = script.execute(null, 42);
-    Assert.assertEquals("$42",result.toString() );
+    assertEquals("$42",result.toString() );
     script = jexl.createScript("`$#{c}`", "c");
     result = script.execute(null, 42);
-    Assert.assertEquals("$42",result.toString() );
+    assertEquals("$42",result.toString() );
     script = jexl.createScript("`##{c}`", "c");
     result = script.execute(null, 42);
-    Assert.assertEquals("#42",result.toString() );
+    assertEquals("#42",result.toString() );
     script = jexl.createScript("`--##{c}`", "c");
     result = script.execute(null, 42);
-    Assert.assertEquals("--#42",result.toString() );
+    assertEquals("--#42",result.toString() );
   }
 
   @Test
   public void test419() throws NoSuchMethodException {
     // check RESTRICTED permissions denies call to System::currentTimeMillis()
     Method currentTimeMillis = System.class.getMethod("currentTimeMillis");
-    Assert.assertFalse(RESTRICTED.allow(currentTimeMillis));
+    assertFalse(RESTRICTED.allow(currentTimeMillis));
     // compose using a positive class permission to allow just System::currentTimeMillis()
     JexlPermissions permissions = RESTRICTED.compose("java.lang { +System { currentTimeMillis(); } }");
     // check no side effect on compose
-    Assert.assertTrue(permissions.allow(currentTimeMillis));
-    Assert.assertFalse(RESTRICTED.allow(currentTimeMillis));
+    assertTrue(permissions.allow(currentTimeMillis));
+    assertFalse(RESTRICTED.allow(currentTimeMillis));
 
     // An engine with the System class as namespace and the positive permissions
     JexlEngine jexl = new JexlBuilder()
@@ -373,17 +375,17 @@ public class Issues400Test {
         .create();
 
     AtomicLong result = new AtomicLong();
-    Assert.assertEquals(0, result.get());
+    assertEquals(0, result.get());
     long now = System.currentTimeMillis();
     // calling System::currentTimeMillis() is allowed and behaves as expected
     jexl.createScript("result.set(sns:currentTimeMillis())", "result").execute(null, result);
-    Assert.assertTrue(result.get() >= now);
+    assertTrue(result.get() >= now);
 
     // we still cant call anything else
     try {
       jexl.createScript("sns:gc()").execute(null);
     } catch(JexlException.Method method) {
-      Assert.assertEquals("gc", method.getMethod());
+      assertEquals("gc", method.getMethod());
     }
   }
 
@@ -397,14 +399,14 @@ public class Issues400Test {
         "text;";
     script = jexl.createScript(srcContinue);
     result = script.execute(null);
-    Assert.assertEquals("42", result);
+    assertEquals("42", result);
 
     String srcBreak = "let i = 33;\n" +
         "while (i < 66) { if (i == 42) { break; } i += 1; }\n" +
         "i;";
     script = jexl.createScript(srcBreak);
     result = script.execute(null);
-    Assert.assertEquals(42, result);
+    assertEquals(42, result);
   }
 
   @Test
@@ -418,10 +420,10 @@ public class Issues400Test {
             + "  }\n"
             + "}");
     Object r = script.execute(ctxt);
-    Assert.assertNotNull(r);
+    assertNotNull(r);
     script = (JexlScript) r;
     r = script.execute(ctxt);
-    Assert.assertEquals("USERS.user", r);
+    assertEquals("USERS.user", r);
   }
 
   @Test
@@ -436,10 +438,10 @@ public class Issues400Test {
         + "  var user = useTest ? test : member(Users, 'user');\n"
         + "})\n" , "useTest");
     Object r = script.execute(ctxt, false);
-    Assert.assertNotNull(r);
-    Assert.assertEquals("USERS.user", r);
+    assertNotNull(r);
+    assertEquals("USERS.user", r);
     r = script.execute(ctxt, true);
-    Assert.assertNotNull(r);
-    Assert.assertEquals(42, r);
+    assertNotNull(r);
+    assertEquals(42, r);
   }
 }

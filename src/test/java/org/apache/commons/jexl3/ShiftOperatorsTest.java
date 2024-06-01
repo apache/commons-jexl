@@ -16,6 +16,8 @@
  */
 package org.apache.commons.jexl3;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import java.math.BigInteger;
 
 import org.apache.commons.jexl3.junit.Asserter;
@@ -107,17 +109,17 @@ public class ShiftOperatorsTest extends JexlTestCase {
         x = new StringBuilder("1");
         e = jexl.createScript("x << 'Left'", "x");
         o = e.execute(null, x);
-        Assert.assertEquals(e.getSourceText(), "1Left", o.toString());
+        assertEquals("1Left", o.toString(), e::getSourceText);
 
         e = jexl.createScript("'Right' >> x", "x");
         x = new StringBuilder("1");
         o = e.execute(null, x);
-        Assert.assertEquals(e.getSourceText(), "1Right", x.toString());
+        assertEquals("1Right", x.toString(), e::getSourceText);
 
         e = jexl.createScript("'Right' >>> x", "x");
         x = new StringBuilder("1");
         o = e.execute(null, x);
-        Assert.assertEquals(e.getSourceText(), "1right", x.toString());
+        assertEquals("1right", x.toString(), e::getSourceText);
     }
 
     @Test

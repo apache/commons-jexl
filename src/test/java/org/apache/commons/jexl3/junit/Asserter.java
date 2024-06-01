@@ -16,6 +16,8 @@
  */
 package org.apache.commons.jexl3.junit;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -69,30 +71,30 @@ public class Asserter extends Assert {
         final Object value = exp.execute(context, args);
         if (expected instanceof BigDecimal) {
             final JexlArithmetic jexla = engine.getArithmetic();
-            Assert.assertEquals("expression: " + expression, 0,
+            assertEquals("expression: " + expression, 0,
                     ((BigDecimal) expected).compareTo(jexla.toBigDecimal(value)));
         } else if (expected instanceof BigInteger) {
             final JexlArithmetic jexla = engine.getArithmetic();
-            Assert.assertEquals("expression: " + expression, 0,
+            assertEquals("expression: " + expression, 0,
                     ((BigInteger) expected).compareTo(jexla.toBigInteger(value)));
         } else if (expected != null && value != null) {
             if (expected.getClass().isArray() && value.getClass().isArray()) {
                 final int esz = Array.getLength(expected);
                 final int vsz = Array.getLength(value);
                 final String report = "expression: " + expression;
-                Assert.assertEquals(report + ", array size", esz, vsz);
+                assertEquals(report + ", array size", esz, vsz);
                 for (int i = 0; i < vsz; ++i) {
-                    Assert.assertEquals(report + ", value@[]" + i, Array.get(expected, i), Array.get(value, i));
+                    assertEquals(report + ", value@[]" + i, Array.get(expected, i), Array.get(value, i));
                 }
             } else {
-                Assert.assertEquals("expression: " + expression + ", "
+                assertEquals("expression: " + expression + ", "
                         + expected.getClass().getSimpleName()
                         + " ?= "
                         + value.getClass().getSimpleName(),
                         expected, value);
             }
         } else {
-            Assert.assertEquals("expression: " + expression, expected, value);
+            assertEquals("expression: " + expression, expected, value);
         }
     }
 

@@ -16,6 +16,8 @@
  */
 package org.apache.commons.jexl3;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -112,10 +114,10 @@ public class CollectionLiteralTest extends JexlTestCase {
         Object previous = null;
         for(int i = 0; i < 4; ++i) {
             result = script.execute(null);
-            Assert.assertNotNull(result);
-            Assert.assertNotSame(previous, result);
+            assertNotNull(result);
+            assertNotSame(previous, result);
             previous = result;
-            Assert.assertEquals( 1 + i, jc.arrays.get());
+            assertEquals( 1 + i, jc.arrays.get());
         }
     }
 
@@ -130,10 +132,10 @@ public class CollectionLiteralTest extends JexlTestCase {
         Object previous = null;
         for(int i = 0; i < 4; ++i) {
             result = script.execute(null);
-            Assert.assertNotNull(result);
-            Assert.assertNotSame(previous, result);
+            assertNotNull(result);
+            assertNotSame(previous, result);
             previous = result;
-            Assert.assertEquals(1 + i, jc.maps.get());
+            assertEquals(1 + i, jc.maps.get());
         }
     }
 
@@ -148,10 +150,10 @@ public class CollectionLiteralTest extends JexlTestCase {
         Object previous = null;
         for(int i = 0; i < 4; ++i) {
             result = script.execute(null);
-            Assert.assertNotNull(result);
-            Assert.assertNotSame(previous, result);
+            assertNotNull(result);
+            assertNotSame(previous, result);
             previous = result;
-            Assert.assertEquals(1 + i, jc.sets.get());
+            assertEquals(1 + i, jc.sets.get());
         }
     }
 

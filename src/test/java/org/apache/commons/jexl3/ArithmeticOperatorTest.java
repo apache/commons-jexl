@@ -16,6 +16,8 @@
  */
 
 package org.apache.commons.jexl3;
+
+import static org.junit.jupiter.api.Assertions.*;
 import java.io.StringWriter;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -279,12 +281,12 @@ public class ArithmeticOperatorTest extends JexlTestCase {
         final JexlEngine jexl = new JexlBuilder().cache(32).arithmetic(new DateArithmetic(true)).create();
         final JexlScript expr0 = jexl.createScript("date.yyyy = 1969; date.MM=7; date.dd=20; ", "date");
         Object value0 = expr0.execute(jc, d);
-        Assert.assertNotNull(value0);
+        assertNotNull(value0);
         value0 = d;
         //d = new Date();
-        Assert.assertEquals(1969, jexl.createScript("date.yyyy", "date").execute(jc, value0));
-        Assert.assertEquals(7, jexl.createScript("date.MM", "date").execute(jc, value0));
-        Assert.assertEquals(20, jexl.createScript("date.dd", "date").execute(jc, value0));
+        assertEquals(1969, jexl.createScript("date.yyyy", "date").execute(jc, value0));
+        assertEquals(7, jexl.createScript("date.MM", "date").execute(jc, value0));
+        assertEquals(20, jexl.createScript("date.dd", "date").execute(jc, value0));
     }
 
     @Test
@@ -300,35 +302,35 @@ public class ArithmeticOperatorTest extends JexlTestCase {
         final JexlScript expr0 = jexl.createScript("x.format(y)", "x", "y");
         Object value10 = expr0.execute(jc, x0, y0);
         final Object value20 = expr0.execute(jc, x0, y0);
-        Assert.assertEquals(value10, value20);
+        assertEquals(value10, value20);
         Object value11 = expr0.execute(jc, x1, y1);
         final Object value21 = expr0.execute(jc, x1, y1);
-        Assert.assertEquals(value11, value21);
+        assertEquals(value11, value21);
         value10 = expr0.execute(jc, x0, y0);
-        Assert.assertEquals(value10, value20);
+        assertEquals(value10, value20);
         value11 = expr0.execute(jc, x1, y1);
-        Assert.assertEquals(value11, value21);
+        assertEquals(value11, value21);
         value10 = expr0.execute(jc, x0, y0);
-        Assert.assertEquals(value10, value20);
+        assertEquals(value10, value20);
         value11 = expr0.execute(jc, x1, y1);
-        Assert.assertEquals(value11, value21);
+        assertEquals(value11, value21);
 
         JexlScript expr1 = jexl.createScript("format(x, y)", "x", "y");
         value10 = expr1.execute(jc, x0, y0);
-        Assert.assertEquals(value10, value20);
+        assertEquals(value10, value20);
         Object s0 = expr1.execute(jc, x0, "EEE dd MMM yyyy");
-        Assert.assertEquals("Wed 20 Aug 1969", s0);
+        assertEquals("Wed 20 Aug 1969", s0);
         jc.setLocale(Locale.FRANCE);
         s0 = expr1.execute(jc, x0, "EEE dd MMM yyyy");
-        Assert.assertEquals("mer. 20 ao\u00fbt 1969", s0);
+        assertEquals("mer. 20 ao\u00fbt 1969", s0);
 
         expr1 = jexl.createScript("format(now(), y)", "y");
         final Object n0 = expr1.execute(jc, y0);
-        Assert.assertNotNull(n0);
+        assertNotNull(n0);
         expr1 = jexl.createScript("now().format(y)", "y");
         final Object n1 = expr1.execute(jc, y0);
-        Assert.assertNotNull(n0);
-        Assert.assertEquals(n0, n1);
+        assertNotNull(n0);
+        assertEquals(n0, n1);
     }
 
     @Test
@@ -347,25 +349,25 @@ public class ArithmeticOperatorTest extends JexlTestCase {
         StringWriter strw = new StringWriter();
         expr0.evaluate(jc, strw, x0, y0);
         String strws = strw.toString();
-        Assert.assertEquals("1969-08-20", strws);
+        assertEquals("1969-08-20", strws);
 
         expr0 = jxlt.createTemplate("${calc:sum(x .. y)}", "x", "y");
         strw = new StringWriter();
         expr0.evaluate(jc, strw, 1, 3);
         strws = strw.toString();
-        Assert.assertEquals("6", strws);
+        assertEquals("6", strws);
 
         final JxltEngine.Template expr1 = jxlt.createTemplate("${jexl:include(s, x, y)}", "s", "x", "y");
         strw = new StringWriter();
         expr1.evaluate(jc, strw, expr0, 1, 3);
         strws = strw.toString();
-        Assert.assertEquals("6", strws);
+        assertEquals("6", strws);
 
         expr0 = jxlt.createTemplate("${now().format(y)}", "y");
         strw = new StringWriter();
         expr0.evaluate(jc, strw, y0);
         strws = strw.toString();
-        Assert.assertNotNull(strws);
+        assertNotNull(strws);
     }
 
     @Test
@@ -375,10 +377,10 @@ public class ArithmeticOperatorTest extends JexlTestCase {
         Object result;
         script = jexl.createScript("var i = null; ++i");
         result = script.execute(null);
-        Assert.assertEquals(1, result);
+        assertEquals(1, result);
         script = jexl.createScript("var i = null; --i");
         result = script.execute(null);
-        Assert.assertEquals(-1, result);
+        assertEquals(-1, result);
     }
 
     @Test
@@ -392,32 +394,32 @@ public class ArithmeticOperatorTest extends JexlTestCase {
 
         script = jexl.createScript("1 .. 3");
         result = script.execute(null);
-        Assert.assertTrue(result instanceof Iterable<?>);
+        assertTrue(result instanceof Iterable<?>);
         Iterator<Integer> ii = ((Iterable<Integer>) result).iterator();
-        Assert.assertEquals(Integer.valueOf(1), ii.next());
-        Assert.assertEquals(Integer.valueOf(2), ii.next());
-        Assert.assertEquals(Integer.valueOf(3), ii.next());
+        assertEquals(Integer.valueOf(1), ii.next());
+        assertEquals(Integer.valueOf(2), ii.next());
+        assertEquals(Integer.valueOf(3), ii.next());
 
         script = jexl.createScript("(4 - 3) .. (9 / 3)");
         result = script.execute(null);
-        Assert.assertTrue(result instanceof Iterable<?>);
+        assertTrue(result instanceof Iterable<?>);
         ii = ((Iterable<Integer>) result).iterator();
-        Assert.assertEquals(Integer.valueOf(1), ii.next());
-        Assert.assertEquals(Integer.valueOf(2), ii.next());
-        Assert.assertEquals(Integer.valueOf(3), ii.next());
+        assertEquals(Integer.valueOf(1), ii.next());
+        assertEquals(Integer.valueOf(2), ii.next());
+        assertEquals(Integer.valueOf(3), ii.next());
 
         // sum of 1, 2, 3
         script = jexl.createScript("var x = 0; for(var y : ((5 - 4) .. (12 / 4))) { x = x + y }; x");
         result = script.execute(null);
-        Assert.assertEquals(Integer.valueOf(6), result);
+        assertEquals(Integer.valueOf(6), result);
 
         script = jexl.createScript("calc:sum(1 .. 3)");
         result = script.execute(null);
-        Assert.assertEquals(Integer.valueOf(6), result);
+        assertEquals(Integer.valueOf(6), result);
 
         script = jexl.createScript("calc:sum(-3 .. 3)");
         result = script.execute(null);
-        Assert.assertEquals(Integer.valueOf(0), result);
+        assertEquals(Integer.valueOf(0), result);
     }
 
     @Test
@@ -515,15 +517,15 @@ public class ArithmeticOperatorTest extends JexlTestCase {
         try {
             final Object value0 = expr0.execute(jc, d);
             if (!silent) {
-                Assert.fail("should have failed");
+                fail("should have failed");
             } else {
-                Assert.assertEquals(1, log.count("warn"));
+                assertEquals(1, log.count("warn"));
             }
         } catch (final JexlException.Operator xop) {
-            Assert.assertEquals("*", xop.getSymbol());
+            assertEquals("*", xop.getSymbol());
         }
         if (!silent) {
-            Assert.assertEquals(0, log.count("warn"));
+            assertEquals(0, log.count("warn"));
         }
     }
 
@@ -577,8 +579,8 @@ public class ArithmeticOperatorTest extends JexlTestCase {
         final List<Number> y = new ArrayList<>();
         context.set("y", y);
         final Object result = script.execute(context);
-        Assert.assertEquals("x0", x0, context.get("x"));
-        Assert.assertEquals("y0", y0, y.get(0));
+        assertEquals(x0, context.get("x"), "x0");
+        assertEquals(y0, y.get(0), "y0");
     }
     @Test
     public void testStartsEndsWith() throws Exception {

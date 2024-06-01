@@ -16,6 +16,8 @@
  */
 package org.apache.commons.jexl3;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -266,8 +268,8 @@ public class Issues200Test extends JexlTestCase {
         eval.setJexl(jexl);
         final String src = "var f = fn(\'(x)->{x + 42}\'); f(y)";
         final JexlScript s200 = jexl.createScript(src, "y");
-        Assert.assertEquals(142, s200.execute(jc, 100));
-        Assert.assertEquals(52, s200.execute(jc, 10));
+        assertEquals(142, s200.execute(jc, 100));
+        assertEquals(52, s200.execute(jc, 10));
     }
 
     @Test
@@ -276,7 +278,7 @@ public class Issues200Test extends JexlTestCase {
         final JexlEngine jexl = new JexlBuilder().create();
         final JexlScript e = jexl.createScript("var x = 0; var f = (y)->{ x = y; }; f(42); x");
         final Object r = e.execute(jc);
-        Assert.assertEquals(0, r);
+        assertEquals(0, r);
     }
 
     @Test
@@ -285,7 +287,7 @@ public class Issues200Test extends JexlTestCase {
         final JexlEngine jexl = new JexlBuilder().create();
         final JexlScript e = jexl.createScript("var x = new('java.util.HashMap'); x.a = ()->{return 1}; x['a']()");
         final Object r = e.execute(jc);
-        Assert.assertEquals(1, r);
+        assertEquals(1, r);
     }
 
     @Test
@@ -294,7 +296,7 @@ public class Issues200Test extends JexlTestCase {
         final JexlEngine jexl = new JexlBuilder().create();
         final JexlScript e = jexl.createScript("var x = new('java.util.HashMap'); x['a'] = ()->{return 1}; x.a()");
         final Object r = e.execute(jc);
-        Assert.assertEquals(1, r);
+        assertEquals(1, r);
     }
 
     @Test
@@ -305,10 +307,10 @@ public class Issues200Test extends JexlTestCase {
         final JexlScript e = jexl.createScript("v210.npe()");
         try {
             e.execute(jc);
-            Assert.fail("should have thrown an exception");
+            fail("should have thrown an exception");
         } catch (final JexlException xjexl) {
             final Throwable th = xjexl.getCause();
-            Assert.assertEquals("NPE210", th.getMessage());
+            assertEquals("NPE210", th.getMessage());
         }
     }
 
@@ -323,23 +325,23 @@ public class Issues200Test extends JexlTestCase {
         jexl = new JexlBuilder().strict(false).silent(false).create();
         e = jexl.createScript("foo[3]");
         r = e.execute(jc);
-        Assert.assertEquals(42, r);
+        assertEquals(42, r);
 
         // cache and fail?
         jc.set("foo", new int[]{0, 1});
         options.setStrict(true);
-        Assert.assertTrue(options.isStrict());
+        assertTrue(options.isStrict());
         try {
             r = e.execute(jc);
-            Assert.fail("should have thrown an exception");
+            fail("should have thrown an exception");
         } catch (final JexlException xjexl) {
             final Throwable th = xjexl.getCause();
-            Assert.assertEquals(ArrayIndexOutOfBoundsException.class, th.getClass());
+            assertEquals(ArrayIndexOutOfBoundsException.class, th.getClass());
         }
         //
         options.setStrict(false);
         r = e.execute(jc);
-        Assert.assertNull("oob adverted", r);
+        assertNull(r, "oob adverted");
     }
 
     @Test
@@ -352,11 +354,11 @@ public class Issues200Test extends JexlTestCase {
         final JexlScript e = jexl.createScript("(x)->{ map[x] }");
         Object r;
         r = e.execute(jc, (Object) null);
-        Assert.assertNull(r);
+        assertNull(r);
         r = e.execute(jc, (Object) null);
-        Assert.assertNull(r);
+        assertNull(r);
         r = e.execute(jc, "one");
-        Assert.assertEquals(1, r);
+        assertEquals(1, r);
     }
 
     @Test
@@ -368,19 +370,19 @@ public class Issues200Test extends JexlTestCase {
         Object r;
         JexlScript e = jexl.createScript("(map, x)->{ map[x] }");
         r = e.execute(jc, a0, 1);
-        Assert.assertEquals("two", r);
+        assertEquals("two", r);
         r = e.execute(jc, a1, 1);
-        Assert.assertEquals("two", r);
+        assertEquals("two", r);
         e = jexl.createScript("(map)->{ map.1 }");
         r = e.execute(jc, a0);
-        Assert.assertEquals("two", r);
+        assertEquals("two", r);
         r = e.execute(jc, a1);
-        Assert.assertEquals("two", r);
+        assertEquals("two", r);
         e = jexl.createScript("(map, x)->{ map(x) }");
         r = e.execute(jc, a0, 1);
-        Assert.assertEquals("two", r);
+        assertEquals("two", r);
         r = e.execute(jc, a1, 1);
-        Assert.assertEquals("two", r);
+        assertEquals("two", r);
     }
 
     @Test
@@ -389,9 +391,9 @@ public class Issues200Test extends JexlTestCase {
         final JexlEngine jexl = new JexlBuilder().create();
 
         final JexlExpression expression = jexl.createExpression("bar()");
-        Assert.assertEquals("bar", expression.evaluate(df));
+        assertEquals("bar", expression.evaluate(df));
         final ObjectContext<Object> context = new ObjectContext<>(jexl, df);
-        Assert.assertEquals("bar", expression.evaluate(context));
+        assertEquals("bar", expression.evaluate(context));
     }
 
     @Test
@@ -403,13 +405,13 @@ public class Issues200Test extends JexlTestCase {
         Object value;
         for (int l = 0; l < 2; ++l) {
             value = jexl.createExpression("fo\\ o[0]").evaluate(ctxt);
-            Assert.assertEquals(42, value);
+            assertEquals(42, value);
             value = jexl.createExpression("fo\\ o[0] = 43").evaluate(ctxt);
-            Assert.assertEquals(43, value);
+            assertEquals(43, value);
             value = jexl.createExpression("fo\\ o.0").evaluate(ctxt);
-            Assert.assertEquals(43, value);
+            assertEquals(43, value);
             value = jexl.createExpression("fo\\ o.0 = 42").evaluate(ctxt);
-            Assert.assertEquals(42, value);
+            assertEquals(42, value);
         }
     }
 
@@ -441,9 +443,8 @@ public class Issues200Test extends JexlTestCase {
         final JexlEngine JEXL_ENGINE = new JexlBuilder().strict(true).silent(true).create();
         final JexlExpression jsp = JEXL_ENGINE.createExpression("a + b");
         final Double e = (Double) jsp.evaluate(context);
-        Assert.assertEquals(Double.doubleToLongBits(e) + " != " + Double.doubleToLongBits(c), c,
-                e, 0.0);
-        Assert.assertEquals(Double.doubleToLongBits(e) + " != " + Double.doubleToLongBits(c), a + b, e, 0.0);
+        assertEquals(c, e, 0.0, () -> Double.doubleToLongBits(e) + " != " + Double.doubleToLongBits(c));
+        assertEquals(a + b, e, 0.0, () -> Double.doubleToLongBits(e) + " != " + Double.doubleToLongBits(c));
     }
 
     @Test
@@ -452,7 +453,7 @@ public class Issues200Test extends JexlTestCase {
         final JexlScript script = jexl.createScript("while(true);");
         try {
             final JexlExpression expr = jexl.createExpression("while(true);");
-            Assert.fail("should have failed!, expr do not allow 'while' statement");
+            fail("should have failed!, expr do not allow 'while' statement");
         } catch (final JexlException xparse) {
             // ok
         }
@@ -472,20 +473,20 @@ public class Issues200Test extends JexlTestCase {
         for(final Object arg : args ){
             foo245.setBar(arg);
             // ok
-            Assert.assertEquals(foo245.getBar(), foobar.evaluate(ctx));
+            assertEquals(foo245.getBar(), foobar.evaluate(ctx));
             // fail level 1
             try {
                 foobaz.evaluate(ctx);
-                Assert.fail("foo.baz is not solvable, exception expected");
+                fail("foo.baz is not solvable, exception expected");
             } catch (final JexlException xp) {
-                Assert.assertTrue(xp instanceof JexlException.Property);
+                assertTrue(xp instanceof JexlException.Property);
             }
             // fail level 2
             try {
                 foobarbaz.evaluate(ctx);
-                Assert.fail("foo.bar.baz is not solvable, exception expected");
+                fail("foo.bar.baz is not solvable, exception expected");
             } catch (final JexlException xp) {
-                Assert.assertTrue(xp instanceof JexlException.Property);
+                assertTrue(xp instanceof JexlException.Property);
             }
         }
     }
@@ -518,12 +519,12 @@ public class Issues200Test extends JexlTestCase {
         script = engine.createScript("java = 3");
         try {
              script.execute(ctx);
-             Assert.fail("should have failed!");
+             fail("should have failed!");
         } catch (final JexlException xjexl) {
             // expected
         }
         script = engine.createScript("java.version");
-        Assert.assertEquals(10, script.execute(ctx));
+        assertEquals(10, script.execute(ctx));
     }
 
     @Test
@@ -540,13 +541,13 @@ public class Issues200Test extends JexlTestCase {
         }
         script = jexl.createScript("(true) ? (x) : abs(2)");
         result = script.execute(ctxt);
-        Assert.assertEquals(42, result);
+        assertEquals(42, result);
         script = jexl.createScript("(true) ? x : (abs(3))");
         result = script.execute(ctxt);
-        Assert.assertEquals(42, result);
+        assertEquals(42, result);
         script = jexl.createScript("(!true) ? abs(4) : x");
         result = script.execute(ctxt);
-        Assert.assertEquals(42, result);
+        assertEquals(42, result);
     }
 
     @Test
@@ -560,8 +561,8 @@ public class Issues200Test extends JexlTestCase {
         ctxt.set("list", li);
         script = jexl.createScript("for (var item : list) { if (item <= 3) remove(); } return size(list)");
         result = script.execute(ctxt);
-        Assert.assertEquals(3, result);
-        Assert.assertEquals(3, li.size());
+        assertEquals(3, result);
+        assertEquals(3, li.size());
 
         final Map<String, Integer> msi = new HashMap<>();
         msi.put("a", 1);
@@ -573,8 +574,8 @@ public class Issues200Test extends JexlTestCase {
         ctxt.set("map", msi);
         script = jexl.createScript("for (var item : map) { if (item <= 2) remove(); } return size(map)");
         result = script.execute(ctxt);
-        Assert.assertEquals(4, result);
-        Assert.assertEquals(4, msi.size());
+        assertEquals(4, result);
+        assertEquals(4, msi.size());
     }
 
     @Test
@@ -586,15 +587,15 @@ public class Issues200Test extends JexlTestCase {
         // API declared params
         script = jexl.createScript("x + y", "x", "y");
         result = script.execute(ctxt, 20, 22);
-        Assert.assertEquals(42, result);
+        assertEquals(42, result);
         // script declared params
         script = jexl.createScript("(x, y)->{ x + y}");
         result = script.execute(ctxt, 22, 20);
-        Assert.assertEquals(42, result);
+        assertEquals(42, result);
         // explicitly returning the lambda
         script = jexl.createScript("return (x, y)->{ x + y}");
         result = script.execute(ctxt);
-        Assert.assertTrue(result instanceof JexlScript);
+        assertTrue(result instanceof JexlScript);
     }
 
     @Test
@@ -603,24 +604,24 @@ public class Issues200Test extends JexlTestCase {
         final JexlContext ctxt = new MapContext();
         JexlScript script= jexl.createScript("var f = (x)->{ x > 1? x * f(x - 1) : x }; f(a)", "a");
         Object result = script.execute(ctxt, 3);
-        Assert.assertEquals(6, result);
+        assertEquals(6, result);
         try {
             result = script.execute(ctxt, 32);
-            Assert.fail("should have overflown");
+            fail("should have overflown");
         } catch (final JexlException.StackOverflow xstack) {
             // expected
             final String sxs = xstack.toString();
-            Assert.assertTrue(sxs.contains("jexl"));
+            assertTrue(sxs.contains("jexl"));
         }
         jexl = new JexlBuilder().strict(true).create();
         script= jexl.createScript("var f = (x)->{ x * f(x - 1) }; f(a)", "a");
         try {
             result = script.execute(ctxt, 32);
-            Assert.fail("should have overflown");
+            fail("should have overflown");
         } catch (final JexlException.StackOverflow xstack) {
             // expected
             final String sxs = xstack.toString();
-            Assert.assertTrue(sxs.contains("jvm"));
+            assertTrue(sxs.contains("jvm"));
         }
     }
 
@@ -633,9 +634,9 @@ public class Issues200Test extends JexlTestCase {
         final JexlScript e = jexl.createScript("out.println(xyz)");
         try {
             final Object o = e.execute(ctxt);
-            Assert.fail("should have thrown");
+            fail("should have thrown");
         } catch (final JexlException.Variable xvar) {
-            Assert.assertEquals("xyz", xvar.getVariable());
+            assertEquals("xyz", xvar.getVariable());
         }
     }
 
@@ -647,10 +648,10 @@ public class Issues200Test extends JexlTestCase {
         final JexlScript e = jexl.createScript("var xyz = xyz");
         try {
             final Object o = e.execute(ctxt);
-            Assert.assertNull(o);
+            assertNull(o);
         } catch (final JexlException.Variable xvar) {
-            Assert.fail("should not have thrown");
-            // Assert.assertEquals("xyz", xvar.getVariable());
+            fail("should not have thrown");
+            // assertEquals("xyz", xvar.getVariable());
         }
     }
 
@@ -665,9 +666,9 @@ public class Issues200Test extends JexlTestCase {
         // wont make an error
         try {
             r = e.execute(ctxt, false, true);
-            Assert.assertEquals(42, r);
+            assertEquals(42, r);
         } catch (final JexlException.Variable xjexl) {
-            Assert.fail("should not have thrown");
+            fail("should not have thrown");
         }
     }
 
@@ -680,9 +681,9 @@ public class Issues200Test extends JexlTestCase {
         final JexlScript e = jexl.createScript("{ var xyz = 42 } out.println(xyz)");
         try {
             final Object o = e.execute(ctxt);
-            Assert.assertNull(o);
+            assertNull(o);
         } catch (final JexlException.Variable xvar) {
-            Assert.fail("should not have thrown" + xvar);
+            fail("should not have thrown" + xvar);
         }
     }
 
@@ -708,15 +709,15 @@ public class Issues200Test extends JexlTestCase {
             String src = srcs[i];
             try {
                 jc = jexl.createScript(src);
-                Assert.fail("should have failed, " + (jc != null));
+                fail("should have failed, " + (jc != null));
             } catch (final JexlException.Ambiguous xa) {
                 final String str = xa.toString();
-                Assert.assertTrue(str.contains("143"));
+                assertTrue(str.contains("143"));
                 src = xa.tryCleanSource(src);
             }
             jc = jexl.createScript(src);
             value = jc.execute(ctxt);
-            Assert.assertEquals(src, ctls[i], value);
+            assertEquals(ctls[i], value, src);
         }
     }
 
@@ -758,27 +759,27 @@ public class Issues200Test extends JexlTestCase {
                             if (logger != null) {
                                 logger.warn(ctxt.has("z") + ": " + src + ": no fail, " + result);
                             }
-                            Assert.fail("should have failed: " + src);
+                            fail("should have failed: " + src);
                         }
                         // not reachable
-                        Assert.assertNull("non-null result ?!", result);
+                        assertNull(result, "non-null result ?!");
                     } catch (final JexlException.Variable xvar) {
                         if (logger != null) {
                             logger.warn(ctxt.has("z") + ": " + src + ": fail, " + xvar);
                         }
                         if (!strict) {
-                            Assert.fail(src + ", should not have thrown " + xvar);
+                            fail(src + ", should not have thrown " + xvar);
                         } else {
-                            Assert.assertTrue(src + ": " + xvar.toString(), xvar.toString().contains("z"));
+                            assertTrue(xvar.toString().contains("z"), () -> src + ": " + xvar.toString());
                         }
                     } catch (final JexlException.Property xprop) {
                         if (logger != null) {
                             logger.warn(ctxt.has("z") + ": " + src + ": fail, " + xprop);
                         }
                         if (!strict) {
-                            Assert.fail(src + ", should not have thrown " + xprop);
+                            fail(src + ", should not have thrown " + xprop);
                         } else {
-                            Assert.assertTrue(src + ": " + xprop.toString(), xprop.toString().contains("1"));
+                            assertTrue(xprop.toString().contains("1"), () -> src + ": " + xprop.toString());
                         }
                     }
                 }
@@ -797,14 +798,14 @@ public class Issues200Test extends JexlTestCase {
         final JexlEngine jexl = new JexlBuilder().safe(true).strict(true).create();
         script = jexl.createScript(src);
         result = script.execute(ctxt, "abc");
-        Assert.assertEquals("a", result);
+        assertEquals("a", result);
         result = null;
         try {
             result = script.execute(ctxt, (Object) null);
         } catch (final JexlException xany) {
-            Assert.assertNotNull(xany.getMessage());
+            assertNotNull(xany.getMessage());
         }
-        Assert.assertNull(result);
+        assertNull(result);
     }
 
     @Test
@@ -830,9 +831,9 @@ public class Issues200Test extends JexlTestCase {
                 .safe(false).strict(true).lexical(true).create();
         final JexlScript script = jexl.createScript(src);
         final Object result = script.execute(ctxt, (Object) null);
-        Assert.assertEquals(6, result);
+        assertEquals(6, result);
         final List<String> ctl = Arrays.asList("g", "h", "i", "j", "k", "l");
-        Assert.assertEquals(ctl, out);
+        assertEquals(ctl, out);
     }
 
     @Test
@@ -848,9 +849,9 @@ public class Issues200Test extends JexlTestCase {
         final JexlEngine jexl = new JexlBuilder().safe(false).strict(true).lexical(false).create();
         final JexlScript script = jexl.createScript(src);
         final Object result = script.execute(ctxt, (Object) null);
-        Assert.assertEquals(6, result);
+        assertEquals(6, result);
         final List<String> ctl = Arrays.asList("g", "h", "i", "j", "k", "l");
-        Assert.assertEquals(ctl, out);
+        assertEquals(ctl, out);
     }
 
     @Test
@@ -866,16 +867,16 @@ public class Issues200Test extends JexlTestCase {
         final JexlEngine jexl = new JexlBuilder().safe(false).strict(true).create();
         final JexlScript script = jexl.createScript(src);
         final Object result = script.execute(ctxt, (Object) null);
-        Assert.assertEquals(6, result);
+        assertEquals(6, result);
         final List<String> ctl = Arrays.asList("g", "h", "i", "j", "k", "l");
-        Assert.assertEquals(ctl, out);
+        assertEquals(ctl, out);
     }
 
     @Test
     public void test286() {
         final String s286 = "var x = 0; for(x : 1..2){}; return x";
         final JexlEngine jexl = new JexlBuilder().strict(true).create();
-        Assert.assertEquals(2, jexl.createScript(s286).execute(null));
+        assertEquals(2, jexl.createScript(s286).execute(null));
     }
 
     @Test
@@ -890,39 +891,39 @@ public class Issues200Test extends JexlTestCase {
         src = "x = 1; if (false) var x = 2; x";
         script = jexl.createScript(src);
         result = script.execute(ctxt);
-        Assert.assertEquals(1, result);
+        assertEquals(1, result);
         // declared and defined
         src = "x = 1; if (true) var x = 2; x";
         script = jexl.createScript(src);
         result = script.execute(ctxt);
-        Assert.assertEquals(2, result);
+        assertEquals(2, result);
         // definition using shadowed global
         src = "x = 1; var x = x + 41; x";
         script = jexl.createScript(src);
         result = script.execute(ctxt);
-        Assert.assertEquals(42, result);
+        assertEquals(42, result);
         // definition using shadowed global
         options.setLexical(false);
         src = "(x)->{ if (x==1) { var y = 2; } else if (x==2) { var y = 3; }; y }";
         script = jexl.createScript(src);
         result = script.execute(ctxt, 1);
-        Assert.assertEquals(2, result);
+        assertEquals(2, result);
         result = script.execute(ctxt, 2);
-        Assert.assertEquals(3, result);
+        assertEquals(3, result);
         options.setStrict(true);
         try {
             result = script.execute(ctxt, 0);
-            Assert.fail("should have failed!");
+            fail("should have failed!");
         } catch (final JexlException.Variable xvar) {
-            Assert.assertTrue(xvar.getMessage().contains("y"));
+            assertTrue(xvar.getMessage().contains("y"));
         }
         options.setStrict(false);
         try {
             result = script.execute(ctxt, 0);
         } catch (final JexlException xvar) {
-            Assert.fail("should not have failed!");
+            fail("should not have failed!");
         }
-        Assert.assertNull(result);
+        assertNull(result);
     }
 
     @Test
@@ -935,7 +936,7 @@ public class Issues200Test extends JexlTestCase {
         src = "var x = function(a) { var b; return b}; x(1,2)";
         script = jexl.createScript(src);
         result = script.execute(ctxt);
-        Assert.assertNull(result);
+        assertNull(result);
     }
 
     @Test
@@ -954,15 +955,15 @@ public class Issues200Test extends JexlTestCase {
                 try {
                     result = script.execute(null, "abc");
                     if (!safe) {
-                        Assert.fail("should have failed: " + src);
+                        fail("should have failed: " + src);
                     } else {
-                        Assert.assertNull("non-null result ?!", result);
+                        assertNull(result, "non-null result ?!");
                     }
                 } catch (final JexlException.Method xmethod) {
                     if (safe) {
-                        Assert.fail(src + ", should not have thrown " + xmethod);
+                        fail(src + ", should not have thrown " + xmethod);
                     } else {
-                        Assert.assertTrue(src + ": " + xmethod.toString(), xmethod.toString().contains("nothing"));
+                        assertTrue(xmethod.toString().contains("nothing"), () -> src + ": " + xmethod.toString());
                     }
                 }
             }
@@ -981,7 +982,7 @@ public class Issues200Test extends JexlTestCase {
         for (final String src : srcs) {
             script = jexl.createScript(src);
             result = script.execute(null, "abc");
-            Assert.assertNull(result);
+            assertNull(result);
         }
     }
 
@@ -992,14 +993,14 @@ public class Issues200Test extends JexlTestCase {
         final JexlEngine jexl = new JexlBuilder().create();
         JexlExpression e = jexl.createExpression(str);
         Object value = e.evaluate(ctxt);
-        Assert.assertEquals("one", value);
+        assertEquals("one", value);
 
         final JexlEngine sandboxedJexlEngine = new JexlBuilder().
                 sandbox(new JexlSandbox(true)). // add a whitebox sandbox
                 create();
          e = sandboxedJexlEngine.createExpression(str);
         value = e.evaluate(ctxt);
-        Assert.assertEquals("one", value);
+        assertEquals("one", value);
     }
 
     @Test
@@ -1011,18 +1012,17 @@ public class Issues200Test extends JexlTestCase {
         String str = "c.size()";
         JexlScript e = jexl.createScript(str, "c");
         Object value = e.execute(ctxt, c298);
-        Assert.assertEquals(str, 42, value);
+        assertEquals(42, value, str);
 
         str = "size c";
         e = jexl.createScript(str, "c");
         value = e.execute(ctxt, c298);
-        Assert.assertEquals(str, 42, value);
+        assertEquals(42, value, str);
 
         str = "c.size(127)";
         e = jexl.createScript(str, "c");
         value = e.execute(ctxt, c298);
-        Assert.assertEquals(str, 169, value);
-
+        assertEquals(169, value, str);
     }
 
     @Test
@@ -1041,11 +1041,11 @@ public class Issues200Test extends JexlTestCase {
             "$$ }\n" +
             "${res}\n";
         final JxltEngine.Template script = jexlt.createTemplate("$$", new StringReader(source));
-        Assert.assertNotNull(script);
+        assertNotNull(script);
         final TemplateDebugger dbg = new TemplateDebugger();
         final String refactored = dbg.debug(script) ? dbg.toString() : "";
-        Assert.assertNotNull(refactored);
-        Assert.assertEquals(source, refactored);
+        assertNotNull(refactored);
+        assertEquals(source, refactored);
     }
 
     @Test
@@ -1064,10 +1064,10 @@ public class Issues200Test extends JexlTestCase {
             "$$   }\n" +
             "$$ }\n";
         final JxltEngine.Template script = jexlt.createTemplate("$$", new StringReader(source));
-        Assert.assertNotNull(script);
+        assertNotNull(script);
         final TemplateDebugger dbg = new TemplateDebugger();
         final String refactored = dbg.debug(script) ? dbg.toString() : "";
-        Assert.assertNotNull(refactored);
-        Assert.assertEquals(source, refactored);
+        assertNotNull(refactored);
+        assertEquals(source, refactored);
     }
 }

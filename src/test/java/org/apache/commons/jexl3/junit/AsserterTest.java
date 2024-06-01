@@ -17,6 +17,8 @@
 
 package org.apache.commons.jexl3.junit;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import org.apache.commons.jexl3.Foo;
 import org.apache.commons.jexl3.JexlTestCase;
 import org.junit.Assert;
@@ -38,7 +40,7 @@ public class AsserterTest extends JexlTestCase {
         asserter.assertExpression("this.repeat('abc')", "Repeat : abc");
         try {
             asserter.assertExpression("this.count", "Wrong Value");
-            Assert.fail("This method should have thrown an assertion exception");
+            fail("This method should have thrown an assertion exception");
         }
         catch (final AssertionError e) {
             // it worked!
@@ -60,7 +62,7 @@ public class AsserterTest extends JexlTestCase {
 
         try {
             asserter.assertExpression("bar.count", Integer.valueOf(5));
-            Assert.fail("This method should have thrown an assertion exception");
+            fail("This method should have thrown an assertion exception");
         }
         catch (final AssertionError e) {
             // it worked!

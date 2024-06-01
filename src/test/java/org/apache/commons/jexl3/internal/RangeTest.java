@@ -16,6 +16,8 @@
  */
 package org.apache.commons.jexl3.internal;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
@@ -41,13 +43,13 @@ public class RangeTest extends JexlTestCase {
         final Iterator<Integer> ii = ir.iterator();
         if (ii.hasNext()) {
             int l = ii.next();
-            Assert.assertEquals(first, l);
+            assertEquals(first, l);
             while(ii.hasNext()) {
                 l = ii.next();
             }
-            Assert.assertEquals(last, l);
+            assertEquals(last, l);
         } else {
-            Assert.fail("empty iterator?");
+            fail("empty iterator?");
         }
     }
 
@@ -55,13 +57,13 @@ public class RangeTest extends JexlTestCase {
         final Iterator<Long> ii = lr.iterator();
         if (ii.hasNext()) {
             long l = ii.next();
-            Assert.assertEquals(first, l);
+            assertEquals(first, l);
             while(ii.hasNext()) {
                 l = ii.next();
             }
-            Assert.assertEquals(last, l);
+            assertEquals(last, l);
         } else {
-            Assert.fail("empty iterator?");
+            fail("empty iterator?");
         }
     }
 
@@ -83,20 +85,20 @@ public class RangeTest extends JexlTestCase {
         Iterator<Integer> ii = new AscIntegerIterator(3, 5);
         Integer i = 3;
         while(ii.hasNext()) {
-            Assert.assertEquals(i, ii.next());
+            assertEquals(i, ii.next());
             i += 1;
         }
         try {
             ii.next();
-            Assert.fail("iterator exhausted");
+            fail("iterator exhausted");
         } catch(NoSuchElementException e) {
-            Assert.assertNotNull(e);
+            assertNotNull(e);
         }
         try {
             ii.remove();
-            Assert.fail("remove not implemented");
+            fail("remove not implemented");
         } catch(UnsupportedOperationException e) {
-            Assert.assertNotNull(e);
+            assertNotNull(e);
         }
     }
 
@@ -105,91 +107,91 @@ public class RangeTest extends JexlTestCase {
         Iterator<Long> ii = new AscLongIterator(3L, 5L);
         Long i = 3L;
         while(ii.hasNext()) {
-            Assert.assertEquals(i, ii.next());
+            assertEquals(i, ii.next());
             i += 1;
         }
         try {
             ii.next();
-            Assert.fail("iterator exhausted");
+            fail("iterator exhausted");
         } catch(NoSuchElementException e) {
-            Assert.assertNotNull(e);
+            assertNotNull(e);
         }
         try {
             ii.remove();
-            Assert.fail("remove not implemented");
+            fail("remove not implemented");
         } catch(UnsupportedOperationException e) {
-            Assert.assertNotNull(e);
+            assertNotNull(e);
         }
     }
 
     @Test public void testMisc() {
-        Assert.assertEquals("?", Scope.UNDEFINED.toString());
-        Assert.assertEquals("??", Scope.UNDECLARED.toString());
+        assertEquals("?", Scope.UNDEFINED.toString());
+        assertEquals("??", Scope.UNDECLARED.toString());
     }
 
 
     @Test
     public void testRanges() throws Exception {
         final LongRange lr0 = LongRange.create(20,10);
-        Assert.assertEquals(10L, lr0.getMin());
-        Assert.assertEquals(20L, lr0.getMax());
-        Assert.assertFalse(lr0.isEmpty());
-        Assert.assertTrue(lr0.contains(10L));
-        Assert.assertTrue(lr0.contains(20L));
-        Assert.assertFalse(lr0.contains(30L));
-        Assert.assertFalse(lr0.contains(5L));
-        Assert.assertFalse(lr0.contains(null));
+        assertEquals(10L, lr0.getMin());
+        assertEquals(20L, lr0.getMax());
+        assertFalse(lr0.isEmpty());
+        assertTrue(lr0.contains(10L));
+        assertTrue(lr0.contains(20L));
+        assertFalse(lr0.contains(30L));
+        assertFalse(lr0.contains(5L));
+        assertFalse(lr0.contains(null));
         checkIteration(lr0, 20L, 10L);
         final LongRange lr1 = LongRange.create(10,20);
         checkIteration(lr1, 10L, 20L);
-        Assert.assertTrue(lr0.containsAll(lr1));
+        assertTrue(lr0.containsAll(lr1));
         final LongRange lr2 = LongRange.create(10,15);
-        Assert.assertNotEquals(lr0, lr2);
-        Assert.assertTrue(lr0.containsAll(lr2));
-        Assert.assertFalse(lr2.containsAll(lr1));
+        assertNotEquals(lr0, lr2);
+        assertTrue(lr0.containsAll(lr2));
+        assertFalse(lr2.containsAll(lr1));
         final IntegerRange ir0 = IntegerRange.create(20,10);
         checkIteration(ir0, 20, 10);
-        Assert.assertEquals(10, ir0.getMin());
-        Assert.assertEquals(20, ir0.getMax());
-        Assert.assertFalse(ir0.isEmpty());
-        Assert.assertTrue(ir0.contains(10));
-        Assert.assertTrue(ir0.contains(20));
-        Assert.assertFalse(ir0.contains(30));
-        Assert.assertFalse(ir0.contains(5));
-        Assert.assertFalse(ir0.contains(null));
+        assertEquals(10, ir0.getMin());
+        assertEquals(20, ir0.getMax());
+        assertFalse(ir0.isEmpty());
+        assertTrue(ir0.contains(10));
+        assertTrue(ir0.contains(20));
+        assertFalse(ir0.contains(30));
+        assertFalse(ir0.contains(5));
+        assertFalse(ir0.contains(null));
         final IntegerRange ir1 = IntegerRange.create(10,20);
         checkIteration(ir1, 10, 20);
-        Assert.assertTrue(ir0.containsAll(ir1));
-        Assert.assertNotEquals(ir0, lr0);
-        Assert.assertNotEquals(ir1, lr1);
+        assertTrue(ir0.containsAll(ir1));
+        assertNotEquals(ir0, lr0);
+        assertNotEquals(ir1, lr1);
         final IntegerRange ir2 = IntegerRange.create(10,15);
-        Assert.assertNotEquals(ir0, ir2);
-        Assert.assertTrue(ir0.containsAll(ir2));
-        Assert.assertFalse(ir2.containsAll(ir1));
+        assertNotEquals(ir0, ir2);
+        assertTrue(ir0.containsAll(ir2));
+        assertFalse(ir2.containsAll(ir1));
 
         long lc0 = 20;
         final Iterator<Long> il0 = lr0.iterator();
         while(il0.hasNext()) {
             final long v0 = il0.next();
-            Assert.assertEquals(lc0, v0);
+            assertEquals(lc0, v0);
             try {
                 switch((int)v0) {
-                    case 10:  il0.remove(); Assert.fail(); break;
-                    case 11: lr1.add(v0); Assert.fail(); break;
-                    case 12: lr1.remove(v0); Assert.fail(); break;
-                    case 13: lr1.addAll(Collections.singletonList(v0)); Assert.fail(); break;
-                    case 14: lr1.removeAll(Collections.singletonList(v0)); Assert.fail(); break;
-                    case 15: lr1.retainAll(Collections.singletonList(v0)); Assert.fail(); break;
+                    case 10:  il0.remove(); fail(); break;
+                    case 11: lr1.add(v0); fail(); break;
+                    case 12: lr1.remove(v0); fail(); break;
+                    case 13: lr1.addAll(Collections.singletonList(v0)); fail(); break;
+                    case 14: lr1.removeAll(Collections.singletonList(v0)); fail(); break;
+                    case 15: lr1.retainAll(Collections.singletonList(v0)); fail(); break;
                 }
             } catch (final UnsupportedOperationException xuo) {
                 // ok
             }
             lc0 -= 1;
         }
-        Assert.assertEquals(9L, lc0);
+        assertEquals(9L, lc0);
         try {
             il0.next();
-            Assert.fail();
+            fail();
         } catch (final NoSuchElementException xns) {
             // ok
         }
@@ -198,25 +200,25 @@ public class RangeTest extends JexlTestCase {
         final Iterator<Integer> ii0 = ir0.iterator();
         while(ii0.hasNext()) {
             final int v0 = ii0.next();
-            Assert.assertEquals(ic0, v0);
+            assertEquals(ic0, v0);
             try {
                 switch(v0) {
-                    case 10: ii0.remove(); Assert.fail(); break;
-                    case 11: ir1.add(v0); Assert.fail(); break;
-                    case 12: ir1.remove(v0); Assert.fail(); break;
-                    case 13: ir1.addAll(Collections.singletonList(v0)); Assert.fail(); break;
-                    case 14: ir1.removeAll(Collections.singletonList(v0)); Assert.fail(); break;
-                    case 15: ir1.retainAll(Collections.singletonList(v0)); Assert.fail(); break;
+                    case 10: ii0.remove(); fail(); break;
+                    case 11: ir1.add(v0); fail(); break;
+                    case 12: ir1.remove(v0); fail(); break;
+                    case 13: ir1.addAll(Collections.singletonList(v0)); fail(); break;
+                    case 14: ir1.removeAll(Collections.singletonList(v0)); fail(); break;
+                    case 15: ir1.retainAll(Collections.singletonList(v0)); fail(); break;
                 }
             } catch (final UnsupportedOperationException xuo) {
                 // ok
             }
             ic0 -= 1;
         }
-        Assert.assertEquals(9, ic0);
+        assertEquals(9, ic0);
         try {
             ii0.next();
-            Assert.fail();
+            fail();
         } catch (final NoSuchElementException xns) {
             // ok
         }
@@ -228,15 +230,15 @@ public class RangeTest extends JexlTestCase {
         Source src0 = new Source(features, "x -> -x");
         Source src0b = new Source(features, "x -> -x");
         Source src1 = new Source(features, "x -> +x");
-        Assert.assertEquals(7, src0.length());
-        Assert.assertEquals(src0, src0);
-        Assert.assertEquals(src0, src0b);
-        Assert.assertNotEquals(src0, src1);
-        Assert.assertEquals(src0.hashCode(), src0b.hashCode());
-        Assert.assertNotEquals(src0.hashCode(), src1.hashCode());
-        Assert.assertTrue(src0.compareTo(src0b) == 0);
-        Assert.assertTrue(src0.compareTo(src1) > 0);
-        Assert.assertTrue(src1.compareTo(src0) < 0);
+        assertEquals(7, src0.length());
+        assertEquals(src0, src0);
+        assertEquals(src0, src0b);
+        assertNotEquals(src0, src1);
+        assertEquals(src0.hashCode(), src0b.hashCode());
+        assertNotEquals(src0.hashCode(), src1.hashCode());
+        assertTrue(src0.compareTo(src0b) == 0);
+        assertTrue(src0.compareTo(src1) > 0);
+        assertTrue(src1.compareTo(src0) < 0);
     }
 }
 

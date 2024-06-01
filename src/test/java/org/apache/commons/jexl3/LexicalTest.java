@@ -16,6 +16,8 @@
  */
 package org.apache.commons.jexl3;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import static org.apache.commons.jexl3.JexlTestCase.createEngine;
 
 import java.io.StringReader;
@@ -124,13 +126,13 @@ public class LexicalTest {
                 try {
                     final JexlScript script = jexl.createScript(src);
                     if (!expected) {
-                        Assert.fail(src);
+                        fail(src);
                     }
                 } catch (final JexlException.Parsing xlexical) {
                     if (expected) {
-                        Assert.fail(src);
+                        fail(src);
                     }
-                    //Assert.assertTrue(xlexical.detailedMessage().contains("x"));
+                    //assertTrue(xlexical.detailedMessage().contains("x"));
                 }
             }
         }
@@ -155,7 +157,7 @@ public class LexicalTest {
             if (!feature) {
                 script.execute(ctxt);
             }
-            Assert.fail();
+            fail();
         } catch (final JexlException xany) {
             final String ww = xany.toString();
         }
@@ -164,7 +166,7 @@ public class LexicalTest {
             if (!feature) {
                 script.execute(ctxt);
             }
-            Assert.fail();
+            fail();
         } catch (final JexlException xany) {
             final String ww = xany.toString();
         }
@@ -173,7 +175,7 @@ public class LexicalTest {
             if (!feature) {
                 script.execute(ctxt);
             }
-            Assert.fail();
+            fail();
         } catch (final JexlException xany) {
             final String ww = xany.toString();
         }
@@ -182,7 +184,7 @@ public class LexicalTest {
             if (!feature) {
                 script.execute(ctxt);
             }
-            Assert.fail();
+            fail();
         } catch (final JexlException xany) {
             final String ww = xany.toString();
         }
@@ -191,7 +193,7 @@ public class LexicalTest {
             if (!feature) {
                 script.execute(ctxt);
             }
-            Assert.fail();
+            fail();
         } catch (final JexlException xany) {
             final String ww = xany.toString();
         }
@@ -200,7 +202,7 @@ public class LexicalTest {
             if (!feature) {
                 script.execute(ctxt);
             }
-            Assert.fail();
+            fail();
         } catch (final JexlException xany) {
             final String ww = xany.toString();
         }
@@ -209,7 +211,7 @@ public class LexicalTest {
             if (!feature) {
                 script.execute(ctxt, 42);
             }
-            Assert.fail();
+            fail();
         } catch (final JexlException xany) {
             final String ww = xany.toString();
         }
@@ -235,7 +237,7 @@ public class LexicalTest {
             script = jexl.createScript("{ var x = 0; } x");
             script.execute(ctxt);
             if (shade) {
-                Assert.fail("local shade means 'x' should be undefined");
+                fail("local shade means 'x' should be undefined");
             }
         } catch (final JexlException xany) {
             if (!shade) {
@@ -247,7 +249,7 @@ public class LexicalTest {
             script = jexl.createScript("{ var x = 0; } x = 42");
             script.execute(ctxt);
             if (shade) {
-                Assert.fail("local shade means 'x = 42' should be undefined");
+                fail("local shade means 'x = 42' should be undefined");
             }
         } catch (final JexlException xany) {
             if (!shade) {
@@ -259,7 +261,7 @@ public class LexicalTest {
             script = jexl.createScript("{ var x = 0; } y = 42");
             script.execute(ctxt);
             if (shade) {
-                Assert.fail("local shade means 'y = 42' should be undefined (y is undefined)");
+                fail("local shade means 'y = 42' should be undefined (y is undefined)");
             }
         } catch (final JexlException xany) {
             if (!shade) {
@@ -278,9 +280,9 @@ public class LexicalTest {
             script = jexl.createScript("{ var y = 0; } y = 42");
             result = script.execute(ctxt);
             if (!shade) {
-                Assert.assertEquals(42, result);
+                assertEquals(42, result);
             } else {
-                Assert.fail("local shade means 'y = 42' should be undefined");
+                fail("local shade means 'y = 42' should be undefined");
             }
         } catch (final JexlException xany) {
             if (!shade) {
@@ -295,37 +297,37 @@ public class LexicalTest {
         final JexlScript script = jexl.createScript("{var x = 42}; {var x; return x; }");
         final Object result = script.execute(ctxt);
         if (lexical) {
-            Assert.assertNull(result);
+            assertNull(result);
         } else {
-            Assert.assertEquals(42, result);
+            assertEquals(42, result);
         }
     }
 
     void runTestScope(final LexicalScope scope, final int init, final int count, final int step) {
         final int size = (count - init) / step;
         for(int i = init; i < count; i += step) {
-            Assert.assertTrue(scope.addSymbol(i));
+            assertTrue(scope.addSymbol(i));
             if (i % (step + 1) == 1) {
-                Assert.assertTrue(scope.addConstant(i));
+                assertTrue(scope.addConstant(i));
             }
-            Assert.assertFalse(scope.addSymbol(i));
+            assertFalse(scope.addSymbol(i));
         }
         for(int i = init; i < count; i += step) {
-            Assert.assertTrue(scope.hasSymbol(i));
+            assertTrue(scope.hasSymbol(i));
             for(int s = 1; s < step; ++s) {
-                Assert.assertFalse(scope.hasSymbol(i + s));
+                assertFalse(scope.hasSymbol(i + s));
             }
             if (i % (step + 1) == 1) {
-                Assert.assertTrue(scope.isConstant(i));
+                assertTrue(scope.isConstant(i));
             }
         }
-        Assert.assertEquals(size, scope.getSymbolCount());
+        assertEquals(size, scope.getSymbolCount());
         final BitSet collect = new BitSet();
         scope.clearSymbols(b -> collect.set(b));
         for(int i = init; i < count; i += step) {
-            Assert.assertTrue("missing " + i, collect.get(i));
+            assertTrue(collect.get(i), "missing " + i);
         }
-        Assert.assertEquals(0, scope.getSymbolCount());
+        assertEquals(0, scope.getSymbolCount());
     }
 
     private JexlFeatures runVarLoop(final boolean flag, final String src) {
@@ -343,8 +345,8 @@ public class LexicalTest {
         final List<Integer> out = new ArrayList<>(10);
         vars.set("$out", out);
         final Object result = script.execute(vars);
-        Assert.assertEquals(true, result);
-        Assert.assertEquals(10, out.size());
+        assertEquals(true, result);
+        assertEquals(10, out.size());
         return features;
     }
 
@@ -356,7 +358,7 @@ public class LexicalTest {
         final JexlScript script = jexl.createScript("@scale(13) @test var i = 42");
         final JexlContext jc = new OptAnnotationContext();
         final Object result = script.execute(jc);
-        Assert.assertEquals(42, result);
+        assertEquals(42, result);
     }
 
     @Test
@@ -368,7 +370,7 @@ public class LexicalTest {
                 "var x = 10; (b->{ x + b })(32)");
         final JexlContext jc = new MapContext();
         final Object result = script.execute(jc);
-        Assert.assertEquals(42, result);
+        assertEquals(42, result);
     }
 
     @Test
@@ -381,7 +383,7 @@ public class LexicalTest {
         final JexlContext jc = new MapContext();
         jc.set("x", 11);
         final Object result = script.execute(jc);
-        Assert.assertEquals(43, result);
+        assertEquals(43, result);
     }
 
     @Test
@@ -392,7 +394,7 @@ public class LexicalTest {
                 "{ const x = 10; x + 1 }; { let x = 20; x = 22}");
         final JexlContext jc = new MapContext();
         final Object result = script.execute(jc);
-        Assert.assertEquals(22, result);
+        assertEquals(22, result);
     }
 
     @Test
@@ -403,7 +405,7 @@ public class LexicalTest {
                 "{ const x = 10; }{ const x = 20; }");
         final JexlContext jc = new MapContext();
         final Object result = script.execute(jc);
-        Assert.assertEquals(20, result);
+        assertEquals(20, result);
     }
 
     @Test
@@ -413,9 +415,9 @@ public class LexicalTest {
         try {
             final JexlScript script = jexl.createScript(
                     "const foo;  foo");
-            Assert.fail("should fail, const foo must be followed by assign.");
+            fail("should fail, const foo must be followed by assign.");
         } catch (final JexlException.Parsing xparse) {
-            Assert.assertTrue(xparse.getMessage().contains("const"));
+            assertTrue(xparse.getMessage().contains("const"));
         }
     }
 
@@ -426,9 +428,9 @@ public class LexicalTest {
         for(final String op : Arrays.asList("=", "+=", "-=", "/=", "*=", "%=", "<<=", ">>=", ">>>=", "^=", "&=", "|=")) {
             try {
                 final JexlScript script = jexl.createScript("const foo = 42;  foo "+op+" 1;");
-                Assert.fail("should fail, const precludes assignment");
+                fail("should fail, const precludes assignment");
             } catch (final JexlException.Parsing xparse) {
-                Assert.assertTrue(xparse.getMessage().contains("foo"));
+                assertTrue(xparse.getMessage().contains("foo"));
             }
         }
     }
@@ -440,9 +442,9 @@ public class LexicalTest {
         for(final String op : Arrays.asList("=", "+=", "-=", "/=", "*=", "%=", "<<=", ">>=", ">>>=", "^=", "&=", "|=")) {
             try {
                 final JexlScript script = jexl.createScript("const foo = 42;  if (true) { foo "+op+" 1; }");
-                Assert.fail("should fail, const precludes assignment");
+                fail("should fail, const precludes assignment");
             } catch (final JexlException.Parsing xparse) {
-                Assert.assertTrue(xparse.getMessage().contains("foo"));
+                assertTrue(xparse.getMessage().contains("foo"));
             }
         }
     }
@@ -454,9 +456,9 @@ public class LexicalTest {
         for(final String op : Arrays.asList("=", "+=", "-=", "/=", "*=", "%=", "<<=", ">>=", ">>>=", "^=", "&=", "|=")) {
             try {
                 final JexlScript script = jexl.createScript("{ const foo = 42; } { let foo  = 0; foo " + op + " 1; }");
-                Assert.assertNotNull(script);
+                assertNotNull(script);
             } catch (final JexlException.Parsing xparse) {
-                Assert.fail(xparse.toString());
+                fail(xparse.toString());
             }
         }
     }
@@ -472,7 +474,7 @@ public class LexicalTest {
         for(final String src: srcs) {
             final JexlScript script = jexl.createScript(src);
             final Object result = script.execute(null);
-            Assert.assertNotNull(src, result);
+            assertNotNull(result, src);
         }
     }
 
@@ -488,9 +490,9 @@ public class LexicalTest {
             try {
                 final JexlScript script = jexl.createScript(src);
                 final Object result = script.execute(null);
-                Assert.fail(src);
+                fail(src);
             } catch (final JexlException.Assignment xassign) {
-                Assert.assertNotNull(src, xassign); // debug breakpoint
+                assertNotNull(xassign, src); // debug breakpoint
             }
         }
     }
@@ -532,9 +534,9 @@ public class LexicalTest {
         final JexlScript script = jexl.createScript("{var x = 42;} options.lexical = false; options.lexicalShade=false; x");
         try {
         final Object result = script.execute(ctxt);
-        Assert.fail("setting options.lexical should have no effect during execution");
+        fail("setting options.lexical should have no effect during execution");
         } catch (final JexlException xf) {
-            Assert.assertNotNull(xf);
+            assertNotNull(xf);
         }
     }
 
@@ -558,11 +560,11 @@ public class LexicalTest {
         // run it once, old 3.1 semantics, lexical/shade = false
         result = runner.execute(ctxt, false, tested, catchFn);
         // result 42
-        Assert.assertEquals(42, result);
+        assertEquals(42, result);
         // run it a second time, new 3.2 semantics, lexical/shade = true
         result = runner.execute(ctxt, true, tested, catchFn);
         // result is exception!
-        Assert.assertTrue(result instanceof JexlException.Variable);
+        assertTrue(result instanceof JexlException.Variable);
     }
 
     @Test
@@ -573,7 +575,7 @@ public class LexicalTest {
         final JexlEngine jexl = createEngine(f);
         try {
             final JexlScript script = jexl.createScript("for(let x : 1..3) { let c = 0}; return x");
-            Assert.fail("Should not have been parsed");
+            fail("Should not have been parsed");
         } catch (final JexlException ex) {
            // OK
         }
@@ -587,7 +589,7 @@ public class LexicalTest {
         final JexlEngine jexl = createEngine(f);
         try {
             final JexlScript script = jexl.createScript("for(var x : 1..3) { var c = 0}; return x");
-            Assert.fail("Should not have been parsed");
+            fail("Should not have been parsed");
         } catch (final JexlException ex) {
             // OK
         }
@@ -601,10 +603,10 @@ public class LexicalTest {
         final JexlEngine jexl = createEngine(f);
         try {
             final JexlScript script = jexl.createScript("for(var x : 1..3) { var c = 0} for(var x : 1..3) { var c = 0}; return x");
-            Assert.fail("Should not have been parsed");
+            fail("Should not have been parsed");
         } catch (final JexlException ex) {
            // OK
-           Assert.assertTrue(ex instanceof JexlException);
+           assertTrue(ex instanceof JexlException);
         }
     }
 
@@ -616,10 +618,10 @@ public class LexicalTest {
         final JexlEngine jexl = createEngine(f);
         try {
             final JexlScript script = jexl.createScript("for(let x : 1..3) { let c = 0} for(let x : 1..3) { var c = 0}; return x");
-            Assert.fail("Should not have been parsed");
+            fail("Should not have been parsed");
         } catch (final JexlException ex) {
             // OK
-            Assert.assertTrue(ex instanceof JexlException);
+            assertTrue(ex instanceof JexlException);
         }
     }
 
@@ -632,24 +634,24 @@ public class LexicalTest {
                 "var x = 32; ("
                         + "()->{ for(var x : null) { var c = 0; {return x; }} })"
                         + "();");
-        Assert.assertNull(script.execute(null));
+        assertNull(script.execute(null));
     }
 
     @Test
     public void testInnerAccess1a() {
         final JexlEngine jexl = new JexlBuilder().strict(true).lexical(true).create();
         final JexlScript script = jexl.createScript("var x = 32; (()->{ for(var x : null) { var c = 0; {return x; }} })();");
-        Assert.assertNotNull(script);
+        assertNotNull(script);
     }
 
     @Test
     public void testInnerAccess1b() {
         final JexlEngine jexl = new JexlBuilder().strict(true).create();
         final JexlScript script = jexl.createScript("let x = 32; (()->{ for(let x : null) { let c = 0; { return x; } } } )(); ");
-        Assert.assertNotNull(script);
+        assertNotNull(script);
         final String dbg = JexlTestCase.toString(script);
         final String src = script.getSourceText();
-        Assert.assertTrue(JexlTestCase.equalsIgnoreWhiteSpace(src, dbg));
+        assertTrue(JexlTestCase.equalsIgnoreWhiteSpace(src, dbg));
     }
 
     @Test
@@ -666,12 +668,12 @@ public class LexicalTest {
         opts.setSharedInstance(true);
         final Script script = (Script) e;
         final JexlFeatures features = script.getFeatures();
-        Assert.assertTrue(features.isLexical());
-        Assert.assertTrue(features.isLexicalShade());
+        assertTrue(features.isLexical());
+        assertTrue(features.isLexicalShade());
         final Object result = e.execute(vars);
-        Assert.assertEquals(42, result);
-        Assert.assertTrue(opts.isLexical());
-        Assert.assertTrue(opts.isLexicalShade());
+        assertEquals(42, result);
+        assertTrue(opts.isLexical());
+        assertTrue(opts.isLexicalShade());
     }
 
     @Test
@@ -683,7 +685,7 @@ public class LexicalTest {
         final JexlContext jc = new MapContext();
         jc.set("x", 11);
         final Object result = script.execute(jc);
-        Assert.assertEquals(43, result);
+        assertEquals(43, result);
 
     }
 
@@ -739,8 +741,8 @@ public class LexicalTest {
         script = jexl.createScript("var x = 0; for(var y : [1]) { var x = 42; return x; };");
         try {
         result = script.execute(ctxt);
-        //Assert.assertEquals(42, result);
-            Assert.fail();
+        //assertEquals(42, result);
+            fail();
         } catch (final JexlException xany) {
             final String ww = xany.toString();
         }
@@ -748,14 +750,14 @@ public class LexicalTest {
         try {
             script = jexl.createScript("(x)->{ if (x) { var x = 7 * (x + x); x; } }");
             result = script.execute(ctxt, 3);
-            Assert.fail();
+            fail();
         } catch (final JexlException xany) {
             final String ww = xany.toString();
         }
 
         script = jexl.createScript("{ var x = 0; } var x = 42; x");
         result = script.execute(ctxt, 21);
-        Assert.assertEquals(42, result);
+        assertEquals(42, result);
     }
 
     @Test
@@ -785,11 +787,11 @@ public class LexicalTest {
         JexlScript e = jexl.createScript(str);
         final JexlContext jc = new MapContext();
         Object o = e.execute(jc);
-        Assert.assertTrue(((Set)o).contains(1));
+        assertTrue(((Set)o).contains(1));
 
         e = jexl.createScript(str);
         o = e.execute(jc);
-        Assert.assertTrue(((Set)o).contains(1));
+        assertTrue(((Set)o).contains(1));
     }
 
     @Test
@@ -807,7 +809,7 @@ public class LexicalTest {
         t.evaluate(ctxt, strw);
         final String output = strw.toString();
         final String ctl = "<report>\n\n3\n</report>\n";
-        Assert.assertEquals(ctl, output);
+        assertEquals(ctl, output);
     }
 
     @Test
@@ -819,10 +821,10 @@ public class LexicalTest {
             script = jexl.createScript("var x = 42; var y = () -> { {var x = debug(-42); }; return x; }; y()");
         try {
             result = script.execute(ctxt);
-            Assert.assertEquals(42, result);
+            assertEquals(42, result);
         } catch (final JexlException xany) {
             final String ww = xany.toString();
-            Assert.fail(ww);
+            fail(ww);
         }
     }
 
@@ -833,7 +835,7 @@ public class LexicalTest {
         final JexlScript e = jexl.createScript(str);
         final JexlContext ctxt = new MapContext();
         final Object o = e.execute(ctxt);
-        Assert.assertEquals(0, o);
+        assertEquals(0, o);
     }
 
     @Test
@@ -845,7 +847,7 @@ public class LexicalTest {
         final JexlScript e = jexl.createScript(str);
         final JexlContext ctxt = new MapContext();
         final Object o = e.execute(ctxt);
-        Assert.assertEquals(0, o);
+        assertEquals(0, o);
     }
 
     @Test
@@ -856,9 +858,9 @@ public class LexicalTest {
         final JexlContext ctxt = new MapContext();
         try {
             final Object o = e.execute(ctxt);
-            Assert.fail("i should be shaded");
+            fail("i should be shaded");
         } catch (final JexlException xany) {
-            Assert.assertNotNull(xany);
+            assertNotNull(xany);
         }
     }
 
@@ -869,7 +871,7 @@ public class LexicalTest {
         final JexlScript e = jexl.createScript(str);
         final JexlContext ctxt = new MapContext();
         final Object o = e.execute(ctxt);
-        Assert.assertEquals(0, o);
+        assertEquals(0, o);
     }
 
     @Test
@@ -880,9 +882,9 @@ public class LexicalTest {
         final JexlContext ctxt = new MapContext();
         try {
             final Object o = e.execute(ctxt);
-            Assert.fail("i should be shaded");
+            fail("i should be shaded");
         } catch (final JexlException xany) {
-            Assert.assertNotNull(xany);
+            assertNotNull(xany);
         }
     }
 
@@ -891,10 +893,10 @@ public class LexicalTest {
         final JexlEngine jexl = new JexlBuilder().safe(true).create();
         final JexlScript script = jexl.createScript(text);
         final Object result = script.execute(null);
-        Assert.assertEquals(42, result);
+        assertEquals(42, result);
         final String s0 = script.getParsedText();
         final String s1 = script.getSourceText();
-        Assert.assertNotEquals(s0, s1);
+        assertNotEquals(s0, s1);
     }
 
     @Test public void testManyLet() {
@@ -902,10 +904,10 @@ public class LexicalTest {
         final JexlEngine jexl = new JexlBuilder().safe(true).create();
         final JexlScript script = jexl.createScript(text);
         final Object result = script.execute(null);
-        Assert.assertEquals(42, result);
+        assertEquals(42, result);
         final String s0 = script.getParsedText();
         final String s1 = script.getSourceText();
-        Assert.assertNotEquals(s0, s1);
+        assertNotEquals(s0, s1);
     }
 
     @Test
@@ -916,7 +918,7 @@ public class LexicalTest {
         final JexlScript script = jexl.createScript("var i = (x, y, z)->{return x + y + z}; i(22,18,2)");
         final JexlContext jc = new MapContext();
         final Object result = script.execute(jc);
-        Assert.assertEquals(42, result);
+        assertEquals(42, result);
     }
 
     @Test
@@ -929,25 +931,25 @@ public class LexicalTest {
             JexlOptions o;
 
             n42 = (Integer) jexl.createScript("#pragma jexl.options none\n-42").execute(vars);
-            Assert.assertEquals(-42, n42);
+            assertEquals(-42, n42);
             o = vars.snatchOptions();
-            Assert.assertNotNull(o);
-            Assert.assertTrue(o.isStrict());
-            Assert.assertTrue(o.isSafe());
-            Assert.assertTrue(o.isCancellable());
-            Assert.assertFalse(o.isLexical());
-            Assert.assertFalse(o.isLexicalShade());
+            assertNotNull(o);
+            assertTrue(o.isStrict());
+            assertTrue(o.isSafe());
+            assertTrue(o.isCancellable());
+            assertFalse(o.isLexical());
+            assertFalse(o.isLexicalShade());
 
             n42 = (Integer) jexl.createScript("#pragma jexl.options canonical\n42").execute(vars);
-            Assert.assertEquals(42, n42);
+            assertEquals(42, n42);
             o = vars.snatchOptions();
-            Assert.assertNotNull(o);
-            Assert.assertTrue(o.isStrict());
-            Assert.assertFalse(o.isSafe());
-            Assert.assertTrue(o.isCancellable());
-            Assert.assertTrue(o.isLexical());
-            Assert.assertTrue(o.isLexicalShade());
-            Assert.assertFalse(o.isSharedInstance());
+            assertNotNull(o);
+            assertTrue(o.isStrict());
+            assertFalse(o.isSafe());
+            assertTrue(o.isCancellable());
+            assertTrue(o.isLexical());
+            assertTrue(o.isLexicalShade());
+            assertFalse(o.isSharedInstance());
         } finally {
             JexlOptions.setDefaultFlags("-safe", "+lexical");
         }
@@ -958,9 +960,9 @@ public class LexicalTest {
         final String str = "function(u) {}";
         final JexlEngine jexl = new JexlBuilder().create();
         JexlScript e = jexl.createScript(str);
-        Assert.assertEquals(1, e.getParameters().length);
+        assertEquals(1, e.getParameters().length);
         e = jexl.createScript(new JexlInfo("TestScript", 1, 1), str);
-        Assert.assertEquals(1, e.getParameters().length);
+        assertEquals(1, e.getParameters().length);
     }
 
     @Test
@@ -970,7 +972,7 @@ public class LexicalTest {
         final String strs = "var s = function(x) { for (var i : 1..3) {if (i > 2) return x}}; s(42)";
         final JexlScript s42 = jexl.createScript(strs);
         final Object result = s42.execute(jc);
-        Assert.assertEquals(42, result);
+        assertEquals(42, result);
     }
 
     @Test
@@ -981,7 +983,7 @@ public class LexicalTest {
         final JexlScript e = jexl.createScript(str);
         final JexlContext ctxt = new MapContext();
         final Object result = e.execute(ctxt);
-        Assert.assertEquals(42, result);
+        assertEquals(42, result);
     }
 
     @Test
@@ -994,9 +996,9 @@ public class LexicalTest {
         final JexlContext ctxt = new MapContext();
         try {
             final Object o = e.execute(ctxt);
-            Assert.fail("i should be shaded");
+            fail("i should be shaded");
         } catch (final JexlException xany) {
-            Assert.assertNotNull(xany);
+            assertNotNull(xany);
         }
     }
 
@@ -1055,10 +1057,10 @@ public class LexicalTest {
         final JexlEngine jexl = createEngine(f);
         try {
             final JexlScript script = jexl.createScript("{var x = 0}; return x");
-            Assert.fail("Should not have been parsed");
+            fail("Should not have been parsed");
         } catch (final Exception ex) {
            // OK
-           Assert.assertTrue(ex instanceof JexlException);
+           assertTrue(ex instanceof JexlException);
         }
     }
 
@@ -1103,13 +1105,13 @@ public class LexicalTest {
         final JexlFeatures ft2= runVarLoop(true, src2);
 
         // and check some features
-        Assert.assertEquals(ff0, ff1);
-        Assert.assertEquals(ft0, ft1);
-        Assert.assertNotEquals(ff0, ft0);
+        assertEquals(ff0, ff1);
+        assertEquals(ft0, ft1);
+        assertNotEquals(ff0, ft0);
         final String sff0 = ff0.toString();
         final String sff1 = ff1.toString();
-        Assert.assertEquals(sff0, sff1);
+        assertEquals(sff0, sff1);
         final String sft1 = ft1.toString();
-        Assert.assertNotEquals(sff0, sft1);
+        assertNotEquals(sff0, sft1);
     }
 }

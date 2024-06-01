@@ -16,6 +16,8 @@
  */
 package org.apache.commons.jexl3;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -195,56 +197,56 @@ public class PropertyAccessTest extends JexlTestCase {
         String stmt = "x.2.class.name";
         JexlScript script = engine.createScript(stmt);
         Object result = script.execute(ctx);
-        Assert.assertEquals("java.lang.String", result);
+        assertEquals("java.lang.String", result);
 
         try {
             stmt = "x.3?.class.name";
             script = engine.createScript(stmt);
             result = script.execute(ctx);
-            Assert.assertNull(result);
+            assertNull(result);
         } catch (final JexlException xany) {
-            Assert.fail("Should have evaluated to null");
+            fail("Should have evaluated to null");
         }
         try {
             stmt = "x?.3.class.name";
             script = engine.createScript(stmt);
             result = script.execute(ctx);
-            Assert.fail("Should have thrown, fail on 3");
-            Assert.assertNull(result);
+            fail("Should have thrown, fail on 3");
+            assertNull(result);
         } catch (final JexlException xany) {
-            Assert.assertTrue(xany.detailedMessage().contains("3"));
+            assertTrue(xany.detailedMessage().contains("3"));
         }
         try {
             stmt = "x?.3?.class.name";
             script = engine.createScript(stmt);
             result = script.execute(ctx);
-            Assert.assertNull(result);
+            assertNull(result);
         } catch (final JexlException xany) {
-            Assert.fail("Should have evaluated to null");
+            fail("Should have evaluated to null");
         }
         try {
             stmt = "y?.3.class.name";
             script = engine.createScript(stmt);
             result = script.execute(ctx);
-            Assert.assertNull(result);
+            assertNull(result);
         } catch (final JexlException xany) {
-            Assert.fail("Should have evaluated to null");
+            fail("Should have evaluated to null");
         }
         try {
             stmt = "x?.y?.z";
             script = engine.createScript(stmt);
             result = script.execute(ctx);
-            Assert.assertNull(result);
+            assertNull(result);
         } catch (final JexlException xany) {
-            Assert.fail("Should have evaluated to null");
+            fail("Should have evaluated to null");
         }
         try {
             stmt = "x? (x.y? (x.y.z ?: null) :null) : null";
             script = engine.createScript(stmt);
             result = script.execute(ctx);
-            Assert.assertNull(result);
+            assertNull(result);
         } catch (final JexlException xany) {
-            Assert.fail("Should have evaluated to null");
+            fail("Should have evaluated to null");
         }
     }
 
@@ -262,38 +264,38 @@ public class PropertyAccessTest extends JexlTestCase {
         script = jexl.createScript("$in[p].intValue()", "p");
         try {
             result = script.execute(ctxt, "fail");
-            Assert.fail("should have thrown a " + JexlException.Property.class);
+            fail("should have thrown a " + JexlException.Property.class);
         } catch (final JexlException xany) {
-            Assert.assertEquals(JexlException.Property.class, xany.getClass());
+            assertEquals(JexlException.Property.class, xany.getClass());
         }
-        Assert.assertNull(result);
+        assertNull(result);
         result = script.execute(ctxt, "stuff");
-        Assert.assertEquals(42, result);
+        assertEquals(42, result);
 
         // protected navigation
         script = jexl.createScript("$in[p]?.intValue()", "p");
         result = script.execute(ctxt, "fail");
-        Assert.assertNull(result);
+        assertNull(result);
         result = script.execute(ctxt, "stuff");
-        Assert.assertEquals(42, result);
+        assertEquals(42, result);
 
         // unprotected navigation
         script = jexl.createScript("$in.`${p}`.intValue()", "p");
         try {
             result = script.execute(ctxt, "fail");
-            Assert.fail("should have thrown a " + JexlException.Property.class);
+            fail("should have thrown a " + JexlException.Property.class);
         } catch (final JexlException xany) {
-            Assert.assertEquals(JexlException.Property.class, xany.getClass());
+            assertEquals(JexlException.Property.class, xany.getClass());
         }
         result = script.execute(ctxt, "stuff");
-        Assert.assertEquals(42, result);
+        assertEquals(42, result);
 
         // protected navigation
         script = jexl.createScript("$in.`${p}`?.intValue()", "p");
         result = script.execute(ctxt, "fail");
-        Assert.assertNull(result);
+        assertNull(result);
         result = script.execute(ctxt, "stuff");
-        Assert.assertEquals(42, result);
+        assertEquals(42, result);
 
     }
 
@@ -309,24 +311,24 @@ public class PropertyAccessTest extends JexlTestCase {
         // unprotected navigation
         script = jexl.createScript("$in[p].intValue()", "p");
         Object result = script.execute(ctxt, "fail");
-        Assert.assertNull(result);
+        assertNull(result);
 
         result = script.execute(ctxt, "stuff");
-        Assert.assertEquals(42, result);
+        assertEquals(42, result);
 
         // unprotected navigation
         script = jexl.createScript("$in.`${p}`.intValue()", "p");
         result = script.execute(ctxt, "fail");
-        Assert.assertNull(result);
+        assertNull(result);
         result = script.execute(ctxt, "stuff");
-        Assert.assertEquals(42, result);
+        assertEquals(42, result);
 
         // protected navigation
         script = jexl.createScript("$in.`${p}`?.intValue()", "p");
         result = script.execute(ctxt, "fail");
-        Assert.assertNull(result);
+        assertNull(result);
         result = script.execute(ctxt, "stuff");
-        Assert.assertEquals(42, result);
+        assertEquals(42, result);
     }
 
     @Test
@@ -338,50 +340,50 @@ public class PropertyAccessTest extends JexlTestCase {
         String stmt = "(x)->{ x?.class ?? 'oops' }";
         JexlScript script = engine.createScript(stmt);
         Object result = script.execute(ctx, "querty");
-        Assert.assertEquals("querty".getClass(), result);
+        assertEquals("querty".getClass(), result);
 
         // fail with unknown property
         stmt = "(x)->{ x.class1 ?? 'oops' }";
         script = engine.createScript(stmt);
         result = script.execute(ctx, "querty");
-        Assert.assertEquals("oops", result);
+        assertEquals("oops", result);
 
         // succeeds with jxlt & strict navigation
         ctx.set("al", "la");
         stmt = "(x)->{ x.`c${al}ss` ?? 'oops' }";
         script = engine.createScript(stmt);
         result = script.execute(ctx, "querty");
-        Assert.assertEquals("querty".getClass(), result);
+        assertEquals("querty".getClass(), result);
 
         // succeeds with jxlt & lenient navigation
         stmt = "(x)->{ x?.`c${al}ss` ?? 'oops' }";
         script = engine.createScript(stmt);
         result = script.execute(ctx, "querty");
-        Assert.assertEquals("querty".getClass(), result);
+        assertEquals("querty".getClass(), result);
 
         // fails with jxlt & lenient navigation
         stmt = "(x)->{ x?.`c${la}ss` ?? 'oops' }";
         script = engine.createScript(stmt);
         result = script.execute(ctx, "querty");
-        Assert.assertEquals("oops", result);
+        assertEquals("oops", result);
 
         // fails with jxlt & strict navigation
         stmt = "(x)->{ x.`c${la}ss` ?? 'oops' }";
         script = engine.createScript(stmt);
         result = script.execute(ctx, "querty");
-        Assert.assertEquals("oops", result);
+        assertEquals("oops", result);
 
         // fails with jxlt & lenient navigation
         stmt = "(x)->{ x?.`c${la--ss` ?? 'oops' }";
         script = engine.createScript(stmt);
         result = script.execute(ctx, "querty");
-        Assert.assertEquals("oops", result);
+        assertEquals("oops", result);
 
         // fails with jxlt & strict navigation
         stmt = "(x)->{ x.`c${la--ss` ?? 'oops' }";
         script = engine.createScript(stmt);
         result = script.execute(ctx, "querty");
-        Assert.assertEquals("oops", result);
+        assertEquals("oops", result);
     }
 
     @Test
@@ -395,49 +397,49 @@ public class PropertyAccessTest extends JexlTestCase {
         final int calls = pa.getCalls();
         final JexlScript getName = JEXL.createScript("foo.property.name", "foo");
         result = getName.execute(null, quux);
-        Assert.assertEquals("quux", result);
+        assertEquals("quux", result);
 
         final JexlScript get0 = JEXL.createScript("foo.property.0", "foo");
         result = get0.execute(null, quux);
-        Assert.assertEquals("quux", result);
+        assertEquals("quux", result);
 
         final JexlScript getNumber = JEXL.createScript("foo.property.number", "foo");
         result = getNumber.execute(null, quux);
-        Assert.assertEquals(42, result);
+        assertEquals(42, result);
 
         final JexlScript get1 = JEXL.createScript("foo.property.1", "foo");
         result = get1.execute(null, quux);
-        Assert.assertEquals(42, result);
+        assertEquals(42, result);
 
         final JexlScript setName = JEXL.createScript("foo.property.name = $0", "foo", "$0");
         setName.execute(null, quux, "QUUX");
         result = getName.execute(null, quux);
-        Assert.assertEquals("QUUX", result);
+        assertEquals("QUUX", result);
         result = get0.execute(null, quux);
-        Assert.assertEquals("QUUX", result);
+        assertEquals("QUUX", result);
 
         final JexlScript set0 = JEXL.createScript("foo.property.0 = $0", "foo", "$0");
         set0.execute(null, quux, "BAR");
         result = getName.execute(null, quux);
-        Assert.assertEquals("BAR", result);
+        assertEquals("BAR", result);
         result = get0.execute(null, quux);
-        Assert.assertEquals("BAR", result);
+        assertEquals("BAR", result);
 
         final JexlScript setNumber = JEXL.createScript("foo.property.number = $0", "foo", "$0");
         setNumber.execute(null, quux, -42);
         result = getNumber.execute(null, quux);
-        Assert.assertEquals(-42, result);
+        assertEquals(-42, result);
         result = get1.execute(null, quux);
-        Assert.assertEquals(-42, result);
+        assertEquals(-42, result);
 
         final JexlScript set1 = JEXL.createScript("foo.property.1 = $0", "foo", "$0");
         set1.execute(null, quux, 24);
         result = getNumber.execute(null, quux);
-        Assert.assertEquals(24, result);
+        assertEquals(24, result);
         result = get1.execute(null, quux);
-        Assert.assertEquals(24, result);
+        assertEquals(24, result);
 
-        Assert.assertEquals(calls, pa.getCalls());
+        assertEquals(calls, pa.getCalls());
     }
 
     @Test
@@ -449,36 +451,36 @@ public class PropertyAccessTest extends JexlTestCase {
 
         final JexlScript getName = jexl.createScript("foo.property.name", "foo");
         result = getName.execute(null, quux);
-        Assert.assertEquals("bar", result);
+        assertEquals("bar", result);
         final int calls = pa.getCalls();
         final JexlScript setName = jexl.createScript("foo.property.name = $0", "foo", "$0");
         setName.execute(null, quux, 123);
         result = getName.execute(null, quux);
-        Assert.assertEquals("123", result);
+        assertEquals("123", result);
         setName.execute(null, quux, 456);
         result = getName.execute(null, quux);
-        Assert.assertEquals("456", result);
-        Assert.assertEquals(calls + 2, pa.getCalls());
+        assertEquals("456", result);
+        assertEquals(calls + 2, pa.getCalls());
         setName.execute(null, quux, "quux");
         result = getName.execute(null, quux);
-        Assert.assertEquals("QUUX", result);
-        Assert.assertEquals(calls + 2, pa.getCalls());
+        assertEquals("QUUX", result);
+        assertEquals(calls + 2, pa.getCalls());
 
         final JexlScript getNumber = jexl.createScript("foo.property.number", "foo");
         result = getNumber.execute(null, quux);
-        Assert.assertEquals(169, result);
+        assertEquals(169, result);
         final JexlScript setNumber = jexl.createScript("foo.property.number = $0", "foo", "$0");
         setNumber.execute(null, quux, 42);
         result = getNumber.execute(null, quux);
-        Assert.assertEquals(1042, result);
+        assertEquals(1042, result);
         setNumber.execute(null, quux, 24);
         result = getNumber.execute(null, quux);
-        Assert.assertEquals(1024, result);
-        Assert.assertEquals(calls + 4, pa.getCalls());
+        assertEquals(1024, result);
+        assertEquals(calls + 4, pa.getCalls());
         setNumber.execute(null, quux, "42");
         result = getNumber.execute(null, quux);
-        Assert.assertEquals(1042, result);
-        Assert.assertEquals(calls + 4, pa.getCalls());
+        assertEquals(1042, result);
+        assertEquals(calls + 4, pa.getCalls());
     }
 
     @Test
@@ -543,21 +545,21 @@ public class PropertyAccessTest extends JexlTestCase {
         foo.put("q u u x", "456");
         JexlExpression e = JEXL.createExpression("foo.\"q u u x\"");
         Object result = e.evaluate(jc);
-        Assert.assertEquals("456", result);
+        assertEquals("456", result);
         e = JEXL.createExpression("foo.'q u u x'");
         result = e.evaluate(jc);
-        Assert.assertEquals("456", result);
+        assertEquals("456", result);
         JexlScript s = JEXL.createScript("foo.\"q u u x\"");
         result = s.execute(jc);
-        Assert.assertEquals("456", result);
+        assertEquals("456", result);
         s = JEXL.createScript("foo.'q u u x'");
         result = s.execute(jc);
-        Assert.assertEquals("456", result);
+        assertEquals("456", result);
 
         final Debugger dbg = new Debugger();
         dbg.debug(e);
         final String dbgdata = dbg.toString();
-        Assert.assertEquals("foo.'q u u x'", dbgdata);
+        assertEquals("foo.'q u u x'", dbgdata);
     }
 
 }

@@ -16,6 +16,8 @@
  */
 package org.apache.commons.jexl3;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -89,7 +91,7 @@ public final class JexlTest extends JexlTestCase {
     protected void assertExpression(final JexlContext jc, final String expression, final Object expected) throws Exception {
         final JexlExpression e = JEXL.createExpression(expression);
         final Object actual = e.evaluate(jc);
-        Assert.assertEquals(expression, expected, actual);
+        assertEquals(expected, actual, expression);
     }
 
     @Test
@@ -119,13 +121,13 @@ public final class JexlTest extends JexlTestCase {
         Object result;
         expr = jexl.createExpression("array.1");
         result = expr.evaluate(jc);
-        Assert.assertEquals(expr.toString(), 101, result);
+        assertEquals(101, result);
         expr = jexl.createExpression("array[1] = 1010");
         result = expr.evaluate(jc);
-        Assert.assertEquals(expr.toString(), 1010, result);
+        assertEquals(1010, result, expr::toString);
         expr = jexl.createExpression("array.0");
         result = expr.evaluate(jc);
-        Assert.assertEquals(expr.toString(), 100, result);
+        assertEquals(100, result, expr::toString);
     }
 
     /**
@@ -142,12 +144,12 @@ public final class JexlTest extends JexlTestCase {
         parser.parse(null, new JexlFeatures().register(false), "aString = 'World';", null);
 
         assertExpression(jc, "hello = 'world'", "world");
-        Assert.assertEquals("hello variable not changed", "world", jc.get("hello"));
+        assertEquals("world", jc.get("hello"), "hello variable not changed");
         assertExpression(jc, "result = 1 + 1", Integer.valueOf(2));
-        Assert.assertEquals("result variable not changed", Integer.valueOf(2), jc.get("result"));
+        assertEquals(Integer.valueOf(2), jc.get("result"), "result variable not changed");
         // todo: make sure properties can be assigned to, fall back to flat var if no property
         // assertExpression(jc, "foo.property1 = '99'", "99");
-        // Assert.assertEquals("property not set", "99", foo.getProperty1());
+        // assertEquals("property not set", "99", foo.getProperty1());
     }
 
     /**
@@ -158,7 +160,7 @@ public final class JexlTest extends JexlTestCase {
     public void testBadParse() throws Exception {
         try {
             assertExpression(new MapContext(), "empty()", null);
-            Assert.fail("Bad expression didn't throw ParseException");
+            fail("Bad expression didn't throw ParseException");
         } catch (final JexlException pe) {
             // expected behavior
         }
@@ -206,13 +208,13 @@ public final class JexlTest extends JexlTestCase {
         jc.set("foo", tester);
         final JexlExpression expr = JEXL.createExpression("first and foo.trueAndModify");
         expr.evaluate(jc);
-        Assert.assertFalse("Short circuit failure: rhs evaluated when lhs FALSE", tester.getModified());
+        assertFalse(tester.getModified(), "Short circuit failure: rhs evaluated when lhs FALSE");
         // handle true for the left arg of 'and'
         tester = new Foo();
         jc.set("first", Boolean.TRUE);
         jc.set("foo", tester);
         expr.evaluate(jc);
-        Assert.assertTrue("Short circuit failure: rhs not evaluated when lhs TRUE", tester.getModified());
+        assertTrue(tester.getModified(), "Short circuit failure: rhs not evaluated when lhs TRUE");
     }
 
     /**
@@ -228,13 +230,13 @@ public final class JexlTest extends JexlTestCase {
         jc.set("foo", tester);
         final JexlExpression expr = JEXL.createExpression("first or foo.trueAndModify");
         expr.evaluate(jc);
-        Assert.assertTrue("Short circuit failure: rhs not evaluated when lhs FALSE", tester.getModified());
+        assertTrue(tester.getModified(), "Short circuit failure: rhs not evaluated when lhs FALSE");
         // handle true for the left arg of 'or'
         tester = new Foo();
         jc.set("first", Boolean.TRUE);
         jc.set("foo", tester);
         expr.evaluate(jc);
-        Assert.assertFalse("Short circuit failure: rhs evaluated when lhs TRUE", tester.getModified());
+        assertFalse(tester.getModified(), "Short circuit failure: rhs evaluated when lhs TRUE");
     }
 
     /**
@@ -382,22 +384,22 @@ public final class JexlTest extends JexlTestCase {
         Object result;
         expr = jexl.createExpression("duck.zero");
         result = expr.evaluate(jc);
-        Assert.assertEquals(expr.toString(), 0, result);
+        assertEquals(0, result, expr::toString);
         expr = jexl.createExpression("duck.one");
         result = expr.evaluate(jc);
-        Assert.assertEquals(expr.toString(), 1, result);
+        assertEquals(1, result, expr::toString);
         expr = jexl.createExpression("duck.user = 20");
         result = expr.evaluate(jc);
-        Assert.assertEquals(expr.toString(), 20, result);
+        assertEquals(20, result, expr::toString);
         expr = jexl.createExpression("duck.user");
         result = expr.evaluate(jc);
-        Assert.assertEquals(expr.toString(), 20, result);
+        assertEquals(20, result, expr::toString);
         expr = jexl.createExpression("duck.user = 'zero'");
         result = expr.evaluate(jc);
-        Assert.assertEquals(expr.toString(), "zero", result);
+        assertEquals("zero", result, expr::toString);
         expr = jexl.createExpression("duck.user");
         result = expr.evaluate(jc);
-        Assert.assertEquals(expr.toString(), 0, result);
+        assertEquals(0, result, expr::toString);
     }
 
     @Test
@@ -513,8 +515,8 @@ public final class JexlTest extends JexlTestCase {
         final Foo foo = new Foo();
 
         // lets check the square function first..
-        Assert.assertEquals(4, foo.square(2));
-        Assert.assertEquals(4, foo.square(-2));
+        assertEquals(4, foo.square(2));
+        assertEquals(4, foo.square(-2));
 
         final JexlContext jc = new MapContext();
         jc.set("foo", foo);
@@ -584,13 +586,13 @@ public final class JexlTest extends JexlTestCase {
         Object value;
         expr = JEXL.createExpression("new(double, 1)");
         value = expr.evaluate(jc);
-        Assert.assertEquals(expr.toString(), Double.valueOf(1.0), value);
+        assertEquals(Double.valueOf(1.0), value, expr::toString);
         expr = JEXL.createExpression("new('java.lang.Float', 100)");
         value = expr.evaluate(jc);
-        Assert.assertEquals(expr.toString(), Float.valueOf((float) 100.0), value);
+        assertEquals(Float.valueOf((float) 100.0), value, expr::toString);
         expr = JEXL.createExpression("new(foo).quux");
         value = expr.evaluate(jc);
-        Assert.assertEquals(expr.toString(), "String : quux", value);
+        assertEquals("String : quux", value, expr::toString);
     }
 
     @Test
@@ -600,7 +602,7 @@ public final class JexlTest extends JexlTestCase {
         Object result;
         expr = jexl.createExpression("new LinkedList([1,2,3,...])");
         result = expr.evaluate(null);
-        Assert.assertTrue(result instanceof LinkedList);
+        assertTrue(result instanceof LinkedList);
     }
 
     /**
@@ -684,8 +686,8 @@ public final class JexlTest extends JexlTestCase {
         jc.set("foo", new Foo());
         final Object o = e.evaluate(jc);
 
-        Assert.assertTrue("o not instanceof String", o instanceof String);
-        Assert.assertEquals("o incorrect", GET_METHOD_STRING, o);
+        assertTrue(o instanceof String, "o not instanceof String");
+        assertEquals(GET_METHOD_STRING, o, "o incorrect");
     }
 
     @Test
@@ -808,7 +810,7 @@ public final class JexlTest extends JexlTestCase {
     public void testToString() throws Exception {
         final String code = "abcd";
         final JexlExpression expr = JEXL.createExpression(code);
-        Assert.assertEquals("Bad expression value", code, expr.toString());
+        assertEquals(code, expr.toString(), "Bad expression value");
     }
 
     @Test

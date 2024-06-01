@@ -16,6 +16,8 @@
  */
 package org.example;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -77,11 +79,11 @@ public class SomeTest {
     String src = "`Call ${x}`";
     JexlScript script = jexl.createScript(src, "x");
     Object result = script.execute(null, 406);
-    Assert.assertEquals("Call 406", result);
-    Assert.assertEquals(1, CALL406.get());
+    assertEquals("Call 406", result);
+    assertEquals(1, CALL406.get());
     result = script.execute(null, 42);
-    Assert.assertEquals("Call 42", result);
-    Assert.assertEquals(2, CALL406.get());
+    assertEquals("Call 42", result);
+    assertEquals(2, CALL406.get());
   }
 
   /**
@@ -97,6 +99,6 @@ public class SomeTest {
       jc.set("pi", Math.PI);
       JexlExpression e = jexl.createExpression("math:cos(pi)");
       Number result = (Number) e.evaluate(jc);
-      Assert.assertEquals(-1, result.intValue());
+      assertEquals(-1, result.intValue());
   }
 }

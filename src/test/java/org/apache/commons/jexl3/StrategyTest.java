@@ -16,6 +16,8 @@
  */
 package org.apache.commons.jexl3;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -65,48 +67,48 @@ public class StrategyTest extends JexlTestCase {
 
         i.put("class", 42);
         result = jexl.createScript("i['class'] ", "i").execute((JexlContext)null, i);
-        Assert.assertEquals(42, result);
+        assertEquals(42, result);
         result = jexl.createScript("i['class'] = 28", "i").execute((JexlContext)null, i);
-        Assert.assertEquals(28, result);
-        Assert.assertEquals(28, i.get("class"));
+        assertEquals(28, result);
+        assertEquals(28, i.get("class"));
         result = jexl.createScript("i.class", "i").execute((JexlContext)null, i);
         if (std) {
-            Assert.assertEquals(java.util.HashMap.class, result);
+            assertEquals(java.util.HashMap.class, result);
         } else {
-            Assert.assertEquals(28, result);
+            assertEquals(28, result);
         }
         result = jexl.createScript("i.'class'", "i").execute((JexlContext)null, i);
         if (std) {
-            Assert.assertEquals(java.util.HashMap.class, result);
+            assertEquals(java.util.HashMap.class, result);
         } else {
-            Assert.assertEquals(28, result);
+            assertEquals(28, result);
         }
 
         i.put("size", 4242);
         result = jexl.createScript("i['size'] ", "i").execute((JexlContext)null, i);
-        Assert.assertEquals(4242 ,result);
+        assertEquals(4242 ,result);
         result = jexl.createScript("i['size'] = 2828", "i").execute((JexlContext)null, i);
-        Assert.assertEquals(2828, result);
-        Assert.assertEquals(2828, i.get("size"));
+        assertEquals(2828, result);
+        assertEquals(2828, i.get("size"));
         result = jexl.createScript("i.'size'", "i").execute((JexlContext)null, i);
-        Assert.assertEquals(2828, result);
+        assertEquals(2828, result);
         result = jexl.createScript("size i", "i").execute((JexlContext)null, i);
-        Assert.assertEquals(2, result);
+        assertEquals(2, result);
 
         i.put("empty", 424242);
         result = jexl.createScript("i['empty'] ", "i").execute((JexlContext)null, i);
-        Assert.assertEquals(424242, result);
+        assertEquals(424242, result);
         result = jexl.createScript("i['empty'] = 282828", "i").execute((JexlContext)null, i);
-        Assert.assertEquals(282828, result);
-        Assert.assertEquals(282828, i.get("empty"));
+        assertEquals(282828, result);
+        assertEquals(282828, i.get("empty"));
         result = jexl.createScript("i.'empty'", "i").execute((JexlContext)null, i);
         if (std) {
-        Assert.assertNotEquals(282828, result);
+        assertNotEquals(282828, result);
         } else {
-            Assert.assertEquals(282828, result);
+            assertEquals(282828, result);
         }
         result = jexl.createScript("empty i", "i").execute((JexlContext)null, i);
-        Assert.assertFalse((Boolean) result);
+        assertFalse((Boolean) result);
     }
 
     @Test
@@ -134,13 +136,13 @@ public class StrategyTest extends JexlTestCase {
         final JexlUberspect uberspect = jexl.getUberspect();
         final JexlUberspect.PropertyResolver rfieldp = JexlUberspect.JexlResolver.FIELD;
         final JexlPropertyGet fget = rfieldp.getPropertyGet(uberspect, map, "key");
-        Assert.assertNull(fget);
+        assertNull(fget);
         final JexlPropertySet fset = rfieldp.getPropertySet(uberspect, map, "key", "value");
-        Assert.assertNull(fset);
+        assertNull(fset);
         final JexlUberspect.PropertyResolver rmap = JexlUberspect.JexlResolver.MAP;
         final JexlPropertyGet mget = rmap.getPropertyGet(uberspect, map, "key");
-        Assert.assertNotNull(mget);
+        assertNotNull(mget);
         final JexlPropertySet mset = rmap.getPropertySet(uberspect, map, "key", "value");
-        Assert.assertNotNull(mset);
+        assertNotNull(mset);
     }
 }

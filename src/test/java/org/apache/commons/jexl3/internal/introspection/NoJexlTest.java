@@ -16,6 +16,8 @@
  */
 package org.apache.commons.jexl3.internal.introspection;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -83,55 +85,55 @@ public class NoJexlTest {
     @Test
     public void testNoJexlPermissions() throws Exception {
         final Permissions p = Permissions.UNRESTRICTED;
-        Assert.assertFalse(p.allow((Field) null));
-        Assert.assertFalse(p.allow((Package) null));
-        Assert.assertFalse(p.allow((Method) null));
-        Assert.assertFalse(p.allow((Constructor<?>) null));
-        Assert.assertFalse(p.allow((Class<?>) null));
+        assertFalse(p.allow((Field) null));
+        assertFalse(p.allow((Package) null));
+        assertFalse(p.allow((Method) null));
+        assertFalse(p.allow((Constructor<?>) null));
+        assertFalse(p.allow((Class<?>) null));
 
-        Assert.assertFalse(p.allow(A2.class));
-        Assert.assertTrue(p.allow(A3.class));
-        Assert.assertTrue(p.allow(A5.class));
+        assertFalse(p.allow(A2.class));
+        assertTrue(p.allow(A3.class));
+        assertTrue(p.allow(A5.class));
 
         final Method mA = A.class.getMethod("method");
-        Assert.assertNotNull(mA);
+        assertNotNull(mA);
         final Method mA0 = A0.class.getMethod("method");
-        Assert.assertNotNull(mA0);
+        assertNotNull(mA0);
         final Method mA1 = A1.class.getMethod("method");
-        Assert.assertNotNull(mA1);
+        assertNotNull(mA1);
         final Method mA2 = A2.class.getMethod("method");
-        Assert.assertNotNull(mA2);
+        assertNotNull(mA2);
         final Method mA3 = A2.class.getDeclaredMethod("method");
-        Assert.assertNotNull(mA3);
+        assertNotNull(mA3);
 
-        Assert.assertTrue(p.allow(mA));
-        Assert.assertFalse(p.allow(mA0));
-        Assert.assertFalse(p.allow(mA1));
-        Assert.assertFalse(p.allow(mA2));
-        Assert.assertFalse(p.allow(mA3));
+        assertTrue(p.allow(mA));
+        assertFalse(p.allow(mA0));
+        assertFalse(p.allow(mA1));
+        assertFalse(p.allow(mA2));
+        assertFalse(p.allow(mA3));
 
         final Field fA = A.class.getField("i");
-        Assert.assertNotNull(fA);
-        Assert.assertTrue(p.allow(fA));
+        assertNotNull(fA);
+        assertTrue(p.allow(fA));
 
         final Field fA0 = A0.class.getField("i0");
-        Assert.assertNotNull(fA0);
-        Assert.assertFalse(p.allow(fA0));
+        assertNotNull(fA0);
+        assertFalse(p.allow(fA0));
         final Field fA1 = A1.class.getDeclaredField("i1");
-        Assert.assertNotNull(fA1);
-        Assert.assertFalse(p.allow(fA0));
+        assertNotNull(fA1);
+        assertFalse(p.allow(fA0));
 
         final Constructor<?> cA = A.class.getConstructor();
-        Assert.assertNotNull(cA);
-        Assert.assertTrue(p.allow(cA));
+        assertNotNull(cA);
+        assertTrue(p.allow(cA));
 
         final Constructor<?> cA0 = A0.class.getConstructor();
-        Assert.assertNotNull(cA0);
-        Assert.assertFalse(p.allow(cA0));
+        assertNotNull(cA0);
+        assertFalse(p.allow(cA0));
 
         final Constructor<?> cA3 = A3.class.getDeclaredConstructor();
-        Assert.assertNotNull(cA3);
-        Assert.assertFalse(p.allow(cA3));
+        assertNotNull(cA3);
+        assertFalse(p.allow(cA3));
     }
 
 }

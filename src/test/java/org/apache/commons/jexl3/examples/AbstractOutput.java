@@ -17,6 +17,8 @@
 
 package org.apache.commons.jexl3.examples;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import org.junit.Assert;
 
 /**
@@ -29,7 +31,7 @@ public abstract class AbstractOutput {
     public static final AbstractOutput JUNIT = new AbstractOutput() {
         @Override
         public void print(final String expr, final Object actual, final Object expected) {
-            Assert.assertEquals(expr, expected, actual);
+            assertEquals(expected, actual, expr);
         }
     };
 

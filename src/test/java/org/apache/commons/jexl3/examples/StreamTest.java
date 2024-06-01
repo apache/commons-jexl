@@ -16,6 +16,8 @@
  */
 package org.apache.commons.jexl3.examples;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import static java.lang.Boolean.TRUE;
 
 import java.net.URI;
@@ -133,11 +135,11 @@ public class StreamTest {
             "list.filter(uri -> uri.scheme =^ 'http')",
             "list");
         final Object filtered = filter.execute(sctxt, uris);
-        Assert.assertTrue(filtered instanceof List<?>);
+        assertTrue(filtered instanceof List<?>);
         List<URI> result = (List<URI>) filtered;
-        Assert.assertEquals(2, result.size());
+        assertEquals(2, result.size());
         for(URI uri : result) {
-            Assert.assertTrue(uri.getScheme().startsWith("http"));
+            assertTrue(uri.getScheme().startsWith("http"));
         }
 
         // map, all results scheme now 'https'
@@ -145,11 +147,11 @@ public class StreamTest {
             "list.map(uri -> uri.scheme =^ 'http'? URI:create(`https://${uri.host}`) : null)",
             "list");
         final Object transformed = mapper.execute(sctxt, uris);
-        Assert.assertTrue(transformed instanceof List<?>);
+        assertTrue(transformed instanceof List<?>);
         result = (List<URI>) transformed;
-        Assert.assertEquals(2, result.size());
+        assertEquals(2, result.size());
         for(URI uri : result) {
-          Assert.assertEquals("https", uri.getScheme());
+          assertEquals("https", uri.getScheme());
         }
     }
 
@@ -167,7 +169,7 @@ public class StreamTest {
                 .map(uri -> uri.getScheme().startsWith("http")? "https://" + uri.getHost() : null)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
-        Assert.assertEquals(2, control.size());
+        assertEquals(2, control.size());
 
         // Create scripts:
         // uri is the name of the variable used as parameter; the beans are exposed as properties
@@ -185,7 +187,7 @@ public class StreamTest {
         sctxt.set("mapper", mapper);
 
         final Object transformed = transform.execute(sctxt, uris);
-        Assert.assertTrue(transformed instanceof List<?>);
-        Assert.assertEquals(control, transformed);
+        assertTrue(transformed instanceof List<?>);
+        assertEquals(control, transformed);
     }
 }

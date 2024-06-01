@@ -16,6 +16,8 @@
  */
 package org.apache.commons.jexl3;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -41,10 +43,10 @@ public class ForEachTest extends JexlTestCase {
     public void testForEachBreakBroken() throws Exception {
         try {
             final JexlScript e = JEXL.createScript("if (true) { break; }");
-            Assert.fail("break is out of loop!");
+            fail("break is out of loop!");
         } catch (final JexlException.Parsing xparse) {
             final String str = xparse.detailedMessage();
-            Assert.assertTrue(str.contains("break"));
+            assertTrue(str.contains("break"));
         }
     }
 
@@ -56,17 +58,17 @@ public class ForEachTest extends JexlTestCase {
         final JexlContext jc = new MapContext();
         jc.set("list", new Foo());
         final Object o = e.execute(jc);
-        Assert.assertEquals("Result is not last evaluated expression", 3, o);
+        assertEquals(3, o, "Result is not last evaluated expression");
     }
 
     @Test
     public void testForEachContinueBroken() throws Exception {
         try {
             final JexlScript e = JEXL.createScript("var rr = 0; continue;");
-            Assert.fail("continue is out of loop!");
+            fail("continue is out of loop!");
         } catch (final JexlException.Parsing xparse) {
             final String str = xparse.detailedMessage();
-            Assert.assertTrue(str.contains("continue"));
+            assertTrue(str.contains("continue"));
         }
     }
 
@@ -78,7 +80,7 @@ public class ForEachTest extends JexlTestCase {
         final JexlContext jc = new MapContext();
         jc.set("list", new Foo());
         final Object o = e.execute(jc);
-        Assert.assertEquals("Result is not last evaluated expression", 15, o);
+        assertEquals(15, o, "Result is not last evaluated expression");
     }
 
     @Test
@@ -87,7 +89,7 @@ public class ForEachTest extends JexlTestCase {
         final JexlContext jc = new MapContext();
         jc.set("list", new Object[]{"Hello", "World"});
         final Object o = e.execute(jc);
-        Assert.assertEquals("Result is not last evaluated expression", "World", o);
+        assertEquals("World", o, "Result is not last evaluated expression");
     }
 
     @Test
@@ -97,8 +99,8 @@ public class ForEachTest extends JexlTestCase {
         jc.set("list", new Object[]{2, 3});
             jc.set("x", Integer.valueOf(1));
         final Object o = exs0.execute(jc);
-            Assert.assertEquals("Result is wrong", Integer.valueOf(6), o);
-            Assert.assertEquals("x is wrong", Integer.valueOf(6), jc.get("x"));
+            assertEquals(Integer.valueOf(6), o, "Result is wrong");
+            assertEquals(Integer.valueOf(6), jc.get("x"), "x is wrong");
         }
 
     @Test
@@ -107,7 +109,7 @@ public class ForEachTest extends JexlTestCase {
         final JexlContext jc = new MapContext();
         jc.set("list", Arrays.asList("Hello", "World"));
         final Object o = e.execute(jc);
-        Assert.assertEquals("Result is not last evaluated expression", "World", o);
+        assertEquals("World", o, "Result is not last evaluated expression");
     }
 
     @Test
@@ -117,7 +119,7 @@ public class ForEachTest extends JexlTestCase {
         jc.set("list", Collections.emptyList());
 
         final Object o = e.execute(jc);
-        Assert.assertNull("Result is not null", o);
+        assertNull(o);
     }
 
     @Test
@@ -127,7 +129,7 @@ public class ForEachTest extends JexlTestCase {
         jc.set("list", Collections.emptyList());
 
         final Object o = e.execute(jc);
-        Assert.assertNull("Result is not null", o);
+        assertNull(o);
     }
 
     @Test
@@ -136,7 +138,7 @@ public class ForEachTest extends JexlTestCase {
         final JexlContext jc = new MapContext();
         jc.set("list", new StringTokenizer("Hello,World", ","));
         final Object o = e.execute(jc);
-        Assert.assertEquals("Result is not last evaluated expression", "World", o);
+        assertEquals("World", o, "Result is not last evaluated expression");
     }
 
     @Test
@@ -145,7 +147,7 @@ public class ForEachTest extends JexlTestCase {
         final JexlContext jc = new MapContext();
         jc.set("list", Arrays.asList("Hello", "World").iterator());
         final Object o = e.execute(jc);
-        Assert.assertEquals("Result is not last evaluated expression", "World", o);
+        assertEquals("World", o, "Result is not last evaluated expression");
     }
 
     @Test
@@ -154,7 +156,7 @@ public class ForEachTest extends JexlTestCase {
         final JexlContext jc = new MapContext();
         jc.set("list", new Foo());
         final Object o = e.execute(jc);
-        Assert.assertEquals("Result is not last evaluated expression", "brie", o);
+        assertEquals("brie", o, "Result is not last evaluated expression");
     }
 
     @Test
@@ -165,7 +167,7 @@ public class ForEachTest extends JexlTestCase {
         final String lastKey = (String) new ArrayList<Object>(map.keySet()).get(System.getProperties().size() - 1);
         jc.set("list", map);
         final Object o = e.execute(jc);
-        Assert.assertEquals("Result is not last evaluated expression", lastKey, o);
+        assertEquals(lastKey, o, "Result is not last evaluated expression");
     }
 
     @Test
@@ -176,7 +178,7 @@ public class ForEachTest extends JexlTestCase {
         final String lastProperty = (String) new ArrayList<Object>(map.values()).get(System.getProperties().size() - 1);
         jc.set("list", map);
         final Object o = e.execute(jc);
-        Assert.assertEquals("Result is not last evaluated expression", lastProperty, o);
+        assertEquals(lastProperty, o, "Result is not last evaluated expression");
     }
 
     @Test
@@ -185,7 +187,7 @@ public class ForEachTest extends JexlTestCase {
         final JexlContext jc = new MapContext();
         jc.set("list", new Foo());
         final Object o = e.execute(jc);
-        Assert.assertEquals("Result is not last evaluated expression", "brie", o);
+        assertEquals("brie", o, "Result is not last evaluated expression");
     }
 
     @Test public void testForLoop0a() {
@@ -194,10 +196,10 @@ public class ForEachTest extends JexlTestCase {
         final JexlScript script = jexl.createScript(src);
         final List<Integer> l = new ArrayList<>();
         final Object result = script.execute(null, l);
-        Assert.assertNotNull(result);
-        Assert.assertEquals(Arrays.asList(0, 1, 2, 3), l);
+        assertNotNull(result);
+        assertEquals(Arrays.asList(0, 1, 2, 3), l);
         final String resrc = toString(script);
-        Assert.assertEquals(src, resrc);
+        assertEquals(src, resrc);
     }
 
     @Test public void testForLoop0b0() {
@@ -206,9 +208,9 @@ public class ForEachTest extends JexlTestCase {
         final JexlScript script = jexl.createScript(src);
         final List<Integer> l = new ArrayList<>();
         final Object result = script.execute(null, l);
-        Assert.assertNotNull(result);
-        Assert.assertEquals(Arrays.asList(0, 1, 2, 3), l);
+        assertNotNull(result);
+        assertEquals(Arrays.asList(0, 1, 2, 3), l);
         final String resrc = toString(script);
-        Assert.assertEquals(src, resrc);
+        assertEquals(src, resrc);
     }
 }

@@ -16,6 +16,8 @@
  */
 package org.apache.commons.jexl3;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import java.io.Serializable;
 import java.util.AbstractCollection;
 import java.util.AbstractList;
@@ -80,7 +82,7 @@ public class ArrayTypeTest {
         .create();
     // Super for ClassC
     Set<Class<?>> superSet = ClassMisc.getSuperClasses(ClassC.class);
-    Assert.assertTrue(superSet.size() > 0);
+    assertTrue(superSet.size() > 0);
     // verify the order
     List<Class<?>> ordered = Arrays.asList(
         ClassB.class, ClassA.class, Class0.class,
@@ -88,28 +90,28 @@ public class ArrayTypeTest {
         InterA.class, Inter0.class);
     int i = 0;
     for(Class<?> clazz : superSet) {
-      Assert.assertEquals("order " + i, clazz, ordered.get(i++));
+      assertEquals(clazz, ordered.get(i++), "order " + i);
     }
     // intersect ClassC, ClassX -> Class0
     Class<?> inter = ClassMisc.getCommonSuperClass(ClassC.class, ClassX.class);
-    Assert.assertEquals(Class0.class, inter);
+    assertEquals(Class0.class, inter);
 
     // intersect ClassC, ClassB -> ClassB
     inter = ClassMisc.getCommonSuperClass(ClassC.class, ClassB.class);
-    Assert.assertEquals(ClassB.class, inter);
+    assertEquals(ClassB.class, inter);
 
     // intersect ArrayList, ArrayDeque -> AbstractCollection
     Class<?> list = ClassMisc.getCommonSuperClass(ArrayList.class, ArrayDeque.class);
-    Assert.assertEquals(list, AbstractCollection.class);
+    assertEquals(list, AbstractCollection.class);
 
     Set<Class<?>> sset = ClassMisc.getSuperClasses(ArrayList.class, ArrayDeque.class);
-    Assert.assertFalse(sset.isEmpty());
+    assertFalse(sset.isEmpty());
     // in java 21, a SequenceCollection interface is added to the sset
     List<Class<?>> expected = Arrays.asList(AbstractCollection.class, Collection.class, Iterable.class, Cloneable.class, Serializable.class);
-    Assert.assertTrue(sset.containsAll(expected));
+    assertTrue(sset.containsAll(expected));
 
     Class<?> collection = ClassMisc.getCommonSuperClass(ArrayList.class, Collections.emptyList().getClass());
-    Assert.assertEquals(AbstractList.class, collection);
+    assertEquals(AbstractList.class, collection);
     collection = ClassMisc.getSuperClasses(ArrayList.class, Collections.emptyList().getClass())
                           .stream().findFirst().orElse(Object.class);
 
@@ -124,28 +126,28 @@ public class ArrayTypeTest {
     script = jexl.createScript("[ a, b, c, d ]", "a", "b", "c", "d");
     // intersect a, b, c, c -> classA
     result = script.execute(null, a, b, c, c);
-    Assert.assertTrue(result.getClass().isArray()
+    assertTrue(result.getClass().isArray()
         && result.getClass().getComponentType().equals(ClassA.class));
 
     // intersect a, b, c, x -> class0
     result = script.execute(null, a, b, c, x);
-    Assert.assertTrue(result.getClass().isArray()
+    assertTrue(result.getClass().isArray()
         && result.getClass().getComponentType().equals(Class0.class));
 
     // intersect x, c, b, a -> class0
     result = script.execute(null, x, c, b, a);
-    Assert.assertTrue(result.getClass().isArray()
+    assertTrue(result.getClass().isArray()
         & result.getClass().getComponentType().equals(Class0.class));
 
     // intersect a, b, c, d -> inter0
     Object d = new ClassD();
     result = script.execute(null, a, b, c, d);
-    Assert.assertTrue(result.getClass().isArray()
+    assertTrue(result.getClass().isArray()
         && result.getClass().getComponentType().equals(Inter0.class));
 
     script = jexl.createScript("[ a, b, c, d, ... ]", "a", "b", "c", "d");
     // intersect a, b, c, c -> classA
     result = script.execute(null, a, b, c, c);
-    Assert.assertTrue(result instanceof List);
+    assertTrue(result instanceof List);
   }
 }

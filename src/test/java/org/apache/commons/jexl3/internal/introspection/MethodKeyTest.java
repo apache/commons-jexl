@@ -16,6 +16,8 @@
  */
 package org.apache.commons.jexl3.internal.introspection;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -117,14 +119,14 @@ public class MethodKeyTest {
     void checkKey(final String method, final Class<?>... params) {
         final MethodKey key = makeKey(method, params);
         final String out = BY_KEY.get(key);
-        Assert.assertNotNull(out);
+        assertNotNull(out);
     }
 
     /** Checks that a string key does exist */
     void checkStringKey(final String method, final Class<?>... params) {
         final String key = makeStringKey(method, params);
         final MethodKey out = BY_STRING.get(key);
-        Assert.assertNotNull(out);
+        assertNotNull(out);
     }
 
     /** Builds a method key */
@@ -145,7 +147,7 @@ public class MethodKeyTest {
     public void testDebugString() throws Exception {
         final MethodKey c = KEY_LIST[0];
         final String str = c.debugString();
-        Assert.assertNotNull(str);
+        assertNotNull(str);
     }
 
     @Test
@@ -153,8 +155,8 @@ public class MethodKeyTest {
         for (final MethodKey ctl : KEY_LIST) {
             final MethodKey key = makeKey(ctl.getMethod(), ctl.getParameters());
             final String out = BY_KEY.get(key);
-            Assert.assertNotNull(out);
-            Assert.assertEquals(ctl.toString() + " != " + out, ctl.toString(), out);
+            assertNotNull(out);
+            assertEquals(ctl.toString(), out, () -> ctl.toString() + " != " + out);
         }
 
     }
@@ -164,7 +166,7 @@ public class MethodKeyTest {
             for (final MethodKey ctl : KEY_LIST) {
                 final MethodKey key = makeKey(ctl.getMethod(), ctl.getParameters());
                 final String out = BY_KEY.get(key);
-                Assert.assertNotNull(out);
+                assertNotNull(out);
             }
         }
     }
@@ -192,7 +194,7 @@ public class MethodKeyTest {
             for (final MethodKey ctl : KEY_LIST) {
                 final String key = makeStringKey(ctl.getMethod(), ctl.getParameters());
                 final MethodKey out = BY_STRING.get(key);
-                Assert.assertNotNull(out);
+                assertNotNull(out);
             }
         }
     }
@@ -219,8 +221,8 @@ public class MethodKeyTest {
         for (final MethodKey ctl : KEY_LIST) {
             final String key = makeStringKey(ctl.getMethod(), ctl.getParameters());
             final MethodKey out = BY_STRING.get(key);
-            Assert.assertNotNull(out);
-            Assert.assertEquals(ctl.toString() + " != " + key, ctl, out);
+            assertNotNull(out);
+            assertEquals(ctl, out, ctl.toString() + " != " + key);
         }
 
     }

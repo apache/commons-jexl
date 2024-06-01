@@ -16,6 +16,8 @@
  */
 package org.apache.commons.jexl3.internal.introspection;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import static org.apache.commons.jexl3.introspection.JexlPermissions.RESTRICTED;
 
 import java.lang.reflect.Constructor;
@@ -160,74 +162,74 @@ public class PermissionsTest {
     }
 
     private void runTestPermissions(final JexlPermissions p) throws Exception {
-        Assert.assertFalse(p.allow((Field) null));
-        Assert.assertFalse(p.allow((Package) null));
-        Assert.assertFalse(p.allow((Method) null));
-        Assert.assertFalse(p.allow((Constructor<?>) null));
-        Assert.assertFalse(p.allow((Class<?>) null));
+        assertFalse(p.allow((Field) null));
+        assertFalse(p.allow((Package) null));
+        assertFalse(p.allow((Method) null));
+        assertFalse(p.allow((Constructor<?>) null));
+        assertFalse(p.allow((Class<?>) null));
 
-        Assert.assertFalse(p.allow(A2.class));
-        Assert.assertTrue(p.allow(A3.class));
-        Assert.assertTrue(p.allow(A5.class));
+        assertFalse(p.allow(A2.class));
+        assertTrue(p.allow(A3.class));
+        assertTrue(p.allow(A5.class));
 
         final Method mA = A.class.getMethod("method");
-        Assert.assertNotNull(mA);
+        assertNotNull(mA);
         final Method mA0 = A0.class.getMethod("method");
-        Assert.assertNotNull(mA0);
+        assertNotNull(mA0);
         final Method mA1 = A1.class.getMethod("method");
-        Assert.assertNotNull(mA1);
+        assertNotNull(mA1);
         final Method mA2 = A2.class.getMethod("method");
-        Assert.assertNotNull(mA2);
+        assertNotNull(mA2);
         final Method mA3 = A2.class.getDeclaredMethod("method");
-        Assert.assertNotNull(mA3);
+        assertNotNull(mA3);
 
-        Assert.assertTrue(p.allow(mA));
-        Assert.assertFalse(p.allow(mA0));
-        Assert.assertFalse(p.allow(mA1));
-        Assert.assertFalse(p.allow(mA2));
-        Assert.assertFalse(p.allow(mA3));
+        assertTrue(p.allow(mA));
+        assertFalse(p.allow(mA0));
+        assertFalse(p.allow(mA1));
+        assertFalse(p.allow(mA2));
+        assertFalse(p.allow(mA3));
 
         final Field fA = A.class.getField("i");
-        Assert.assertNotNull(fA);
-        Assert.assertTrue(p.allow(fA));
+        assertNotNull(fA);
+        assertTrue(p.allow(fA));
 
         final Field fA0 = A0.class.getField("i0");
-        Assert.assertNotNull(fA0);
-        Assert.assertFalse(p.allow(fA0));
+        assertNotNull(fA0);
+        assertFalse(p.allow(fA0));
         final Field fA1 = A1.class.getDeclaredField("i1");
-        Assert.assertNotNull(fA1);
-        Assert.assertFalse(p.allow(fA0));
+        assertNotNull(fA1);
+        assertFalse(p.allow(fA0));
 
         final Constructor<?> cA = A.class.getConstructor();
-        Assert.assertNotNull(cA);
-        Assert.assertTrue(p.allow(cA));
+        assertNotNull(cA);
+        assertTrue(p.allow(cA));
 
         final Constructor<?> cA0 = A0.class.getConstructor();
-        Assert.assertNotNull(cA0);
-        Assert.assertFalse(p.allow(cA0));
+        assertNotNull(cA0);
+        assertFalse(p.allow(cA0));
 
         final Constructor<?> cA3 = A3.class.getDeclaredConstructor();
-        Assert.assertNotNull(cA3);
-        Assert.assertFalse(p.allow(cA3));
+        assertNotNull(cA3);
+        assertFalse(p.allow(cA3));
     }
 
     @Test
     public void testGetPackageName() {
         final String PKG = "org.apache.commons.jexl3.internal.introspection";
         String pkg = ClassTool.getPackageName(Outer.class);
-        Assert.assertEquals(PKG, pkg);
+        assertEquals(PKG, pkg);
         pkg = ClassTool.getPackageName(Outer.Inner.class);
-        Assert.assertEquals(PKG, pkg);
+        assertEquals(PKG, pkg);
         final Outer[] oo = {};
         pkg = ClassTool.getPackageName(oo.getClass());
-        Assert.assertEquals(PKG, pkg);
+        assertEquals(PKG, pkg);
         final Outer.Inner[] ii = {};
         pkg = ClassTool.getPackageName(ii.getClass());
-        Assert.assertEquals(PKG, pkg);
+        assertEquals(PKG, pkg);
         pkg = ClassTool.getPackageName(Process.class);
-        Assert.assertEquals("java.lang", pkg);
+        assertEquals("java.lang", pkg);
         pkg = ClassTool.getPackageName(Integer.TYPE);
-        Assert.assertEquals("java.lang", pkg);
+        assertEquals("java.lang", pkg);
     }
 
     @Test
@@ -235,20 +237,20 @@ public class PermissionsTest {
         final String src = "java.lang { Runtime { exit(); exec(); } }\njava.net { URL {} }";
         final Permissions p = (Permissions) JexlPermissions.parse(src);
         final Map<String, Permissions.NoJexlPackage> nojexlmap = p.getPackages();
-        Assert.assertNotNull(nojexlmap);
+        assertNotNull(nojexlmap);
         final Permissions.NoJexlPackage njp = nojexlmap.get("java.lang");
-        Assert.assertNotNull(njp);
+        assertNotNull(njp);
         final Method exit = getMethod(java.lang.Runtime.class,"exit");
-        Assert.assertNotNull(exit);
-        Assert.assertFalse(p.allow(exit));
+        assertNotNull(exit);
+        assertFalse(p.allow(exit));
         final Method exec = getMethod(java.lang.Runtime.class,"exec");
-        Assert.assertNotNull(exec);
-        Assert.assertFalse(p.allow(exec));
+        assertNotNull(exec);
+        assertFalse(p.allow(exec));
         final Method avp = getMethod(java.lang.Runtime.class,"availableProcessors");
-        Assert.assertNotNull(avp);
-        Assert.assertTrue(p.allow(avp));
+        assertNotNull(avp);
+        assertTrue(p.allow(avp));
         final JexlUberspect uber = new Uberspect(null, null, p);
-        Assert.assertNull(uber.getClassByName("java.net.URL"));
+        assertNull(uber.getClassByName("java.net.URL"));
     }
 
     @Test
@@ -256,8 +258,8 @@ public class PermissionsTest {
         final String src = "java.lang { -Runtime { exit(); } }";
         final Permissions p = (Permissions) JexlPermissions.parse(src);
         final Method exit = getMethod(java.lang.Runtime.class,"exit");
-        Assert.assertNotNull(exit);
-        Assert.assertFalse(p.allow(exit));
+        assertNotNull(exit);
+        assertFalse(p.allow(exit));
     }
 
     @Test
@@ -265,8 +267,8 @@ public class PermissionsTest {
         final String src = "java.lang { +Runtime { availableProcessorCount(); } }";
         final Permissions p = (Permissions) JexlPermissions.parse(src);
         final Method exit = getMethod(java.lang.Runtime.class,"exit");
-        Assert.assertNotNull(exit);
-        Assert.assertFalse(p.allow(exit));
+        assertNotNull(exit);
+        assertFalse(p.allow(exit));
     }
 
     @Test
@@ -274,11 +276,11 @@ public class PermissionsTest {
         final String src = "java.lang { +System { currentTimeMillis(); } }";
         final JexlPermissions p = RESTRICTED.compose(src);
         final Field in = System.class.getField("in");
-        Assert.assertNotNull(in);
-        Assert.assertFalse(p.allow(in));
+        assertNotNull(in);
+        assertFalse(p.allow(in));
         final Method ctm = getMethod(java.lang.System.class,"currentTimeMillis");
-        Assert.assertNotNull(ctm);
-        Assert.assertTrue(p.allow(ctm));
+        assertNotNull(ctm);
+        assertTrue(p.allow(ctm));
     }
 
     @Test
@@ -286,11 +288,11 @@ public class PermissionsTest {
         final String src = "java.lang { +System { in; } }";
         final JexlPermissions p = RESTRICTED.compose(src);
         final Field in = System.class.getField("in");
-        Assert.assertNotNull(in);
-        Assert.assertTrue(p.allow(in));
+        assertNotNull(in);
+        assertTrue(p.allow(in));
         final Method ctm = getMethod(java.lang.System.class,"currentTimeMillis");
-        Assert.assertNotNull(ctm);
-        Assert.assertFalse(p.allow(ctm));
+        assertNotNull(ctm);
+        assertFalse(p.allow(ctm));
     }
 
     @Test
@@ -298,21 +300,21 @@ public class PermissionsTest {
         final String src = "java.lang { +Class { getName(); getSimpleName(); } }";
         final JexlPermissions p = RESTRICTED.compose(src);
         final Method getName = getMethod(java.lang.Class.class,"getName");
-        Assert.assertNotNull(getName);
-        Assert.assertTrue(p.allow(getName));
-        Assert.assertFalse(RESTRICTED.allow(getName));
+        assertNotNull(getName);
+        assertTrue(p.allow(getName));
+        assertFalse(RESTRICTED.allow(getName));
         final Method getSimpleName = getMethod(java.lang.Class.class,"getSimpleName");
-        Assert.assertNotNull(getSimpleName);
-        Assert.assertTrue(p.allow(getSimpleName));
-        Assert.assertFalse(RESTRICTED.allow(getSimpleName));
+        assertNotNull(getSimpleName);
+        assertTrue(p.allow(getSimpleName));
+        assertFalse(RESTRICTED.allow(getSimpleName));
 
         final Method getMethod = getMethod(java.lang.Class.class,"getMethod");
-        Assert.assertNotNull(getMethod);
-        Assert.assertFalse(p.allow(getMethod));
+        assertNotNull(getMethod);
+        assertFalse(p.allow(getMethod));
 
         final Method exit = getMethod(java.lang.Runtime.class,"exit");
-        Assert.assertNotNull(exit);
-        Assert.assertFalse(p.allow(exit));
+        assertNotNull(exit);
+        assertFalse(p.allow(exit));
     }
 
     @Test
@@ -320,15 +322,15 @@ public class PermissionsTest {
         final String src = "java.lang { +Class {  } }";
         final JexlPermissions p = RESTRICTED.compose(src);
         final Method getName = getMethod(java.lang.Class.class,"getName");
-        Assert.assertNotNull(getName);
-        Assert.assertTrue(p.allow(getName));
+        assertNotNull(getName);
+        assertTrue(p.allow(getName));
         final Method getMethod = getMethod(java.lang.Class.class,"getMethod");
-        Assert.assertNotNull(getMethod);
-        Assert.assertTrue(p.allow(getMethod));
+        assertNotNull(getMethod);
+        assertTrue(p.allow(getMethod));
 
         final Method exit = getMethod(java.lang.Runtime.class,"exit");
-        Assert.assertNotNull(exit);
-        Assert.assertFalse(p.allow(exit));
+        assertNotNull(exit);
+        assertFalse(p.allow(exit));
     }
 
     @Test
@@ -353,38 +355,38 @@ public class PermissionsTest {
                 " }"};
         final Permissions p = (Permissions) JexlPermissions.parse(src);
         final Map<String, Permissions.NoJexlPackage> nojexlmap = p.getPackages();
-        Assert.assertNotNull(nojexlmap);
+        assertNotNull(nojexlmap);
         final Set<String> wildcards = p.getWildcards();
-        Assert.assertEquals(4, wildcards.size());
+        assertEquals(4, wildcards.size());
 
         final JexlEngine jexl = new JexlBuilder().permissions(p).safe(false).lexical(true).create();
 
         final Method exit = getMethod(java.lang.Runtime.class,"exit");
-        Assert.assertNotNull(exit);
-        Assert.assertFalse(p.allow(exit));
+        assertNotNull(exit);
+        assertFalse(p.allow(exit));
         final Method exec = getMethod(java.lang.Runtime.class,"getRuntime");
-        Assert.assertNotNull(exec);
-        Assert.assertFalse(p.allow(exec));
+        assertNotNull(exec);
+        assertFalse(p.allow(exec));
         final Method callMeNot = getMethod(Outer.Inner.class, "callMeNot");
-        Assert.assertNotNull(callMeNot);
-        Assert.assertFalse(p.allow(callMeNot));
+        assertNotNull(callMeNot);
+        assertFalse(p.allow(callMeNot));
         JexlScript script = jexl.createScript("o.callMeNot()", "o");
         try {
             final Object result = script.execute(null, new Outer.Inner());
-            Assert.fail("callMeNot should be uncallable");
+            fail("callMeNot should be uncallable");
         } catch (final JexlException.Method xany) {
-            Assert.assertEquals("callMeNot", xany.getMethod());
+            assertEquals("callMeNot", xany.getMethod());
         }
         final Method uncallable = getMethod(Invisible.class, "uncallable");
-        Assert.assertFalse(p.allow(uncallable));
+        assertFalse(p.allow(uncallable));
         final Package ip = Invisible.class.getPackage();
-        Assert.assertFalse(p.allow(ip));
+        assertFalse(p.allow(ip));
         script = jexl.createScript("o.uncallable()", "o");
         try {
             final Object result = script.execute(null, new Invisible());
-            Assert.fail("uncallable should be uncallable");
+            fail("uncallable should be uncallable");
         } catch (final JexlException.Method xany) {
-            Assert.assertEquals("uncallable", xany.getMethod());
+            assertEquals("uncallable", xany.getMethod());
         }
     }
 
@@ -402,9 +404,9 @@ public class PermissionsTest {
         for(final String src : srcs) {
             try {
                 final Permissions p = (Permissions) JexlPermissions.parse(src);
-                Assert.fail(src);
+                fail(src);
             } catch (final IllegalStateException xill) {
-                Assert.assertNotNull(xill);
+                assertNotNull(xill);
             }
         }
     }
@@ -433,9 +435,9 @@ public class PermissionsTest {
         final JexlArithmetic jexla = new I33Arithmetic(true);
         final JexlEngine jexl = new JexlBuilder().safe(false).arithmetic(jexla).create();
         final JexlScript script = jexl.createScript(src);
-        Assert.assertNotNull(script);
+        assertNotNull(script);
         final Object result = script.execute(null);
-        Assert.assertEquals(1, result);
+        assertEquals(1, result);
     }
 
     @Test public void testProtectedOverride0() {
@@ -448,14 +450,14 @@ public class PermissionsTest {
         script = jexl.createScript("x.protectedMethod()", "x");
         try {
             r = script.execute(null, foo2);
-            Assert.fail("protectedMethod() is not public through superclass Foo2");
+            fail("protectedMethod() is not public through superclass Foo2");
         } catch (final JexlException xjexl) {
-            Assert.assertNotNull(xjexl);
+            assertNotNull(xjexl);
         }
         // call public override, ok
         foo2 = new Foo3();
         r = script.execute(null, foo3);
-        Assert.assertEquals("foo3",r);
+        assertEquals("foo3",r);
     }
 
     @Test public void testProtectedOverride1() {
@@ -469,12 +471,12 @@ public class PermissionsTest {
         final JexlContext context = new MapContext();
         context.set("a", a);
         final Object result = script.execute(context, a);
-        Assert.assertNotNull(result);
+        assertNotNull(result);
     }
 
     @Test
     public void testSecurePermissions() {
-        Assert.assertNotNull(JexlTestCase.SECURE);
+        assertNotNull(JexlTestCase.SECURE);
         final List<Class<?>> acs = Arrays.asList(
             java.lang.Runtime.class,
             java.math.BigDecimal.class,
@@ -482,8 +484,8 @@ public class PermissionsTest {
             java.util.Map.class);
         for(final Class<?> ac: acs) {
             final Package p = ac.getPackage();
-            Assert.assertNotNull(ac.getName(), p);
-            Assert.assertTrue(ac.getName(), JexlTestCase.SECURE.allow(p));
+            assertNotNull(p, ac::getName);
+            assertTrue(JexlTestCase.SECURE.allow(p), ac::getName);
         }
         final List<Class<?>> nacs = Arrays.asList(
                 java.lang.annotation.ElementType.class,
@@ -494,8 +496,8 @@ public class PermissionsTest {
                 java.lang.reflect.Method.class);
         for(final Class<?> nac : nacs) {
             final Package p = nac.getPackage();
-            Assert.assertNotNull(nac.getName(), p);
-            Assert.assertFalse(nac.getName(), JexlTestCase.SECURE.allow(p));
+            assertNotNull(p, nac::getName);
+            assertFalse(JexlTestCase.SECURE.allow(p), nac::getName);
         }
     }
 
@@ -505,8 +507,8 @@ public class PermissionsTest {
         boolean found;
         wildcards = new HashSet<>(Arrays.asList("com.apache.*"));
         found = Permissions.wildcardAllow(wildcards, "com.apache.commons.jexl3");
-        Assert.assertTrue(found);
+        assertTrue(found);
         found = Permissions.wildcardAllow(wildcards, "com.google.spexl");
-        Assert.assertFalse(found);
+        assertFalse(found);
     }
 }

@@ -16,6 +16,8 @@
  */
 package org.apache.commons.jexl3;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -39,7 +41,7 @@ public class IfTest extends JexlTestCase {
         final JexlContext jc = new MapContext();
 
         final Object o = e.execute(jc);
-        Assert.assertEquals("Result is wrong", Integer.valueOf(3), o);
+        assertEquals(Integer.valueOf(3), o, "Result is wrong");
     }
 
     /**
@@ -53,18 +55,18 @@ public class IfTest extends JexlTestCase {
         final JexlContext jc = new MapContext();
 
         final Object o = e.execute(jc);
-        Assert.assertEquals("Result is wrong", "hello", o);
+        assertEquals("hello", o, "Result is wrong");
     }
 
     @Test
     public void testIfElseIfExpression() throws Exception {
         final JexlScript e = JEXL.createScript("if (x == 1) { 10; } else if (x == 2) 20  else 30", "x");
         Object o = e.execute(null, 1);
-        Assert.assertEquals(10, o);
+        assertEquals(10, o);
         o = e.execute(null, 2);
-        Assert.assertEquals(20, o);
+        assertEquals(20, o);
         o = e.execute(null, 4);
-        Assert.assertEquals(30, o);
+        assertEquals(30, o);
     }
 
     @Test
@@ -73,13 +75,13 @@ public class IfTest extends JexlTestCase {
                 "if (x == 1) return 10;  if (x == 2) return 20  else if (x == 3) return 30; else return 40;",
                 "x");
         Object o = e.execute(null, 1);
-        Assert.assertEquals(10, o);
+        assertEquals(10, o);
         o = e.execute(null, 2);
-        Assert.assertEquals(20, o);
+        assertEquals(20, o);
         o = e.execute(null, 3);
-        Assert.assertEquals(30, o);
+        assertEquals(30, o);
         o = e.execute(null, 4);
-        Assert.assertEquals(40, o);
+        assertEquals(40, o);
     }
 
     @Test
@@ -88,13 +90,13 @@ public class IfTest extends JexlTestCase {
                 "if (x == 1) return 10; if (x == 2)  return 20; else if (x == 3) return 30  else { return 40 }",
                 "x");
         Object o = e.execute(null, 1);
-        Assert.assertEquals(10, o);
+        assertEquals(10, o);
         o = e.execute(null, 2);
-        Assert.assertEquals(20, o);
+        assertEquals(20, o);
         o = e.execute(null, 3);
-        Assert.assertEquals(30, o);
+        assertEquals(30, o);
         o = e.execute(null, 4);
-        Assert.assertEquals(40, o);
+        assertEquals(40, o);
     }
 
     /**
@@ -109,7 +111,7 @@ public class IfTest extends JexlTestCase {
         jc.set("x", Integer.valueOf(2));
 
         final Object o = e.execute(jc);
-        Assert.assertEquals("Result is not true", Boolean.TRUE, o);
+        assertEquals(Boolean.TRUE, o);
     }
 
     /**
@@ -125,7 +127,7 @@ public class IfTest extends JexlTestCase {
 
         e.execute(jc);
         final Object result = jc.get("y");
-        Assert.assertEquals("y has the wrong value", Integer.valueOf(1), result);
+        assertEquals(Integer.valueOf(1), result, "y has the wrong value");
     }
 
     /**
@@ -140,7 +142,7 @@ public class IfTest extends JexlTestCase {
         jc.set("x", Float.valueOf(2.5f));
 
         final Object o = e.execute(jc);
-        Assert.assertEquals("Result is not true", Boolean.TRUE, o);
+        assertEquals(Boolean.TRUE, o);
     }
 
     /**
@@ -155,7 +157,7 @@ public class IfTest extends JexlTestCase {
         jc.set("x", Integer.valueOf(1));
 
         final Object o = e.execute(jc);
-        Assert.assertEquals("Result is not true", Boolean.TRUE, o);
+        assertEquals(Boolean.TRUE, o);
     }
 
     @Test
@@ -164,16 +166,16 @@ public class IfTest extends JexlTestCase {
         final JexlEvalContext jc = new JexlEvalContext();
         final JexlExpression xtrue = JEXL.createExpression("x??true");
         o = xtrue.evaluate(jc);
-        Assert.assertEquals("Should be true", true, o);
+        assertEquals(true, o);
         jc.set("x", false);
         o = xtrue.evaluate(jc);
-        Assert.assertEquals("Should be false", false, o);
+        assertEquals(false, o);
         final JexlExpression yone = JEXL.createExpression("y??1");
         o = yone.evaluate(jc);
-        Assert.assertEquals("Should be 1", 1, o);
+        assertEquals(1, o);
         jc.set("y", 0);
         o = yone.evaluate(jc);
-        Assert.assertEquals("Should be 0", 0, o);
+        assertEquals(0, o);
         debuggerCheck(JEXL);
     }
 
@@ -183,16 +185,16 @@ public class IfTest extends JexlTestCase {
         final JexlEvalContext jc = new JexlEvalContext();
         final JexlScript xtrue = JEXL.createScript("x??true");
         o = xtrue.execute(jc);
-        Assert.assertEquals("Should be true", true, o);
+        assertEquals(true, o);
         jc.set("x", false);
         o = xtrue.execute(jc);
-        Assert.assertEquals("Should be false", false, o);
+        assertEquals(false, o);
         final JexlScript yone = JEXL.createScript("y??1");
         o = yone.execute(jc);
-        Assert.assertEquals("Should be 1", 1, o);
+        assertEquals(1, o);
         jc.set("y", 0);
         o = yone.execute(jc);
-        Assert.assertEquals("Should be 0", 0, o);
+        assertEquals(0, o);
         debuggerCheck(JEXL);
     }
 
@@ -207,7 +209,7 @@ public class IfTest extends JexlTestCase {
         final JexlContext jc = new MapContext();
 
         final Object o = e.execute(jc);
-        Assert.assertEquals("Result is not 2", Integer.valueOf(2), o);
+        assertEquals(Integer.valueOf(2), o);
     }
 
     /**
@@ -221,7 +223,7 @@ public class IfTest extends JexlTestCase {
         final JexlContext jc = new MapContext();
 
         final Object o = e.execute(jc);
-        Assert.assertNull("Return value is not empty", o);
+        assertNull(o);
     }
 
     /**
@@ -235,7 +237,7 @@ public class IfTest extends JexlTestCase {
         final JexlContext jc = new MapContext();
 
         final Object o = e.execute(jc);
-        Assert.assertEquals("Result is not 1", Integer.valueOf(1), o);
+        assertEquals(Integer.valueOf(1), o);
     }
 
     /**
@@ -257,9 +259,9 @@ public class IfTest extends JexlTestCase {
             options.setStrict((l & 1) == 0);
             options.setSilent((l & 2) != 0);
             o = e.evaluate(jc);
-            Assert.assertEquals("Should be quux", "quux", o);
+            assertEquals("quux", o);
             o = jc.get("x.y.z");
-            Assert.assertEquals("Should be quux", "quux", o);
+            assertEquals("quux", o);
         }
 
         jc.set("foo", null);
@@ -268,9 +270,9 @@ public class IfTest extends JexlTestCase {
             options.setStrict((l & 1) == 0);
             options.setSilent((l & 2) != 0);
             o = e.evaluate(jc);
-            Assert.assertEquals("Should be quux", "quux", o);
+            assertEquals("quux", o);
             o = jc.get("x.y.z");
-            Assert.assertEquals("Should be quux", "quux", o);
+            assertEquals("quux", o);
         }
 
         jc.set("foo", Boolean.FALSE);
@@ -279,9 +281,9 @@ public class IfTest extends JexlTestCase {
             options.setStrict((l & 1) == 0);
             options.setSilent((l & 2) != 0);
             o = e.evaluate(jc);
-            Assert.assertEquals("Should be quux", "quux", o);
+            assertEquals("quux", o);
             o = jc.get("x.y.z");
-            Assert.assertEquals("Should be quux", "quux", o);
+            assertEquals("quux", o);
         }
 
         jc.set("foo", Boolean.TRUE);
@@ -290,9 +292,9 @@ public class IfTest extends JexlTestCase {
             options.setStrict((l & 1) == 0);
             options.setSilent((l & 2) != 0);
             o = e.evaluate(jc);
-            Assert.assertEquals("Should be bar", "bar", o);
+            assertEquals("bar", o);
             o = jc.get("x.y.z");
-            Assert.assertEquals("Should be bar", "bar", o);
+            assertEquals("bar", o);
         }
 
         debuggerCheck(jexl);
@@ -308,10 +310,10 @@ public class IfTest extends JexlTestCase {
         options.setSilent(false);
         try {
            o = e.evaluate(jc);
-           Assert.fail("Should have failed");
+           fail("Should have failed");
         } catch (final JexlException xjexl) {
            // OK
-           Assert.assertTrue(xjexl.toString().contains("quux"));
+           assertTrue(xjexl.toString().contains("quux"));
         }
     }
 
@@ -333,11 +335,11 @@ public class IfTest extends JexlTestCase {
             options.setStrict((l & 1) == 0);
             options.setSilent((l & 2) != 0);
             o = e.evaluate(jc);
-            Assert.assertEquals("Should be quux", "quux", o);
+            assertEquals("quux", o);
             o = jc.get("x.y.z");
-            Assert.assertEquals("Should be quux", "quux", o);
+            assertEquals("quux", o);
             o = f.evaluate(jc);
-            Assert.assertEquals("Should be quux", "quux", o);
+            assertEquals("quux", o);
         }
 
         jc.set("foo", null);
@@ -346,11 +348,11 @@ public class IfTest extends JexlTestCase {
             options.setStrict((l & 1) == 0);
             options.setSilent((l & 2) != 0);
             o = e.evaluate(jc);
-            Assert.assertEquals("Should be quux", "quux", o);
+            assertEquals("quux", o);
             o = jc.get("x.y.z");
-            Assert.assertEquals("Should be quux", "quux", o);
+            assertEquals("quux", o);
             o = f.evaluate(jc);
-            Assert.assertEquals("Should be quux", "quux", o);
+            assertEquals("quux", o);
         }
 
         jc.set("foo", Boolean.FALSE);
@@ -359,11 +361,11 @@ public class IfTest extends JexlTestCase {
             options.setStrict((l & 1) == 0);
             options.setSilent((l & 2) != 0);
             o = e.evaluate(jc);
-            Assert.assertEquals("Should be quux", "quux", o);
+            assertEquals("quux", o);
             o = jc.get("x.y.z");
-            Assert.assertEquals("Should be quux", "quux", o);
+            assertEquals("quux", o);
             o = f.evaluate(jc);
-            Assert.assertEquals("Should be false", false, o);
+            assertEquals(false, o);
         }
 
         jc.set("foo", Double.NaN);
@@ -372,11 +374,11 @@ public class IfTest extends JexlTestCase {
             options.setStrict((l & 1) == 0);
             options.setSilent((l & 2) != 0);
             o = e.evaluate(jc);
-            Assert.assertEquals("Should be quux", "quux", o);
+            assertEquals("quux", o);
             o = jc.get("x.y.z");
-            Assert.assertEquals("Should be quux", "quux", o);
+            assertEquals("quux", o);
             o = f.evaluate(jc);
-            Assert.assertTrue("Should be NaN", Double.isNaN((Double) o));
+            assertTrue(Double.isNaN((Double) o), "Should be NaN");
         }
 
         jc.set("foo", "");
@@ -385,11 +387,11 @@ public class IfTest extends JexlTestCase {
             options.setStrict((l & 1) == 0);
             options.setSilent((l & 2) != 0);
             o = e.evaluate(jc);
-            Assert.assertEquals("Should be quux", "quux", o);
+            assertEquals("quux", o);
             o = jc.get("x.y.z");
-            Assert.assertEquals("Should be quux", "quux", o);
+            assertEquals("quux", o);
             o = f.evaluate(jc);
-            Assert.assertEquals("Should be empty string", "", o);
+            assertEquals("", o, "Should be empty string");
         }
 
         jc.set("foo", "false");
@@ -398,11 +400,11 @@ public class IfTest extends JexlTestCase {
             options.setStrict((l & 1) == 0);
             options.setSilent((l & 2) != 0);
             o = e.evaluate(jc);
-            Assert.assertEquals("Should be quux", "quux", o);
+            assertEquals("quux", o);
             o = jc.get("x.y.z");
-            Assert.assertEquals("Should be quux", "quux", o);
+            assertEquals("quux", o);
             o = f.evaluate(jc);
-            Assert.assertEquals("Should be 'false'", "false", o);
+            assertEquals("false", o);
         }
 
         jc.set("foo", 0d);
@@ -411,11 +413,11 @@ public class IfTest extends JexlTestCase {
             options.setStrict((l & 1) == 0);
             options.setSilent((l & 2) != 0);
             o = e.evaluate(jc);
-            Assert.assertEquals("Should be quux", "quux", o);
+            assertEquals("quux", o);
             o = jc.get("x.y.z");
-            Assert.assertEquals("Should be quux", "quux", o);
+            assertEquals("quux", o);
             o = f.evaluate(jc);
-            Assert.assertEquals("Should be 0", 0.d, o);
+            assertEquals(0.d, o);
         }
 
         jc.set("foo", 0);
@@ -424,11 +426,11 @@ public class IfTest extends JexlTestCase {
             options.setStrict((l & 1) == 0);
             options.setSilent((l & 2) != 0);
             o = e.evaluate(jc);
-            Assert.assertEquals("Should be quux", "quux", o);
+            assertEquals("quux", o);
             o = jc.get("x.y.z");
-            Assert.assertEquals("Should be quux", "quux", o);
+            assertEquals("quux", o);
             o = f.evaluate(jc);
-            Assert.assertEquals("Should be 0", 0, o);
+            assertEquals(0, o);
         }
 
         jc.set("foo", "bar");
@@ -437,9 +439,9 @@ public class IfTest extends JexlTestCase {
             options.setStrict((l & 1) == 0);
             options.setSilent((l & 2) != 0);
             o = e.evaluate(jc);
-            Assert.assertEquals("Should be bar", "bar", o);
+            assertEquals("bar", o);
             o = jc.get("x.y.z");
-            Assert.assertEquals("Should be bar", "bar", o);
+            assertEquals("bar", o);
         }
 
         debuggerCheck(JEXL);

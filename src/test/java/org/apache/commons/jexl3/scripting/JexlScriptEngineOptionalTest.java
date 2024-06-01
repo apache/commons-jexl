@@ -17,6 +17,8 @@
 
 package org.apache.commons.jexl3.scripting;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import java.io.StringWriter;
 
 import javax.script.Compilable;
@@ -34,11 +36,11 @@ public class JexlScriptEngineOptionalTest {
 
     @Test
     public void testCompilable() throws Exception {
-        Assert.assertTrue("Engine should implement Compilable", engine instanceof Compilable);
+        assertTrue(engine instanceof Compilable, "Engine should implement Compilable");
         final Compilable cengine = (Compilable) engine;
         final CompiledScript script = cengine.compile("40 + 2");
-        Assert.assertEquals(42, script.eval());
-        Assert.assertEquals(42, script.eval());
+        assertEquals(42, script.eval());
+        assertEquals(42, script.eval());
     }
 
     @Test
@@ -48,17 +50,17 @@ public class JexlScriptEngineOptionalTest {
         final StringWriter outContent = new StringWriter();
         engine.getContext().setErrorWriter(outContent);
         engine.eval(error);
-        Assert.assertEquals("ERROR", outContent.toString());
+        assertEquals("ERROR", outContent.toString());
     }
 
     @Test
     public void testOutput() throws Exception {
         final String output = factory.getOutputStatement("foo\u00a9bar");
-        Assert.assertEquals("JEXL.out.print('foo\\u00a9bar')", output);
+        assertEquals("JEXL.out.print('foo\\u00a9bar')", output);
         // redirect output to capture evaluation result
         final StringWriter outContent = new StringWriter();
         engine.getContext().setWriter(outContent);
         engine.eval(output);
-        Assert.assertEquals("foo\u00a9bar", outContent.toString());
+        assertEquals("foo\u00a9bar", outContent.toString());
     }
 }

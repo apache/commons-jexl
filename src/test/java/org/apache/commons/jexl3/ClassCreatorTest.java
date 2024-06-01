@@ -16,6 +16,8 @@
  */
 package org.apache.commons.jexl3;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import java.io.File;
 import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
@@ -149,32 +151,32 @@ public class ClassCreatorTest extends JexlTestCase {
         cctor.setSeed(2);
         cctor.setCtorBody("value = (Integer) ctxt.get(\"value\") + 10;");
         Class<?> foo1 = cctor.createClass(true);
-        Assert.assertSame(foo1.getClassLoader(), cctor.getClassLoader());
-        Assert.assertEquals("foo2", foo1.getSimpleName());
+        assertSame(foo1.getClassLoader(), cctor.getClassLoader());
+        assertEquals("foo2", foo1.getSimpleName());
         Object result = cctor.newInstance(foo1, ctxt);
-        Assert.assertEquals(foo1, result.getClass());
+        assertEquals(foo1, result.getClass());
         jexl2.setClassLoader(cctor.getClassLoader());
         cctor.clear();
 
         // check the namespace functor behavior
         final JexlScript script = jexl2.createScript("test:getValue()");
         result = script.execute(ctxt, foo1.getName());
-        Assert.assertEquals(1010, result);
+        assertEquals(1010, result);
 
         // change the body
         cctor.setSeed(2);
         cctor.setCtorBody("value = (Integer) ctxt.get(\"value\") + 99;");
         final Class<?> foo11 = cctor.createClass(true);
-        Assert.assertEquals("foo2", foo1.getSimpleName());
-        Assert.assertNotSame(foo11, foo1);
+        assertEquals("foo2", foo1.getSimpleName());
+        assertNotSame(foo11, foo1);
         foo1 = foo11;
         result = cctor .newInstance(foo1, ctxt);
-        Assert.assertEquals(foo1, result.getClass());
+        assertEquals(foo1, result.getClass());
         // drum rolll....
         jexl2.setClassLoader(foo1.getClassLoader());
         result = script.execute(ctxt, foo1.getName());
         // tada!
-        Assert.assertEquals(1099, result);
+        assertEquals(1099, result);
     }
 
     @Before
@@ -195,13 +197,13 @@ public class ClassCreatorTest extends JexlTestCase {
     public void testBasicCtor() throws Exception {
         final JexlScript s = jexl.createScript("(c, v)->{ var ct2 = new(c, v); ct2.value; }");
         Object r = s.execute(null, TwoCtors.class, 10);
-        Assert.assertEquals(10, r);
+        assertEquals(10, r);
         r = s.execute(null, TwoCtors.class, 5 + 5);
-        Assert.assertEquals(10, r);
+        assertEquals(10, r);
         r = s.execute(null, TwoCtors.class, 10d);
-        Assert.assertEquals(-10, r);
+        assertEquals(-10, r);
         r = s.execute(null, TwoCtors.class, 100f);
-        Assert.assertEquals(-100, r);
+        assertEquals(-100, r);
     }
 
     @Test
@@ -210,10 +212,10 @@ public class ClassCreatorTest extends JexlTestCase {
         ctxt.set("value", 42);
         JexlScript s = jexl.createScript("(c)->{ new(c).value }");
         Object r = s.execute(ctxt, ContextualCtor.class);
-        Assert.assertEquals(42, r);
+        assertEquals(42, r);
         s = jexl.createScript("(c, v)->{ new(c, v).value }");
         r = s.execute(ctxt, ContextualCtor.class, 100);
-        Assert.assertEquals(142, r);
+        assertEquals(142, r);
     }
 
     @Test
@@ -237,36 +239,36 @@ public class ClassCreatorTest extends JexlTestCase {
         cctor.setSeed(1);
         cctor.setCtorBody("value = (Integer) ctxt.get(\"value\") + 10;");
         Class<?> foo1 = cctor.createClass(true);
-        Assert.assertSame(foo1.getClassLoader(), cctor.getClassLoader());
-        Assert.assertEquals("foo1", foo1.getSimpleName());
+        assertSame(foo1.getClassLoader(), cctor.getClassLoader());
+        assertEquals("foo1", foo1.getSimpleName());
         Object result = cctor.newInstance(foo1, ctxt);
-        Assert.assertEquals(foo1, result.getClass());
+        assertEquals(foo1, result.getClass());
         jexl.setClassLoader(cctor.getClassLoader());
         cctor.clear();
 
         // check we can invoke that ctor using its name or class
         final JexlScript script = jexl.createScript("(c)->{ new(c).value; }");
         result = script.execute(ctxt, foo1);
-        Assert.assertEquals(1010, result);
+        assertEquals(1010, result);
         result = script.execute(ctxt, foo1.getName());
-        Assert.assertEquals(1010, result);
+        assertEquals(1010, result);
 
         // re-create foo1 with a different body!
         cctor.setSeed(1);
         cctor.setCtorBody("value = (Integer) ctxt.get(\"value\") + 99;");
         final Class<?> foo11 = cctor.createClass(true);
-        Assert.assertEquals("foo1", foo1.getSimpleName());
-        Assert.assertNotSame(foo11, foo1);
+        assertEquals("foo1", foo1.getSimpleName());
+        assertNotSame(foo11, foo1);
         foo1 = foo11;
         result = cctor.newInstance(foo1, ctxt);
-        Assert.assertEquals(foo1, result.getClass());
+        assertEquals(foo1, result.getClass());
         // drum rolll....
         jexl.setClassLoader(foo1.getClassLoader());
         result = script.execute(ctxt, foo1.getName());
         // tada!
-        Assert.assertEquals(1099, result);
+        assertEquals(1099, result);
         result = script.execute(ctxt, foo1);
-        Assert.assertEquals(1099, result);
+        assertEquals(1099, result);
     }
 
     @Test
@@ -278,10 +280,10 @@ public class ClassCreatorTest extends JexlTestCase {
         cctor.setSeed(2);
         cctor.setCtorBody("value = (Integer) ctxt.get(\"value\") + 10;");
         Class<?> foo1 = cctor.createClass(true);
-        Assert.assertSame(foo1.getClassLoader(), cctor.getClassLoader());
-        Assert.assertEquals("foo2", foo1.getSimpleName());
+        assertSame(foo1.getClassLoader(), cctor.getClassLoader());
+        assertEquals("foo2", foo1.getSimpleName());
         Object result = cctor.newInstance(foo1, ctxt);
-        Assert.assertEquals(foo1, result.getClass());
+        assertEquals(foo1, result.getClass());
         jexl.setClassLoader(cctor.getClassLoader());
         cctor.clear();
 
@@ -291,21 +293,21 @@ public class ClassCreatorTest extends JexlTestCase {
 
         final JexlScript script = jexl2.createScript("test:getValue()");
         result = script.execute(ctxt, foo1.getName());
-        Assert.assertEquals(1010, result);
+        assertEquals(1010, result);
 
         cctor.setSeed(2);
         cctor.setCtorBody("value = (Integer) ctxt.get(\"value\") + 99;");
         final Class<?> foo11 = cctor.createClass(true);
-        Assert.assertEquals("foo2", foo1.getSimpleName());
-        Assert.assertNotSame(foo11, foo1);
+        assertEquals("foo2", foo1.getSimpleName());
+        assertNotSame(foo11, foo1);
         foo1 = foo11;
         result = cctor.newInstance(foo1, ctxt);
-        Assert.assertEquals(foo1, result.getClass());
+        assertEquals(foo1, result.getClass());
         // drum rolll....
         jexl2.setClassLoader(foo1.getClassLoader());
         result = script.execute(ctxt, foo1.getName());
         // tada!
-        Assert.assertEquals(1099, result);
+        assertEquals(1099, result);
     }
 
     @Test
@@ -336,7 +338,7 @@ public class ClassCreatorTest extends JexlTestCase {
             } else {
                 clazz = cctor.getClassInstance();
                 if (clazz == null) {
-                    Assert.assertEquals(i, gced);
+                    assertEquals(i, gced);
                     break;
                 }
             }
@@ -348,17 +350,17 @@ public class ClassCreatorTest extends JexlTestCase {
             context.set("clazz", cctor.getClassName());
             context.set("foo", null);
             Object z = newx.evaluate(context);
-            Assert.assertNull(z);
+            assertNull(z);
             // check with the class itself
             context.set("clazz", clazz);
             z = newx.evaluate(context);
-            Assert.assertNotNull(clazz + ": class " + i + " could not be instantiated on pass " + pass, z);
-            Assert.assertEquals(Integer.valueOf(i), expr.evaluate(context));
+            assertNotNull(z, clazz + ": class " + i + " could not be instantiated on pass " + pass);
+            assertEquals(Integer.valueOf(i), expr.evaluate(context));
             // with the proper class loader, attempt to create an instance from the class name
             jexl.setClassLoader(cctor.getClassLoader());
             z = newx.evaluate(context);
-            Assert.assertEquals(z.getClass(), clazz);
-            Assert.assertEquals(Integer.valueOf(i), expr.evaluate(context));
+            assertEquals(z.getClass(), clazz);
+            assertEquals(Integer.valueOf(i), expr.evaluate(context));
             cctor.clear();
             jexl.setClassLoader(null);
 
@@ -396,7 +398,7 @@ public class ClassCreatorTest extends JexlTestCase {
 
         if (gced < 0) {
             logger.warn("unable to force GC");
-            //Assert.assertTrue(gced > 0);
+            //assertTrue(gced > 0);
         }
     }
 
@@ -410,7 +412,7 @@ public class ClassCreatorTest extends JexlTestCase {
         final ClassCreator cctor = new ClassCreator(jexl, base);
         cctor.setSeed(1);
         final Class<?> foo1 = cctor.createClass();
-        Assert.assertEquals("foo1", foo1.getSimpleName());
+        assertEquals("foo1", foo1.getSimpleName());
         cctor.clear();
     }
 }

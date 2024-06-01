@@ -16,6 +16,12 @@
  */
 package org.apache.commons.jexl3;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.Callable;
@@ -24,7 +30,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.jexl3.internal.Interpreter;
-import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -118,7 +123,7 @@ public class AnnotationTest extends JexlTestCase {
                     final boolean s = (Boolean) args[0];
                     final boolean b = options.isSilent();
                     options.setSilent(s);
-                    Assert.assertEquals(s, options.isSilent());
+                    assertEquals(s, options.isSilent());
                     final Object r = statement.call();
                     options.setSilent(b);
                     return r;
@@ -159,7 +164,7 @@ public class AnnotationTest extends JexlTestCase {
             // during execution; we can only prove the 'synchronized' if the unsync-ed
             // version fails...
             if (NUM_THREADS * NUM_ITERATIONS != concCounter.getValue()) {
-                Assert.assertEquals(NUM_THREADS * NUM_ITERATIONS, syncCounter.getValue());
+                assertEquals(NUM_THREADS * NUM_ITERATIONS, syncCounter.getValue());
             }
         }
     }
@@ -177,7 +182,7 @@ public class AnnotationTest extends JexlTestCase {
         final JexlContext jc = new MapContext();
         final JexlScript e = JEXL.createScript("@synchronized { return 42; }");
         final Object r = e.execute(jc);
-        Assert.assertEquals(42, r);
+        assertEquals(42, r);
     }
 
     @Test
@@ -194,18 +199,18 @@ public class AnnotationTest extends JexlTestCase {
         try {
             final Object r = e.execute(jc);
             if (!silent) {
-                Assert.fail("should have failed");
+                fail("should have failed");
             } else {
-                Assert.assertEquals(1, log.count("warn"));
+                assertEquals(1, log.count("warn"));
             }
         } catch (final JexlException.Annotation xjexl) {
-            Assert.assertEquals("error", xjexl.getAnnotation());
+            assertEquals("error", xjexl.getAnnotation());
         }
-        Assert.assertEquals(1, jc.getCount());
-        Assert.assertTrue(jc.getNames().contains("error"));
-        Assert.assertTrue(jc.getNames().contains("42"));
+        assertEquals(1, jc.getCount());
+        assertTrue(jc.getNames().contains("error"));
+        assertTrue(jc.getNames().contains("42"));
         if (!silent) {
-            Assert.assertEquals(0, log.count("warn"));
+            assertEquals(0, log.count("warn"));
         }
     }
 
@@ -214,9 +219,9 @@ public class AnnotationTest extends JexlTestCase {
         final AnnotationContext jc = new AnnotationContext();
         final JexlScript e = JEXL.createScript("var t = 1; @synchronized for(var x : [2,3,7]) t *= x; t");
         final Object r = e.execute(jc);
-        Assert.assertEquals(42, r);
-        Assert.assertEquals(1, jc.getCount());
-        Assert.assertTrue(jc.getNames().contains("synchronized"));
+        assertEquals(42, r);
+        assertEquals(1, jc.getCount());
+        assertTrue(jc.getNames().contains("synchronized"));
     }
 
     @Test
@@ -242,11 +247,11 @@ public class AnnotationTest extends JexlTestCase {
         final AnnotationContext jc = new AnnotationContext();
         final JexlScript e = JEXL.createScript("@one(1) @synchronized { return 42; }");
         final Object r = e.execute(jc);
-        Assert.assertEquals(42, r);
-        Assert.assertEquals(2, jc.getCount());
-        Assert.assertTrue(jc.getNames().contains("synchronized"));
-        Assert.assertTrue(jc.getNames().contains("one"));
-        Assert.assertTrue(jc.getNames().contains("1"));
+        assertEquals(42, r);
+        assertEquals(2, jc.getCount());
+        assertTrue(jc.getNames().contains("synchronized"));
+        assertTrue(jc.getNames().contains("one"));
+        assertTrue(jc.getNames().contains("1"));
     }
 
     @Test
@@ -254,9 +259,9 @@ public class AnnotationTest extends JexlTestCase {
         final AnnotationContext jc = new AnnotationContext();
         final JexlScript e = JEXL.createScript("@synchronized { return 42; }");
         final Object r = e.execute(jc);
-        Assert.assertEquals(42, r);
-        Assert.assertEquals(1, jc.getCount());
-        Assert.assertTrue(jc.getNames().contains("synchronized"));
+        assertEquals(42, r);
+        assertEquals(1, jc.getCount());
+        assertTrue(jc.getNames().contains("synchronized"));
     }
 
     @Test
@@ -264,9 +269,9 @@ public class AnnotationTest extends JexlTestCase {
         final AnnotationContext jc = new AnnotationContext();
         final JexlScript e = JEXL.createScript("@synchronized 42");
         final Object r = e.execute(jc);
-        Assert.assertEquals(42, r);
-        Assert.assertEquals(1, jc.getCount());
-        Assert.assertTrue(jc.getNames().contains("synchronized"));
+        assertEquals(42, r);
+        assertEquals(1, jc.getCount());
+        assertTrue(jc.getNames().contains("synchronized"));
     }
 
     @Test
@@ -274,9 +279,9 @@ public class AnnotationTest extends JexlTestCase {
         final AnnotationContext jc = new AnnotationContext();
         final JexlScript e = JEXL.createScript("@synchronized if (true) 2 * 3 * 7; else -42;");
         final Object r = e.execute(jc);
-        Assert.assertEquals(42, r);
-        Assert.assertEquals(1, jc.getCount());
-        Assert.assertTrue(jc.getNames().contains("synchronized"));
+        assertEquals(42, r);
+        assertEquals(1, jc.getCount());
+        assertTrue(jc.getNames().contains("synchronized"));
     }
 
     @Test
@@ -284,10 +289,10 @@ public class AnnotationTest extends JexlTestCase {
         final AnnotationContext jc = new AnnotationContext();
         final JexlScript e = JEXL.createScript("@one(1) { return 42; }");
         final Object r = e.execute(jc);
-        Assert.assertEquals(42, r);
-        Assert.assertEquals(1, jc.getCount());
-        Assert.assertTrue(jc.getNames().contains("one"));
-        Assert.assertTrue(jc.getNames().contains("1"));
+        assertEquals(42, r);
+        assertEquals(1, jc.getCount());
+        assertTrue(jc.getNames().contains("one"));
+        assertTrue(jc.getNames().contains("1"));
     }
 
     @Test
@@ -322,18 +327,18 @@ public class AnnotationTest extends JexlTestCase {
         try {
             final Object r = e.execute(jc);
             if (!silent) {
-                Assert.fail("should have failed");
+                fail("should have failed");
             } else {
-                Assert.assertEquals(1, log.count("warn"));
+                assertEquals(1, log.count("warn"));
             }
         } catch (final JexlException.Annotation xjexl) {
-            Assert.assertEquals("unknown", xjexl.getAnnotation());
+            assertEquals("unknown", xjexl.getAnnotation());
         }
-        Assert.assertEquals(1, jc.getCount());
-        Assert.assertTrue(jc.getNames().contains("unknown"));
-        Assert.assertFalse(jc.getNames().contains("42"));
+        assertEquals(1, jc.getCount());
+        assertTrue(jc.getNames().contains("unknown"));
+        assertFalse(jc.getNames().contains("42"));
         if (!silent) {
-            Assert.assertEquals(0, log.count("warn"));
+            assertEquals(0, log.count("warn"));
         }
     }
 
@@ -350,9 +355,9 @@ public class AnnotationTest extends JexlTestCase {
         // wont make an error
         try {
             r = e.execute(jc, false, true);
-            Assert.assertEquals(42, r);
+            assertEquals(42, r);
         } catch (final JexlException.Variable xjexl) {
-            Assert.fail("should not have thrown");
+            fail("should not have thrown");
         }
 
         r = null;
@@ -360,18 +365,18 @@ public class AnnotationTest extends JexlTestCase {
         options.setSafe(false);
         try {
             r = e.execute(jc, true, false);
-            Assert.fail("should have thrown");
+            fail("should have thrown");
         } catch (final JexlException.Variable xjexl) {
-            Assert.assertNull(r);
+            assertNull(r);
         }
 
         r = null;
         // will make an error and will not throw but result is null
         try {
             r = e.execute(jc, true, true);
-            Assert.assertNull(r);
+            assertNull(r);
         } catch (final JexlException.Variable xjexl) {
-            Assert.fail("should not have thrown");
+            fail("should not have thrown");
         }
         options.setSafe(true);
 
@@ -379,16 +384,16 @@ public class AnnotationTest extends JexlTestCase {
         // will not make an error and will not throw
         try {
             r = e.execute(jc, false, false);
-            Assert.assertEquals(42, r);
+            assertEquals(42, r);
         } catch (final JexlException.Variable xjexl) {
-            Assert.fail("should not have thrown");
+            fail("should not have thrown");
         }
-        //Assert.assertEquals(42, r);
-        Assert.assertTrue(options.isStrict());
+        //assertEquals(42, r);
+        assertTrue(options.isStrict());
         e = JEXL.createScript("@scale(5) 42;");
         r = e.execute(jc);
-        Assert.assertEquals(42, r);
-        Assert.assertTrue(options.isStrict());
-        Assert.assertEquals(5, options.getMathScale());
+        assertEquals(42, r);
+        assertTrue(options.isStrict());
+        assertEquals(5, options.getMathScale());
     }
 }

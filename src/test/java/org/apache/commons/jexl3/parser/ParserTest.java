@@ -16,6 +16,8 @@
  */
 package org.apache.commons.jexl3.parser;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import org.apache.commons.jexl3.JexlException;
 import org.apache.commons.jexl3.JexlFeatures;
 import org.junit.Assert;
@@ -45,7 +47,7 @@ public class ParserTest {
         };
         for(final String[] pair: strings) {
             final String output = StringParser.buildString(pair[1], true);
-            Assert.assertEquals(pair[0], output);
+            assertEquals(pair[0], output);
         }
     }
 
@@ -54,11 +56,11 @@ public class ParserTest {
         final Parser parser = new Parser(";");
         try {
             final JexlNode sn = parser.parse(null, FEATURES, "x = 1 y = 5", null);
-            Assert.fail("should have failed on ambiguous statement");
+            fail("should have failed on ambiguous statement");
         } catch (final JexlException.Ambiguous xambiguous) {
             // ok
         } catch (final JexlException xother) {
-            Assert.fail(xother.toString());
+            fail(xother.toString());
         }
     }
 
@@ -69,7 +71,7 @@ public class ParserTest {
             final Parser parser = new Parser(";");
             try {
                 final JexlNode sn = parser.parse(null, FEATURES, "foo() "+op+" 1;", null);
-                Assert.fail("should have failed on invalid assignment " + op);
+                fail("should have failed on invalid assignment " + op);
             } catch (final JexlException.Parsing xparse) {
                 // ok
                 final String ss = xparse.getDetail();
@@ -83,9 +85,9 @@ public class ParserTest {
         final String[] ids = {"a\\ b", "a\\ b\\ c", "a\\'b\\\"c", "a\\ \\ c"};
         for(final String id : ids) {
             final String esc0 = StringParser.unescapeIdentifier(id);
-            Assert.assertFalse(esc0.contains("\\"));
+            assertFalse(esc0.contains("\\"));
             final String esc1 = StringParser.escapeIdentifier(esc0);
-            Assert.assertEquals(id, esc1);
+            assertEquals(id, esc1);
         }
     }
 
@@ -97,12 +99,12 @@ public class ParserTest {
         final Parser parser = new Parser(";");
         JexlNode sn;
         sn = parser.parse(null, FEATURES, "foo = 1;", null);
-        Assert.assertNotNull("parsed node is null", sn);
+        assertNotNull(sn, "parsed node is null");
 
         sn = parser.parse(null, FEATURES, "foo = \"bar\";", null);
-        Assert.assertNotNull("parsed node is null", sn);
+        assertNotNull(sn, "parsed node is null");
 
         sn = parser.parse(null, FEATURES, "foo = 'bar';", null);
-        Assert.assertNotNull("parsed node is null", sn);
+        assertNotNull(sn, "parsed node is null");
     }
 }

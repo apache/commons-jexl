@@ -16,6 +16,8 @@
  */
 package org.apache.commons.jexl3;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -35,7 +37,7 @@ public class WhileTest extends JexlTestCase {
         final JexlContext jc = new MapContext();
 
         final Object o = e.execute(jc);
-        Assert.assertNull("Result is not null", o);
+        assertNull(o);
     }
 
     @Test
@@ -45,7 +47,7 @@ public class WhileTest extends JexlTestCase {
         jc.set("x", Integer.valueOf(1));
 
         final Object o = e.execute(jc);
-        Assert.assertEquals("Result is wrong", Integer.valueOf(10), o);
+        assertEquals(Integer.valueOf(10), o);
     }
 
     @Test
@@ -56,8 +58,8 @@ public class WhileTest extends JexlTestCase {
         jc.set("y", Integer.valueOf(1));
 
         final Object o = e.execute(jc);
-        Assert.assertEquals("Result is wrong", Integer.valueOf(512), o);
-        Assert.assertEquals("x is wrong", Integer.valueOf(10), jc.get("x"));
-        Assert.assertEquals("y is wrong", Integer.valueOf(512), jc.get("y"));
+        assertEquals(Integer.valueOf(512), o);
+        assertEquals(Integer.valueOf(10), jc.get("x"), "x is wrong");
+        assertEquals(Integer.valueOf(512), jc.get("y"), "y is wrong");
     }
 }

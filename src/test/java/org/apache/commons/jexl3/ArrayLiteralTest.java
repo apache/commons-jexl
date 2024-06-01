@@ -16,6 +16,8 @@
  */
 package org.apache.commons.jexl3;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -40,14 +42,14 @@ public class ArrayLiteralTest extends JexlTestCase {
         jc.set("one", 1);
         jc.set("two", 2);
         final int[] o1 = (int[]) e147.evaluate(jc);
-        Assert.assertEquals(1, o1[0]);
-        Assert.assertEquals(2, o1[1]);
+        assertEquals(1, o1[0]);
+        assertEquals(2, o1[1]);
 
         jc.set("one", 10);
         jc.set("two", 20);
         final int[] o2 = (int[]) e147.evaluate(jc);
-        Assert.assertEquals(10, o2[0]);
-        Assert.assertEquals(20, o2[1]);
+        assertEquals(10, o2[0]);
+        assertEquals(20, o2[1]);
     }
 
     @Test
@@ -55,22 +57,22 @@ public class ArrayLiteralTest extends JexlTestCase {
         final JexlContext jc = new MapContext();
         Object o;
         o = JEXL.createExpression("[]").evaluate(jc);
-        Assert.assertTrue(o instanceof Object[]);
-        Assert.assertEquals(0, ((Object[]) o).length);
+        assertTrue(o instanceof Object[]);
+        assertEquals(0, ((Object[]) o).length);
         o = JEXL.createExpression("[...]").evaluate(jc);
-        Assert.assertTrue(o instanceof List<?>);
-        Assert.assertEquals(0, ((List<?>) o).size());
+        assertTrue(o instanceof List<?>);
+        assertEquals(0, ((List<?>) o).size());
         try {
             final Object ff = JEXL.createExpression("[ , ]");
-            Assert.fail(ff.toString());
+            fail(ff.toString());
         } catch(final JexlException.Parsing parsing) {
-            Assert.assertNotNull(parsing);
+            assertNotNull(parsing);
         }
         try {
             final Object ff = JEXL.createExpression("[ ... , ]");
-            Assert.fail(ff.toString());
+            fail(ff.toString());
         } catch(final JexlException.Parsing parsing) {
-            Assert.assertNotNull(parsing);
+            assertNotNull(parsing);
         }
     }
 
@@ -81,13 +83,13 @@ public class ArrayLiteralTest extends JexlTestCase {
 
         final Object o = e.evaluate(jc);
         final Object[] check = {"foo", "bar"};
-        Assert.assertEquals(Arrays.asList(check), o);
-        Assert.assertEquals(2, ((List<?>) o).size());
+        assertEquals(Arrays.asList(check), o);
+        assertEquals(2, ((List<?>) o).size());
         try {
             JEXL.createExpression("[ 'foo' , 'bar', ... , ]");
-            Assert.fail("syntax");
+            fail("syntax");
         } catch(final JexlException.Parsing parsing) {
-            Assert.assertNotNull(parsing);
+            assertNotNull(parsing);
         }
     }
 
@@ -98,7 +100,7 @@ public class ArrayLiteralTest extends JexlTestCase {
 
         final Object o = e.evaluate(jc);
         final int[] check = {5, 10};
-        Assert.assertArrayEquals(check, (int[]) o);
+        assertArrayEquals(check, (int[]) o);
     }
 
     @Test
@@ -121,7 +123,7 @@ public class ArrayLiteralTest extends JexlTestCase {
         for (int t = 0; t < exprs.length; ++t) {
             final JexlExpression e = JEXL.createExpression(exprs[t]);
             final Object o = e.evaluate(jc);
-            Assert.assertArrayEquals(exprs[t], checks[t], (Object[]) o);
+            assertArrayEquals(checks[t], (Object[]) o, exprs[t]);
         }
 
     }
@@ -133,8 +135,8 @@ public class ArrayLiteralTest extends JexlTestCase {
 
         final Object o = e.evaluate(jc);
         final Object[] check = {Double.valueOf(5), Integer.valueOf(10)};
-        Assert.assertArrayEquals(check, (Object[]) o);
-        Assert.assertTrue(o.getClass().isArray() && o.getClass().getComponentType().equals(Number.class));
+        assertArrayEquals(check, (Object[]) o);
+        assertTrue(o.getClass().isArray() && o.getClass().getComponentType().equals(Number.class));
     }
 
     @Test
@@ -144,7 +146,7 @@ public class ArrayLiteralTest extends JexlTestCase {
         for(final String src : sources) {
             final JexlExpression e = JEXL.createExpression(src);
             final Object o = e.evaluate(null);
-            Assert.assertArrayEquals(check, (Object[]) o);
+            assertArrayEquals(check, (Object[]) o);
         }
     }
 
@@ -155,7 +157,7 @@ public class ArrayLiteralTest extends JexlTestCase {
         for(final String src : sources) {
             final JexlExpression e = JEXL.createExpression(src);
             final Object o = e.evaluate(null);
-            Assert.assertArrayEquals(check, (Object[]) o);
+            assertArrayEquals(check, (Object[]) o);
         }
     }
 
@@ -165,7 +167,7 @@ public class ArrayLiteralTest extends JexlTestCase {
         final JexlContext jc = new MapContext();
 
         final Object o = e.evaluate(jc);
-        Assert.assertFalse((Boolean) o);
+        assertFalse((Boolean) o);
     }
 
     @Test
@@ -174,7 +176,7 @@ public class ArrayLiteralTest extends JexlTestCase {
         final JexlContext jc = new MapContext();
 
         final Object o = e.evaluate(jc);
-        Assert.assertEquals(Integer.valueOf(1), o);
+        assertEquals(Integer.valueOf(1), o);
     }
 
     @Test
@@ -183,6 +185,6 @@ public class ArrayLiteralTest extends JexlTestCase {
         final JexlContext jc = new MapContext();
 
         final Object o = e.evaluate(jc);
-        Assert.assertEquals(Integer.valueOf(2), o);
+        assertEquals(Integer.valueOf(2), o);
     }
 }

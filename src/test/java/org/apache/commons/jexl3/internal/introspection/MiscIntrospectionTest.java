@@ -16,6 +16,8 @@
  */
 package org.apache.commons.jexl3.internal.introspection;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import java.util.ArrayList;
 import java.util.NoSuchElementException;
 
@@ -34,34 +36,34 @@ public class MiscIntrospectionTest {
         try {
             new ArrayIterator(new ArrayList<>());
         } catch (final IllegalArgumentException xill) {
-            Assert.assertNotNull(xill);
+            assertNotNull(xill);
         }
         // wih null ?
         ArrayIterator ai0 = new ArrayIterator(null);
-        Assert.assertFalse(ai0.hasNext());
+        assertFalse(ai0.hasNext());
         try {
             ai0.next();
-            Assert.fail("should have failed");
+            fail("should have failed");
         } catch (final NoSuchElementException no) {
-            Assert.assertNotNull(no);
+            assertNotNull(no);
         }
         // an array
         ai0 = new ArrayIterator(new int[]{42});
-        Assert.assertTrue(ai0.hasNext());
-        Assert.assertEquals(42, ai0.next());
-        Assert.assertFalse(ai0.hasNext());
+        assertTrue(ai0.hasNext());
+        assertEquals(42, ai0.next());
+        assertFalse(ai0.hasNext());
         try {
             ai0.next();
-            Assert.fail("iterator on null ?");
+            fail("iterator on null ?");
         } catch (final NoSuchElementException no) {
-            Assert.assertNotNull(no);
+            assertNotNull(no);
         }
         // no remove
         try {
             ai0.remove();
-            Assert.fail("should have failed");
+            fail("should have failed");
         } catch (final UnsupportedOperationException no) {
-            Assert.assertNotNull(no);
+            assertNotNull(no);
         }
     }
     @Test
@@ -69,23 +71,23 @@ public class MiscIntrospectionTest {
         ArrayListWrapper alw ;
         try {
             new ArrayListWrapper(1);
-            Assert.fail("non-array wrap?");
+            fail("non-array wrap?");
         } catch (final IllegalArgumentException xil) {
-            Assert.assertNotNull(xil);
+            assertNotNull(xil);
         }
         final Integer[] ai = {1, 2};
         alw = new ArrayListWrapper(ai);
-        Assert.assertEquals(1, alw.indexOf(2));
-        Assert.assertEquals(-1, alw.indexOf(null));
+        assertEquals(1, alw.indexOf(2));
+        assertEquals(-1, alw.indexOf(null));
     }
 
     @Test
     public void testEmptyContext() {
         try {
             JexlEngine.EMPTY_CONTEXT.set("nope", 42);
-            Assert.fail("empty context should be readonly");
+            fail("empty context should be readonly");
         } catch (final UnsupportedOperationException xun) {
-            Assert.assertNotNull(xun);
+            assertNotNull(xun);
         }
     }
 

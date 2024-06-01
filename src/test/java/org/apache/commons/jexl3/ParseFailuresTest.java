@@ -16,6 +16,8 @@
  */
 package org.apache.commons.jexl3;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Assert;
@@ -44,7 +46,7 @@ public class ParseFailuresTest extends JexlTestCase {
         final String badExpression = "eq";
         try {
             JEXL.createExpression(badExpression);
-            Assert.fail("Parsing \"" + badExpression
+            fail("Parsing \"" + badExpression
                     + "\" should result in a JexlException");
         } catch (final JexlException pe) {
             // expected
@@ -58,7 +60,7 @@ public class ParseFailuresTest extends JexlTestCase {
         final String badExpression = "?";
         try {
             JEXL.createExpression(badExpression);
-            Assert.fail("Parsing \"" + badExpression
+            fail("Parsing \"" + badExpression
                     + "\" should result in a JexlException");
         } catch (final JexlException pe) {
             // expected
@@ -72,7 +74,7 @@ public class ParseFailuresTest extends JexlTestCase {
         final String badScript = "eq";
         try {
             JEXL.createScript(badScript);
-            Assert.fail("Parsing \"" + badScript
+            fail("Parsing \"" + badScript
                     + "\" should result in a JexlException");
         } catch (final JexlException pe) {
             // expected
@@ -86,7 +88,7 @@ public class ParseFailuresTest extends JexlTestCase {
         final String badScript = "?";
         try {
             JEXL.createScript(badScript);
-            Assert.fail("Parsing \"" + badScript
+            fail("Parsing \"" + badScript
                     + "\" should result in a JexlException");
         } catch (final JexlException pe) {
             // expected
@@ -100,7 +102,7 @@ public class ParseFailuresTest extends JexlTestCase {
         final String badScript = "foo=1;bar=2;a?b:c:d;";
         try {
             JEXL.createScript(badScript);
-            Assert.fail("Parsing \"" + badScript
+            fail("Parsing \"" + badScript
                     + "\" should result in a JexlException");
         } catch (final JexlException pe) {
             // expected

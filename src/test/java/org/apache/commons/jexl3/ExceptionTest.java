@@ -16,6 +16,8 @@
  */
 package org.apache.commons.jexl3;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import org.apache.commons.jexl3.internal.Engine;
 import org.junit.Assert;
 import org.junit.Test;
@@ -61,22 +63,22 @@ public class ExceptionTest extends JexlTestCase {
         try {
             r = e.execute(jc);
             if (strict && !silent) {
-                Assert.fail("should have thrown an exception");
+                fail("should have thrown an exception");
             }
         } catch (final JexlException xjexl) {
             if (!strict || silent) {
-                Assert.fail(src + ": should not have thrown an exception");
+                fail(src + ": should not have thrown an exception");
             }
         }
         if (strict) {
             if (silent && l.count("warn") == 0) {
-                Assert.fail(src + ": should have generated a warning");
+                fail(src + ": should have generated a warning");
             }
         } else {
             if (l.count("debug") == 0) {
-                Assert.fail(src + ": should have generated a debug");
+                fail(src + ": should have generated a debug");
             }
-            Assert.assertEquals(42, r);
+            assertEquals(42, r);
         }
     }
 
@@ -114,10 +116,10 @@ public class ExceptionTest extends JexlTestCase {
         // empty cotext
         try {
             /* Object o = */ e.evaluate(ctxt);
-            Assert.fail("c not defined as variable should throw");
+            fail("c not defined as variable should throw");
         } catch (final JexlException.Variable xjexl) {
             final String msg = xjexl.getMessage();
-            Assert.assertTrue(msg.indexOf("variable 'c.e'") > 0);
+            assertTrue(msg.indexOf("variable 'c.e'") > 0);
         }
 
         // disallow null operands
@@ -125,10 +127,10 @@ public class ExceptionTest extends JexlTestCase {
         ctxt.set("c.e", null);
         try {
             /* Object o = */ e.evaluate(ctxt);
-            Assert.fail("c.e as null operand should throw");
+            fail("c.e as null operand should throw");
         } catch (final JexlException.Variable xjexl) {
             final String msg = xjexl.getMessage();
-            Assert.assertTrue(msg.indexOf("variable 'c.e'") > 0);
+            assertTrue(msg.indexOf("variable 'c.e'") > 0);
         }
 
         // allow null operands
@@ -137,7 +139,7 @@ public class ExceptionTest extends JexlTestCase {
             /* Object o = */ e.evaluate(ctxt);
 
         } catch (final JexlException xjexl) {
-            Assert.fail("c.e in expr should not throw");
+            fail("c.e in expr should not throw");
         }
 
         // ensure c.e is not a defined property
@@ -145,10 +147,10 @@ public class ExceptionTest extends JexlTestCase {
         ctxt.set("e", Integer.valueOf(2));
         try {
             /* Object o = */ e.evaluate(ctxt);
-            Assert.fail("c.e not accessible as property should throw");
+            fail("c.e not accessible as property should throw");
         } catch (final JexlException.Property xjexl) {
             final String msg = xjexl.getMessage();
-            Assert.assertTrue(msg.indexOf("property 'e") > 0);
+            assertTrue(msg.indexOf("property 'e") > 0);
         }
     }
 
@@ -166,10 +168,10 @@ public class ExceptionTest extends JexlTestCase {
         // empty cotext
         try {
             /* Object o = */ e.evaluate(ctxt);
-            Assert.fail("c not declared as variable should throw");
+            fail("c not declared as variable should throw");
         } catch (final JexlException.Variable xjexl) {
             final String msg = xjexl.getMessage();
-            Assert.assertTrue(msg.indexOf("variable 'c.e'") > 0);
+            assertTrue(msg.indexOf("variable 'c.e'") > 0);
         }
 
         // disallow null operands
@@ -177,10 +179,10 @@ public class ExceptionTest extends JexlTestCase {
         ctxt.set("c.e", null);
         try {
             /* Object o = */ e.evaluate(ctxt);
-            Assert.fail("c.e as null operand should throw");
+            fail("c.e as null operand should throw");
         } catch (final JexlException xjexl) {
             final String msg = xjexl.getMessage();
-            Assert.assertTrue(msg.indexOf("variable 'c.e'") > 0);
+            assertTrue(msg.indexOf("variable 'c.e'") > 0);
         }
     }
 
@@ -199,10 +201,10 @@ public class ExceptionTest extends JexlTestCase {
         // empty cotext
         try {
             /* Object o = */ e.execute(ctxt);
-            Assert.fail("x is null, should throw");
+            fail("x is null, should throw");
         } catch (final JexlException xjexl) {
             final String msg = xjexl.getMessage();
-            Assert.assertTrue(msg.indexOf("null") > 0);
+            assertTrue(msg.indexOf("null") > 0);
         }
 
         // allow null operands
@@ -210,7 +212,7 @@ public class ExceptionTest extends JexlTestCase {
         try {
             final Object o = e.execute(ctxt, (Object) null);
         } catch (final JexlException.Variable xjexl) {
-            Assert.fail("arithmetic allows null operands, should not throw");
+            fail("arithmetic allows null operands, should not throw");
         }
     }
 
@@ -221,10 +223,10 @@ public class ExceptionTest extends JexlTestCase {
         final JexlContext jc = new ObjectContext<>(jexl, new ThrowNPE());
         try {
             e.evaluate(jc);
-            Assert.fail("Should have thrown NPE");
+            fail("Should have thrown NPE");
         } catch (final JexlException xany) {
             final Throwable xth = xany.getCause();
-            Assert.assertEquals(NullPointerException.class, xth.getClass());
+            assertEquals(NullPointerException.class, xth.getClass());
         }
     }
     @Test
@@ -233,50 +235,50 @@ public class ExceptionTest extends JexlTestCase {
         final ThrowNPE npe = new ThrowNPE();
         try {
             final Object r = jexl.getProperty(npe, "foo");
-            Assert.fail("Should have thrown JexlException.Property");
+            fail("Should have thrown JexlException.Property");
         } catch (final JexlException.Property xany) {
             final Throwable xth = xany.getCause();
-            Assert.assertNull(xth);
+            assertNull(xth);
         }
         try {
             jexl.setProperty(npe, "foo", 42);
-            Assert.fail("Should have thrown JexlException.Property");
+            fail("Should have thrown JexlException.Property");
         } catch (final JexlException.Property xany) {
             final Throwable xth = xany.getCause();
-            Assert.assertNull(xth);
+            assertNull(xth);
         }
 
         final boolean b = (Boolean) jexl.getProperty(npe, "fail");
-        Assert.assertFalse(b);
+        assertFalse(b);
         try {
             jexl.setProperty(npe, "fail", false);
             jexl.setProperty(npe, "fail", true);
-            Assert.fail("Should have thrown JexlException.Property");
+            fail("Should have thrown JexlException.Property");
         } catch (final JexlException.Property xany) {
             final Throwable xth = xany.getCause();
-            Assert.assertEquals(NullPointerException.class, xth.getClass());
+            assertEquals(NullPointerException.class, xth.getClass());
         }
         try {
             jexl.getProperty(npe, "fail");
-            Assert.fail("Should have thrown JexlException.Property");
+            fail("Should have thrown JexlException.Property");
         } catch (final JexlException.Property xany) {
             final Throwable xth = xany.getCause();
-            Assert.assertEquals(NullPointerException.class, xth.getClass());
+            assertEquals(NullPointerException.class, xth.getClass());
         }
 
         try {
             jexl.invokeMethod(npe, "foo", 42);
-            Assert.fail("Should have thrown JexlException.Method");
+            fail("Should have thrown JexlException.Method");
         } catch (final JexlException.Method xany) {
             final Throwable xth = xany.getCause();
-            Assert.assertNull(xth);
+            assertNull(xth);
         }
         try {
             jexl.invokeMethod(npe, "npe");
-            Assert.fail("Should have thrown NullPointerException");
+            fail("Should have thrown NullPointerException");
         } catch (final JexlException.Method xany) {
             final Throwable xth = xany.getCause();
-            Assert.assertEquals(NullPointerException.class, xth.getClass());
+            assertEquals(NullPointerException.class, xth.getClass());
         }
     }
 }

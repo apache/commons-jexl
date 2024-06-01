@@ -16,6 +16,8 @@
  */
 package org.apache.commons.jexl3;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -111,7 +113,7 @@ public class IssuesTest extends JexlTestCase {
                 final JexlExpression expr = jexl.createExpression(s);
                 /* Object value = */
                 expr.evaluate(ctxt);
-                Assert.fail(s + " : should have failed due to null argument");
+                fail(s + " : should have failed due to null argument");
             } catch (final JexlException xjexl) {
                 // expected
             }
@@ -131,7 +133,7 @@ public class IssuesTest extends JexlTestCase {
 
         final JexlExpression expr = jexl.createExpression("derived.foo()");
         final Object value = expr.evaluate(ctxt);
-        Assert.assertTrue("should be true", (Boolean) value);
+        assertTrue((Boolean) value);
     }
 
     // JEXL-42: NullPointerException evaluating an expression
@@ -151,7 +153,7 @@ public class IssuesTest extends JexlTestCase {
 
         final JxltEngine.Expression expr = uel.createExpression("${ax+(bx)}");
         final Object value = expr.evaluate(ctxt);
-        Assert.assertEquals("should be ok", "ok", value);
+        assertEquals("ok", value);
     }
 
     // JEXL-44
@@ -164,13 +166,13 @@ public class IssuesTest extends JexlTestCase {
         options.setSilent(false);
         JexlScript script;
         script = jexl.createScript("'hello world!'//commented");
-        Assert.assertEquals("hello world!", script.execute(ctxt));
+        assertEquals("hello world!", script.execute(ctxt));
         script = jexl.createScript("'hello world!'; //commented\n'bye...'");
-        Assert.assertEquals("bye...", script.execute(ctxt));
+        assertEquals("bye...", script.execute(ctxt));
         script = jexl.createScript("'hello world!'## commented");
-        Assert.assertEquals("hello world!", script.execute(ctxt));
+        assertEquals("hello world!", script.execute(ctxt));
         script = jexl.createScript("'hello world!';## commented\n'bye...'");
-        Assert.assertEquals("bye...", script.execute(ctxt));
+        assertEquals("bye...", script.execute(ctxt));
     }
 
     // JEXL-47: C style comments (single & multi line) (fixed in Parser.jjt)
@@ -185,15 +187,15 @@ public class IssuesTest extends JexlTestCase {
 
         JexlExpression expr = jexl.createExpression("true//false\n");
         Object value = expr.evaluate(ctxt);
-        Assert.assertTrue("should be true", (Boolean) value);
+        assertTrue((Boolean) value);
 
         expr = jexl.createExpression("/*true*/false");
         value = expr.evaluate(ctxt);
-        Assert.assertFalse("should be false", (Boolean) value);
+        assertFalse((Boolean) value);
 
         expr = jexl.createExpression("/*\"true\"*/false");
         value = expr.evaluate(ctxt);
-        Assert.assertFalse("should be false", (Boolean) value);
+        assertFalse((Boolean) value);
     }
 
     @Test
@@ -209,11 +211,11 @@ public class IssuesTest extends JexlTestCase {
             final JexlExpression e = jexl.createExpression(jexlExp);
             jc.set("foo", new Foo());
             /* Object o = */ e.evaluate(jc);
-            Assert.fail("Should have failed due to invalid assignment");
+            fail("Should have failed due to invalid assignment");
         } catch (final JexlException.Assignment xparse) {
             final String dbg = xparse.toString();
         } catch (final JexlException xjexl) {
-            Assert.fail("Should have thrown a parse exception");
+            fail("Should have thrown a parse exception");
         }
     }
 
@@ -226,7 +228,7 @@ public class IssuesTest extends JexlTestCase {
         final String stmt = "a = 'b'; c = 'd';";
         final JexlScript expr = jexl.createScript(stmt);
         /* Object value = */ expr.execute(ctxt);
-        Assert.assertTrue("JEXL-49 is not fixed", vars.get("a").equals("b") && vars.get("c").equals("d"));
+        assertTrue(vars.get("a").equals("b") && vars.get("c").equals("d"), "JEXL-49 is not fixed");
     }
 
     // JEXL-52: can be implemented by deriving Interpreter.{g,s}etAttribute; later
@@ -236,24 +238,24 @@ public class IssuesTest extends JexlTestCase {
         final Uberspect uber = (Uberspect) jexl.getUberspect();
         // most likely, call will be in an Interpreter, getUberspect
         String[] names = uber.getMethodNames(Another.class);
-        Assert.assertTrue("should find methods", names.length > 0);
+        assertTrue(names.length > 0, "should find methods");
         int found = 0;
         for (final String name : names) {
             if ("foo".equals(name) || "goo".equals(name)) {
                 found += 1;
             }
         }
-        Assert.assertEquals("should have foo & goo", 2, found);
+        assertEquals(2, found, "should have foo & goo");
 
         names = uber.getFieldNames(Another.class);
-        Assert.assertTrue("should find fields", names.length > 0);
+        assertTrue(names.length > 0, "should find fields");
         found = 0;
         for (final String name : names) {
             if ("name".equals(name)) {
                 found += 1;
             }
         }
-        Assert.assertEquals("should have name", 1, found);
+        assertEquals(1, found, "should have name");
     }
 
     // JEXL-62
@@ -269,24 +271,24 @@ public class IssuesTest extends JexlTestCase {
         JexlScript jscript;
 
         jscript = jexl.createScript("dummy.hashCode()");
-        Assert.assertNull(jscript.getSourceText(), jscript.execute(ctxt)); // OK
+        assertNull(jscript.execute(ctxt), jscript::getSourceText); // OK
 
         ctxt.set("dummy", "abcd");
-        Assert.assertEquals(jscript.getSourceText(), Integer.valueOf("abcd".hashCode()), jscript.execute(ctxt)); // OK
+        assertEquals(Integer.valueOf("abcd".hashCode()), jscript.execute(ctxt), jscript::getSourceText); // OK
 
         jscript = jexl.createScript("dummy.hashCode");
-        Assert.assertNull(jscript.getSourceText(), jscript.execute(ctxt)); // OK
+        assertNull(jscript.execute(ctxt), jscript::getSourceText); // OK
 
         JexlExpression jexpr;
         vars.clear();
         jexpr = jexl.createExpression("dummy.hashCode()");
-        Assert.assertNull(jexpr.toString(), jexpr.evaluate(ctxt)); // OK
+        assertNull(jexpr.evaluate(ctxt), jexpr::toString); // OK
 
         ctxt.set("dummy", "abcd");
-        Assert.assertEquals(jexpr.toString(), Integer.valueOf("abcd".hashCode()), jexpr.evaluate(ctxt)); // OK
+        assertEquals(Integer.valueOf("abcd".hashCode()), jexpr.evaluate(ctxt), jexpr::toString); // OK
 
         jexpr = jexl.createExpression("dummy.hashCode");
-        Assert.assertNull(jexpr.toString(), jexpr.evaluate(ctxt)); // OK
+        assertNull(jexpr.evaluate(ctxt), jexpr::toString); // OK
     }
 
     // JEXL-87
@@ -302,13 +304,13 @@ public class IssuesTest extends JexlTestCase {
 
         ctxt.set("l", java.math.BigInteger.valueOf(7));
         ctxt.set("r", java.math.BigInteger.valueOf(2));
-        Assert.assertEquals(java.math.BigInteger.valueOf(3), divide.evaluate(ctxt));
-        Assert.assertTrue(jexl.getArithmetic().equals(1, modulo.evaluate(ctxt)));
+        assertEquals(java.math.BigInteger.valueOf(3), divide.evaluate(ctxt));
+        assertTrue(jexl.getArithmetic().equals(1, modulo.evaluate(ctxt)));
 
         ctxt.set("l", java.math.BigDecimal.valueOf(7));
         ctxt.set("r", java.math.BigDecimal.valueOf(2));
-        Assert.assertEquals(java.math.BigDecimal.valueOf(3.5), divide.evaluate(ctxt));
-        Assert.assertTrue(jexl.getArithmetic().equals(1, modulo.evaluate(ctxt)));
+        assertEquals(java.math.BigDecimal.valueOf(3.5), divide.evaluate(ctxt));
+        assertTrue(jexl.getArithmetic().equals(1, modulo.evaluate(ctxt)));
     }
 
     // JEXL-90
@@ -330,7 +332,7 @@ public class IssuesTest extends JexlTestCase {
         for (final String fexpr : fexprs) {
             try {
                 jexl.createScript(fexpr);
-                Assert.fail(fexpr + ": Should have failed in parse");
+                fail(fexpr + ": Should have failed in parse");
             } catch (final JexlException xany) {
                 // expected to fail in createExpression
             }
@@ -347,7 +349,7 @@ public class IssuesTest extends JexlTestCase {
         ctxt.set("y", Boolean.TRUE);
         for (final String expr : exprs) {
             final JexlScript s = jexl.createScript(expr);
-            Assert.assertEquals(Integer.valueOf(2), s.execute(ctxt));
+            assertEquals(Integer.valueOf(2), s.execute(ctxt));
         }
         debuggerCheck(jexl);
     }
@@ -370,11 +372,11 @@ public class IssuesTest extends JexlTestCase {
         final long start = System.nanoTime();
         script = jexl.createExpression(input);
         final Object value = script.evaluate(ctxt);
-        Assert.assertEquals(Integer.valueOf(11), value);
+        assertEquals(Integer.valueOf(11), value);
         final long end = System.nanoTime();
         final double millisec = (end - start) / 1e6;
         final double limit = 200.0; // Allow plenty of slack
-        Assert.assertTrue("Expected parse to take less than " + limit + "ms, actual " + millisec, millisec < limit);
+        assertTrue(millisec < limit, () -> "Expected parse to take less than " + limit + "ms, actual " + millisec);
     }
 
     @Test
@@ -389,7 +391,7 @@ public class IssuesTest extends JexlTestCase {
         final JexlEngine jexl = new JexlBuilder().namespaces(funcs).create();
         for (final String expr : exprs) {
             final Object value = jexl.createExpression(expr).evaluate(null);
-            Assert.assertEquals(expr, "DOMAIN\\\\somename", value);
+            assertEquals("DOMAIN\\\\somename", value, expr);
         }
     }
 

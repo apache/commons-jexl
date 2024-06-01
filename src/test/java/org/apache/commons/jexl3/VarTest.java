@@ -16,6 +16,8 @@
  */
 package org.apache.commons.jexl3;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -253,64 +255,64 @@ public class VarTest extends JexlTestCase {
     @Test
     public void testLiteral() throws Exception {
         JexlBuilder builder = new JexlBuilder().collectMode(2);
-        Assert.assertEquals(2, builder.collectMode());
-        Assert.assertTrue(builder.collectAll());
+        assertEquals(2, builder.collectMode());
+        assertTrue(builder.collectAll());
 
         JexlEngine jexld = builder.create();
         JexlScript e = jexld.createScript("x.y[['z', 't']]");
         Set<List<String>> vars = e.getVariables();
-        Assert.assertEquals(1, vars.size());
-        Assert.assertTrue(eq(mkref(new String[][]{{"x", "y", "[ 'z', 't' ]"}}), vars));
+        assertEquals(1, vars.size());
+        assertTrue(eq(mkref(new String[][]{{"x", "y", "[ 'z', 't' ]"}}), vars));
 
         e = jexld.createScript("x.y[{'z': 't'}]");
         vars = e.getVariables();
-        Assert.assertEquals(1, vars.size());
-        Assert.assertTrue(eq(mkref(new String[][]{{"x", "y", "{ 'z' : 't' }"}}), vars));
+        assertEquals(1, vars.size());
+        assertTrue(eq(mkref(new String[][]{{"x", "y", "{ 'z' : 't' }"}}), vars));
 
         e = jexld.createScript("x.y.'{ \\'z\\' : \\'t\\' }'");
         vars = e.getVariables();
-        Assert.assertEquals(1, vars.size());
-        Assert.assertTrue(eq(mkref(new String[][]{{"x", "y", "{ 'z' : 't' }"}}), vars));
+        assertEquals(1, vars.size());
+        assertTrue(eq(mkref(new String[][]{{"x", "y", "{ 'z' : 't' }"}}), vars));
 
         // only string or number literals
         builder = builder.collectAll(true);
-        Assert.assertEquals(1, builder.collectMode());
-        Assert.assertTrue(builder.collectAll());
+        assertEquals(1, builder.collectMode());
+        assertTrue(builder.collectAll());
 
         jexld = builder.create();
         e = jexld.createScript("x.y[{'z': 't'}]");
         vars = e.getVariables();
-        Assert.assertEquals(1, vars.size());
-        Assert.assertTrue(eq(mkref(new String[][]{{"x", "y"}}), vars));
+        assertEquals(1, vars.size());
+        assertTrue(eq(mkref(new String[][]{{"x", "y"}}), vars));
 
         e = jexld.createScript("x.y[['z', 't']]");
         vars = e.getVariables();
-        Assert.assertEquals(1, vars.size());
-        Assert.assertTrue(eq(mkref(new String[][]{{"x", "y"}}), vars));
+        assertEquals(1, vars.size());
+        assertTrue(eq(mkref(new String[][]{{"x", "y"}}), vars));
 
         e = jexld.createScript("x.y['z']");
         vars = e.getVariables();
-        Assert.assertEquals(1, vars.size());
-        Assert.assertTrue(eq(mkref(new String[][]{{"x", "y", "z"}}), vars));
+        assertEquals(1, vars.size());
+        assertTrue(eq(mkref(new String[][]{{"x", "y", "z"}}), vars));
 
         e = jexld.createScript("x.y[42]");
         vars = e.getVariables();
-        Assert.assertEquals(1, vars.size());
-        Assert.assertTrue(eq(mkref(new String[][]{{"x", "y", "42"}}), vars));
+        assertEquals(1, vars.size());
+        assertTrue(eq(mkref(new String[][]{{"x", "y", "42"}}), vars));
     }
 
     @Test
     public void testLocalBasic() throws Exception {
         final JexlScript e = JEXL.createScript("var x; x = 42");
         final Object o = e.execute(null);
-        Assert.assertEquals("Result is not 42", Integer.valueOf(42), o);
+        assertEquals(Integer.valueOf(42), o);
     }
 
     @Test
     public void testLocalFor() throws Exception {
         final JexlScript e = JEXL.createScript("var y  = 0; for(var x : [5, 17, 20]) { y = y + x; } y;");
         final Object o = e.execute(null);
-        Assert.assertEquals("Result is not 42", Integer.valueOf(42), o);
+        assertEquals(Integer.valueOf(42), o);
     }
 
     @Test
@@ -318,7 +320,7 @@ public class VarTest extends JexlTestCase {
         final JexlContext jc = new NumbersContext();
         final JexlScript e = JEXL.createScript("var y  = 0; for(var x : numbers()) { y = y + x; } y;");
         final Object o = e.execute(jc);
-        Assert.assertEquals("Result is not 42", Integer.valueOf(42), o);
+        assertEquals(Integer.valueOf(42), o);
     }
 
     @Test
@@ -326,16 +328,16 @@ public class VarTest extends JexlTestCase {
         final JexlContext jc = new NumbersContext();
         final JexlScript e = JEXL.createScript("var y  = 42; for(var x : numbers()) { if (x > 10) return x } y;");
         final Object o = e.execute(jc);
-        Assert.assertEquals("Result is not 17", Integer.valueOf(17), o);
+        assertEquals(Integer.valueOf(17), o);
 
-        Assert.assertTrue(toString(e.getVariables()), e.getVariables().isEmpty());
+        assertTrue(e.getVariables().isEmpty(), () -> toString(e.getVariables()));
     }
 
     @Test
     public void testLocalSimple() throws Exception {
         final JexlScript e = JEXL.createScript("var x = 21; x + x");
         final Object o = e.execute(null);
-        Assert.assertEquals("Result is not 42", Integer.valueOf(42), o);
+        assertEquals(Integer.valueOf(42), o);
     }
 
     @Test
@@ -347,11 +349,11 @@ public class VarTest extends JexlTestCase {
         final String[] parms = e.getParameters();
         final String[] locals = e.getLocalVariables();
 
-        Assert.assertTrue(eq(mkref(new String[][]{{"y"}}), vars));
-        Assert.assertEquals(1, parms.length);
-        Assert.assertEquals("x", parms[0]);
-        Assert.assertEquals(1, locals.length);
-        Assert.assertEquals("z", locals[0]);
+        assertTrue(eq(mkref(new String[][]{{"y"}}), vars));
+        assertEquals(1, parms.length);
+        assertEquals("x", parms[0]);
+        assertEquals(1, locals.length);
+        assertEquals("z", locals[0]);
     }
 
     @Test
@@ -363,23 +365,23 @@ public class VarTest extends JexlTestCase {
             Object result;
             script = JEXL.createScript("x = 3");
             result = script.execute(jc);
-            Assert.assertEquals(3, vars.getX());
-            Assert.assertEquals(3, result);
+            assertEquals(3, vars.getX());
+            assertEquals(3, result);
             script = JEXL.createScript("x == 3");
             result = script.execute(jc);
-            Assert.assertTrue((Boolean) result);
-            Assert.assertTrue(jc.has("x"));
+            assertTrue((Boolean) result);
+            assertTrue(jc.has("x"));
 
             script = JEXL.createScript("color = 'blue'");
             result = script.execute(jc);
-            Assert.assertEquals("blue", vars.getColor());
-            Assert.assertEquals("blue", result);
+            assertEquals("blue", vars.getColor());
+            assertEquals("blue", result);
             script = JEXL.createScript("color == 'blue'");
             result = script.execute(jc);
-            Assert.assertTrue((Boolean) result);
-            Assert.assertTrue(jc.has("color"));
+            assertTrue((Boolean) result);
+            assertTrue(jc.has("color"));
         } catch (final JexlException.Method ambiguous) {
-            Assert.fail("total() is solvable");
+            fail("total() is solvable");
         }
     }
 
@@ -397,28 +399,28 @@ public class VarTest extends JexlTestCase {
 
         script = jexld.createScript("moon.landing[['yyyy', 'MM', 'dd']]");
         result = (List<String>) script.execute(ctxt);
-        Assert.assertEquals(Arrays.asList("1969", "7", "20"), result);
+        assertEquals(Arrays.asList("1969", "7", "20"), result);
 
         vars = script.getVariables();
-        Assert.assertEquals(1, vars.size());
+        assertEquals(1, vars.size());
         List<String> var = vars.iterator().next();
-        Assert.assertEquals("moon", var.get(0));
-        Assert.assertEquals("landing", var.get(1));
-        Assert.assertArrayEquals(new String[]{"yyyy", "MM", "dd"}, readIdentifiers(var.get(2)));
+        assertEquals("moon", var.get(0));
+        assertEquals("landing", var.get(1));
+        assertArrayEquals(new String[]{"yyyy", "MM", "dd"}, readIdentifiers(var.get(2)));
 
         script = jexld.createScript("moon.landing[ { 'yyyy' : 'year', 'MM' : 'month', 'dd' : 'day' } ]");
         final Map<String, String> mapr = (Map<String, String>) script.execute(ctxt);
-        Assert.assertEquals(3, mapr.size());
-        Assert.assertEquals("1969", mapr.get("year"));
-        Assert.assertEquals("7", mapr.get("month"));
-        Assert.assertEquals("20", mapr.get("day"));
+        assertEquals(3, mapr.size());
+        assertEquals("1969", mapr.get("year"));
+        assertEquals("7", mapr.get("month"));
+        assertEquals("20", mapr.get("day"));
 
         vars = script.getVariables();
-        Assert.assertEquals(1, vars.size());
+        assertEquals(1, vars.size());
         var = vars.iterator().next();
-        Assert.assertEquals("moon", var.get(0));
-        Assert.assertEquals("landing", var.get(1));
-        Assert.assertArrayEquals(new String[]{"yyyy", "MM", "dd"}, readIdentifiers(var.get(2)));
+        assertEquals("moon", var.get(0));
+        assertEquals("landing", var.get(1));
+        assertArrayEquals(new String[]{"yyyy", "MM", "dd"}, readIdentifiers(var.get(2)));
     }
 
     @Test
@@ -430,112 +432,112 @@ public class VarTest extends JexlTestCase {
         e = JEXL.createScript("a[b]['c']");
         vars = e.getVariables();
         expect = mkref(new String[][]{{"a"},{"b"}});
-        Assert.assertTrue(eq(expect, vars));
+        assertTrue(eq(expect, vars));
 
         e = JEXL.createScript("a.'b + c'");
         vars = e.getVariables();
         expect = mkref(new String[][]{{"a", "b + c"}});
-        Assert.assertTrue(eq(expect, vars));
+        assertTrue(eq(expect, vars));
 
         e = JEXL.createScript("e[f]");
         vars = e.getVariables();
         expect = mkref(new String[][]{{"e"},{"f"}});
-        Assert.assertTrue(eq(expect, vars));
+        assertTrue(eq(expect, vars));
 
         e = JEXL.createScript("e[f][g]");
         vars = e.getVariables();
         expect = mkref(new String[][]{{"e"},{"f"},{"g"}});
-        Assert.assertTrue(eq(expect, vars));
+        assertTrue(eq(expect, vars));
 
         e = JEXL.createScript("e['f'].goo");
         vars = e.getVariables();
         expect = mkref(new String[][]{{"e","f","goo"}});
-        Assert.assertTrue(eq(expect, vars));
+        assertTrue(eq(expect, vars));
 
         e = JEXL.createScript("e['f']");
         vars = e.getVariables();
         expect = mkref(new String[][]{{"e","f"}});
-        Assert.assertTrue(eq(expect, vars));
+        assertTrue(eq(expect, vars));
 
         e = JEXL.createScript("e[f]['g']");
         vars = e.getVariables();
         expect = mkref(new String[][]{{"e"},{"f"}});
-        Assert.assertTrue(eq(expect, vars));
+        assertTrue(eq(expect, vars));
 
         e = JEXL.createScript("e['f']['g']");
         vars = e.getVariables();
         expect = mkref(new String[][]{{"e","f","g"}});
-        Assert.assertTrue(eq(expect, vars));
+        assertTrue(eq(expect, vars));
 
         e = JEXL.createScript("a['b'].c['d'].e");
         vars = e.getVariables();
         expect = mkref(new String[][]{{"a", "b", "c", "d", "e"}});
-        Assert.assertTrue(eq(expect, vars));
+        assertTrue(eq(expect, vars));
 
         e = JEXL.createScript("a + b.c + b.c.d + e['f']");
         vars = e.getVariables();
         expect = mkref(new String[][]{{"a"}, {"b", "c"}, {"b", "c", "d"}, {"e", "f"}});
-        Assert.assertTrue(eq(expect, vars));
+        assertTrue(eq(expect, vars));
 
         e = JEXL.createScript("D[E[F]]");
         vars = e.getVariables();
         expect = mkref(new String[][]{{"D"}, {"E"}, {"F"}});
-        Assert.assertTrue(eq(expect, vars));
+        assertTrue(eq(expect, vars));
 
         e = JEXL.createScript("D[E[F[G[H]]]]");
         vars = e.getVariables();
         expect = mkref(new String[][]{{"D"}, {"E"}, {"F"}, {"G"}, {"H"}});
-        Assert.assertTrue(eq(expect, vars));
+        assertTrue(eq(expect, vars));
 
         e = JEXL.createScript(" A + B[C] + D[E[F]] + x[y[z]] ");
         vars = e.getVariables();
         expect = mkref(new String[][]{{"A"}, {"B"}, {"C"}, {"D"}, {"E"}, {"F"}, {"x"} , {"y"}, {"z"}});
-        Assert.assertTrue(eq(expect, vars));
+        assertTrue(eq(expect, vars));
 
         e = JEXL.createScript(" A + B[C] + D.E['F'] + x[y.z] ");
         vars = e.getVariables();
         expect = mkref(new String[][]{{"A"}, {"B"}, {"C"}, {"D", "E", "F"}, {"x"} , {"y", "z"}});
-        Assert.assertTrue(eq(expect, vars));
+        assertTrue(eq(expect, vars));
 
         e = JEXL.createScript("(A)");
         vars = e.getVariables();
         expect = mkref(new String[][]{{"A"}});
-        Assert.assertTrue(eq(expect, vars));
+        assertTrue(eq(expect, vars));
 
         e = JEXL.createScript("not(A)");
         vars = e.getVariables();
         expect = mkref(new String[][]{{"A"}});
-        Assert.assertTrue(eq(expect, vars));
+        assertTrue(eq(expect, vars));
 
         e = JEXL.createScript("not((A))");
         vars = e.getVariables();
         expect = mkref(new String[][]{{"A"}});
-        Assert.assertTrue(eq(expect, vars));
+        assertTrue(eq(expect, vars));
 
         e = JEXL.createScript("a[b]['c']");
         vars = e.getVariables();
         expect = mkref(new String[][]{{"a"}, {"b"}});
-        Assert.assertTrue(eq(expect, vars));
+        assertTrue(eq(expect, vars));
 
         e = JEXL.createScript("a['b'][c]");
         vars = e.getVariables();
         expect = mkref(new String[][]{{"a", "b"}, {"c"}});
-        Assert.assertTrue(eq(expect, vars));
+        assertTrue(eq(expect, vars));
 
         e = JEXL.createScript("a[b].c");
         vars = e.getVariables();
         expect = mkref(new String[][]{{"a"}, {"b"}});
-        Assert.assertTrue(eq(expect, vars));
+        assertTrue(eq(expect, vars));
 
         e = JEXL.createScript("a[b].c[d]");
         vars = e.getVariables();
         expect = mkref(new String[][]{{"a"}, {"b"}, {"d"}});
-        Assert.assertTrue(eq(expect, vars));
+        assertTrue(eq(expect, vars));
 
         e = JEXL.createScript("a[b][e].c[d][f]");
         vars = e.getVariables();
         expect = mkref(new String[][]{{"a"}, {"b"}, {"d"}, {"e"}, {"f"}});
-        Assert.assertTrue(eq(expect, vars));
+        assertTrue(eq(expect, vars));
     }
 
     @Test
@@ -551,14 +553,14 @@ public class VarTest extends JexlTestCase {
         e = JEXL.createScript("x");
         try {
             final Object o = e.execute(ctxt);
-            Assert.fail("should have thrown an unknown var exception");
+            fail("should have thrown an unknown var exception");
         } catch (final JexlException xjexl) {
             // ok since we are strict and x does not exist
         }
         e = JEXL.createScript("x = 42");
         try {
             final Object o = e.execute(ctxt);
-            Assert.fail("should have thrown a readonly context exception");
+            fail("should have thrown a readonly context exception");
         } catch (final JexlException xjexl) {
             // ok since we are strict and context is readonly
         }
@@ -567,7 +569,7 @@ public class VarTest extends JexlTestCase {
         e = JEXL.createScript("x.theAnswerToEverything()");
         try {
             final Object o = e.execute(ctxt);
-            Assert.fail("should have thrown an unknown method exception");
+            fail("should have thrown an unknown method exception");
         } catch (final JexlException xjexl) {
             // ok since we are strict and method does not exist
         }
@@ -578,7 +580,7 @@ public class VarTest extends JexlTestCase {
         final JexlScript script = JEXL.createScript("sum(TOTAL) - partial.sum() + partial['sub'].avg() - sum(partial.sub)");
         final Set<List<String>> vars = script.getVariables();
 
-        Assert.assertEquals(3, vars.size());
+        assertEquals(3, vars.size());
     }
 
     @Test
@@ -591,27 +593,27 @@ public class VarTest extends JexlTestCase {
         e = jexl.createScript("a['b'][c]");
         vars = e.getVariables();
         expect = mkref(new String[][]{{"a"}, {"c"}});
-        Assert.assertTrue(eq(expect, vars));
+        assertTrue(eq(expect, vars));
 
         e = jexl.createScript(" A + B[C] + D[E[F]] + x[y[z]] ");
         vars = e.getVariables();
         expect = mkref(new String[][]{{"A"}, {"B"}, {"C"}, {"D"}, {"E"}, {"F"}, {"x"} , {"y"}, {"z"}});
-        Assert.assertTrue(eq(expect, vars));
+        assertTrue(eq(expect, vars));
 
         e = jexl.createScript("e['f']['g']");
         vars = e.getVariables();
         expect = mkref(new String[][]{{"e"}});
-        Assert.assertTrue(eq(expect, vars));
+        assertTrue(eq(expect, vars));
 
         e = jexl.createScript("a[b][e].c[d][f]");
         vars = e.getVariables();
         expect = mkref(new String[][]{{"a"}, {"b"}, {"d"}, {"e"}, {"f"}});
-        Assert.assertTrue(eq(expect, vars));
+        assertTrue(eq(expect, vars));
 
         e = jexl.createScript("a + b.c + b.c.d + e['f']");
         vars = e.getVariables();
         expect = mkref(new String[][]{{"a"}, {"b", "c"}, {"b", "c", "d"}, {"e"}});
-        Assert.assertTrue(eq(expect, vars));
+        assertTrue(eq(expect, vars));
     }
 
     /**

@@ -16,6 +16,8 @@
  */
 package org.apache.commons.jexl3;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -336,22 +338,22 @@ public class MethodTest extends JexlTestCase {
         Object result;
         // basic call works
         result = JEXL.invokeMethod(func, "over", "foo", 42);
-        Assert.assertEquals("foo + 42", result);
+        assertEquals("foo + 42", result);
         // ambiguous call fails
         try {
             JEXL.invokeMethod(func, "over", "not null", null);
-            Assert.fail("should be ambiguous");
+            fail("should be ambiguous");
         } catch (final JexlException.Method xinvoke) {
-            Assert.assertEquals("over(String, Object)", xinvoke.getMethodSignature());
+            assertEquals("over(String, Object)", xinvoke.getMethodSignature());
         }
 
         // another ambiguous call fails
         try {
             final String[] arg2 = {"more", "than", "one"};
             JEXL.invokeMethod(func, "over", "not null", arg2);
-            Assert.fail("should be ambiguous");
+            fail("should be ambiguous");
         } catch (final JexlException.Method xinvoke) {
-            Assert.assertEquals("over(String, String[])", xinvoke.getMethodSignature());
+            assertEquals("over(String, String[])", xinvoke.getMethodSignature());
         }
     }
 
@@ -359,11 +361,11 @@ public class MethodTest extends JexlTestCase {
     public void testCallJexlVarArgMethod() throws Exception {
         final VarArgs test = new VarArgs();
         asserter.setVariable("test", test);
-        Assert.assertEquals("jexl:0", test.callMixed("jexl"));
+        assertEquals("jexl:0", test.callMixed("jexl"));
         asserter.assertExpression("test.callMixed('jexl')", "jexl:0");
         // Java and JEXL equivalent behavior: 'jexl:-1000' expected
         //{
-        Assert.assertEquals("jexl:-1000", test.callMixed("jexl", (Integer[]) null));
+        assertEquals("jexl:-1000", test.callMixed("jexl", (Integer[]) null));
         asserter.assertExpression("test.callMixed('jexl', null)", "jexl:-1000");
         //}
         asserter.assertExpression("test.callMixed('jexl', 2)", test.callMixed("jexl", 2));
@@ -374,11 +376,11 @@ public class MethodTest extends JexlTestCase {
     public void testCallMixedVarArgMethod() throws Exception {
         final VarArgs test = new VarArgs();
         asserter.setVariable("test", test);
-        Assert.assertEquals("Mixed:1", test.callMixed(Integer.valueOf(1)));
+        assertEquals("Mixed:1", test.callMixed(Integer.valueOf(1)));
         asserter.assertExpression("test.callMixed(1)", test.callMixed(1));
         // Java and JEXL equivalent behavior: 'Mixed:-999' expected
         //{
-        Assert.assertEquals("Mixed:-999", test.callMixed(Integer.valueOf(1), (Integer[]) null));
+        assertEquals("Mixed:-999", test.callMixed(Integer.valueOf(1), (Integer[]) null));
         asserter.assertExpression("test.callMixed(1, null)", "Mixed:-999");
         //}
         asserter.assertExpression("test.callMixed(1,2)", test.callMixed(1, 2));
@@ -404,32 +406,32 @@ public class MethodTest extends JexlTestCase {
         JexlScript bar = JEXL.createScript("functor:get('drink')");
         Object o;
         o = bar.execute(context);
-        Assert.assertEquals("Wrong choice", "champaign", o);
+        assertEquals("champaign", o, "Wrong choice");
         context.set("base", "gin");
         o = bar.execute(context);
-        Assert.assertEquals("Wrong choice", "gin fizz", o);
+        assertEquals("gin fizz", o, "Wrong choice");
 
         // despite being called twice, the functor is created only once.
         context.set("base", "wine");
         bar = JEXL.createScript("var glass = functor:get('drink'); base = 'gin'; functor:get('drink')");
         o = bar.execute(context);
-        Assert.assertEquals("Wrong choice", "champaign", o);
+        assertEquals("champaign", o, "Wrong choice");
     }
 
     @Test
     public void testInvoke() throws Exception {
         Functor func = new Functor();
-        Assert.assertEquals(Integer.valueOf(10), JEXL.invokeMethod(func, "ten"));
-        Assert.assertEquals(Integer.valueOf(42), JEXL.invokeMethod(func, "PLUS20", Integer.valueOf(22)));
+        assertEquals(Integer.valueOf(10), JEXL.invokeMethod(func, "ten"));
+        assertEquals(Integer.valueOf(42), JEXL.invokeMethod(func, "PLUS20", Integer.valueOf(22)));
         try {
             JEXL.invokeMethod(func, "nonExistentMethod");
-            Assert.fail("method does not exist!");
+            fail("method does not exist!");
         } catch (final Exception xj0) {
             // ignore
         }
         try {
             JEXL.invokeMethod(func, "NPEIfNull", (Object[]) null);
-            Assert.fail("method should have thrown!");
+            fail("method should have thrown!");
         } catch (final Exception xj0) {
             // ignore
         }
@@ -437,7 +439,7 @@ public class MethodTest extends JexlTestCase {
         Object result;
         try {
             result = JEXL.invokeMethod(func, "over", "foo", 42);
-            Assert.assertEquals("foo + 42", result);
+            assertEquals("foo + 42", result);
         } catch (final Exception xj0) {
             // ignore
             result = xj0;
@@ -445,7 +447,7 @@ public class MethodTest extends JexlTestCase {
 
         try {
             result = JEXL.invokeMethod(func, "over", null, null);
-            Assert.fail("method should have thrown!");
+            fail("method should have thrown!");
         } catch (final Exception xj0) {
             // ignore
             result = xj0;
@@ -454,9 +456,9 @@ public class MethodTest extends JexlTestCase {
         func = new FunctorOver();
         try {
             result = JEXL.invokeMethod(func, "over", null, null);
-            Assert.assertEquals("null + null", result);
+            assertEquals("null + null", result);
         } catch (final Exception xj0) {
-            Assert.fail("method should not have thrown!");
+            fail("method should not have thrown!");
         }
     }
 
@@ -486,23 +488,23 @@ public class MethodTest extends JexlTestCase {
         final JexlEvalContext jc = new EnhancedContext(funcs);
 
         Object o = e.evaluate(jc);
-        Assert.assertEquals("Result is not 10", Integer.valueOf(10), o);
+        assertEquals(Integer.valueOf(10), o);
 
         e = JEXL.createExpression("func:plus10(10)");
         o = e.evaluate(jc);
-        Assert.assertEquals("Result is not 20", Integer.valueOf(20), o);
+        assertEquals(Integer.valueOf(20), o);
 
         e = JEXL.createExpression("func:plus10(func:ten())");
         o = e.evaluate(jc);
-        Assert.assertEquals("Result is not 20", Integer.valueOf(20), o);
+        assertEquals(Integer.valueOf(20), o);
 
         e = JEXL.createExpression("FUNC:PLUS20(10)");
         o = e.evaluate(jc);
-        Assert.assertEquals("Result is not 30", Integer.valueOf(30), o);
+        assertEquals(Integer.valueOf(30), o);
 
         e = JEXL.createExpression("FUNC:PLUS20(FUNC:TWENTY())");
         o = e.evaluate(jc);
-        Assert.assertEquals("Result is not 40", Integer.valueOf(40), o);
+        assertEquals(Integer.valueOf(40), o);
     }
 
     @Test
@@ -519,57 +521,57 @@ public class MethodTest extends JexlTestCase {
             for (int i = 0; i < 2; ++i) {
                 e = JEXL.createExpression("func:exec([1, 2])");
                 o = e.evaluate(jc);
-                Assert.assertEquals("exec(int[] arg): " + i, 20, o);
+                assertEquals(20, o, "exec(int[] arg): " + i);
 
                 e = JEXL.createExpression("func:exec(1, 2)");
                 o = e.evaluate(jc);
-                Assert.assertEquals("exec(Object... args): " + i, 4, o);
+                assertEquals(4, o, "exec(Object... args): " + i);
 
                 e = JEXL.createExpression("func:exec([10.0, 20.0])");
                 o = e.evaluate(jc);
-                Assert.assertEquals("exec(Object args): " + i, 3, o);
+                assertEquals(3, o, "exec(Object args): " + i);
 
                 e = JEXL.createExpression("func:exec('1', 2)");
                 o = e.evaluate(jc);
-                Assert.assertEquals("exec(Object... args): " + i, 4, o);
+                assertEquals(4, o, "exec(Object... args): " + i);
 
                 // no way to differentiate between a single arg call with an array and a vararg call with same args
-                Assert.assertEquals("exec(String... args): " + i, func.exec("1", "2"), func.exec(new String[]{"1", "2"}));
+                assertEquals(func.exec("1", "2"), func.exec(new String[]{"1", "2"}), "exec(String... args): " + i);
                 e = JEXL.createExpression("func:exec(['1', '2'])");
                 o = e.evaluate(jc);
-                Assert.assertEquals("exec(String... args): " + i, func.exec(new String[]{"1", "2"}), o);
+                assertEquals(func.exec(new String[]{"1", "2"}), o, "exec(String... args): " + i);
                 e = JEXL.createExpression("func:exec('1', '2')");
                 o = e.evaluate(jc);
-                Assert.assertEquals("exec(String... args): " + i, func.exec("1", "2"), o);
+                assertEquals(func.exec("1", "2"), o, "exec(String... args): " + i);
 
                 e = JEXL.createExpression("func:exec(true, [1, 2])");
                 o = e.evaluate(jc);
-                Assert.assertEquals("exec(int[] arg): " + i, 20, o);
+                assertEquals(20, o, "exec(int[] arg): " + i);
 
                 e = JEXL.createExpression("func:exec(true, 1, 2)");
                 o = e.evaluate(jc);
-                Assert.assertEquals("exec(Object... args): " + i, 4, o);
+                assertEquals(4, o, "exec(Object... args): " + i);
 
                 e = JEXL.createExpression("func:exec(true, ['1', '2'])");
                 o = e.evaluate(jc);
-                Assert.assertEquals("exec(Object args): " + i, 3, o);
+                assertEquals(3, o, "exec(Object args): " + i);
 
                 e = JEXL.createExpression("func:exec(true, '1', '2')");
                 o = e.evaluate(jc);
-                Assert.assertEquals("exec(Object... args): " + i, 4, o);
+                assertEquals(4, o, "exec(Object... args): " + i);
 
                 e = JEXL.createExpression("func:execute(true, '1', '2')");
                 o = e.evaluate(jc);
                 c = func.execute(Boolean.TRUE, "1", "2");
-                Assert.assertTrue("execute(Object... args): " + i, eqExecute(o, c));
+                assertTrue(eqExecute(o, c), "execute(Object... args): " + i);
 
                 e = JEXL.createExpression("func:execute([true])");
                 o = e.evaluate(jc);
                 c = func.execute(new boolean[]{true});
-                Assert.assertTrue("execute(Object... args): " + i, eqExecute(o, c));
+                assertTrue(eqExecute(o, c), "execute(Object... args): " + i);
             }
         } catch (final JexlException xjexl) {
-            Assert.fail(xjexl.toString());
+            fail(xjexl.toString());
         }
     }
 
@@ -580,19 +582,19 @@ public class MethodTest extends JexlTestCase {
         context.set("plus", plus);
         JexlScript forty2 = JEXL.createScript("plus(4, 2) * plus(4, 3)");
         Object o = forty2.execute(context);
-        Assert.assertEquals("Result is not 42", Integer.valueOf(42), o);
+        assertEquals(Integer.valueOf(42), o);
 
         final Map<String, Object> foo = new HashMap<>();
         foo.put("plus", plus);
         context.set("foo", foo);
         forty2 = JEXL.createScript("foo.plus(4, 2) * foo.plus(4, 3)");
         o = forty2.execute(context);
-        Assert.assertEquals("Result is not 42", Integer.valueOf(42), o);
+        assertEquals(Integer.valueOf(42), o);
 
         context = new ScriptContext(foo);
         forty2 = JEXL.createScript("script:plus(4, 2) * script:plus(4, 3)");
         o = forty2.execute(context);
-        Assert.assertEquals("Result is not 42", Integer.valueOf(42), o);
+        assertEquals(Integer.valueOf(42), o);
 
         final JexlArithmetic ja = JEXL.getArithmetic();
         final JexlMethod mplus = new JexlMethod() {
@@ -636,12 +638,12 @@ public class MethodTest extends JexlTestCase {
         foo.put("PLUS", mplus);
         forty2 = JEXL.createScript("script:PLUS(4, 2) * script:PLUS(4, 3)");
         o = forty2.execute(context);
-        Assert.assertEquals("Result is not 42", Integer.valueOf(42), o);
+        assertEquals(Integer.valueOf(42), o);
 
         context.set("foo.bar", foo);
         forty2 = JEXL.createScript("foo.'bar'.PLUS(4, 2) * foo.bar.PLUS(4, 3)");
         o = forty2.execute(context);
-        Assert.assertEquals("Result is not 42", Integer.valueOf(42), o);
+        assertEquals(Integer.valueOf(42), o);
     }
 
     /**
@@ -683,24 +685,24 @@ public class MethodTest extends JexlTestCase {
 
         JexlExpression e = JEXL.createExpression("ten()");
         Object o = e.evaluate(jc);
-        Assert.assertEquals("Result is not 10", Integer.valueOf(10), o);
+        assertEquals(Integer.valueOf(10), o);
 
         e = JEXL.createExpression("plus10(10)");
         o = e.evaluate(jc);
-        Assert.assertEquals("Result is not 20", Integer.valueOf(20), o);
+        assertEquals(Integer.valueOf(20), o);
 
         e = JEXL.createExpression("plus10(ten())");
         o = e.evaluate(jc);
-        Assert.assertEquals("Result is not 20", Integer.valueOf(20), o);
+        assertEquals(Integer.valueOf(20), o);
 
         jc.set("pi", Double.valueOf(Math.PI));
         e = JEXL.createExpression("math:cos(pi)");
         o = e.evaluate(jc);
-        Assert.assertEquals(Double.valueOf(-1), o);
+        assertEquals(Double.valueOf(-1), o);
 
         e = JEXL.createExpression("cx:ratio(10) + cx:ratio(20)");
         o = e.evaluate(jc);
-        Assert.assertEquals(Integer.valueOf(7), o);
+        assertEquals(Integer.valueOf(7), o);
     }
 
     @Test
@@ -713,53 +715,53 @@ public class MethodTest extends JexlTestCase {
         final JexlUberspect uber = JEXL.getUberspect();
         // tryInvoke
         final JexlMethod method = uber.getMethod(func, "over", "foo", 42);
-        Assert.assertNotNull(method);
+        assertNotNull(method);
         // tryInvoke succeeds
         result = method.tryInvoke("over", func, "foo", 42);
-        Assert.assertEquals("foo + 42", result);
+        assertEquals("foo + 42", result);
         // tryInvoke fails
         func.setKill(true);
         try {
             /*result = */method.tryInvoke("over", func, "foo", 42);
-            Assert.fail("should throw TryFailed");
+            fail("should throw TryFailed");
         } catch (final JexlException.TryFailed xfail) {
-            Assert.assertEquals(UnsupportedOperationException.class, xfail.getCause().getClass());
+            assertEquals(UnsupportedOperationException.class, xfail.getCause().getClass());
         }
 
         func.setKill(false);
         final JexlPropertySet setter = uber.getPropertySet(func, "under", "42");
         result = setter.tryInvoke(func, "under", "42");
-        Assert.assertFalse(setter.tryFailed(result));
-        Assert.assertEquals("42", result);
+        assertFalse(setter.tryFailed(result));
+        assertEquals("42", result);
 
         final JexlPropertyGet getter = uber.getPropertyGet(func, "under");
         result = getter.tryInvoke(func, "under");
-        Assert.assertFalse(getter.tryFailed(result));
-        Assert.assertEquals("42", result);
+        assertFalse(getter.tryFailed(result));
+        assertEquals("42", result);
 
         func.setKill(true);
         try {
             /*result = */setter.tryInvoke(func, "under", "42");
-            Assert.fail("should throw TryFailed");
+            fail("should throw TryFailed");
         } catch (final JexlException.TryFailed xfail) {
-            Assert.assertEquals(UnsupportedOperationException.class, xfail.getCause().getClass());
+            assertEquals(UnsupportedOperationException.class, xfail.getCause().getClass());
         }
         func.setKill(false);
         result = setter.tryInvoke(func, "under", "-42");
-        Assert.assertEquals("-42", result);
+        assertEquals("-42", result);
 
         func.setKill(true);
         try {
             /*result = */getter.tryInvoke(func, "under");
-            Assert.fail("should throw TryFailed");
+            fail("should throw TryFailed");
         } catch (final JexlException.TryFailed xfail) {
-            Assert.assertEquals(UnsupportedOperationException.class, xfail.getCause().getClass());
+            assertEquals(UnsupportedOperationException.class, xfail.getCause().getClass());
         }
 
         func.setKill(false);
         result = getter.tryInvoke(func, "under");
-        Assert.assertFalse(getter.tryFailed(result));
-        Assert.assertEquals("-42", result);
+        assertFalse(getter.tryFailed(result));
+        assertEquals("-42", result);
     }
 
     @Test
@@ -773,50 +775,50 @@ public class MethodTest extends JexlTestCase {
         final JexlScript method = JEXL.createScript("(x, y)->{ func.over(x, y) }");
         // tryInvoke
         //JexlMethod method = uber.getMethod(func, "over", "foo", 42);
-        Assert.assertNotNull(method);
+        assertNotNull(method);
         // tryInvoke succeeds
         result = method.execute(ctxt, "foo", 42);
-        Assert.assertEquals("foo + 42", result);
+        assertEquals("foo + 42", result);
         // tryInvoke fails
         func.setKill(true);
         try {
             /*result = */method.execute(ctxt, "foo", 42);
-            Assert.fail("should throw TryFailed");
+            fail("should throw TryFailed");
         } catch (final JexlException xfail) {
-            Assert.assertEquals(UnsupportedOperationException.class, xfail.getCause().getClass());
+            assertEquals(UnsupportedOperationException.class, xfail.getCause().getClass());
         }
 
         func.setKill(false);
         final JexlScript setter = JEXL.createScript("(x)->{ func.under = x }");
         //JexlPropertySet setter = uber.getPropertySet(func, "under", "42");
         result = setter.execute(ctxt, "42");
-        Assert.assertEquals("42", result);
+        assertEquals("42", result);
 
         final JexlScript getter = JEXL.createScript("func.under");
-        Assert.assertEquals("42", result);
+        assertEquals("42", result);
 
         func.setKill(true);
         try {
             /*result = */setter.execute(ctxt, "42");
-            Assert.fail("should throw TryFailed");
+            fail("should throw TryFailed");
         } catch (final JexlException xfail) {
-            Assert.assertEquals(UnsupportedOperationException.class, xfail.getCause().getClass());
+            assertEquals(UnsupportedOperationException.class, xfail.getCause().getClass());
         }
         func.setKill(false);
         result = setter.execute(ctxt, "-42");
-        Assert.assertEquals("-42", result);
+        assertEquals("-42", result);
 
         func.setKill(true);
         try {
             /*result = */getter.execute(ctxt);
-            Assert.fail("should throw TryFailed");
+            fail("should throw TryFailed");
         } catch (final JexlException xfail) {
-            Assert.assertEquals(UnsupportedOperationException.class, xfail.getCause().getClass());
+            assertEquals(UnsupportedOperationException.class, xfail.getCause().getClass());
         }
 
         func.setKill(false);
         result = getter.execute(ctxt);
-        Assert.assertEquals("-42", result);
+        assertEquals("-42", result);
     }
 
     @Test
@@ -831,28 +833,28 @@ public class MethodTest extends JexlTestCase {
         final String z41 = "z(41)";
         final JexlScript callz41 = jexl.createScript(z41);
         Object onovar = callz41.execute(zjc);
-        Assert.assertEquals(222, onovar);
+        assertEquals(222, onovar);
 
         // override z() with global var
         final JexlScript z241 = jexl.createScript("(x)->{ return x + 241}");
         vars.put("z", z241);
         final Object oglobal = callz41.execute(zjc);
-        Assert.assertEquals(282, oglobal);
+        assertEquals(282, oglobal);
         // clear global and execute again
         vars.remove("z");
         onovar = callz41.execute(zjc);
-        Assert.assertEquals(222, onovar);
+        assertEquals(222, onovar);
 
         // override z() with local var
         final String slocal = "var z = (x)->{ return x + 141}; z(1)";
         final JexlScript jlocal = jexl.createScript(slocal);
         final Object olocal = jlocal.execute(zjc);
-        Assert.assertEquals(142, olocal);
+        assertEquals(142, olocal);
 
         // and now try the context, the null namespace and the arithmetic
-        Assert.assertEquals(42, jexl.createScript("zz(2)").execute(zjc));
-        Assert.assertEquals(42, jexl.createScript("zzz(3)").execute(zjc));
-        Assert.assertEquals(42, jexl.createScript("zzzz(4)").execute(zjc));
+        assertEquals(42, jexl.createScript("zz(2)").execute(zjc));
+        assertEquals(42, jexl.createScript("zzz(3)").execute(zjc));
+        assertEquals(42, jexl.createScript("zzzz(4)").execute(zjc));
     }
 
 }

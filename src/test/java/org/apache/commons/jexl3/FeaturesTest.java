@@ -16,6 +16,8 @@
  */
 package org.apache.commons.jexl3;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import static org.apache.commons.jexl3.JexlFeatures.CONST_CAPTURE;
 
 import java.util.Arrays;
@@ -42,7 +44,7 @@ public class FeaturesTest extends JexlTestCase {
             try {
                 final JexlScript e = jexl.createScript(str);
             } catch (final JexlException.Feature xfeature) {
-                Assert.fail(str + " :: should not fail parse: " + xfeature.getMessage());
+                fail(str + " :: should not fail parse: " + xfeature.getMessage());
             }
         }
     }
@@ -57,13 +59,13 @@ public class FeaturesTest extends JexlTestCase {
     private void checkFeature(final JexlFeatures features, final String[] scripts) throws Exception {
         for (final String script : scripts) {
             final JexlScript ctl = JEXL.createScript(script);
-            Assert.assertNotNull(ctl);
+            assertNotNull(ctl);
             try {
                 final JexlScript e = jexl.createScript(features, null, script);
-                Assert.fail("should fail parse: " + script);
+                fail("should fail parse: " + script);
             } catch (final JexlException.Parsing xfeature) {
                 final String msg = xfeature.getMessage();
-                Assert.assertNotNull(msg);
+                assertNotNull(msg);
             }
         }
     }
@@ -71,33 +73,33 @@ public class FeaturesTest extends JexlTestCase {
     @Test
     public void test410a() {
         long x = JexlFeatures.createAll().getFlags();
-        Assert.assertEquals(CONST_CAPTURE + 1, Long.bitCount(x));
-        Assert.assertTrue((x & (1L << CONST_CAPTURE)) != 0);
+        assertEquals(CONST_CAPTURE + 1, Long.bitCount(x));
+        assertTrue((x & (1L << CONST_CAPTURE)) != 0);
 
         JexlFeatures all = JexlFeatures.createAll();
         final JexlEngine jexl = new JexlBuilder().features(all).create();
         JexlScript script = jexl.createScript("#0 * #1", "#0", "#1");
         Object r = script.execute(null, 6, 7);
-        Assert.assertEquals(42, r);
+        assertEquals(42, r);
     }
 
     @Test
     public void test410b() {
         JexlFeatures features = JexlFeatures.createScript();
-        Assert.assertTrue(features.isLexical());
-        Assert.assertTrue(features.isLexicalShade());
-        Assert.assertTrue(features.supportsConstCapture());
+        assertTrue(features.isLexical());
+        assertTrue(features.isLexicalShade());
+        assertTrue(features.supportsConstCapture());
         //features.pragmaAnywhere(false);
-        Assert.assertFalse(features.supportsPragmaAnywhere());
+        assertFalse(features.supportsPragmaAnywhere());
         //features.comparatorNames(false);
-        Assert.assertFalse(features.supportsComparatorNames());
+        assertFalse(features.supportsComparatorNames());
 
         final JexlEngine jexl = new JexlBuilder().features(features).create();
         Collection<String> reserved = features.getReservedNames();
         for(String varName : reserved) {
             String src = "var " + varName;
             //JexlScript script = jexl.createScript(src);
-            Assert.assertThrows(src, JexlException.Feature.class, () -> jexl.createScript(src));
+            assertThrows(JexlException.Feature.class, () -> jexl.createScript(src), src);
         }
         final String[] cmpNameScripts = {
             "1 eq 1",
@@ -108,7 +110,7 @@ public class FeaturesTest extends JexlTestCase {
             "3 ge 2"
         };
         for(String src : cmpNameScripts) {
-            Assert.assertThrows(JexlException.Ambiguous.class, () -> jexl.createScript(src));
+            assertThrows(JexlException.Ambiguous.class, () -> jexl.createScript(src));
         }
     }
 
@@ -159,46 +161,46 @@ public class FeaturesTest extends JexlTestCase {
     @Test
     public void testCreate() {
         final JexlFeatures f = JexlFeatures.createNone();
-        Assert.assertTrue(f.supportsExpression());
+        assertTrue(f.supportsExpression());
 
-        Assert.assertFalse(f.supportsAnnotation());
-        Assert.assertFalse(f.supportsArrayReferenceExpr());
-        Assert.assertFalse(f.supportsComparatorNames());
-        Assert.assertFalse(f.supportsFatArrow());
-        Assert.assertFalse(f.supportsImportPragma());
-        Assert.assertFalse(f.supportsLambda());
-        Assert.assertFalse(f.supportsLocalVar());
-        Assert.assertFalse(f.supportsLoops());
-        Assert.assertFalse(f.supportsMethodCall());
-        Assert.assertFalse(f.supportsNamespacePragma());
-        Assert.assertFalse(f.supportsNewInstance());
-        Assert.assertFalse(f.supportsPragma());
-        Assert.assertFalse(f.supportsPragmaAnywhere());
-        Assert.assertFalse(f.supportsScript());
-        Assert.assertFalse(f.supportsStructuredLiteral());
+        assertFalse(f.supportsAnnotation());
+        assertFalse(f.supportsArrayReferenceExpr());
+        assertFalse(f.supportsComparatorNames());
+        assertFalse(f.supportsFatArrow());
+        assertFalse(f.supportsImportPragma());
+        assertFalse(f.supportsLambda());
+        assertFalse(f.supportsLocalVar());
+        assertFalse(f.supportsLoops());
+        assertFalse(f.supportsMethodCall());
+        assertFalse(f.supportsNamespacePragma());
+        assertFalse(f.supportsNewInstance());
+        assertFalse(f.supportsPragma());
+        assertFalse(f.supportsPragmaAnywhere());
+        assertFalse(f.supportsScript());
+        assertFalse(f.supportsStructuredLiteral());
 
-        Assert.assertFalse(f.isLexical());
-        Assert.assertFalse(f.isLexicalShade());
-        Assert.assertFalse(f.supportsConstCapture());
+        assertFalse(f.isLexical());
+        assertFalse(f.isLexicalShade());
+        assertFalse(f.supportsConstCapture());
 
         JexlEngine jnof = new JexlBuilder().features(f).create();
-        Assert.assertThrows(JexlException.Feature.class, ()->jnof.createScript("{ 3 + 4 }"));
-        Assert.assertNotNull(jnof.createExpression("3 + 4"));
+        assertThrows(JexlException.Feature.class, ()->jnof.createScript("{ 3 + 4 }"));
+        assertNotNull(jnof.createExpression("3 + 4"));
     }
 
     @Test
     public void testIssue409() {
         final JexlFeatures baseFeatures =  JexlFeatures.createDefault();
-        Assert.assertFalse(baseFeatures.isLexical());
-        Assert.assertFalse(baseFeatures.isLexicalShade());
-        Assert.assertFalse(baseFeatures.supportsConstCapture());
+        assertFalse(baseFeatures.isLexical());
+        assertFalse(baseFeatures.isLexicalShade());
+        assertFalse(baseFeatures.supportsConstCapture());
 
         final JexlFeatures scriptFeatures = JexlFeatures.createScript();
-        Assert.assertTrue(scriptFeatures.isLexical());
-        Assert.assertTrue(scriptFeatures.isLexicalShade());
+        assertTrue(scriptFeatures.isLexical());
+        assertTrue(scriptFeatures.isLexicalShade());
         scriptFeatures.lexical(false);
-        Assert.assertFalse(scriptFeatures.isLexical());
-        Assert.assertFalse(scriptFeatures.isLexicalShade());
+        assertFalse(scriptFeatures.isLexical());
+        assertFalse(scriptFeatures.isLexicalShade());
     }
 
     @Test
@@ -300,7 +302,7 @@ public class FeaturesTest extends JexlTestCase {
     @Test
     public void testNoScript() throws Exception {
         final JexlFeatures f = new JexlFeatures().script(false);
-        Assert.assertTrue(f.supportsExpression());
+        assertTrue(f.supportsExpression());
         final String[] scripts = {
             "if (false) { block(); }",
             "{ noway(); }",
@@ -360,7 +362,7 @@ public class FeaturesTest extends JexlTestCase {
             try {
                 final JexlScript e = jexl.createScript("var x = foo(); " + str);
             } catch (final JexlException.Feature xfeature) {
-                Assert.fail(str + " :: should not fail parse: " + xfeature.getMessage());
+                fail(str + " :: should not fail parse: " + xfeature.getMessage());
             }
         }
     }

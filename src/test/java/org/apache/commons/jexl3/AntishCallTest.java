@@ -16,6 +16,8 @@
  */
 package org.apache.commons.jexl3;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import java.math.BigInteger;
 import java.util.Map;
 import java.util.TreeMap;
@@ -136,10 +138,10 @@ public class AntishCallTest extends JexlTestCase {
         final JexlScript check2 = jexl.createScript("java.math.BigInteger('4321')");
 
         final Object o1 = check1.execute(jc);
-        Assert.assertEquals("Result is not 1234", new java.math.BigInteger("1234"), o1);
+        assertEquals(new java.math.BigInteger("1234"), o1, "Result is not 1234");
 
         final Object o2 = check2.execute(jc);
-        Assert.assertEquals("Result is not 4321", new java.math.BigInteger("4321"), o2);
+        assertEquals(new java.math.BigInteger("4321"), o2, "Result is not 4321");
     }
 
     @Test
@@ -155,7 +157,7 @@ public class AntishCallTest extends JexlTestCase {
         lmap.remove("java.math.BigInteger");
         try {
             runTestCall(jexl, jc);
-        Assert.fail("should have failed");
+        fail("should have failed");
         } catch (final JexlException xjexl) {
             //
         }
@@ -183,17 +185,17 @@ public class AntishCallTest extends JexlTestCase {
 
         script = JEXL.createScript("x.y.z");
         result = script.execute(ctxt);
-        Assert.assertEquals(42, result);
-        Assert.assertEquals(42, ctxt.get("x.y.z"));
+        assertEquals(42, result);
+        assertEquals(42, ctxt.get("x.y.z"));
 
         options.setAntish(false);
         try {
             result = script.execute(ctxt);
-            Assert.fail("antish var shall not be resolved");
+            fail("antish var shall not be resolved");
         } catch (final JexlException.Variable xvar) {
-            Assert.assertEquals("x", xvar.getVariable());
+            assertEquals("x", xvar.getVariable());
         } catch (final JexlException xother) {
-            Assert.assertNotNull(xother);
+            assertNotNull(xother);
         } finally {
             options.setAntish(true);
         }
@@ -201,42 +203,42 @@ public class AntishCallTest extends JexlTestCase {
         result = null;
         script = JEXL.createScript("x?.y?.z");
         result = script.execute(ctxt);
-        Assert.assertNull(result); // safe navigation, null
+        assertNull(result); // safe navigation, null
 
         result = null;
         script = JEXL.createScript("x?.y?.z = 3");
         try {
              result = script.execute(ctxt);
-             Assert.fail("not antish assign");
+             fail("not antish assign");
         } catch (final JexlException xjexl) {
-            Assert.assertNull(result);
+            assertNull(result);
         }
 
         result = null;
         script = JEXL.createScript("x.y?.z");
         try {
              result = script.execute(ctxt);
-             Assert.fail("x not defined");
+             fail("x not defined");
         } catch (final JexlException xjexl) {
-            Assert.assertNull(result);
+            assertNull(result);
         }
 
         result = null;
         script = JEXL.createScript("x.y?.z = 3");
         try {
              result = script.execute(ctxt);
-             Assert.fail("not antish assign");
+             fail("not antish assign");
         } catch (final JexlException xjexl) {
-            Assert.assertNull(result);
+            assertNull(result);
         }
 
         result = null;
         script = JEXL.createScript("x.`'y'`.z = 3");
         try {
              result = script.execute(ctxt);
-             Assert.fail("not antish assign");
+             fail("not antish assign");
         } catch (final JexlException xjexl) {
-            Assert.assertNull(result);
+            assertNull(result);
         }
     }
 

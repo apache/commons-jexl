@@ -16,6 +16,8 @@
  */
 package org.apache.commons.jexl3;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -40,14 +42,14 @@ public class MapLiteralTest extends JexlTestCase {
         final JexlContext jc = new MapContext();
 
         final Object o = e.evaluate(jc);
-        Assert.assertEquals(Integer.valueOf(1), o);
+        assertEquals(Integer.valueOf(1), o);
     }
 
     @Test
     public void testEmptyMap() throws Exception {
         final JexlScript script = JEXL.createScript("map['']", "map");
         final Object result = script.execute(null, Collections.singletonMap("", 42));
-        Assert.assertEquals(42, result);
+        assertEquals(42, result);
     }
 
     @Test
@@ -59,7 +61,7 @@ public class MapLiteralTest extends JexlTestCase {
         for(final String src : sources) {
             final JexlExpression e = JEXL.createExpression("{ 'foo' : 'bar', 'eat' : 'food' }");
             final Object o = e.evaluate(null);
-            Assert.assertEquals(expected, o);
+            assertEquals(expected, o);
         }
     }
 
@@ -69,47 +71,47 @@ public class MapLiteralTest extends JexlTestCase {
         final JexlContext jc = new MapContext();
 
         Object o = e.evaluate(jc);
-        Assert.assertEquals(Collections.singletonMap(Integer.valueOf(5), Integer.valueOf(10)), o);
+        assertEquals(Collections.singletonMap(Integer.valueOf(5), Integer.valueOf(10)), o);
 
         e = JEXL.createExpression("m = { 3 : 30, 4 : 40, 5 : 'fifty', '7' : 'seven', 7 : 'SEVEN' }");
         e.evaluate(jc);
 
         e = JEXL.createExpression("m.3");
         o = e.evaluate(jc);
-        Assert.assertEquals(Integer.valueOf(30), o);
+        assertEquals(Integer.valueOf(30), o);
 
         e = JEXL.createExpression("m[4]");
         o = e.evaluate(jc);
-        Assert.assertEquals(Integer.valueOf(40), o);
+        assertEquals(Integer.valueOf(40), o);
 
         jc.set("i", Integer.valueOf(5));
         e = JEXL.createExpression("m[i]");
         o = e.evaluate(jc);
-        Assert.assertEquals("fifty", o);
+        assertEquals("fifty", o);
 
         e = JEXL.createExpression("m.3 = 'thirty'");
         e.evaluate(jc);
         e = JEXL.createExpression("m.3");
         o = e.evaluate(jc);
-        Assert.assertEquals("thirty", o);
+        assertEquals("thirty", o);
 
         e = JEXL.createExpression("m['7']");
         o = e.evaluate(jc);
-        Assert.assertEquals("seven", o);
+        assertEquals("seven", o);
 
         e = JEXL.createExpression("m.7");
         o = e.evaluate(jc);
-        Assert.assertEquals("SEVEN", o);
+        assertEquals("SEVEN", o);
 
         jc.set("k", Integer.valueOf(7));
         e = JEXL.createExpression("m[k]");
         o = e.evaluate(jc);
-        Assert.assertEquals("SEVEN", o);
+        assertEquals("SEVEN", o);
 
         jc.set("k", "7");
         e = JEXL.createExpression("m[k]");
         o = e.evaluate(jc);
-        Assert.assertEquals("seven", o);
+        assertEquals("seven", o);
     }
 
     @Test
@@ -118,13 +120,13 @@ public class MapLiteralTest extends JexlTestCase {
         for(final String src : sources) {
             final JexlExpression e = JEXL.createExpression(src);
             final Object o = e.evaluate(null);
-            Assert.assertEquals(Collections.singletonMap("foo", "bar"), o);
+            assertEquals(Collections.singletonMap("foo", "bar"), o);
         }
         try {
             final Object ff = JEXL.createExpression("{  : , }");
-            Assert.fail(ff.toString());
+            fail(ff.toString());
         } catch(final JexlException.Parsing parsing) {
-            Assert.assertNotNull(parsing);
+            assertNotNull(parsing);
         }
     }
 
@@ -133,12 +135,12 @@ public class MapLiteralTest extends JexlTestCase {
         JexlExpression e = JEXL.createExpression("{'foo' : [ 'inner' , 'bar' ]}");
         final JexlContext jc = new MapContext();
         Object o = e.evaluate(jc);
-        Assert.assertNotNull(o);
+        assertNotNull(o);
 
         jc.set("outer", o);
         e = JEXL.createExpression("outer.foo.1");
         o = e.evaluate(jc);
-        Assert.assertEquals("bar", o);
+        assertEquals("bar", o);
     }
 
     @Test
@@ -146,12 +148,12 @@ public class MapLiteralTest extends JexlTestCase {
         JexlExpression e = JEXL.createExpression("{'foo' : { 'inner' : 'bar' }}");
         final JexlContext jc = new MapContext();
         Object o = e.evaluate(jc);
-        Assert.assertNotNull(o);
+        assertNotNull(o);
 
         jc.set("outer", o);
         e = JEXL.createExpression("outer.foo.inner");
         o = e.evaluate(jc);
-        Assert.assertEquals("bar", o);
+        assertEquals("bar", o);
     }
 
     @Test
@@ -160,7 +162,7 @@ public class MapLiteralTest extends JexlTestCase {
         final JexlContext jc = new MapContext();
 
         final Object o = e.evaluate(jc);
-        Assert.assertFalse((Boolean) o);
+        assertFalse((Boolean) o);
     }
 
     @Test
@@ -169,14 +171,14 @@ public class MapLiteralTest extends JexlTestCase {
         final JexlContext jc = new MapContext();
 
         final Object o = e.evaluate(jc);
-        Assert.assertEquals(Integer.valueOf(1), o);
+        assertEquals(Integer.valueOf(1), o);
     }
 
     @Test
     public void testVariableMap() throws Exception {
         final JexlScript script = JEXL.createScript("{ ['1', '2'.toString()] : someValue }", "someValue");
         final Object result = script.execute(null, 42);
-        Assert.assertTrue(result instanceof Map);
+        assertTrue(result instanceof Map);
         Object key = null;
         Object value = null;
         for(final Map.Entry<?,?> e : ((Map<?,?>) result).entrySet()) {
@@ -185,7 +187,7 @@ public class MapLiteralTest extends JexlTestCase {
             break;
         }
         final Object gg = ((Map) result).get(key);
-        Assert.assertEquals(42, ((Number) gg).intValue());
-        Assert.assertEquals(value, ((Number) gg).intValue());
+        assertEquals(42, ((Number) gg).intValue());
+        assertEquals(value, ((Number) gg).intValue());
     }
 }

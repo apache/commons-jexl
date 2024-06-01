@@ -20,6 +20,8 @@
  * <h2><a id="intro">Introduction</a></h2>
  * <p>
  * This package only contains one class, Asserter, which
+
+import static org.junit.jupiter.api.Assertions.*;
  * allows you to use a JEXL expression in a JUnit assertion.
  * The following example demonstrates the use of the Asserter
  * class.  An instance is created, and the internal JexlContext
@@ -41,3 +43,5 @@
  * </pre>
  */
 package org.apache.commons.jexl3.junit;
+
+import static org.junit.jupiter.api.Assertions.*;

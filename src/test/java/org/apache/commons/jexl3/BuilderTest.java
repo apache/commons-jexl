@@ -16,6 +16,8 @@
  */
 package org.apache.commons.jexl3;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
@@ -35,43 +37,43 @@ public class BuilderTest {
 
     @Test
     public void testFlags() {
-        Assert.assertTrue(builder().antish(true).antish());
-        Assert.assertFalse(builder().antish(false).antish());
-        Assert.assertTrue(builder().cancellable(true).cancellable());
-        Assert.assertFalse(builder().cancellable(false).cancellable());
-        Assert.assertTrue(builder().safe(true).safe());
-        Assert.assertFalse(builder().safe(false).safe());
-        Assert.assertTrue(builder().silent(true).silent());
-        Assert.assertFalse(builder().silent(false).silent());
-        Assert.assertTrue(builder().lexical(true).lexical());
-        Assert.assertFalse(builder().lexical(false).lexical());
-        Assert.assertTrue(builder().lexicalShade(true).lexicalShade());
-        Assert.assertFalse(builder().lexicalShade(false).lexicalShade());
-        Assert.assertTrue(builder().silent(true).silent());
-        Assert.assertFalse(builder().silent(false).silent());
-        Assert.assertTrue(builder().strict(true).strict());
-        Assert.assertFalse(builder().strict(false).strict());
+        assertTrue(builder().antish(true).antish());
+        assertFalse(builder().antish(false).antish());
+        assertTrue(builder().cancellable(true).cancellable());
+        assertFalse(builder().cancellable(false).cancellable());
+        assertTrue(builder().safe(true).safe());
+        assertFalse(builder().safe(false).safe());
+        assertTrue(builder().silent(true).silent());
+        assertFalse(builder().silent(false).silent());
+        assertTrue(builder().lexical(true).lexical());
+        assertFalse(builder().lexical(false).lexical());
+        assertTrue(builder().lexicalShade(true).lexicalShade());
+        assertFalse(builder().lexicalShade(false).lexicalShade());
+        assertTrue(builder().silent(true).silent());
+        assertFalse(builder().silent(false).silent());
+        assertTrue(builder().strict(true).strict());
+        assertFalse(builder().strict(false).strict());
     }
 
     @Test
     public void testOther() {
         final ClassLoader cls = getClass().getClassLoader().getParent();
-        Assert.assertEquals(cls, builder().loader(cls).loader());
+        assertEquals(cls, builder().loader(cls).loader());
         final Charset cs = StandardCharsets.UTF_16;
-        Assert.assertEquals(cs, builder().charset(cs).charset());
-        Assert.assertEquals(cs, builder().loader(cs).charset());
+        assertEquals(cs, builder().charset(cs).charset());
+        assertEquals(cs, builder().loader(cs).charset());
         final JexlUberspect u0 = builder().create().getUberspect();
         final JexlSandbox sandbox = new JexlSandbox();
         final JexlUberspect uberspect = new SandboxUberspect(u0, sandbox);
-        Assert.assertEquals(sandbox, builder().sandbox(sandbox).sandbox());
-        Assert.assertEquals(uberspect, builder().uberspect(uberspect).uberspect());
+        assertEquals(sandbox, builder().sandbox(sandbox).sandbox());
+        assertEquals(uberspect, builder().uberspect(uberspect).uberspect());
     }
 
     @Test
     public void testValues() {
-        Assert.assertEquals(1, builder().collectMode(1).collectMode());
-        Assert.assertEquals(0, builder().collectMode(0).collectMode());
-        Assert.assertEquals(32, builder().cacheThreshold(32).cacheThreshold());
-        Assert.assertEquals(8, builder().stackOverflow(8).stackOverflow());
+        assertEquals(1, builder().collectMode(1).collectMode());
+        assertEquals(0, builder().collectMode(0).collectMode());
+        assertEquals(32, builder().cacheThreshold(32).cacheThreshold());
+        assertEquals(8, builder().stackOverflow(8).stackOverflow());
     }
 }

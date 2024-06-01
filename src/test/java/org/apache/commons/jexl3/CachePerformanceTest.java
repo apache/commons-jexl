@@ -16,6 +16,8 @@
  */
 package org.apache.commons.jexl3;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -130,7 +132,7 @@ public class CachePerformanceTest {
     // seed the cache
     for(int i = 0; i < CACHED; ++i) {
       JexlScript script = jexl.createScript(Integer.toString(i));
-      Assert.assertNotNull(script);
+      assertNotNull(script);
     }
     // create a set of tasks ready to go
     for(int t = 0; t < THREADS; ++t) {
@@ -152,7 +154,7 @@ public class CachePerformanceTest {
     }
     exec.shutdown();
     tt.stop();
-    Assert.assertEquals(total, LOOPS * CACHED * THREADS * HIT);
+    assertEquals(total, LOOPS * CACHED * THREADS * HIT);
     LOGGER.info(name+ " : " + tt.elapse());
   }
 
