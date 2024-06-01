@@ -79,6 +79,56 @@ public class RangeTest extends JexlTestCase {
     }
 
     @Test
+    public void testAscIterator() {
+        Iterator<Integer> ii = new AscIntegerIterator(3, 5);
+        Integer i = 3;
+        while(ii.hasNext()) {
+            Assert.assertEquals(i, ii.next());
+            i += 1;
+        }
+        try {
+            ii.next();
+            Assert.fail("iterator exhausted");
+        } catch(NoSuchElementException e) {
+            Assert.assertNotNull(e);
+        }
+        try {
+            ii.remove();
+            Assert.fail("remove not implemented");
+        } catch(UnsupportedOperationException e) {
+            Assert.assertNotNull(e);
+        }
+    }
+
+    @Test
+    public void testAscLongIterator() {
+        Iterator<Long> ii = new AscLongIterator(3L, 5L);
+        Long i = 3L;
+        while(ii.hasNext()) {
+            Assert.assertEquals(i, ii.next());
+            i += 1;
+        }
+        try {
+            ii.next();
+            Assert.fail("iterator exhausted");
+        } catch(NoSuchElementException e) {
+            Assert.assertNotNull(e);
+        }
+        try {
+            ii.remove();
+            Assert.fail("remove not implemented");
+        } catch(UnsupportedOperationException e) {
+            Assert.assertNotNull(e);
+        }
+    }
+
+    @Test public void testMisc() {
+        Assert.assertEquals("?", Scope.UNDEFINED.toString());
+        Assert.assertEquals("??", Scope.UNDECLARED.toString());
+    }
+
+
+    @Test
     public void testRanges() throws Exception {
         final LongRange lr0 = LongRange.create(20,10);
         Assert.assertEquals(10L, lr0.getMin());
@@ -173,51 +223,6 @@ public class RangeTest extends JexlTestCase {
     }
 
     @Test
-    public void testAscIterator() {
-        Iterator<Integer> ii = new AscIntegerIterator(3, 5);
-        Integer i = 3;
-        while(ii.hasNext()) {
-            Assert.assertEquals(i, ii.next());
-            i += 1;
-        }
-        try {
-            ii.next();
-            Assert.fail("iterator exhausted");
-        } catch(NoSuchElementException e) {
-            Assert.assertNotNull(e);
-        }
-        try {
-            ii.remove();
-            Assert.fail("remove not implemented");
-        } catch(UnsupportedOperationException e) {
-            Assert.assertNotNull(e);
-        }
-    }
-
-    @Test
-    public void testAscLongIterator() {
-        Iterator<Long> ii = new AscLongIterator(3L, 5L);
-        Long i = 3L;
-        while(ii.hasNext()) {
-            Assert.assertEquals(i, ii.next());
-            i += 1;
-        }
-        try {
-            ii.next();
-            Assert.fail("iterator exhausted");
-        } catch(NoSuchElementException e) {
-            Assert.assertNotNull(e);
-        }
-        try {
-            ii.remove();
-            Assert.fail("remove not implemented");
-        } catch(UnsupportedOperationException e) {
-            Assert.assertNotNull(e);
-        }
-    }
-
-
-    @Test
     public void testSource() {
         JexlFeatures features = JexlFeatures.createDefault();
         Source src0 = new Source(features, "x -> -x");
@@ -232,11 +237,6 @@ public class RangeTest extends JexlTestCase {
         Assert.assertTrue(src0.compareTo(src0b) == 0);
         Assert.assertTrue(src0.compareTo(src1) > 0);
         Assert.assertTrue(src1.compareTo(src0) < 0);
-    }
-
-    @Test public void testMisc() {
-        Assert.assertEquals("?", Scope.UNDEFINED.toString());
-        Assert.assertEquals("??", Scope.UNDECLARED.toString());
     }
 }
 
