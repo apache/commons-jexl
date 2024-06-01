@@ -564,24 +564,15 @@ public class Issues300Test {
         final JxltEngine jxlt = jexl.createJxltEngine();
         final JexlContext context = new MapContext();
 
-        final String[] ins = {
-                "${'{'}", "${\"{\"}", "${\"{}\"}", "${'{42}'}", "${\"{\\\"\\\"}\"}"
-        };
-        final String[] ctls = {
-                "{", "{", "{}", "{42}", "{\"\"}"
-        };
+        final String[] ins = { "${'{'}", "${\"{\"}", "${\"{}\"}", "${'{42}'}", "${\"{\\\"\\\"}\"}" };
+        final String[] ctls = { "{", "{", "{}", "{42}", "{\"\"}" };
         StringWriter strw;
         JxltEngine.Template template;
         String output;
 
         for (int i = 0; i < ins.length; ++i) {
             final String src = ins[i];
-            try {
-                template = jxlt.createTemplate("$$", new StringReader(src));
-            } catch (final JexlException xany) {
-                fail(src);
-                throw xany;
-            }
+            template = jxlt.createTemplate("$$", new StringReader(src));
             strw = new StringWriter();
             template.evaluate(context, strw);
             output = strw.toString();
