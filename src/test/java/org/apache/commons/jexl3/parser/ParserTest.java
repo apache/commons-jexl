@@ -19,7 +19,7 @@ package org.apache.commons.jexl3.parser;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.apache.commons.jexl3.JexlException;
 import org.apache.commons.jexl3.JexlFeatures;
@@ -56,27 +56,18 @@ public class ParserTest {
     @Test
     public void testErrorAmbiguous() throws Exception {
         final Parser parser = new Parser(";");
-        try {
-            final JexlNode sn = parser.parse(null, FEATURES, "x = 1 y = 5", null);
-            fail("should have failed on ambiguous statement");
-        } catch (final JexlException.Ambiguous xambiguous) {
-            // ok
-        }
+        assertThrows(JexlException.Ambiguous.class, () -> parser.parse(null, FEATURES, "x = 1 y = 5", null), "should have failed on ambiguous statement");
     }
 
     @Test
     public void testErrorAssign() throws Exception {
         final String[] ops = { "=", "+=", "-=", "/=", "*=", "^=", "&=", "|=" };
-        for(final String op : ops) {
+        for (final String op : ops) {
             final Parser parser = new Parser(";");
-            try {
-                final JexlNode sn = parser.parse(null, FEATURES, "foo() "+op+" 1;", null);
-                fail("should have failed on invalid assignment " + op);
-            } catch (final JexlException.Parsing xparse) {
-                // ok
-                final String ss = xparse.getDetail();
-                final String sss = xparse.toString();
-            }
+            JexlException.Parsing xparse = assertThrows(JexlException.Parsing.class, () -> parser.parse(null, FEATURES, "foo() " + op + " 1;", null),
+                    () -> "should have failed on invalid assignment " + op);
+            assertNotNull(xparse.getDetail());
+            assertNotNull(xparse.toString());
         }
     }
 
