@@ -57,12 +57,13 @@ public class Issues300Test {
         public Arithmetic383(final boolean astrict) {
             super(astrict);
         }
+
         @Override
         public boolean isStrict(final JexlOperator op) {
-            switch(op) {
-                case NOT:
-                case CONDITION:
-                    return false;
+            switch (op) {
+            case NOT:
+            case CONDITION:
+                return false;
             }
             return super.isStrict(op);
         }
@@ -84,17 +85,21 @@ public class Issues300Test {
 
     public static class Arithmetic384c extends JexlArithmetic {
         AtomicInteger cmp = new AtomicInteger();
+
         public Arithmetic384c(final boolean astrict) {
             super(astrict);
         }
+
         public Arithmetic384c(final boolean astrict, final MathContext bigdContext, final int bigdScale) {
             super(astrict, bigdContext, bigdScale);
         }
+
         @Override
         protected int compare(final Object l, final Object r, final String op) {
             cmp.incrementAndGet();
             return super.compare(l, r, op);
         }
+
         int getCmpCalls() {
             return cmp.get();
         }
@@ -104,13 +109,15 @@ public class Issues300Test {
         public Arithmetic384d(final boolean astrict) {
             super(astrict);
         }
+
         public Arithmetic384d(final boolean astrict, final MathContext bigdContext, final int bigdScale) {
             super(astrict, bigdContext, bigdScale);
         }
     }
 
     private static class Class397 implements Interface397i {
-        @Override public String summary() {
+        @Override
+        public String summary() {
             return getClass().getName();
         }
     }
@@ -118,6 +125,7 @@ public class Issues300Test {
     public static class Context0930 extends MapContext {
         /**
          * This allows using a JEXL lambda as a filter.
+         *
          * @param stream the stream
          * @param filter the lambda to use as filter
          * @return the filtered stream
@@ -132,9 +140,11 @@ public class Issues300Test {
      */
     public static class Driver0930 {
         private final String name;
+
         Driver0930(final String n) {
             name = n;
         }
+
         public String getAttributeName() {
             return name;
         }
@@ -153,23 +163,26 @@ public class Issues300Test {
     public static class TestObject374 {
         private String name;
         private TestObject374 nested;
+
         public String getName() {
             return name;
         }
+
         public TestObject374 getNested() {
             return nested;
         }
+
         public void setName(final String pName) {
             this.name = pName;
         }
+
         public void setNested(final TestObject374 pNested) {
             nested = pNested;
         }
     }
 
     public enum Type375 {
-        DELIVERY_ADDRESS,
-        DOMICILE
+        DELIVERY_ADDRESS, DOMICILE
     }
 
     public static class User322 {
@@ -194,9 +207,11 @@ public class Issues300Test {
 
     public static class Var370 {
         private String name;
+
         public String getName() {
             return name;
         }
+
         public void setName(final String s) {
             name = s;
         }
@@ -204,15 +219,13 @@ public class Issues300Test {
 
     static JexlContext pragmaticContext() {
         final JexlOptions opts = new JexlOptions();
-        opts.setFlags( "-strict", "-cancellable", "-lexical", "-lexicalShade", "+safe", "+sharedInstance");
+        opts.setFlags("-strict", "-cancellable", "-lexical", "-lexicalShade", "+safe", "+sharedInstance");
         return new JexlTestCase.PragmaticContext(opts);
     }
 
     <T> T createProxy(final JexlEngine jexl, final Object o, final Class[] clazzz) {
         // a JEX-based delegating proxy
-        return (T) Proxy.newProxyInstance(getClass().getClassLoader(), clazzz,
-            (proxy, method, args) ->  jexl.invokeMethod(o, method.getName(), args)
-        );
+        return (T) Proxy.newProxyInstance(getClass().getClassLoader(), clazzz, (proxy, method, args) -> jexl.invokeMethod(o, method.getName(), args));
     }
 
     private Object run361a(final JexlEngine jexl) {
@@ -224,13 +237,15 @@ public class Issues300Test {
     }
 
     private Object run361b(final JexlEngine jexl) {
+        // @formatter:off
         final String src = "()-> { ()-> {" +
                 "var voa = vaf.value;\n" +
                 "if (voa != NaN && voa <= 0)" +
                 "{ return 'foo'; } else { return 'bar'; }" +
                 "} }";
+        // @formatter:on
         final JexlContext context = new MapContext();
-        final Map<String,Object> vaf = Collections.singletonMap("value", null);
+        final Map<String, Object> vaf = Collections.singletonMap("value", null);
         context.set("vaf", vaf);
         final JexlScript script = jexl.createScript(src);
         final Object result = script.execute(null);
@@ -239,15 +254,17 @@ public class Issues300Test {
     }
 
     private String run361c(final JexlEngine jexl) {
+        // @formatter:off
         final String src = "$$var t = null;\n" +
                 "$$if (t < 0) {\n" +
                 "'foo'\n" +
                 "$$} else {\n" +
                 "'bar'\n" +
                 "$$}";
+        // @formatter:on
         final JxltEngine jxlt = jexl.createJxltEngine();
         final JexlContext context = new MapContext();
-        final Map<String,Object> vaf = Collections.singletonMap("value", null);
+        final Map<String, Object> vaf = Collections.singletonMap("value", null);
         context.set("vaf", vaf);
         final JxltEngine.Template template = jxlt.createTemplate(src);
         final StringWriter strw = new StringWriter();
@@ -264,9 +281,7 @@ public class Issues300Test {
     @Test
     public void test301a() {
         final JexlEngine jexl = new JexlBuilder().safe(false).arithmetic(new JexlArithmetic(false)).create();
-        final String[] srcs = {
-                "var x = null; x.0", "var x = null; x[0]", "var x = [null,1]; x[0][0]"
-        };
+        final String[] srcs = { "var x = null; x.0", "var x = null; x[0]", "var x = [null,1]; x[0][0]" };
         for (int i = 0; i < srcs.length; ++i) {
             final String src = srcs[i];
             final JexlScript s = jexl.createScript(src);
@@ -284,12 +299,14 @@ public class Issues300Test {
     @Test
     public void test302() {
         final JexlContext jc = new MapContext();
+        // @formatter:off
         final String[] strs = {
                 "{if (0) 1 else 2; var x = 4;}",
                 "if (0) 1; else 2; ",
                 "{ if (0) 1; else 2; }",
                 "{ if (0) { if (false) 1 else -3 } else 2; }"
         };
+        // @formatter:on
         final JexlEngine jexl = new JexlBuilder().create();
         for (final String str : strs) {
             final JexlScript e = jexl.createScript(str);
@@ -320,14 +337,15 @@ public class Issues300Test {
         value = e304.evaluate(context);
         assertEquals(42, value);
 
+        // @formatter:off
         final String[]  keywords = {
                 "if", "else", "do", "while", "for", "break", "continue", "function", "return", "new", "size", "empty",
                 "var", "let", "const",
                 "null", "true", "false",
                 "not", "div", "mod", "and", "or",
                 "eq", "ne", "lt", "gt", "ge", "le",
-
         };
+        // @formatter:on
         for (final String keyword : keywords) {
             final String pkw = "e304." + keyword;
             map.put(pkw, 42);
@@ -335,7 +353,7 @@ public class Issues300Test {
             value = e304.evaluate(context);
             assertEquals(42, value);
         }
-        for(int i = 0; i < keywords.length; ++i) {
+        for (int i = 0; i < keywords.length; ++i) {
             final String pkw = "e304." + keywords[i] + "." + keywords[keywords.length - 1 - i];
             map.put(pkw, 42);
             e304 = jexlEngine.createExpression(pkw);
@@ -545,9 +563,11 @@ public class Issues300Test {
         JexlScript script;
         Object result;
         JexlInfo info = new JexlInfo("test317", 1, 1);
+        // @formatter:off
         script = jexl.createScript(info, "var f = "
                         + "()-> {x + x }; f",
                 "x");
+        // @formatter:on
         result = script.execute(ctxt, 21);
         assertTrue(result instanceof JexlScript);
         script = (JexlScript) result;
@@ -750,7 +770,8 @@ public class Issues300Test {
         assertFalse((Boolean) result);
     }
 
-    @Test public void test349() {
+    @Test
+    public void test349() {
         final String text = "(A ? C.D : E)";
         final JexlEngine jexl = new JexlBuilder().safe(true).create();
         final JexlExpression expr = jexl.createExpression(text);
@@ -766,7 +787,7 @@ public class Issues300Test {
     @Test
     public void test361a_32() {
         final JexlEngine jexl = new Engine32(new JexlBuilder().safe(false));
-        final Object result  = run361a(jexl);
+        final Object result = run361a(jexl);
         assertNotNull(result);
     }
 
@@ -799,7 +820,7 @@ public class Issues300Test {
     @Test
     public void test361d_32() {
         final JexlEngine jexl = new Engine32(new JexlBuilder().lexical(false).lexicalShade(false).safe(false));
-        final Object result  = run361d(jexl);
+        final Object result = run361d(jexl);
         assertNotNull(result);
     }
 
@@ -809,7 +830,8 @@ public class Issues300Test {
         assertThrows(JexlException.class, () -> run361d(jexl), "null arg should fail");
     }
 
-    @Test public void test367() {
+    @Test
+    public void test367() {
         final String text = "var toto; function foo(x) { x }; var tata = 3; foo(3)";
         final JexlEngine jexl = new JexlBuilder().safe(true).create();
         final JexlScript script = jexl.createScript(text);
@@ -890,9 +912,11 @@ public class Issues300Test {
 
     @Test
     public void test379a() {
+        // @formatter:off
         final String src =
                 "#pragma jexl.import java.util\n"+
                         "const map = new LinkedHashMap({0 : 'zero'});";
+        // @formatter:on
         final JexlEngine jexl = new JexlBuilder().safe(true).create();
         final JexlScript script = jexl.createScript(src);
         assertNotNull(script);
@@ -955,6 +979,7 @@ public class Issues300Test {
             assertFalse(xvar.isUndefined());
         }
     }
+
     @Test
     public void test384b() {
         // be explicit about + handling null
@@ -991,11 +1016,13 @@ public class Issues300Test {
     @Test
     public void test384c() {
         final Arithmetic384c ja = new Arithmetic384c(true);
+        // @formatter:off
         final JexlEngine jexl = new JexlBuilder()
                 .safe(false)
                 .strict(true)
                 .arithmetic(ja)
                 .create();
+        // @formatter:on
         assertTrue(ja.toBoolean(jexl.createExpression("3 < 4").evaluate(null)));
         assertTrue(ja.toBoolean(jexl.createExpression("6 <= 8").evaluate(null)));
         assertFalse(ja.toBoolean(jexl.createExpression("6 == 7").evaluate(null)));
@@ -1008,11 +1035,13 @@ public class Issues300Test {
     @Test
     public void test384d() {
         final Arithmetic384c ja = new Arithmetic384d(true);
+        // @formatter:off
         final JexlEngine jexl = new JexlBuilder()
                 .safe(false)
                 .strict(true)
                 .arithmetic(ja)
                 .create();
+        // @formatter:on
         assertTrue(ja.toBoolean(jexl.createExpression("3 < 4").evaluate(null)));
         assertTrue(ja.toBoolean(jexl.createExpression("6 <= 8").evaluate(null)));
         assertFalse(ja.toBoolean(jexl.createExpression("6 == 7").evaluate(null)));
@@ -1076,7 +1105,8 @@ public class Issues300Test {
         assertEquals("'\\b\\t\\f'", parsed);
     }
 
-    @Test public void testDow() {
+    @Test
+    public void testDow() {
         // @formatter:off
         final String src = "(y, m, d)->{\n" +
                 "// will return 0 for Sunday, 6 for Saturday\n" +
@@ -1097,7 +1127,8 @@ public class Issues300Test {
         assertEquals(0, dow.intValue());
     }
 
-    @Test public void testIssue394() {
+    @Test
+    public void testIssue394() {
         final StringBuilder x = new StringBuilder("foobar");
         assertEquals("foobar", x.toString());
         final String src = "x -> x.setLength(3)";
@@ -1107,7 +1138,8 @@ public class Issues300Test {
         assertEquals("foo", x.toString());
     }
 
-    @Test public void testIssue397() {
+    @Test
+    public void testIssue397() {
         String result;
         final String control = Class397.class.getName();
         final JexlEngine jexl = new JexlBuilder().permissions(RESTRICTED).create();
@@ -1116,7 +1148,7 @@ public class Issues300Test {
         result = (String) jexl.invokeMethod(instance, "summary");
         assertEquals(control, result);
 
-        final Interface397i proxy = createProxy(jexl, instance, new Class[] { Interface397i.class }) ;
+        final Interface397i proxy = createProxy(jexl, instance, new Class[] { Interface397i.class });
         result = (String) jexl.invokeMethod(proxy, "summary");
         assertEquals(control, result);
 
@@ -1129,34 +1161,38 @@ public class Issues300Test {
 
     @Test
     public void testIssue398a() {
+        // @formatter:off
         final String src = "let m = {\n" +
             "  \"foo\": 1,\n" +
             "  \"bar\": 2,\n" +
             "}";
+        // @formatter:on
         final JexlEngine jexl = new JexlBuilder().create();
         final JexlScript script = jexl.createScript(src);
         final Object result = script.execute(null);
         assertTrue(result instanceof Map);
-        final Map<?,?> map = (Map<?, ?>) result;
+        final Map<?, ?> map = (Map<?, ?>) result;
         assertEquals(2, map.size());
     }
 
     @Test
     public void testIssue398b() {
-        final Map<String,Object> foo = Collections.singletonMap("X", "x");
-        final Map<String,Object> bar = Collections.singletonMap("Y", "y");
+        final Map<String, Object> foo = Collections.singletonMap("X", "x");
+        final Map<String, Object> bar = Collections.singletonMap("Y", "y");
         final JexlContext ctxt = new MapContext();
         ctxt.set("foo", foo);
         ctxt.set("bar", bar);
+        // @formatter:off
         final String src = "let m = {\n" +
                 "  foo.X: 1,\n" +
                 "  bar.Y: 2,\n" +
                 "}";
+        // @formatter:on
         final JexlEngine jexl = new JexlBuilder().create();
         JexlScript script = jexl.createScript(src);
         Object result = script.execute(ctxt);
         assertTrue(result instanceof Map);
-        Map<?,?> map = (Map<?, ?>) result;
+        Map<?, ?> map = (Map<?, ?>) result;
         assertEquals(2, map.size());
         assertEquals(1, map.get("x"));
         assertEquals(2, map.get("y"));
@@ -1179,19 +1215,21 @@ public class Issues300Test {
         assertTrue(jexl.createScript("[1,...]").execute(null) instanceof ArrayList<?>);
         assertTrue(jexl.createScript("{1}").execute(null) instanceof HashSet<?>);
         assertTrue(jexl.createScript("{1,...}").execute(null) instanceof LinkedHashSet<?>);
-        assertTrue(jexl.createScript("{'one': 1}").execute(null) instanceof HashMap<?,?>);
-        assertTrue(jexl.createScript("{'one': 1,...}").execute(null) instanceof LinkedHashMap<?,?>);
+        assertTrue(jexl.createScript("{'one': 1}").execute(null) instanceof HashMap<?, ?>);
+        assertTrue(jexl.createScript("{'one': 1,...}").execute(null) instanceof LinkedHashMap<?, ?>);
     }
 
-    @Test public void testPropagateOptions() {
+    @Test
+    public void testPropagateOptions() {
+        // @formatter:off
         final String src0 = "`${$options.strict?'+':'-'}strict"
                 + " ${$options.cancellable?'+':'-'}cancellable"
                 + " ${$options.lexical?'+':'-'}lexical"
                 + " ${$options.lexicalShade?'+':'-'}lexicalShade"
                 + " ${$options.sharedInstance?'+':'-'}sharedInstance"
                 + " ${$options.safe?'+':'-'}safe`";
-        final String text = "#pragma script.mode pro50\n" +
-                "()->{ ()->{ "+src0+"; } }";
+        // @formatter:on
+        final String text = "#pragma script.mode pro50\n" + "()->{ ()->{ " + src0 + "; } }";
         final JexlEngine jexl = new JexlBuilder().safe(true).create();
         final JexlScript script = jexl.createScript(text);
         JexlContext context = pragmaticContext();
@@ -1200,14 +1238,13 @@ public class Issues300Test {
         final Object result = closure.execute(opts);
         assertEquals("+strict +cancellable +lexical +lexicalShade -sharedInstance -safe", result);
 
-        final String text0 = "#pragma script.mode pro50\n" +
-                "()->{ "+src0+"; }";
+        final String text0 = "#pragma script.mode pro50\n" + "()->{ " + src0 + "; }";
         final JexlScript script0 = jexl.createScript(text0);
         context = pragmaticContext();
         final Object result0 = script0.execute(context);
         assertEquals("+strict +cancellable +lexical +lexicalShade -sharedInstance -safe", result0);
 
-        final String text1 = "#pragma script.mode pro50\n"+src0;
+        final String text1 = "#pragma script.mode pro50\n" + src0;
         final JexlScript script1 = jexl.createScript(text1);
         context = pragmaticContext();
         final Object result1 = script1.execute(context);
@@ -1238,10 +1275,10 @@ public class Issues300Test {
     public void testSO20220930() {
         // fill some drivers in a list
         final List<Driver0930> values = new ArrayList<>();
-        for(int i = 0; i < 8; ++i) {
+        for (int i = 0; i < 8; ++i) {
             values.add(new Driver0930("drvr" + Integer.toOctalString(i)));
         }
-        for(int i = 0; i < 4; ++i) {
+        for (int i = 0; i < 4; ++i) {
             values.add(new Driver0930("favorite" + Integer.toOctalString(i)));
         }
         // Use a context that can filter and that exposes Collectors
@@ -1252,7 +1289,7 @@ public class Issues300Test {
         // The script with a JEXL 3.2 (lambda function) and 3.3 syntax (lambda expression)
         final String src32 = "values.stream().filter((driver) ->{ driver.attributeName =^ 'favorite' }).collect(Collectors.toList())";
         final String src33 = "values.stream().filter(driver -> driver.attributeName =^ 'favorite').collect(Collectors.toList())";
-        for(final String src : Arrays.asList(src32, src33)) {
+        for (final String src : Arrays.asList(src32, src33)) {
             final JexlExpression s = jexl.createExpression(src);
             assertNotNull(s);
 
