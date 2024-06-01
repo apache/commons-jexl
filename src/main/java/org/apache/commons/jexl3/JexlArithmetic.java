@@ -97,7 +97,7 @@ public class JexlArithmetic {
          * Simple ctor.
          * @param msg the exception message
          */
-        public CoercionException(String msg) {
+        public CoercionException(final String msg) {
             super(msg);
         }
     }
@@ -237,9 +237,9 @@ public class JexlArithmetic {
         // Some bits greater than 2^31 that might cause overflow
         // Check the result using the divide operator
         // and check for the special case of Long.MIN_VALUE * -1
-        return !(((ax | ay) >>> (Integer.SIZE - 1) != 0)
-                 && ((y != 0 && r / y != x)
-                     || (x == Long.MIN_VALUE && y == -1)));
+        return !((ax | ay) >>> Integer.SIZE - 1 != 0
+                 && (y != 0 && r / y != x
+                     || x == Long.MIN_VALUE && y == -1));
     }
 
     /** Whether this JexlArithmetic instance behaves in strict or lenient mode. */
@@ -401,11 +401,11 @@ public class JexlArithmetic {
             return (Number) value;
         }
         if (value instanceof Boolean) {
-            Boolean b = (Boolean) value;
+            final Boolean b = (Boolean) value;
             return b ? 1L : 0L;
         }
         if (value instanceof AtomicBoolean) {
-            AtomicBoolean b = (AtomicBoolean) value;
+            final AtomicBoolean b = (AtomicBoolean) value;
             return b.get() ? 1L : 0L;
         }
         if (value == null && !strict) {
@@ -798,7 +798,7 @@ public class JexlArithmetic {
                 final Comparable<Object> comparable = (Comparable<Object>) left;
                 try {
                     return comparable.compareTo(right);
-                } catch(ClassCastException castException) {
+                } catch(final ClassCastException castException) {
                     // ignore it, continue in sequence
                 }
             }
@@ -1298,7 +1298,7 @@ public class JexlArithmetic {
      * @param narrow the target narrow class
      * @return the narrowed or initial number
      */
-    private Number narrow(final Class<?> narrow, double value) {
+    private Number narrow(final Class<?> narrow, final double value) {
         return narrowAccept(narrow, Float.class) && (float) value == value
             ? (float) value
             : value;
