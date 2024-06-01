@@ -267,7 +267,7 @@ public class ArithmeticTest extends JexlTestCase {
         }
 
         @Override
-        public boolean toBoolean(Object x) {
+        public boolean toBoolean(final Object x) {
             throw new ArithmeticException(Objects.toString(x));
         }
 
@@ -418,7 +418,7 @@ public class ArithmeticTest extends JexlTestCase {
     }
     public static class InstanceofContext extends MapContext implements JexlContext.ClassNameResolver {
         @Override
-        public String resolveClassName(String name) {
+        public String resolveClassName(final String name) {
             if ("Double".equals(name)) {
                 return Double.class.getName();
             }
@@ -529,7 +529,7 @@ public class ArithmeticTest extends JexlTestCase {
         assertEquals(expect, empty);
     }
 
-    private void runInstanceof(JexlEngine jexl, JexlContext ctxt) {
+    private void runInstanceof(final JexlEngine jexl, final JexlContext ctxt) {
         Object r = jexl.createExpression("3.0 instanceof 'Double'").evaluate(ctxt);
         assertTrue((Boolean) r);
         r = jexl.createExpression("'3.0' !instanceof 'Double'").evaluate(ctxt);
@@ -1091,15 +1091,15 @@ public class ArithmeticTest extends JexlTestCase {
         assertEquals(BigDecimal.valueOf(1.), ja.toBigDecimal(true));
         assertEquals(BigDecimal.valueOf(0.), ja.toBigDecimal(false));
         // BigDecimal precision is kept when used as argument
-        BigDecimal a42 = BigDecimal.valueOf(42);
-        BigDecimal a49 = BigDecimal.valueOf(49);
+        final BigDecimal a42 = BigDecimal.valueOf(42);
+        final BigDecimal a49 = BigDecimal.valueOf(49);
         JexlScript bde = JEXL.createScript("a * 6 / 7", "a");
         assertEquals(a42, bde.execute(null, a49));
         bde = JEXL.createScript("(a - 12) / 12", "a");
-        MathContext mc = ja.getMathContext();
-        BigDecimal b56 = BigDecimal.valueOf(56);
-        BigDecimal b12 = BigDecimal.valueOf(12);
-        BigDecimal b3dot666 = b56.subtract(b12, mc).divide(b12, mc);
+        final MathContext mc = ja.getMathContext();
+        final BigDecimal b56 = BigDecimal.valueOf(56);
+        final BigDecimal b12 = BigDecimal.valueOf(12);
+        final BigDecimal b3dot666 = b56.subtract(b12, mc).divide(b12, mc);
         assertEquals(b3dot666, bde.execute(null, b56));
     }
 
@@ -1284,8 +1284,8 @@ public class ArithmeticTest extends JexlTestCase {
             try {
                 final Object result = expression.evaluate(jc);
                 assertEquals(expected, result, () -> "failed on " + stext);
-            } catch(JexlException jexlException) {
-                Throwable cause = jexlException.getCause();
+            } catch(final JexlException jexlException) {
+                final Throwable cause = jexlException.getCause();
                 if (cause == null || !cause.getClass().equals(expected)) {
                     fail(stext);
                 }
@@ -1486,7 +1486,7 @@ public class ArithmeticTest extends JexlTestCase {
 
     @Test
     public void testFailAllOperators() {
-        String[] scripts = new String[]{
+        final String[] scripts = new String[]{
             "(x, y)->{ x < y }",
             "(x, y)->{ x <= y }",
             "(x, y)->{ x > y }",
@@ -1525,12 +1525,12 @@ public class ArithmeticTest extends JexlTestCase {
         };
         final JexlEngine jexl = new JexlBuilder().cache(64).arithmetic(new ArithmeticFail(true)).create();
         final JexlContext jc = new EmptyTestContext();
-        for(String src : scripts) {
-            JexlScript script = jexl.createScript(src);
+        for(final String src : scripts) {
+            final JexlScript script = jexl.createScript(src);
             try {
-                Object result = script.execute(jc, new Var(42), new Var(43));
+                final Object result = script.execute(jc, new Var(42), new Var(43));
                 fail(src);
-            } catch(JexlException xjexl) {
+            } catch(final JexlException xjexl) {
                 assertNotNull(jexl);
             }
         }
@@ -1842,7 +1842,7 @@ public class ArithmeticTest extends JexlTestCase {
         asserter.assertExpression("a -> list.get(a)", "zero", BigDecimal.ZERO);
         asserter.assertExpression("a -> list.get(a)", "one", BigDecimal.ONE);
         asserter.assertExpression("a -> list.get(2B)", "two");
-        BigDecimal bd42 = BigDecimal.valueOf(42);
+        final BigDecimal bd42 = BigDecimal.valueOf(42);
         asserter.setVariable("bd10", BigDecimal.valueOf(10d));
         asserter.setVariable("bd420",BigDecimal.valueOf(420d));
         asserter.assertExpression("420 / bd10", bd42);
@@ -1860,7 +1860,7 @@ public class ArithmeticTest extends JexlTestCase {
         asserter.assertExpression("a -> list.get(a)", "zero", BigInteger.ZERO);
         asserter.assertExpression("a -> list.get(a)", "one", BigInteger.ONE);
         asserter.assertExpression("a -> list.get(2H)", "two");
-        BigInteger b42 = BigInteger.valueOf(42);
+        final BigInteger b42 = BigInteger.valueOf(42);
         asserter.setVariable("bi10", BigInteger.valueOf(10));
         asserter.setVariable("bi420", BigInteger.valueOf(420));
         asserter.assertExpression("420 / bi10", b42);
@@ -2045,7 +2045,7 @@ public class ArithmeticTest extends JexlTestCase {
         assertEquals(BigDecimal.ZERO, jexla.toBigDecimal(""));
         assertEquals(BigDecimal.ZERO, jexla.toBigDecimal((char) 0));
 
-        Double d64d3 = new Double( 6.4 / 3 );
+        final Double d64d3 = new Double( 6.4 / 3 );
         assertEquals(d64d3, ((Number) JEXL.createExpression("6.4 / 3").evaluate(null)).doubleValue(), EPSILON);
         asserter.assertExpression("6.4 / 3", d64d3);
         assertEquals(d64d3, ((Number) JEXL.createExpression("6.4 / 3d").evaluate(null)).doubleValue(), EPSILON);
