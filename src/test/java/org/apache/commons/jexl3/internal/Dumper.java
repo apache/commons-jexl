@@ -16,8 +16,6 @@
  */
 package org.apache.commons.jexl3.internal;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 import org.apache.commons.jexl3.JexlScript;
 import org.apache.commons.jexl3.parser.ASTIdentifier;
 import org.apache.commons.jexl3.parser.ASTIdentifierAccess;
