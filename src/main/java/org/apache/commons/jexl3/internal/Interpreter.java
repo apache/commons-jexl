@@ -331,7 +331,7 @@ public class Interpreter extends InterpreterBase {
         if (symbol < 0) {
             setContextVariable(catchVar.jjtGetParent(), catchVariable.getName(), caught);
         } else {
-            Throwable cause  = caught.getCause();
+            final Throwable cause  = caught.getCause();
             frame.set(symbol, cause == null? caught : cause);
         }
         try {
@@ -805,7 +805,7 @@ public class Interpreter extends InterpreterBase {
         if (object == null || clazz == null) {
             return false;
         }
-        Class<?> c = clazz instanceof Class<?>
+        final Class<?> c = clazz instanceof Class<?>
             ? (Class<?>) clazz
             : uberspect.getClassByName(resolveClassName(clazz.toString()));
         return c != null && c.isInstance(object);
@@ -2036,7 +2036,7 @@ public class Interpreter extends InterpreterBase {
 
     @Override
     protected Object visit(final ASTThrowStatement node, final Object data) {
-        Object thrown = node.jjtGetChild(0).jjtAccept(this, data);
+        final Object thrown = node.jjtGetChild(0).jjtAccept(this, data);
         throw new JexlException.Throw(node, thrown);
     }
 
@@ -2061,7 +2061,7 @@ public class Interpreter extends InterpreterBase {
         try {
             for(int c = 0; c < bodyChild; ++c) {
                 final JexlNode tryResource = node.jjtGetChild(c);
-                Object result = tryResource.jjtAccept(this, data);
+                final Object result = tryResource.jjtAccept(this, data);
                 if (result != null) {
                     tryResult.add(result);
                 }
@@ -2091,7 +2091,7 @@ public class Interpreter extends InterpreterBase {
                 JexlException.Break | JexlException.Continue xflow) {
             // flow control exceptions do not trigger the catch clause
             flowControl = xflow;
-        } catch(JexlException xany) {
+        } catch(final JexlException xany) {
             rethrow = xany;
         }
         JexlException thrownByCatch = null;
@@ -2107,7 +2107,7 @@ public class Interpreter extends InterpreterBase {
             } catch (JexlException.Return | JexlException.Cancel |
                      JexlException.Break | JexlException.Continue alterFlow) {
                 flowControl = alterFlow;
-            } catch (JexlException exception) {
+            } catch (final JexlException exception) {
                 // catching an exception thrown from catch body; can be a (re)throw
                 rethrow = thrownByCatch = exception;
             }
@@ -2123,10 +2123,10 @@ public class Interpreter extends InterpreterBase {
                 if (!(flowControl instanceof JexlException.Cancel)) {
                     flowControl = flowException;
                 }
-            } catch (JexlException.Cancel cancelException) {
+            } catch (final JexlException.Cancel cancelException) {
                 // cancel swallows everything
                 flowControl = cancelException;
-            } catch (JexlException exception) {
+            } catch (final JexlException exception) {
                 // catching an exception thrown in finally body
                 if (jexl.logger.isDebugEnabled()) {
                     jexl.logger.debug("exception thrown in finally", exception);
