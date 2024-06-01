@@ -1077,12 +1077,14 @@ public class Issues300Test {
     }
 
     @Test public void testDow() {
+        // @formatter:off
         final String src = "(y, m, d)->{\n" +
                 "// will return 0 for Sunday, 6 for Saturday\n" +
                 "const t = [0, 3, 2, 5, 0, 3, 5, 1, 4, 6, 2, 4];\n"+
                 "if (m < 3) { --y }\n" +
                 "(y + y/4 - y/100 + y/400 + t[m-1] + d) % 7;\n" +
             "}";
+        // @formatter:on
         final JexlEngine jexl = new JexlBuilder().create();
         final JexlScript script = jexl.createScript(src);
         Object r = script.execute(null, 2023, 3, 1);
@@ -1221,21 +1223,14 @@ public class Issues300Test {
     @Test
     public void tests301b() {
         final JexlEngine jexl = new JexlBuilder().safe(false).arithmetic(new JexlArithmetic(false)).create();
-        final Object[] xs = {null, null, new Object[]{null, 1}};
-        final String[] srcs = {
-                "x.0", "x[0]", "x[0][0]"
-        };
+        final Object[] xs = { null, null, new Object[] { null, 1 } };
+        final String[] srcs = { "x.0", "x[0]", "x[0][0]" };
         final JexlContext ctxt = new MapContext();
         for (int i = 0; i < xs.length; ++i) {
             ctxt.set("x", xs[i]);
             final String src = srcs[i];
             final JexlScript s = jexl.createScript(src);
-            try {
-                final Object o = s.execute(null);
-                fail(src + ": Should have failed");
-            } catch (final Exception ex) {
-                //
-            }
+            assertThrows(JexlException.class, () -> s.execute(null));
         }
     }
 
