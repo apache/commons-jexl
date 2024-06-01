@@ -1272,16 +1272,15 @@ public class ArithmeticTest extends JexlTestCase {
         };
         final JexlEngine jexl = new JexlBuilder().create();
         final JexlContext jc = new EmptyTestContext();
-        JexlExpression expression;
 
         for (int e = 0; e < EXPRESSIONS.length; e += 2) {
             final String stext = (String) EXPRESSIONS[e];
             final Object expected = EXPRESSIONS[e + 1];
-            expression = jexl.createExpression(stext);
+            final JexlExpression expression = jexl.createExpression(stext);
             try {
                 final Object result = expression.evaluate(jc);
                 assertEquals(expected, result, () -> "failed on " + stext);
-            } catch(final JexlException jexlException) {
+            } catch (final JexlException jexlException) {
                 final Throwable cause = jexlException.getCause();
                 if (cause == null || !cause.getClass().equals(expected)) {
                     fail(stext);
@@ -1483,6 +1482,7 @@ public class ArithmeticTest extends JexlTestCase {
 
     @Test
     public void testFailAllOperators() {
+        // @formatter:off
         final String[] scripts = {
             "(x, y)->{ x < y }",
             "(x, y)->{ x <= y }",
@@ -1520,16 +1520,12 @@ public class ArithmeticTest extends JexlTestCase {
             "(x, ignore)->{ x-- }",
             "(x, ignore)->{ x++ }"
         };
+        // @formatter:on
         final JexlEngine jexl = new JexlBuilder().cache(64).arithmetic(new ArithmeticFail(true)).create();
         final JexlContext jc = new EmptyTestContext();
-        for(final String src : scripts) {
+        for (final String src : scripts) {
             final JexlScript script = jexl.createScript(src);
-            try {
-                final Object result = script.execute(jc, new Var(42), new Var(43));
-                fail(src);
-            } catch(final JexlException xjexl) {
-                assertNotNull(jexl);
-            }
+            assertThrows(JexlException.class, () -> script.execute(jc, new Var(42), new Var(43)));
         }
     }
 
