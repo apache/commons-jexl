@@ -563,12 +563,7 @@ public class LexicalTest {
         f.lexical(true);
         f.lexicalShade(true);
         final JexlEngine jexl = createEngine(f);
-        try {
-            final JexlScript script = jexl.createScript("for(let x : 1..3) { let c = 0}; return x");
-            fail("Should not have been parsed");
-        } catch (final JexlException ex) {
-           // OK
-        }
+        assertThrows(JexlException.class, () -> jexl.createScript("for(let x : 1..3) { let c = 0}; return x", "Should not have been parsed"));
     }
 
     @Test
