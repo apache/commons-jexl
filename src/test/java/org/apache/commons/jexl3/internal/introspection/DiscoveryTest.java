@@ -32,7 +32,7 @@ import org.apache.commons.jexl3.internal.Engine;
 import org.apache.commons.jexl3.introspection.JexlMethod;
 import org.apache.commons.jexl3.introspection.JexlPropertyGet;
 import org.apache.commons.jexl3.introspection.JexlPropertySet;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests for checking introspection discovery.

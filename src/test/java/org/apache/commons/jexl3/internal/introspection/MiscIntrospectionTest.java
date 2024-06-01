@@ -26,7 +26,7 @@ import java.util.ArrayList;
 import java.util.NoSuchElementException;
 
 import org.apache.commons.jexl3.JexlEngine;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Checks the CacheMap.MethodKey implementation

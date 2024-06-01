@@ -27,9 +27,8 @@ import java.util.Map;
 
 import org.apache.commons.jexl3.internal.Engine;
 import org.apache.commons.jexl3.internal.introspection.Uberspect;
-import org.junit.Before;
-import org.junit.Test;
-//import org.apache.commons.beanutils.LazyDynaMap;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test cases for reported issue between JEXL-1 and JEXL-100.
@@ -85,7 +84,7 @@ public class IssuesTest extends JexlTestCase {
         super("IssuesTest", null);
     }
 
-    @Before
+    @BeforeEach
     @Override
     public void setUp() throws Exception {
         // ensure jul logging is only error to avoid warning in silent mode

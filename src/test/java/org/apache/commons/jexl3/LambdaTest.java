@@ -29,7 +29,7 @@ import java.util.concurrent.Callable;
 
 import org.apache.commons.jexl3.internal.Closure;
 import org.apache.commons.jexl3.internal.Script;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests function/lambda/closure features.

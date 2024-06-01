@@ -37,7 +37,7 @@ import java.util.concurrent.Callable;
 
 import org.apache.commons.jexl3.internal.LexicalScope;
 import org.apache.commons.jexl3.internal.Script;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test cases for lexical option and feature.

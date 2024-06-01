@@ -27,7 +27,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.commons.jexl3.internal.ArrayBuilder;
 import org.apache.commons.jexl3.internal.MapBuilder;
 import org.apache.commons.jexl3.internal.SetBuilder;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 /**
  * Counting the number of times map,sets,array literals are created.
  * <p>

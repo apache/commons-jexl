@@ -41,8 +41,8 @@ import java.util.TimeZone;
 import java.util.TreeSet;
 
 import org.apache.commons.jexl3.junit.Asserter;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests for the startsWith, endsWith, match and range operators.
@@ -227,7 +227,7 @@ public class ArithmeticOperatorTest extends JexlTestCase {
         super("ArithmeticOperatorTest");
     }
 
-    @Before
+    @BeforeEach
     @Override
     public void setUp() {
         asserter = new Asserter(JEXL);

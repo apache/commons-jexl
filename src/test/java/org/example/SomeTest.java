@@ -32,7 +32,7 @@ import org.apache.commons.jexl3.internal.Engine;
 import org.apache.commons.jexl3.internal.TemplateInterpreter;
 import org.apache.commons.jexl3.introspection.JexlPermissions;
 import org.apache.commons.jexl3.parser.JexlNode;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class SomeTest {
 

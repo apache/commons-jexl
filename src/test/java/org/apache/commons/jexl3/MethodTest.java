@@ -32,8 +32,8 @@ import org.apache.commons.jexl3.introspection.JexlPropertyGet;
 import org.apache.commons.jexl3.introspection.JexlPropertySet;
 import org.apache.commons.jexl3.introspection.JexlUberspect;
 import org.apache.commons.jexl3.junit.Asserter;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests for calling methods on objects
@@ -326,7 +326,7 @@ public class MethodTest extends JexlTestCase {
         return false;
     }
 
-    @Before
+    @BeforeEach
     @Override
     public void setUp() {
         asserter = new Asserter(JEXL);

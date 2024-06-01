@@ -30,7 +30,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.jexl3.internal.Interpreter;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test cases for annotations.

@@ -36,8 +36,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.jexl3.internal.Engine;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test cases for reported issue between JEXL-100 and JEXL-199.
@@ -205,7 +205,7 @@ public static class Foo125 {
         super("Issues100Test", null);
     }
 
-    @Before
+    @BeforeEach
     @Override
     public void setUp() throws Exception {
         // ensure jul logging is only error to avoid warning in silent mode

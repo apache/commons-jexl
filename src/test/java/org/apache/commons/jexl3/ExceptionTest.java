@@ -23,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import org.apache.commons.jexl3.internal.Engine;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Checks various exception handling cases.

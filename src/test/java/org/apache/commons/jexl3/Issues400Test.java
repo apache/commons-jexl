@@ -36,7 +36,7 @@ import java.util.Objects;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.commons.jexl3.introspection.JexlPermissions;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test cases for reported issue between JEXL-300 and JEXL-399.

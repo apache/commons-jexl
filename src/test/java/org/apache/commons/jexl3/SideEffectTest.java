@@ -34,8 +34,8 @@ import org.apache.commons.jexl3.jexl342.OptionalArithmetic;
 import org.apache.commons.jexl3.junit.Asserter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests for array access operator []
@@ -456,7 +456,7 @@ public class SideEffectTest extends JexlTestCase {
     }
 
     @Override
-    @Before
+    @BeforeEach
     public void setUp() {
         asserter = new Asserter(JEXL);
     }

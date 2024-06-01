@@ -36,7 +36,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.jexl3.parser.Parser;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Simple test cases.

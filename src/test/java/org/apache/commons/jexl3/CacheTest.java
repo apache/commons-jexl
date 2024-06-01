@@ -28,9 +28,9 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Verifies cache & tryExecute
@@ -629,14 +629,14 @@ public class CacheTest extends JexlTestCase {
         }
     }
 
-    @Before
+    @BeforeEach
     @Override
     public void setUp() throws Exception {
         // ensure jul logging is only error to avoid warning in silent mode
         java.util.logging.Logger.getLogger(JexlEngine.class.getName()).setLevel(java.util.logging.Level.SEVERE);
     }
 
-    @After
+    @AfterEach
     @Override
     public void tearDown() throws Exception {
         debuggerCheck(jexl);

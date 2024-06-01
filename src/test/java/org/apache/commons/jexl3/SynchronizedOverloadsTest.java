@@ -22,8 +22,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test cases for synchronized calls.
@@ -35,7 +35,7 @@ public class SynchronizedOverloadsTest extends JexlTestCase {
         super("SynchronizedOverloadsTest", null);
     }
 
-    @Before
+    @BeforeEach
     @Override
     public void setUp() throws Exception {
         // ensure jul logging is only error to avoid warning in silent mode

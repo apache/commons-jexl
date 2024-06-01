@@ -28,7 +28,7 @@ import org.apache.commons.jexl3.internal.OptionsContext;
 import org.apache.commons.jexl3.internal.Util;
 import org.apache.commons.jexl3.internal.introspection.Uberspect;
 import org.apache.commons.jexl3.introspection.JexlPermissions;
-import org.junit.After;
+import org.junit.jupiter.api.AfterEach;
 
 /**
  * Implements runTest methods to dynamically instantiate and invoke a test,
@@ -235,7 +235,7 @@ public class JexlTestCase {
         return arg.trim().replaceAll("\\s+", " ");
     }
 
-    @After
+    @AfterEach
     public void tearDown() throws Exception {
         debuggerCheck(JEXL);
     }

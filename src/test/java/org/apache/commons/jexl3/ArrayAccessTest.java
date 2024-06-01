@@ -22,8 +22,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.jexl3.junit.Asserter;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests for array access operator []
@@ -58,7 +58,7 @@ public class ArrayAccessTest extends JexlTestCase {
     }
 
     @Override
-    @Before
+    @BeforeEach
     public void setUp() {
         asserter = new Asserter(JEXL);
     }

@@ -23,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 import org.apache.commons.jexl3.JexlException;
 import org.apache.commons.jexl3.JexlFeatures;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  */

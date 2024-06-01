@@ -21,7 +21,7 @@ import org.apache.commons.jexl3.JexlEngine;
 import org.apache.commons.jexl3.JexlFeatures;
 import org.apache.commons.jexl3.JexlTestCase;
 import org.apache.commons.jexl3.junit.Asserter;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class FeatureControllerTest extends JexlTestCase {
 

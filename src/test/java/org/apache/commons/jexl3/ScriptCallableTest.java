@@ -37,7 +37,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.commons.jexl3.internal.Script;
 import org.apache.commons.lang3.ThreadUtils;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests around asynchronous script execution and interrupts.

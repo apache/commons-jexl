@@ -35,9 +35,9 @@ import java.util.Map;
 import org.apache.commons.lang3.SystemProperties;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Basic check on automated class creation
@@ -182,7 +182,7 @@ public class ClassCreatorTest extends JexlTestCase {
         assertEquals(1099, result);
     }
 
-    @Before
+    @BeforeEach
     @Override
     public void setUp() throws Exception {
         base = new File(SystemProperties.getJavaIoTmpdir(), "jexl" + System.currentTimeMillis());
@@ -190,7 +190,7 @@ public class ClassCreatorTest extends JexlTestCase {
 
     }
 
-    @After
+    @AfterEach
     @Override
     public void tearDown() throws Exception {
         deleteDirectory(base);

@@ -29,9 +29,9 @@ import java.util.NoSuchElementException;
 
 import org.apache.commons.jexl3.JexlFeatures;
 import org.apache.commons.jexl3.JexlTestCase;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Basic checks on ranges.
@@ -71,14 +71,14 @@ public class RangeTest extends JexlTestCase {
         }
     }
 
-    @Before
+    @BeforeEach
     @Override
     public void setUp() throws Exception {
         // ensure jul logging is only error
         java.util.logging.Logger.getLogger(org.apache.commons.jexl3.JexlEngine.class.getName()).setLevel(java.util.logging.Level.SEVERE);
     }
 
-    @After
+    @AfterEach
     @Override
     public void tearDown() throws Exception {
         super.tearDown();

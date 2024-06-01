@@ -46,7 +46,7 @@ import java.util.stream.Stream;
 import org.apache.commons.jexl3.internal.Engine32;
 import org.apache.commons.jexl3.internal.OptionsContext;
 import org.apache.commons.jexl3.introspection.JexlSandbox;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test cases for reported issue between JEXL-300 and JEXL-399.

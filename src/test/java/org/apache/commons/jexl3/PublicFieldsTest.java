@@ -20,8 +20,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests public field set/get.
@@ -59,7 +59,7 @@ public class PublicFieldsTest extends JexlTestCase {
         super("PublicFieldsTest");
     }
 
-    @Before
+    @BeforeEach
     @Override
     public void setUp() {
         pub = new Struct();

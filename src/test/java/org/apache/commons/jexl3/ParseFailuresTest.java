@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests for malformed expressions and scripts.

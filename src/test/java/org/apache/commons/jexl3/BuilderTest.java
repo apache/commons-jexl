@@ -26,7 +26,7 @@ import java.nio.charset.StandardCharsets;
 import org.apache.commons.jexl3.internal.introspection.SandboxUberspect;
 import org.apache.commons.jexl3.introspection.JexlSandbox;
 import org.apache.commons.jexl3.introspection.JexlUberspect;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Checking the builder basics.

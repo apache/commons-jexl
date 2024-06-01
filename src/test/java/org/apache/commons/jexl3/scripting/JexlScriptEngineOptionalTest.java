@@ -27,7 +27,7 @@ import javax.script.CompiledScript;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class JexlScriptEngineOptionalTest {
     private final JexlScriptEngineFactory factory = new JexlScriptEngineFactory();

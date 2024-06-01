@@ -46,7 +46,7 @@ import org.apache.commons.jexl3.MapContext;
 import org.apache.commons.jexl3.internal.introspection.nojexlpackage.Invisible;
 import org.apache.commons.jexl3.introspection.JexlPermissions;
 import org.apache.commons.jexl3.introspection.JexlUberspect;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Checks the CacheMap.MethodKey implementation

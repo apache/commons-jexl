@@ -38,9 +38,9 @@ import javax.script.ScriptException;
 import org.apache.commons.jexl3.JexlBuilder;
 import org.apache.commons.jexl3.JexlException;
 import org.apache.commons.jexl3.introspection.JexlPermissions;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class JexlScriptEngineTest {
     public static class Errors {
@@ -60,11 +60,11 @@ public class JexlScriptEngineTest {
                                                             "application/x-jexl2",
                                                             "application/x-jexl3");
 
-    @Before
+    @BeforeEach
     public void setUp() {
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         JexlBuilder.setDefaultPermissions(null);
         JexlScriptEngine.setInstance(null);

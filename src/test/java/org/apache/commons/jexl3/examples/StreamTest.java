@@ -37,7 +37,7 @@ import org.apache.commons.jexl3.JexlScript;
 import org.apache.commons.jexl3.MapContext;
 import org.apache.commons.jexl3.introspection.JexlPermissions;
 import org.apache.commons.jexl3.introspection.JexlPermissions.ClassPermissions;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * A test around scripting streams.

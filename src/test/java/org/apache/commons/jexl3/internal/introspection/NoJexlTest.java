@@ -25,7 +25,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
 import org.apache.commons.jexl3.annotations.NoJexl;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Checks the CacheMap.MethodKey implementation

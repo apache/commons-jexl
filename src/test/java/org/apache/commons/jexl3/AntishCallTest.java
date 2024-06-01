@@ -25,7 +25,7 @@ import java.math.BigInteger;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test cases for calling antish variables as method names (JEXL-240);

@@ -37,7 +37,7 @@ import org.apache.commons.jexl3.JexlInfo;
 import org.apache.commons.jexl3.JexlScript;
 import org.apache.commons.jexl3.MapContext;
 import org.apache.commons.jexl3.introspection.JexlUberspect;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class OptionalTest {
 

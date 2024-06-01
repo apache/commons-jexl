@@ -41,8 +41,8 @@ import java.util.concurrent.Executors;
 import org.apache.commons.jexl3.internal.TemplateDebugger;
 import org.apache.commons.jexl3.introspection.JexlSandbox;
 import org.apache.commons.logging.Log;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test cases for reported issue between JEXL-200 and JEXL-299.
@@ -254,7 +254,7 @@ public class Issues200Test extends JexlTestCase {
         super("Issues200Test", null);
     }
 
-    @Before
+    @BeforeEach
     @Override
     public void setUp() throws Exception {
         // ensure jul logging is only error to avoid warning in silent mode

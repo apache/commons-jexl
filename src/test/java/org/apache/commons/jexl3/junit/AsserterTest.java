@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 import org.apache.commons.jexl3.Foo;
 import org.apache.commons.jexl3.JexlTestCase;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  *  Simple tests

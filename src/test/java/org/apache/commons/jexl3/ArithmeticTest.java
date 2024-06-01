@@ -42,8 +42,8 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.apache.commons.jexl3.junit.Asserter;
 import org.apache.commons.lang3.SystemProperties;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
@@ -765,7 +765,7 @@ public class ArithmeticTest extends JexlTestCase {
         }
     }
 
-    @Before
+    @BeforeEach
     @Override
     public void setUp() {
     }

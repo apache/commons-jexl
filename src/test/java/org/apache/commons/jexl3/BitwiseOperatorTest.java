@@ -17,8 +17,8 @@
 package org.apache.commons.jexl3;
 
 import org.apache.commons.jexl3.junit.Asserter;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests for the bitwise operators.
@@ -35,7 +35,7 @@ public class BitwiseOperatorTest extends JexlTestCase {
     }
 
     @Override
-    @Before
+    @BeforeEach
     public void setUp() {
         asserter = new Asserter(JEXL);
         asserter.setStrict(false, false);

@@ -29,8 +29,8 @@ import org.apache.commons.jexl3.internal.introspection.IndexedType;
 import org.apache.commons.jexl3.internal.introspection.Uberspect;
 import org.apache.commons.jexl3.introspection.JexlPermissions;
 import org.apache.commons.jexl3.junit.Asserter;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests for property access operator '.'
@@ -181,7 +181,7 @@ public class PropertyAccessTest extends JexlTestCase {
         super("PropertyAccessTest");
     }
 
-    @Before
+    @BeforeEach
     @Override
     public void setUp() {
         asserter = new Asserter(JEXL);

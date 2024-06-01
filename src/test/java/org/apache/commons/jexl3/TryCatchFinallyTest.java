@@ -24,8 +24,8 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.IOException;
 
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 public class TryCatchFinallyTest extends JexlTestCase {
     public static class Circuit implements AutoCloseable {
@@ -71,7 +71,7 @@ public class TryCatchFinallyTest extends JexlTestCase {
         assertFalse(circuit.isOpened());
     }
 
-    @Ignore
+    @Disabled
     public void testEdgeTry() throws Exception {
         int i = 0;
         while (i++ < 5) {
