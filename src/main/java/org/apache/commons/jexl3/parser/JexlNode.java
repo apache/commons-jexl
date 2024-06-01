@@ -185,9 +185,9 @@ public abstract class JexlNode extends SimpleNode {
         if (this instanceof ASTIdentifier) {
             return ((ASTIdentifier) this).getSymbol() < 0;
         }
-        final int nc = this.jjtGetNumChildren() - 1;
+        final int nc = jjtGetNumChildren() - 1;
         if (nc >= 0) {
-            final JexlNode first = this.jjtGetChild(0);
+            final JexlNode first = jjtGetChild(0);
             return first.isGlobalVar();
         }
         if (jjtGetParent() instanceof ASTReference) {
@@ -228,13 +228,13 @@ public abstract class JexlNode extends SimpleNode {
             return jjtGetChild(0).isSafeLhs(safe);
         }
         if (this instanceof ASTMethodNode) {
-            if (this.jjtGetNumChildren() > 1
-                    && this.jjtGetChild(0) instanceof ASTIdentifierAccess
-                    && (((ASTIdentifierAccess) this.jjtGetChild(0)).isSafe() || safe)) {
+            if (jjtGetNumChildren() > 1
+                    && jjtGetChild(0) instanceof ASTIdentifierAccess
+                    && (((ASTIdentifierAccess) jjtGetChild(0)).isSafe() || safe)) {
                 return true;
             }
         }
-        final JexlNode parent = this.jjtGetParent();
+        final JexlNode parent = jjtGetParent();
         if (parent == null) {
             return false;
         }
