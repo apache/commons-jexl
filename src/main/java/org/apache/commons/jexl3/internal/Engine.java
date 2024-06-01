@@ -88,6 +88,126 @@ public class Engine extends JexlEngine {
         private UberspectHolder() {}
     }
     /**
+     * Utility class to collect variables.
+     */
+    protected static class VarCollector {
+        /**
+         * The collected variables represented as a set of list of strings.
+         */
+        private final Set<List<String>> refs = new LinkedHashSet<>();
+        /**
+         * The current variable being collected.
+         */
+        private List<String> ref = new ArrayList<>();
+        /**
+         * The node that started the collect.
+         */
+        private JexlNode root;
+        /**
+         * Whether constant array-access is considered equivalent to dot-access;
+         * if so, > 1 means collect any constant (set,map,...) instead of just
+         * strings and numbers.
+         */
+        final int mode;
+
+        /**
+         * Constructs a new instance.
+         * @param constaa whether constant array-access is considered equivalent to dot-access
+         */
+        protected VarCollector(final int constaa) {
+            mode = constaa;
+        }
+
+        /**
+         * Adds a 'segment' to the variable being collected.
+         * @param name the name
+         */
+        public void add(final String name) {
+            ref.add(name);
+        }
+
+        /**
+         * Starts/stops a variable collect.
+         * @param node starts if not null, stop if null
+         */
+        public void collect(final JexlNode node) {
+            if (!ref.isEmpty()) {
+                refs.add(ref);
+                ref = new ArrayList<>();
+            }
+            root = node;
+        }
+
+        /**
+         *@return the collected variables
+         */
+        public Set<List<String>> collected() {
+            return refs;
+        }
+
+        /**
+         * @return true if currently collecting a variable, false otherwise
+         */
+        public boolean isCollecting() {
+            return root instanceof ASTIdentifier;
+        }
+    }
+    /**
+     * The features allowed for property set/get methods.
+     */
+    protected static final JexlFeatures PROPERTY_FEATURES = new JexlFeatures()
+            .localVar(false)
+            .loops(false)
+            .lambda(false)
+            .script(false)
+            .arrayReferenceExpr(false)
+            .methodCall(false)
+            .register(true);
+    /**
+     * Use {@link Engine#getUberspect(Log, JexlUberspect.ResolverStrategy, JexlPermissions)}.
+     * @deprecated 3.3
+     * @param logger the logger
+     * @param strategy the strategy
+     * @return an Uberspect instance
+     */
+    @Deprecated
+    public static Uberspect getUberspect(final Log logger, final JexlUberspect.ResolverStrategy strategy) {
+        return getUberspect(logger, strategy, null);
+    }
+    /**
+     * Gets the default instance of Uberspect.
+     * <p>This is lazily initialized to avoid building a default instance if there
+     * is no use for it. The main reason for not using the default Uberspect instance is to
+     * be able to use a (low level) introspector created with a given logger
+     * instead of the default one and even more so for with a different (restricted) set of permissions.</p>
+     * @param logger the logger to use for the underlying Uberspect
+     * @param strategy the property resolver strategy
+     * @param permissions the introspection permissions
+     * @return Uberspect the default uberspector instance.
+     * @since 3.3
+     */
+    public static Uberspect getUberspect(
+            final Log logger,
+            final JexlUberspect.ResolverStrategy strategy,
+            final JexlPermissions permissions) {
+        if ((logger == null || logger.equals(LogFactory.getLog(JexlEngine.class)))
+            && (strategy == null || strategy == JexlUberspect.JEXL_STRATEGY)
+            && (permissions == null || permissions == JexlPermissions.UNRESTRICTED)) {
+            return UberspectHolder.UBERSPECT;
+        }
+        return new Uberspect(logger, strategy, permissions);
+    }
+    /**
+     * Solves an optional option.
+     * @param conf the option as configured, may be null
+     * @param def the default value if null, shall not be null
+     * @param <T> the option type
+     * @return conf or def
+     */
+    private static <T> T option(final T conf, final T def) {
+        return conf == null ? def : conf;
+    }
+    /**
      * The Log to which all JexlEngine messages will be logged.
      */
     protected final Log logger;
@@ -159,22 +279,27 @@ public class Engine extends JexlEngine {
      * The expression max length to hit the cache.
      */
     protected final int cacheThreshold;
+
     /**
      * The expression cache.
      */
     protected final JexlCache<Source, ASTJexlScript> cache;
+
     /**
      * The default jxlt engine.
      */
     protected volatile TemplateEngine jxlt;
+
     /**
      * Collect all or only dot references.
      */
     protected final int collectMode;
+
     /**
      * A cached version of the options.
      */
     protected final JexlOptions options;
+
     /**
      * The cache factory method.
      */
@@ -244,121 +369,118 @@ public class Engine extends JexlEngine {
         }
     }
 
-    /**
-     * Gets the default instance of Uberspect.
-     * <p>This is lazily initialized to avoid building a default instance if there
-     * is no use for it. The main reason for not using the default Uberspect instance is to
-     * be able to use a (low level) introspector created with a given logger
-     * instead of the default one and even more so for with a different (restricted) set of permissions.</p>
-     * @param logger the logger to use for the underlying Uberspect
-     * @param strategy the property resolver strategy
-     * @param permissions the introspection permissions
-     * @return Uberspect the default uberspector instance.
-     * @since 3.3
-     */
-    public static Uberspect getUberspect(
-            final Log logger,
-            final JexlUberspect.ResolverStrategy strategy,
-            final JexlPermissions permissions) {
-        if ((logger == null || logger.equals(LogFactory.getLog(JexlEngine.class)))
-            && (strategy == null || strategy == JexlUberspect.JEXL_STRATEGY)
-            && (permissions == null || permissions == JexlPermissions.UNRESTRICTED)) {
-            return UberspectHolder.UBERSPECT;
-        }
-        return new Uberspect(logger, strategy, permissions);
-    }
-
-    /**
-     * Use {@link Engine#getUberspect(Log, JexlUberspect.ResolverStrategy, JexlPermissions)}.
-     * @deprecated 3.3
-     * @param logger the logger
-     * @param strategy the strategy
-     * @return an Uberspect instance
-     */
-    @Deprecated
-    public static Uberspect getUberspect(final Log logger, final JexlUberspect.ResolverStrategy strategy) {
-        return getUberspect(logger, strategy, null);
-    }
-
     @Override
-    public JexlUberspect getUberspect() {
-        return uberspect;
-    }
-
-    @Override
-    public JexlArithmetic getArithmetic() {
-        return arithmetic;
-    }
-
-    @Override
-    public boolean isDebug() {
-        return this.debug;
-    }
-
-    @Override
-    public boolean isSilent() {
-        return this.silent;
-    }
-
-    @Override
-    public boolean isStrict() {
-        return this.strict;
-    }
-
-    @Override
-    public boolean isCancellable() {
-        return this.cancellable;
-    }
-
-    @Override
-    public void setClassLoader(final ClassLoader loader) {
-        jxlt = null;
-        uberspect.setClassLoader(loader);
-        if (functions != null) {
-            final Iterable<String> names = new ArrayList<>(functions.keySet());
-            for(final String name : names) {
-                final Object functor = functions.get(name);
-                if (functor instanceof Class<?>) {
-                    final Class<?> fclass = (Class<?>) functor;
-                    try {
-                        final Class<?> nclass = loader.loadClass(fclass.getName());
-                        if (nclass != fclass) {
-                            functions.put(name, nclass);
-                        }
-                    } catch (final ClassNotFoundException xany) {
-                         functions.put(name, fclass.getName());
-                    }
-                }
-            }
-        }
+    public void clearCache() {
         if (cache != null) {
             cache.clear();
         }
     }
 
     @Override
-    public Charset getCharset() {
-        return charset;
+    public Script createExpression(final JexlInfo info, final String expression) {
+        return createScript(expressionFeatures, info, expression);
     }
 
     /**
-     * Solves a namespace using this engine map of functions.
-     * @param name the namespoce name
-     * @return the object associated
+     * Creates an interpreter.
+     * @param context a JexlContext; if null, the empty context is used instead.
+     * @param frame   the interpreter frame
+     * @param opts    the evaluation options
+     * @return an Interpreter
      */
-    final Object getNamespace(final String name) {
-        return functions.get(name);
+    protected Interpreter createInterpreter(final JexlContext context, final Frame frame, final JexlOptions opts) {
+        return new Interpreter(this, opts, context, frame);
+    }
+
+    @Override
+    public TemplateEngine createJxltEngine(final boolean noScript, final int cacheSize, final char immediate, final char deferred) {
+        return new TemplateEngine(this, noScript, cacheSize, immediate, deferred);
+    }
+
+    @Override
+    public Script createScript(final JexlFeatures features, final JexlInfo info, final String scriptText, final String... names) {
+        if (scriptText == null) {
+            throw new NullPointerException("source is null");
+        }
+        final String source = trimSource(scriptText);
+        final Scope scope = names == null || names.length == 0? null : new Scope(null, names);
+        final JexlFeatures ftrs = features == null ? scriptFeatures : features;
+        final ASTJexlScript tree = parse(info, ftrs, source, scope);
+        return new Script(this, source, tree);
     }
 
     /**
-     * Solves an optional option.
-     * @param conf the option as configured, may be null
-     * @param def the default value if null, shall not be null
-     * @param <T> the option type
-     * @return conf or def
+     * Creates a template interpreter.
+     * @param args the template interpreter arguments
      */
-    private static <T> T option(final T conf, final T def) {
-        return conf == null ? def : conf;
+    protected Interpreter createTemplateInterpreter(final TemplateInterpreter.Arguments args) {
+        return new TemplateInterpreter(args);
+    }
+
+    /**
+     * Creates a new instance of an object using the most appropriate constructor
+     * based on the arguments.
+     * @param clazz the class to instantiate
+     * @param args  the constructor arguments
+     * @return the created object instance or null on failure when silent
+     */
+    protected Object doCreateInstance(final Object clazz, final Object... args) {
+        JexlException xjexl = null;
+        Object result = null;
+        final JexlInfo info = debug ? createInfo() : null;
+        try {
+            JexlMethod ctor = uberspect.getConstructor(clazz, args);
+            if (ctor == null && arithmetic.narrowArguments(args)) {
+                ctor = uberspect.getConstructor(clazz, args);
+            }
+            if (ctor != null) {
+                result = ctor.invoke(clazz, args);
+            } else {
+                xjexl = new JexlException.Method(info, clazz.toString(), args);
+            }
+        } catch (final JexlException xany) {
+            xjexl = xany;
+        } catch (final Exception xany) {
+            xjexl = new JexlException.Method(info, clazz.toString(), args, xany);
+        }
+        if (xjexl != null) {
+            if (silent) {
+                if (logger.isWarnEnabled()) {
+                    logger.warn(xjexl.getMessage(), xjexl.getCause());
+                }
+                return null;
+            }
+            throw xjexl.clean();
+        }
+        return result;
+    }
+
+    /**
+     * Compute a script options for evaluation.
+     * <p>This calls processPragma(...).
+     * @param script the script
+     * @param context the context
+     * @return the options
+     */
+    protected JexlOptions evalOptions(final ASTJexlScript script, final JexlContext context) {
+        final JexlOptions opts = evalOptions(context);
+        if (opts != options) {
+            // when feature lexical, try hard to run lexical
+            if (scriptFeatures.isLexical()) {
+                opts.setLexical(true);
+            }
+            if (scriptFeatures.isLexicalShade()) {
+                opts.setLexicalShade(true);
+            }
+            if (scriptFeatures.supportsConstCapture()) {
+                opts.setConstCapture(true);
+            }
+        }
+        if (script != null) {
+           // process script pragmas if any
+           processPragmas(script, context, opts);
+        }
+        return opts;
     }
 
     /**
@@ -401,256 +523,43 @@ public class Engine extends JexlEngine {
         return jexlo;
     }
 
+    @Override
+    public JexlArithmetic getArithmetic() {
+        return arithmetic;
+    }
+
+    @Override
+    public Charset getCharset() {
+        return charset;
+    }
+
     /**
-     * Compute a script options for evaluation.
-     * <p>This calls processPragma(...).
+     * Gets the array of local variable from a script.
      * @param script the script
-     * @param context the context
-     * @return the options
+     * @return the local variables array which may be empty (but not null) if no local variables were defined
+     * @since 3.0
      */
-    protected JexlOptions evalOptions(final ASTJexlScript script, final JexlContext context) {
-        final JexlOptions opts = evalOptions(context);
-        if (opts != options) {
-            // when feature lexical, try hard to run lexical
-            if (scriptFeatures.isLexical()) {
-                opts.setLexical(true);
-            }
-            if (scriptFeatures.isLexicalShade()) {
-                opts.setLexicalShade(true);
-            }
-            if (scriptFeatures.supportsConstCapture()) {
-                opts.setConstCapture(true);
-            }
-        }
-        if (script != null) {
-           // process script pragmas if any
-           processPragmas(script, context, opts);
-        }
-        return opts;
+    protected String[] getLocalVariables(final JexlScript script) {
+        return script.getLocalVariables();
     }
 
     /**
-     * Processes a script pragmas.
-     * <p>Only called from options(...)
+     * Solves a namespace using this engine map of functions.
+     * @param name the namespoce name
+     * @return the object associated
+     */
+    final Object getNamespace(final String name) {
+        return functions.get(name);
+    }
+
+    /**
+     * Gets the array of parameters from a script.
      * @param script the script
-     * @param context the context
-     * @param opts the options
+     * @return the parameters which may be empty (but not null) if no parameters were defined
+     * @since 3.0
      */
-    protected void processPragmas(final ASTJexlScript script, final JexlContext context, final JexlOptions opts) {
-        final Map<String, Object> pragmas = script.getPragmas();
-        if (pragmas != null && !pragmas.isEmpty()) {
-            final JexlContext.PragmaProcessor processor =
-                    context instanceof JexlContext.PragmaProcessor
-                            ? (JexlContext.PragmaProcessor) context
-                            : null;
-            Map<String, Object> ns = null;
-            for (final Map.Entry<String, Object> pragma : pragmas.entrySet()) {
-                final String key = pragma.getKey();
-                final Object value = pragma.getValue();
-                if (PRAGMA_OPTIONS.equals(key)) {
-                    if (value instanceof String) {
-                        // jexl.options
-                        final String[] vs = value.toString().split(" ");
-                        opts.setFlags(vs);
-                    }
-                }  else if (PRAGMA_IMPORT.equals(key)) {
-                    // jexl.import, may use a set
-                    final Set<String> is = new LinkedHashSet<>();
-                    withValueSet(value, o -> {
-                        if (o instanceof String) {
-                            is.add(o.toString());
-                        }
-                    });
-                    if (!is.isEmpty()) {
-                        opts.setImports(is);
-                    }
-                } else if (key.startsWith(PRAGMA_JEXLNS)) {
-                    if (ns == null)  {
-                        ns = new LinkedHashMap<>();
-                    }
-                    processPragmaNamespace(ns, key, value);
-                    if (!ns.isEmpty()) {
-                        opts.setNamespaces(ns);
-                    }
-                } else if (key.startsWith(PRAGMA_MODULE)) {
-                    if (ns == null)  {
-                        ns = new LinkedHashMap<>();
-                    }
-                    processPragmaModule(ns, key, value, script.jexlInfo(), context);
-                    if (!ns.isEmpty()) {
-                        opts.setNamespaces(ns);
-                    }
-                }
-                // user-defined processor may alter options
-                if (processor != null) {
-                    processor.processPragma(opts, key, value);
-                }
-            }
-        }
-    }
-
-    /**
-     * Utility to deal with single value or set of values.
-     * @param value the value or the set
-     * @param consumer the consumer of values
-     */
-    private void withValueSet(final Object value, final Consumer<Object> consumer) {
-        final Set<?> values = value instanceof Set<?>
-                ? (Set<?>) value
-                : Collections.singleton(value);
-        for (final Object o : values) {
-            consumer.accept(o);
-        }
-    }
-
-    /**
-     * Processes jexl.namespace.ns pragma.
-     * @param ns the namespace map
-     * @param key the key
-     * @param value the value, ie the class
-     */
-    private void processPragmaNamespace(final Map<String, Object> ns, final String key, final Object value) {
-        if (value instanceof String) {
-            // jexl.namespace.***
-            final String namespaceName = key.substring(PRAGMA_JEXLNS.length());
-            if (!namespaceName.isEmpty()) {
-                final String nsclass = value.toString();
-                final Class<?> clazz = uberspect.getClassByName(nsclass);
-                if (clazz == null) {
-                    if (logger.isWarnEnabled()) {
-                        logger.warn(key + ": unable to find class " + nsclass);
-                    }
-                } else {
-                    ns.put(namespaceName, clazz);
-                }
-            }
-        } else {
-            if (logger.isWarnEnabled()) {
-                logger.warn(key + ": ambiguous declaration " + value);
-            }
-        }
-    }
-
-    /**
-     * Processes jexl.module.ns pragma.
-     *
-     * <p>If the value is empty, the namespace will be cleared which may be useful to debug and force unload
-     * the object bound to the namespace.</p>
-     * @param ns the namespace map
-     * @param key the key the namespace
-     * @param value the value, ie the expression to evaluate and its result bound to the namespace
-     * @param info the expression info
-     * @param context the value-as-expression evaluation context
-     */
-    private void processPragmaModule(final Map<String, Object> ns, final String key, final Object value, final JexlInfo info,
-            final JexlContext context) {
-        // jexl.module.***
-        final String module = key.substring(PRAGMA_MODULE.length());
-        if (module.isEmpty()) {
-            if (logger.isWarnEnabled()) {
-                logger.warn(module + ": invalid module declaration");
-            }
-        } else {
-            withValueSet(value, o -> {
-                if (!(o instanceof CharSequence)) {
-                    if (logger.isWarnEnabled()) {
-                        logger.warn(module + ": unable to define module from " + value);
-                    }
-                } else {
-                    final String moduleSrc = o.toString();
-                    final Object functor;
-                    if (context instanceof JexlContext.ModuleProcessor) {
-                        final JexlContext.ModuleProcessor processor = (JexlContext.ModuleProcessor) context;
-                        functor = processor.processModule(this, info, module, moduleSrc);
-                    } else {
-                        final Object moduleObject = createExpression(info, moduleSrc).evaluate(context);
-                        functor = moduleObject instanceof Script ? ((Script) moduleObject).execute(context) : moduleObject;
-                    }
-                    if (functor != null) {
-                        ns.put(module, functor);
-                    } else {
-                        ns.remove(module);
-                    }
-                }
-            });
-        }
-    }
-
-    /**
-     * Sets options from this engine options.
-     * @param opts the options to set
-     * @return the options
-     */
-    public JexlOptions optionsSet(final JexlOptions opts) {
-        if (opts != null) {
-            opts.set(options);
-        }
-        return opts;
-    }
-
-    @Override
-    public TemplateEngine createJxltEngine(final boolean noScript, final int cacheSize, final char immediate, final char deferred) {
-        return new TemplateEngine(this, noScript, cacheSize, immediate, deferred);
-    }
-
-    @Override
-    public void clearCache() {
-        if (cache != null) {
-            cache.clear();
-        }
-    }
-
-    /**
-     * Creates an interpreter.
-     * @param context a JexlContext; if null, the empty context is used instead.
-     * @param frame   the interpreter frame
-     * @param opts    the evaluation options
-     * @return an Interpreter
-     */
-    protected Interpreter createInterpreter(final JexlContext context, final Frame frame, final JexlOptions opts) {
-        return new Interpreter(this, opts, context, frame);
-    }
-
-    /**
-     * Creates a template interpreter.
-     * @param args the template interpreter arguments
-     */
-    protected Interpreter createTemplateInterpreter(final TemplateInterpreter.Arguments args) {
-        return new TemplateInterpreter(args);
-    }
-
-    @Override
-    public Script createExpression(final JexlInfo info, final String expression) {
-        return createScript(expressionFeatures, info, expression);
-    }
-
-    @Override
-    public Script createScript(final JexlFeatures features, final JexlInfo info, final String scriptText, final String... names) {
-        if (scriptText == null) {
-            throw new NullPointerException("source is null");
-        }
-        final String source = trimSource(scriptText);
-        final Scope scope = names == null || names.length == 0? null : new Scope(null, names);
-        final JexlFeatures ftrs = features == null ? scriptFeatures : features;
-        final ASTJexlScript tree = parse(info, ftrs, source, scope);
-        return new Script(this, source, tree);
-    }
-
-    /**
-     * The features allowed for property set/get methods.
-     */
-    protected static final JexlFeatures PROPERTY_FEATURES = new JexlFeatures()
-            .localVar(false)
-            .loops(false)
-            .lambda(false)
-            .script(false)
-            .arrayReferenceExpr(false)
-            .methodCall(false)
-            .register(true);
-
-    @Override
-    public Object getProperty(final Object bean, final String expr) {
-        return getProperty(null, bean, expr);
+    protected String[] getParameters(final JexlScript script) {
+        return script.getParameters();
     }
 
     @Override
@@ -677,132 +586,13 @@ public class Engine extends JexlEngine {
     }
 
     @Override
-    public void setProperty(final Object bean, final String expr, final Object value) {
-        setProperty(null, bean, expr, value);
+    public Object getProperty(final Object bean, final String expr) {
+        return getProperty(null, bean, expr);
     }
 
     @Override
-    public void setProperty(final JexlContext context, final Object bean, final String expr, final Object value) {
-        // synthesize expr using register
-        String src = trimSource(expr);
-        src = "#0" + (src.charAt(0) == '[' ? "" : ".") + src + "=" + "#1";
-        try {
-            final Scope scope = new Scope(null, "#0", "#1");
-            final ASTJexlScript script = parse(null, PROPERTY_FEATURES, src, scope);
-            final JexlNode node = script.jjtGetChild(0);
-            final Frame frame = script.createFrame(bean, value);
-            final Interpreter interpreter = createInterpreter(context != null ? context : EMPTY_CONTEXT, frame, options);
-            interpreter.visitLexicalNode(node, null);
-        } catch (final JexlException xjexl) {
-            if (silent) {
-                if (logger.isWarnEnabled()) {
-                    logger.warn(xjexl.getMessage(), xjexl.getCause());
-                }
-                return;
-            }
-            throw xjexl.clean();
-        }
-    }
-
-    @Override
-    public Object invokeMethod(final Object obj, final String meth, final Object... args) {
-        JexlException xjexl = null;
-        Object result = null;
-        final JexlInfo info = debug ? createInfo() : null;
-        try {
-            JexlMethod method = uberspect.getMethod(obj, meth, args);
-            if (method == null && arithmetic.narrowArguments(args)) {
-                method = uberspect.getMethod(obj, meth, args);
-            }
-            if (method != null) {
-                result = method.invoke(obj, args);
-            } else {
-                xjexl = new JexlException.Method(info, meth, args);
-            }
-        } catch (final JexlException xany) {
-            xjexl = xany;
-        } catch (final Exception xany) {
-            xjexl = new JexlException.Method(info, meth, args, xany);
-        }
-        if (xjexl != null) {
-            if (!silent) {
-                throw xjexl.clean();
-            }
-            if (logger.isWarnEnabled()) {
-                logger.warn(xjexl.getMessage(), xjexl.getCause());
-            }
-        }
-        return result;
-    }
-
-    @Override
-    public <T> T newInstance(final Class<? extends T> clazz, final Object... args) {
-        return clazz.cast(doCreateInstance(clazz, args));
-    }
-
-    @Override
-    public Object newInstance(final String clazz, final Object... args) {
-        return doCreateInstance(clazz, args);
-    }
-
-    /**
-     * Creates a new instance of an object using the most appropriate constructor
-     * based on the arguments.
-     * @param clazz the class to instantiate
-     * @param args  the constructor arguments
-     * @return the created object instance or null on failure when silent
-     */
-    protected Object doCreateInstance(final Object clazz, final Object... args) {
-        JexlException xjexl = null;
-        Object result = null;
-        final JexlInfo info = debug ? createInfo() : null;
-        try {
-            JexlMethod ctor = uberspect.getConstructor(clazz, args);
-            if (ctor == null && arithmetic.narrowArguments(args)) {
-                ctor = uberspect.getConstructor(clazz, args);
-            }
-            if (ctor != null) {
-                result = ctor.invoke(clazz, args);
-            } else {
-                xjexl = new JexlException.Method(info, clazz.toString(), args);
-            }
-        } catch (final JexlException xany) {
-            xjexl = xany;
-        } catch (final Exception xany) {
-            xjexl = new JexlException.Method(info, clazz.toString(), args, xany);
-        }
-        if (xjexl != null) {
-            if (silent) {
-                if (logger.isWarnEnabled()) {
-                    logger.warn(xjexl.getMessage(), xjexl.getCause());
-                }
-                return null;
-            }
-            throw xjexl.clean();
-        }
-        return result;
-    }
-
-    /**
-     * Swaps the current thread local context.
-     * @param tls the context or null
-     * @return the previous thread local context
-     */
-    protected JexlContext.ThreadLocal putThreadLocal(final JexlContext.ThreadLocal tls) {
-        final JexlContext.ThreadLocal local = CONTEXT.get();
-        CONTEXT.set(tls);
-        return local;
-    }
-
-    /**
-     * Swaps the current thread local engine.
-     * @param jexl the engine or null
-     * @return the previous thread local engine
-     */
-    protected JexlEngine putThreadEngine(final JexlEngine jexl) {
-        final JexlEngine pjexl = ENGINE.get();
-        ENGINE.set(jexl);
-        return pjexl;
+    public JexlUberspect getUberspect() {
+        return uberspect;
     }
 
     /**
@@ -817,80 +607,6 @@ public class Engine extends JexlEngine {
         final VarCollector collector = varCollector();
         getVariables(script, script, collector);
         return collector.collected();
-    }
-
-    /**
-     * Creates a collector instance.
-     * @return a collector instance
-     */
-    protected VarCollector varCollector() {
-        return new VarCollector(this.collectMode);
-    }
-
-    /**
-     * Utility class to collect variables.
-     */
-    protected static class VarCollector {
-        /**
-         * The collected variables represented as a set of list of strings.
-         */
-        private final Set<List<String>> refs = new LinkedHashSet<>();
-        /**
-         * The current variable being collected.
-         */
-        private List<String> ref = new ArrayList<>();
-        /**
-         * The node that started the collect.
-         */
-        private JexlNode root;
-        /**
-         * Whether constant array-access is considered equivalent to dot-access;
-         * if so, > 1 means collect any constant (set,map,...) instead of just
-         * strings and numbers.
-         */
-        final int mode;
-
-        /**
-         * Constructs a new instance.
-         * @param constaa whether constant array-access is considered equivalent to dot-access
-         */
-        protected VarCollector(final int constaa) {
-            mode = constaa;
-        }
-
-        /**
-         * Starts/stops a variable collect.
-         * @param node starts if not null, stop if null
-         */
-        public void collect(final JexlNode node) {
-            if (!ref.isEmpty()) {
-                refs.add(ref);
-                ref = new ArrayList<>();
-            }
-            root = node;
-        }
-
-        /**
-         * @return true if currently collecting a variable, false otherwise
-         */
-        public boolean isCollecting() {
-            return root instanceof ASTIdentifier;
-        }
-
-        /**
-         * Adds a 'segment' to the variable being collected.
-         * @param name the name
-         */
-        public void add(final String name) {
-            ref.add(name);
-        }
-
-        /**
-         *@return the collected variables
-         */
-        public Set<List<String>> collected() {
-            return refs;
-        }
     }
 
     /**
@@ -958,24 +674,95 @@ public class Engine extends JexlEngine {
         }
     }
 
-    /**
-     * Gets the array of parameters from a script.
-     * @param script the script
-     * @return the parameters which may be empty (but not null) if no parameters were defined
-     * @since 3.0
-     */
-    protected String[] getParameters(final JexlScript script) {
-        return script.getParameters();
+    @Override
+    public Object invokeMethod(final Object obj, final String meth, final Object... args) {
+        JexlException xjexl = null;
+        Object result = null;
+        final JexlInfo info = debug ? createInfo() : null;
+        try {
+            JexlMethod method = uberspect.getMethod(obj, meth, args);
+            if (method == null && arithmetic.narrowArguments(args)) {
+                method = uberspect.getMethod(obj, meth, args);
+            }
+            if (method != null) {
+                result = method.invoke(obj, args);
+            } else {
+                xjexl = new JexlException.Method(info, meth, args);
+            }
+        } catch (final JexlException xany) {
+            xjexl = xany;
+        } catch (final Exception xany) {
+            xjexl = new JexlException.Method(info, meth, args, xany);
+        }
+        if (xjexl != null) {
+            if (!silent) {
+                throw xjexl.clean();
+            }
+            if (logger.isWarnEnabled()) {
+                logger.warn(xjexl.getMessage(), xjexl.getCause());
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public boolean isCancellable() {
+        return this.cancellable;
+    }
+
+    @Override
+    public boolean isDebug() {
+        return this.debug;
+    }
+
+    @Override
+    public boolean isSilent() {
+        return this.silent;
+    }
+
+    @Override
+    public boolean isStrict() {
+        return this.strict;
     }
 
     /**
-     * Gets the array of local variable from a script.
-     * @param script the script
-     * @return the local variables array which may be empty (but not null) if no local variables were defined
-     * @since 3.0
+     * Gets and/or creates a default template engine.
+     * @return a template engine
      */
-    protected String[] getLocalVariables(final JexlScript script) {
-        return script.getLocalVariables();
+    protected TemplateEngine jxlt() {
+        TemplateEngine e = jxlt;
+        if (e == null) {
+            synchronized(this) {
+                e = jxlt;
+                if (e == null) {
+                    e = new TemplateEngine(this, true, 0, '$', '#');
+                    jxlt = e;
+                }
+            }
+        }
+        return e;
+    }
+
+    @Override
+    public <T> T newInstance(final Class<? extends T> clazz, final Object... args) {
+        return clazz.cast(doCreateInstance(clazz, args));
+    }
+
+    @Override
+    public Object newInstance(final String clazz, final Object... args) {
+        return doCreateInstance(clazz, args);
+    }
+
+    /**
+     * Sets options from this engine options.
+     * @param opts the options to set
+     * @return the options
+     */
+    public JexlOptions optionsSet(final JexlOptions opts) {
+        if (opts != null) {
+            opts.set(options);
+        }
+        return opts;
     }
 
     /**
@@ -1038,6 +825,215 @@ public class Engine extends JexlEngine {
     }
 
     /**
+     * Processes jexl.module.ns pragma.
+     *
+     * <p>If the value is empty, the namespace will be cleared which may be useful to debug and force unload
+     * the object bound to the namespace.</p>
+     * @param ns the namespace map
+     * @param key the key the namespace
+     * @param value the value, ie the expression to evaluate and its result bound to the namespace
+     * @param info the expression info
+     * @param context the value-as-expression evaluation context
+     */
+    private void processPragmaModule(final Map<String, Object> ns, final String key, final Object value, final JexlInfo info,
+            final JexlContext context) {
+        // jexl.module.***
+        final String module = key.substring(PRAGMA_MODULE.length());
+        if (module.isEmpty()) {
+            if (logger.isWarnEnabled()) {
+                logger.warn(module + ": invalid module declaration");
+            }
+        } else {
+            withValueSet(value, o -> {
+                if (!(o instanceof CharSequence)) {
+                    if (logger.isWarnEnabled()) {
+                        logger.warn(module + ": unable to define module from " + value);
+                    }
+                } else {
+                    final String moduleSrc = o.toString();
+                    final Object functor;
+                    if (context instanceof JexlContext.ModuleProcessor) {
+                        final JexlContext.ModuleProcessor processor = (JexlContext.ModuleProcessor) context;
+                        functor = processor.processModule(this, info, module, moduleSrc);
+                    } else {
+                        final Object moduleObject = createExpression(info, moduleSrc).evaluate(context);
+                        functor = moduleObject instanceof Script ? ((Script) moduleObject).execute(context) : moduleObject;
+                    }
+                    if (functor != null) {
+                        ns.put(module, functor);
+                    } else {
+                        ns.remove(module);
+                    }
+                }
+            });
+        }
+    }
+
+    /**
+     * Processes jexl.namespace.ns pragma.
+     * @param ns the namespace map
+     * @param key the key
+     * @param value the value, ie the class
+     */
+    private void processPragmaNamespace(final Map<String, Object> ns, final String key, final Object value) {
+        if (value instanceof String) {
+            // jexl.namespace.***
+            final String namespaceName = key.substring(PRAGMA_JEXLNS.length());
+            if (!namespaceName.isEmpty()) {
+                final String nsclass = value.toString();
+                final Class<?> clazz = uberspect.getClassByName(nsclass);
+                if (clazz == null) {
+                    if (logger.isWarnEnabled()) {
+                        logger.warn(key + ": unable to find class " + nsclass);
+                    }
+                } else {
+                    ns.put(namespaceName, clazz);
+                }
+            }
+        } else {
+            if (logger.isWarnEnabled()) {
+                logger.warn(key + ": ambiguous declaration " + value);
+            }
+        }
+    }
+
+    /**
+     * Processes a script pragmas.
+     * <p>Only called from options(...)
+     * @param script the script
+     * @param context the context
+     * @param opts the options
+     */
+    protected void processPragmas(final ASTJexlScript script, final JexlContext context, final JexlOptions opts) {
+        final Map<String, Object> pragmas = script.getPragmas();
+        if (pragmas != null && !pragmas.isEmpty()) {
+            final JexlContext.PragmaProcessor processor =
+                    context instanceof JexlContext.PragmaProcessor
+                            ? (JexlContext.PragmaProcessor) context
+                            : null;
+            Map<String, Object> ns = null;
+            for (final Map.Entry<String, Object> pragma : pragmas.entrySet()) {
+                final String key = pragma.getKey();
+                final Object value = pragma.getValue();
+                if (PRAGMA_OPTIONS.equals(key)) {
+                    if (value instanceof String) {
+                        // jexl.options
+                        final String[] vs = value.toString().split(" ");
+                        opts.setFlags(vs);
+                    }
+                }  else if (PRAGMA_IMPORT.equals(key)) {
+                    // jexl.import, may use a set
+                    final Set<String> is = new LinkedHashSet<>();
+                    withValueSet(value, o -> {
+                        if (o instanceof String) {
+                            is.add(o.toString());
+                        }
+                    });
+                    if (!is.isEmpty()) {
+                        opts.setImports(is);
+                    }
+                } else if (key.startsWith(PRAGMA_JEXLNS)) {
+                    if (ns == null)  {
+                        ns = new LinkedHashMap<>();
+                    }
+                    processPragmaNamespace(ns, key, value);
+                    if (!ns.isEmpty()) {
+                        opts.setNamespaces(ns);
+                    }
+                } else if (key.startsWith(PRAGMA_MODULE)) {
+                    if (ns == null)  {
+                        ns = new LinkedHashMap<>();
+                    }
+                    processPragmaModule(ns, key, value, script.jexlInfo(), context);
+                    if (!ns.isEmpty()) {
+                        opts.setNamespaces(ns);
+                    }
+                }
+                // user-defined processor may alter options
+                if (processor != null) {
+                    processor.processPragma(opts, key, value);
+                }
+            }
+        }
+    }
+
+    /**
+     * Swaps the current thread local engine.
+     * @param jexl the engine or null
+     * @return the previous thread local engine
+     */
+    protected JexlEngine putThreadEngine(final JexlEngine jexl) {
+        final JexlEngine pjexl = ENGINE.get();
+        ENGINE.set(jexl);
+        return pjexl;
+    }
+
+    /**
+     * Swaps the current thread local context.
+     * @param tls the context or null
+     * @return the previous thread local context
+     */
+    protected JexlContext.ThreadLocal putThreadLocal(final JexlContext.ThreadLocal tls) {
+        final JexlContext.ThreadLocal local = CONTEXT.get();
+        CONTEXT.set(tls);
+        return local;
+    }
+
+    @Override
+    public void setClassLoader(final ClassLoader loader) {
+        jxlt = null;
+        uberspect.setClassLoader(loader);
+        if (functions != null) {
+            final Iterable<String> names = new ArrayList<>(functions.keySet());
+            for(final String name : names) {
+                final Object functor = functions.get(name);
+                if (functor instanceof Class<?>) {
+                    final Class<?> fclass = (Class<?>) functor;
+                    try {
+                        final Class<?> nclass = loader.loadClass(fclass.getName());
+                        if (nclass != fclass) {
+                            functions.put(name, nclass);
+                        }
+                    } catch (final ClassNotFoundException xany) {
+                         functions.put(name, fclass.getName());
+                    }
+                }
+            }
+        }
+        if (cache != null) {
+            cache.clear();
+        }
+    }
+
+    @Override
+    public void setProperty(final JexlContext context, final Object bean, final String expr, final Object value) {
+        // synthesize expr using register
+        String src = trimSource(expr);
+        src = "#0" + (src.charAt(0) == '[' ? "" : ".") + src + "=" + "#1";
+        try {
+            final Scope scope = new Scope(null, "#0", "#1");
+            final ASTJexlScript script = parse(null, PROPERTY_FEATURES, src, scope);
+            final JexlNode node = script.jjtGetChild(0);
+            final Frame frame = script.createFrame(bean, value);
+            final Interpreter interpreter = createInterpreter(context != null ? context : EMPTY_CONTEXT, frame, options);
+            interpreter.visitLexicalNode(node, null);
+        } catch (final JexlException xjexl) {
+            if (silent) {
+                if (logger.isWarnEnabled()) {
+                    logger.warn(xjexl.getMessage(), xjexl.getCause());
+                }
+                return;
+            }
+            throw xjexl.clean();
+        }
+    }
+
+    @Override
+    public void setProperty(final Object bean, final String expr, final Object value) {
+        setProperty(null, bean, expr, value);
+    }
+
+    /**
      * Trims the source from front and ending spaces.
      * @param str expression to clean
      * @return trimmed expression ending in a semicolon
@@ -1063,20 +1059,24 @@ public class Engine extends JexlEngine {
     }
 
     /**
-     * Gets and/or creates a default template engine.
-     * @return a template engine
+     * Creates a collector instance.
+     * @return a collector instance
      */
-    protected TemplateEngine jxlt() {
-        TemplateEngine e = jxlt;
-        if (e == null) {
-            synchronized(this) {
-                e = jxlt;
-                if (e == null) {
-                    e = new TemplateEngine(this, true, 0, '$', '#');
-                    jxlt = e;
-                }
-            }
+    protected VarCollector varCollector() {
+        return new VarCollector(this.collectMode);
+    }
+
+    /**
+     * Utility to deal with single value or set of values.
+     * @param value the value or the set
+     * @param consumer the consumer of values
+     */
+    private void withValueSet(final Object value, final Consumer<Object> consumer) {
+        final Set<?> values = value instanceof Set<?>
+                ? (Set<?>) value
+                : Collections.singleton(value);
+        for (final Object o : values) {
+            consumer.accept(o);
         }
-        return e;
     }
 }
