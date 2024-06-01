@@ -890,10 +890,8 @@ public class Engine extends JexlEngine {
                     ns.put(namespaceName, clazz);
                 }
             }
-        } else {
-            if (logger.isWarnEnabled()) {
-                logger.warn(key + ": ambiguous declaration " + value);
-            }
+        } else if (logger.isWarnEnabled()) {
+            logger.warn(key + ": ambiguous declaration " + value);
         }
     }
 
