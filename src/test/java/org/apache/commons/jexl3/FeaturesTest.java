@@ -64,8 +64,7 @@ public class FeaturesTest extends JexlTestCase {
             final JexlScript ctl = JEXL.createScript(script);
             assertNotNull(ctl);
             final JexlException.Parsing xfeature = assertThrows(JexlException.Parsing.class, () -> jexl.createScript(features, null, script));
-            final String msg = xfeature.getMessage();
-            assertNotNull(msg);
+            assertNotNull(xfeature.getMessage());
         }
     }
 
