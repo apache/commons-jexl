@@ -483,13 +483,8 @@ public class LexicalTest {
                 "let bar = '34'; const f = ()->{  const bar = 3; z ->{ bar += z; } };");
         // @formatter:on
         for (final String src : srcs) {
-            try {
-                final JexlScript script = jexl.createScript(src);
-                final Object result = script.execute(null);
-                fail(src);
-            } catch (final JexlException.Assignment xassign) {
-                assertNotNull(xassign, src); // debug breakpoint
-            }
+            final JexlException.Assignment xassign = assertThrows(JexlException.Assignment.class, () -> jexl.createScript(src), src);
+            assertNotNull(xassign, src); // debug breakpoint
         }
     }
 
