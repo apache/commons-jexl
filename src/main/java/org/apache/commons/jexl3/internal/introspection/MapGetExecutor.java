@@ -27,9 +27,6 @@ public final class MapGetExecutor extends AbstractExecutor.Get {
     /** The java.util.map.get method used as an active marker in MapGet. */
     private static final java.lang.reflect.Method MAP_GET =
             initMarker(Map.class, "get", Object.class);
-    /** The property. */
-    private final Object property;
-
     /**
      * Attempts to discover a MapGetExecutor.
      *
@@ -45,6 +42,9 @@ public final class MapGetExecutor extends AbstractExecutor.Get {
         }
         return null;
     }
+
+    /** The property. */
+    private final Object property;
 
     /**
      * Creates an instance.
