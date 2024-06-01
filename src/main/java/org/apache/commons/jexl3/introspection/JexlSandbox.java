@@ -67,182 +67,81 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public final class JexlSandbox {
     /**
-     * The marker string for explicitly disallowed null properties.
+     * A allow set of names.
      */
-    public static final String NULL = "?";
-    /**
-     * The map from class names to permissions.
-     */
-    private final Map<String, Permissions> sandbox;
-    /**
-     * Whether permissions can be inherited (through implementation or extension).
-     */
-    private final boolean inherit;
-    /**
-     * Default behavior, block or allow.
-     */
-    private final boolean allow;
+    static class AllowSet extends Names {
+        /** The map of controlled names and aliases. */
+        private Map<String, String> names;
 
-    /**
-     * Creates a new default sandbox.
-     * <p>In the absence of explicit permissions on a class, the
-     * sandbox is a allow-box, allow-listing that class for all permissions (read, write and execute).
-     */
-    public JexlSandbox() {
-        this(true, false, null);
-    }
-
-    /**
-     * Creates a new default sandbox.
-     * <p>A allow-box considers no permissions as &quot;everything is allowed&quot; when
-     * a block-box considers no permissions as &quot;nothing is allowed&quot;.
-     * @param ab whether this sandbox is allow (true) or block (false)
-     * if no permission is explicitly defined for a class.
-     * @since 3.1
-     */
-    public JexlSandbox(final boolean ab) {
-        this(ab, false, null);
-    }
-
-    /**
-     * Creates a sandbox.
-     * @param ab whether this sandbox is allow (true) or block (false)
-     * @param inh whether permissions on interfaces and classes are inherited (true) or not (false)
-     * @since 3.2
-     */
-    public JexlSandbox(final boolean ab, final boolean inh) {
-        this(ab, inh, null);
-    }
-
-    /**
-     * Creates a sandbox based on an existing permissions map.
-     * @param map the permissions map
-     */
-    @Deprecated
-    protected JexlSandbox(final Map<String, Permissions> map) {
-        this(true, false, map);
-    }
-
-    /**
-     * Creates a sandbox based on an existing permissions map.
-     * @param ab whether this sandbox is allow (true) or block (false)
-     * @param map the permissions map
-     * @since 3.1
-     */
-    @Deprecated
-    protected JexlSandbox(final boolean ab, final Map<String, Permissions> map) {
-        this(ab, false, map);
-    }
-
-    /**
-     * Creates a sandbox based on an existing permissions map.
-     * @param ab whether this sandbox is allow (true) or block (false)
-     * @param inh whether permissions are inherited, default false
-     * @param map the permissions map
-     * @since 3.2
-     */
-    protected JexlSandbox(final boolean ab, final boolean inh, final Map<String, Permissions> map) {
-        allow = ab;
-        inherit = inh;
-        sandbox = map != null ? map : new HashMap<>();
-    }
-
-    /**
-     * @return a copy of this sandbox
-     */
-    public JexlSandbox copy() {
-        // modified concurrently at runtime so...
-        final Map<String, Permissions> map = new ConcurrentHashMap<>();
-        for (final Map.Entry<String, Permissions> entry : sandbox.entrySet()) {
-            map.put(entry.getKey(), entry.getValue().copy());
+        @Override
+        public boolean add(final String name) {
+            if (names == null) {
+                names = new HashMap<>();
+            }
+            return names.put(name, name) == null;
         }
-        return new JexlSandbox(allow, inherit, map);
-    }
 
-    /**
-     * Gets a class by name, crude mechanism for backwards (&lt;3.2 ) compatibility.
-     * @param cname the class name
-     * @return the class
-     */
-    static Class<?> forName(final String cname) {
-        try {
-            return Class.forName(cname);
-        } catch (final Exception xany) {
-            return null;
+        @Override
+        public boolean alias(final String name, final String alias) {
+            if (names == null) {
+                names = new HashMap<>();
+            }
+            return names.put(alias, name) == null;
+        }
+
+        @Override
+        protected Names copy() {
+            final AllowSet copy = new AllowSet();
+            copy.names = names == null ? null : new HashMap<>(names);
+            return copy;
+        }
+
+        @Override
+        public String get(final String name) {
+            if (names == null) {
+                return name;
+            }
+            final String actual = names.get(name);
+            // if null is not explicitly allowed, explicit null aka NULL
+            if (name == null && actual == null && !names.containsKey(null)) {
+                return JexlSandbox.NULL;
+            }
+            return actual;
         }
     }
-
     /**
-     * Gets the read permission value for a given property of a class.
-     *
-     * @param clazz the class
-     * @param name the property name
-     * @return null (or NULL if name is null) if not allowed, the name of the property to use otherwise
-     */
-    public String read(final Class<?> clazz, final String name) {
-        return get(clazz).read().get(name);
-    }
-
-    /**
-     * Gets the read permission value for a given property of a class.
-     *
-     * @param clazz the class name
-     * @param name the property name
-     * @return null if not allowed, the name of the property to use otherwise
+     * @deprecated since 3.2, use {@link BlockSet}
      */
     @Deprecated
-    public String read(final String clazz, final String name) {
-        return get(clazz).read().get(name);
-    }
-
+    public static final class BlackSet extends BlockSet {}
     /**
-     * Gets the write permission value for a given property of a class.
-     *
-     * @param clazz the class
-     * @param name the property name
-     * @return null (or NULL if name is null) if not allowed, the name of the property to use otherwise
+     * A block set of names.
      */
-    public String write(final Class<?> clazz, final String name) {
-        return get(clazz).write().get(name);
-    }
+    static class BlockSet extends Names {
+        /** The set of controlled names. */
+        private Set<String> names;
 
-    /**
-     * Gets the write permission value for a given property of a class.
-     *
-     * @param clazz the class name
-     * @param name the property name
-     * @return null if not allowed, the name of the property to use otherwise
-     */
-    @Deprecated
-    public String write(final String clazz, final String name) {
-        return get(clazz).write().get(name);
-    }
+        @Override
+        public boolean add(final String name) {
+            if (names == null) {
+                names = new HashSet<>();
+            }
+            return names.add(name);
+        }
 
-    /**
-     * Gets the execute permission value for a given method of a class.
-     *
-     * @param clazz the class
-     * @param name the method name
-     * @return null if not allowed, the name of the method to use otherwise
-     */
-    public String execute(final Class<?> clazz, final String name) {
-        final String m = get(clazz).execute().get(name);
-        return "".equals(name) && m != null ? clazz.getName() : m;
-    }
+        @Override
+        protected Names copy() {
+            final BlockSet copy = new BlockSet();
+            copy.names = names == null ? null : new HashSet<>(names);
+            return copy;
+        }
 
-    /**
-     * Gets the execute permission value for a given method of a class.
-     *
-     * @param clazz the class name
-     * @param name the method name
-     * @return null if not allowed, the name of the method to use otherwise
-     */
-    @Deprecated
-    public String execute(final String clazz, final String name) {
-        final String m = get(clazz).execute().get(name);
-        return "".equals(name) && m != null ? clazz : m;
+        @Override
+        public String get(final String name) {
+            // if name is null and contained in set, explicit null aka NULL
+            return names != null && !names.contains(name) ? name : name != null ? null : NULL;
+        }
     }
-
     /**
      * A base set of names.
      */
@@ -269,6 +168,13 @@ public final class JexlSandbox {
         }
 
         /**
+         * @return a copy of these Names
+         */
+        protected Names copy() {
+            return this;
+        }
+
+        /**
          * Whether a given name is allowed or not.
          *
          * @param name the method/property name to check
@@ -277,134 +183,7 @@ public final class JexlSandbox {
         public String get(final String name) {
             return name;
         }
-
-        /**
-         * @return a copy of these Names
-         */
-        protected Names copy() {
-            return this;
-        }
     }
-
-    /**
-     * The pass-thru name set.
-     */
-    static final Names ALLOW_NAMES = new Names() {
-        @Override
-        public boolean add(final String name) {
-            return false;
-        }
-
-        @Override
-        protected Names copy() {
-            return this;
-        }
-    };
-
-    /**
-     * The block-all name set.
-     */
-    private static final Names BLOCK_NAMES = new Names() {
-        @Override
-        public boolean add(final String name) {
-            return false;
-        }
-
-        @Override
-        protected Names copy() {
-            return this;
-        }
-
-        @Override
-        public String get(final String name) {
-            return name == null ? NULL : null;
-        }
-    };
-
-    /**
-     * A allow set of names.
-     */
-    static class AllowSet extends Names {
-        /** The map of controlled names and aliases. */
-        private Map<String, String> names;
-
-        @Override
-        protected Names copy() {
-            final AllowSet copy = new AllowSet();
-            copy.names = names == null ? null : new HashMap<>(names);
-            return copy;
-        }
-
-        @Override
-        public boolean add(final String name) {
-            if (names == null) {
-                names = new HashMap<>();
-            }
-            return names.put(name, name) == null;
-        }
-
-        @Override
-        public boolean alias(final String name, final String alias) {
-            if (names == null) {
-                names = new HashMap<>();
-            }
-            return names.put(alias, name) == null;
-        }
-
-        @Override
-        public String get(final String name) {
-            if (names == null) {
-                return name;
-            }
-            final String actual = names.get(name);
-            // if null is not explicitly allowed, explicit null aka NULL
-            if (name == null && actual == null && !names.containsKey(null)) {
-                return JexlSandbox.NULL;
-            }
-            return actual;
-        }
-    }
-
-    /**
-     * A block set of names.
-     */
-    static class BlockSet extends Names {
-        /** The set of controlled names. */
-        private Set<String> names;
-
-        @Override
-        protected Names copy() {
-            final BlockSet copy = new BlockSet();
-            copy.names = names == null ? null : new HashSet<>(names);
-            return copy;
-        }
-
-        @Override
-        public boolean add(final String name) {
-            if (names == null) {
-                names = new HashSet<>();
-            }
-            return names.add(name);
-        }
-
-        @Override
-        public String get(final String name) {
-            // if name is null and contained in set, explicit null aka NULL
-            return names != null && !names.contains(name) ? name : name != null ? null : NULL;
-        }
-    }
-
-    /**
-     * @deprecated since 3.2, use {@link AllowSet}
-     */
-    @Deprecated
-    public static final class WhiteSet extends AllowSet {}
-
-    /**
-     * @deprecated since 3.2, use {@link BlockSet}
-     */
-    @Deprecated
-    public static final class BlackSet extends BlockSet {}
 
     /**
      * Contains the allow or block lists for properties and methods for a given class.
@@ -457,36 +236,12 @@ public final class JexlSandbox {
         }
 
         /**
-         * @return whether these permissions applies to derived classes.
-         */
-        public boolean isInheritable() {
-            return inheritable;
-        }
-
-        /**
-         * Adds a list of readable property names to these permissions.
+         * Gets the set of method names in these permissions.
          *
-         * @param propertyNames the property names
-         * @return this instance of permissions
+         * @return the set of method names
          */
-        public Permissions read(final String... propertyNames) {
-            for (final String propertyName : propertyNames) {
-                read.add(propertyName);
-            }
-            return this;
-        }
-
-        /**
-         * Adds a list of writable property names to these permissions.
-         *
-         * @param propertyNames the property names
-         * @return this instance of permissions
-         */
-        public Permissions write(final String... propertyNames) {
-            for (final String propertyName : propertyNames) {
-                write.add(propertyName);
-            }
-            return this;
+        public Names execute() {
+            return execute;
         }
 
         /**
@@ -504,12 +259,32 @@ public final class JexlSandbox {
         }
 
         /**
+         * @return whether these permissions applies to derived classes.
+         */
+        public boolean isInheritable() {
+            return inheritable;
+        }
+
+        /**
          * Gets the set of readable property names in these permissions.
          *
          * @return the set of property names
          */
         public Names read() {
             return read;
+        }
+
+        /**
+         * Adds a list of readable property names to these permissions.
+         *
+         * @param propertyNames the property names
+         * @return this instance of permissions
+         */
+        public Permissions read(final String... propertyNames) {
+            for (final String propertyName : propertyNames) {
+                read.add(propertyName);
+            }
+            return this;
         }
 
         /**
@@ -522,59 +297,165 @@ public final class JexlSandbox {
         }
 
         /**
-         * Gets the set of method names in these permissions.
+         * Adds a list of writable property names to these permissions.
          *
-         * @return the set of method names
+         * @param propertyNames the property names
+         * @return this instance of permissions
          */
-        public Names execute() {
-            return execute;
+        public Permissions write(final String... propertyNames) {
+            for (final String propertyName : propertyNames) {
+                write.add(propertyName);
+            }
+            return this;
         }
     }
+
+    /**
+     * @deprecated since 3.2, use {@link AllowSet}
+     */
+    @Deprecated
+    public static final class WhiteSet extends AllowSet {}
+
+    /**
+     * The marker string for explicitly disallowed null properties.
+     */
+    public static final String NULL = "?";
+
+    /**
+     * The pass-thru name set.
+     */
+    static final Names ALLOW_NAMES = new Names() {
+        @Override
+        public boolean add(final String name) {
+            return false;
+        }
+
+        @Override
+        protected Names copy() {
+            return this;
+        }
+    };
+
+    /**
+     * The block-all name set.
+     */
+    private static final Names BLOCK_NAMES = new Names() {
+        @Override
+        public boolean add(final String name) {
+            return false;
+        }
+
+        @Override
+        protected Names copy() {
+            return this;
+        }
+
+        @Override
+        public String get(final String name) {
+            return name == null ? NULL : null;
+        }
+    };
 
     /**
      * The pass-thru permissions.
      */
     private static final Permissions ALLOW_ALL = new Permissions(false, ALLOW_NAMES, ALLOW_NAMES, ALLOW_NAMES);
+
     /**
      * The block-all permissions.
      */
     private static final Permissions BLOCK_ALL = new Permissions(false, BLOCK_NAMES, BLOCK_NAMES, BLOCK_NAMES);
 
     /**
-     * Creates the set of permissions for a given class.
-     * <p>The sandbox inheritance property will apply to the permissions created by this method
-     *
-     * @param clazz the class for which these permissions apply
-     * @param readFlag whether the readable property list is allow - true - or block - false -
-     * @param writeFlag whether the writable property list is allow - true - or block - false -
-     * @param executeFlag whether the executable method list is allow - true - or block - false -
-     * @return the set of permissions
+     * Gets a class by name, crude mechanism for backwards (&lt;3.2 ) compatibility.
+     * @param cname the class name
+     * @return the class
      */
-    public Permissions permissions(final String clazz,
-                                   final boolean readFlag,
-                                   final boolean writeFlag,
-                                   final boolean executeFlag) {
-        return permissions(clazz, inherit, readFlag, writeFlag, executeFlag);
+    static Class<?> forName(final String cname) {
+        try {
+            return Class.forName(cname);
+        } catch (final Exception xany) {
+            return null;
+        }
     }
 
     /**
-     * Creates the set of permissions for a given class.
-     *
-     * @param clazz the class for which these permissions apply
-     * @param inhf whether these permissions are inheritable
-     * @param readf whether the readable property list is allow - true - or block - false -
-     * @param writef whether the writable property list is allow - true - or block - false -
-     * @param execf whether the executable method list is allow - true - or block - false -
-     * @return the set of permissions
+     * The map from class names to permissions.
      */
-    public Permissions permissions(final String clazz,
-                                   final boolean inhf,
-                                   final boolean readf,
-                                   final boolean writef,
-                                   final boolean execf) {
-        final Permissions box = new Permissions(inhf, readf, writef, execf);
-        sandbox.put(clazz, box);
-        return box;
+    private final Map<String, Permissions> sandbox;
+
+    /**
+     * Whether permissions can be inherited (through implementation or extension).
+     */
+    private final boolean inherit;
+
+    /**
+     * Default behavior, block or allow.
+     */
+    private final boolean allow;
+
+    /**
+     * Creates a new default sandbox.
+     * <p>In the absence of explicit permissions on a class, the
+     * sandbox is a allow-box, allow-listing that class for all permissions (read, write and execute).
+     */
+    public JexlSandbox() {
+        this(true, false, null);
+    }
+
+    /**
+     * Creates a new default sandbox.
+     * <p>A allow-box considers no permissions as &quot;everything is allowed&quot; when
+     * a block-box considers no permissions as &quot;nothing is allowed&quot;.
+     * @param ab whether this sandbox is allow (true) or block (false)
+     * if no permission is explicitly defined for a class.
+     * @since 3.1
+     */
+    public JexlSandbox(final boolean ab) {
+        this(ab, false, null);
+    }
+
+    /**
+     * Creates a sandbox.
+     * @param ab whether this sandbox is allow (true) or block (false)
+     * @param inh whether permissions on interfaces and classes are inherited (true) or not (false)
+     * @since 3.2
+     */
+    public JexlSandbox(final boolean ab, final boolean inh) {
+        this(ab, inh, null);
+    }
+
+    /**
+     * Creates a sandbox based on an existing permissions map.
+     * @param ab whether this sandbox is allow (true) or block (false)
+     * @param inh whether permissions are inherited, default false
+     * @param map the permissions map
+     * @since 3.2
+     */
+    protected JexlSandbox(final boolean ab, final boolean inh, final Map<String, Permissions> map) {
+        allow = ab;
+        inherit = inh;
+        sandbox = map != null ? map : new HashMap<>();
+    }
+
+    /**
+     * Creates a sandbox based on an existing permissions map.
+     * @param ab whether this sandbox is allow (true) or block (false)
+     * @param map the permissions map
+     * @since 3.1
+     */
+    @Deprecated
+    protected JexlSandbox(final boolean ab, final Map<String, Permissions> map) {
+        this(ab, false, map);
+    }
+
+    /**
+     * Creates a sandbox based on an existing permissions map.
+     * @param map the permissions map
+     */
+    @Deprecated
+    protected JexlSandbox(final Map<String, Permissions> map) {
+        this(true, false, map);
     }
 
     /**
@@ -587,14 +468,15 @@ public final class JexlSandbox {
     public Permissions allow(final String clazz) {
         return permissions(clazz, true, true, true);
     }
+
     /**
-     * Use allow() instead.
+     * Use block() instead.
      * @param clazz the allowed class name
      * @return the permissions instance
      */
     @Deprecated
-    public Permissions white(final String clazz) {
-        return allow(clazz);
+    public Permissions black(final String clazz) {
+        return block(clazz);
     }
 
     /**
@@ -609,32 +491,41 @@ public final class JexlSandbox {
     }
 
     /**
-     * Use block() instead.
-     * @param clazz the allowed class name
-     * @return the permissions instance
+     * @return a copy of this sandbox
      */
-    @Deprecated
-    public Permissions black(final String clazz) {
-        return block(clazz);
+    public JexlSandbox copy() {
+        // modified concurrently at runtime so...
+        final Map<String, Permissions> map = new ConcurrentHashMap<>();
+        for (final Map.Entry<String, Permissions> entry : sandbox.entrySet()) {
+            map.put(entry.getKey(), entry.getValue().copy());
+        }
+        return new JexlSandbox(allow, inherit, map);
     }
 
     /**
-     * Gets the set of permissions associated to a class.
+     * Gets the execute permission value for a given method of a class.
      *
-     * @param clazz the class name
-     * @return the defined permissions or an all-allow permission instance if none were defined
+     * @param clazz the class
+     * @param name the method name
+     * @return null if not allowed, the name of the method to use otherwise
      */
-    public Permissions get(final String clazz) {
-        if (inherit) {
-            return get(forName(clazz));
-        }
-        final Permissions permissions = sandbox.get(clazz);
-        if (permissions == null) {
-            return allow ? ALLOW_ALL : BLOCK_ALL;
-        }
-        return permissions;
+    public String execute(final Class<?> clazz, final String name) {
+        final String m = get(clazz).execute().get(name);
+        return "".equals(name) && m != null ? clazz.getName() : m;
     }
 
+    /**
+     * Gets the execute permission value for a given method of a class.
+     *
+     * @param clazz the class name
+     * @param name the method name
+     * @return null if not allowed, the name of the method to use otherwise
+     */
+    @Deprecated
+    public String execute(final String clazz, final String name) {
+        final String m = get(clazz).execute().get(name);
+        return "".equals(name) && m != null ? clazz : m;
+    }
     /**
      * Gets the permissions associated to a class.
      * @param clazz the class
@@ -682,6 +573,115 @@ public final class JexlSandbox {
             }
         }
         return permissions;
+    }
+
+    /**
+     * Gets the set of permissions associated to a class.
+     *
+     * @param clazz the class name
+     * @return the defined permissions or an all-allow permission instance if none were defined
+     */
+    public Permissions get(final String clazz) {
+        if (inherit) {
+            return get(forName(clazz));
+        }
+        final Permissions permissions = sandbox.get(clazz);
+        if (permissions == null) {
+            return allow ? ALLOW_ALL : BLOCK_ALL;
+        }
+        return permissions;
+    }
+
+    /**
+     * Creates the set of permissions for a given class.
+     * <p>The sandbox inheritance property will apply to the permissions created by this method
+     *
+     * @param clazz the class for which these permissions apply
+     * @param readFlag whether the readable property list is allow - true - or block - false -
+     * @param writeFlag whether the writable property list is allow - true - or block - false -
+     * @param executeFlag whether the executable method list is allow - true - or block - false -
+     * @return the set of permissions
+     */
+    public Permissions permissions(final String clazz,
+                                   final boolean readFlag,
+                                   final boolean writeFlag,
+                                   final boolean executeFlag) {
+        return permissions(clazz, inherit, readFlag, writeFlag, executeFlag);
+    }
+
+    /**
+     * Creates the set of permissions for a given class.
+     *
+     * @param clazz the class for which these permissions apply
+     * @param inhf whether these permissions are inheritable
+     * @param readf whether the readable property list is allow - true - or block - false -
+     * @param writef whether the writable property list is allow - true - or block - false -
+     * @param execf whether the executable method list is allow - true - or block - false -
+     * @return the set of permissions
+     */
+    public Permissions permissions(final String clazz,
+                                   final boolean inhf,
+                                   final boolean readf,
+                                   final boolean writef,
+                                   final boolean execf) {
+        final Permissions box = new Permissions(inhf, readf, writef, execf);
+        sandbox.put(clazz, box);
+        return box;
+    }
+    /**
+     * Gets the read permission value for a given property of a class.
+     *
+     * @param clazz the class
+     * @param name the property name
+     * @return null (or NULL if name is null) if not allowed, the name of the property to use otherwise
+     */
+    public String read(final Class<?> clazz, final String name) {
+        return get(clazz).read().get(name);
+    }
+
+    /**
+     * Gets the read permission value for a given property of a class.
+     *
+     * @param clazz the class name
+     * @param name the property name
+     * @return null if not allowed, the name of the property to use otherwise
+     */
+    @Deprecated
+    public String read(final String clazz, final String name) {
+        return get(clazz).read().get(name);
+    }
+
+    /**
+     * Use allow() instead.
+     * @param clazz the allowed class name
+     * @return the permissions instance
+     */
+    @Deprecated
+    public Permissions white(final String clazz) {
+        return allow(clazz);
+    }
+
+    /**
+     * Gets the write permission value for a given property of a class.
+     *
+     * @param clazz the class
+     * @param name the property name
+     * @return null (or NULL if name is null) if not allowed, the name of the property to use otherwise
+     */
+    public String write(final Class<?> clazz, final String name) {
+        return get(clazz).write().get(name);
+    }
+
+    /**
+     * Gets the write permission value for a given property of a class.
+     *
+     * @param clazz the class name
+     * @param name the property name
+     * @return null if not allowed, the name of the property to use otherwise
+     */
+    @Deprecated
+    public String write(final String clazz, final String name) {
+        return get(clazz).write().get(name);
     }
 
 }
