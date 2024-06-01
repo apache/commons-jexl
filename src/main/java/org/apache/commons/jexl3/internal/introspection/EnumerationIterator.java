@@ -42,12 +42,12 @@ public class EnumerationIterator<T> implements Iterator<T> {
     }
 
     @Override
-    public T next() {
-        return enumeration.nextElement();
+    public boolean hasNext() {
+        return enumeration.hasMoreElements();
     }
 
     @Override
-    public boolean hasNext() {
-        return enumeration.hasMoreElements();
+    public T next() {
+        return enumeration.nextElement();
     }
 }
