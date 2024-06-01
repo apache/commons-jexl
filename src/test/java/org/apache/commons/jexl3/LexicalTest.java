@@ -22,6 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -416,26 +417,19 @@ public class LexicalTest {
     public void testConst1() {
         final JexlFeatures f = new JexlFeatures();
         final JexlEngine jexl = new JexlBuilder().strict(true).create();
-        try {
-            final JexlScript script = jexl.createScript(
-                    "const foo;  foo");
-            fail("should fail, const foo must be followed by assign.");
-        } catch (final JexlException.Parsing xparse) {
-            assertTrue(xparse.getMessage().contains("const"));
-        }
+        final JexlException.Parsing xparse = assertThrows(JexlException.Parsing.class, () -> jexl.createScript("const foo;  foo"),
+                "should fail, const foo must be followed by assign.");
+        assertTrue(xparse.getMessage().contains("const"));
+
     }
 
     @Test
     public void testConst2a() {
-        final JexlFeatures f = new JexlFeatures();
         final JexlEngine jexl = new JexlBuilder().strict(true).create();
-        for(final String op : Arrays.asList("=", "+=", "-=", "/=", "*=", "%=", "<<=", ">>=", ">>>=", "^=", "&=", "|=")) {
-            try {
-                final JexlScript script = jexl.createScript("const foo = 42;  foo "+op+" 1;");
-                fail("should fail, const precludes assignment");
-            } catch (final JexlException.Parsing xparse) {
-                assertTrue(xparse.getMessage().contains("foo"));
-            }
+        for (final String op : Arrays.asList("=", "+=", "-=", "/=", "*=", "%=", "<<=", ">>=", ">>>=", "^=", "&=", "|=")) {
+            final JexlException.Parsing xparse = assertThrows(JexlException.Parsing.class, () -> jexl.createScript("const foo = 42;  foo " + op + " 1;"),
+                    "should fail, const precludes assignment");
+            assertTrue(xparse.getMessage().contains("foo"));
         }
     }
 
@@ -443,13 +437,10 @@ public class LexicalTest {
     public void testConst2b() {
         final JexlFeatures f = new JexlFeatures();
         final JexlEngine jexl = new JexlBuilder().strict(true).create();
-        for(final String op : Arrays.asList("=", "+=", "-=", "/=", "*=", "%=", "<<=", ">>=", ">>>=", "^=", "&=", "|=")) {
-            try {
-                final JexlScript script = jexl.createScript("const foo = 42;  if (true) { foo "+op+" 1; }");
-                fail("should fail, const precludes assignment");
-            } catch (final JexlException.Parsing xparse) {
-                assertTrue(xparse.getMessage().contains("foo"));
-            }
+        for (final String op : Arrays.asList("=", "+=", "-=", "/=", "*=", "%=", "<<=", ">>=", ">>>=", "^=", "&=", "|=")) {
+            final JexlException.Parsing xparse = assertThrows(JexlException.Parsing.class, () -> jexl.createScript("const foo = 42;  if (true) { foo " + op + " 1; }"),
+                    "should fail, const precludes assignment");
+            assertTrue(xparse.getMessage().contains("foo"));
         }
     }
 
