@@ -64,107 +64,6 @@ public class SimpleNode implements Node {
         this(i);
     }
 
-    @Override
-    public void jjtOpen() {
-    }
-
-    @Override
-    public void jjtClose() {
-    }
-
-    /**
-     * Sets this node's parent.
-     * @param n the parent
-     */
-    @Override
-    public void jjtSetParent(final Node n) {
-        parent = (JexlNode) n;
-    }
-
-    /**
-     * Gets this node's parent.
-     *
-     * @return the parent node
-     */
-    @Override
-    public JexlNode jjtGetParent() {
-        return parent;
-    }
-
-    /**
-     * Adds a child node.
-     *
-     * @param n the child node
-     * @param i the child offset
-     */
-    @Override
-    public void jjtAddChild(final Node n, final int i) {
-        if (children == null) {
-            children = new JexlNode[i + 1];
-        } else if (i >= children.length) {
-            final JexlNode[] c = new JexlNode[i + 1];
-            System.arraycopy(children, 0, c, 0, children.length);
-            children = c;
-        }
-        children[i] = (JexlNode) n;
-    }
-
-    // For use by ASTJexlScript only
-    void jjtSetChildren(final JexlNode[] jexlNodes) {
-        children = jexlNodes;
-    }
-
-    /**
-     * Gets a child of this node.
-     *
-     * @param i the child offset
-     * @return the child node
-     */
-    @Override
-    public JexlNode jjtGetChild(final int i) {
-        return children[i];
-    }
-
-    /**
-     * Gets this node number of children.
-     *
-     * @return the number of children
-     */
-    @Override
-    public int jjtGetNumChildren() {
-        return children == null ? 0 : children.length;
-    }
-
-    /**
-     * Sets this node value.
-     *
-     * @param value this node value.
-     */
-    public void jjtSetValue(final Object value) {
-        this.value = value;
-    }
-
-    /**
-     * Gets this node value.
-     *
-     * @return value
-     */
-    public Object jjtGetValue() {
-        return value;
-    }
-
-    /**
-     * Accepts the visitor.
-     *
-     * @param visitor the visitor
-     * @param data contextual data
-     * @return result of visit
-     **/
-    @Override
-    public Object jjtAccept(final ParserVisitor visitor, final Object data) {
-        return visitor.visit(this, data);
-    }
-
     /**
      * Accepts the visitor on all this node's children.
      *
@@ -179,20 +78,6 @@ public class SimpleNode implements Node {
             }
         }
         return data;
-    }
-
-    /* You can override these two methods in subclasses of SimpleNode to
-    customize the way the JexlNode appears when the tree is dumped.  If
-    your output uses more than one line you should override
-    toString(String), otherwise overriding toString() is probably all
-    you need to do. */
-    @Override
-    public String toString() {
-        return ParserTreeConstants.jjtNodeName[id];
-    }
-
-    public String toString(final String prefix) {
-        return prefix + toString();
     }
 
     /* Override this method if you want to customize how the JexlNode dumps
@@ -219,6 +104,121 @@ public class SimpleNode implements Node {
     @Override
     public int getId() {
         return id;
+    }
+
+    /**
+     * Accepts the visitor.
+     *
+     * @param visitor the visitor
+     * @param data contextual data
+     * @return result of visit
+     **/
+    @Override
+    public Object jjtAccept(final ParserVisitor visitor, final Object data) {
+        return visitor.visit(this, data);
+    }
+
+    /**
+     * Adds a child node.
+     *
+     * @param n the child node
+     * @param i the child offset
+     */
+    @Override
+    public void jjtAddChild(final Node n, final int i) {
+        if (children == null) {
+            children = new JexlNode[i + 1];
+        } else if (i >= children.length) {
+            final JexlNode[] c = new JexlNode[i + 1];
+            System.arraycopy(children, 0, c, 0, children.length);
+            children = c;
+        }
+        children[i] = (JexlNode) n;
+    }
+
+    @Override
+    public void jjtClose() {
+    }
+
+    /**
+     * Gets a child of this node.
+     *
+     * @param i the child offset
+     * @return the child node
+     */
+    @Override
+    public JexlNode jjtGetChild(final int i) {
+        return children[i];
+    }
+
+    /**
+     * Gets this node number of children.
+     *
+     * @return the number of children
+     */
+    @Override
+    public int jjtGetNumChildren() {
+        return children == null ? 0 : children.length;
+    }
+
+    /**
+     * Gets this node's parent.
+     *
+     * @return the parent node
+     */
+    @Override
+    public JexlNode jjtGetParent() {
+        return parent;
+    }
+
+    /**
+     * Gets this node value.
+     *
+     * @return value
+     */
+    public Object jjtGetValue() {
+        return value;
+    }
+
+    @Override
+    public void jjtOpen() {
+    }
+
+    // For use by ASTJexlScript only
+    void jjtSetChildren(final JexlNode[] jexlNodes) {
+        children = jexlNodes;
+    }
+
+    /**
+     * Sets this node's parent.
+     * @param n the parent
+     */
+    @Override
+    public void jjtSetParent(final Node n) {
+        parent = (JexlNode) n;
+    }
+
+    /**
+     * Sets this node value.
+     *
+     * @param value this node value.
+     */
+    public void jjtSetValue(final Object value) {
+        this.value = value;
+    }
+
+    /* You can override these two methods in subclasses of SimpleNode to
+    customize the way the JexlNode appears when the tree is dumped.  If
+    your output uses more than one line you should override
+    toString(String), otherwise overriding toString() is probably all
+    you need to do. */
+    @Override
+    public String toString() {
+        return ParserTreeConstants.jjtNodeName[id];
+    }
+
+    public String toString(final String prefix) {
+        return prefix + toString();
     }
 }
 
