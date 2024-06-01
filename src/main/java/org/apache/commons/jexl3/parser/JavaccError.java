@@ -22,10 +22,10 @@ package org.apache.commons.jexl3.parser;
 public interface JavaccError {
 
     /**
-     * Gets the line number.
-     * @return line number.
+     * Gets the last correct input.
+     * @return the string after which the error occurred
      */
-    int getLine();
+    String getAfter();
 
     /**
      * Gets the column number.
@@ -34,8 +34,8 @@ public interface JavaccError {
     int getColumn();
 
     /**
-     * Gets the last correct input.
-     * @return the string after which the error occurred
+     * Gets the line number.
+     * @return line number.
      */
-    String getAfter();
+    int getLine();
 }
