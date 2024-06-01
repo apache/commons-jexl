@@ -1024,22 +1024,20 @@ public class Issues300Test {
 
     @Test
     public void test390() throws Exception {
+        // @formatter:off
         final JexlEngine jexl = new JexlBuilder()
                 .safe(false)
                 .strict(true)
                 .debug(true)
                 .create();
+        // @formatter:on
         JexlScript script = null;
-        String src;
-        src = "if (true) #pragma one 42";
-        try {
-            script = jexl.createScript(src);
-            fail("should have failed parsing");
-        } catch (final JexlException.Parsing xparse) {
-            assertTrue(xparse.getDetail().contains("pragma"));
-        }
-        src = "if (true) { #pragma one 42 }";
-        script = jexl.createScript(src);
+        final String src = "if (true) #pragma one 42";
+        final JexlException.Parsing xparse = assertThrows(JexlException.Parsing.class, () -> jexl.createScript(src), "should have failed parsing");
+        assertTrue(xparse.getDetail().contains("pragma"));
+
+        String src1 = "if (true) { #pragma one 42 }";
+        script = jexl.createScript(src1);
         final Object result = script.execute(null);
         debuggerCheck(jexl);
     }
