@@ -17,6 +17,5 @@
 @NoJexl
 package org.apache.commons.jexl3.internal.introspection.nojexlpackage;
 
-import static org.junit.jupiter.api.Assertions.*;
 import org.apache.commons.jexl3.annotations.NoJexl;
 
