@@ -991,7 +991,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     @Override
     protected Object visit(final ASTJxltLiteral node, final Object data) {
         final String img = StringParser.escapeString(node.getLiteral(), '`');
-        return this.check(node, img, data);
+        return check(node, img, data);
     }
 
     @Override
@@ -1123,7 +1123,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     @Override
     protected Object visit(final ASTQualifiedIdentifier node, final Object data) {
         final String img = node.getName();
-        return this.check(node, img, data);
+        return check(node, img, data);
     }
 
     @Override
@@ -1271,7 +1271,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     @Override
     protected Object visit(final ASTStringLiteral node, final Object data) {
         final String img = StringParser.escapeString(node.getLiteral(), '\'');
-        return this.check(node, img, data);
+        return check(node, img, data);
     }
 
     @Override
@@ -1314,8 +1314,8 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     }
 
     @Override
-    protected Object visit(ASTTryResources node, Object data) {
-        int tryBody = node.jjtGetNumChildren() - 1;
+    protected Object visit(final ASTTryResources node, final Object data) {
+        final int tryBody = node.jjtGetNumChildren() - 1;
         builder.append('(');
         accept(node.jjtGetChild(0), data);
         for(int c = 1; c < tryBody; ++c) {
