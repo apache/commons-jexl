@@ -58,6 +58,7 @@ public class SomeTest {
     protected TemplateInterpreter406(final Arguments args) {
       super(args);
     }
+    @Override
     public Object interpret(final JexlNode node) {
       CALL406.incrementAndGet();
       return super.interpret(node);
@@ -75,8 +76,8 @@ public class SomeTest {
         return new Engine406(this);
       }
     }.cache(64).strict(true).safe(false).create();
-    String src = "`Call ${x}`";
-    JexlScript script = jexl.createScript(src, "x");
+    final String src = "`Call ${x}`";
+    final JexlScript script = jexl.createScript(src, "x");
     Object result = script.execute(null, 406);
     assertEquals("Call 406", result);
     assertEquals(1, CALL406.get());
@@ -90,14 +91,14 @@ public class SomeTest {
    */
   @Test
   public void testCustomFunctionPermissions() {
-      Map<String, Object> funcs = new HashMap<>();
+      final Map<String, Object> funcs = new HashMap<>();
       funcs.put("math", new MyMath());
-      JexlPermissions permissions = JexlPermissions.parse("org.example.*");
-      JexlEngine jexl = new JexlBuilder().permissions(permissions).namespaces(funcs).create();
-      JexlContext jc = new MapContext();
+      final JexlPermissions permissions = JexlPermissions.parse("org.example.*");
+      final JexlEngine jexl = new JexlBuilder().permissions(permissions).namespaces(funcs).create();
+      final JexlContext jc = new MapContext();
       jc.set("pi", Math.PI);
-      JexlExpression e = jexl.createExpression("math:cos(pi)");
-      Number result = (Number) e.evaluate(jc);
+      final JexlExpression e = jexl.createExpression("math:cos(pi)");
+      final Number result = (Number) e.evaluate(jc);
       assertEquals(-1, result.intValue());
   }
 }
