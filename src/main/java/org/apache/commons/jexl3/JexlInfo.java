@@ -25,35 +25,19 @@ import org.apache.commons.jexl3.internal.Script;
  */
 public class JexlInfo {
 
-    /** Line number. */
-    private final int line;
-
-    /** Column number. */
-    private final int column;
-
-    /** Name. */
-    private final String name;
-
-    /**
-     * @return the detailed information in case of an error
-     */
-    public Detail getDetail() {
-        return null;
-    }
-
     /**
      * Describes errors more precisely.
      */
     public interface Detail {
         /**
-         * @return the start column on the line that triggered the error
-         */
-        int start();
-
-        /**
          * @return the end column on the line that triggered the error
          */
         int end();
+
+        /**
+         * @return the start column on the line that triggered the error
+         */
+        int start();
 
         /**
          * @return the actual part of code that triggered the error
@@ -64,17 +48,22 @@ public class JexlInfo {
     }
 
     /**
-     * Create info.
-     *
-     * @param source source name
-     * @param l line number
-     * @param c column number
+     * Gets the info from a script.
+     * @param script the script
+     * @return the info
      */
-    public JexlInfo(final String source, final int l, final int c) {
-        name = source;
-        line = l <= 0? 1: l;
-        column = c <= 0? 1 : c;
+    public static JexlInfo from(final JexlScript script) {
+        return script instanceof Script? ((Script) script).getInfo() :  null;
     }
+
+    /** Line number. */
+    private final int line;
+
+    /** Column number. */
+    private final int column;
+
+    /** Name. */
+    private final String name;
 
     /**
      * Create an information structure for dynamic set/get/invoke/new.
@@ -104,6 +93,28 @@ public class JexlInfo {
     }
 
     /**
+     * The copy constructor.
+     *
+     * @param copy the instance to copy
+     */
+    protected JexlInfo(final JexlInfo copy) {
+        this(copy.getName(), copy.getLine(), copy.getColumn());
+    }
+
+    /**
+     * Create info.
+     *
+     * @param source source name
+     * @param l line number
+     * @param c column number
+     */
+    public JexlInfo(final String source, final int l, final int c) {
+        name = source;
+        line = l <= 0? 1: l;
+        column = c <= 0? 1 : c;
+    }
+
+    /**
      * Creates info reusing the name.
      *
      * @param l the line
@@ -115,12 +126,44 @@ public class JexlInfo {
     }
 
     /**
-     * The copy constructor.
-     *
-     * @param copy the instance to copy
+     * @return this instance or a copy without any decorations
      */
-    protected JexlInfo(final JexlInfo copy) {
-        this(copy.getName(), copy.getLine(), copy.getColumn());
+    public JexlInfo detach() {
+        return this;
+    }
+
+    /**
+     * Gets the column number.
+     *
+     * @return the column.
+     */
+    public final int getColumn() {
+        return column;
+    }
+
+    /**
+     * @return the detailed information in case of an error
+     */
+    public Detail getDetail() {
+        return null;
+    }
+
+    /**
+     * Gets the line number.
+     *
+     * @return line number.
+     */
+    public final int getLine() {
+        return line;
+    }
+
+    /**
+     * Gets the file/script/url name.
+     *
+     * @return template name
+     */
+    public final String getName() {
+        return name;
     }
 
     /**
@@ -146,49 +189,6 @@ public class JexlInfo {
             sb.append("'");
         }
         return sb.toString();
-    }
-
-    /**
-     * Gets the file/script/url name.
-     *
-     * @return template name
-     */
-    public final String getName() {
-        return name;
-    }
-
-    /**
-     * Gets the line number.
-     *
-     * @return line number.
-     */
-    public final int getLine() {
-        return line;
-    }
-
-    /**
-     * Gets the column number.
-     *
-     * @return the column.
-     */
-    public final int getColumn() {
-        return column;
-    }
-
-    /**
-     * @return this instance or a copy without any decorations
-     */
-    public JexlInfo detach() {
-        return this;
-    }
-
-    /**
-     * Gets the info from a script.
-     * @param script the script
-     * @return the info
-     */
-    public static JexlInfo from(final JexlScript script) {
-        return script instanceof Script? ((Script) script).getInfo() :  null;
     }
 }
 
