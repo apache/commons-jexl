@@ -165,14 +165,14 @@ abstract class AbstractExecutor {
         if (!this.getClass().equals(arg.getClass())) {
             return false;
         }
-        if (!this.getMethod().equals(arg.getMethod())) {
+        if (!getMethod().equals(arg.getMethod())) {
             return false;
         }
-        if (!this.getTargetClass().equals(arg.getTargetClass())) {
+        if (!getTargetClass().equals(arg.getTargetClass())) {
             return false;
         }
         // specific equality check
-        final Object lhsp = this.getTargetProperty();
+        final Object lhsp = getTargetProperty();
         final Object rhsp = arg.getTargetProperty();
         if (lhsp == null && rhsp == null) {
             return true;
