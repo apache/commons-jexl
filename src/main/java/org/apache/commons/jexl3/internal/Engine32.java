@@ -47,12 +47,10 @@ public class Engine32 extends Engine {
         if ((ii.options.isLexicalShade() || identifier.isLexical()) && identifier.isShaded()) {
             return ii.undefinedVariable(identifier, identifier.getName());
         }
-        if (symbol >= 0) {
-            if (frame.has(symbol)) {
-                final Object value = frame.get(symbol);
-                if (value != Scope.UNDEFINED) {
-                    return value;
-                }
+        if (symbol >= 0 && frame.has(symbol)) {
+            final Object value = frame.get(symbol);
+            if (value != Scope.UNDEFINED) {
+                return value;
             }
         }
         final String name = identifier.getName();
