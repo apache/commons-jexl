@@ -86,7 +86,7 @@ public class RangeTest extends JexlTestCase {
 
     @Test
     public void testAscIterator() {
-        Iterator<Integer> ii = new AscIntegerIterator(3, 5);
+        final Iterator<Integer> ii = new AscIntegerIterator(3, 5);
         Integer i = 3;
         while(ii.hasNext()) {
             assertEquals(i, ii.next());
@@ -95,20 +95,20 @@ public class RangeTest extends JexlTestCase {
         try {
             ii.next();
             fail("iterator exhausted");
-        } catch(NoSuchElementException e) {
+        } catch(final NoSuchElementException e) {
             assertNotNull(e);
         }
         try {
             ii.remove();
             fail("remove not implemented");
-        } catch(UnsupportedOperationException e) {
+        } catch(final UnsupportedOperationException e) {
             assertNotNull(e);
         }
     }
 
     @Test
     public void testAscLongIterator() {
-        Iterator<Long> ii = new AscLongIterator(3L, 5L);
+        final Iterator<Long> ii = new AscLongIterator(3L, 5L);
         Long i = 3L;
         while(ii.hasNext()) {
             assertEquals(i, ii.next());
@@ -117,13 +117,13 @@ public class RangeTest extends JexlTestCase {
         try {
             ii.next();
             fail("iterator exhausted");
-        } catch(NoSuchElementException e) {
+        } catch(final NoSuchElementException e) {
             assertNotNull(e);
         }
         try {
             ii.remove();
             fail("remove not implemented");
-        } catch(UnsupportedOperationException e) {
+        } catch(final UnsupportedOperationException e) {
             assertNotNull(e);
         }
     }
@@ -230,10 +230,10 @@ public class RangeTest extends JexlTestCase {
 
     @Test
     public void testSource() {
-        JexlFeatures features = JexlFeatures.createDefault();
-        Source src0 = new Source(features, "x -> -x");
-        Source src0b = new Source(features, "x -> -x");
-        Source src1 = new Source(features, "x -> +x");
+        final JexlFeatures features = JexlFeatures.createDefault();
+        final Source src0 = new Source(features, "x -> -x");
+        final Source src0b = new Source(features, "x -> -x");
+        final Source src1 = new Source(features, "x -> +x");
         assertEquals(7, src0.length());
         assertEquals(src0, src0);
         assertEquals(src0, src0b);
