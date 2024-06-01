@@ -47,7 +47,7 @@ public class IssuesTest extends JexlTestCase {
 
     // JEXL-40: failed to discover all methods (non public class implements public method)
     // fixed in ClassMap by taking newer version of populateCache from Velocity
-    public static abstract class Base {
+    public abstract static class Base {
         public abstract boolean foo();
     }
 

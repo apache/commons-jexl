@@ -16,6 +16,8 @@
  */
 package org.apache.commons.jexl3;
 
+import static org.apache.commons.jexl3.introspection.JexlPermissions.RESTRICTED;
+
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -29,8 +31,6 @@ import java.util.concurrent.atomic.AtomicLong;
 import org.apache.commons.jexl3.introspection.JexlPermissions;
 import org.junit.Assert;
 import org.junit.Test;
-
-import static org.apache.commons.jexl3.introspection.JexlPermissions.RESTRICTED;
 
 /**
  * Test cases for reported issue between JEXL-300 and JEXL-399.
