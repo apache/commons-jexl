@@ -16,6 +16,9 @@
  */
 package org.apache.commons.jexl3.junit;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
+
 import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -29,7 +32,6 @@ import org.apache.commons.jexl3.JexlEngine;
 import org.apache.commons.jexl3.JexlEvalContext;
 import org.apache.commons.jexl3.JexlException;
 import org.apache.commons.jexl3.JexlScript;
-import org.junit.Assert;
 
 /**
  * A utility class for performing JUnit based assertions using Jexl
@@ -38,7 +40,7 @@ import org.junit.Assert;
  *
  * @since 1.0
  */
-public class Asserter extends Assert {
+public class Asserter {
     /** Variables used during asserts. */
     private final Map<String, Object> variables = new HashMap<>();
     /** Context to use during asserts. */
@@ -69,30 +71,25 @@ public class Asserter extends Assert {
         final Object value = exp.execute(context, args);
         if (expected instanceof BigDecimal) {
             final JexlArithmetic jexla = engine.getArithmetic();
-            assertEquals("expression: " + expression, 0,
-                    ((BigDecimal) expected).compareTo(jexla.toBigDecimal(value)));
+            assertEquals(0, ((BigDecimal) expected).compareTo(jexla.toBigDecimal(value)), () -> "expression: " + expression);
         } else if (expected instanceof BigInteger) {
             final JexlArithmetic jexla = engine.getArithmetic();
-            assertEquals("expression: " + expression, 0,
-                    ((BigInteger) expected).compareTo(jexla.toBigInteger(value)));
+            assertEquals(0, ((BigInteger) expected).compareTo(jexla.toBigInteger(value)), () -> "expression: " + expression);
         } else if (expected != null && value != null) {
             if (expected.getClass().isArray() && value.getClass().isArray()) {
                 final int esz = Array.getLength(expected);
                 final int vsz = Array.getLength(value);
                 final String report = "expression: " + expression;
-                assertEquals(report + ", array size", esz, vsz);
+                assertEquals(esz, vsz, () -> report + ", array size");
                 for (int i = 0; i < vsz; ++i) {
-                    assertEquals(report + ", value@[]" + i, Array.get(expected, i), Array.get(value, i));
+                    assertEquals(Array.get(expected, i), Array.get(value, i), report + ", value@[]" + i);
                 }
             } else {
-                assertEquals("expression: " + expression + ", "
-                        + expected.getClass().getSimpleName()
-                        + " ?= "
-                        + value.getClass().getSimpleName(),
-                        expected, value);
+                assertEquals(expected, value,
+                        () -> "expression: " + expression + ", " + expected.getClass().getSimpleName() + " ?= " + value.getClass().getSimpleName());
             }
         } else {
-            assertEquals("expression: " + expression, expected, value);
+            assertEquals(expected, value, () -> "expression: " + expression);
         }
     }
 
