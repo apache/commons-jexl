@@ -29,18 +29,78 @@ import org.apache.commons.jexl3.introspection.JexlPropertySet;
  */
 public abstract class JexlNode extends SimpleNode {
     /**
-     */
-    private static final long serialVersionUID = 1L;
-    // line + column encoded: up to 4096 columns (ie 20 bits for line + 12 bits for column)
-    private int lc = -1;
-
-    /**
      * A marker interface for constants.
      * @param <T> the literal type
      */
     public interface Constant<T> {
         T getLiteral();
     }
+    /**
+     * Marker interface for cachable function calls.
+     */
+    public interface Funcall {}
+
+    /**
+     * An info bound to its node.
+     * <p>Used to parse expressions for templates.
+     */
+    public static class Info extends JexlInfo {
+        JexlNode node = null;
+
+        /**
+         * Default ctor.
+         * @param jnode the node
+         */
+        public Info(final JexlNode jnode) {
+            this(jnode, jnode.jexlInfo());
+        }
+
+        /**
+         * Copy ctor.
+         * @param jnode the node
+         * @param info the
+         */
+        public Info(final JexlNode jnode, final JexlInfo info) {
+            this(jnode, info.getName(), info.getLine(), info.getColumn());
+        }
+
+        /**
+         * Full detail ctor.
+         * @param jnode the node
+         * @param name the file name
+         * @param l the line
+         * @param c the column
+         */
+        private Info(final JexlNode jnode, final String name, final int l, final int c) {
+            super(name, l, c);
+            node = jnode;
+        }
+
+        @Override
+        public JexlInfo at(final int l, final int c) {
+            return new Info(node, getName(), l, c);
+        }
+
+        @Override
+        public JexlInfo detach() {
+            node = null;
+            return this;
+        }
+
+        /**
+         * @return the node this info is bound to
+         */
+        public JexlNode getNode() {
+            return node;
+        }
+    }
+
+    /**
+     */
+    private static final long serialVersionUID = 1L;
+
+    // line + column encoded: up to 4096 columns (ie 20 bits for line + 12 bits for column)
+    private int lc = -1;
 
     public JexlNode(final int id) {
         super(id);
@@ -57,54 +117,6 @@ public abstract class JexlNode extends SimpleNode {
     public JexlNode(final Parser p, final int id) {
         super(p, id);
     }
-
-    public void jjtSetFirstToken(final Token t) {
-        // 0xc = 12, 12 bits -> 4096
-        // 0xfff, 12 bits mask
-        this.lc = t.beginLine << 0xc | 0xfff & t.beginColumn;
-    }
-
-    public void jjtSetLastToken(final Token t) {
-        // nothing
-    }
-
-    public int getLine() {
-        return this.lc >>> 0xc;
-    }
-
-    public int getColumn() {
-        return this.lc & 0xfff;
-    }
-
-    /**
-     * Gets the associated JexlInfo instance.
-     *
-     * @return the info
-     */
-    public JexlInfo jexlInfo() {
-        JexlInfo info = null;
-        JexlNode node = this;
-        while (node != null) {
-            if (node.jjtGetValue() instanceof JexlInfo) {
-                info = (JexlInfo) node.jjtGetValue();
-                break;
-            }
-            node = node.jjtGetParent();
-        }
-        if (lc >= 0) {
-            final int c = lc & 0xfff;
-            final int l = lc >> 0xc;
-            // at least an info with line/column number
-            return info != null ? info.at(info.getLine() + l - 1, c) : new JexlInfo(null, l, c);
-        }
-        // weird though; no jjSetFirstToken(...) ever called?
-        return info;
-    }
-
-    /**
-     * Marker interface for cachable function calls.
-     */
-    public interface Funcall {}
 
     /**
      * Clears any cached value of type JexlProperty{G,S}et or JexlMethod.
@@ -126,16 +138,12 @@ public abstract class JexlNode extends SimpleNode {
         }
     }
 
-    /**
-     * Checks whether this node is an operator that accepts a null argument
-     * even when arithmetic is in strict mode.
-     * The default cases are equals and not equals.
-     *
-     * @param arithmetic the node to test
-     * @return true if node accepts null arguments, false otherwise
-     */
-    public boolean isStrictOperator(final JexlArithmetic arithmetic) {
-        return OperatorController.INSTANCE.isStrict(arithmetic, this);
+    public int getColumn() {
+        return this.lc & 0xfff;
+    }
+
+    public int getLine() {
+        return this.lc >>> 0xc;
     }
 
     /**
@@ -168,27 +176,6 @@ public abstract class JexlNode extends SimpleNode {
     }
 
     /**
-     * Whether this node is a left value.
-     * @return true if node is assignable, false otherwise
-     */
-    public boolean isLeftValue() {
-        JexlNode walk = this;
-        do {
-            if (walk instanceof ASTIdentifier
-                || walk instanceof ASTIdentifierAccess
-                || walk instanceof ASTArrayAccess) {
-                return true;
-            }
-            final int nc = walk.jjtGetNumChildren() - 1;
-            if (nc < 0) {
-                return walk.jjtGetParent() instanceof ASTReference;
-            }
-            walk = walk.jjtGetChild(nc);
-        } while (walk != null);
-        return false;
-    }
-
-    /**
      * @return true if this node looks like a global var
      */
     public boolean isGlobalVar() {
@@ -206,6 +193,27 @@ public abstract class JexlNode extends SimpleNode {
         if (jjtGetParent() instanceof ASTReference) {
             return true;
         }
+        return false;
+    }
+
+    /**
+     * Whether this node is a left value.
+     * @return true if node is assignable, false otherwise
+     */
+    public boolean isLeftValue() {
+        JexlNode walk = this;
+        do {
+            if (walk instanceof ASTIdentifier
+                || walk instanceof ASTIdentifierAccess
+                || walk instanceof ASTArrayAccess) {
+                return true;
+            }
+            final int nc = walk.jjtGetNumChildren() - 1;
+            if (nc < 0) {
+                return walk.jjtGetParent() instanceof ASTReference;
+            }
+            walk = walk.jjtGetChild(nc);
+        } while (walk != null);
         return false;
     }
 
@@ -259,58 +267,50 @@ public abstract class JexlNode extends SimpleNode {
     }
 
     /**
-     * An info bound to its node.
-     * <p>Used to parse expressions for templates.
+     * Checks whether this node is an operator that accepts a null argument
+     * even when arithmetic is in strict mode.
+     * The default cases are equals and not equals.
+     *
+     * @param arithmetic the node to test
+     * @return true if node accepts null arguments, false otherwise
      */
-    public static class Info extends JexlInfo {
-        JexlNode node = null;
+    public boolean isStrictOperator(final JexlArithmetic arithmetic) {
+        return OperatorController.INSTANCE.isStrict(arithmetic, this);
+    }
 
-        /**
-         * Default ctor.
-         * @param jnode the node
-         */
-        public Info(final JexlNode jnode) {
-            this(jnode, jnode.jexlInfo());
+    /**
+     * Gets the associated JexlInfo instance.
+     *
+     * @return the info
+     */
+    public JexlInfo jexlInfo() {
+        JexlInfo info = null;
+        JexlNode node = this;
+        while (node != null) {
+            if (node.jjtGetValue() instanceof JexlInfo) {
+                info = (JexlInfo) node.jjtGetValue();
+                break;
+            }
+            node = node.jjtGetParent();
         }
+        if (lc >= 0) {
+            final int c = lc & 0xfff;
+            final int l = lc >> 0xc;
+            // at least an info with line/column number
+            return info != null ? info.at(info.getLine() + l - 1, c) : new JexlInfo(null, l, c);
+        }
+        // weird though; no jjSetFirstToken(...) ever called?
+        return info;
+    }
 
-        /**
-         * Copy ctor.
-         * @param jnode the node
-         * @param info the
-         */
-        public Info(final JexlNode jnode, final JexlInfo info) {
-            this(jnode, info.getName(), info.getLine(), info.getColumn());
-        }
+    public void jjtSetFirstToken(final Token t) {
+        // 0xc = 12, 12 bits -> 4096
+        // 0xfff, 12 bits mask
+        this.lc = t.beginLine << 0xc | 0xfff & t.beginColumn;
+    }
 
-        /**
-         * Full detail ctor.
-         * @param jnode the node
-         * @param name the file name
-         * @param l the line
-         * @param c the column
-         */
-        private Info(final JexlNode jnode, final String name, final int l, final int c) {
-            super(name, l, c);
-            node = jnode;
-        }
-
-        /**
-         * @return the node this info is bound to
-         */
-        public JexlNode getNode() {
-            return node;
-        }
-
-        @Override
-        public JexlInfo at(final int l, final int c) {
-            return new Info(node, getName(), l, c);
-        }
-
-        @Override
-        public JexlInfo detach() {
-            node = null;
-            return this;
-        }
+    public void jjtSetLastToken(final Token t) {
+        // nothing
     }
 
 }
