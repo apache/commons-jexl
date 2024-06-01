@@ -30,9 +30,6 @@ public final class ListGetExecutor extends AbstractExecutor.Get {
     /** The java.util.obj.get method used as an active marker in ListGet. */
     private static final java.lang.reflect.Method LIST_GET =
             initMarker(List.class, "get", Integer.TYPE);
-    /** The property. */
-    private final Integer property;
-
     /**
      * Attempts to discover a ListGetExecutor.
      *
@@ -53,6 +50,9 @@ public final class ListGetExecutor extends AbstractExecutor.Get {
         }
         return null;
     }
+
+    /** The property. */
+    private final Integer property;
 
     /**
      * Creates an instance.
