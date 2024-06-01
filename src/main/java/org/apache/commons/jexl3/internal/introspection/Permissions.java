@@ -52,11 +52,62 @@ import org.apache.commons.jexl3.introspection.JexlPermissions;
  */
 public class Permissions implements JexlPermissions {
     /**
+     * A positive NoJexl construct that defines what is denied by absence in the set.
+     * <p>Field or method that are named are the only one allowed access.</p>
+     */
+    static class JexlClass extends NoJexlClass {
+        @Override boolean deny(final Constructor<?> method) { return !super.deny(method); }
+        @Override boolean deny(final Field field) { return !super.deny(field); }
+        @Override boolean deny(final Method method) { return !super.deny(method); }
+    }
+
+    /**
+     * Equivalent of @NoJexl on a ctor, a method or a field in a class.
+     * <p>Field or method that are named are denied access.</p>
+     */
+    static class NoJexlClass {
+        // the NoJexl method names (including ctor, name of class)
+        protected final Set<String> methodNames;
+        // the NoJexl field names
+        protected final Set<String> fieldNames;
+
+        NoJexlClass() {
+            this(new HashSet<>(), new HashSet<>());
+        }
+
+        NoJexlClass(final Set<String> methods, final Set<String> fields) {
+            methodNames = methods;
+            fieldNames = fields;
+        }
+
+        boolean deny(final Constructor<?> method) {
+            return methodNames.contains(method.getDeclaringClass().getSimpleName());
+        }
+
+        boolean deny(final Field field) {
+            return fieldNames.contains(field.getName());
+        }
+
+        boolean deny(final Method method) {
+            return methodNames.contains(method.getName());
+        }
+
+        boolean isEmpty() { return methodNames.isEmpty() && fieldNames.isEmpty(); }
+    }
+
+    /**
      * Equivalent of @NoJexl on a class in a package.
      */
     static class NoJexlPackage {
         // the NoJexl class names
         protected final Map<String, NoJexlClass> nojexl;
+
+        /**
+         * Default ctor.
+         */
+        NoJexlPackage() {
+            this(null);
+        }
 
         /**
          * Ctor.
@@ -66,19 +117,6 @@ public class Permissions implements JexlPermissions {
             this.nojexl = new ConcurrentHashMap<>(map == null ? Collections.emptyMap() : map);
         }
 
-        /**
-         * Default ctor.
-         */
-        NoJexlPackage() {
-            this(null);
-        }
-
-        boolean isEmpty() { return nojexl.isEmpty(); }
-
-        NoJexlClass getNoJexl(final Class<?> clazz) {
-            return nojexl.get(classKey(clazz));
-        }
-
         void addNoJexl(final String key, final NoJexlClass njc) {
             if (njc == null) {
                 nojexl.remove(key);
@@ -86,7 +124,62 @@ public class Permissions implements JexlPermissions {
                 nojexl.put(key, njc);
             }
         }
+
+        NoJexlClass getNoJexl(final Class<?> clazz) {
+            return nojexl.get(classKey(clazz));
+        }
+
+        boolean isEmpty() { return nojexl.isEmpty(); }
     }
+
+    /** Marker for whole NoJexl class. */
+    static final NoJexlClass NOJEXL_CLASS = new NoJexlClass(Collections.emptySet(), Collections.emptySet()) {
+        @Override boolean deny(final Constructor<?> method) {
+            return true;
+        }
+
+        @Override boolean deny(final Field field) {
+            return true;
+        }
+
+        @Override boolean deny(final Method method) {
+            return true;
+        }
+    };
+
+    /** Marker for allowed class. */
+    static final NoJexlClass JEXL_CLASS = new NoJexlClass(Collections.emptySet(), Collections.emptySet()) {
+        @Override boolean deny(final Constructor<?> method) {
+            return false;
+        }
+
+        @Override boolean deny(final Field field) {
+            return false;
+        }
+
+        @Override  boolean deny(final Method method) {
+            return false;
+        }
+    };
+
+    /** Marker for @NoJexl package. */
+    static final NoJexlPackage NOJEXL_PACKAGE = new NoJexlPackage(Collections.emptyMap()) {
+        @Override NoJexlClass getNoJexl(final Class<?> clazz) {
+            return NOJEXL_CLASS;
+        }
+    };
+
+    /** Marker for fully allowed package. */
+    static final NoJexlPackage JEXL_PACKAGE = new NoJexlPackage(Collections.emptyMap()) {
+        @Override NoJexlClass getNoJexl(final Class<?> clazz) {
+            return JEXL_CLASS;
+        }
+    };
+
+    /**
+     * The no-restriction introspection permission singleton.
+     */
+    static final Permissions UNRESTRICTED = new Permissions();
 
     /**
      * Creates a class key joining enclosing ascendants with '$'.
@@ -121,184 +214,6 @@ public class Permissions implements JexlPermissions {
         }
         return clazz.getSimpleName();
     }
-
-    /**
-     * Equivalent of @NoJexl on a ctor, a method or a field in a class.
-     * <p>Field or method that are named are denied access.</p>
-     */
-    static class NoJexlClass {
-        // the NoJexl method names (including ctor, name of class)
-        protected final Set<String> methodNames;
-        // the NoJexl field names
-        protected final Set<String> fieldNames;
-
-        NoJexlClass(final Set<String> methods, final Set<String> fields) {
-            methodNames = methods;
-            fieldNames = fields;
-        }
-
-        boolean isEmpty() { return methodNames.isEmpty() && fieldNames.isEmpty(); }
-
-        NoJexlClass() {
-            this(new HashSet<>(), new HashSet<>());
-        }
-
-        boolean deny(final Field field) {
-            return fieldNames.contains(field.getName());
-        }
-
-        boolean deny(final Method method) {
-            return methodNames.contains(method.getName());
-        }
-
-        boolean deny(final Constructor<?> method) {
-            return methodNames.contains(method.getDeclaringClass().getSimpleName());
-        }
-    }
-
-    /**
-     * A positive NoJexl construct that defines what is denied by absence in the set.
-     * <p>Field or method that are named are the only one allowed access.</p>
-     */
-    static class JexlClass extends NoJexlClass {
-        @Override boolean deny(final Field field) { return !super.deny(field); }
-        @Override boolean deny(final Method method) { return !super.deny(method); }
-        @Override boolean deny(final Constructor<?> method) { return !super.deny(method); }
-    }
-
-    /** Marker for whole NoJexl class. */
-    static final NoJexlClass NOJEXL_CLASS = new NoJexlClass(Collections.emptySet(), Collections.emptySet()) {
-        @Override boolean deny(final Field field) {
-            return true;
-        }
-
-        @Override boolean deny(final Method method) {
-            return true;
-        }
-
-        @Override boolean deny(final Constructor<?> method) {
-            return true;
-        }
-    };
-
-    /** Marker for allowed class. */
-    static final NoJexlClass JEXL_CLASS = new NoJexlClass(Collections.emptySet(), Collections.emptySet()) {
-        @Override boolean deny(final Field field) {
-            return false;
-        }
-
-        @Override  boolean deny(final Method method) {
-            return false;
-        }
-
-        @Override boolean deny(final Constructor<?> method) {
-            return false;
-        }
-    };
-
-    /** Marker for @NoJexl package. */
-    static final NoJexlPackage NOJEXL_PACKAGE = new NoJexlPackage(Collections.emptyMap()) {
-        @Override NoJexlClass getNoJexl(final Class<?> clazz) {
-            return NOJEXL_CLASS;
-        }
-    };
-
-    /** Marker for fully allowed package. */
-    static final NoJexlPackage JEXL_PACKAGE = new NoJexlPackage(Collections.emptyMap()) {
-        @Override NoJexlClass getNoJexl(final Class<?> clazz) {
-            return JEXL_CLASS;
-        }
-    };
-
-    /**
-     * The @NoJexl execution-time map.
-     */
-    private final Map<String, NoJexlPackage> packages;
-    /**
-     * The closed world package patterns.
-     */
-    private final Set<String> allowed;
-
-    /** Allow inheritance. */
-    protected Permissions() {
-        this(Collections.emptySet(), Collections.emptyMap());
-    }
-
-    /**
-     * Default ctor.
-     * @param perimeter the allowed wildcard set of packages
-     * @param nojexl the NoJexl external map
-     */
-    protected Permissions(final Set<String> perimeter, final Map<String, NoJexlPackage> nojexl) {
-        this.allowed = perimeter;
-        this.packages = nojexl;
-    }
-
-    /**
-     * Creates a new set of permissions by composing these permissions with a new set of rules.
-     * @param src the rules
-     * @return the new permissions
-     */
-    @Override
-    public Permissions compose(final String... src) {
-        return new PermissionsParser().parse(new LinkedHashSet<>(allowed),new ConcurrentHashMap<>(packages), src);
-    }
-
-    /**
-     * The no-restriction introspection permission singleton.
-     */
-    static final Permissions UNRESTRICTED = new Permissions();
-
-    /**
-     * @return the packages
-     */
-    Map<String, NoJexlPackage> getPackages() {
-        return packages == null ? Collections.emptyMap() : Collections.unmodifiableMap(packages);
-    }
-
-    /**
-     * @return the wilcards
-     */
-    Set<String> getWildcards() {
-        return allowed == null ? Collections.emptySet() : Collections.unmodifiableSet(allowed);
-    }
-
-    /**
-     * Gets the package constraints.
-     * @param packageName the package name
-     * @return the package constraints instance, not-null.
-     */
-    private NoJexlPackage getNoJexlPackage(final String packageName) {
-        return packages.getOrDefault(packageName, JEXL_PACKAGE);
-    }
-
-    /**
-     * Gets the class constraints.
-     * <p>If nothing was explicitly forbidden, everything is allowed.</p>
-     * @param clazz the class
-     * @return the class constraints instance, not-null.
-     */
-    private NoJexlClass getNoJexl(final Class<?> clazz) {
-        final String pkgName = ClassTool.getPackageName(clazz);
-        final NoJexlPackage njp = getNoJexlPackage(pkgName);
-        if (njp != null) {
-            final NoJexlClass njc = njp.getNoJexl(clazz);
-            if (njc != null) {
-                return njc;
-            }
-        }
-        return JEXL_CLASS;
-    }
-
-    /**
-     * Whether the wildcard set of packages allows a given class to be introspected.
-     * @param clazz the package name (not null)
-     * @return true if allowed, false otherwise
-     */
-    private boolean wildcardAllow(final Class<?> clazz) {
-        return wildcardAllow(allowed, ClassTool.getPackageName(clazz));
-    }
-
     /**
      * Whether the wilcard set of packages allows a given package to be introspected.
      * @param allowed the allowed set (not null, may be empty)
@@ -319,89 +234,28 @@ public class Permissions implements JexlPermissions {
     }
 
     /**
-     * Whether a whole package is denied Jexl visibility.
-     * @param pack the package
-     * @return true if denied, false otherwise
+     * The @NoJexl execution-time map.
      */
-    private boolean deny(final Package pack) {
-        // is package annotated with nojexl ?
-        final NoJexl nojexl = pack.getAnnotation(NoJexl.class);
-        if (nojexl != null) {
-            return true;
-        }
-        return Objects.equals(NOJEXL_PACKAGE, packages.get(pack.getName()));
+    private final Map<String, NoJexlPackage> packages;
+
+    /**
+     * The closed world package patterns.
+     */
+    private final Set<String> allowed;
+
+    /** Allow inheritance. */
+    protected Permissions() {
+        this(Collections.emptySet(), Collections.emptyMap());
     }
 
     /**
-     * Whether a whole class is denied Jexl visibility.
-     * <p>Also checks package visibility.</p>
-     * @param clazz the class
-     * @return true if denied, false otherwise
+     * Default ctor.
+     * @param perimeter the allowed wildcard set of packages
+     * @param nojexl the NoJexl external map
      */
-    private boolean deny(final Class<?> clazz) {
-        // Don't deny arrays
-        if (clazz.isArray()) {
-            return false;
-        }
-        // is clazz annotated with nojexl ?
-        final NoJexl nojexl = clazz.getAnnotation(NoJexl.class);
-        if (nojexl != null) {
-            return true;
-        }
-        final NoJexlPackage njp = packages.get(ClassTool.getPackageName(clazz));
-        return njp != null && Objects.equals(NOJEXL_CLASS, njp.getNoJexl(clazz));
-    }
-
-    /**
-     * Whether a constructor is denied Jexl visibility.
-     * @param ctor the constructor
-     * @return true if denied, false otherwise
-     */
-    private boolean deny(final Constructor<?> ctor) {
-        // is ctor annotated with nojexl ?
-        final NoJexl nojexl = ctor.getAnnotation(NoJexl.class);
-        if (nojexl != null) {
-            return true;
-        }
-        return getNoJexl(ctor.getDeclaringClass()).deny(ctor);
-    }
-
-    /**
-     * Whether a field is denied Jexl visibility.
-     * @param field the field
-     * @return true if denied, false otherwise
-     */
-    private boolean deny(final Field field) {
-        // is field annotated with nojexl ?
-        final NoJexl nojexl = field.getAnnotation(NoJexl.class);
-        if (nojexl != null) {
-            return true;
-        }
-        return getNoJexl(field.getDeclaringClass()).deny(field);
-    }
-
-    /**
-     * Whether a method is denied Jexl visibility.
-     * @param method the method
-     * @return true if denied, false otherwise
-     */
-    private boolean deny(final Method method) {
-        // is method annotated with nojexl ?
-        final NoJexl nojexl = method.getAnnotation(NoJexl.class);
-        if (nojexl != null) {
-            return true;
-        }
-        return getNoJexl(method.getDeclaringClass()).deny(method);
-    }
-
-    /**
-     * Checks whether a package explicitly disallows JEXL introspection.
-     * @param pack the package
-     * @return true if JEXL is allowed to introspect, false otherwise
-     */
-    @Override
-    public boolean allow(final Package pack) {
-       return validate(pack) && !deny(pack);
+    protected Permissions(final Set<String> perimeter, final Map<String, NoJexlPackage> nojexl) {
+        this.allowed = perimeter;
+        this.packages = nojexl;
     }
 
     /**
@@ -438,6 +292,35 @@ public class Permissions implements JexlPermissions {
         }
         // check wildcards
         return explicit;
+    }
+
+    /**
+     * Check whether a method is allowed to be introspected in one superclass or interface.
+     * @param clazz the superclass or interface to check
+     * @param method the method
+     * @param explicit carries whether the package holding the method is explicitly allowed
+     * @return true if JEXL is allowed to introspect, false otherwise
+     */
+    private boolean allow(final Class<?> clazz, final Method method, final boolean[] explicit) {
+        try {
+            // check if method in that class is declared ie overrides
+            final Method override = clazz.getDeclaredMethod(method.getName(), method.getParameterTypes());
+            // should not be possible...
+            if (denyMethod(override)) {
+                return false;
+            }
+            // explicit |= ...
+            if (!explicit[0]) {
+                explicit[0] = wildcardAllow(clazz);
+            }
+            return true;
+        } catch (final NoSuchMethodException ex) {
+            // will happen if not overriding method in clazz
+            return true;
+        } catch (final SecurityException ex) {
+            // unexpected, can't do much
+            return false;
+        }
     }
 
     /**
@@ -526,6 +409,102 @@ public class Permissions implements JexlPermissions {
     }
 
     /**
+     * Checks whether a package explicitly disallows JEXL introspection.
+     * @param pack the package
+     * @return true if JEXL is allowed to introspect, false otherwise
+     */
+    @Override
+    public boolean allow(final Package pack) {
+       return validate(pack) && !deny(pack);
+    }
+
+    /**
+     * Creates a new set of permissions by composing these permissions with a new set of rules.
+     * @param src the rules
+     * @return the new permissions
+     */
+    @Override
+    public Permissions compose(final String... src) {
+        return new PermissionsParser().parse(new LinkedHashSet<>(allowed),new ConcurrentHashMap<>(packages), src);
+    }
+
+    /**
+     * Whether a whole class is denied Jexl visibility.
+     * <p>Also checks package visibility.</p>
+     * @param clazz the class
+     * @return true if denied, false otherwise
+     */
+    private boolean deny(final Class<?> clazz) {
+        // Don't deny arrays
+        if (clazz.isArray()) {
+            return false;
+        }
+        // is clazz annotated with nojexl ?
+        final NoJexl nojexl = clazz.getAnnotation(NoJexl.class);
+        if (nojexl != null) {
+            return true;
+        }
+        final NoJexlPackage njp = packages.get(ClassTool.getPackageName(clazz));
+        return njp != null && Objects.equals(NOJEXL_CLASS, njp.getNoJexl(clazz));
+    }
+
+    /**
+     * Whether a constructor is denied Jexl visibility.
+     * @param ctor the constructor
+     * @return true if denied, false otherwise
+     */
+    private boolean deny(final Constructor<?> ctor) {
+        // is ctor annotated with nojexl ?
+        final NoJexl nojexl = ctor.getAnnotation(NoJexl.class);
+        if (nojexl != null) {
+            return true;
+        }
+        return getNoJexl(ctor.getDeclaringClass()).deny(ctor);
+    }
+
+    /**
+     * Whether a field is denied Jexl visibility.
+     * @param field the field
+     * @return true if denied, false otherwise
+     */
+    private boolean deny(final Field field) {
+        // is field annotated with nojexl ?
+        final NoJexl nojexl = field.getAnnotation(NoJexl.class);
+        if (nojexl != null) {
+            return true;
+        }
+        return getNoJexl(field.getDeclaringClass()).deny(field);
+    }
+
+    /**
+     * Whether a method is denied Jexl visibility.
+     * @param method the method
+     * @return true if denied, false otherwise
+     */
+    private boolean deny(final Method method) {
+        // is method annotated with nojexl ?
+        final NoJexl nojexl = method.getAnnotation(NoJexl.class);
+        if (nojexl != null) {
+            return true;
+        }
+        return getNoJexl(method.getDeclaringClass()).deny(method);
+    }
+
+    /**
+     * Whether a whole package is denied Jexl visibility.
+     * @param pack the package
+     * @return true if denied, false otherwise
+     */
+    private boolean deny(final Package pack) {
+        // is package annotated with nojexl ?
+        final NoJexl nojexl = pack.getAnnotation(NoJexl.class);
+        if (nojexl != null) {
+            return true;
+        }
+        return Objects.equals(NOJEXL_PACKAGE, packages.get(pack.getName()));
+    }
+
+    /**
      * Checks whether a method is denied.
      * @param method the method
      * @return true if it has been disallowed through annotation or declaration
@@ -536,31 +515,52 @@ public class Permissions implements JexlPermissions {
     }
 
     /**
-     * Check whether a method is allowed to be introspected in one superclass or interface.
-     * @param clazz the superclass or interface to check
-     * @param method the method
-     * @param explicit carries whether the package holding the method is explicitly allowed
-     * @return true if JEXL is allowed to introspect, false otherwise
+     * Gets the class constraints.
+     * <p>If nothing was explicitly forbidden, everything is allowed.</p>
+     * @param clazz the class
+     * @return the class constraints instance, not-null.
      */
-    private boolean allow(final Class<?> clazz, final Method method, final boolean[] explicit) {
-        try {
-            // check if method in that class is declared ie overrides
-            final Method override = clazz.getDeclaredMethod(method.getName(), method.getParameterTypes());
-            // should not be possible...
-            if (denyMethod(override)) {
-                return false;
+    private NoJexlClass getNoJexl(final Class<?> clazz) {
+        final String pkgName = ClassTool.getPackageName(clazz);
+        final NoJexlPackage njp = getNoJexlPackage(pkgName);
+        if (njp != null) {
+            final NoJexlClass njc = njp.getNoJexl(clazz);
+            if (njc != null) {
+                return njc;
             }
-            // explicit |= ...
-            if (!explicit[0]) {
-                explicit[0] = wildcardAllow(clazz);
-            }
-            return true;
-        } catch (final NoSuchMethodException ex) {
-            // will happen if not overriding method in clazz
-            return true;
-        } catch (final SecurityException ex) {
-            // unexpected, can't do much
-            return false;
         }
+        return JEXL_CLASS;
+    }
+
+    /**
+     * Gets the package constraints.
+     * @param packageName the package name
+     * @return the package constraints instance, not-null.
+     */
+    private NoJexlPackage getNoJexlPackage(final String packageName) {
+        return packages.getOrDefault(packageName, JEXL_PACKAGE);
+    }
+
+    /**
+     * @return the packages
+     */
+    Map<String, NoJexlPackage> getPackages() {
+        return packages == null ? Collections.emptyMap() : Collections.unmodifiableMap(packages);
+    }
+
+    /**
+     * @return the wilcards
+     */
+    Set<String> getWildcards() {
+        return allowed == null ? Collections.emptySet() : Collections.unmodifiableSet(allowed);
+    }
+
+    /**
+     * Whether the wildcard set of packages allows a given class to be introspected.
+     * @param clazz the package name (not null)
+     * @return true if allowed, false otherwise
+     */
+    private boolean wildcardAllow(final Class<?> clazz) {
+        return wildcardAllow(allowed, ClassTool.getPackageName(clazz));
     }
 }
