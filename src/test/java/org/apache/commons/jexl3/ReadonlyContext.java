@@ -16,8 +16,6 @@
  */
 package org.apache.commons.jexl3;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 import org.apache.commons.jexl3.annotations.NoJexl;
 
 /**
