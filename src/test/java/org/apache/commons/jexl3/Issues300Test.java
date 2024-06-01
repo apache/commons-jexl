@@ -615,63 +615,43 @@ public class Issues300Test {
         final JexlEngine jexl = new JexlBuilder().safe(false).create();
         final Map<String, Object> vars = new HashMap<>();
         final JexlContext jc = new MapContext(vars);
-        JexlScript script;
         Object result;
 
         // nothing in context, ex
-        try {
-            script = jexl.createScript("a.n.t.variable");
-            result = script.execute(jc);
-            fail("a.n.t.variable is undefined!");
-        } catch (final JexlException.Variable xvar) {
-            assertTrue(xvar.toString().contains("a.n.t"));
-        }
+        final JexlScript script0 = jexl.createScript("a.n.t.variable");
+        JexlException.Variable xvar = assertThrows(JexlException.Variable.class, () -> script0.execute(jc), "a.n.t.variable is undefined!");
+        assertTrue(xvar.toString().contains("a.n.t"));
 
         // defined and null
         jc.set("a.n.t.variable", null);
-        script = jexl.createScript("a.n.t.variable");
+        final JexlScript script = jexl.createScript("a.n.t.variable");
         result = script.execute(jc);
         assertNull(result);
 
         // defined and null, dereference
         jc.set("a.n.t", null);
-        try {
-            script = jexl.createScript("a.n.t[0].variable");
-            result = script.execute(jc);
-            fail("a.n.t is null!");
-        } catch (final JexlException.Variable xvar) {
-            assertTrue(xvar.toString().contains("a.n.t"));
-        }
+        final JexlScript script1 = jexl.createScript("a.n.t[0].variable");
+        xvar = assertThrows(JexlException.Variable.class, () -> script1.execute(jc), "a.n.t is null!");
+        assertTrue(xvar.toString().contains("a.n.t"));
 
         // undefined, dereference
         vars.remove("a.n.t");
-        try {
-            script = jexl.createScript("a.n.t[0].variable");
-            result = script.execute(jc);
-            fail("a.n.t is undefined!");
-        } catch (final JexlException.Variable xvar) {
-            assertTrue(xvar.toString().contains("a.n.t"));
-        }
+        final JexlScript script2 = jexl.createScript("a.n.t[0].variable");
+        xvar = assertThrows(JexlException.Variable.class, () -> script2.execute(jc), "a.n.t is undefined!");
+        assertTrue(xvar.toString().contains("a.n.t"));
+
         // defined, derefence undefined property
         final List<Object> inner = new ArrayList<>();
         vars.put("a.n.t", inner);
-        try {
-            script = jexl.createScript("a.n.t[0].variable");
-            result = script.execute(jc);
-            fail("a.n.t is null!");
-        } catch (final JexlException.Property xprop) {
-            assertTrue(xprop.toString().contains("0"));
-        }
+        final JexlScript script3 = jexl.createScript("a.n.t[0].variable");
+        JexlException.Property xprop = assertThrows(JexlException.Property.class, () -> script3.execute(jc), "a.n.t is null!");
+        assertTrue(xprop.toString().contains("0"));
+
         // defined, derefence undefined property
         inner.add(42);
-        try {
-            script = jexl.createScript("a.n.t[0].variable");
-            result = script.execute(jc);
-            fail("a.n.t is null!");
-        } catch (final JexlException.Property xprop) {
-            assertTrue(xprop.toString().contains("variable"));
-        }
-
+        final JexlScript script4 = jexl.createScript("a.n.t[0].variable");
+        xprop = assertThrows(JexlException.Property.class, () -> script4.execute(jc), "a.n.t is null!");
+        assertTrue(xprop.toString().contains("variable"));
     }
 
     @Test
