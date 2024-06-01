@@ -23,6 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -414,21 +415,19 @@ public class Issues300Test {
 
     @Test
     public void test309a() {
+        // @formatter:off
         final String src = "<html lang=\"en\">\n"
                 + "  <body>\n"
                 + "    <h1>Hello World!</h1>\n"
                 + "$$ var i = 12++;\n"
                 + "  </body>\n"
                 + "</html>";
+        // @formatter:on
         final JexlEngine jexl = new JexlBuilder().safe(true).create();
         final JxltEngine jxlt = jexl.createJxltEngine();
         final JexlInfo info = new JexlInfo("template", 1, 1);
-        try {
-            final JxltEngine.Template tmplt = jxlt.createTemplate(info, src);
-            fail("shoud have thrown exception");
-        } catch (final JexlException.Parsing xerror) {
-            assertEquals(4, xerror.getInfo().getLine());
-        }
+        final JexlException.Parsing xerror = assertThrows(JexlException.Parsing.class, () -> jxlt.createTemplate(info, src));
+        assertEquals(4, xerror.getInfo().getLine());
     }
 
     @Test
