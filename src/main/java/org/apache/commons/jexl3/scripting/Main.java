@@ -35,25 +35,6 @@ import javax.script.ScriptException;
 public class Main {
 
     /**
-     * Reads an input.
-     *
-     * @param charset the charset or null for default charset
-     * @param fileName the file name or null for stdin
-     * @return the reader
-     * @throws Exception if anything goes wrong
-     */
-    static BufferedReader read(final Charset charset, final String fileName) throws Exception {
-        return new BufferedReader(
-            new InputStreamReader(
-                    fileName == null
-                        ? System.in
-                        : new FileInputStream(new File(fileName)),
-                    charset == null
-                        ? Charset.defaultCharset()
-                        : charset));
-    }
-
-    /**
      * Test application for JexlScriptEngine (JSR-223 implementation).
      *
      * If a single argument is present, it is treated as a file name of a JEXL
@@ -89,5 +70,24 @@ public class Main {
                 out.print("> ");
             }
         }
+    }
+
+    /**
+     * Reads an input.
+     *
+     * @param charset the charset or null for default charset
+     * @param fileName the file name or null for stdin
+     * @return the reader
+     * @throws Exception if anything goes wrong
+     */
+    static BufferedReader read(final Charset charset, final String fileName) throws Exception {
+        return new BufferedReader(
+            new InputStreamReader(
+                    fileName == null
+                        ? System.in
+                        : new FileInputStream(new File(fileName)),
+                    charset == null
+                        ? Charset.defaultCharset()
+                        : charset));
     }
 }
