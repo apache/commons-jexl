@@ -29,19 +29,64 @@ import org.apache.commons.jexl3.introspection.JexlPropertyGet;
  * It implements JexlPropertyGet since such a container can only be accessed from its owning instance (not set).
  */
 public final class IndexedType implements JexlPropertyGet {
-    /** The container name. */
-    final String container;
-    /** The container class. */
-    final Class<?> clazz;
-    /** The array of getter methods. */
-    private final Method[] getters;
-    /** Last get method used. */
-    private volatile Method get;
-    /** The array of setter methods. */
-    private final Method[] setters;
-    /** Last set method used. */
-    private volatile Method set;
+    /**
+     * A generic indexed property container, exposes get(key) and set(key, value)
+     * and solves method call dynamically based on arguments.
+     * <p>Must remain public for introspection purpose.</p>
+     */
+    public static final class IndexedContainer {
+        /** The container instance. */
+        final Object container;
+        /** The container type instance. */
+        final IndexedType type;
 
+        /**
+         * Creates a new duck container.
+         * @param theType the container type
+         * @param theContainer the container instance
+         */
+        IndexedContainer(final IndexedType theType, final Object theContainer) {
+            this.type = theType;
+            this.container = theContainer;
+        }
+
+        /**
+         * Gets a property from this indexed container.
+         * @param key the property key
+         * @return the property value
+         * @throws Exception if inner invocation fails
+         */
+        public Object get(final Object key) throws Exception {
+            return type.invokeGet(container, key);
+        }
+
+        /**
+         * Gets the property container class.
+         * @return the container class
+         */
+        public Class<?> getContainerClass() {
+            return type.clazz;
+        }
+
+        /**
+         * Gets the property container name.
+         * @return the container name
+         */
+        public String getContainerName() {
+            return type.container;
+        }
+
+        /**
+         * Sets a property in this indexed container.
+         * @param key the property key
+         * @param value the property value
+         * @return the invocation result (frequently null)
+         * @throws Exception if inner invocation fails
+         */
+        public Object set(final Object key, final Object value) throws Exception {
+            return type.invokeSet(container, key, value);
+        }
+    }
     /**
      * Attempts to find an indexed-property getter in an object.
      * The code attempts to find the list of methods getXXX() and setXXX().
@@ -66,65 +111,20 @@ public final class IndexedType implements JexlPropertyGet {
         }
         return null;
     }
+    /** The container name. */
+    final String container;
+    /** The container class. */
+    final Class<?> clazz;
+    /** The array of getter methods. */
+    private final Method[] getters;
+    /** Last get method used. */
+    private volatile Method get;
 
-    /**
-     * A generic indexed property container, exposes get(key) and set(key, value)
-     * and solves method call dynamically based on arguments.
-     * <p>Must remain public for introspection purpose.</p>
-     */
-    public static final class IndexedContainer {
-        /** The container instance. */
-        final Object container;
-        /** The container type instance. */
-        final IndexedType type;
+    /** The array of setter methods. */
+    private final Method[] setters;
 
-        /**
-         * Creates a new duck container.
-         * @param theType the container type
-         * @param theContainer the container instance
-         */
-        IndexedContainer(final IndexedType theType, final Object theContainer) {
-            this.type = theType;
-            this.container = theContainer;
-        }
-
-        /**
-         * Gets the property container name.
-         * @return the container name
-         */
-        public String getContainerName() {
-            return type.container;
-        }
-
-        /**
-         * Gets the property container class.
-         * @return the container class
-         */
-        public Class<?> getContainerClass() {
-            return type.clazz;
-        }
-
-        /**
-         * Gets a property from this indexed container.
-         * @param key the property key
-         * @return the property value
-         * @throws Exception if inner invocation fails
-         */
-        public Object get(final Object key) throws Exception {
-            return type.invokeGet(container, key);
-        }
-
-        /**
-         * Sets a property in this indexed container.
-         * @param key the property key
-         * @param value the property value
-         * @return the invocation result (frequently null)
-         * @throws Exception if inner invocation fails
-         */
-        public Object set(final Object key, final Object value) throws Exception {
-            return type.invokeSet(container, key, value);
-        }
-    }
+    /** Last set method used. */
+    private volatile Method set;
 
     /**
      * Creates a new indexed property container type.
@@ -146,26 +146,6 @@ public final class IndexedType implements JexlPropertyGet {
             return new IndexedContainer(this, obj);
         }
         throw new IntrospectionException("property resolution error");
-    }
-
-    @Override
-    public Object tryInvoke(final Object obj, final Object key) {
-        if (obj != null && key != null
-            && clazz.equals(obj.getClass())
-            && container.equals(key.toString())) {
-            return new IndexedContainer(this, obj);
-        }
-        return Uberspect.TRY_FAILED;
-    }
-
-    @Override
-    public boolean tryFailed(final Object rval) {
-        return rval == Uberspect.TRY_FAILED;
-    }
-
-    @Override
-    public boolean isCacheable() {
-        return true;
     }
 
     /**
@@ -233,6 +213,26 @@ public final class IndexedType implements JexlPropertyGet {
         throw new IntrospectionException("property set error: "
                 + object.getClass().toString()
                 + "@" + key.toString());
+    }
+
+    @Override
+    public boolean isCacheable() {
+        return true;
+    }
+
+    @Override
+    public boolean tryFailed(final Object rval) {
+        return rval == Uberspect.TRY_FAILED;
+    }
+
+    @Override
+    public Object tryInvoke(final Object obj, final Object key) {
+        if (obj != null && key != null
+            && clazz.equals(obj.getClass())
+            && container.equals(key.toString())) {
+            return new IndexedContainer(this, obj);
+        }
+        return Uberspect.TRY_FAILED;
     }
 
 }
