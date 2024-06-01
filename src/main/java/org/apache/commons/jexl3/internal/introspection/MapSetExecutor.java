@@ -25,11 +25,6 @@ import java.util.Map;
 public final class MapSetExecutor extends AbstractExecutor.Set {
     /** The java.util.map.put method used as an active marker in MapSet. */
     private static final java.lang.reflect.Method MAP_SET = initMarker(Map.class, "put", Object.class, Object.class);
-    /** The property. */
-    private final Object property;
-    /** The property value class. */
-    private final Class<?> valueClass;
-
     /**
      * Attempts to discover a MapSetExecutor.
      *
@@ -49,6 +44,11 @@ public final class MapSetExecutor extends AbstractExecutor.Set {
         }
         return null;
     }
+    /** The property. */
+    private final Object property;
+
+    /** The property value class. */
+    private final Class<?> valueClass;
 
     /**
      * Creates an instance.
