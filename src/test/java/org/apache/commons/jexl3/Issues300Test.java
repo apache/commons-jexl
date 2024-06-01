@@ -1044,6 +1044,7 @@ public class Issues300Test {
 
     @Test
     public void test393() {
+        // @formatter:off
         final String src = "const total = 0;\n" +
                 "if (true) {\n" +
                 "  total = 1;\n" +
@@ -1053,12 +1054,9 @@ public class Issues300Test {
                 .safe(false)
                 .strict(true)
                 .create();
-        try {
-            final JexlScript script = jexl.createScript(src);
-            fail("should fail on const total assignment");
-        } catch (final JexlException.Parsing xparse) {
-            assertTrue(xparse.getMessage().contains("total"));
-        }
+        // @formatter:on
+        final JexlException.Parsing xparse = assertThrows(JexlException.Parsing.class, () -> jexl.createScript(src), "should fail on const total assignment");
+        assertTrue(xparse.getMessage().contains("total"));
     }
 
     @Test
