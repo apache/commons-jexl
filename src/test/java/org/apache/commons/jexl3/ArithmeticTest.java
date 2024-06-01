@@ -20,6 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -460,11 +461,7 @@ public class ArithmeticTest extends JexlTestCase {
     private static final double EPSILON = 1.e-6;
 
     private static void assertArithmeticException(final java.util.function.Supplier<Object> fun) {
-        try {
-            assertNull(fun.get());
-        } catch (final ArithmeticException xany) {
-            assertNotNull(xany);
-        }
+        assertThrows(ArithmeticException.class, fun::get);
     }
 
     private static void assertNullOperand(final java.util.function.Supplier<Object> fun) {
