@@ -153,24 +153,16 @@ public class ExceptionTest extends JexlTestCase {
         // make unknown vars throw
         options.setStrict(true);
         // empty cotext
-        try {
-            /* Object o = */ e.evaluate(ctxt);
-            fail("c not declared as variable should throw");
-        } catch (final JexlException.Variable xjexl) {
-            final String msg = xjexl.getMessage();
-            assertTrue(msg.indexOf("variable 'c.e'") > 0);
-        }
+        JexlException xjexl = assertThrows(JexlException.class, () -> e.evaluate(ctxt), "c not declared as variable should throw");
+        String msg = xjexl.getMessage();
+        assertTrue(msg.indexOf("variable 'c.e'") > 0);
 
         // disallow null operands
         options.setStrictArithmetic(true);
         ctxt.set("c.e", null);
-        try {
-            /* Object o = */ e.evaluate(ctxt);
-            fail("c.e as null operand should throw");
-        } catch (final JexlException xjexl) {
-            final String msg = xjexl.getMessage();
-            assertTrue(msg.indexOf("variable 'c.e'") > 0);
-        }
+        xjexl = assertThrows(JexlException.class, () -> e.evaluate(ctxt));
+        msg = xjexl.getMessage();
+        assertTrue(msg.indexOf("variable 'c.e'") > 0);
     }
 
     // null local vars and strict arithmetic effects
