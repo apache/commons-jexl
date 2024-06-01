@@ -29,6 +29,13 @@ import org.apache.commons.jexl3.JexlException;
  */
 public interface JexlMethod {
     /**
+     * returns the return type of the method invoked.
+     *
+     * @return return type
+     */
+    Class<?> getReturnType();
+
+    /**
      * Invocation method, called when the method invocation should be performed
      * and a value returned.
 
@@ -38,6 +45,23 @@ public interface JexlMethod {
      * @throws Exception on any error.
      */
     Object invoke(Object obj, Object... params) throws Exception;
+
+    /**
+     * Specifies if this JexlMethod is cacheable and able to be reused for this
+     * class of object it was returned for.
+     *
+     * @return true if can be reused for this class, false if not
+     */
+    boolean isCacheable();
+
+    /**
+     * Checks whether a tryInvoke return value indicates a failure or not.
+     * <p>Usage is : <code>Object r = tryInvoke(...); if (tryFailed(r) {...} else {...}</code>
+     *
+     * @param rval the value returned by tryInvoke
+     * @return true if tryInvoke failed, false otherwise
+     */
+    boolean tryFailed(Object rval);
 
     /**
      * Attempts to reuse this JexlMethod, checking that it is compatible with
@@ -53,28 +77,4 @@ public interface JexlMethod {
      * ({@link java.lang.reflect.InvocationTargetException})
      */
     Object tryInvoke(String name, Object obj, Object... params) throws JexlException.TryFailed;
-
-    /**
-     * Checks whether a tryInvoke return value indicates a failure or not.
-     * <p>Usage is : <code>Object r = tryInvoke(...); if (tryFailed(r) {...} else {...}</code>
-     *
-     * @param rval the value returned by tryInvoke
-     * @return true if tryInvoke failed, false otherwise
-     */
-    boolean tryFailed(Object rval);
-
-    /**
-     * Specifies if this JexlMethod is cacheable and able to be reused for this
-     * class of object it was returned for.
-     *
-     * @return true if can be reused for this class, false if not
-     */
-    boolean isCacheable();
-
-    /**
-     * returns the return type of the method invoked.
-     *
-     * @return return type
-     */
-    Class<?> getReturnType();
 }
