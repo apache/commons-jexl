@@ -34,20 +34,6 @@ public class ObjectContext<T> implements JexlContext, JexlContext.NamespaceResol
     private final T object;
 
     /**
-     * @return the Jexl engine
-     */
-    protected JexlEngine getJexl() {
-        return jexl;
-    }
-
-    /**
-     * @return the object exposed by this context
-     */
-    protected T getObject() {
-        return object;
-    }
-
-    /**
      * Creates a new ObjectContext.
      *
      * @param engine  the jexl engine to use to solve properties
@@ -73,19 +59,18 @@ public class ObjectContext<T> implements JexlContext, JexlContext.NamespaceResol
         return null;
     }
 
-    @Override
-    public void set(final String name, final Object value) {
-        final JexlPropertySet jset = jexl.getUberspect().getPropertySet(object, name, value);
-        if (jset != null) {
-            try {
-                jset.invoke(object, value);
-            } catch (final Exception xany) {
-                // ignore
-                if (jexl.isStrict()) {
-                    throw new JexlException.Property(null, name, true, xany);
-                }
-            }
-        }
+    /**
+     * @return the Jexl engine
+     */
+    protected JexlEngine getJexl() {
+        return jexl;
+    }
+
+    /**
+     * @return the object exposed by this context
+     */
+    protected T getObject() {
+        return object;
     }
 
     @Override
@@ -99,5 +84,20 @@ public class ObjectContext<T> implements JexlContext, JexlContext.NamespaceResol
             return object;
         }
         return null;
+    }
+
+    @Override
+    public void set(final String name, final Object value) {
+        final JexlPropertySet jset = jexl.getUberspect().getPropertySet(object, name, value);
+        if (jset != null) {
+            try {
+                jset.invoke(object, value);
+            } catch (final Exception xany) {
+                // ignore
+                if (jexl.isStrict()) {
+                    throw new JexlException.Property(null, name, true, xany);
+                }
+            }
+        }
     }
 }
