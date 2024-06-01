@@ -24,9 +24,6 @@ import org.apache.commons.jexl3.JexlException;
  * @since 2.0
  */
 public final class BooleanGetExecutor extends AbstractExecutor.Get {
-    /** The property. */
-    private final String property;
-
     /**
      * Discovers a BooleanGetExecutor.
      * <p>The method to be found should be named "is{P,p}property and return a boolean.</p>
@@ -45,6 +42,9 @@ public final class BooleanGetExecutor extends AbstractExecutor.Get {
         }
         return null;
     }
+
+    /** The property. */
+    private final String property;
 
     /**
      * Creates an instance by attempting discovery of the get method.
