@@ -93,7 +93,7 @@ public class ArrayBuilder implements JexlArithmetic.ArrayBuilder {
                 isNumber = false;
                 unboxing = false;
             } else {
-                Class<?> eclass = value.getClass();
+                final Class<?> eclass = value.getClass();
                 // base common class on first non-null entry
                 if (commonClass == null) {
                     commonClass = eclass;
@@ -160,7 +160,7 @@ public class ArrayBuilder implements JexlArithmetic.ArrayBuilder {
      * @return the instance
      * @param <T> the type
      */
-    protected <T> List<T> newList(Class<? extends T> clazz, int size) {
+    protected <T> List<T> newList(final Class<? extends T> clazz, final int size) {
         return new ArrayList<>(size);
     }
 }
