@@ -27,11 +27,6 @@ import org.apache.commons.jexl3.JexlException;
  * @since 2.0
  */
 public final class MethodExecutor extends AbstractExecutor.Method {
-    /** If this method is a vararg method, vaStart is the last argument index. */
-    private final int vaStart;
-    /** If this method is a vararg method, vaClass is the component type of the vararg array. */
-    private final Class<?> vaClass;
-
     /**
      * Discovers a {@link MethodExecutor}.
      * <p>
@@ -61,6 +56,11 @@ public final class MethodExecutor extends AbstractExecutor.Method {
         }
         return m == null ? null : new MethodExecutor(clazz, m, key);
     }
+    /** If this method is a vararg method, vaStart is the last argument index. */
+    private final int vaStart;
+
+    /** If this method is a vararg method, vaClass is the component type of the vararg array. */
+    private final Class<?> vaClass;
 
     /**
      * Creates a new instance.
@@ -80,35 +80,6 @@ public final class MethodExecutor extends AbstractExecutor.Method {
         }
         vaStart = vastart;
         vaClass = vaclass;
-    }
-
-    @Override
-    public Object invoke(final Object o, final Object... oArgs) throws IllegalAccessException, InvocationTargetException {
-        Object[] args = oArgs;
-        if (vaClass != null && args != null) {
-            args = handleVarArg(args);
-        }
-        if (method.getDeclaringClass() == ArrayListWrapper.class && o.getClass().isArray()) {
-            return method.invoke(new ArrayListWrapper(o), args);
-        }
-        return method.invoke(o, args);
-    }
-
-    @Override
-    public Object tryInvoke(final String name, final Object obj, final Object... args) {
-        final MethodKey tkey = new MethodKey(name, args);
-        // let's assume that invocation will fly if the declaring class is the
-        // same and arguments have the same type
-        if (objectClass.equals(obj.getClass()) && tkey.equals(key)) {
-            try {
-                return invoke(obj, args);
-            } catch (IllegalAccessException | IllegalArgumentException xill) {
-                return TRY_FAILED; // fail
-            } catch (final InvocationTargetException xinvoke) {
-                throw JexlException.tryFailed(xinvoke); // throw
-            }
-        }
-        return JexlEngine.TRY_FAILED;
     }
 
     /**
@@ -152,6 +123,35 @@ public final class MethodExecutor extends AbstractExecutor.Method {
             actual = newActual;
         }
         return actual;
+    }
+
+    @Override
+    public Object invoke(final Object o, final Object... oArgs) throws IllegalAccessException, InvocationTargetException {
+        Object[] args = oArgs;
+        if (vaClass != null && args != null) {
+            args = handleVarArg(args);
+        }
+        if (method.getDeclaringClass() == ArrayListWrapper.class && o.getClass().isArray()) {
+            return method.invoke(new ArrayListWrapper(o), args);
+        }
+        return method.invoke(o, args);
+    }
+
+    @Override
+    public Object tryInvoke(final String name, final Object obj, final Object... args) {
+        final MethodKey tkey = new MethodKey(name, args);
+        // let's assume that invocation will fly if the declaring class is the
+        // same and arguments have the same type
+        if (objectClass.equals(obj.getClass()) && tkey.equals(key)) {
+            try {
+                return invoke(obj, args);
+            } catch (IllegalAccessException | IllegalArgumentException xill) {
+                return TRY_FAILED; // fail
+            } catch (final InvocationTargetException xinvoke) {
+                throw JexlException.tryFailed(xinvoke); // throw
+            }
+        }
+        return JexlEngine.TRY_FAILED;
     }
 }
 
