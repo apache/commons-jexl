@@ -56,35 +56,6 @@ final class ClassTool {
     }
 
     /**
-     * Checks whether a class is exported by its module (Java 9+).
-     * The code performs the following sequence through reflection (since the same jar can run
-     * on a Java8 or Java9+ runtime and the module features does not exist on 8).
-     * <code>
-     * Module module = declarator.getModule();
-     * return module.isExported(declarator.getPackageName());
-     * </code>
-     * This is required since some classes and methods may not be exported thus not callable through
-     * reflection.
-     *
-     * @param declarator the class
-     * @return true if class is exported or no module support exists
-     */
-    static boolean isExported(final Class<?> declarator) {
-        if (IS_EXPORTED != null) {
-            try {
-                final Object module = GET_MODULE.invoke(declarator);
-                if (module != null) {
-                    final String pkgName = (String) GET_PKGNAME.invoke(declarator);
-                    return (Boolean) IS_EXPORTED.invoke(module, pkgName);
-                }
-            } catch (final Throwable e) {
-                // ignore
-            }
-        }
-        return true;
-    }
-
-    /**
      * Gets the package name of a class (class.getPackage() may return null).
      *
      * @param clz the class
@@ -129,6 +100,35 @@ final class ClassTool {
             }
         }
         return pkgName;
+    }
+
+    /**
+     * Checks whether a class is exported by its module (Java 9+).
+     * The code performs the following sequence through reflection (since the same jar can run
+     * on a Java8 or Java9+ runtime and the module features does not exist on 8).
+     * <code>
+     * Module module = declarator.getModule();
+     * return module.isExported(declarator.getPackageName());
+     * </code>
+     * This is required since some classes and methods may not be exported thus not callable through
+     * reflection.
+     *
+     * @param declarator the class
+     * @return true if class is exported or no module support exists
+     */
+    static boolean isExported(final Class<?> declarator) {
+        if (IS_EXPORTED != null) {
+            try {
+                final Object module = GET_MODULE.invoke(declarator);
+                if (module != null) {
+                    final String pkgName = (String) GET_PKGNAME.invoke(declarator);
+                    return (Boolean) IS_EXPORTED.invoke(module, pkgName);
+                }
+            } catch (final Throwable e) {
+                // ignore
+            }
+        }
+        return true;
     }
 
 }
