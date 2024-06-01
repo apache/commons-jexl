@@ -51,22 +51,22 @@ public class TryCatchFinallyTest extends JexlTestCase {
 
     @Test
     public void testCloseable0x2b() {
-        String src = "try(let x = c) { c.isOpened()? 42 : -42; } finally { 169; }";
-        JexlScript script = JEXL.createScript(src, "c");
-        Circuit circuit = new Circuit();
+        final String src = "try(let x = c) { c.isOpened()? 42 : -42; } finally { 169; }";
+        final JexlScript script = JEXL.createScript(src, "c");
+        final Circuit circuit = new Circuit();
         assertNotNull(script);
-        Object result = script.execute(null, circuit);
+        final Object result = script.execute(null, circuit);
         assertEquals(42, result);
         assertFalse(circuit.isOpened());
     }
 
     @Test
     public void testCloseable0x3b() {
-        String src = "try(let x = c) { c.raiseError(); -42; } catch(const y) { 42; } finally { 169; }";
-        JexlScript script = JEXL.createScript(src, "c");
-        Circuit circuit = new Circuit();
+        final String src = "try(let x = c) { c.raiseError(); -42; } catch(const y) { 42; } finally { 169; }";
+        final JexlScript script = JEXL.createScript(src, "c");
+        final Circuit circuit = new Circuit();
         assertNotNull(script);
-        Object result = script.execute(null, circuit);
+        final Object result = script.execute(null, circuit);
         assertEquals(42, result);
         assertFalse(circuit.isOpened());
     }
@@ -92,175 +92,175 @@ public class TryCatchFinallyTest extends JexlTestCase {
 
     @Test
     public void testExceptionType() throws Exception {
-        JexlScript e = JEXL.createScript("try { 'asb'.getBytes('NoSuchCharacterSet'); } catch (let ex) { ex }");
-        JexlContext jc = new MapContext();
-        Object o = e.execute(jc);
+        final JexlScript e = JEXL.createScript("try { 'asb'.getBytes('NoSuchCharacterSet'); } catch (let ex) { ex }");
+        final JexlContext jc = new MapContext();
+        final Object o = e.execute(jc);
         assertTrue(o instanceof java.io.UnsupportedEncodingException);
     }
 
     @Test
     public void testForm0x2a() {
-        String src = "try(let x = 42) { x; } finally { 169; }";
-        JexlScript script = JEXL.createScript(src);
+        final String src = "try(let x = 42) { x; } finally { 169; }";
+        final JexlScript script = JEXL.createScript(src);
         assertNotNull(script);
-        Object result = script.execute(null);
+        final Object result = script.execute(null);
         assertEquals(42, result);
     }
 
     @Test
     public void testForm0x2b() {
-        String src = "try(let x = 19, y = 23) { x + y; } finally { 169; }";
-        JexlScript script = JEXL.createScript(src);
+        final String src = "try(let x = 19, y = 23) { x + y; } finally { 169; }";
+        final JexlScript script = JEXL.createScript(src);
         assertNotNull(script);
-        Object result = script.execute(null);
+        final Object result = script.execute(null);
         assertEquals(42, result);
     }
 
     @Test
     public void testForm0x2c() {
-        String src = "try(const x = 19; let y = 23; ) { x + y; } finally { 169; }";
-        JexlScript script = JEXL.createScript(src);
+        final String src = "try(const x = 19; let y = 23; ) { x + y; } finally { 169; }";
+        final JexlScript script = JEXL.createScript(src);
         assertNotNull(script);
-        Object result = script.execute(null);
+        final Object result = script.execute(null);
         assertEquals(42, result);
     }
 
     @Test
     public void testForm0x2d() {
-        String src = "try(var x = 19; const y = 23;) { x + y; } finally { 169; }";
-        JexlScript script = JEXL.createScript(src);
+        final String src = "try(var x = 19; const y = 23;) { x + y; } finally { 169; }";
+        final JexlScript script = JEXL.createScript(src);
         assertNotNull(script);
-        Object result = script.execute(null);
+        final Object result = script.execute(null);
         assertEquals(42, result);
     }
 
     @Test
     public void testRedefinition0() {
-        String src = "try(let x = c) { let x = 3; -42; }";
+        final String src = "try(let x = c) { let x = 3; -42; }";
         try {
-            JexlScript script = JEXL.createScript(src, "c");
-        } catch (JexlException.Parsing xvar) {
+            final JexlScript script = JEXL.createScript(src, "c");
+        } catch (final JexlException.Parsing xvar) {
             assertTrue(xvar.getMessage().contains("x: variable is already declared"));
         }
     }
 
     @Test
     public void testRedefinition1() {
-        String src = "const x = 33; try(let x = c) { 169; }";
+        final String src = "const x = 33; try(let x = c) { 169; }";
         try {
-            JexlScript script = JEXL.createScript(src, "c");
-        } catch (JexlException.Parsing xvar) {
+            final JexlScript script = JEXL.createScript(src, "c");
+        } catch (final JexlException.Parsing xvar) {
             assertTrue(xvar.getMessage().contains("x: variable is already declared"));
         }
     }
 
     @Test
     public void testStandard0x2() {
-        String src = "try { 42; } finally { 169; }";
-        JexlScript script = JEXL.createScript(src);
+        final String src = "try { 42; } finally { 169; }";
+        final JexlScript script = JEXL.createScript(src);
         assertNotNull(script);
-        Object result = script.execute(null);
+        final Object result = script.execute(null);
         assertEquals(42, result);
     }
 
     @Test
     public void testThrow0x2a() {
-        String src = "try(let x = 42) { throw x } finally { 169; }";
-        JexlScript script = JEXL.createScript(src);
+        final String src = "try(let x = 42) { throw x } finally { 169; }";
+        final JexlScript script = JEXL.createScript(src);
         assertNotNull(script);
         try {
-            Object result = script.execute(null);
+            final Object result = script.execute(null);
             fail("throw did not throw");
-        } catch (JexlException.Throw xthrow) {
+        } catch (final JexlException.Throw xthrow) {
             assertEquals(42, xthrow.getValue());
         }
     }
 
     @Test
     public void testThrow0x2b() {
-        String src = "try(let x = 42) { throw x } finally { throw 169 }";
-        JexlScript script = JEXL.createScript(src);
+        final String src = "try(let x = 42) { throw x } finally { throw 169 }";
+        final JexlScript script = JEXL.createScript(src);
         assertNotNull(script);
         try {
-            Object result = script.execute(null);
+            final Object result = script.execute(null);
             fail("throw did not throw");
-        } catch (JexlException.Throw xthrow) {
+        } catch (final JexlException.Throw xthrow) {
             assertEquals(169, xthrow.getValue());
         }
     }
 
     @Test
     public void testThrowCatchBreakFinallyContinue() {
-        String src = "let r = 0; for(let i : 37..42) { try(let x = 169) { r = i; throw -x } catch(const y) { break } finally { continue } } r";
-        JexlScript script = JEXL.createScript(src);
+        final String src = "let r = 0; for(let i : 37..42) { try(let x = 169) { r = i; throw -x } catch(const y) { break } finally { continue } } r";
+        final JexlScript script = JEXL.createScript(src);
         assertNotNull(script);
-        Object result = script.execute(null);
+        final Object result = script.execute(null);
         assertEquals(42, result);
     }
 
     @Test
     public void testThrowCatchContinueFinallyBreak() {
-        String src = "let r = 0; for(let i : 42..37) { try(let x = 169) { r = i; throw -x } catch(const y) { continue } finally { break } } r";
-        JexlScript script = JEXL.createScript(src);
+        final String src = "let r = 0; for(let i : 42..37) { try(let x = 169) { r = i; throw -x } catch(const y) { continue } finally { break } } r";
+        final JexlScript script = JEXL.createScript(src);
         assertNotNull(script);
-        Object result = script.execute(null);
+        final Object result = script.execute(null);
         assertEquals(42, result);
     }
 
     @Test
     public void testThrowCatchThrow() {
-        String src = "try(let x = 42) { throw x } catch(const y) { throw -(y.value) } ";
-        JexlScript script = JEXL.createScript(src);
+        final String src = "try(let x = 42) { throw x } catch(const y) { throw -(y.value) } ";
+        final JexlScript script = JEXL.createScript(src);
         assertNotNull(script);
         try {
-            Object result = script.execute(null);
+            final Object result = script.execute(null);
             fail("throw did not throw");
-        } catch (JexlException.Throw xthrow) {
+        } catch (final JexlException.Throw xthrow) {
             assertEquals(-42, xthrow.getValue());
         }
     }
 
     @Test
     public void testThrowCatchThrowFinallyThrow() {
-        String src = "try(let x = 42) { throw x } catch(const y) { throw -(y.value) } finally { throw 169 }";
-        JexlScript script = JEXL.createScript(src);
+        final String src = "try(let x = 42) { throw x } catch(const y) { throw -(y.value) } finally { throw 169 }";
+        final JexlScript script = JEXL.createScript(src);
         assertNotNull(script);
         try {
-            Object result = script.execute(null);
+            final Object result = script.execute(null);
             fail("throw did not throw");
-        } catch (JexlException.Throw xthrow) {
+        } catch (final JexlException.Throw xthrow) {
             assertEquals(169, xthrow.getValue());
         }
     }
 
     @Test
     public void testThrowRecurse() {
-        String src = "function fact(x, f) { if (x == 1) throw f; fact(x - 1, f * x); } fact(7, 1);";
-        JexlScript script = JEXL.createScript(src);
+        final String src = "function fact(x, f) { if (x == 1) throw f; fact(x - 1, f * x); } fact(7, 1);";
+        final JexlScript script = JEXL.createScript(src);
         assertNotNull(script);
         try {
-            Object result = script.execute(null);
+            final Object result = script.execute(null);
             fail("throw did not throw");
-        } catch (JexlException.Throw xthrow) {
+        } catch (final JexlException.Throw xthrow) {
             assertEquals(5040, xthrow.getValue());
         }
     }
 
     @Test
     public void testTryReturn() {
-        String src = "try(let x = 42) { return x } catch(const y) { throw -(y.value) } ";
-        JexlScript script = JEXL.createScript(src);
+        final String src = "try(let x = 42) { return x } catch(const y) { throw -(y.value) } ";
+        final JexlScript script = JEXL.createScript(src);
         assertNotNull(script);
-        Object result = script.execute(null);
+        final Object result = script.execute(null);
         assertEquals(42, result);
     }
 
     @Test
     public void testTryReturnFinallyReturn() {
-        String src = "try(let x = 42) { return x } finally { return 169 } ";
-        JexlScript script = JEXL.createScript(src);
+        final String src = "try(let x = 42) { return x } finally { return 169 } ";
+        final JexlScript script = JEXL.createScript(src);
         assertNotNull(script);
-        Object result = script.execute(null);
+        final Object result = script.execute(null);
         assertEquals(169, result);
     }
 }
