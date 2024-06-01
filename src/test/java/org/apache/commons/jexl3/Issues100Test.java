@@ -254,19 +254,15 @@ public static class Foo125 {
         context.set("a", new BigDecimal(1));
         context.set("b", new BigDecimal(3));
         final JexlEngine jexl = new Engine();
-        try {
-            final Object value = jexl.createExpression("a / b").evaluate(context);
-            assertNotNull(value);
-        } catch (final JexlException xjexl) {
-            fail("should not occur");
-        }
+        final Object value = jexl.createExpression("a / b").evaluate(context);
+        assertNotNull(value);
         options.setMathContext(MathContext.UNLIMITED);
         options.setMathScale(2);
         try {
             jexl.createExpression("a / b").evaluate(context);
             fail("should fail");
         } catch (final JexlException xjexl) {
-            //ok  to fail
+            // ok to fail
         }
     }
 
