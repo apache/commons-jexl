@@ -411,7 +411,7 @@ public class SandboxTest extends JexlTestCase {
                 "foo.callMeNot()",
                 "foo.NONO",
                 "new('org.apache.commons.jexl3.SandboxTest$Foo', 'one', 'two')" };
-        // @formatter:off
+        // @formatter:on
         final JexlEngine sjexl = new JexlBuilder().strict(true).safe(false).create();
         for (final String expr : exprs) {
             final JexlScript script = sjexl.createScript(expr, "foo");
@@ -598,7 +598,8 @@ public class SandboxTest extends JexlTestCase {
         // can not write quux, null
         for (final String k : Arrays.asList("'quux'", "null")) {
             final JexlExpression expression2 = jexl.createExpression("{" + k + " : 'foo'}[" + k + "] = '42'");
-            assertTrue(assertThrows(JexlException.Property.class, () -> expression2.evaluate(null), "should have blocked " + k).getMessage().contains("undefined"));
+            assertTrue(assertThrows(JexlException.Property.class, () -> expression2.evaluate(null), "should have blocked " + k).getMessage()
+                    .contains("undefined"));
         }
     }
 }
