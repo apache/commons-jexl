@@ -23,39 +23,6 @@ public class ASTIdentifierAccess extends JexlNode {
     /**
      */
     private static final long serialVersionUID = 1L;
-    private String name;
-    private Integer identifier;
-
-    ASTIdentifierAccess(final int id) {
-        super(id);
-    }
-
-    void setIdentifier(final String id) {
-        name = id;
-        identifier = parseIdentifier(id);
-    }
-
-    @Override
-    public boolean isGlobalVar() {
-        return !isSafe() && !isExpression();
-    }
-
-    /**
-     * Whether this is a dot or a question-mark-dot aka safe-navigation access.
-     * @return true is ?., false if .
-     */
-    public boolean isSafe() {
-        return false;
-    }
-
-    /**
-     * Whether this is a Jxlt based identifier.
-     * @return true if `..${...}...`, false otherwise
-     */
-    public boolean isExpression() {
-        return false;
-    }
-
     /**
      * Parse an identifier which must be of the form:
      * 0|([1-9][0-9]*)
@@ -88,6 +55,13 @@ public class ASTIdentifierAccess extends JexlNode {
         }
         return null;
     }
+    private String name;
+
+    private Integer identifier;
+
+    ASTIdentifierAccess(final int id) {
+        super(id);
+    }
 
     public Object getIdentifier() {
         return identifier != null ? identifier : name;
@@ -97,9 +71,35 @@ public class ASTIdentifierAccess extends JexlNode {
         return name;
     }
 
+    /**
+     * Whether this is a Jxlt based identifier.
+     * @return true if `..${...}...`, false otherwise
+     */
+    public boolean isExpression() {
+        return false;
+    }
+
+    @Override
+    public boolean isGlobalVar() {
+        return !isSafe() && !isExpression();
+    }
+
+    /**
+     * Whether this is a dot or a question-mark-dot aka safe-navigation access.
+     * @return true is ?., false if .
+     */
+    public boolean isSafe() {
+        return false;
+    }
+
     @Override
     public Object jjtAccept(final ParserVisitor visitor, final Object data) {
         return visitor.visit(this, data);
+    }
+
+    void setIdentifier(final String id) {
+        name = id;
+        identifier = parseIdentifier(id);
     }
 
     @Override
