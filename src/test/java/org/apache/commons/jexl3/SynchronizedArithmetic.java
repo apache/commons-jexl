@@ -34,7 +34,7 @@ public class SynchronizedArithmetic extends JexlArithmetic {
      * <p>
      * This class counts how many times we called enter & exit; they should be balanced
      */
-    public static abstract class AbstractMonitor {
+    public abstract static class AbstractMonitor {
         /* Counts the number of times enter is called. */
         private final AtomicInteger enters = new AtomicInteger();
         /* Counts the number of times exit is called. */
