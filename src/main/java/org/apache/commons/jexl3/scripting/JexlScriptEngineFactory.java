@@ -54,6 +54,11 @@ public class JexlScriptEngineFactory implements ScriptEngineFactory {
     }
 
     @Override
+    public List<String> getExtensions() {
+        return Collections.unmodifiableList(Arrays.asList("jexl", "jexl2", "jexl3"));
+    }
+
+    @Override
     public String getLanguageName() {
         return "JEXL";
     }
@@ -80,11 +85,6 @@ public class JexlScriptEngineFactory implements ScriptEngineFactory {
         }
         sb.append(')');
         return sb.toString();
-    }
-
-    @Override
-    public List<String> getExtensions() {
-        return Collections.unmodifiableList(Arrays.asList("jexl", "jexl2", "jexl3"));
     }
 
     @Override
