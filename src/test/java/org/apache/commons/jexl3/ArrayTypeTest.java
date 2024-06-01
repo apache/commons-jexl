@@ -16,11 +16,6 @@
  */
 package org.apache.commons.jexl3;
 
-import org.apache.commons.jexl3.internal.ArrayBuilder;
-import org.apache.commons.jexl3.internal.introspection.ClassMisc;
-import org.junit.Assert;
-import org.junit.Test;
-
 import java.io.Serializable;
 import java.util.AbstractCollection;
 import java.util.AbstractList;
@@ -31,6 +26,11 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+
+import org.apache.commons.jexl3.internal.ArrayBuilder;
+import org.apache.commons.jexl3.internal.introspection.ClassMisc;
+import org.junit.Assert;
+import org.junit.Test;
 
 /**
  * Ensure ArrayBuilder types its output by finding some common ancestor class or interface (besides Object.class)
