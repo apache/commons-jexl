@@ -26,7 +26,7 @@ import org.junit.Test;
 @SuppressWarnings({"UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
 public class ExceptionTest extends JexlTestCase {
     public static class ThrowNPE {
-        boolean doThrow = false;
+        boolean doThrow;
         public boolean getFail() {
             if (doThrow) {
                 throw new NullPointerException("ThrowNPE/get");
