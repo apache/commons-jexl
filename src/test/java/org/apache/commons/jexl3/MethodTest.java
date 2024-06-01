@@ -484,61 +484,57 @@ public class MethodTest extends JexlTestCase {
         Object c;
         JexlExpression e;
         final JexlEvalContext jc = new EnhancedContext(funcs);
-        try {
-            for (int i = 0; i < 2; ++i) {
-                e = JEXL.createExpression("func:exec([1, 2])");
-                o = e.evaluate(jc);
-                assertEquals(20, o, "exec(int[] arg): " + i);
+        for (int i = 0; i < 2; ++i) {
+            e = JEXL.createExpression("func:exec([1, 2])");
+            o = e.evaluate(jc);
+            assertEquals(20, o, "exec(int[] arg): " + i);
 
-                e = JEXL.createExpression("func:exec(1, 2)");
-                o = e.evaluate(jc);
-                assertEquals(4, o, "exec(Object... args): " + i);
+            e = JEXL.createExpression("func:exec(1, 2)");
+            o = e.evaluate(jc);
+            assertEquals(4, o, "exec(Object... args): " + i);
 
-                e = JEXL.createExpression("func:exec([10.0, 20.0])");
-                o = e.evaluate(jc);
-                assertEquals(3, o, "exec(Object args): " + i);
+            e = JEXL.createExpression("func:exec([10.0, 20.0])");
+            o = e.evaluate(jc);
+            assertEquals(3, o, "exec(Object args): " + i);
 
-                e = JEXL.createExpression("func:exec('1', 2)");
-                o = e.evaluate(jc);
-                assertEquals(4, o, "exec(Object... args): " + i);
+            e = JEXL.createExpression("func:exec('1', 2)");
+            o = e.evaluate(jc);
+            assertEquals(4, o, "exec(Object... args): " + i);
 
-                // no way to differentiate between a single arg call with an array and a vararg call with same args
-                assertEquals(func.exec("1", "2"), func.exec(new String[]{"1", "2"}), "exec(String... args): " + i);
-                e = JEXL.createExpression("func:exec(['1', '2'])");
-                o = e.evaluate(jc);
-                assertEquals(func.exec(new String[]{"1", "2"}), o, "exec(String... args): " + i);
-                e = JEXL.createExpression("func:exec('1', '2')");
-                o = e.evaluate(jc);
-                assertEquals(func.exec("1", "2"), o, "exec(String... args): " + i);
+            // no way to differentiate between a single arg call with an array and a vararg call with same args
+            assertEquals(func.exec("1", "2"), func.exec(new String[] { "1", "2" }), "exec(String... args): " + i);
+            e = JEXL.createExpression("func:exec(['1', '2'])");
+            o = e.evaluate(jc);
+            assertEquals(func.exec(new String[] { "1", "2" }), o, "exec(String... args): " + i);
+            e = JEXL.createExpression("func:exec('1', '2')");
+            o = e.evaluate(jc);
+            assertEquals(func.exec("1", "2"), o, "exec(String... args): " + i);
 
-                e = JEXL.createExpression("func:exec(true, [1, 2])");
-                o = e.evaluate(jc);
-                assertEquals(20, o, "exec(int[] arg): " + i);
+            e = JEXL.createExpression("func:exec(true, [1, 2])");
+            o = e.evaluate(jc);
+            assertEquals(20, o, "exec(int[] arg): " + i);
 
-                e = JEXL.createExpression("func:exec(true, 1, 2)");
-                o = e.evaluate(jc);
-                assertEquals(4, o, "exec(Object... args): " + i);
+            e = JEXL.createExpression("func:exec(true, 1, 2)");
+            o = e.evaluate(jc);
+            assertEquals(4, o, "exec(Object... args): " + i);
 
-                e = JEXL.createExpression("func:exec(true, ['1', '2'])");
-                o = e.evaluate(jc);
-                assertEquals(3, o, "exec(Object args): " + i);
+            e = JEXL.createExpression("func:exec(true, ['1', '2'])");
+            o = e.evaluate(jc);
+            assertEquals(3, o, "exec(Object args): " + i);
 
-                e = JEXL.createExpression("func:exec(true, '1', '2')");
-                o = e.evaluate(jc);
-                assertEquals(4, o, "exec(Object... args): " + i);
+            e = JEXL.createExpression("func:exec(true, '1', '2')");
+            o = e.evaluate(jc);
+            assertEquals(4, o, "exec(Object... args): " + i);
 
-                e = JEXL.createExpression("func:execute(true, '1', '2')");
-                o = e.evaluate(jc);
-                c = func.execute(Boolean.TRUE, "1", "2");
-                assertTrue(eqExecute(o, c), "execute(Object... args): " + i);
+            e = JEXL.createExpression("func:execute(true, '1', '2')");
+            o = e.evaluate(jc);
+            c = func.execute(Boolean.TRUE, "1", "2");
+            assertTrue(eqExecute(o, c), "execute(Object... args): " + i);
 
-                e = JEXL.createExpression("func:execute([true])");
-                o = e.evaluate(jc);
-                c = func.execute(new boolean[]{true});
-                assertTrue(eqExecute(o, c), "execute(Object... args): " + i);
-            }
-        } catch (final JexlException xjexl) {
-            fail(xjexl.toString());
+            e = JEXL.createExpression("func:execute([true])");
+            o = e.evaluate(jc);
+            c = func.execute(new boolean[] { true });
+            assertTrue(eqExecute(o, c), "execute(Object... args): " + i);
         }
     }
 
