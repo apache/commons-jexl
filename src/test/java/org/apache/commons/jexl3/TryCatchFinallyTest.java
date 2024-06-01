@@ -16,11 +16,11 @@
  */
 package org.apache.commons.jexl3;
 
+import java.io.IOException;
+
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
-
-import java.io.IOException;
 
 public class TryCatchFinallyTest extends JexlTestCase {
   public TryCatchFinallyTest() {
