@@ -66,30 +66,6 @@ public final class JexlOptions {
     };
     /** Default mask .*/
     private static int DEFAULT = 1 /*<< CANCELLABLE*/ | 1 << STRICT | 1 << ANTISH | 1 << SAFE;
-    /** The arithmetic math context. */
-    private MathContext mathContext;
-    /** The arithmetic math scale. */
-    private int mathScale = Integer.MIN_VALUE;
-    /** The arithmetic strict math flag. */
-    private boolean strictArithmetic = true;
-    /** The default flags, all but safe. */
-    private int flags = DEFAULT;
-    /** The namespaces .*/
-    private Map<String, Object> namespaces = Collections.emptyMap();
-    /** The imports. */
-    private Collection<String> imports = Collections.emptySet();
-
-    /**
-     * Sets the value of a flag in a mask.
-     * @param ordinal the flag ordinal
-     * @param mask the flags mask
-     * @param value true or false
-     * @return the new flags mask value
-     */
-    private static int set(final int ordinal, final int mask, final boolean value) {
-        return value? mask | 1 << ordinal : mask & ~(1 << ordinal);
-    }
-
     /**
      * Checks the value of a flag in the mask.
      * @param ordinal the flag ordinal
@@ -99,30 +75,6 @@ public final class JexlOptions {
     private static boolean isSet(final int ordinal, final int mask) {
         return (mask & 1 << ordinal) != 0;
     }
-
-    /**
-     * Default ctor.
-     */
-    public JexlOptions() {
-        // all inits in members declarations
-    }
-
-    /**
-     * Sets the default (static, shared) option flags.
-     * <p>
-     * Whenever possible, we recommend using JexlBuilder methods to unambiguously instantiate a JEXL
-     * engine; this method should only be used for testing / validation.
-     * <p>A '+flag' or 'flag' will set the option named 'flag' as true, '-flag' set as false.
-     * The possible flag names are:
-     * cancellable, strict, silent, safe, lexical, antish, lexicalShade
-     * <p>Calling JexlBuilder.setDefaultOptions("+safe") once before JEXL engine creation
-     * may ease validating JEXL3.2 in your environment.
-     * @param flags the flags to set
-     */
-    public static void setDefaultFlags(final String...flags) {
-        DEFAULT = parseFlags(DEFAULT, flags);
-    }
-
     /**
      * Parses flags by name.
      * <p>A '+flag' or 'flag' will set flag as true, '-flag' set as false.
@@ -158,13 +110,69 @@ public final class JexlOptions {
         }
         return mask;
     }
+    /**
+     * Sets the value of a flag in a mask.
+     * @param ordinal the flag ordinal
+     * @param mask the flags mask
+     * @param value true or false
+     * @return the new flags mask value
+     */
+    private static int set(final int ordinal, final int mask, final boolean value) {
+        return value? mask | 1 << ordinal : mask & ~(1 << ordinal);
+    }
+    /**
+     * Sets the default (static, shared) option flags.
+     * <p>
+     * Whenever possible, we recommend using JexlBuilder methods to unambiguously instantiate a JEXL
+     * engine; this method should only be used for testing / validation.
+     * <p>A '+flag' or 'flag' will set the option named 'flag' as true, '-flag' set as false.
+     * The possible flag names are:
+     * cancellable, strict, silent, safe, lexical, antish, lexicalShade
+     * <p>Calling JexlBuilder.setDefaultOptions("+safe") once before JEXL engine creation
+     * may ease validating JEXL3.2 in your environment.
+     * @param flags the flags to set
+     */
+    public static void setDefaultFlags(final String...flags) {
+        DEFAULT = parseFlags(DEFAULT, flags);
+    }
+    /** The arithmetic math context. */
+    private MathContext mathContext;
+    /** The arithmetic math scale. */
+    private int mathScale = Integer.MIN_VALUE;
+
+    /** The arithmetic strict math flag. */
+    private boolean strictArithmetic = true;
+
+    /** The default flags, all but safe. */
+    private int flags = DEFAULT;
+
+    /** The namespaces .*/
+    private Map<String, Object> namespaces = Collections.emptyMap();
+
+    /** The imports. */
+    private Collection<String> imports = Collections.emptySet();
 
     /**
-     * Sets this option flags using the +/- syntax.
-     * @param opts the option flags
+     * Default ctor.
      */
-    public void setFlags(final String... opts) {
-        flags = parseFlags(flags, opts);
+    public JexlOptions() {
+        // all inits in members declarations
+    }
+
+    /**
+     * Creates a copy of this instance.
+     * @return a copy
+     */
+    public JexlOptions copy() {
+        return new JexlOptions().set(this);
+    }
+
+    /**
+     * Gets the optional set of imported packages.
+     * @return the set of imports, may be empty, not null
+     */
+    public Collection<String> getImports() {
+        return imports;
     }
 
     /**
@@ -184,6 +192,14 @@ public final class JexlOptions {
     }
 
     /**
+     * Gets the optional map of namespaces.
+     * @return the map of namespaces, may be empty, not null
+     */
+    public Map<String, Object> getNamespaces() {
+        return namespaces;
+    }
+
+    /**
      * Checks whether evaluation will attempt resolving antish variable names.
      * @return true if antish variables are solved, false otherwise
      */
@@ -198,6 +214,13 @@ public final class JexlOptions {
      */
     public boolean isCancellable() {
         return isSet(CANCELLABLE, flags);
+    }
+
+    /**
+     * @return true if lambda captured-variables are const, false otherwise
+     */
+    public boolean isConstCapture() {
+        return isSet(CONST_CAPTURE, flags);
     }
 
     /**
@@ -234,6 +257,14 @@ public final class JexlOptions {
     }
 
     /**
+     * @return false if a copy of these options is used during execution,
+     * true if those can potentially be modified
+     */
+    public boolean isSharedInstance() {
+        return isSet(SHARED, flags);
+    }
+
+    /**
      * Checks whether the engine will throw a {@link JexlException} when an
      * error is encountered during evaluation.
      * @return true if silent, false otherwise
@@ -258,138 +289,6 @@ public final class JexlOptions {
      */
     public boolean isStrictArithmetic() {
         return strictArithmetic;
-    }
-
-    /**
-     * Sets whether the engine will attempt solving antish variable names from
-     * context.
-     * @param flag true if antish variables are solved, false otherwise
-     */
-    public void setAntish(final boolean flag) {
-        flags = set(ANTISH, flags, flag);
-    }
-
-    /**
-     * Sets whether the engine will throw JexlException.Cancel (true) or return
-     * null (false) when interrupted during evaluation.
-     * @param flag true when cancellable, false otherwise
-     */
-    public void setCancellable(final boolean flag) {
-        flags = set(CANCELLABLE, flags, flag);
-    }
-
-    /**
-     * Sets whether the engine uses a strict block lexical scope during
-     * evaluation.
-     * @param flag true if lexical scope is used, false otherwise
-     */
-    public void setLexical(final boolean flag) {
-        flags = set(LEXICAL, flags, flag);
-    }
-
-    /**
-     * Sets whether the engine strictly shades global variables.
-     * Local symbols shade globals after definition and creating global
-     * variables is prohibited during evaluation.
-     * If setting to lexical shade, lexical scope is also set.
-     * @param flag true if creation is allowed, false otherwise
-     */
-    public void setLexicalShade(final boolean flag) {
-        flags = set(SHADE, flags, flag);
-        if (flag) {
-            flags = set(LEXICAL, flags, true);
-        }
-    }
-
-    /**
-     * Sets whether lambda captured-variables are const or not.
-     * <p>
-     * When disabled, lambda-captured variables are implicitly converted to read-write local variable (let),
-     * when enabled, those are implicitly converted to read-only local variables (const).
-     * </p>
-     * @param flag true to enable, false to disable
-     */
-    public void setConstCapture(final boolean flag) {
-        flags = set(CONST_CAPTURE, flags, true);
-    }
-
-    /**
-     * @return true if lambda captured-variables are const, false otherwise
-     */
-    public boolean isConstCapture() {
-        return isSet(CONST_CAPTURE, flags);
-    }
-
-    /**
-     * Sets the arithmetic math context.
-     * @param mcontext the context
-     */
-    public void setMathContext(final MathContext mcontext) {
-        this.mathContext = mcontext;
-    }
-
-    /**
-     * Sets the arithmetic math scale.
-     * @param mscale the scale
-     */
-    public void setMathScale(final int mscale) {
-        this.mathScale = mscale;
-    }
-
-    /**
-     * Sets whether the engine considers null in navigation expression as null or as errors
-     * during evaluation.
-     * <p>If safe, encountering null during a navigation expression - dereferencing a method or a field through a null
-     * object or property - will <em>not</em> be considered an error but evaluated as <em>null</em>. It is recommended
-     * to use <em>setSafe(false)</em> as an explicit default.</p>
-     * @param flag true if safe, false otherwise
-     */
-    public void setSafe(final boolean flag) {
-        flags = set(SAFE, flags, flag);
-    }
-
-    /**
-     * Sets whether the engine will throw a {@link JexlException} when an error
-     * is encountered during evaluation.
-     * @param flag true if silent, false otherwise
-     */
-    public void setSilent(final boolean flag) {
-        flags = set(SILENT, flags, flag);
-    }
-
-    /**
-     * Sets whether the engine considers unknown variables, methods and
-     * constructors as errors during evaluation.
-     * @param flag true if strict, false otherwise
-     */
-    public void setStrict(final boolean flag) {
-        flags = set(STRICT, flags, flag);
-    }
-
-    /**
-     * Sets the strict arithmetic flag.
-     * @param stricta true or false
-     */
-    public void setStrictArithmetic(final boolean stricta) {
-        this.strictArithmetic = stricta;
-    }
-
-    /**
-     * Whether these options are immutable at runtime.
-     * <p>Expert mode; allows instance handled through context to be shared
-     * instead of copied.
-     * @param flag true if shared, false if not
-     */
-    public void setSharedInstance(final boolean flag) {
-        flags = set(SHARED, flags, flag);
-    }
-
-    /**
-     * @return false if a copy of these options is used during execution,
-     * true if those can potentially be modified
-     */
-    public boolean isSharedInstance() {
-        return isSet(SHARED, flags);
     }
 
     /**
@@ -420,27 +319,41 @@ public final class JexlOptions {
     }
 
     /**
-     * Gets the optional map of namespaces.
-     * @return the map of namespaces, may be empty, not null
+     * Sets whether the engine will attempt solving antish variable names from
+     * context.
+     * @param flag true if antish variables are solved, false otherwise
      */
-    public Map<String, Object> getNamespaces() {
-        return namespaces;
+    public void setAntish(final boolean flag) {
+        flags = set(ANTISH, flags, flag);
     }
 
     /**
-     * Sets the optional map of namespaces.
-     * @param ns a namespaces map
+     * Sets whether the engine will throw JexlException.Cancel (true) or return
+     * null (false) when interrupted during evaluation.
+     * @param flag true when cancellable, false otherwise
      */
-    public void setNamespaces(final Map<String, Object> ns) {
-        this.namespaces = ns == null || ns.isEmpty()? Collections.emptyMap() : ns;
+    public void setCancellable(final boolean flag) {
+        flags = set(CANCELLABLE, flags, flag);
     }
 
     /**
-     * Gets the optional set of imported packages.
-     * @return the set of imports, may be empty, not null
+     * Sets whether lambda captured-variables are const or not.
+     * <p>
+     * When disabled, lambda-captured variables are implicitly converted to read-write local variable (let),
+     * when enabled, those are implicitly converted to read-only local variables (const).
+     * </p>
+     * @param flag true to enable, false to disable
      */
-    public Collection<String> getImports() {
-        return imports;
+    public void setConstCapture(final boolean flag) {
+        flags = set(CONST_CAPTURE, flags, true);
+    }
+
+    /**
+     * Sets this option flags using the +/- syntax.
+     * @param opts the option flags
+     */
+    public void setFlags(final String... opts) {
+        flags = parseFlags(flags, opts);
     }
 
     /**
@@ -452,11 +365,98 @@ public final class JexlOptions {
     }
 
     /**
-     * Creates a copy of this instance.
-     * @return a copy
+     * Sets whether the engine uses a strict block lexical scope during
+     * evaluation.
+     * @param flag true if lexical scope is used, false otherwise
      */
-    public JexlOptions copy() {
-        return new JexlOptions().set(this);
+    public void setLexical(final boolean flag) {
+        flags = set(LEXICAL, flags, flag);
+    }
+
+    /**
+     * Sets whether the engine strictly shades global variables.
+     * Local symbols shade globals after definition and creating global
+     * variables is prohibited during evaluation.
+     * If setting to lexical shade, lexical scope is also set.
+     * @param flag true if creation is allowed, false otherwise
+     */
+    public void setLexicalShade(final boolean flag) {
+        flags = set(SHADE, flags, flag);
+        if (flag) {
+            flags = set(LEXICAL, flags, true);
+        }
+    }
+
+    /**
+     * Sets the arithmetic math context.
+     * @param mcontext the context
+     */
+    public void setMathContext(final MathContext mcontext) {
+        this.mathContext = mcontext;
+    }
+
+    /**
+     * Sets the arithmetic math scale.
+     * @param mscale the scale
+     */
+    public void setMathScale(final int mscale) {
+        this.mathScale = mscale;
+    }
+
+    /**
+     * Sets the optional map of namespaces.
+     * @param ns a namespaces map
+     */
+    public void setNamespaces(final Map<String, Object> ns) {
+        this.namespaces = ns == null || ns.isEmpty()? Collections.emptyMap() : ns;
+    }
+
+    /**
+     * Sets whether the engine considers null in navigation expression as null or as errors
+     * during evaluation.
+     * <p>If safe, encountering null during a navigation expression - dereferencing a method or a field through a null
+     * object or property - will <em>not</em> be considered an error but evaluated as <em>null</em>. It is recommended
+     * to use <em>setSafe(false)</em> as an explicit default.</p>
+     * @param flag true if safe, false otherwise
+     */
+    public void setSafe(final boolean flag) {
+        flags = set(SAFE, flags, flag);
+    }
+
+    /**
+     * Whether these options are immutable at runtime.
+     * <p>Expert mode; allows instance handled through context to be shared
+     * instead of copied.
+     * @param flag true if shared, false if not
+     */
+    public void setSharedInstance(final boolean flag) {
+        flags = set(SHARED, flags, flag);
+    }
+
+    /**
+     * Sets whether the engine will throw a {@link JexlException} when an error
+     * is encountered during evaluation.
+     * @param flag true if silent, false otherwise
+     */
+    public void setSilent(final boolean flag) {
+        flags = set(SILENT, flags, flag);
+    }
+
+    /**
+     * Sets whether the engine considers unknown variables, methods and
+     * constructors as errors during evaluation.
+     * @param flag true if strict, false otherwise
+     */
+    public void setStrict(final boolean flag) {
+        flags = set(STRICT, flags, flag);
+    }
+
+    /**
+     * Sets the strict arithmetic flag.
+     * @param stricta true or false
+     */
+    public void setStrictArithmetic(final boolean stricta) {
+        this.strictArithmetic = stricta;
     }
 
     @Override public String toString() {
