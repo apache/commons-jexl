@@ -43,53 +43,8 @@ final class OperatorController extends ScriptVisitor {
     }
 
     @Override
-    protected JexlOperator visitNode(final JexlNode node, final Object data) {
-        return null;
-    }
-
-    @Override
-    protected JexlOperator visit(final ASTNotNode node, final Object data) {
-        return JexlOperator.NOT;
-    }
-
-    @Override
     protected JexlOperator visit(final ASTAddNode node, final Object data) {
         return JexlOperator.ADD;
-    }
-
-    @Override
-    protected JexlOperator visit(final ASTSetAddNode node, final Object data) {
-        return JexlOperator.SELF_ADD;
-    }
-
-    @Override
-    protected JexlOperator visit(final ASTMulNode node, final Object data) {
-        return JexlOperator.MULTIPLY;
-    }
-
-    @Override
-    protected JexlOperator visit(final ASTSetMultNode node, final Object data) {
-        return JexlOperator.SELF_MULTIPLY;
-    }
-
-    @Override
-    protected JexlOperator visit(final ASTModNode node, final Object data) {
-        return JexlOperator.MOD;
-    }
-
-    @Override
-    protected JexlOperator visit(final ASTSetModNode node, final Object data) {
-        return JexlOperator.SELF_MOD;
-    }
-
-    @Override
-    protected JexlOperator visit(final ASTDivNode node, final Object data) {
-        return JexlOperator.DIVIDE;
-    }
-
-    @Override
-    protected JexlOperator visit(final ASTSetDivNode node, final Object data) {
-        return JexlOperator.SELF_DIVIDE;
     }
 
     @Override
@@ -98,8 +53,8 @@ final class OperatorController extends ScriptVisitor {
     }
 
     @Override
-    protected JexlOperator visit(final ASTSetAndNode node, final Object data) {
-        return JexlOperator.SELF_AND;
+    protected JexlOperator visit(final ASTBitwiseComplNode node, final Object data) {
+        return JexlOperator.COMPLEMENT;
     }
 
     @Override
@@ -108,33 +63,13 @@ final class OperatorController extends ScriptVisitor {
     }
 
     @Override
-    protected JexlOperator visit(final ASTSetOrNode node, final Object data) {
-        return JexlOperator.SELF_OR;
-    }
-
-    @Override
     protected JexlOperator visit(final ASTBitwiseXorNode node, final Object data) {
         return JexlOperator.XOR;
     }
 
     @Override
-    protected JexlOperator visit(final ASTSetXorNode node, final Object data) {
-        return JexlOperator.SELF_OR;
-    }
-
-    @Override
-    protected JexlOperator visit(final ASTBitwiseComplNode node, final Object data) {
-        return JexlOperator.COMPLEMENT;
-    }
-
-    @Override
-    protected JexlOperator visit(final ASTSubNode node, final Object data) {
-        return JexlOperator.SUBTRACT;
-    }
-
-    @Override
-    protected JexlOperator visit(final ASTSetSubNode node, final Object data) {
-        return JexlOperator.SELF_SUBTRACT;
+    protected JexlOperator visit(final ASTDivNode node, final Object data) {
+        return JexlOperator.DIVIDE;
     }
 
     @Override
@@ -148,6 +83,46 @@ final class OperatorController extends ScriptVisitor {
     }
 
     @Override
+    protected JexlOperator visit(final ASTERNode node, final Object data) {
+        return JexlOperator.CONTAINS;
+    }
+
+    @Override
+    protected JexlOperator visit(final ASTEWNode node, final Object data) {
+        return JexlOperator.ENDSWITH;
+    }
+
+    @Override
+    protected JexlOperator visit(final ASTGENode node, final Object data) {
+        return JexlOperator.GTE;
+    }
+
+    @Override
+    protected JexlOperator visit(final ASTGTNode node, final Object data) {
+        return JexlOperator.GT;
+    }
+
+    @Override
+    protected JexlOperator visit(final ASTLENode node, final Object data) {
+        return JexlOperator.LTE;
+    }
+
+    @Override
+    protected JexlOperator visit(final ASTLTNode node, final Object data) {
+        return JexlOperator.LT;
+    }
+
+    @Override
+    protected JexlOperator visit(final ASTModNode node, final Object data) {
+        return JexlOperator.MOD;
+    }
+
+    @Override
+    protected JexlOperator visit(final ASTMulNode node, final Object data) {
+        return JexlOperator.MULTIPLY;
+    }
+
+    @Override
     protected JexlOperator visit(final ASTNENode node, final Object data) {
         return JexlOperator.EQ;
     }
@@ -158,28 +133,18 @@ final class OperatorController extends ScriptVisitor {
     }
 
     @Override
-    protected JexlOperator visit(final ASTGTNode node, final Object data) {
-        return JexlOperator.GT;
+    protected JexlOperator visit(final ASTNEWNode node, final Object data) {
+        return JexlOperator.ENDSWITH;
     }
 
     @Override
-    protected JexlOperator visit(final ASTGENode node, final Object data) {
-        return JexlOperator.GTE;
+    protected JexlOperator visit(final ASTNotNode node, final Object data) {
+        return JexlOperator.NOT;
     }
 
     @Override
-    protected JexlOperator visit(final ASTLTNode node, final Object data) {
-        return JexlOperator.LT;
-    }
-
-    @Override
-    protected JexlOperator visit(final ASTLENode node, final Object data) {
-        return JexlOperator.LTE;
-    }
-
-    @Override
-    protected JexlOperator visit(final ASTSWNode node, final Object data) {
-        return JexlOperator.STARTSWITH;
+    protected JexlOperator visit(final ASTNRNode node, final Object data) {
+        return JexlOperator.CONTAINS;
     }
 
     @Override
@@ -188,22 +153,57 @@ final class OperatorController extends ScriptVisitor {
     }
 
     @Override
-    protected JexlOperator visit(final ASTEWNode node, final Object data) {
-        return JexlOperator.ENDSWITH;
+    protected JexlOperator visit(final ASTSetAddNode node, final Object data) {
+        return JexlOperator.SELF_ADD;
     }
 
     @Override
-    protected JexlOperator visit(final ASTNEWNode node, final Object data) {
-        return JexlOperator.ENDSWITH;
+    protected JexlOperator visit(final ASTSetAndNode node, final Object data) {
+        return JexlOperator.SELF_AND;
     }
 
     @Override
-    protected JexlOperator visit(final ASTERNode node, final Object data) {
-        return JexlOperator.CONTAINS;
+    protected JexlOperator visit(final ASTSetDivNode node, final Object data) {
+        return JexlOperator.SELF_DIVIDE;
     }
 
     @Override
-    protected JexlOperator visit(final ASTNRNode node, final Object data) {
-        return JexlOperator.CONTAINS;
+    protected JexlOperator visit(final ASTSetModNode node, final Object data) {
+        return JexlOperator.SELF_MOD;
+    }
+
+    @Override
+    protected JexlOperator visit(final ASTSetMultNode node, final Object data) {
+        return JexlOperator.SELF_MULTIPLY;
+    }
+
+    @Override
+    protected JexlOperator visit(final ASTSetOrNode node, final Object data) {
+        return JexlOperator.SELF_OR;
+    }
+
+    @Override
+    protected JexlOperator visit(final ASTSetSubNode node, final Object data) {
+        return JexlOperator.SELF_SUBTRACT;
+    }
+
+    @Override
+    protected JexlOperator visit(final ASTSetXorNode node, final Object data) {
+        return JexlOperator.SELF_OR;
+    }
+
+    @Override
+    protected JexlOperator visit(final ASTSubNode node, final Object data) {
+        return JexlOperator.SUBTRACT;
+    }
+
+    @Override
+    protected JexlOperator visit(final ASTSWNode node, final Object data) {
+        return JexlOperator.STARTSWITH;
+    }
+
+    @Override
+    protected JexlOperator visitNode(final JexlNode node, final Object data) {
+        return null;
     }
 }
