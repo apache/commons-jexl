@@ -107,7 +107,7 @@ public class AnnotationTest extends JexlTestCase {
     public static class OptAnnotationContext extends JexlEvalContext implements JexlContext.AnnotationProcessor {
         @Override
         public Object processAnnotation(final String name, final Object[] args, final Callable<Object> statement) throws Exception {
-            final JexlOptions options = this.getEngineOptions();
+            final JexlOptions options = getEngineOptions();
             // transient side effect for strict
             if ("strict".equals(name)) {
                 final boolean s = (Boolean) args[0];
