@@ -257,8 +257,7 @@ public class Issues300Test {
     private Object run361d(final JexlEngine jexl) {
         final String src = "var foo = 42; var foo = 43;";
         final JexlScript script = jexl.createScript(src);
-        final Object result = script.execute(null);
-        return result;
+        return script.execute(null);
     }
 
     @Test
