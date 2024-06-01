@@ -577,7 +577,7 @@ public class Issues200Test extends JexlTestCase {
         JexlEngine jexl = new JexlBuilder().strict(true).safe(true).stackOverflow(5).create();
         final JexlContext ctxt = new MapContext();
         final JexlScript script = jexl.createScript("var f = (x)->{ x > 1? x * f(x - 1) : x }; f(a)", "a");
-        Object result = script.execute(ctxt, 3);
+        final Object result = script.execute(ctxt, 3);
         assertEquals(6, result);
         JexlException.StackOverflow xstack = assertThrows(JexlException.StackOverflow.class, () -> script.execute(ctxt, 32));
         assertTrue(xstack.toString().contains("jexl"));
@@ -655,7 +655,7 @@ public class Issues200Test extends JexlTestCase {
             final JexlException.Ambiguous xa = assertThrows(JexlException.Ambiguous.class, () -> jexl.createScript(src));
             final String str = xa.toString();
             assertTrue(str.contains("143"));
-            String clean = xa.tryCleanSource(src);
+            final String clean = xa.tryCleanSource(src);
 
             jc = jexl.createScript(clean);
             value = jc.execute(ctxt);
@@ -845,24 +845,16 @@ public class Issues200Test extends JexlTestCase {
         // definition using shadowed global
         options.setLexical(false);
         src = "(x)->{ if (x==1) { var y = 2; } else if (x==2) { var y = 3; }; y }";
-        script = jexl.createScript(src);
-        result = script.execute(ctxt, 1);
+        final JexlScript script1 = jexl.createScript(src);
+        result = script1.execute(ctxt, 1);
         assertEquals(2, result);
-        result = script.execute(ctxt, 2);
+        result = script1.execute(ctxt, 2);
         assertEquals(3, result);
         options.setStrict(true);
-        try {
-            result = script.execute(ctxt, 0);
-            fail("should have failed!");
-        } catch (final JexlException.Variable xvar) {
-            assertTrue(xvar.getMessage().contains("y"));
-        }
+        final JexlException.Variable xvar = assertThrows(JexlException.Variable.class, () -> script1.execute(ctxt, 0));
+        assertTrue(xvar.getMessage().contains("y"));
         options.setStrict(false);
-        try {
-            result = script.execute(ctxt, 0);
-        } catch (final JexlException xvar) {
-            fail("should not have failed!");
-        }
+        result = script1.execute(ctxt, 0);
         assertNull(result);
     }
 
