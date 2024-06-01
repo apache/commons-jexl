@@ -16,6 +16,8 @@
  */
 package org.apache.commons.jexl3;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -117,11 +119,10 @@ public class PublicFieldsTest extends JexlTestCase {
         ctxt.set("value", 42.0);
         Assert.assertEquals(42.0, set.evaluate(ctxt));
         Assert.assertEquals(42.0, JEXL.getProperty(pub, "inner.aDouble"));
-        try {
+        assertThrows(JexlException.class, () -> {
             ctxt.set("value", UPPER42);
             Assert.assertNull(set.evaluate(ctxt));
-            Assert.fail("should have thrown");
-        } catch (final JexlException xjexl) {}
+        });
     }
 
     @Test
@@ -133,11 +134,10 @@ public class PublicFieldsTest extends JexlTestCase {
         ctxt.set("value", 42);
         Assert.assertEquals(42, set.evaluate(ctxt));
         Assert.assertEquals(42, JEXL.getProperty(pub, "anInt"));
-        try {
+        assertThrows(JexlException.class, () -> {
             ctxt.set("value", UPPER42);
             Assert.assertNull(set.evaluate(ctxt));
-            Assert.fail("should have thrown");
-        } catch (final JexlException xjexl) {}
+        });
     }
 
     @Test
