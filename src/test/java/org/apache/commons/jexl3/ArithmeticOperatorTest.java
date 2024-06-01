@@ -17,7 +17,11 @@
 
 package org.apache.commons.jexl3;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+
 import java.io.StringWriter;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -37,7 +41,6 @@ import java.util.TimeZone;
 import java.util.TreeSet;
 
 import org.apache.commons.jexl3.junit.Asserter;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
