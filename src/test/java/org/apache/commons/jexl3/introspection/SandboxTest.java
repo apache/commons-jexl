@@ -43,7 +43,7 @@ import org.junit.Test;
  */
 @SuppressWarnings({"UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
 public class SandboxTest extends JexlTestCase {
-    public static abstract class AbstractCallMeNot {
+    public abstract static class AbstractCallMeNot {
         public @NoJexl
         String NONO = "should not be accessible!";
 
