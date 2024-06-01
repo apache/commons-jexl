@@ -1310,8 +1310,6 @@ public class JXLTTest extends JexlTestCase {
         } catch (final JexlException.Variable xvar) {
             assertTrue("tab".equals(xvar.getVariable()));
             assertTrue(xvar.isUndefined());
-        } catch (final JexlException xany) {
-            assertTrue(xany.getMessage().contains("tab"));
         }
     }
 
