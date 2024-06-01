@@ -19,6 +19,7 @@ package org.apache.commons.jexl3;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -348,50 +349,32 @@ public class AnnotationTest extends JexlTestCase {
         final JexlOptions options = jc.getEngineOptions();
         jc.getEngineOptions().set(JEXL);
         options.setSharedInstance(true);
-        JexlScript e;
         Object r;
-        e = JEXL.createScript("(s, v)->{ @strict(s) @silent(v) var x = y ; 42; }");
+        final JexlScript e = JEXL.createScript("(s, v)->{ @strict(s) @silent(v) var x = y ; 42; }");
 
         // wont make an error
-        try {
-            r = e.execute(jc, false, true);
-            assertEquals(42, r);
-        } catch (final JexlException.Variable xjexl) {
-            fail("should not have thrown");
-        }
+        r = e.execute(jc, false, true);
+        assertEquals(42, r);
 
         r = null;
         // will make an error and throw
         options.setSafe(false);
-        try {
-            r = e.execute(jc, true, false);
-            fail("should have thrown");
-        } catch (final JexlException.Variable xjexl) {
-            assertNull(r);
-        }
+        assertThrows(JexlException.Variable.class, () -> e.execute(jc, true, false));
 
         r = null;
         // will make an error and will not throw but result is null
-        try {
-            r = e.execute(jc, true, true);
-            assertNull(r);
-        } catch (final JexlException.Variable xjexl) {
-            fail("should not have thrown");
-        }
+        r = e.execute(jc, true, true);
+        assertNull(r);
         options.setSafe(true);
 
         r = null;
         // will not make an error and will not throw
-        try {
-            r = e.execute(jc, false, false);
-            assertEquals(42, r);
-        } catch (final JexlException.Variable xjexl) {
-            fail("should not have thrown");
-        }
-        //assertEquals(42, r);
+        r = e.execute(jc, false, false);
+        assertEquals(42, r);
+        // assertEquals(42, r);
         assertTrue(options.isStrict());
-        e = JEXL.createScript("@scale(5) 42;");
-        r = e.execute(jc);
+        JexlScript e2 = JEXL.createScript("@scale(5) 42;");
+        r = e2.execute(jc);
         assertEquals(42, r);
         assertTrue(options.isStrict());
         assertEquals(5, options.getMathScale());
