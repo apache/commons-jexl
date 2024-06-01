@@ -32,9 +32,6 @@ import org.apache.commons.jexl3.JexlException;
  * @since 2.0
  */
 public final class DuckGetExecutor extends AbstractExecutor.Get {
-    /** The property, may be null. */
-    private final Object property;
-
     /**
      * Attempts to discover a DuckGetExecutor.
      * @param is the introspector
@@ -46,6 +43,9 @@ public final class DuckGetExecutor extends AbstractExecutor.Get {
         final java.lang.reflect.Method method = is.getMethod(clazz, "get", identifier);
         return method == null ? null : new DuckGetExecutor(clazz, method, identifier);
     }
+
+    /** The property, may be null. */
+    private final Object property;
 
     /**
      * Creates an instance.
