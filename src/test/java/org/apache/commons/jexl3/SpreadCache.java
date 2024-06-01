@@ -39,7 +39,7 @@ public class SpreadCache<K, V> extends SoftCache<K, V> {
    *
    * @param theSize the cache size
    */
-  public SpreadCache(int theSize) {
+  public SpreadCache(final int theSize) {
     super(theSize);
   }
 
@@ -66,7 +66,7 @@ class SpreadMap<K, V> extends AbstractMap<K, V> {
    * @param cap capacity
    * @return the smallest power of 2 greater or equal to argument
    */
-  private static int closestPowerOf2(int cap) {
+  private static int closestPowerOf2(final int cap) {
     return cap > 1 ? Integer.highestOneBit(cap - 1) << 1 : 1;
   }
 
@@ -80,8 +80,8 @@ class SpreadMap<K, V> extends AbstractMap<K, V> {
    *
    * @param capacity the overall map capacity
    */
-  SpreadMap(int capacity) {
-    int spread = closestPowerOf2(Runtime.getRuntime().availableProcessors());
+  SpreadMap(final int capacity) {
+    final int spread = closestPowerOf2(Runtime.getRuntime().availableProcessors());
     maps = new Map[spread];
     final int mapCapacity = (capacity + spread + 1) / spread;
     for (int m = 0; m < spread; ++m) {
@@ -99,7 +99,7 @@ class SpreadMap<K, V> extends AbstractMap<K, V> {
   @Override
   public Set<Entry<K, V>> entrySet() {
     final Set<Map.Entry<K, V>> entries = new LinkedHashSet<>(size());
-    for (Map<K, V> map : maps) {
+    for (final Map<K, V> map : maps) {
       synchronized (map) {
         entries.addAll(map.entrySet());
       }
@@ -108,7 +108,7 @@ class SpreadMap<K, V> extends AbstractMap<K, V> {
   }
 
   @Override
-  public V get(Object key) {
+  public V get(final Object key) {
     return getMap(key).get(key);
   }
 
@@ -118,12 +118,12 @@ class SpreadMap<K, V> extends AbstractMap<K, V> {
    * @param key the key
    * @return the map
    */
-  private final Map<K, V> getMap(Object key) {
+  private final Map<K, V> getMap(final Object key) {
     int h = key.hashCode();
-    h ^= (h >>> 16);
+    h ^= h >>> 16;
     // length is a power of 2, length - 1 is the mask of its modulo:
     // length = 4, length - 1 = 3 = 11b : x % 4 <=> x & 3
-    return maps[h & (maps.length - 1)];
+    return maps[h & maps.length - 1];
   }
 
   @Override
