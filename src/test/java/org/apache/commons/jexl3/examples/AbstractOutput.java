@@ -17,9 +17,7 @@
 
 package org.apache.commons.jexl3.examples;
 
-import static org.junit.jupiter.api.Assertions.*;
-
-import org.junit.Assert;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Abstracts using a test within Junit or through a main method.
