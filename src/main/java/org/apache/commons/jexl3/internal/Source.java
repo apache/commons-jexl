@@ -48,7 +48,7 @@ public final class Source implements Comparable<Source> {
     }
 
     @Override
-    public int compareTo(Source s) {
+    public int compareTo(final Source s) {
         return str.compareTo(s.str);
     }
 
