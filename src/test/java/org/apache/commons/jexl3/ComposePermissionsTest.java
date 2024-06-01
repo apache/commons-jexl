@@ -16,13 +16,16 @@
  */
 package org.apache.commons.jexl3;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.fail;
+
 import java.io.File;
 import java.io.FileReader;
 import java.util.Collections;
 
 import org.apache.commons.jexl3.introspection.JexlPermissions;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.google.gson.Gson;
 
@@ -43,22 +46,22 @@ public class ComposePermissionsTest extends JexlTestCase {
     final File jsonFile = new File(SAMPLE_JSON);
     final Gson gson = new Gson();
     final Object json = gson.fromJson(new FileReader(jsonFile), Object.class);
-    Assert.assertNotNull(json);
+    assertNotNull(json);
 
     // will succeed because java.util.Map is allowed and gson LinkedTreeMap is one
     final JexlEngine j0 = createEngine(false, p);
     final JexlScript s0 = j0.createScript("json.pageInfo.pagePic", "json");
     final Object r0 = s0.execute(null, json);
-    Assert.assertEquals(check, r0);
+    assertEquals(check, r0);
 
     // will fail if gson package is denied
     JexlEngine j1 = createEngine(false, p.compose("com.google.gson.internal {}"));
     JexlScript s1 = j1.createScript("json.pageInfo.pagePic", "json");
     try {
       final Object r1 = s1.execute(null, json);
-      Assert.fail("gson restricted");
+      fail("gson restricted");
     } catch (final JexlException.Property xproperty) {
-      Assert.assertEquals("pageInfo", xproperty.getProperty());
+      assertEquals("pageInfo", xproperty.getProperty());
     }
 
     // will fail since gson package is denied
@@ -66,16 +69,16 @@ public class ComposePermissionsTest extends JexlTestCase {
      s1 = j1.createScript("json.pageInfo.pagePic", "json");
     try {
       final Object r1 = s1.execute(null, json);
-      Assert.fail("gson LinkTreeMap restricted");
+      fail("gson LinkTreeMap restricted");
     } catch (final JexlException.Property xproperty) {
-      Assert.assertEquals("pageInfo", xproperty.getProperty());
+      assertEquals("pageInfo", xproperty.getProperty());
     }
 
     // will not fail since gson objects
     j1 = createEngine(false, JexlPermissions.RESTRICTED);
     s1 = j1.createScript("json.pageInfo.pagePic", "json");
     final Object r1 = s1.execute(null, json);
-    Assert.assertEquals(check, r0);
+    assertEquals(check, r0);
   }
 
   @Test
