@@ -71,7 +71,7 @@ public class SideEffectTest extends JexlTestCase {
             public Arithmetic246b(final boolean astrict) {
                 super(astrict);
             }
-    
+
             public Object selfAdd(final Object c, final String item) throws IOException {
                 if (c == null) {
                     return new ArrayList<>(Collections.singletonList(item));
