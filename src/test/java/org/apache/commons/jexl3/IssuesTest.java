@@ -19,6 +19,7 @@ package org.apache.commons.jexl3;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -111,14 +112,8 @@ public class IssuesTest extends JexlTestCase {
         //"1000 / a"
         };
         for (final String s : exprs) {
-            try {
-                final JexlExpression expr = jexl.createExpression(s);
-                /* Object value = */
-                expr.evaluate(ctxt);
-                fail(s + " : should have failed due to null argument");
-            } catch (final JexlException xjexl) {
-                // expected
-            }
+            final JexlExpression expr = jexl.createExpression(s);
+            assertThrows(JexlException.class, () -> expr.evaluate(ctxt), () -> s + " : should have failed due to null argument");
         }
     }
 
