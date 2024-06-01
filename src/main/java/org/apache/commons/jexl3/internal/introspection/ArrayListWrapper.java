@@ -45,20 +45,13 @@ public class ArrayListWrapper extends AbstractList<Object> implements RandomAcce
     }
 
     @Override
+    public boolean contains(final Object o) {
+        return indexOf(o) != -1;
+    }
+
+    @Override
     public Object get(final int index) {
         return Array.get(array, index);
-    }
-
-    @Override
-    public Object set(final int index, final Object element) {
-        final Object old = Array.get(array, index);
-        Array.set(array, index, element);
-        return old;
-    }
-
-    @Override
-    public int size() {
-        return Array.getLength(array);
     }
 
     @Override
@@ -81,9 +74,16 @@ public class ArrayListWrapper extends AbstractList<Object> implements RandomAcce
     }
 
     @Override
-    public boolean contains(final Object o) {
-        return indexOf(o) != -1;
+    public Iterator<Object> iterator() { return new ArrayIterator(array); }
+
+    @Override
+    public Object set(final int index, final Object element) {
+        final Object old = Array.get(array, index);
+        Array.set(array, index, element);
+        return old;
     }
     @Override
-    public Iterator<Object> iterator() { return new ArrayIterator(array); }
+    public int size() {
+        return Array.getLength(array);
+    }
 }
