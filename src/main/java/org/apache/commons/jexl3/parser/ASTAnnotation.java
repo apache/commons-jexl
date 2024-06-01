@@ -29,9 +29,13 @@ public class ASTAnnotation extends JexlNode {
         super(id);
     }
 
-    @Override
-    public String toString() {
+    public String getName() {
         return name;
+    }
+
+    @Override
+    public Object jjtAccept(final ParserVisitor visitor, final Object data) {
+        return visitor.visit(this, data);
     }
 
     void setName(final String identifier) {
@@ -42,12 +46,8 @@ public class ASTAnnotation extends JexlNode {
         }
     }
 
-    public String getName() {
-        return name;
-    }
-
     @Override
-    public Object jjtAccept(final ParserVisitor visitor, final Object data) {
-        return visitor.visit(this, data);
+    public String toString() {
+        return name;
     }
 }
