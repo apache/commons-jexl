@@ -80,15 +80,6 @@ public class PermissionsParser {
 
     /**
      * Parses permissions from a source.
-     * @param srcs the sources
-     * @return the permissions map
-     */
-    public Permissions parse(final String... srcs) {
-        return parse(new LinkedHashSet<>(), new ConcurrentHashMap<>(), srcs);
-    }
-
-    /**
-     * Parses permissions from a source.
      * @param wildcards the set of allowed packages
      * @param packages the map of restricted elements
      * @param srcs the sources
@@ -114,13 +105,117 @@ public class PermissionsParser {
     }
 
     /**
-     * Compose a parsing error message.
-     * @param c the offending character
-     * @param i the offset position
-     * @return the error message
+     * Parses permissions from a source.
+     * @param srcs the sources
+     * @return the permissions map
      */
-    private String unexpected(final char c, final int i) {
-        return "unexpected '" + c + "'" + "@" + i;
+    public Permissions parse(final String... srcs) {
+        return parse(new LinkedHashSet<>(), new ConcurrentHashMap<>(), srcs);
+    }
+
+    /**
+     * Reads a class permission.
+     * @param njpackage the owning package
+     * @param nojexl whether the restriction is explicitly denying (true) or allowing (false) members
+     * @param outer the outer class (if any)
+     * @param inner the inner class name (if any)
+     * @param offset the initial parsing position in the source
+     * @return the new parsing position
+     */
+    private int readClass(final Permissions.NoJexlPackage njpackage, final boolean nojexl, final String outer, final String inner, final int offset) {
+        final StringBuilder temp = new StringBuilder();
+        Permissions.NoJexlClass njclass = null;
+        String njname = null;
+        String identifier = inner;
+        boolean deny = nojexl;
+        int i = offset;
+        int j = -1;
+        boolean isMethod = false;
+        while(i < size) {
+            final char c = src.charAt(i);
+            // if no parsing progress can be made, we are in error
+            if (j >= i) {
+                throw new IllegalStateException(unexpected(c, i));
+            }
+            j = i;
+            // get rid of space
+            if (Character.isWhitespace(c)) {
+                i = readSpaces(i + 1);
+                continue;
+            }
+            // eol comment
+            if (c == '#') {
+                i = readEol(i + 1);
+                continue;
+            }
+            // end of class ?
+            if (njclass != null && c == '}') {
+                i += 1;
+                break;
+            }
+            // read an identifier, the class name
+            if (identifier == null) {
+                // negative or positive set ?
+                if (c == '-') {
+                    i += 1;
+                } else if (c == '+') {
+                    deny = false;
+                    i += 1;
+                }
+                final int next = readIdentifier(temp, i);
+                if (i != next) {
+                    identifier = temp.toString();
+                    temp.setLength(0);
+                    i = next;
+                    continue;
+                }
+            }
+            // parse a class:
+            if (njclass == null) {
+                // we must have read the class ('identifier {'...)
+                if (identifier == null || c != '{') {
+                    throw new IllegalStateException(unexpected(c, i));
+                }
+                // if we have a class, it has a name
+                njclass = deny ? new Permissions.NoJexlClass() : new Permissions.JexlClass();
+                njname = outer != null ? outer + "$" + identifier : identifier;
+                njpackage.addNoJexl(njname, njclass);
+                identifier = null;
+            } else if (identifier != null)  {
+                // class member mode
+                if (c == '{') {
+                    // inner class
+                    i = readClass(njpackage, deny, njname, identifier, i - 1);
+                    identifier = null;
+                    continue;
+                }
+                if (c == ';') {
+                    // field or method?
+                    if (isMethod) {
+                        njclass.methodNames.add(identifier);
+                        isMethod = false;
+                    } else {
+                        njclass.fieldNames.add(identifier);
+                    }
+                    identifier = null;
+                } else if (c == '(' && !isMethod) {
+                    // method; only one opening parenthesis allowed
+                    isMethod = true;
+                } else if (c != ')' || src.charAt(i - 1) != '(') {
+                    // closing parenthesis following opening one was expected
+                    throw new IllegalStateException(unexpected(c, i));
+                }
+            }
+            i += 1;
+        }
+        // empty class means allow or deny all
+        if (njname != null && njclass.isEmpty()) {
+            njpackage.addNoJexl(njname, njclass instanceof Permissions.JexlClass
+                ? Permissions.JEXL_CLASS
+                : Permissions.NOJEXL_CLASS);
+
+        }
+        return i;
     }
 
     /**
@@ -138,23 +233,6 @@ public class PermissionsParser {
             i += 1;
         }
         return i;
-    }
-
-    /**
-     * Reads spaces.
-     * @param offset initial position
-     * @return position after spaces
-     */
-    private int readSpaces(final int offset) {
-        int i = offset;
-        while (i < size) {
-            final char c = src.charAt(i);
-            if (!Character.isWhitespace(c)) {
-                break;
-            }
-            i += 1;
-        }
-        return offset;
     }
 
     /**
@@ -273,107 +351,29 @@ public class PermissionsParser {
     }
 
     /**
-     * Reads a class permission.
-     * @param njpackage the owning package
-     * @param nojexl whether the restriction is explicitly denying (true) or allowing (false) members
-     * @param outer the outer class (if any)
-     * @param inner the inner class name (if any)
-     * @param offset the initial parsing position in the source
-     * @return the new parsing position
+     * Reads spaces.
+     * @param offset initial position
+     * @return position after spaces
      */
-    private int readClass(final Permissions.NoJexlPackage njpackage, final boolean nojexl, final String outer, final String inner, final int offset) {
-        final StringBuilder temp = new StringBuilder();
-        Permissions.NoJexlClass njclass = null;
-        String njname = null;
-        String identifier = inner;
-        boolean deny = nojexl;
+    private int readSpaces(final int offset) {
         int i = offset;
-        int j = -1;
-        boolean isMethod = false;
-        while(i < size) {
+        while (i < size) {
             final char c = src.charAt(i);
-            // if no parsing progress can be made, we are in error
-            if (j >= i) {
-                throw new IllegalStateException(unexpected(c, i));
-            }
-            j = i;
-            // get rid of space
-            if (Character.isWhitespace(c)) {
-                i = readSpaces(i + 1);
-                continue;
-            }
-            // eol comment
-            if (c == '#') {
-                i = readEol(i + 1);
-                continue;
-            }
-            // end of class ?
-            if (njclass != null && c == '}') {
-                i += 1;
+            if (!Character.isWhitespace(c)) {
                 break;
-            }
-            // read an identifier, the class name
-            if (identifier == null) {
-                // negative or positive set ?
-                if (c == '-') {
-                    i += 1;
-                } else if (c == '+') {
-                    deny = false;
-                    i += 1;
-                }
-                final int next = readIdentifier(temp, i);
-                if (i != next) {
-                    identifier = temp.toString();
-                    temp.setLength(0);
-                    i = next;
-                    continue;
-                }
-            }
-            // parse a class:
-            if (njclass == null) {
-                // we must have read the class ('identifier {'...)
-                if (identifier == null || c != '{') {
-                    throw new IllegalStateException(unexpected(c, i));
-                }
-                // if we have a class, it has a name
-                njclass = deny ? new Permissions.NoJexlClass() : new Permissions.JexlClass();
-                njname = outer != null ? outer + "$" + identifier : identifier;
-                njpackage.addNoJexl(njname, njclass);
-                identifier = null;
-            } else if (identifier != null)  {
-                // class member mode
-                if (c == '{') {
-                    // inner class
-                    i = readClass(njpackage, deny, njname, identifier, i - 1);
-                    identifier = null;
-                    continue;
-                }
-                if (c == ';') {
-                    // field or method?
-                    if (isMethod) {
-                        njclass.methodNames.add(identifier);
-                        isMethod = false;
-                    } else {
-                        njclass.fieldNames.add(identifier);
-                    }
-                    identifier = null;
-                } else if (c == '(' && !isMethod) {
-                    // method; only one opening parenthesis allowed
-                    isMethod = true;
-                } else if (c != ')' || src.charAt(i - 1) != '(') {
-                    // closing parenthesis following opening one was expected
-                    throw new IllegalStateException(unexpected(c, i));
-                }
             }
             i += 1;
         }
-        // empty class means allow or deny all
-        if (njname != null && njclass.isEmpty()) {
-            njpackage.addNoJexl(njname, njclass instanceof Permissions.JexlClass
-                ? Permissions.JEXL_CLASS
-                : Permissions.NOJEXL_CLASS);
+        return offset;
+    }
 
-        }
-        return i;
+    /**
+     * Compose a parsing error message.
+     * @param c the offending character
+     * @param i the offset position
+     * @return the error message
+     */
+    private String unexpected(final char c, final int i) {
+        return "unexpected '" + c + "'" + "@" + i;
     }
 }
