@@ -36,10 +36,6 @@ public class ASTArrayAccess extends JexlLexicalNode {
     super(id);
   }
 
-  void setSafe(final long s) {
-    this.safe = s;
-  }
-
   public boolean isSafeChild(final int c) {
     return (safe & 1L << c) != 0;
   }
@@ -47,5 +43,9 @@ public class ASTArrayAccess extends JexlLexicalNode {
   @Override
   public Object jjtAccept(final ParserVisitor visitor, final Object data) {
     return visitor.visit(this, data);
+  }
+
+  void setSafe(final long s) {
+    this.safe = s;
   }
 }
