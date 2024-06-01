@@ -632,8 +632,9 @@ public abstract class JexlParser extends StringParser {
     /**
      * Default implementation does nothing but is overridden by generated code.
      * @param top whether the identifier is beginning an l/r value
-     * @throws ParseException subclasses may throw this
+     * @throws ParseException subclasses may throw ParseException
      */
+    @SuppressWarnings("unused") // subclasses may throw ParseException
     protected void Identifier(final boolean top) throws ParseException {
         // Overridden by generated code
     }
