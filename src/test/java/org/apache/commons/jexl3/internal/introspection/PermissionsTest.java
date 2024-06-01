@@ -160,8 +160,7 @@ public class PermissionsTest {
                 "A2 { } " +
                 "InterNoJexl5 { } " +
                 "} }";
-        final JexlPermissions p = JexlPermissions.parse(src);
-        return p;
+        return JexlPermissions.parse(src);
     }
 
     private void runTestPermissions(final JexlPermissions p) throws Exception {
