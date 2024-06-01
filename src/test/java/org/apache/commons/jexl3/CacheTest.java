@@ -247,7 +247,7 @@ public class CacheTest extends JexlTestCase {
     }
 
     public static class Cached2 extends Cached {
-        boolean flag = false;
+        boolean flag;
         protected String value;
 
         public Cached2() {
@@ -280,7 +280,7 @@ public class CacheTest extends JexlTestCase {
 
     public static class Cached3 extends java.util.TreeMap<String, Object> {
         private static final long serialVersionUID = 1L;
-        boolean flag = false;
+        boolean flag;
 
         public Cached3() {
             put("value", "Cached3:new");
@@ -510,7 +510,7 @@ public class CacheTest extends JexlTestCase {
         Object[] ca = {
             c0, c1, c2, c3, c4
         };
-        Object[] value = null;
+        Object[] value;
     }
 
     // LOOPS & THREADS
