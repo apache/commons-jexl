@@ -27,9 +27,6 @@ import org.apache.commons.jexl3.introspection.JexlMethod;
  * A JexlMethod that wraps a constructor.
  */
 public final class ConstructorMethod implements JexlMethod {
-    /** The wrapped constructor. */
-    private final Constructor<?> ctor;
-
     /**
      * Discovers a class constructor and wrap it as a JexlMethod.
      * @param is the introspector
@@ -54,12 +51,20 @@ public final class ConstructorMethod implements JexlMethod {
         }
         return null;
     }
+
+    /** The wrapped constructor. */
+    private final Constructor<?> ctor;
     /**
      * Creates a constructor method.
      * @param theCtor the constructor to wrap
      */
     ConstructorMethod(final Constructor<?> theCtor) {
         this.ctor = theCtor;
+    }
+
+    @Override
+    public Class<?> getReturnType() {
+        return ctor.getDeclaringClass();
     }
 
     @Override
@@ -77,6 +82,16 @@ public final class ConstructorMethod implements JexlMethod {
                 return ctor.newInstance(params);
             }
         throw new IntrospectionException("constructor resolution error");
+    }
+
+    @Override
+    public boolean isCacheable() {
+        return true;
+    }
+
+    @Override
+    public boolean tryFailed(final Object rval) {
+        return rval == Uberspect.TRY_FAILED;
     }
 
     @Override
@@ -104,21 +119,6 @@ public final class ConstructorMethod implements JexlMethod {
             }
         }
         return Uberspect.TRY_FAILED;
-    }
-
-    @Override
-    public boolean tryFailed(final Object rval) {
-        return rval == Uberspect.TRY_FAILED;
-    }
-
-    @Override
-    public boolean isCacheable() {
-        return true;
-    }
-
-    @Override
-    public Class<?> getReturnType() {
-        return ctor.getDeclaringClass();
     }
 
 }
