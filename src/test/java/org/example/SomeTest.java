@@ -89,7 +89,7 @@ public class SomeTest {
    */
   @Test
   public void testCustomFunctionPermissions() {
-      Map<String, Object> funcs = new HashMap<String, Object>();
+      Map<String, Object> funcs = new HashMap<>();
       funcs.put("math", new MyMath());
       JexlPermissions permissions = JexlPermissions.parse("org.example.*");
       JexlEngine jexl = new JexlBuilder().permissions(permissions).namespaces(funcs).create();
