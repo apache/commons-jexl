@@ -31,11 +31,6 @@ public final class ASTRegexLiteral extends JexlNode implements JexlNode.Constant
         super(id);
     }
 
-    @Override
-    public String toString() {
-        return literal != null ? literal.toString() : "";
-    }
-
     /**
      * Gets the literal value.
      * @return the Pattern literal
@@ -50,12 +45,17 @@ public final class ASTRegexLiteral extends JexlNode implements JexlNode.Constant
         return true;
     }
 
+    @Override
+    public Object jjtAccept(final ParserVisitor visitor, final Object data) {
+        return visitor.visit(this, data);
+    }
+
     void setLiteral(final String literal) {
         this.literal = Pattern.compile(literal);
     }
 
     @Override
-    public Object jjtAccept(final ParserVisitor visitor, final Object data) {
-        return visitor.visit(this, data);
+    public String toString() {
+        return literal != null ? literal.toString() : "";
     }
 }
