@@ -24,7 +24,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
@@ -120,7 +119,7 @@ public class Issues400Test {
     @Test
     public void test403() {
         // @formatter:off
-        final String[] strings = new String[]{
+        final String[] strings = {
             "  map1.`${item.a}` = 1;\n",
             "  map1[`${item.a}`] = 1;\n",
             "  map1[item.a] = 1;\n"
@@ -375,11 +374,10 @@ public class Issues400Test {
         assertTrue(result.get() >= now);
 
         // we still cant call anything else
-        try {
-            jexl.createScript("sns:gc()").execute(null);
-        } catch (final JexlException.Method method) {
-            assertEquals("gc", method.getMethod());
-        }
+        final JexlScript script = jexl.createScript("sns:gc()");
+        final JexlException.Method method = assertThrows(JexlException.Method.class, () -> script.execute(null));
+        assertEquals("gc", method.getMethod());
+
     }
 
     @Test
