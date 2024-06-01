@@ -958,31 +958,30 @@ public class Issues300Test {
     @Test
     public void test384b() {
         // be explicit about + handling null
+        // @formatter:off
         final JexlEngine jexl = new JexlBuilder()
                 .arithmetic(new Arithmetic384(true))
                 .safe(false)
                 .strict(true)
                 .create();
+        // @formatter:on
         // constant
-        for(final String src0 : Arrays.asList("'ABC' + null", "null + 'ABC'")) {
+        for (final String src0 : Arrays.asList("'ABC' + null", "null + 'ABC'")) {
             final JexlContext ctxt = new MapContext();
             final JexlScript s0 = jexl.createScript(src0);
             assertEquals("ABC", s0.execute(ctxt));
         }
         // null local a
-        for(final String src1 : Arrays.asList("'ABC' + a", "a + 'ABC'")) {
+        for (final String src1 : Arrays.asList("'ABC' + a", "a + 'ABC'")) {
             final JexlContext ctxt = new MapContext();
-            JexlScript s1 = jexl.createScript(src1, "a");
+            final JexlScript s1 = jexl.createScript(src1, "a");
             assertEquals("ABC", s1.execute(ctxt, (Object) null));
             // undefined a
-            s1 = jexl.createScript(src1);
-            try {
-                s1.execute(ctxt, (Object) null);
-                fail("null argument should throw");
-            } catch (final JexlException.Variable xvar) {
-                assertEquals("a", xvar.getVariable());
-                assertTrue(xvar.isUndefined());
-            }
+            final JexlScript s2 = jexl.createScript(src1);
+            final JexlException.Variable xvar = assertThrows(JexlException.Variable.class, () -> s2.execute(ctxt, (Object) null), "null argument should throw");
+            assertEquals("a", xvar.getVariable());
+            assertTrue(xvar.isUndefined());
+
             // null a
             ctxt.set("a", null);
             assertEquals("ABC", s1.execute(ctxt, (Object) null));
