@@ -17,11 +17,10 @@
 
 package org.apache.commons.jexl3.junit;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import org.apache.commons.jexl3.Foo;
 import org.apache.commons.jexl3.JexlTestCase;
-import org.junit.Assert;
 import org.junit.Test;
 
 /**
