@@ -164,9 +164,9 @@ public class AnnotationTest extends JexlTestCase {
         }
     }
 
-    public final static int NUM_THREADS = 10;
+    public static final int NUM_THREADS = 10;
 
-    public final static int NUM_ITERATIONS = 1000;
+    public static final int NUM_ITERATIONS = 1000;
 
     public AnnotationTest() {
         super("AnnotationTest");
