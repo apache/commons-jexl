@@ -114,7 +114,7 @@ public class PropertyAccessTest extends JexlTestCase {
      * Overloads propertySet.
      */
     public static class PropertyArithmetic extends JexlArithmetic {
-        int ncalls = 0;
+        int ncalls;
 
         public PropertyArithmetic(final boolean astrict) {
             super(astrict);
