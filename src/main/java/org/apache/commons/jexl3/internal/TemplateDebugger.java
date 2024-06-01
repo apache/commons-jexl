@@ -48,11 +48,20 @@ public class TemplateDebugger extends Debugger {
     }
 
     @Override
-    public void reset() {
-        super.reset();
-        // so we can use it more than one time
-        exprs = null;
-        script = null;
+    protected Object acceptStatement(final JexlNode child, final Object data) {
+        // if not really a template, must use super impl
+        if (exprs == null) {
+            return super.acceptStatement(child, data);
+        }
+        final TemplateExpression te = getPrintStatement(child);
+        if (te != null) {
+            // if statement is a jexl:print(...), may need to prepend '\n'
+            newJxltLine();
+            return visit(te, data);
+        }
+        // if statement is not a jexl:print(...), need to prepend '$$'
+        newJexlLine();
+        return super.acceptStatement(child, data);
     }
 
     /**
@@ -97,57 +106,6 @@ public class TemplateDebugger extends Debugger {
         }
         end = builder.length();
         return end > 0;
-    }
-
-    @Override
-    protected Object visit(final ASTBlock node, final Object data) {
-        // if not really a template, must use super impl
-        if (exprs == null) {
-            return super.visit(node, data);
-        }
-        // open the block
-        builder.append('{');
-        if (indent > 0) {
-            indentLevel += 1;
-            builder.append('\n');
-        } else {
-            builder.append(' ');
-        }
-        final int num = node.jjtGetNumChildren();
-        for (int i = 0; i < num; ++i) {
-            final JexlNode child = node.jjtGetChild(i);
-            acceptStatement(child, data);
-        }
-        // before we close this block node, $$ might be needed
-        newJexlLine();
-        if (indent > 0) {
-            indentLevel -= 1;
-            for (int i = 0; i < indentLevel; ++i) {
-                for(int s = 0; s < indent; ++s) {
-                    builder.append(' ');
-                }
-            }
-        }
-        builder.append('}');
-        // closed the block
-        return data;
-    }
-
-    @Override
-    protected Object acceptStatement(final JexlNode child, final Object data) {
-        // if not really a template, must use super impl
-        if (exprs == null) {
-            return super.acceptStatement(child, data);
-        }
-        final TemplateExpression te = getPrintStatement(child);
-        if (te != null) {
-            // if statement is a jexl:print(...), may need to prepend '\n'
-            newJxltLine();
-            return visit(te, data);
-        }
-        // if statement is not a jexl:print(...), need to prepend '$$'
-        newJexlLine();
-        return super.acceptStatement(child, data);
     }
 
     /**
@@ -219,6 +177,110 @@ public class TemplateDebugger extends Debugger {
         }
     }
 
+    @Override
+    public void reset() {
+        super.reset();
+        // so we can use it more than one time
+        exprs = null;
+        script = null;
+    }
+
+    @Override
+    protected Object visit(final ASTBlock node, final Object data) {
+        // if not really a template, must use super impl
+        if (exprs == null) {
+            return super.visit(node, data);
+        }
+        // open the block
+        builder.append('{');
+        if (indent > 0) {
+            indentLevel += 1;
+            builder.append('\n');
+        } else {
+            builder.append(' ');
+        }
+        final int num = node.jjtGetNumChildren();
+        for (int i = 0; i < num; ++i) {
+            final JexlNode child = node.jjtGetChild(i);
+            acceptStatement(child, data);
+        }
+        // before we close this block node, $$ might be needed
+        newJexlLine();
+        if (indent > 0) {
+            indentLevel -= 1;
+            for (int i = 0; i < indentLevel; ++i) {
+                for(int s = 0; s < indent; ++s) {
+                    builder.append(' ');
+                }
+            }
+        }
+        builder.append('}');
+        // closed the block
+        return data;
+    }
+
+    /**
+     * Visit a composite expression.
+     * @param expr the composite expression
+     * @param data the visitor argument
+     * @return the visitor argument
+     */
+    private Object visit(final CompositeExpression expr, final Object data) {
+        for (final TemplateExpression ce : expr.exprs) {
+            visit(ce, data);
+        }
+        return data;
+    }
+
+    /**
+     * Visit a constant expression.
+     * @param expr the constant expression
+     * @param data the visitor argument
+     * @return the visitor argument
+     */
+    private Object visit(final ConstantExpression expr, final Object data) {
+        expr.asString(builder);
+        return data;
+    }
+
+    /**
+     * Visit a deferred expression.
+     * @param expr the deferred expression
+     * @param data the visitor argument
+     * @return the visitor argument
+     */
+    private Object visit(final DeferredExpression expr, final Object data) {
+        builder.append(expr.isImmediate() ? '$' : '#');
+        builder.append('{');
+        super.accept(expr.node, data);
+        builder.append('}');
+        return data;
+    }
+
+    /**
+     * Visit an immediate expression.
+     * @param expr the immediate expression
+     * @param data the visitor argument
+     * @return the visitor argument
+     */
+    private Object visit(final ImmediateExpression expr, final Object data) {
+        builder.append(expr.isImmediate() ? '$' : '#');
+        builder.append('{');
+        super.accept(expr.node, data);
+        builder.append('}');
+        return data;
+    }
+
+    /**
+     * Visit a nested expression.
+     * @param expr the nested expression
+     * @param data the visitor argument
+     * @return the visitor argument
+     */
+    private Object visit(final NestedExpression expr, final Object data) {
+        super.accept(expr.node, data);
+        return data;
+    }
     /**
      * Visit a template expression.
      * @param expr the constant expression
@@ -247,68 +309,6 @@ public class TemplateDebugger extends Debugger {
                 r = null;
         }
         return r;
-    }
-
-    /**
-     * Visit a constant expression.
-     * @param expr the constant expression
-     * @param data the visitor argument
-     * @return the visitor argument
-     */
-    private Object visit(final ConstantExpression expr, final Object data) {
-        expr.asString(builder);
-        return data;
-    }
-
-    /**
-     * Visit an immediate expression.
-     * @param expr the immediate expression
-     * @param data the visitor argument
-     * @return the visitor argument
-     */
-    private Object visit(final ImmediateExpression expr, final Object data) {
-        builder.append(expr.isImmediate() ? '$' : '#');
-        builder.append('{');
-        super.accept(expr.node, data);
-        builder.append('}');
-        return data;
-    }
-
-    /**
-     * Visit a deferred expression.
-     * @param expr the deferred expression
-     * @param data the visitor argument
-     * @return the visitor argument
-     */
-    private Object visit(final DeferredExpression expr, final Object data) {
-        builder.append(expr.isImmediate() ? '$' : '#');
-        builder.append('{');
-        super.accept(expr.node, data);
-        builder.append('}');
-        return data;
-    }
-
-    /**
-     * Visit a nested expression.
-     * @param expr the nested expression
-     * @param data the visitor argument
-     * @return the visitor argument
-     */
-    private Object visit(final NestedExpression expr, final Object data) {
-        super.accept(expr.node, data);
-        return data;
-    }
-    /**
-     * Visit a composite expression.
-     * @param expr the composite expression
-     * @param data the visitor argument
-     * @return the visitor argument
-     */
-    private Object visit(final CompositeExpression expr, final Object data) {
-        for (final TemplateExpression ce : expr.exprs) {
-            visit(ce, data);
-        }
-        return data;
     }
 
 }
