@@ -901,34 +901,32 @@ public class Issues300Test {
         assertTrue(result instanceof LinkedHashMap);
         assertEquals(1, ((Map) result).size());
     }
-    @Test public void test383() {
+
+    @Test
+    public void test383() {
         final JexlEngine jexl = new JexlBuilder().safe(false).arithmetic(new Arithmetic383(true)).create();
-        final String src0 =  "if (a) 1; else 2;";
+        final String src0 = "if (a) 1; else 2;";
         final String src1 = "if (!a) 1; else 2;";
         // local var
-        JexlScript s0 = jexl.createScript(src0, "a");
-        JexlScript s1 = jexl.createScript(src1, "a");
+        final JexlScript s0 = jexl.createScript(src0, "a");
+        final JexlScript s1 = jexl.createScript(src1, "a");
         assertEquals(2, s0.execute(null, (Object) null));
         assertEquals(1, s1.execute(null, (Object) null));
         // global var undefined
-        s0 = jexl.createScript(src0);
-        s1 = jexl.createScript(src1);
-        try {
-            assertEquals(2, s0.execute(null, (Object) null));
-        } catch (final JexlException.Variable xvar) {
-            assertEquals("a", xvar.getVariable());
-        }
-        try {
-            assertEquals(1, s1.execute(null, (Object) null));
-        } catch (final JexlException.Variable xvar) {
-            assertEquals("a", xvar.getVariable());
-        }
+        final JexlScript s2 = jexl.createScript(src0);
+        final JexlScript s3 = jexl.createScript(src1);
+        JexlException.Variable xvar = assertThrows(JexlException.Variable.class, () -> s2.execute(null, (Object) null));
+        assertEquals("a", xvar.getVariable());
+        xvar = assertThrows(JexlException.Variable.class, () -> s3.execute(null, (Object) null));
+        assertEquals("a", xvar.getVariable());
+
         // global var null
         final MapContext ctxt = new MapContext();
         ctxt.set("a", null);
-        assertEquals(2, s0.execute(ctxt, (Object) null));
-        assertEquals(1, s1.execute(ctxt, (Object) null));
+        assertEquals(2, s2.execute(ctxt, (Object) null));
+        assertEquals(1, s3.execute(ctxt, (Object) null));
     }
+
     @Test
     public void test384a() {
         final JexlEngine jexl = new JexlBuilder()
