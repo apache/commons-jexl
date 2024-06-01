@@ -49,9 +49,30 @@ public class SoftCache<K, V> implements JexlCache<K, V> {
      */
     protected static final float LOAD_FACTOR = 0.75f;
     /**
+     * Creates a synchronized LinkedHashMap.
+     * @param capacity the map capacity
+     * @return the map instance
+     * @param <K> key type
+     * @param <V> value type
+     */
+    public static <K, V> Map<K, V> createSynchronizedLinkedHashMap(final int capacity) {
+        return Collections.synchronizedMap(new java.util.LinkedHashMap<K, V>(capacity, LOAD_FACTOR, true) {
+            /**
+             * Serial version UID.
+             */
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            protected boolean removeEldestEntry(final Map.Entry<K, V> eldest) {
+                return super.size() > capacity;
+            }
+        });
+    }
+    /**
      * The cache capacity.
      */
     protected final int capacity;
+
     /**
      * The soft reference to the cache map.
      */
@@ -78,16 +99,6 @@ public class SoftCache<K, V> implements JexlCache<K, V> {
      * {@inheritDoc}
      */
     @Override
-    public int size() {
-        final SoftReference<Map<K, V>> ref = reference;
-        final Map<K, V> map = ref != null ? ref.get() : null;
-        return map != null ? map.size() : 0;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public void clear() {
         final SoftReference<Map<K, V>> ref = reference;
         if (ref != null ) {
@@ -97,6 +108,28 @@ public class SoftCache<K, V> implements JexlCache<K, V> {
                 map.clear();
             }
         }
+    }
+
+    /**
+     * Creates a cache store.
+     *
+     * @param <KT> the key type
+     * @param <VT> the value type
+     * @param cacheSize the cache size, must be &gt; 0
+     * @return a Map usable as a cache bounded to the given size
+     */
+    protected <KT, VT> Map<KT, VT> createMap(final int cacheSize) {
+        return createSynchronizedLinkedHashMap(cacheSize);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Collection<Map.Entry<K, V>> entries() {
+        final SoftReference<Map<K, V>> ref = reference;
+        final Map<K, V> map = ref != null ? ref.get() : null;
+        return map == null? Collections.emptyList() : map.entrySet();
     }
 
     /**
@@ -133,43 +166,10 @@ public class SoftCache<K, V> implements JexlCache<K, V> {
      * {@inheritDoc}
      */
     @Override
-    public Collection<Map.Entry<K, V>> entries() {
+    public int size() {
         final SoftReference<Map<K, V>> ref = reference;
         final Map<K, V> map = ref != null ? ref.get() : null;
-        return map == null? Collections.emptyList() : map.entrySet();
-    }
-
-    /**
-     * Creates a cache store.
-     *
-     * @param <KT> the key type
-     * @param <VT> the value type
-     * @param cacheSize the cache size, must be &gt; 0
-     * @return a Map usable as a cache bounded to the given size
-     */
-    protected <KT, VT> Map<KT, VT> createMap(final int cacheSize) {
-        return createSynchronizedLinkedHashMap(cacheSize);
-    }
-
-    /**
-     * Creates a synchronized LinkedHashMap.
-     * @param capacity the map capacity
-     * @return the map instance
-     * @param <K> key type
-     * @param <V> value type
-     */
-    public static <K, V> Map<K, V> createSynchronizedLinkedHashMap(final int capacity) {
-        return Collections.synchronizedMap(new java.util.LinkedHashMap<K, V>(capacity, LOAD_FACTOR, true) {
-            /**
-             * Serial version UID.
-             */
-            private static final long serialVersionUID = 1L;
-
-            @Override
-            protected boolean removeEldestEntry(final Map.Entry<K, V> eldest) {
-                return super.size() > capacity;
-            }
-        });
+        return map != null ? map.size() : 0;
     }
 }
 
