@@ -61,8 +61,6 @@ public class ParserTest {
             fail("should have failed on ambiguous statement");
         } catch (final JexlException.Ambiguous xambiguous) {
             // ok
-        } catch (final JexlException xother) {
-            fail(xother.toString());
         }
     }
 
