@@ -731,32 +731,22 @@ public class Issues300Test {
     public void test347() {
         final String src = "A.B == 5";
         JexlEngine jexl = new JexlBuilder().safe(true).create();
-        JexlScript script = jexl.createScript(src);
+        final JexlScript script = jexl.createScript(src);
         Object result = script.execute(null);
         // safe navigation is lenient wrt null
         assertFalse((Boolean) result);
 
         jexl = new JexlBuilder().strict(true).safe(false).create();
         final JexlContext ctxt = new MapContext();
-        script = jexl.createScript(src);
+        final JexlScript script1 = jexl.createScript(src);
         // A and A.B undefined
-        try {
-            result = script.execute(ctxt);
-            fail("should only succeed with safe navigation");
-        } catch (final JexlException xany) {
-            assertNotNull(xany);
-        }
+        assertThrows(JexlException.class, () -> script1.execute(ctxt));
         // A is null, A.B is undefined
         ctxt.set("A", null);
-        try {
-            result = script.execute(ctxt);
-            fail("should only succeed with safe navigation");
-        } catch (final JexlException xany) {
-            assertNotNull(xany);
-        }
+        assertThrows(JexlException.class, () -> script1.execute(ctxt), "should only succeed with safe navigation");
         // A.B is null
         ctxt.set("A.B", null);
-        result = script.execute(ctxt);
+        result = script1.execute(ctxt);
         assertFalse((Boolean) result);
     }
 
