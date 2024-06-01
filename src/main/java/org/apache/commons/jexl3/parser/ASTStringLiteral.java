@@ -27,11 +27,6 @@ public final class ASTStringLiteral extends JexlNode implements JexlNode.Constan
         super(id);
     }
 
-    @Override
-    public String toString() {
-        return this.literal;
-    }
-
     /**
      * Gets the literal value.
      * @return the string literal
@@ -46,12 +41,17 @@ public final class ASTStringLiteral extends JexlNode implements JexlNode.Constan
         return true;
     }
 
+    @Override
+    public Object jjtAccept(final ParserVisitor visitor, final Object data) {
+        return visitor.visit(this, data);
+    }
+
     void setLiteral(final String literal) {
         this.literal = literal;
     }
 
     @Override
-    public Object jjtAccept(final ParserVisitor visitor, final Object data) {
-        return visitor.visit(this, data);
+    public String toString() {
+        return this.literal;
     }
 }
