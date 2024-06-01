@@ -90,6 +90,9 @@ public class JexlBuilder {
      */
     private static JexlPermissions PERMISSIONS = JexlPermissions.RESTRICTED;
 
+    /** The default maximum expression length to hit the expression cache. */
+    protected static final int CACHE_THRESHOLD = 64;
+
     /**
      * Sets the default permissions.
      * @param permissions the permissions
@@ -97,9 +100,6 @@ public class JexlBuilder {
     public static void setDefaultPermissions(final JexlPermissions permissions) {
         PERMISSIONS = permissions == null ? JexlPermissions.RESTRICTED : permissions;
     }
-
-    /** The default maximum expression length to hit the expression cache. */
-    protected static final int CACHE_THRESHOLD = 64;
 
     /** The JexlUberspect instance. */
     private JexlUberspect uberspect;
@@ -181,58 +181,25 @@ public class JexlBuilder {
         this.permissions = PERMISSIONS;
     }
 
-    /**
-     * Sets the JexlUberspect instance the engine will use.
-     *
-     * @param u the uberspect
-     * @return this builder
-     */
-    public JexlBuilder uberspect(final JexlUberspect u) {
-        this.uberspect = u;
-        return this;
-    }
-
-    /** @return the uberspect */
-    public JexlUberspect uberspect() {
-        return this.uberspect;
+    /** @return whether antish resolution is enabled */
+    public boolean antish() {
+        return options.isAntish();
     }
 
     /**
-     * Sets the JexlPermissions instance the engine will use.
-     *
-     * @param p the permissions
-     * @return this builder
-     */
-    public JexlBuilder permissions(final JexlPermissions p) {
-        this.permissions = p;
-        return this;
-    }
+         * Sets whether the engine will resolve antish variable names.
+         *
+         * @param flag true means antish resolution is enabled, false disables it
+         * @return this builder
+         */
+        public JexlBuilder antish(final boolean flag) {
+            options.setAntish(flag);
+            return this;
+        }
 
-    /** @return the permissions */
-    public JexlPermissions permissions() {
-        return this.permissions;
-    }
-
-    /**
-     * Sets the JexlUberspect strategy the engine will use.
-     * <p>This is ignored if the uberspect has been set.
-     *
-     * @param rs the strategy
-     * @return this builder
-     */
-    public JexlBuilder strategy(final JexlUberspect.ResolverStrategy rs) {
-        this.strategy = rs;
-        return this;
-    }
-
-    /** @return the JexlUberspect strategy */
-    public JexlUberspect.ResolverStrategy strategy() {
-        return this.strategy;
-    }
-
-    /** @return the current set of options */
-    public JexlOptions options() {
-        return options;
+    /** @return the arithmetic */
+    public JexlArithmetic arithmetic() {
+        return this.arithmetic;
     }
 
     /**
@@ -249,25 +216,170 @@ public class JexlBuilder {
         return this;
     }
 
-    /** @return the arithmetic */
-    public JexlArithmetic arithmetic() {
-        return this.arithmetic;
+    /**
+     * @return the cache size
+     */
+    public int cache() {
+      return cache;
     }
 
     /**
-     * Sets the sandbox the engine will use.
+     * Sets the expression cache size the engine will use.
+     * <p>The cache will contain at most <code>size</code> expressions of at most <code>cacheThreshold</code> length.
+     * Note that all JEXL caches are held through SoftReferences and may be garbage-collected.</p>
      *
-     * @param box the sandbox
+     * @param size if not strictly positive, no cache is used.
      * @return this builder
      */
-    public JexlBuilder sandbox(final JexlSandbox box) {
-        this.sandbox = box;
+    public JexlBuilder cache(final int size) {
+        this.cache = size;
         return this;
     }
 
-    /** @return the sandbox */
-    public JexlSandbox sandbox() {
-        return this.sandbox;
+    /**
+     * @return the cache factory
+     */
+    public IntFunction<JexlCache<?, ?>> cacheFactory() {
+      return this.cacheFactory;
+    }
+
+    /**
+     * Sets the expression cache size the engine will use.
+     *
+     * @param factory the function to produce a cache.
+     * @return this builder
+     */
+    public JexlBuilder cacheFactory(final IntFunction<JexlCache<?, ?>> factory) {
+      this.cacheFactory = factory;
+      return this;
+    }
+
+    /**
+     * @return the cache threshold
+     */
+    public int cacheThreshold() {
+        return cacheThreshold;
+    }
+
+    /**
+     * Sets the maximum length for an expression to be cached.
+     * <p>Expression whose length is greater than this expression cache length threshold will
+     * bypass the cache.</p>
+     * <p>It is expected that a "long" script will be parsed once and its reference kept
+     * around in user-space structures; the jexl expression cache has no added-value in this case.</p>
+     *
+     * @param length if not strictly positive, the value is silently replaced by the default value (64).
+     * @return this builder
+     */
+    public JexlBuilder cacheThreshold(final int length) {
+        this.cacheThreshold = length > 0? length : CACHE_THRESHOLD;
+        return this;
+    }
+
+    /**
+     * @return the cancellable information flag
+     * @since 3.1
+     */
+    public Boolean cancellable() {
+        return this.cancellable;
+    }
+
+    /**
+     * Sets the engine behavior upon interruption: throw an JexlException.Cancel or terminates the current evaluation
+     * and return null.
+     *
+     * @param flag true implies the engine throws the exception, false makes the engine return null.
+     * @return this builder
+     * @since 3.1
+     */
+    public JexlBuilder cancellable(final boolean flag) {
+        this.cancellable = flag;
+        options.setCancellable(flag);
+        return this;
+    }
+
+    /** @return the charset */
+    public Charset charset() {
+        return charset;
+    }
+
+    /**
+     * Sets the charset to use.
+     *
+     * @param arg the charset
+     * @return this builder
+     * @since 3.1
+     */
+    public JexlBuilder charset(final Charset arg) {
+        this.charset = arg;
+        return this;
+    }
+
+    /**
+     * @return true if variable collection follows strict syntactic rule
+     * @since 3.2
+     */
+    public boolean collectAll() {
+        return this.collectMode != 0;
+    }
+
+    /**
+     * Sets whether the engine variable collectors considers all potential forms of variable syntaxes.
+     *
+     * @param flag true means var collections considers constant array accesses equivalent to dotted references
+     * @return this builder
+     * @since 3.2
+     */
+    public JexlBuilder collectAll(final boolean flag) {
+        return collectMode(flag? 1 : 0);
+    }
+
+    /**
+     * @return 0 if variable collection follows strict syntactic rule
+     * @since 3.2
+     */
+    public int collectMode() {
+        return this.collectMode;
+    }
+
+    /**
+     * Experimental collector mode setter.
+     *
+     * @param mode 0 or 1 as equivalents to false and true, other values are experimental
+     * @return this builder
+     * @since 3.2
+     */
+    public JexlBuilder collectMode(final int mode) {
+        this.collectMode = mode;
+        return this;
+    }
+
+    /**
+     * @return a {@link JexlEngine} instance
+     */
+    public JexlEngine create() {
+        return new Engine(this);
+    }
+
+    /** @return the debugging information flag */
+    public Boolean debug() {
+        return this.debug;
+    }
+
+   /**
+ * Sets whether the engine will report debugging information when error occurs.
+ *
+ * @param flag true implies debug is on, false implies debug is off.
+ * @return this builder
+ */
+public JexlBuilder debug(final boolean flag) {
+    this.debug = flag;
+    return this;
+}
+
+    /** @return the features */
+    public JexlFeatures features() {
+        return this.features;
     }
 
     /**
@@ -292,35 +404,64 @@ public class JexlBuilder {
         return this;
     }
 
-    /** @return the features */
-    public JexlFeatures features() {
-        return this.features;
+    /**
+     * Gets the optional set of imported packages.
+     * @return the set of imports, may be empty, not null
+     */
+    public Collection<String> imports() {
+        return options.getImports();
     }
 
     /**
-     * Sets the o.a.c.Log instance to use.
-     *
-     * @param log the logger
+     * Sets the optional set of imports.
+     * @param imports the imported packages
      * @return this builder
      */
-    public JexlBuilder logger(final Log log) {
-        this.logger = log;
+    public JexlBuilder imports(final Collection<String> imports) {
+        options.setImports(imports);
         return this;
     }
 
-    /** @return the logger */
-    public Log logger() {
-        return this.logger;
+    /**
+     * Sets the optional set of imports.
+     * @param imports the imported packages
+     * @return this builder
+     */
+    public JexlBuilder imports(final String... imports) {
+        return imports(Arrays.asList(imports));
+    }
+
+    /** @return whether lexical scope is enabled */
+    public boolean lexical() {
+        return options.isLexical();
     }
 
     /**
-     * Sets the class loader to use.
+     * Sets whether the engine is in lexical mode.
      *
-     * @param l the class loader
+     * @param flag true means lexical function scope is in effect, false implies non-lexical scoping
      * @return this builder
+     * @since 3.2
      */
-    public JexlBuilder loader(final ClassLoader l) {
-        this.loader = l;
+    public JexlBuilder lexical(final boolean flag) {
+        options.setLexical(flag);
+        return this;
+    }
+
+    /** @return whether lexical shading is enabled */
+    public boolean lexicalShade() {
+        return options.isLexicalShade();
+    }
+
+    /**
+     * Sets whether the engine is in lexical shading mode.
+     *
+     * @param flag true means lexical shading is in effect, false implies no lexical shading
+     * @return this builder
+     * @since 3.2
+     */
+    public JexlBuilder lexicalShade(final boolean flag) {
+        options.setLexicalShade(flag);
         return this;
     }
 
@@ -342,205 +483,37 @@ public class JexlBuilder {
     }
 
     /**
-     * Sets the charset to use.
+     * Sets the class loader to use.
      *
-     * @param arg the charset
+     * @param l the class loader
      * @return this builder
-     * @since 3.1
      */
-    public JexlBuilder charset(final Charset arg) {
-        this.charset = arg;
+    public JexlBuilder loader(final ClassLoader l) {
+        this.loader = l;
         return this;
     }
 
-    /** @return the charset */
-    public Charset charset() {
-        return charset;
-    }
-
-   /**
-     * Sets whether the engine will resolve antish variable names.
-     *
-     * @param flag true means antish resolution is enabled, false disables it
-     * @return this builder
-     */
-    public JexlBuilder antish(final boolean flag) {
-        options.setAntish(flag);
-        return this;
-    }
-
-    /** @return whether antish resolution is enabled */
-    public boolean antish() {
-        return options.isAntish();
+    /** @return the logger */
+    public Log logger() {
+        return this.logger;
     }
 
     /**
-     * Sets whether the engine is in lexical mode.
+     * Sets the o.a.c.Log instance to use.
      *
-     * @param flag true means lexical function scope is in effect, false implies non-lexical scoping
-     * @return this builder
-     * @since 3.2
-     */
-    public JexlBuilder lexical(final boolean flag) {
-        options.setLexical(flag);
-        return this;
-    }
-
-    /** @return whether lexical scope is enabled */
-    public boolean lexical() {
-        return options.isLexical();
-    }
-
-    /**
-     * Sets whether the engine is in lexical shading mode.
-     *
-     * @param flag true means lexical shading is in effect, false implies no lexical shading
-     * @return this builder
-     * @since 3.2
-     */
-    public JexlBuilder lexicalShade(final boolean flag) {
-        options.setLexicalShade(flag);
-        return this;
-    }
-
-    /** @return whether lexical shading is enabled */
-    public boolean lexicalShade() {
-        return options.isLexicalShade();
-    }
-
-    /**
-     * Sets whether the engine will throw JexlException during evaluation when an error is triggered.
-     * <p>When <em>not</em> silent, the engine throws an exception when the evaluation triggers an exception or an
-     * error.</p>
-     * <p>It is recommended to use <em>silent(true)</em> as an explicit default.</p>
-     * @param flag true means no JexlException will occur, false allows them
+     * @param log the logger
      * @return this builder
      */
-    public JexlBuilder silent(final boolean flag) {
-        options.setSilent(flag);
-        return this;
-    }
-
-    /** @return the silent error handling flag */
-    public Boolean silent() {
-        return options.isSilent();
-    }
-
-    /**
-     * Sets whether the engine considers unknown variables, methods, functions and constructors as errors or
-     * evaluates them as null.
-     * <p>When <em>not</em> strict, operators or functions using null operands return null on evaluation. When
-     * strict, those raise exceptions.</p>
-     * <p>It is recommended to use <em>strict(true)</em> as an explicit default.</p>
-     *
-     * @param flag true means strict error reporting, false allows them to be evaluated as null
-     * @return this builder
-     */
-    public JexlBuilder strict(final boolean flag) {
-        options.setStrict(flag);
-        return this;
-    }
-
-    /** @return true if strict, false otherwise */
-    public Boolean strict() {
-        return options.isStrict();
-    }
-
-    /**
-     * Sets whether the engine considers dereferencing null in navigation expressions
-     * as null or triggers an error.
-     * <p><code>x.y()</code> if x is null throws an exception when not safe,
-     * return null and warns if it is.</p>
-     * <p>It is recommended to use <em>safe(false)</em> as an explicit default.</p>
-     *
-     * @param flag true means safe navigation, false throws exception when dereferencing null
-     * @return this builder
-     */
-    public JexlBuilder safe(final boolean flag) {
-        options.setSafe(flag);
-        return this;
-    }
-
-    /** @return true if safe, false otherwise */
-    public Boolean safe() {
-        return options.isSafe();
-    }
-
-    /**
-     * Sets whether the engine will report debugging information when error occurs.
-     *
-     * @param flag true implies debug is on, false implies debug is off.
-     * @return this builder
-     */
-    public JexlBuilder debug(final boolean flag) {
-        this.debug = flag;
-        return this;
-    }
-
-    /** @return the debugging information flag */
-    public Boolean debug() {
-        return this.debug;
-    }
-
-    /**
-     * Sets the engine behavior upon interruption: throw an JexlException.Cancel or terminates the current evaluation
-     * and return null.
-     *
-     * @param flag true implies the engine throws the exception, false makes the engine return null.
-     * @return this builder
-     * @since 3.1
-     */
-    public JexlBuilder cancellable(final boolean flag) {
-        this.cancellable = flag;
-        options.setCancellable(flag);
+    public JexlBuilder logger(final Log log) {
+        this.logger = log;
         return this;
     }
 
     /**
-     * @return the cancellable information flag
-     * @since 3.1
+     * @return the map of namespaces.
      */
-    public Boolean cancellable() {
-        return this.cancellable;
-    }
-
-    /**
-     * Sets whether the engine variable collectors considers all potential forms of variable syntaxes.
-     *
-     * @param flag true means var collections considers constant array accesses equivalent to dotted references
-     * @return this builder
-     * @since 3.2
-     */
-    public JexlBuilder collectAll(final boolean flag) {
-        return collectMode(flag? 1 : 0);
-    }
-
-    /**
-     * Experimental collector mode setter.
-     *
-     * @param mode 0 or 1 as equivalents to false and true, other values are experimental
-     * @return this builder
-     * @since 3.2
-     */
-    public JexlBuilder collectMode(final int mode) {
-        this.collectMode = mode;
-        return this;
-    }
-
-    /**
-     * @return true if variable collection follows strict syntactic rule
-     * @since 3.2
-     */
-    public boolean collectAll() {
-        return this.collectMode != 0;
-    }
-
-    /**
-     * @return 0 if variable collection follows strict syntactic rule
-     * @since 3.2
-     */
-    public int collectMode() {
-        return this.collectMode;
+    public Map<String, Object> namespaces() {
+        return options.getNamespaces();
     }
 
     /**
@@ -573,98 +546,86 @@ public class JexlBuilder {
         return this;
     }
 
-    /**
-     * @return the map of namespaces.
-     */
-    public Map<String, Object> namespaces() {
-        return options.getNamespaces();
+    /** @return the current set of options */
+    public JexlOptions options() {
+        return options;
+    }
+
+    /** @return the permissions */
+    public JexlPermissions permissions() {
+        return this.permissions;
     }
 
     /**
-     * Gets the optional set of imported packages.
-     * @return the set of imports, may be empty, not null
-     */
-    public Collection<String> imports() {
-        return options.getImports();
-    }
-
-    /**
-     * Sets the optional set of imports.
-     * @param imports the imported packages
+     * Sets the JexlPermissions instance the engine will use.
+     *
+     * @param p the permissions
      * @return this builder
      */
-    public JexlBuilder imports(final Collection<String> imports) {
-        options.setImports(imports);
+    public JexlBuilder permissions(final JexlPermissions p) {
+        this.permissions = p;
         return this;
     }
 
-    /**
-     * Sets the optional set of imports.
-     * @param imports the imported packages
-     * @return this builder
-     */
-    public JexlBuilder imports(final String... imports) {
-        return imports(Arrays.asList(imports));
+    /** @return true if safe, false otherwise */
+    public Boolean safe() {
+        return options.isSafe();
     }
 
     /**
-     * Sets the expression cache size the engine will use.
-     * <p>The cache will contain at most <code>size</code> expressions of at most <code>cacheThreshold</code> length.
-     * Note that all JEXL caches are held through SoftReferences and may be garbage-collected.</p>
+     * Sets whether the engine considers dereferencing null in navigation expressions
+     * as null or triggers an error.
+     * <p><code>x.y()</code> if x is null throws an exception when not safe,
+     * return null and warns if it is.</p>
+     * <p>It is recommended to use <em>safe(false)</em> as an explicit default.</p>
      *
-     * @param size if not strictly positive, no cache is used.
+     * @param flag true means safe navigation, false throws exception when dereferencing null
      * @return this builder
      */
-    public JexlBuilder cache(final int size) {
-        this.cache = size;
+    public JexlBuilder safe(final boolean flag) {
+        options.setSafe(flag);
         return this;
     }
 
+    /** @return the sandbox */
+    public JexlSandbox sandbox() {
+        return this.sandbox;
+    }
+
     /**
-     * Sets the expression cache size the engine will use.
+     * Sets the sandbox the engine will use.
      *
-     * @param factory the function to produce a cache.
+     * @param box the sandbox
      * @return this builder
      */
-    public JexlBuilder cacheFactory(final IntFunction<JexlCache<?, ?>> factory) {
-      this.cacheFactory = factory;
-      return this;
+    public JexlBuilder sandbox(final JexlSandbox box) {
+        this.sandbox = box;
+        return this;
+    }
+
+    /** @return the silent error handling flag */
+    public Boolean silent() {
+        return options.isSilent();
+    }
+
+    /**
+     * Sets whether the engine will throw JexlException during evaluation when an error is triggered.
+     * <p>When <em>not</em> silent, the engine throws an exception when the evaluation triggers an exception or an
+     * error.</p>
+     * <p>It is recommended to use <em>silent(true)</em> as an explicit default.</p>
+     * @param flag true means no JexlException will occur, false allows them
+     * @return this builder
+     */
+    public JexlBuilder silent(final boolean flag) {
+        options.setSilent(flag);
+        return this;
     }
 
     /**
      * @return the cache size
      */
-    public int cache() {
-      return cache;
-    }
-
-    /**
-     * @return the cache factory
-     */
-    public IntFunction<JexlCache<?, ?>> cacheFactory() {
-      return this.cacheFactory;
-    }
-
-    /**
-     * Sets the maximum length for an expression to be cached.
-     * <p>Expression whose length is greater than this expression cache length threshold will
-     * bypass the cache.</p>
-     * <p>It is expected that a "long" script will be parsed once and its reference kept
-     * around in user-space structures; the jexl expression cache has no added-value in this case.</p>
-     *
-     * @param length if not strictly positive, the value is silently replaced by the default value (64).
-     * @return this builder
-     */
-    public JexlBuilder cacheThreshold(final int length) {
-        this.cacheThreshold = length > 0? length : CACHE_THRESHOLD;
-        return this;
-    }
-
-    /**
-     * @return the cache threshold
-     */
-    public int cacheThreshold() {
-        return cacheThreshold;
+    public int stackOverflow() {
+        return stackOverflow;
     }
 
     /**
@@ -677,17 +638,56 @@ public class JexlBuilder {
         return this;
     }
 
-    /**
-     * @return the cache size
-     */
-    public int stackOverflow() {
-        return stackOverflow;
+    /** @return the JexlUberspect strategy */
+    public JexlUberspect.ResolverStrategy strategy() {
+        return this.strategy;
     }
 
     /**
-     * @return a {@link JexlEngine} instance
+     * Sets the JexlUberspect strategy the engine will use.
+     * <p>This is ignored if the uberspect has been set.
+     *
+     * @param rs the strategy
+     * @return this builder
      */
-    public JexlEngine create() {
-        return new Engine(this);
+    public JexlBuilder strategy(final JexlUberspect.ResolverStrategy rs) {
+        this.strategy = rs;
+        return this;
+    }
+
+    /** @return true if strict, false otherwise */
+    public Boolean strict() {
+        return options.isStrict();
+    }
+
+    /**
+     * Sets whether the engine considers unknown variables, methods, functions and constructors as errors or
+     * evaluates them as null.
+     * <p>When <em>not</em> strict, operators or functions using null operands return null on evaluation. When
+     * strict, those raise exceptions.</p>
+     * <p>It is recommended to use <em>strict(true)</em> as an explicit default.</p>
+     *
+     * @param flag true means strict error reporting, false allows them to be evaluated as null
+     * @return this builder
+     */
+    public JexlBuilder strict(final boolean flag) {
+        options.setStrict(flag);
+        return this;
+    }
+
+    /** @return the uberspect */
+    public JexlUberspect uberspect() {
+        return this.uberspect;
+    }
+
+    /**
+     * Sets the JexlUberspect instance the engine will use.
+     *
+     * @param u the uberspect
+     * @return this builder
+     */
+    public JexlBuilder uberspect(final JexlUberspect u) {
+        this.uberspect = u;
+        return this;
     }
 }
