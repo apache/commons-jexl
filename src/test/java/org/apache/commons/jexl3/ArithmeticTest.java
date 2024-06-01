@@ -495,7 +495,7 @@ public class ArithmeticTest extends JexlTestCase {
     /** A small delta to compare doubles. */
     private static final double EPSILON = 1.e-6;
 
-    static private void assertArithmeticException(final java.util.function.Supplier<Object> fun) {
+    private static void assertArithmeticException(final java.util.function.Supplier<Object> fun) {
         try {
             Assert.assertNull(fun.get());
         } catch (final ArithmeticException xany) {
@@ -503,7 +503,7 @@ public class ArithmeticTest extends JexlTestCase {
         }
     }
 
-    static private void assertNullOperand(final java.util.function.Supplier<Object> fun) {
+    private static void assertNullOperand(final java.util.function.Supplier<Object> fun) {
         try {
             Assert.assertNull(fun.get());
         } catch (final JexlArithmetic.NullOperand xany) {
