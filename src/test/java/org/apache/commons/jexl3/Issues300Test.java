@@ -929,49 +929,30 @@ public class Issues300Test {
 
     @Test
     public void test384a() {
-        final JexlEngine jexl = new JexlBuilder()
-                .safe(false)
-                .strict(true)
-                .create();
+        final JexlEngine jexl = new JexlBuilder().safe(false).strict(true).create();
         // constant
-        for(final String src0 : Arrays.asList("'ABC' + null", "null + 'ABC'")) {
+        for (final String src0 : Arrays.asList("'ABC' + null", "null + 'ABC'")) {
             final JexlContext ctxt = new MapContext();
             final JexlScript s0 = jexl.createScript(src0);
-            try {
-                s0.execute(ctxt, (Object) null);
-                fail("null argument should throw");
-            } catch (final JexlException xvar) {
-                assertTrue(xvar.toString().contains("+"));
-            }
+            final JexlException xvar = assertThrows(JexlException.class, () -> s0.execute(ctxt, (Object) null), "null argument should throw");
+            assertTrue(xvar.toString().contains("+"));
         }
         // null local a
-        for(final String src1 : Arrays.asList("'ABC' + a", "a + 'ABC'")) {
+        for (final String src1 : Arrays.asList("'ABC' + a", "a + 'ABC'")) {
             final JexlContext ctxt = new MapContext();
-            JexlScript s1 = jexl.createScript(src1, "a");
-            try {
-                s1.execute(ctxt, (Object) null);
-                fail("null argument should throw");
-            } catch (final JexlException.Variable xvar) {
-                assertEquals("a", xvar.getVariable());
-            }
+            final JexlScript s1 = jexl.createScript(src1, "a");
+            JexlException.Variable xvar = assertThrows(JexlException.Variable.class, () -> s1.execute(ctxt, (Object) null), "null argument should throw");
+            assertEquals("a", xvar.getVariable());
             // undefined a
-            s1 = jexl.createScript(src1);
-            try {
-                s1.execute(ctxt, (Object) null);
-                fail("null argument should throw");
-            } catch (final JexlException.Variable xvar) {
-                assertEquals("a", xvar.getVariable());
-                assertTrue(xvar.isUndefined());
-            }
+            final JexlScript s2 = jexl.createScript(src1);
+            xvar = assertThrows(JexlException.Variable.class, () -> s2.execute(ctxt, (Object) null), "null argument should throw");
+            assertEquals("a", xvar.getVariable());
+            assertTrue(xvar.isUndefined());
             // null a
             ctxt.set("a", null);
-            try {
-                s1.execute(ctxt, (Object) null);
-                fail("null argument should throw");
-            } catch (final JexlException.Variable xvar) {
-                assertEquals("a", xvar.getVariable());
-                assertFalse(xvar.isUndefined());
-            }
+            xvar = assertThrows(JexlException.Variable.class, () -> s2.execute(ctxt, (Object) null), "null argument should throw");
+            assertEquals("a", xvar.getVariable());
+            assertFalse(xvar.isUndefined());
         }
     }
     @Test
