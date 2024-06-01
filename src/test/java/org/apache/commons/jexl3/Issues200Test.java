@@ -16,7 +16,11 @@
  */
 package org.apache.commons.jexl3;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.StringReader;
 import java.util.ArrayList;
@@ -37,7 +41,6 @@ import java.util.concurrent.Executors;
 import org.apache.commons.jexl3.internal.TemplateDebugger;
 import org.apache.commons.jexl3.introspection.JexlSandbox;
 import org.apache.commons.logging.Log;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
