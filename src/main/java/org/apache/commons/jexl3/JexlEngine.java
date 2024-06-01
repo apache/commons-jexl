@@ -46,130 +46,6 @@ import org.apache.commons.jexl3.introspection.JexlUberspect;
  */
 public abstract class JexlEngine {
 
-    /** A marker singleton for invocation failures in tryInvoke. */
-    public static final Object TRY_FAILED = new FailObject();
-
-    /** The failure marker class. */
-    private static final class FailObject {
-        /**
-         * Default ctor.
-         */
-        FailObject() {}
-
-        @Override
-        public String toString() {
-            return "tryExecute failed";
-        }
-    }
-
-    /**
-     * The thread local context.
-     */
-    protected static final java.lang.ThreadLocal<JexlContext.ThreadLocal> CONTEXT =
-                       new java.lang.ThreadLocal<>();
-
-    /**
-     * Accesses the current thread local context.
-     *
-     * @return the context or null
-     */
-    public static JexlContext.ThreadLocal getThreadContext() {
-        return CONTEXT.get();
-    }
-
-    /**
-     * The thread local engine.
-     */
-    protected static final java.lang.ThreadLocal<JexlEngine> ENGINE =
-                       new java.lang.ThreadLocal<>();
-
-    /**
-     * Accesses the current thread local engine.
-     * <p>Advanced: you should only use this to retrieve the engine within a method/ctor called through the evaluation
-     * of a script/expression.</p>
-     * @return the engine or null
-     */
-    public static JexlEngine getThreadEngine() {
-        return ENGINE.get();
-    }
-
-    /**
-     * Sets the current thread local context.
-     * <p>This should only be used carefully, for instance when re-evaluating a "stored" script that requires a
-     * given Namespace resolver. Remember to synchronize access if context is shared between threads.
-     *
-     * @param tls the thread local context to set
-     */
-    public static void setThreadContext(final JexlContext.ThreadLocal tls) {
-        CONTEXT.set(tls);
-    }
-
-    /**
-     * Script evaluation options.
-     * <p>The JexlContext used for evaluation can implement this interface to alter behavior.</p>
-     * @deprecated 3.2
-     */
-    @Deprecated
-    public interface Options {
-
-        /**
-         * The charset used for parsing.
-         *
-         * @return the charset
-         */
-        Charset getCharset();
-        /**
-         * Sets whether the engine will throw a {@link JexlException} when an error is encountered during evaluation.
-         *
-         * @return true if silent, false otherwise
-         */
-        Boolean isSilent();
-
-        /**
-         * Checks whether the engine considers unknown variables, methods, functions and constructors as errors or
-         * evaluates them as null.
-         *
-         * @return true if strict, false otherwise
-         */
-        Boolean isStrict();
-
-        /**
-         * Checks whether the arithmetic triggers errors during evaluation when null is used as an operand.
-         *
-         * @return true if strict, false otherwise
-         */
-        Boolean isStrictArithmetic();
-
-        /**
-         * Whether evaluation will throw JexlException.Cancel (true) or return null (false) when interrupted.
-         * @return true when cancellable, false otherwise
-         * @since 3.1
-         */
-        Boolean isCancellable();
-
-        /**
-         * The MathContext instance used for +,-,/,*,% operations on big decimals.
-         *
-         * @return the math context
-         */
-        MathContext getArithmeticMathContext();
-
-        /**
-         * The BigDecimal scale used for comparison and coercion operations.
-         *
-         * @return the scale
-         */
-        int getArithmeticMathScale();
-    }
-
-    /** Default features. */
-    public static final JexlFeatures DEFAULT_FEATURES = new JexlFeatures();
-
-    /**
-     * An empty/static/non-mutable JexlContext singleton used instead of null context.
-     */
-    public static final JexlContext EMPTY_CONTEXT = new EmptyContext();
-
     /**
      * The empty context class, public for instrospection.
      */
@@ -196,11 +72,6 @@ public abstract class JexlEngine {
     }
 
     /**
-     * An empty/static/non-mutable JexlNamespace singleton used instead of null namespace.
-     */
-    public static final JexlContext.NamespaceResolver EMPTY_NS = new EmptyNamespaceResolver();
-
-    /**
      * The  empty/static/non-mutable JexlNamespace class, public for instrospection.
      */
     public static final class EmptyNamespaceResolver implements JexlContext.NamespaceResolver {
@@ -215,67 +86,204 @@ public abstract class JexlEngine {
         }
     }
 
+    /** The failure marker class. */
+    private static final class FailObject {
+        /**
+         * Default ctor.
+         */
+        FailObject() {}
+
+        @Override
+        public String toString() {
+            return "tryExecute failed";
+        }
+    }
+
+    /**
+     * Script evaluation options.
+     * <p>The JexlContext used for evaluation can implement this interface to alter behavior.</p>
+     * @deprecated 3.2
+     */
+    @Deprecated
+    public interface Options {
+
+        /**
+         * The MathContext instance used for +,-,/,*,% operations on big decimals.
+         *
+         * @return the math context
+         */
+        MathContext getArithmeticMathContext();
+        /**
+         * The BigDecimal scale used for comparison and coercion operations.
+         *
+         * @return the scale
+         */
+        int getArithmeticMathScale();
+
+        /**
+         * The charset used for parsing.
+         *
+         * @return the charset
+         */
+        Charset getCharset();
+
+        /**
+         * Whether evaluation will throw JexlException.Cancel (true) or return null (false) when interrupted.
+         * @return true when cancellable, false otherwise
+         * @since 3.1
+         */
+        Boolean isCancellable();
+
+        /**
+         * Sets whether the engine will throw a {@link JexlException} when an error is encountered during evaluation.
+         *
+         * @return true if silent, false otherwise
+         */
+        Boolean isSilent();
+
+        /**
+         * Checks whether the engine considers unknown variables, methods, functions and constructors as errors or
+         * evaluates them as null.
+         *
+         * @return true if strict, false otherwise
+         */
+        Boolean isStrict();
+
+        /**
+         * Checks whether the arithmetic triggers errors during evaluation when null is used as an operand.
+         *
+         * @return true if strict, false otherwise
+         */
+        Boolean isStrictArithmetic();
+    }
+
+    /** A marker singleton for invocation failures in tryInvoke. */
+    public static final Object TRY_FAILED = new FailObject();
+
+    /**
+     * The thread local context.
+     */
+    protected static final java.lang.ThreadLocal<JexlContext.ThreadLocal> CONTEXT =
+                       new java.lang.ThreadLocal<>();
+
+    /**
+     * The thread local engine.
+     */
+    protected static final java.lang.ThreadLocal<JexlEngine> ENGINE =
+                       new java.lang.ThreadLocal<>();
+
+    /** Default features. */
+    public static final JexlFeatures DEFAULT_FEATURES = new JexlFeatures();
+
+    /**
+     * An empty/static/non-mutable JexlContext singleton used instead of null context.
+     */
+    public static final JexlContext EMPTY_CONTEXT = new EmptyContext();
+
+    /**
+     * An empty/static/non-mutable JexlNamespace singleton used instead of null namespace.
+     */
+    public static final JexlContext.NamespaceResolver EMPTY_NS = new EmptyNamespaceResolver();
+
     /** The default Jxlt cache size. */
     private static final int JXLT_CACHE_SIZE = 256;
 
     /**
-     * Gets the charset used for parsing.
+     * Accesses the current thread local context.
      *
-     * @return the charset
+     * @return the context or null
      */
-    public abstract Charset getCharset();
+    public static JexlContext.ThreadLocal getThreadContext() {
+        return CONTEXT.get();
+    }
 
     /**
-     * Gets this engine underlying {@link JexlUberspect}.
-     *
-     * @return the uberspect
+     * Accesses the current thread local engine.
+     * <p>Advanced: you should only use this to retrieve the engine within a method/ctor called through the evaluation
+     * of a script/expression.</p>
+     * @return the engine or null
      */
-    public abstract JexlUberspect getUberspect();
+    public static JexlEngine getThreadEngine() {
+        return ENGINE.get();
+    }
 
     /**
-     * Gets this engine underlying {@link JexlArithmetic}.
+     * Sets the current thread local context.
+     * <p>This should only be used carefully, for instance when re-evaluating a "stored" script that requires a
+     * given Namespace resolver. Remember to synchronize access if context is shared between threads.
      *
-     * @return the arithmetic
+     * @param tls the thread local context to set
      */
-    public abstract JexlArithmetic getArithmetic();
+    public static void setThreadContext(final JexlContext.ThreadLocal tls) {
+        CONTEXT.set(tls);
+    }
 
     /**
-     * Checks whether this engine is in debug mode.
+     * Creates a string from a reader.
      *
-     * @return true if debug is on, false otherwise
+     * @param reader to be read.
+     * @return the contents of the reader as a String.
+     * @throws IOException on any error reading the reader.
      */
-    public abstract boolean isDebug();
+    protected static String toString(final BufferedReader reader) throws IOException {
+        final StringBuilder buffer = new StringBuilder();
+        String line;
+        while ((line = reader.readLine()) != null) {
+            buffer.append(line).append('\n');
+        }
+        return buffer.toString();
+    }
 
     /**
-     * Checks whether this engine throws JexlException during evaluation.
-     *
-     * @return true if silent, false (default) otherwise
+     * Clears the expression cache.
      */
-    public abstract boolean isSilent();
+    public abstract void clearCache();
 
     /**
-     * Checks whether this engine considers unknown variables, methods, functions and constructors as errors.
+     * Creates an JexlExpression from a String containing valid JEXL syntax.
+     * This method parses the expression which must contain either a reference or an expression.
      *
-     * @return true if strict, false otherwise
+     * @param info       An info structure to carry debugging information if needed
+     * @param expression A String containing valid JEXL syntax
+     * @return An {@link JexlExpression} which can be evaluated using a {@link JexlContext}
+     * @throws JexlException if there is a problem parsing the script
      */
-    public abstract boolean isStrict();
+    public abstract JexlExpression createExpression(JexlInfo info, String expression);
 
     /**
-     * Checks whether this engine will throw JexlException.Cancel (true) or return null (false) when interrupted
-     * during an execution.
+     * Creates a JexlExpression from a String containing valid JEXL syntax.
+     * This method parses the expression which must contain either a reference or an expression.
      *
-     * @return true if cancellable, false otherwise
+     * @param expression A String containing valid JEXL syntax
+     * @return An {@link JexlExpression} which can be evaluated using a {@link JexlContext}
+     * @throws JexlException if there is a problem parsing the script
      */
-    public abstract boolean isCancellable();
+    public final JexlExpression createExpression(final String expression) {
+        return createExpression(null, expression);
+    }
 
     /**
-     * Sets the class loader used to discover classes in 'new' expressions.
-     * <p>This method is <em>not</em> thread safe; it may be called after JexlEngine
-     * initialization and allow scripts to use new classes definitions.</p>
+     * Create an information structure for dynamic set/get/invoke/new.
+     * <p>This gathers the class, method and line number of the first calling method
+     * outside of o.a.c.jexl3.</p>
      *
-     * @param loader the class loader to use
+     * @return a JexlInfo instance
      */
-    public abstract void setClassLoader(ClassLoader loader);
+    public JexlInfo createInfo() {
+        return new JexlInfo();
+    }
+
+    /**
+     * Creates a JexlInfo instance.
+     *
+     * @param fn url/file/template/script user given name
+     * @param l  line number
+     * @param c  column number
+     * @return a JexlInfo instance
+     */
+    public JexlInfo createInfo(final String fn, final int l, final int c) {
+        return new JexlInfo(fn, l, c);
+    }
 
     /**
      * Creates a new {@link JxltEngine} instance using this engine.
@@ -308,32 +316,31 @@ public abstract class JexlEngine {
     public abstract JxltEngine createJxltEngine(boolean noScript, int cacheSize, char immediate, char deferred);
 
     /**
-     * Clears the expression cache.
-     */
-    public abstract void clearCache();
-
-    /**
-     * Creates an JexlExpression from a String containing valid JEXL syntax.
-     * This method parses the expression which must contain either a reference or an expression.
+     * Creates a Script from a {@link File} containing valid JEXL syntax.
+     * This method parses the script and validates the syntax.
      *
-     * @param info       An info structure to carry debugging information if needed
-     * @param expression A String containing valid JEXL syntax
-     * @return An {@link JexlExpression} which can be evaluated using a {@link JexlContext}
-     * @throws JexlException if there is a problem parsing the script
+     * @param scriptFile A {@link File} containing valid JEXL syntax. Must not be null. Must be a readable file.
+     * @return A {@link JexlScript} which can be executed with a {@link JexlContext}.
+     * @throws JexlException if there is a problem reading or parsing the script.
      */
-    public abstract JexlExpression createExpression(JexlInfo info, String expression);
-
-    /**
-     * Creates a JexlExpression from a String containing valid JEXL syntax.
-     * This method parses the expression which must contain either a reference or an expression.
-     *
-     * @param expression A String containing valid JEXL syntax
-     * @return An {@link JexlExpression} which can be evaluated using a {@link JexlContext}
-     * @throws JexlException if there is a problem parsing the script
-     */
-    public final JexlExpression createExpression(final String expression) {
-        return createExpression(null, expression);
+    public final JexlScript createScript(final File scriptFile) {
+        return createScript(null, null, readSource(scriptFile), (String[]) null);
     }
+
+    /**
+     * Creates a Script from a {@link File} containing valid JEXL syntax.
+     * This method parses the script and validates the syntax.
+     *
+     * @param scriptFile A {@link File} containing valid JEXL syntax. Must not be null. Must be a readable file.
+     * @param names      The script parameter names used during parsing; a corresponding array of arguments containing
+     * values should be used during evaluation.
+     * @return A {@link JexlScript} which can be executed with a {@link JexlContext}.
+     * @throws JexlException if there is a problem reading or parsing the script.
+     */
+    public final JexlScript createScript(final File scriptFile, final String... names) {
+        return createScript(null, null, readSource(scriptFile), names);
+    }
+
     /**
      * Creates a JexlScript from a String containing valid JEXL syntax.
      * This method parses the script and validates the syntax.
@@ -349,6 +356,21 @@ public abstract class JexlEngine {
     public abstract JexlScript createScript(JexlFeatures features, JexlInfo info, String source, String... names);
 
     /**
+     * Creates a Script from a {@link File} containing valid JEXL syntax.
+     * This method parses the script and validates the syntax.
+     *
+     * @param info       An info structure to carry debugging information if needed
+     * @param scriptFile A {@link File} containing valid JEXL syntax. Must not be null. Must be a readable file.
+     * @param names      The script parameter names used during parsing; a corresponding array of arguments containing
+     * values should be used during evaluation.
+     * @return A {@link JexlScript} which can be executed with a {@link JexlContext}.
+     * @throws JexlException if there is a problem reading or parsing the script.
+     */
+    public final JexlScript createScript(final JexlInfo info, final File scriptFile, final String... names) {
+        return createScript(null, info, readSource(scriptFile), names);
+    }
+
+    /**
      * Creates a JexlScript from a String containing valid JEXL syntax.
      * This method parses the script and validates the syntax.
      *
@@ -361,6 +383,20 @@ public abstract class JexlEngine {
      */
     public final JexlScript createScript(final JexlInfo info, final String source, final String... names) {
         return createScript(null, info, source, names);
+    }
+    /**
+     * Creates a Script from a {@link URL} containing valid JEXL syntax.
+     * This method parses the script and validates the syntax.
+     *
+     * @param info      An info structure to carry debugging information if needed
+     * @param scriptUrl A {@link URL} containing valid JEXL syntax. Must not be null.
+     * @param names     The script parameter names used during parsing; a corresponding array of arguments containing
+     * values should be used during evaluation.
+     * @return A {@link JexlScript} which can be executed with a {@link JexlContext}.
+     * @throws JexlException if there is a problem reading or parsing the script.
+     */
+    public final JexlScript createScript(final JexlInfo info, final URL scriptUrl, final String... names) {
+        return createScript(null, info, readSource(scriptUrl), names);
     }
 
     /**
@@ -390,47 +426,6 @@ public abstract class JexlEngine {
     }
 
     /**
-     * Creates a Script from a {@link File} containing valid JEXL syntax.
-     * This method parses the script and validates the syntax.
-     *
-     * @param scriptFile A {@link File} containing valid JEXL syntax. Must not be null. Must be a readable file.
-     * @return A {@link JexlScript} which can be executed with a {@link JexlContext}.
-     * @throws JexlException if there is a problem reading or parsing the script.
-     */
-    public final JexlScript createScript(final File scriptFile) {
-        return createScript(null, null, readSource(scriptFile), (String[]) null);
-    }
-
-    /**
-     * Creates a Script from a {@link File} containing valid JEXL syntax.
-     * This method parses the script and validates the syntax.
-     *
-     * @param scriptFile A {@link File} containing valid JEXL syntax. Must not be null. Must be a readable file.
-     * @param names      The script parameter names used during parsing; a corresponding array of arguments containing
-     * values should be used during evaluation.
-     * @return A {@link JexlScript} which can be executed with a {@link JexlContext}.
-     * @throws JexlException if there is a problem reading or parsing the script.
-     */
-    public final JexlScript createScript(final File scriptFile, final String... names) {
-        return createScript(null, null, readSource(scriptFile), names);
-    }
-
-    /**
-     * Creates a Script from a {@link File} containing valid JEXL syntax.
-     * This method parses the script and validates the syntax.
-     *
-     * @param info       An info structure to carry debugging information if needed
-     * @param scriptFile A {@link File} containing valid JEXL syntax. Must not be null. Must be a readable file.
-     * @param names      The script parameter names used during parsing; a corresponding array of arguments containing
-     * values should be used during evaluation.
-     * @return A {@link JexlScript} which can be executed with a {@link JexlContext}.
-     * @throws JexlException if there is a problem reading or parsing the script.
-     */
-    public final JexlScript createScript(final JexlInfo info, final File scriptFile, final String... names) {
-        return createScript(null, info, readSource(scriptFile), names);
-    }
-
-    /**
      * Creates a Script from a {@link URL} containing valid JEXL syntax.
      * This method parses the script and validates the syntax.
      *
@@ -457,19 +452,32 @@ public abstract class JexlEngine {
     }
 
     /**
-     * Creates a Script from a {@link URL} containing valid JEXL syntax.
-     * This method parses the script and validates the syntax.
+     * Gets this engine underlying {@link JexlArithmetic}.
      *
-     * @param info      An info structure to carry debugging information if needed
-     * @param scriptUrl A {@link URL} containing valid JEXL syntax. Must not be null.
-     * @param names     The script parameter names used during parsing; a corresponding array of arguments containing
-     * values should be used during evaluation.
-     * @return A {@link JexlScript} which can be executed with a {@link JexlContext}.
-     * @throws JexlException if there is a problem reading or parsing the script.
+     * @return the arithmetic
      */
-    public final JexlScript createScript(final JexlInfo info, final URL scriptUrl, final String... names) {
-        return createScript(null, info, readSource(scriptUrl), names);
-    }
+    public abstract JexlArithmetic getArithmetic();
+
+    /**
+     * Gets the charset used for parsing.
+     *
+     * @return the charset
+     */
+    public abstract Charset getCharset();
+
+    /**
+     * Accesses properties of a bean using an expression.
+     * <p>
+     * If the JEXL engine is silent, errors will be logged through its logger as warning.
+     * </p>
+     *
+     * @param context the evaluation context
+     * @param bean    the bean to get properties from
+     * @param expr    the property expression
+     * @return the value of the property
+     * @throws JexlException if there is an error parsing the expression or during evaluation
+     */
+    public abstract Object getProperty(JexlContext context, Object bean, String expr);
 
     /**
      * Accesses properties of a bean using an expression.
@@ -489,50 +497,11 @@ public abstract class JexlEngine {
     public abstract Object getProperty(Object bean, String expr);
 
     /**
-     * Accesses properties of a bean using an expression.
-     * <p>
-     * If the JEXL engine is silent, errors will be logged through its logger as warning.
-     * </p>
+     * Gets this engine underlying {@link JexlUberspect}.
      *
-     * @param context the evaluation context
-     * @param bean    the bean to get properties from
-     * @param expr    the property expression
-     * @return the value of the property
-     * @throws JexlException if there is an error parsing the expression or during evaluation
+     * @return the uberspect
      */
-    public abstract Object getProperty(JexlContext context, Object bean, String expr);
-
-    /**
-     * Assign properties of a bean using an expression.
-     * <p>
-     * jexl.set(myobject, "foo.bar", 10); should equate to
-     * myobject.getFoo().setBar(10); (or myobject.getFoo().put("bar", 10) )
-     * </p>
-     * <p>
-     * If the JEXL engine is silent, errors will be logged through its logger as warning.
-     * </p>
-     *
-     * @param bean  the bean to set properties in
-     * @param expr  the property expression
-     * @param value the value of the property
-     * @throws JexlException if there is an error parsing the expression or during evaluation
-     */
-    public abstract void setProperty(Object bean, String expr, Object value);
-
-    /**
-     * Assign properties of a bean using an expression.
-     * <p>
-     * If the JEXL engine is silent, errors will be logged through
-     * its logger as warning.
-     * </p>
-     *
-     * @param context the evaluation context
-     * @param bean    the bean to set properties in
-     * @param expr    the property expression
-     * @param value   the value of the property
-     * @throws JexlException if there is an error parsing the expression or during evaluation
-     */
-    public abstract void setProperty(JexlContext context, Object bean, String expr, Object value);
+    public abstract JexlUberspect getUberspect();
 
     /**
      * Invokes an object's method by name and arguments.
@@ -544,6 +513,35 @@ public abstract class JexlEngine {
      * @throws JexlException if method could not be found or failed and engine is not silent
      */
     public abstract Object invokeMethod(Object obj, String meth, Object... args);
+
+    /**
+     * Checks whether this engine will throw JexlException.Cancel (true) or return null (false) when interrupted
+     * during an execution.
+     *
+     * @return true if cancellable, false otherwise
+     */
+    public abstract boolean isCancellable();
+
+    /**
+     * Checks whether this engine is in debug mode.
+     *
+     * @return true if debug is on, false otherwise
+     */
+    public abstract boolean isDebug();
+
+    /**
+     * Checks whether this engine throws JexlException during evaluation.
+     *
+     * @return true if silent, false (default) otherwise
+     */
+    public abstract boolean isSilent();
+
+    /**
+     * Checks whether this engine considers unknown variables, methods, functions and constructors as errors.
+     *
+     * @return true if strict, false otherwise
+     */
+    public abstract boolean isStrict();
 
     /**
      * Creates a new instance of an object using the most appropriate constructor based on the arguments.
@@ -563,45 +561,6 @@ public abstract class JexlEngine {
      * @return the created object instance or null on failure when silent
      */
     public abstract Object newInstance(String clazz, Object... args);
-
-    /**
-     * Creates a JexlInfo instance.
-     *
-     * @param fn url/file/template/script user given name
-     * @param l  line number
-     * @param c  column number
-     * @return a JexlInfo instance
-     */
-    public JexlInfo createInfo(final String fn, final int l, final int c) {
-        return new JexlInfo(fn, l, c);
-    }
-
-    /**
-     * Create an information structure for dynamic set/get/invoke/new.
-     * <p>This gathers the class, method and line number of the first calling method
-     * outside of o.a.c.jexl3.</p>
-     *
-     * @return a JexlInfo instance
-     */
-    public JexlInfo createInfo() {
-        return new JexlInfo();
-    }
-
-    /**
-     * Creates a string from a reader.
-     *
-     * @param reader to be read.
-     * @return the contents of the reader as a String.
-     * @throws IOException on any error reading the reader.
-     */
-    protected static String toString(final BufferedReader reader) throws IOException {
-        final StringBuilder buffer = new StringBuilder();
-        String line;
-        while ((line = reader.readLine()) != null) {
-            buffer.append(line).append('\n');
-        }
-        return buffer.toString();
-    }
 
     /**
      * Reads a JEXL source from a File.
@@ -637,4 +596,45 @@ public abstract class JexlEngine {
             throw new JexlException(createInfo(url.toString(), 1, 1), "could not read source URL", xio);
         }
     }
+
+    /**
+     * Sets the class loader used to discover classes in 'new' expressions.
+     * <p>This method is <em>not</em> thread safe; it may be called after JexlEngine
+     * initialization and allow scripts to use new classes definitions.</p>
+     *
+     * @param loader the class loader to use
+     */
+    public abstract void setClassLoader(ClassLoader loader);
+
+    /**
+     * Assign properties of a bean using an expression.
+     * <p>
+     * If the JEXL engine is silent, errors will be logged through
+     * its logger as warning.
+     * </p>
+     *
+     * @param context the evaluation context
+     * @param bean    the bean to set properties in
+     * @param expr    the property expression
+     * @param value   the value of the property
+     * @throws JexlException if there is an error parsing the expression or during evaluation
+     */
+    public abstract void setProperty(JexlContext context, Object bean, String expr, Object value);
+
+    /**
+     * Assign properties of a bean using an expression.
+     * <p>
+     * jexl.set(myobject, "foo.bar", 10); should equate to
+     * myobject.getFoo().setBar(10); (or myobject.getFoo().put("bar", 10) )
+     * </p>
+     * <p>
+     * If the JEXL engine is silent, errors will be logged through its logger as warning.
+     * </p>
+     *
+     * @param bean  the bean to set properties in
+     * @param expr  the property expression
+     * @param value the value of the property
+     * @throws JexlException if there is an error parsing the expression or during evaluation
+     */
+    public abstract void setProperty(Object bean, String expr, Object value);
 }
