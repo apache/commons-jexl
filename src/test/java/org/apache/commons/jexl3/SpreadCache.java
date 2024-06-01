@@ -61,6 +61,16 @@ public class SpreadCache<K, V> extends SoftCache<K, V> {
  */
 class SpreadMap<K, V> extends AbstractMap<K, V> {
   /**
+   * Returns a power of two for the given target capacity.
+   *
+   * @param cap capacity
+   * @return the smallest power of 2 greater or equal to argument
+   */
+  private static int closestPowerOf2(int cap) {
+    return cap > 1 ? Integer.highestOneBit(cap - 1) << 1 : 1;
+  }
+
+  /**
    * The sub-maps array.
    */
   private final Map<K, V>[] maps;
@@ -79,14 +89,27 @@ class SpreadMap<K, V> extends AbstractMap<K, V> {
     }
   }
 
-  /**
-   * Returns a power of two for the given target capacity.
-   *
-   * @param cap capacity
-   * @return the smallest power of 2 greater or equal to argument
-   */
-  private static int closestPowerOf2(int cap) {
-    return cap > 1 ? Integer.highestOneBit(cap - 1) << 1 : 1;
+  @Override
+  public void clear() {
+    for (int m = 0; m < maps.length; ++m) {
+      maps[m].clear();
+    }
+  }
+
+  @Override
+  public Set<Entry<K, V>> entrySet() {
+    final Set<Map.Entry<K, V>> entries = new LinkedHashSet<>(size());
+    for (Map<K, V> map : maps) {
+      synchronized (map) {
+        entries.addAll(map.entrySet());
+      }
+    }
+    return entries;
+  }
+
+  @Override
+  public V get(Object key) {
+    return getMap(key).get(key);
   }
 
   /**
@@ -104,11 +127,6 @@ class SpreadMap<K, V> extends AbstractMap<K, V> {
   }
 
   @Override
-  public V get(Object key) {
-    return getMap(key).get(key);
-  }
-
-  @Override
   public V put(final K key, final V value) {
     return getMap(key).put(key, value);
   }
@@ -119,29 +137,11 @@ class SpreadMap<K, V> extends AbstractMap<K, V> {
   }
 
   @Override
-  public void clear() {
-    for (int m = 0; m < maps.length; ++m) {
-      maps[m].clear();
-    }
-  }
-
-  @Override
   public int size() {
     int size = 0;
     for (int m = 0; m < maps.length; ++m) {
       size += maps[m].size();
     }
     return size;
-  }
-
-  @Override
-  public Set<Entry<K, V>> entrySet() {
-    final Set<Map.Entry<K, V>> entries = new LinkedHashSet<>(size());
-    for (Map<K, V> map : maps) {
-      synchronized (map) {
-        entries.addAll(map.entrySet());
-      }
-    }
-    return entries;
   }
 }
