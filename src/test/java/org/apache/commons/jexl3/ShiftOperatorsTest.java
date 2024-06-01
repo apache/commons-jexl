@@ -16,12 +16,11 @@
  */
 package org.apache.commons.jexl3;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.math.BigInteger;
 
 import org.apache.commons.jexl3.junit.Asserter;
-import org.junit.Assert;
 import org.junit.Test;
 
 /**
