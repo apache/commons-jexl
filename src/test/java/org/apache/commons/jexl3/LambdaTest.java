@@ -19,6 +19,7 @@ package org.apache.commons.jexl3;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -229,22 +230,16 @@ public class LambdaTest extends JexlTestCase {
     public void testFailParseFunc0() {
         final String src = "if (false) function foo(x) { x + x }; var foo = 1";
         final JexlEngine jexl = createEngine();
-        try {
-            final JexlScript script = jexl.createScript(src);
-        } catch (final JexlException.Parsing xparse) {
-            assertTrue(xparse.getMessage().contains("function"));
-        }
+        final JexlException.Parsing xparse = assertThrows(JexlException.Parsing.class, () -> jexl.createScript(src));
+        assertTrue(xparse.getMessage().contains("function"));
     }
 
     @Test
     public void testFailParseFunc1() {
         final String src = "if (false) let foo = (x) { x + x }; var foo = 1";
         final JexlEngine jexl = createEngine();
-        try {
-            final JexlScript script = jexl.createScript(src);
-        } catch (final JexlException.Parsing xparse) {
-            assertTrue(xparse.getMessage().contains("let"));
-        }
+        final JexlException.Parsing xparse = assertThrows(JexlException.Parsing.class, () -> jexl.createScript(src));
+        assertTrue(xparse.getMessage().contains("let"));
     }
 
     @Test public void testFatFact0() {
@@ -261,17 +256,14 @@ public class LambdaTest extends JexlTestCase {
         final String src = "function (a) { const fact = (x)=> x <= 1? 1 : x * fact(x - 1) ; fact(a) }";
         final JexlFeatures features = new JexlFeatures();
         features.fatArrow(true);
-        JexlEngine jexl = createEngine(features);
-        JexlScript script = jexl.createScript(src);
+        final JexlEngine jexl = createEngine(features);
+        final JexlScript script = jexl.createScript(src);
         final Object result = script.execute(null, 6);
         assertEquals(720, result);
         features.fatArrow(false);
-        jexl = createEngine(features);
-        try {
-            script = jexl.createScript(src);
-        } catch (final JexlException.Feature xfeature) {
-            assertTrue(xfeature.getMessage().contains("fat-arrow"));
-        }
+        final JexlEngine jexl1 = createEngine(features);
+        final JexlException.Feature xfeature = assertThrows(JexlException.Feature.class, () -> jexl1.createScript(src));
+        assertTrue(xfeature.getMessage().contains("fat-arrow"));
     }
 
     @Test
@@ -439,13 +431,10 @@ public class LambdaTest extends JexlTestCase {
     @Test public void testNamedFuncIsConst() {
         final String src = "function foo(x) { x + x }; var foo ='nonononon'";
         final JexlEngine jexl = createEngine();
-        try {
-            final JexlScript script = jexl.createScript(src);
-            fail("should fail, foo is already defined");
-        } catch (final JexlException.Parsing xparse) {
-            assertTrue(xparse.getMessage().contains("foo"));
-        }
+        final JexlException.Parsing xparse = assertThrows(JexlException.Parsing.class, () -> jexl.createScript(src));
+        assertTrue(xparse.getMessage().contains("foo"));
     }
+
     @Test
     public void testNestLambada() throws Exception {
         final JexlEngine jexl = createEngine();
