@@ -25,6 +25,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -250,7 +251,7 @@ public class VarTest extends JexlTestCase {
         }
             ls.add(strb.toString());
         }
-        ls.sort(null);
+        Collections.sort(ls);
         return ls;
     }
 
