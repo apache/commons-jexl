@@ -16,6 +16,7 @@
  */
 package org.apache.commons.jexl3;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -23,7 +24,6 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.PrintWriter;
 import java.io.StringReader;
@@ -1282,8 +1282,7 @@ public class JXLTTest extends JexlTestCase {
         opts.setLexicalShade(false);
         opts.setSharedInstance(true);
         final JexlContext ctxt = new PragmaticContext(opts);
-        final String src = "$$if (false) { var tab = 42; }\n"
-                + "${tab}";
+        final String src = "$$if (false) { var tab = 42; }\n" + "${tab}";
         JxltEngine.Template tmplt;
         final JexlFeatures features = BUILDER.features();
         try {
@@ -1296,12 +1295,8 @@ public class JXLTTest extends JexlTestCase {
         }
         final Writer strw = new StringWriter();
         opts.setSafe(true);
-        try {
-            tmplt.evaluate(ctxt, strw);
-            assertTrue(strw.toString().isEmpty());
-        } catch (final JexlException.Variable xvar) {
-            fail("safe should prevent local shade");
-        }
+        assertDoesNotThrow(() -> tmplt.evaluate(ctxt, strw), "safe should prevent local shade");
+        assertTrue(strw.toString().isEmpty());
         opts.setStrict(true);
         opts.setSafe(false);
         final JexlException.Variable xvar = assertThrows(JexlException.Variable.class, () -> tmplt.evaluate(ctxt, strw));
