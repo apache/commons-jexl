@@ -17,7 +17,8 @@
 
 package org.apache.commons.jexl3.scripting;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.StringWriter;
 
@@ -26,7 +27,6 @@ import javax.script.CompiledScript;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 public class JexlScriptEngineOptionalTest {
