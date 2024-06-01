@@ -18,8 +18,8 @@ package org.apache.commons.jexl3;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -160,12 +160,7 @@ public final class JexlTest extends JexlTestCase {
      */
     @Test
     public void testBadParse() throws Exception {
-        try {
-            assertExpression(new MapContext(), "empty()", null);
-            fail("Bad expression didn't throw ParseException");
-        } catch (final JexlException pe) {
-            // expected behavior
-        }
+        assertThrows(JexlException.class, () -> assertExpression(new MapContext(), "empty()", null));
     }
 
     /**
