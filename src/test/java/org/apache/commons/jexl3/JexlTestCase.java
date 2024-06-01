@@ -17,6 +17,7 @@
 
 package org.apache.commons.jexl3;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import java.lang.reflect.Constructor;
@@ -153,13 +154,7 @@ public class JexlTestCase {
         Class<JexlTestCase> clazz = null;
         JexlTestCase test = null;
         // find the class
-        try {
-            clazz = (Class<JexlTestCase>) Class.forName(testClassName);
-        }
-        catch (final ClassNotFoundException xclass) {
-            fail("no such class: " + testClassName);
-            return;
-        }
+        assertThrows(ClassNotFoundException.class, () -> Class.forName(testClassName), () -> "no such class: " + testClassName);
         // find ctor & instantiate
         Constructor<JexlTestCase> ctor = null;
         try {
