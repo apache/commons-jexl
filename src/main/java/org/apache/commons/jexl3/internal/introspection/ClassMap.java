@@ -45,6 +45,15 @@ import org.apache.commons.logging.Log;
  */
 final class ClassMap {
     /**
+     * The cache miss marker method.
+     */
+    static final Method CACHE_MISS = cacheMiss();
+
+    /**
+     * Singleton for permissions non-allowed classes.
+     */
+    private static final ClassMap EMPTY = new ClassMap();
+    /**
      * A method that returns itself used as a marker for cache miss,
      * allows the underlying cache map to be strongly typed.
      *
@@ -58,11 +67,119 @@ final class ClassMap {
             return null;
         }
     }
+    /**
+     * Populate the Map of direct hits. These are taken from all the public methods
+     * that our class, its parents and their implemented interfaces provide.
+     *
+     * @param cache          the ClassMap instance we create
+     * @param permissions    the permissions to apply during introspection
+     * @param clazz          the class to cache
+     * @param log            the Log
+     */
+    private static void create(final ClassMap cache, final JexlPermissions permissions, final Class<?> clazz, final Log log) {
+        //
+        // Build a list of all elements in the class hierarchy. This one is bottom-first; we start
+        // with the actual declaring class and its interfaces and then move up (superclass etc.) until we
+        // hit java.lang.Object. That is important because it will give us the methods of the declaring class
+        // which might in turn be abstract further up the tree.
+        //
+        // We also ignore all SecurityExceptions that might happen due to SecurityManager restrictions.
+        //
+        for (Class<?> classToReflect = clazz; classToReflect != null; classToReflect = classToReflect.getSuperclass()) {
+            if (Modifier.isPublic(classToReflect.getModifiers()) && ClassTool.isExported(classToReflect)) {
+                populateWithClass(cache, permissions, classToReflect, log);
+            }
+            final Class<?>[] interfaces = classToReflect.getInterfaces();
+            for (final Class<?> anInterface : interfaces) {
+                populateWithInterface(cache, permissions, anInterface, log);
+            }
+        }
+        // now that we've got all methods keyed in, lets organize them by name
+        if (!cache.byKey.isEmpty()) {
+            final List<Method> lm = new ArrayList<>(cache.byKey.values());
+            // sort all methods by name
+            lm.sort(Comparator.comparing(Method::getName));
+            // put all lists of methods with same name in byName cache
+            int start = 0;
+            while (start < lm.size()) {
+                final String name = lm.get(start).getName();
+                int end = start + 1;
+                while (end < lm.size()) {
+                    final String walk = lm.get(end).getName();
+                    if (!walk.equals(name)) {
+                        break;
+                    }
+                    end += 1;
+                }
+                final Method[] lmn = lm.subList(start, end).toArray(new Method[0]);
+                cache.byName.put(name, lmn);
+                start = end;
+            }
+        }
+    }
+    /**
+     * @return the empty classmap instance
+     */
+    static ClassMap empty() {
+        return EMPTY;
+    }
 
     /**
-     * The cache miss marker method.
+     * Recurses up class hierarchy to get all super classes.
+     *
+     * @param cache       the cache to fill
+     * @param permissions the permissions to apply during introspection
+     * @param clazz       the class to populate the cache from
+     * @param log         the Log
      */
-    static final Method CACHE_MISS = cacheMiss();
+    private static void populateWithClass(final ClassMap cache,
+                                          final JexlPermissions permissions,
+                                          final Class<?> clazz,
+                                          final Log log) {
+        try {
+            final Method[] methods = clazz.getDeclaredMethods();
+            for (final Method mi : methods) {
+                // method must be public
+                if (!Modifier.isPublic(mi.getModifiers())) {
+                    continue;
+                }
+                // add method to byKey cache; do not override
+                final MethodKey key = new MethodKey(mi);
+                final Method pmi = cache.byKey.putIfAbsent(key, permissions.allow(mi) ? mi : CACHE_MISS);
+                if (pmi != null && pmi != CACHE_MISS && log.isDebugEnabled() && !key.equals(new MethodKey(pmi))) {
+                    // foo(int) and foo(Integer) have the same signature for JEXL
+                    log.debug("Method " + pmi + " is already registered, key: " + key.debugString());
+                }
+            }
+        } catch (final SecurityException se) {
+            // Everybody feels better with...
+            if (log.isDebugEnabled()) {
+                log.debug("While accessing methods of " + clazz + ": ", se);
+            }
+        }
+    }
+
+    /**
+     * Recurses up interface hierarchy to get all super interfaces.
+     *
+     * @param cache       the cache to fill
+     * @param permissions the permissions to apply during introspection
+     * @param iface       the interface to populate the cache from
+     * @param log         the Log
+     */
+    private static void populateWithInterface(final ClassMap cache,
+                                              final JexlPermissions permissions,
+                                              final Class<?> iface,
+                                              final Log log) {
+        if (Modifier.isPublic(iface.getModifiers())) {
+            populateWithClass(cache, permissions, iface, log);
+            final Class<?>[] supers = iface.getInterfaces();
+            for (final Class<?> aSuper : supers) {
+                populateWithInterface(cache, permissions, aSuper, log);
+            }
+        }
+    }
+
     /**
      * This is the cache to store and look up the method information.
      * <p>
@@ -78,26 +195,16 @@ final class ClassMap {
      * Uses ConcurrentMap since 3.0, marginally faster than 2.1 under contention.
      */
     private final Map<MethodKey, Method> byKey ;
+
     /**
      * Keep track of all methods with the same name; this is not modified after creation.
      */
     private final Map<String, Method[]> byName;
+
     /**
      * Cache of fields.
      */
     private final Map<String, Field> fieldCache;
-
-    /**
-     * Singleton for permissions non-allowed classes.
-     */
-    private static final ClassMap EMPTY = new ClassMap();
-
-    /**
-     * @return the empty classmap instance
-     */
-    static ClassMap empty() {
-        return EMPTY;
-    }
 
     /**
      * Empty map.
@@ -105,15 +212,15 @@ final class ClassMap {
     private ClassMap() {
         this.byKey = Collections.unmodifiableMap(new AbstractMap<MethodKey, Method>() {
             @Override
-            public String toString() {
-                return "emptyClassMap{}";
-            }
-            @Override
             public Set<Entry<MethodKey, Method>> entrySet() {
                 return Collections.emptySet();
             }
             @Override public Method get(final Object name) {
                 return CACHE_MISS;
+            }
+            @Override
+            public String toString() {
+                return "emptyClassMap{}";
             }
         });
         this.byName = Collections.emptyMap();
@@ -168,29 +275,6 @@ final class ClassMap {
     }
 
     /**
-     * Gets the methods names cached by this map.
-     *
-     * @return the array of method names
-     */
-    String[] getMethodNames() {
-        return byName.keySet().toArray(new String[0]);
-    }
-
-    /**
-     * Gets all the methods with a given name from this map.
-     *
-     * @param methodName the seeked methods name
-     * @return the array of methods (null or non-empty)
-     */
-    Method[] getMethods(final String methodName) {
-        final Method[] lm = byName.get(methodName);
-        if (lm != null && lm.length > 0) {
-            return lm.clone();
-        }
-        return null;
-    }
-
-    /**
      * Find a Method using the method name and parameter objects.
      * <p>
      * Look in the methodMap for an entry. If found,
@@ -234,109 +318,25 @@ final class ClassMap {
     }
 
     /**
-     * Populate the Map of direct hits. These are taken from all the public methods
-     * that our class, its parents and their implemented interfaces provide.
+     * Gets the methods names cached by this map.
      *
-     * @param cache          the ClassMap instance we create
-     * @param permissions    the permissions to apply during introspection
-     * @param clazz          the class to cache
-     * @param log            the Log
+     * @return the array of method names
      */
-    private static void create(final ClassMap cache, final JexlPermissions permissions, final Class<?> clazz, final Log log) {
-        //
-        // Build a list of all elements in the class hierarchy. This one is bottom-first; we start
-        // with the actual declaring class and its interfaces and then move up (superclass etc.) until we
-        // hit java.lang.Object. That is important because it will give us the methods of the declaring class
-        // which might in turn be abstract further up the tree.
-        //
-        // We also ignore all SecurityExceptions that might happen due to SecurityManager restrictions.
-        //
-        for (Class<?> classToReflect = clazz; classToReflect != null; classToReflect = classToReflect.getSuperclass()) {
-            if (Modifier.isPublic(classToReflect.getModifiers()) && ClassTool.isExported(classToReflect)) {
-                populateWithClass(cache, permissions, classToReflect, log);
-            }
-            final Class<?>[] interfaces = classToReflect.getInterfaces();
-            for (final Class<?> anInterface : interfaces) {
-                populateWithInterface(cache, permissions, anInterface, log);
-            }
-        }
-        // now that we've got all methods keyed in, lets organize them by name
-        if (!cache.byKey.isEmpty()) {
-            final List<Method> lm = new ArrayList<>(cache.byKey.values());
-            // sort all methods by name
-            lm.sort(Comparator.comparing(Method::getName));
-            // put all lists of methods with same name in byName cache
-            int start = 0;
-            while (start < lm.size()) {
-                final String name = lm.get(start).getName();
-                int end = start + 1;
-                while (end < lm.size()) {
-                    final String walk = lm.get(end).getName();
-                    if (!walk.equals(name)) {
-                        break;
-                    }
-                    end += 1;
-                }
-                final Method[] lmn = lm.subList(start, end).toArray(new Method[0]);
-                cache.byName.put(name, lmn);
-                start = end;
-            }
-        }
+    String[] getMethodNames() {
+        return byName.keySet().toArray(new String[0]);
     }
 
     /**
-     * Recurses up interface hierarchy to get all super interfaces.
+     * Gets all the methods with a given name from this map.
      *
-     * @param cache       the cache to fill
-     * @param permissions the permissions to apply during introspection
-     * @param iface       the interface to populate the cache from
-     * @param log         the Log
+     * @param methodName the seeked methods name
+     * @return the array of methods (null or non-empty)
      */
-    private static void populateWithInterface(final ClassMap cache,
-                                              final JexlPermissions permissions,
-                                              final Class<?> iface,
-                                              final Log log) {
-        if (Modifier.isPublic(iface.getModifiers())) {
-            populateWithClass(cache, permissions, iface, log);
-            final Class<?>[] supers = iface.getInterfaces();
-            for (final Class<?> aSuper : supers) {
-                populateWithInterface(cache, permissions, aSuper, log);
-            }
+    Method[] getMethods(final String methodName) {
+        final Method[] lm = byName.get(methodName);
+        if (lm != null && lm.length > 0) {
+            return lm.clone();
         }
-    }
-
-    /**
-     * Recurses up class hierarchy to get all super classes.
-     *
-     * @param cache       the cache to fill
-     * @param permissions the permissions to apply during introspection
-     * @param clazz       the class to populate the cache from
-     * @param log         the Log
-     */
-    private static void populateWithClass(final ClassMap cache,
-                                          final JexlPermissions permissions,
-                                          final Class<?> clazz,
-                                          final Log log) {
-        try {
-            final Method[] methods = clazz.getDeclaredMethods();
-            for (final Method mi : methods) {
-                // method must be public
-                if (!Modifier.isPublic(mi.getModifiers())) {
-                    continue;
-                }
-                // add method to byKey cache; do not override
-                final MethodKey key = new MethodKey(mi);
-                final Method pmi = cache.byKey.putIfAbsent(key, permissions.allow(mi) ? mi : CACHE_MISS);
-                if (pmi != null && pmi != CACHE_MISS && log.isDebugEnabled() && !key.equals(new MethodKey(pmi))) {
-                    // foo(int) and foo(Integer) have the same signature for JEXL
-                    log.debug("Method " + pmi + " is already registered, key: " + key.debugString());
-                }
-            }
-        } catch (final SecurityException se) {
-            // Everybody feels better with...
-            if (log.isDebugEnabled()) {
-                log.debug("While accessing methods of " + clazz + ": ", se);
-            }
-        }
+        return null;
     }
 }
