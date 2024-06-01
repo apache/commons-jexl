@@ -24,24 +24,24 @@ public class ASTTryStatement extends JexlNode {
     /** catch() &= 1, finally &= 2. */
     private int tryForm;
 
-    public void catchClause() {
-        tryForm |= 1;
+    public ASTTryStatement(final int id) {
+        super(id);
     }
 
-    public boolean hasCatchClause() {
-        return (tryForm & 1) != 0;
+    public void catchClause() {
+        tryForm |= 1;
     }
 
     public void finallyClause() {
         tryForm |= 2;
     }
 
-    public boolean hasFinallyClause() {
-        return (tryForm & 2) != 0;
+    public boolean hasCatchClause() {
+        return (tryForm & 1) != 0;
     }
 
-    public ASTTryStatement(final int id) {
-        super(id);
+    public boolean hasFinallyClause() {
+        return (tryForm & 2) != 0;
     }
 
     @Override
