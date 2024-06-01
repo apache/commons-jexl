@@ -317,24 +317,17 @@ public class Issues400Test {
         final JexlBuilder builder = new JexlBuilder();
         final JexlEngine jexl = builder.create();
         final JexlScript script = jexl.createScript("#pragma jexl.options '+constCapture'\nvar c = 42; var f = y -> c += y; f(z)", "z");
-        try {
-            final Number result = (Number) script.execute(null, 12);
-            fail("c should be const");
-        } catch (final JexlException.Variable xvar) {
-            assertEquals("c", xvar.getVariable());
-        }
+        final JexlException.Variable xvar = assertThrows(JexlException.Variable.class, () -> script.execute(null, 12), "c should be const");
+        assertEquals("c", xvar.getVariable());
     }
 
     @Test
     public void test413d() {
         final JexlBuilder builder = new JexlBuilder().features(new JexlFeatures().constCapture(true));
         final JexlEngine jexl = builder.create();
-        try {
-            final JexlScript script = jexl.createScript("var c = 42; var f = y -> c += y; f(z)", "z");
-            fail("c should be const");
-        } catch (final JexlException.Parsing xvar) {
-            assertTrue(xvar.getMessage().contains("const"));
-        }
+        final JexlException.Parsing xparse = assertThrows(JexlException.Parsing.class, () -> jexl.createScript("var c = 42; var f = y -> c += y; f(z)", "z"),
+                "c should be const");
+        assertTrue(xparse.getMessage().contains("const"));
     }
 
     @Test
