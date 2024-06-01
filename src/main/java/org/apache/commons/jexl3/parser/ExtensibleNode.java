@@ -33,8 +33,9 @@ public class ExtensibleNode extends JexlNode {
     super(id);
   }
 
-  public void setExtended(final boolean e) {
-    this.extended = e;
+  @Override
+  protected boolean isConstant(final boolean literal) {
+    return constant;
   }
 
   public boolean isExtended() {
@@ -42,19 +43,18 @@ public class ExtensibleNode extends JexlNode {
   }
 
   @Override
-  protected boolean isConstant(final boolean literal) {
-    return constant;
+  public void jjtClose() {
+    constant = super.isConstant(true);
+  }
+
+  public void setExtended(final boolean e) {
+    this.extended = e;
   }
 
   @Override
   public String toString() {
     final Debugger dbg = new Debugger();
     return dbg.data(this);
-  }
-
-  @Override
-  public void jjtClose() {
-    constant = super.isConstant(true);
   }
 
 }
