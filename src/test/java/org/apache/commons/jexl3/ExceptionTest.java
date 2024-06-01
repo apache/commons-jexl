@@ -19,6 +19,7 @@ package org.apache.commons.jexl3;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -117,44 +118,27 @@ public class ExceptionTest extends JexlTestCase {
         // make unknown vars throw
         options.setStrict(true);
         // empty cotext
-        try {
-            /* Object o = */ e.evaluate(ctxt);
-            fail("c not defined as variable should throw");
-        } catch (final JexlException.Variable xjexl) {
-            final String msg = xjexl.getMessage();
-            assertTrue(msg.indexOf("variable 'c.e'") > 0);
-        }
+        JexlException.Variable xjexl = assertThrows(JexlException.Variable.class, () -> e.evaluate(ctxt), "c not defined as variable should throw");
+        String msg = xjexl.getMessage();
+        assertTrue(msg.indexOf("variable 'c.e'") > 0);
 
         // disallow null operands
         options.setStrictArithmetic(true);
         ctxt.set("c.e", null);
-        try {
-            /* Object o = */ e.evaluate(ctxt);
-            fail("c.e as null operand should throw");
-        } catch (final JexlException.Variable xjexl) {
-            final String msg = xjexl.getMessage();
-            assertTrue(msg.indexOf("variable 'c.e'") > 0);
-        }
+        xjexl = assertThrows(JexlException.Variable.class, () -> e.evaluate(ctxt), "c.e as null operand should throw");
+        msg = xjexl.getMessage();
+        assertTrue(msg.indexOf("variable 'c.e'") > 0);
 
         // allow null operands
         options.setStrictArithmetic(false);
-        try {
-            /* Object o = */ e.evaluate(ctxt);
-
-        } catch (final JexlException xjexl) {
-            fail("c.e in expr should not throw");
-        }
+        /* Object o = */ e.evaluate(ctxt);
 
         // ensure c.e is not a defined property
         ctxt.set("c", "{ 'a' : 3, 'b' : 5}");
         ctxt.set("e", Integer.valueOf(2));
-        try {
-            /* Object o = */ e.evaluate(ctxt);
-            fail("c.e not accessible as property should throw");
-        } catch (final JexlException.Property xjexl) {
-            final String msg = xjexl.getMessage();
-            assertTrue(msg.indexOf("property 'e") > 0);
-        }
+        final JexlException.Property ep = assertThrows(JexlException.Property.class, () -> e.evaluate(ctxt));
+        msg = ep.getMessage();
+        assertTrue(msg.indexOf("property 'e") > 0);
     }
 
     // Unknown vars and properties versus null operands
