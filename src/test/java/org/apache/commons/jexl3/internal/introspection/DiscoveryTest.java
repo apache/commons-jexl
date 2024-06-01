@@ -16,7 +16,10 @@
  */
 package org.apache.commons.jexl3.internal.introspection;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -29,7 +32,6 @@ import org.apache.commons.jexl3.internal.Engine;
 import org.apache.commons.jexl3.introspection.JexlMethod;
 import org.apache.commons.jexl3.introspection.JexlPropertyGet;
 import org.apache.commons.jexl3.introspection.JexlPropertySet;
-import org.junit.Assert;
 import org.junit.Test;
 
 /**
