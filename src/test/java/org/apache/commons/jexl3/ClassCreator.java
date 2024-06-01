@@ -87,32 +87,31 @@ public class ClassCreator {
         final String source = packageDir.getPath() + "/" + sourceName;
         final JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
         final DiagnosticCollector<JavaFileObject> diagnosticsCollector = new DiagnosticCollector<>();
-        final StandardJavaFileManager fileManager = compiler.getStandardFileManager(diagnosticsCollector, null, null);
-        final Iterable<? extends JavaFileObject> compilationUnits = fileManager
-                .getJavaFileObjectsFromStrings(Collections.singletonList(source));
+        final boolean success;
+        try (StandardJavaFileManager fileManager = compiler.getStandardFileManager(diagnosticsCollector, null, null)) {
+            final Iterable<? extends JavaFileObject> compilationUnits = fileManager.getJavaFileObjectsFromStrings(Collections.singletonList(source));
 
-        final List<String> options = new ArrayList<>();
-        options.add("-classpath");
-        // only add hbase classes to classpath. This is a little bit tricky: assume
-        // the classpath is {hbaseSrc}/target/classes.
-        final String currentDir = new File(".").getAbsolutePath();
-        final String classpath = currentDir + File.separator + "target" + File.separator + "classes"
-        //+ File.pathSeparator + System.getProperty("java.class.path")
-        + File.pathSeparator + System.getProperty("surefire.test.class.path");
+            final List<String> options = new ArrayList<>();
+            options.add("-classpath");
+            // only add hbase classes to classpath. This is a little bit tricky: assume
+            // the classpath is {hbaseSrc}/target/classes.
+            final String currentDir = new File(".").getAbsolutePath();
+            final String classpath = currentDir + File.separator + "target" + File.separator + "classes"
+            // + File.pathSeparator + System.getProperty("java.class.path")
+                    + File.pathSeparator + System.getProperty("surefire.test.class.path");
 
-        options.add(classpath);
-        //LOG.debug("Setting classpath to: " + classpath);
+            options.add(classpath);
+            // LOG.debug("Setting classpath to: " + classpath);
 
-        final JavaCompiler.CompilationTask task = compiler.getTask(null, fileManager, diagnosticsCollector, options,
-                null, compilationUnits);
-        final boolean success = task.call();
-        fileManager.close();
+            final JavaCompiler.CompilationTask task = compiler.getTask(null, fileManager, diagnosticsCollector, options, null, compilationUnits);
+            success = task.call();
+        }
         if (success) {
             return getClassLoader().loadClass(GEN_CLASS + className);
         }
         final List<Diagnostic<? extends JavaFileObject>> diagnostics = diagnosticsCollector.getDiagnostics();
         for (final Diagnostic<? extends JavaFileObject> diagnostic : diagnostics) {
-            // read error dertails from the diagnostic object
+            // read error details from the diagnostic object
             System.out.println(diagnostic.getMessage(null));
 
         }
