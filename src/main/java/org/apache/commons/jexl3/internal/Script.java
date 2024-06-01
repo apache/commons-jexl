@@ -35,6 +35,65 @@ import org.apache.commons.jexl3.parser.ASTJexlScript;
  */
 public class Script implements JexlScript, JexlExpression {
     /**
+     * Implements the Future and Callable interfaces to help delegation.
+     */
+    public class Callable implements java.util.concurrent.Callable<Object> {
+        /** The actual interpreter. */
+        protected final Interpreter interpreter;
+        /** Use interpreter as marker for not having run. */
+        protected volatile Object result;
+
+        /**
+         * The base constructor.
+         * @param intrprtr the interpreter to use
+         */
+        protected Callable(final Interpreter intrprtr) {
+            this.interpreter = intrprtr;
+            this.result = intrprtr;
+        }
+
+        @Override
+        public Object call() throws Exception {
+            synchronized(this) {
+                if (result == interpreter) {
+                    checkCacheVersion();
+                    result = interpret();
+                }
+                return result;
+            }
+        }
+
+        /**
+         * Soft cancel the execution.
+         * @return true if cancel was successful, false otherwise
+         */
+        public boolean cancel() {
+            return interpreter.cancel();
+        }
+
+        /**
+         * Run the interpreter.
+         * @return the evaluation result
+         */
+        protected Object interpret() {
+            return interpreter.interpret(script);
+        }
+
+        /**
+         * @return true if interruption will throw a JexlException.Cancel, false otherwise
+         */
+        public boolean isCancellable() {
+            return interpreter.isCancellable();
+        }
+
+        /**
+         * @return true if evaluation was cancelled, false otherwise
+         */
+        public boolean isCancelled() {
+            return interpreter.isCancelled();
+        }
+    }
+    /**
      * The engine for this expression.
      */
     protected final Engine jexl;
@@ -46,17 +105,11 @@ public class Script implements JexlScript, JexlExpression {
      * The resulting AST we can interpret.
      */
     protected final ASTJexlScript script;
+
     /**
      * The engine version (as class loader change count) that last evaluated this script.
      */
     protected int version;
-
-    /**
-     * @return the script AST
-     */
-    protected ASTJexlScript getScript() {
-        return script;
-    }
 
     /**
      * Do not let this be generally instantiated with a 'new'.
@@ -70,6 +123,31 @@ public class Script implements JexlScript, JexlExpression {
         source = expr;
         script = ref;
         version = jexl.getUberspect().getVersion();
+    }
+
+    /**
+     * Creates a Callable from this script.
+     * <p>This allows to submit it to an executor pool and provides support for asynchronous calls.</p>
+     * <p>The interpreter will handle interruption/cancellation gracefully if needed.</p>
+     * @param context the context
+     * @return the callable
+     */
+    @Override
+    public Callable callable(final JexlContext context) {
+        return callable(context, (Object[]) null);
+    }
+
+    /**
+     * Creates a Callable from this script.
+     * <p>This allows to submit it to an executor pool and provides support for asynchronous calls.</p>
+     * <p>The interpreter will handle interruption/cancellation gracefully if needed.</p>
+     * @param context the context
+     * @param args    the script arguments
+     * @return the callable
+     */
+    @Override
+    public Callable callable(final JexlContext context, final Object... args) {
+        return new Callable(createInterpreter(context, script.createFrame(args)));
     }
 
     /**
@@ -121,49 +199,13 @@ public class Script implements JexlScript, JexlExpression {
         return jexl.createInterpreter(context, frame, options != null ? options : jexl.evalOptions(script, context));
     }
 
-    /**
-     * @return the engine that created this script
-     */
-    public JexlEngine getEngine() {
-        return jexl;
-    }
-
     @Override
-    public String getSourceText() {
-        return source;
-    }
-
-    @Override
-    public String getParsedText() {
-        return getParsedText(2);
-    }
-
-    @Override
-    public String getParsedText(final int indent) {
-        final Debugger debug = new Debugger();
-        debug.outputPragmas(true).indentation(indent).debug(script, false);
-        return debug.toString();
-    }
-
-    @Override
-    public String toString() {
-        CharSequence src = source;
-        if (src == null) {
-            final Debugger debug = new Debugger();
-            debug.debug(script, false);
-            src = debug.toString();
+    public JexlScript curry(final Object... args) {
+        final String[] parms = script.getParameters();
+        if (parms == null || parms.length == 0) {
+            return this;
         }
-        return src.toString();
-    }
-
-    @Override
-    public int hashCode() {
-        // CSOFF: Magic number
-        int hash = 17;
-        hash = 31 * hash + (this.jexl != null ? this.jexl.hashCode() : 0);
-        hash = 31 * hash + (this.source != null ? this.source.hashCode() : 0);
-        return hash;
-        // CSON: Magic number
+        return new Closure(this, args);
     }
 
     @Override
@@ -205,30 +247,6 @@ public class Script implements JexlScript, JexlExpression {
         return interpreter.interpret(script);
     }
 
-    @Override
-    public JexlScript curry(final Object... args) {
-        final String[] parms = script.getParameters();
-        if (parms == null || parms.length == 0) {
-            return this;
-        }
-        return new Closure(this, args);
-    }
-
-    @Override
-    public String[] getParameters() {
-        return script.getParameters();
-    }
-
-    @Override
-    public String[] getUnboundParameters() {
-        return getParameters();
-    }
-
-    @Override
-    public String[] getLocalVariables() {
-        return script.getLocalVariables();
-    }
-
     /**
      * Gets this script captured variable, i.e. symbols captured from outer scopes.
      * @return the captured variable names
@@ -238,10 +256,10 @@ public class Script implements JexlScript, JexlExpression {
     }
 
     /**
-     * @return the info
+     * @return the engine that created this script
      */
-    public JexlInfo getInfo() {
-        return script.jexlInfo();
+    public JexlEngine getEngine() {
+        return jexl;
     }
 
     /**
@@ -252,14 +270,32 @@ public class Script implements JexlScript, JexlExpression {
     }
 
     /**
-     * Gets this script variables.
-     * <p>Note that since variables can be in an ant-ish form (ie foo.bar.quux), each variable is returned as
-     * a list of strings where each entry is a fragment of the variable ({"foo", "bar", "quux"} in the example.</p>
-     * @return the variables or null
+     * @return the info
      */
+    public JexlInfo getInfo() {
+        return script.jexlInfo();
+    }
+
     @Override
-    public Set<List<String>> getVariables() {
-        return jexl.getVariables(script);
+    public String[] getLocalVariables() {
+        return script.getLocalVariables();
+    }
+
+    @Override
+    public String[] getParameters() {
+        return script.getParameters();
+    }
+
+    @Override
+    public String getParsedText() {
+        return getParsedText(2);
+    }
+
+    @Override
+    public String getParsedText(final int indent) {
+        final Debugger debug = new Debugger();
+        debug.outputPragmas(true).indentation(indent).debug(script, false);
+        return debug.toString();
     }
 
     /**
@@ -273,87 +309,51 @@ public class Script implements JexlScript, JexlExpression {
     }
 
     /**
-     * Creates a Callable from this script.
-     * <p>This allows to submit it to an executor pool and provides support for asynchronous calls.</p>
-     * <p>The interpreter will handle interruption/cancellation gracefully if needed.</p>
-     * @param context the context
-     * @return the callable
+     * @return the script AST
      */
+    protected ASTJexlScript getScript() {
+        return script;
+    }
+
     @Override
-    public Callable callable(final JexlContext context) {
-        return callable(context, (Object[]) null);
+    public String getSourceText() {
+        return source;
+    }
+
+    @Override
+    public String[] getUnboundParameters() {
+        return getParameters();
     }
 
     /**
-     * Creates a Callable from this script.
-     * <p>This allows to submit it to an executor pool and provides support for asynchronous calls.</p>
-     * <p>The interpreter will handle interruption/cancellation gracefully if needed.</p>
-     * @param context the context
-     * @param args    the script arguments
-     * @return the callable
+     * Gets this script variables.
+     * <p>Note that since variables can be in an ant-ish form (ie foo.bar.quux), each variable is returned as
+     * a list of strings where each entry is a fragment of the variable ({"foo", "bar", "quux"} in the example.</p>
+     * @return the variables or null
      */
     @Override
-    public Callable callable(final JexlContext context, final Object... args) {
-        return new Callable(createInterpreter(context, script.createFrame(args)));
+    public Set<List<String>> getVariables() {
+        return jexl.getVariables(script);
     }
 
-    /**
-     * Implements the Future and Callable interfaces to help delegation.
-     */
-    public class Callable implements java.util.concurrent.Callable<Object> {
-        /** The actual interpreter. */
-        protected final Interpreter interpreter;
-        /** Use interpreter as marker for not having run. */
-        protected volatile Object result;
+    @Override
+    public int hashCode() {
+        // CSOFF: Magic number
+        int hash = 17;
+        hash = 31 * hash + (this.jexl != null ? this.jexl.hashCode() : 0);
+        hash = 31 * hash + (this.source != null ? this.source.hashCode() : 0);
+        return hash;
+        // CSON: Magic number
+    }
 
-        /**
-         * The base constructor.
-         * @param intrprtr the interpreter to use
-         */
-        protected Callable(final Interpreter intrprtr) {
-            this.interpreter = intrprtr;
-            this.result = intrprtr;
+    @Override
+    public String toString() {
+        CharSequence src = source;
+        if (src == null) {
+            final Debugger debug = new Debugger();
+            debug.debug(script, false);
+            src = debug.toString();
         }
-
-        /**
-         * Run the interpreter.
-         * @return the evaluation result
-         */
-        protected Object interpret() {
-            return interpreter.interpret(script);
-        }
-
-        @Override
-        public Object call() throws Exception {
-            synchronized(this) {
-                if (result == interpreter) {
-                    checkCacheVersion();
-                    result = interpret();
-                }
-                return result;
-            }
-        }
-
-        /**
-         * Soft cancel the execution.
-         * @return true if cancel was successful, false otherwise
-         */
-        public boolean cancel() {
-            return interpreter.cancel();
-        }
-
-        /**
-         * @return true if evaluation was cancelled, false otherwise
-         */
-        public boolean isCancelled() {
-            return interpreter.isCancelled();
-        }
-
-        /**
-         * @return true if interruption will throw a JexlException.Cancel, false otherwise
-         */
-        public boolean isCancellable() {
-            return interpreter.isCancellable();
-        }
+        return src.toString();
     }
 }
