@@ -220,10 +220,10 @@ public class JexlTestCase {
             return;
         }
         try {
-            this.setUp();
+            setUp();
             method.invoke(this);
         } finally {
-            this.tearDown();
+            tearDown();
         }
     }
 

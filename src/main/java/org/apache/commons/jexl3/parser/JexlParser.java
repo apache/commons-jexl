@@ -328,7 +328,7 @@ public abstract class JexlParser extends StringParser {
         blocks.clear();
         block = null;
         blockScopes.clear();
-        this.setFeatures(features);
+        setFeatures(features);
     }
 
     /**
@@ -422,7 +422,7 @@ public abstract class JexlParser extends StringParser {
         }
         // declaring a namespace or module
         final String[] nsprefixes = { PRAGMA_JEXLNS, PRAGMA_MODULE };
-        for(String nsprefix : nsprefixes) {
+        for(final String nsprefix : nsprefixes) {
             if (key.startsWith(nsprefix)) {
                 if (!features.supportsNamespacePragma()) {
                     throwFeatureException(JexlFeatures.NS_PRAGMA, getToken(0));
@@ -592,7 +592,7 @@ public abstract class JexlParser extends StringParser {
      * @param name the namespace name
      * @return true if declared, false otherwise
      */
-    private boolean isNamespace(String name) {
+    private boolean isNamespace(final String name) {
         // templates
         if ("jexl".equals(name) || "$jexl".equals(name)) {
             return true;
@@ -632,7 +632,7 @@ public abstract class JexlParser extends StringParser {
         final String name = ns.image;
         if (isVariable(name)) {
             // the namespace sticks to the colon as in 'ns:fun()' (vs 'ns : fun()')
-            return colon.beginColumn - 1 == ns.endColumn && ((colon.endColumn == fun.beginColumn - 1) || isNamespace(name));
+            return colon.beginColumn - 1 == ns.endColumn && (colon.endColumn == fun.beginColumn - 1 || isNamespace(name));
         }
         return true;
     }
@@ -819,7 +819,7 @@ public abstract class JexlParser extends StringParser {
     protected void throwFeatureException(final int feature, final Token trigger) {
         Token token = trigger;
         if (token == null) {
-            token = this.getToken(0);
+            token = getToken(0);
             if (token == null) {
                 throw new JexlException.Parsing(null, JexlFeatures.stringify(feature)).clean();
             }
@@ -838,7 +838,7 @@ public abstract class JexlParser extends StringParser {
         String msg = "unrecoverable state";
         Token token = parsed;
         if (token == null) {
-            token = this.getToken(0);
+            token = getToken(0);
         }
         if (token != null) {
             xinfo = info.at(token.beginLine, token.beginColumn);
