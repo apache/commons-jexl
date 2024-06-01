@@ -453,30 +453,36 @@ public class LexicalTest {
         }
     }
 
-    @Test public void testConst3a() {
+    @Test
+    public void testConst3a() {
         final JexlEngine jexl = new JexlBuilder().create();
+        // @formatter:off
         final List<String> srcs = Arrays.asList(
                 "const f = ()->{ var foo = 3; foo = 5; }",
                 "const y = '42'; const f = (let y)->{ var foo = 3; foo = 5; }",
                 "const foo = '34'; const f = ()->{ var foo = 3; foo = 5; };",
                 "const bar = '34'; const f = ()->{ var f = 3; f = 5; };",
                 "const bar = '34'; const f = ()->{ var bar = 3; z ->{ bar += z; } };");
-        for(final String src: srcs) {
+        // @formatter:on
+        for (final String src : srcs) {
             final JexlScript script = jexl.createScript(src);
             final Object result = script.execute(null);
             assertNotNull(result, src);
         }
     }
 
-    @Test public void testConst3b() {
+    @Test
+    public void testConst3b() {
         final JexlEngine jexl = new JexlBuilder().create();
+        // @formatter:off
         final List<String> srcs = Arrays.asList(
                 "const f = ()->{ var foo = 3; f = 5; }",
                 "const y = '42'; const f = (let z)->{ y += z; }",
                 "const foo = '34'; const f = ()->{ foo = 3; };",
                 "const bar = '34'; const f = ()->{  bar = 3; z ->{ bar += z; } };",
                 "let bar = '34'; const f = ()->{  const bar = 3; z ->{ bar += z; } };");
-        for(final String src: srcs) {
+        // @formatter:on
+        for (final String src : srcs) {
             try {
                 final JexlScript script = jexl.createScript(src);
                 final Object result = script.execute(null);
@@ -489,6 +495,7 @@ public class LexicalTest {
 
     @Test
     public void testConstCaptures() {
+        // @formatter:off
         final List<String> srcsFalse = Arrays.asList(
                 "const x = 0;  x = 1;",
                 "const x = 0; x *= 1;",
@@ -501,13 +508,16 @@ public class LexicalTest {
                 "const x = 0; if (true) { if (false) { y -> { z -> { x = y + 1; x } } }" ,
                 ""
         );
+        // @formatter:on
         checkParse(srcsFalse, false);
+        // @formatter:off
         final List<String> srcsTrue = Arrays.asList(
             "const x = 0; if (true) { var f  = x -> x + 1;}" ,
             "const x = 0; if (true) { var f  = y -> { var x = y + 1; x } }" ,
             "const x = 0; if (true) { var f  = y -> { const x = y + 1; x } }" ,
             "const x = 0; if (true) { var f  = y -> { z -> { let x = y + 1; x } } }" ,
-        "");
+            "");
+        // @formatter:on
         checkParse(srcsTrue, true);
     }
 
