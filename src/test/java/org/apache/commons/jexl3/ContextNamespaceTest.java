@@ -199,12 +199,8 @@ public class ContextNamespaceTest extends JexlTestCase {
     private void run348d(final JexlEngine jexl, final JexlContext ctxt, final String ns) {
         final String src = "empty(x) ? z : "+ns+"func(y)";
         // global vars
-        JexlScript script = null;
-        try {
-           script = jexl.createScript(src);
-        } catch (final JexlException.Parsing xparse) {
-            fail(src);
-        }
+        final JexlScript script = jexl.createScript(src);
+
         ctxt.set("x", null);
         ctxt.set("z", 169);
         ctxt.set("y", 1);
