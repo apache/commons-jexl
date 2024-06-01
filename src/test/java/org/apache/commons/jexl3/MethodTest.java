@@ -416,46 +416,17 @@ public class MethodTest extends JexlTestCase {
 
     @Test
     public void testInvoke() throws Exception {
-        Functor func = new Functor();
+        final Functor func = new Functor();
         assertEquals(Integer.valueOf(10), JEXL.invokeMethod(func, "ten"));
         assertEquals(Integer.valueOf(42), JEXL.invokeMethod(func, "PLUS20", Integer.valueOf(22)));
-        try {
-            JEXL.invokeMethod(func, "nonExistentMethod");
-            fail("method does not exist!");
-        } catch (final Exception xj0) {
-            // ignore
-        }
-        try {
-            JEXL.invokeMethod(func, "NPEIfNull", (Object[]) null);
-            fail("method should have thrown!");
-        } catch (final Exception xj0) {
-            // ignore
-        }
-
-        Object result;
-        try {
-            result = JEXL.invokeMethod(func, "over", "foo", 42);
-            assertEquals("foo + 42", result);
-        } catch (final Exception xj0) {
-            // ignore
-            result = xj0;
-        }
-
-        try {
-            result = JEXL.invokeMethod(func, "over", null, null);
-            fail("method should have thrown!");
-        } catch (final Exception xj0) {
-            // ignore
-            result = xj0;
-        }
-
-        func = new FunctorOver();
-        try {
-            result = JEXL.invokeMethod(func, "over", null, null);
-            assertEquals("null + null", result);
-        } catch (final Exception xj0) {
-            fail("method should not have thrown!");
-        }
+        assertThrows(Exception.class, () -> JEXL.invokeMethod(func, "nonExistentMethod"), "method does not exist!");
+        assertThrows(Exception.class, () -> JEXL.invokeMethod(func, "NPEIfNull", (Object[]) null), "method should have thrown!");
+        Object result = JEXL.invokeMethod(func, "over", "foo", 42);
+        assertEquals("foo + 42", result);
+        assertThrows(Exception.class, () -> JEXL.invokeMethod(func, "over", null, null));
+        final Functor func1 = new FunctorOver();
+        result = JEXL.invokeMethod(func1, "over", null, null);
+        assertEquals("null + null", result);
     }
 
     /**
