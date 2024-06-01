@@ -27,9 +27,6 @@ import org.apache.commons.jexl3.JexlException;
 public final class PropertyGetExecutor extends AbstractExecutor.Get {
     /** A static signature for method(). */
     private static final Object[] EMPTY_PARAMS = {};
-    /** The property. */
-    private final String property;
-
     /**
      * Discovers a PropertyGetExecutor.
      * <p>The method to be found should be named "get{P,p}property.</p>
@@ -43,6 +40,42 @@ public final class PropertyGetExecutor extends AbstractExecutor.Get {
         final java.lang.reflect.Method method = discoverGet(is, "get", clazz, property);
         return method == null ? null : new PropertyGetExecutor(clazz, method, property);
     }
+
+    /**
+     * Base method for boolean and object property get.
+     * @param is the introspector
+     * @param which "is" or "get" for boolean or object
+     * @param clazz The class being examined.
+     * @param property The property being addressed.
+     * @return The {get,is}{p,P}roperty method if one exists, null otherwise.
+     */
+    static java.lang.reflect.Method discoverGet(final Introspector is,
+                                                final String which,
+                                                final Class<?> clazz,
+                                                final String property) {
+        if (property == null || property.isEmpty()) {
+            return null;
+        }
+        //  this is gross and linear, but it keeps it straightforward.
+        java.lang.reflect.Method method;
+        final int start = which.length(); // "get" or "is" so 3 or 2 for char case switch
+        // start with get<Property>
+        final StringBuilder sb = new StringBuilder(which);
+        sb.append(property);
+        // uppercase nth char
+        final char c = sb.charAt(start);
+        sb.setCharAt(start, Character.toUpperCase(c));
+        method = is.getMethod(clazz, sb.toString(), EMPTY_PARAMS);
+        //lowercase nth char
+        if (method == null) {
+            sb.setCharAt(start, Character.toLowerCase(c));
+            method = is.getMethod(clazz, sb.toString(), EMPTY_PARAMS);
+        }
+        return method;
+    }
+
+    /** The property. */
+    private final String property;
 
     /**
      * Creates an instance.
@@ -79,39 +112,6 @@ public final class PropertyGetExecutor extends AbstractExecutor.Get {
             }
         }
         return TRY_FAILED;
-    }
-
-    /**
-     * Base method for boolean and object property get.
-     * @param is the introspector
-     * @param which "is" or "get" for boolean or object
-     * @param clazz The class being examined.
-     * @param property The property being addressed.
-     * @return The {get,is}{p,P}roperty method if one exists, null otherwise.
-     */
-    static java.lang.reflect.Method discoverGet(final Introspector is,
-                                                final String which,
-                                                final Class<?> clazz,
-                                                final String property) {
-        if (property == null || property.isEmpty()) {
-            return null;
-        }
-        //  this is gross and linear, but it keeps it straightforward.
-        java.lang.reflect.Method method;
-        final int start = which.length(); // "get" or "is" so 3 or 2 for char case switch
-        // start with get<Property>
-        final StringBuilder sb = new StringBuilder(which);
-        sb.append(property);
-        // uppercase nth char
-        final char c = sb.charAt(start);
-        sb.setCharAt(start, Character.toUpperCase(c));
-        method = is.getMethod(clazz, sb.toString(), EMPTY_PARAMS);
-        //lowercase nth char
-        if (method == null) {
-            sb.setCharAt(start, Character.toLowerCase(c));
-            method = is.getMethod(clazz, sb.toString(), EMPTY_PARAMS);
-        }
-        return method;
     }
 }
 
