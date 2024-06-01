@@ -150,8 +150,7 @@ public final class TemplateEngine extends JxltEngine {
                     strb.append(value.toString());
                 }
             }
-            value = strb.toString();
-            return value;
+            return strb.toString();
         }
 
         @Override
