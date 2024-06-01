@@ -632,6 +632,7 @@ public class Issues200Test extends JexlTestCase {
 
     @Test
     public void test278() throws Exception {
+        // @formatter:off
         final String[] srcs = {
             "return union x143('arg',5,6) ",
             "return union y143('arg',5,6)   ;",
@@ -641,26 +642,24 @@ public class Issues200Test extends JexlTestCase {
         final Object[] ctls = {
             "42","42","42", 42
         };
+        // @formatter:on
         final JexlEngine jexl = new JexlBuilder().cache(4).create();
         final JexlContext ctxt = new MapContext();
-        final int[] foo = {42};
+        final int[] foo = { 42 };
         ctxt.set("foo", foo);
         ctxt.set("union", "42");
         Object value;
         JexlScript jc;
-        for(int i = 0; i < srcs.length; ++i) {
-            String src = srcs[i];
-            try {
-                jc = jexl.createScript(src);
-                fail("should have failed, " + (jc != null));
-            } catch (final JexlException.Ambiguous xa) {
-                final String str = xa.toString();
-                assertTrue(str.contains("143"));
-                src = xa.tryCleanSource(src);
-            }
-            jc = jexl.createScript(src);
+        for (int i = 0; i < srcs.length; ++i) {
+            final String src = srcs[i];
+            final JexlException.Ambiguous xa = assertThrows(JexlException.Ambiguous.class, () -> jexl.createScript(src));
+            final String str = xa.toString();
+            assertTrue(str.contains("143"));
+            String clean = xa.tryCleanSource(src);
+
+            jc = jexl.createScript(clean);
             value = jc.execute(ctxt);
-            assertEquals(ctls[i], value, src);
+            assertEquals(ctls[i], value, clean);
         }
     }
 
