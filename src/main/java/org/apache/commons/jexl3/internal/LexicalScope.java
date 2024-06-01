@@ -72,71 +72,18 @@ public class LexicalScope {
     }
 
     /**
-     * Ensures more symbols can be stored.
-     *
-     * @return the set of more symbols
-     */
-    private BitSet moreBits() {
-        if (moreSymbols == null) {
-            moreSymbols = new BitSet();
-        }
-        return moreSymbols;
-    }
-
-    /**
-     * Whether a given bit (not symbol) is set.
-     * @param bit the bit
-     * @return true if set
-     */
-    private boolean isSet(final int bit) {
-        if (bit < BITS_PER_LONG) {
-            return (symbols & 1L << bit) != 0L;
-        }
-        return moreSymbols != null && moreSymbols.get(bit - BITS_PER_LONG);
-    }
-
-    /**
-     * Sets a given bit (not symbol).
-     * @param bit the bit
-     * @return true if it was actually set, false if it was set before
-     */
-    private boolean set(final int bit) {
-        if (bit < BITS_PER_LONG) {
-            if ((symbols & 1L << bit) != 0L) {
-                return false;
-            }
-            symbols |= 1L << bit;
-        } else {
-            final int bit64 = bit - BITS_PER_LONG;
-            final BitSet ms = moreBits();
-            if (ms.get(bit64)) {
-                return false;
-            }
-            ms.set(bit64, true);
-        }
-        return true;
-    }
-
-    /**
-     * Checks whether a symbol has already been declared.
+     * Adds a constant in this scope.
      *
      * @param symbol the symbol
-     * @return true if declared, false otherwise
+     * @return true if registered, false if symbol was already registered
      */
-    public boolean hasSymbol(final int symbol) {
-        final int bit = symbol << SYMBOL_SHIFT;
-        return isSet(bit);
-    }
-
-    /**
-     * Checks whether a symbol is declared as a constant.
-     *
-     * @param symbol the symbol
-     * @return true if declared as constant, false otherwise
-     */
-    public boolean isConstant(final int symbol) {
+    public boolean addConstant(final int symbol) {
+        final int letb = symbol << SYMBOL_SHIFT ;
+        if (!isSet(letb)) {
+            throw new IllegalStateException("const not declared as symbol " + symbol);
+        }
         final int bit = symbol << SYMBOL_SHIFT | 1;
-        return isSet(bit);
+        return set(bit);
     }
 
     /**
@@ -152,21 +99,6 @@ public class LexicalScope {
             return true;
         }
         return false;
-    }
-
-    /**
-     * Adds a constant in this scope.
-     *
-     * @param symbol the symbol
-     * @return true if registered, false if symbol was already registered
-     */
-    public boolean addConstant(final int symbol) {
-        final int letb = symbol << SYMBOL_SHIFT ;
-        if (!isSet(letb)) {
-            throw new IllegalStateException("const not declared as symbol " + symbol);
-        }
-        final int bit = symbol << SYMBOL_SHIFT | 1;
-        return set(bit);
     }
 
     /**
@@ -206,5 +138,73 @@ public class LexicalScope {
      */
     public int getSymbolCount() {
         return count;
+    }
+
+    /**
+     * Checks whether a symbol has already been declared.
+     *
+     * @param symbol the symbol
+     * @return true if declared, false otherwise
+     */
+    public boolean hasSymbol(final int symbol) {
+        final int bit = symbol << SYMBOL_SHIFT;
+        return isSet(bit);
+    }
+
+    /**
+     * Checks whether a symbol is declared as a constant.
+     *
+     * @param symbol the symbol
+     * @return true if declared as constant, false otherwise
+     */
+    public boolean isConstant(final int symbol) {
+        final int bit = symbol << SYMBOL_SHIFT | 1;
+        return isSet(bit);
+    }
+
+    /**
+     * Whether a given bit (not symbol) is set.
+     * @param bit the bit
+     * @return true if set
+     */
+    private boolean isSet(final int bit) {
+        if (bit < BITS_PER_LONG) {
+            return (symbols & 1L << bit) != 0L;
+        }
+        return moreSymbols != null && moreSymbols.get(bit - BITS_PER_LONG);
+    }
+
+    /**
+     * Ensures more symbols can be stored.
+     *
+     * @return the set of more symbols
+     */
+    private BitSet moreBits() {
+        if (moreSymbols == null) {
+            moreSymbols = new BitSet();
+        }
+        return moreSymbols;
+    }
+
+    /**
+     * Sets a given bit (not symbol).
+     * @param bit the bit
+     * @return true if it was actually set, false if it was set before
+     */
+    private boolean set(final int bit) {
+        if (bit < BITS_PER_LONG) {
+            if ((symbols & 1L << bit) != 0L) {
+                return false;
+            }
+            symbols |= 1L << bit;
+        } else {
+            final int bit64 = bit - BITS_PER_LONG;
+            final BitSet ms = moreBits();
+            if (ms.get(bit64)) {
+                return false;
+            }
+            ms.set(bit64, true);
+        }
+        return true;
     }
 }
