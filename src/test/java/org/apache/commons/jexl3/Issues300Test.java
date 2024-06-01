@@ -432,21 +432,19 @@ public class Issues300Test {
 
     @Test
     public void test309b() {
+        // @formatter:off
         final String src = "<html lang=\"en\">\n"
                 + "  <body>\n"
                 + "    <h1>Hello World!</h1>\n"
                 + "$$ var i = a b c;\n"
                 + "  </body>\n"
                 + "</html>";
+        // @formatter:on
         final JexlEngine jexl = new JexlBuilder().safe(true).create();
         final JxltEngine jxlt = jexl.createJxltEngine();
         final JexlInfo info = new JexlInfo("template", 1, 1);
-        try {
-            final JxltEngine.Template tmplt = jxlt.createTemplate(info, src);
-            fail("shoud have thrown exception");
-        } catch (final JexlException.Parsing xerror) {
-            assertEquals(4, xerror.getInfo().getLine());
-        }
+        final JexlException.Parsing xerror = assertThrows(JexlException.Parsing.class, () -> jxlt.createTemplate(info, src));
+        assertEquals(4, xerror.getInfo().getLine());
     }
 
     @Test
