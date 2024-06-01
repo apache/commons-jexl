@@ -846,13 +846,8 @@ public class Issues300Test {
         final String src = "var i = ++1";
         final JexlEngine jexl = new JexlBuilder().safe(true).create();
         final JexlInfo info = new JexlInfo("badscript", 0, 0);
-        try {
-            final JexlScript script = jexl.createScript(info, src);
-            fail("should not parse");
-        } catch (final JexlException.Parsing xparse) {
-            final String msg = xparse.getMessage();
-            assertTrue(msg.contains("badscript"));
-        }
+        final JexlException.Parsing xparse = assertThrows(JexlException.Parsing.class, () -> jexl.createScript(info, src), "should not parse");
+        assertTrue(xparse.getMessage().contains("badscript"));
     }
 
     @Test
@@ -865,13 +860,7 @@ public class Issues300Test {
         myObject.setName("John");
         final JexlContext context = new ObjectContext<>(engine, myObject);
         // Expect an exception because nested is null, so we are doing null.name
-        try {
-            final Object result = expr.evaluate(context);
-            fail("An exception expected, but got: " + result);
-        } catch (final JexlException ex) {
-            // Expected
-            //ex.printStackTrace();
-        }
+        assertThrows(JexlException.class, () -> expr.evaluate(context));
     }
 
     @Test
