@@ -17,9 +17,8 @@
 package org.apache.commons.jexl3;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.math.BigInteger;
 import java.util.Map;
@@ -150,19 +149,14 @@ public class AntishCallTest extends JexlTestCase {
     public void testAntishArithmetic() throws Exception {
         final CallSupportArithmetic ja = new CallSupportArithmetic(true);
         final JexlEngine jexl = new JexlBuilder().cache(512).arithmetic(ja).create();
-        final Map<String,Object> lmap = new TreeMap<>();
+        final Map<String, Object> lmap = new TreeMap<>();
         final JexlContext jc = new MapContext(lmap);
         lmap.put("java.math.BigInteger", java.math.BigInteger.class);
         runTestCall(jexl, jc);
         lmap.put("java.math.BigInteger", new ClassReference(BigInteger.class));
         runTestCall(jexl, jc);
         lmap.remove("java.math.BigInteger");
-        try {
-            runTestCall(jexl, jc);
-        fail("should have failed");
-        } catch (final JexlException xjexl) {
-            //
-        }
+        assertThrows(JexlException.class, () -> runTestCall(jexl, jc));
     }
 
     @Test
@@ -185,63 +179,30 @@ public class AntishCallTest extends JexlTestCase {
         JexlScript script;
         Object result;
 
-        script = JEXL.createScript("x.y.z");
-        result = script.execute(ctxt);
+        final JexlScript script0 = JEXL.createScript("x.y.z");
+        result = script0.execute(ctxt);
         assertEquals(42, result);
         assertEquals(42, ctxt.get("x.y.z"));
 
         options.setAntish(false);
-        try {
-            result = script.execute(ctxt);
-            fail("antish var shall not be resolved");
-        } catch (final JexlException.Variable xvar) {
-            assertEquals("x", xvar.getVariable());
-        } catch (final JexlException xother) {
-            assertNotNull(xother);
-        } finally {
-            options.setAntish(true);
-        }
+        assertThrows(JexlException.class, () -> script0.execute(ctxt), "antish var shall not be resolved");
+        options.setAntish(true);
 
-        result = null;
         script = JEXL.createScript("x?.y?.z");
         result = script.execute(ctxt);
         assertNull(result); // safe navigation, null
 
-        result = null;
-        script = JEXL.createScript("x?.y?.z = 3");
-        try {
-             result = script.execute(ctxt);
-             fail("not antish assign");
-        } catch (final JexlException xjexl) {
-            assertNull(result);
-        }
+        final JexlScript script1 = JEXL.createScript("x?.y?.z = 3");
+        assertThrows(JexlException.class, () -> script1.execute(ctxt), "not antish assign");
 
-        result = null;
-        script = JEXL.createScript("x.y?.z");
-        try {
-             result = script.execute(ctxt);
-             fail("x not defined");
-        } catch (final JexlException xjexl) {
-            assertNull(result);
-        }
+        final JexlScript script2 = JEXL.createScript("x.y?.z");
+        assertThrows(JexlException.class, () -> script2.execute(ctxt), "x not defined");
 
-        result = null;
-        script = JEXL.createScript("x.y?.z = 3");
-        try {
-             result = script.execute(ctxt);
-             fail("not antish assign");
-        } catch (final JexlException xjexl) {
-            assertNull(result);
-        }
+        final JexlScript script3 = JEXL.createScript("x.y?.z = 3");
+        assertThrows(JexlException.class, () -> script3.execute(ctxt), "x not defined");
 
-        result = null;
-        script = JEXL.createScript("x.`'y'`.z = 3");
-        try {
-             result = script.execute(ctxt);
-             fail("not antish assign");
-        } catch (final JexlException xjexl) {
-            assertNull(result);
-        }
+        final JexlScript script4 = JEXL.createScript("x.`'y'`.z = 3");
+        assertThrows(JexlException.class, () -> script4.execute(ctxt), "x not defined");
     }
 
 }
