@@ -18,6 +18,7 @@ package org.apache.commons.jexl3;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.ArrayList;
@@ -382,14 +383,9 @@ public class CacheTest extends JexlTestCase {
                 assertEquals(expected, result, compute2::toString);
 
                 if (value instanceof Integer) {
-                    try {
-                        vars.put("a0", Short.valueOf((short) 17));
-                        vars.put("a1", Short.valueOf((short) 19));
-                        result = ambiguous.evaluate(jc);
-                        fail("should have thrown an exception");
-                    } catch (final JexlException xany) {
-                        // throws due to ambiguous exception
-                    }
+                    vars.put("a0", Short.valueOf((short) 17));
+                    vars.put("a1", Short.valueOf((short) 19));
+                    assertThrows(JexlException.class, () -> ambiguous.evaluate(jc));
                 }
 
                 if (value instanceof String) {
@@ -404,19 +400,15 @@ public class CacheTest extends JexlTestCase {
                 result = compute1.evaluate(jc);
                 assertEquals(expected, result, compute1::toString);
 
-                try {
-                    vars.put("a0", null);
-                    result = compute1null.evaluate(jc);
-                    fail("should have thrown an exception");
-                } catch (final JexlException xany) {
-                    // throws due to ambiguous exception
-                    final String sany = xany.getMessage();
-                    final String tname = getClass().getName();
-                    if (!sany.startsWith(tname)) {
-                        fail("debug mode should carry caller information, "
-                                + sany + ", "
-                                + tname);
-                    }
+                vars.put("a0", null);
+                final JexlException xany = assertThrows(JexlException.class, () -> compute1null.evaluate(jc));
+                // throws due to ambiguous exception
+                final String sany = xany.getMessage();
+                final String tname = getClass().getName();
+                if (!sany.startsWith(tname)) {
+                    fail("debug mode should carry caller information, "
+                            + sany + ", "
+                            + tname);
                 }
             }
             return Integer.valueOf(loops);
