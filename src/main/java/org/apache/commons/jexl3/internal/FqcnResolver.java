@@ -55,44 +55,6 @@ import org.apache.commons.jexl3.introspection.JexlUberspect;
     private final FqcnResolver parent;
 
     /**
-     * Adds a collection of packages as import root, checks the names are one of a package.
-     * @param names the package names
-     */
-    private void importCheck(final Iterable<String> names) {
-        if (names != null) {
-            names.forEach(this::importCheck);
-        }
-    }
-
-    /**
-     * Adds a package as import root, checks the name if one of a package.
-     * @param name the package name
-     */
-    private void importCheck(final String name) {
-        // check the package name actually points to a package to avoid clutter
-        if (name != null && Package.getPackage(name) != null) {
-            imports.add(name);
-        }
-    }
-
-    @Override
-    public String resolveClassName(final String name) {
-        return getQualifiedName(name);
-    }
-
-    /**
-     * Creates a class name solver.
-     *
-     * @param uber   the optional class loader
-     * @param packages the optional package names
-     */
-    FqcnResolver(final JexlUberspect uber, final Iterable<String> packages) {
-        this.uberspect = uber;
-        this.parent = null;
-        importCheck(packages);
-    }
-
-    /**
      * Creates a class name solver.
      *
      * @param solver the parent solver
@@ -107,43 +69,15 @@ import org.apache.commons.jexl3.introspection.JexlUberspect;
     }
 
     /**
-     * Checks is a package is imported by this solver of one of its ascendants.
+     * Creates a class name solver.
      *
-     * @param pkg the package name
-     * @return true if an import exists for this package, false otherwise
+     * @param uber   the optional class loader
+     * @param packages the optional package names
      */
-    boolean isImporting(final String pkg) {
-        if (parent != null && parent.isImporting(pkg)) {
-            return true;
-        }
-        lock.readLock().lock();
-        try {
-            return imports.contains(pkg);
-        } finally {
-            lock.readLock().unlock();
-        }
-    }
-
-    /**
-     * Imports a list of packages as solving roots.
-     *
-     * @param packages the packages
-     * @return this solver
-     */
-    FqcnResolver importPackages(final Iterable<String> packages) {
-        if (packages != null) {
-            lock.writeLock().lock();
-            try {
-                if (parent == null) {
-                    importCheck(packages);
-                } else {
-                    packages.forEach(pkg ->{ if (!parent.isImporting(pkg)) { importCheck(pkg); }});
-                }
-            } finally {
-                lock.writeLock().unlock();
-            }
-        }
-        return this;
+    FqcnResolver(final JexlUberspect uber, final Iterable<String> packages) {
+        this.uberspect = uber;
+        this.parent = null;
+        importCheck(packages);
     }
 
     /**
@@ -187,5 +121,71 @@ import org.apache.commons.jexl3.introspection.JexlUberspect;
             }
         }
         return fqcn;
+    }
+
+    /**
+     * Adds a collection of packages as import root, checks the names are one of a package.
+     * @param names the package names
+     */
+    private void importCheck(final Iterable<String> names) {
+        if (names != null) {
+            names.forEach(this::importCheck);
+        }
+    }
+
+    /**
+     * Adds a package as import root, checks the name if one of a package.
+     * @param name the package name
+     */
+    private void importCheck(final String name) {
+        // check the package name actually points to a package to avoid clutter
+        if (name != null && Package.getPackage(name) != null) {
+            imports.add(name);
+        }
+    }
+
+    /**
+     * Imports a list of packages as solving roots.
+     *
+     * @param packages the packages
+     * @return this solver
+     */
+    FqcnResolver importPackages(final Iterable<String> packages) {
+        if (packages != null) {
+            lock.writeLock().lock();
+            try {
+                if (parent == null) {
+                    importCheck(packages);
+                } else {
+                    packages.forEach(pkg ->{ if (!parent.isImporting(pkg)) { importCheck(pkg); }});
+                }
+            } finally {
+                lock.writeLock().unlock();
+            }
+        }
+        return this;
+    }
+
+    /**
+     * Checks is a package is imported by this solver of one of its ascendants.
+     *
+     * @param pkg the package name
+     * @return true if an import exists for this package, false otherwise
+     */
+    boolean isImporting(final String pkg) {
+        if (parent != null && parent.isImporting(pkg)) {
+            return true;
+        }
+        lock.readLock().lock();
+        try {
+            return imports.contains(pkg);
+        } finally {
+            lock.readLock().unlock();
+        }
+    }
+
+    @Override
+    public String resolveClassName(final String name) {
+        return getQualifiedName(name);
     }
 }
