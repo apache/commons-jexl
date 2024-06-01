@@ -28,11 +28,6 @@ import org.apache.commons.jexl3.JexlException;
 public class PropertySetExecutor extends AbstractExecutor.Set {
     /** Index of the first character of the set{p,P}roperty. */
     private static final int SET_START_INDEX = 3;
-    /** The property. */
-    protected final String property;
-    /** The property value class. */
-    protected final Class<?> valueClass;
-
     /**
      * Discovers a PropertySetExecutor.
      * <p>The method to be found should be named "set{P,p}property.</p>
@@ -53,6 +48,88 @@ public class PropertySetExecutor extends AbstractExecutor.Set {
         final java.lang.reflect.Method method = discoverSet(is, clazz, property, value);
         return method != null ? new PropertySetExecutor(clazz, method, property, value) : null;
     }
+    /**
+     * Discovers the method for a {@link org.apache.commons.jexl3.introspection.JexlPropertySet}.
+     * <p>The method to be found should be named "set{P,p}property.
+     * As a special case, any empty array will try to find a valid array-setting non-ambiguous method.
+     *
+     * @param is       the introspector
+     * @param clazz    the class to find the get method from
+     * @param property the name of the property to set
+     * @param arg      the value to assign to the property
+     * @return the method if found, null otherwise
+     */
+    private static java.lang.reflect.Method discoverSet(final Introspector is,
+                                                        final Class<?> clazz,
+                                                        final String property,
+                                                        final Object arg) {
+        // first, we introspect for the set<identifier> setter method
+        final Object[] params = {arg};
+        final StringBuilder sb = new StringBuilder("set");
+        sb.append(property);
+        // uppercase nth char
+        final char c = sb.charAt(SET_START_INDEX);
+        sb.setCharAt(SET_START_INDEX, Character.toUpperCase(c));
+        java.lang.reflect.Method method = is.getMethod(clazz, sb.toString(), params);
+        // lowercase nth char
+        if (method == null) {
+            sb.setCharAt(SET_START_INDEX, Character.toLowerCase(c));
+            method = is.getMethod(clazz, sb.toString(), params);
+            // uppercase nth char, try array
+            if (method == null && isEmptyArray(arg)) {
+                sb.setCharAt(SET_START_INDEX, Character.toUpperCase(c));
+                method = lookupSetEmptyArray(is, clazz, sb.toString());
+                // lowercase nth char
+                if (method == null) {
+                    sb.setCharAt(SET_START_INDEX, Character.toLowerCase(c));
+                    method = lookupSetEmptyArray(is, clazz, sb.toString());
+                }
+            }
+        }
+        return method;
+    }
+
+    /**
+     * Checks whether an argument is an empty array.
+     * @param arg the argument
+     * @return true if <code>arg</code> is an empty array
+     */
+    private static boolean isEmptyArray(final Object arg) {
+        return arg != null && arg.getClass().isArray() && Array.getLength(arg) == 0;
+    }
+
+    /**
+     * Finds an empty array property setter method by <code>methodName</code>.
+     * <p>This checks only one method with that name accepts an array as sole parameter.
+     * @param is       the introspector
+     * @param clazz    the class to find the get method from
+     * @param methodName    the method name to find
+     * @return         the sole method that accepts an array as parameter
+     */
+    private static java.lang.reflect.Method lookupSetEmptyArray(final Introspector is, final Class<?> clazz, final String methodName) {
+        java.lang.reflect.Method candidate = null;
+        final java.lang.reflect.Method[] methods = is.getMethods(clazz, methodName);
+        if (methods != null) {
+            for (final java.lang.reflect.Method method : methods) {
+                final Class<?>[] paramTypes = method.getParameterTypes();
+                if (paramTypes.length == 1 && paramTypes[0].isArray()) {
+                    if (candidate != null) {
+                        // because the setter method is overloaded for different parameter type,
+                        // return null here to report the ambiguity.
+                        return null;
+                    }
+                    candidate = method;
+                }
+            }
+        }
+        return candidate;
+    }
+
+    /** The property. */
+    protected final String property;
+
+    /** The property value class. */
+    protected final Class<?> valueClass;
 
     /**
      * Creates an instance.
@@ -111,82 +188,5 @@ public class PropertySetExecutor extends AbstractExecutor.Set {
             }
         }
         return TRY_FAILED;
-    }
-
-    /**
-     * Checks whether an argument is an empty array.
-     * @param arg the argument
-     * @return true if <code>arg</code> is an empty array
-     */
-    private static boolean isEmptyArray(final Object arg) {
-        return arg != null && arg.getClass().isArray() && Array.getLength(arg) == 0;
-    }
-
-    /**
-     * Discovers the method for a {@link org.apache.commons.jexl3.introspection.JexlPropertySet}.
-     * <p>The method to be found should be named "set{P,p}property.
-     * As a special case, any empty array will try to find a valid array-setting non-ambiguous method.
-     *
-     * @param is       the introspector
-     * @param clazz    the class to find the get method from
-     * @param property the name of the property to set
-     * @param arg      the value to assign to the property
-     * @return the method if found, null otherwise
-     */
-    private static java.lang.reflect.Method discoverSet(final Introspector is,
-                                                        final Class<?> clazz,
-                                                        final String property,
-                                                        final Object arg) {
-        // first, we introspect for the set<identifier> setter method
-        final Object[] params = {arg};
-        final StringBuilder sb = new StringBuilder("set");
-        sb.append(property);
-        // uppercase nth char
-        final char c = sb.charAt(SET_START_INDEX);
-        sb.setCharAt(SET_START_INDEX, Character.toUpperCase(c));
-        java.lang.reflect.Method method = is.getMethod(clazz, sb.toString(), params);
-        // lowercase nth char
-        if (method == null) {
-            sb.setCharAt(SET_START_INDEX, Character.toLowerCase(c));
-            method = is.getMethod(clazz, sb.toString(), params);
-            // uppercase nth char, try array
-            if (method == null && isEmptyArray(arg)) {
-                sb.setCharAt(SET_START_INDEX, Character.toUpperCase(c));
-                method = lookupSetEmptyArray(is, clazz, sb.toString());
-                // lowercase nth char
-                if (method == null) {
-                    sb.setCharAt(SET_START_INDEX, Character.toLowerCase(c));
-                    method = lookupSetEmptyArray(is, clazz, sb.toString());
-                }
-            }
-        }
-        return method;
-    }
-
-    /**
-     * Finds an empty array property setter method by <code>methodName</code>.
-     * <p>This checks only one method with that name accepts an array as sole parameter.
-     * @param is       the introspector
-     * @param clazz    the class to find the get method from
-     * @param methodName    the method name to find
-     * @return         the sole method that accepts an array as parameter
-     */
-    private static java.lang.reflect.Method lookupSetEmptyArray(final Introspector is, final Class<?> clazz, final String methodName) {
-        java.lang.reflect.Method candidate = null;
-        final java.lang.reflect.Method[] methods = is.getMethods(clazz, methodName);
-        if (methods != null) {
-            for (final java.lang.reflect.Method method : methods) {
-                final Class<?>[] paramTypes = method.getParameterTypes();
-                if (paramTypes.length == 1 && paramTypes[0].isArray()) {
-                    if (candidate != null) {
-                        // because the setter method is overloaded for different parameter type,
-                        // return null here to report the ambiguity.
-                        return null;
-                    }
-                    candidate = method;
-                }
-            }
-        }
-        return candidate;
     }
 }
