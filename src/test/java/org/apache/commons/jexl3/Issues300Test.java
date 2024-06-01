@@ -1036,7 +1036,7 @@ public class Issues300Test {
         final JexlException.Parsing xparse = assertThrows(JexlException.Parsing.class, () -> jexl.createScript(src), "should have failed parsing");
         assertTrue(xparse.getDetail().contains("pragma"));
 
-        String src1 = "if (true) { #pragma one 42 }";
+        final String src1 = "if (true) { #pragma one 42 }";
         script = jexl.createScript(src1);
         final Object result = script.execute(null);
         debuggerCheck(jexl);
@@ -1270,6 +1270,7 @@ public class Issues300Test {
     @Test
     public void testUnsolvableMethod() throws Exception {
         final JexlEngine jexl = new JexlBuilder().create();
+        // @formatter:off
         final JexlScript script = jexl.createScript(
             "var myFunction1 = function(object) {"
                 + " myNonExistentFunction();"
@@ -1278,11 +1279,8 @@ public class Issues300Test {
                 + " myFunction1();"
                 + "}"
                 + "myFunction2();");
-        try {
-            script.execute(new MapContext());
-            fail("myNonExistentFunction() is not solvable");
-        } catch (final JexlException.Method unsolvable) {
-            assertEquals("myNonExistentFunction", unsolvable.getMethod());
-        }
+        // @formatter:on
+        final JexlException.Method unsolvable = assertThrows(JexlException.Method.class, () -> script.execute(new MapContext()));
+        assertEquals("myNonExistentFunction", unsolvable.getMethod());
     }
 }
