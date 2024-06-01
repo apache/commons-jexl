@@ -63,42 +63,14 @@ public class Closure extends Script {
     }
 
     @Override
-    public int hashCode() {
-        // CSOFF: Magic number
-        int hash = 17;
-        hash = 31 * hash + Objects.hashCode(jexl);
-        hash = 31 * hash + Objects.hashCode(source);
-        hash = 31 * hash + (frame != null ? Arrays.deepHashCode(frame.nocycleStack(this)) : 0);
-        // CSON: Magic number
-        return hash;
-    }
-
-    @Override
-    public boolean equals(final Object obj) {
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final Closure other = (Closure) obj;
-        if (this.jexl != other.jexl) {
-            return false;
-        }
-        if (!Objects.equals(this.source, other.source)) {
-            return false;
-        }
-        if (this.frame == other.frame) {
-            return true;
-        }
-        return Arrays.deepEquals(
-                this.frame.nocycleStack(this),
-                other.frame.nocycleStack(other));
-    }
-
-    @Override
-    public String[] getUnboundParameters() {
-        return frame.getUnboundParameters();
+    public Callable callable(final JexlContext context, final Object... args) {
+        final Frame local = frame != null ? frame.assign(args) : null;
+        return new Callable(createInterpreter(context, local, options)) {
+            @Override
+            public Object interpret() {
+                return interpreter.runClosure(Closure.this);
+            }
+        };
     }
 
     /**
@@ -125,6 +97,29 @@ public class Closure extends Script {
     }
 
     @Override
+    public boolean equals(final Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Closure other = (Closure) obj;
+        if (this.jexl != other.jexl) {
+            return false;
+        }
+        if (!Objects.equals(this.source, other.source)) {
+            return false;
+        }
+        if (this.frame == other.frame) {
+            return true;
+        }
+        return Arrays.deepEquals(
+                this.frame.nocycleStack(this),
+                other.frame.nocycleStack(other));
+    }
+
+    @Override
     public Object evaluate(final JexlContext context) {
         return execute(context, (Object[])null);
     }
@@ -142,14 +137,19 @@ public class Closure extends Script {
     }
 
     @Override
-    public Callable callable(final JexlContext context, final Object... args) {
-        final Frame local = frame != null ? frame.assign(args) : null;
-        return new Callable(createInterpreter(context, local, options)) {
-            @Override
-            public Object interpret() {
-                return interpreter.runClosure(Closure.this);
-            }
-        };
+    public String[] getUnboundParameters() {
+        return frame.getUnboundParameters();
+    }
+
+    @Override
+    public int hashCode() {
+        // CSOFF: Magic number
+        int hash = 17;
+        hash = 31 * hash + Objects.hashCode(jexl);
+        hash = 31 * hash + Objects.hashCode(source);
+        hash = 31 * hash + (frame != null ? Arrays.deepHashCode(frame.nocycleStack(this)) : 0);
+        // CSON: Magic number
+        return hash;
     }
 
 }
