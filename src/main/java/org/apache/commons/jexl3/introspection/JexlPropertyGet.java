@@ -39,6 +39,22 @@ public interface JexlPropertyGet {
     Object invoke(Object obj) throws Exception;
 
     /**
+     * Specifies if this JexlPropertyGet is cacheable and able to be reused for
+     * this class of object it was returned for.
+     *
+     * @return true if can be reused for this class, false if not
+     */
+    boolean isCacheable();
+
+    /**
+     * Checks whether a tryInvoke failed or not.
+     *
+     * @param rval the value returned by tryInvoke
+     * @return true if tryInvoke failed, false otherwise
+     */
+    boolean tryFailed(Object rval);
+
+    /**
      * Attempts to reuse this JexlPropertyGet, checking that it is compatible with
      * the actual set of arguments.
      *
@@ -50,20 +66,4 @@ public interface JexlPropertyGet {
      * ({@link java.lang.reflect.InvocationTargetException})
      */
     Object tryInvoke(Object obj, Object key) throws JexlException.TryFailed;
-
-    /**
-     * Checks whether a tryInvoke failed or not.
-     *
-     * @param rval the value returned by tryInvoke
-     * @return true if tryInvoke failed, false otherwise
-     */
-    boolean tryFailed(Object rval);
-
-    /**
-     * Specifies if this JexlPropertyGet is cacheable and able to be reused for
-     * this class of object it was returned for.
-     *
-     * @return true if can be reused for this class, false if not
-     */
-    boolean isCacheable();
 }
