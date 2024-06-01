@@ -16,7 +16,9 @@
  */
 package org.apache.commons.jexl3;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -32,7 +34,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.function.Function;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import com.sun.net.httpserver.HttpExchange;
