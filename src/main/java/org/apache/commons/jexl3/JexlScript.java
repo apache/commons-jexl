@@ -40,92 +40,6 @@ import java.util.concurrent.Callable;
 public interface JexlScript {
 
      /**
-     * Returns the source text of this expression.
-      *
-     * @return the source text
-     */
-    String getSourceText();
-
-    /**
-     * Recreates the source text of this expression from the internal syntactic tree.
-     *
-     * @return the source text
-     */
-    String getParsedText();
-
-    /**
-     * Recreates the source text of this expression from the internal syntactic tree.
-     *
-     * @param indent the number of spaces for indentation, 0 meaning no indentation
-     * @return the source text
-     */
-    String getParsedText(int indent);
-
-    /**
-     * Executes the script with the variables contained in the
-     * supplied {@link JexlContext}.
-     *
-     * @param context A JexlContext containing variables.
-     * @return The result of this script, usually the result of
-     *         the last statement.
-     */
-    Object execute(JexlContext context);
-
-    /**
-     * Executes the script with the variables contained in the
-     * supplied {@link JexlContext} and a set of arguments corresponding to the
-     * parameters used during parsing.
-     *
-     * @param context A JexlContext containing variables.
-     * @param args the arguments
-     * @return The result of this script, usually the result of
-     *         the last statement.
-     * @since 2.1
-     */
-    Object execute(JexlContext context, Object... args);
-
-    /**
-     * Gets this script parameters.
-     *
-     * @return the parameters or null
-     * @since 2.1
-     */
-    String[] getParameters();
-
-    /**
-     * Gets this script unbound parameters.
-     * <p>Parameters that haven't been bound by a previous call to curry().</p>
-     * @return the parameters or null
-     * @since 3.2
-     */
-    String[] getUnboundParameters();
-
-    /**
-     * Gets this script local variables.
-     *
-     * @return the local variables or null
-     * @since 2.1
-     */
-    String[] getLocalVariables();
-
-    /**
-     * Gets this script variables.
-     * <p>Note that since variables can be in an ant-ish form (ie foo.bar.quux), each variable is returned as
-     * a list of strings where each entry is a fragment of the variable ({"foo", "bar", "quux"} in the example.</p>
-     *
-     * @return the variables or null
-     * @since 2.1
-     */
-    Set<List<String>> getVariables();
-
-    /**
-     * Gets this script pragmas.
-     *
-     * @return the (non null, may be empty) pragmas map
-     */
-    Map<String, Object> getPragmas();
-
-    /**
      * Creates a Callable from this script.
      *
      * <p>This allows to submit it to an executor pool and provides support for asynchronous calls.</p>
@@ -160,4 +74,90 @@ public interface JexlScript {
      * @return the curried script or this script if no binding can occur
      */
     JexlScript curry(Object... args);
+
+    /**
+     * Executes the script with the variables contained in the
+     * supplied {@link JexlContext}.
+     *
+     * @param context A JexlContext containing variables.
+     * @return The result of this script, usually the result of
+     *         the last statement.
+     */
+    Object execute(JexlContext context);
+
+    /**
+     * Executes the script with the variables contained in the
+     * supplied {@link JexlContext} and a set of arguments corresponding to the
+     * parameters used during parsing.
+     *
+     * @param context A JexlContext containing variables.
+     * @param args the arguments
+     * @return The result of this script, usually the result of
+     *         the last statement.
+     * @since 2.1
+     */
+    Object execute(JexlContext context, Object... args);
+
+    /**
+     * Gets this script local variables.
+     *
+     * @return the local variables or null
+     * @since 2.1
+     */
+    String[] getLocalVariables();
+
+    /**
+     * Gets this script parameters.
+     *
+     * @return the parameters or null
+     * @since 2.1
+     */
+    String[] getParameters();
+
+    /**
+     * Recreates the source text of this expression from the internal syntactic tree.
+     *
+     * @return the source text
+     */
+    String getParsedText();
+
+    /**
+     * Recreates the source text of this expression from the internal syntactic tree.
+     *
+     * @param indent the number of spaces for indentation, 0 meaning no indentation
+     * @return the source text
+     */
+    String getParsedText(int indent);
+
+    /**
+     * Gets this script pragmas.
+     *
+     * @return the (non null, may be empty) pragmas map
+     */
+    Map<String, Object> getPragmas();
+
+    /**
+     * Returns the source text of this expression.
+      *
+     * @return the source text
+     */
+    String getSourceText();
+
+    /**
+     * Gets this script unbound parameters.
+     * <p>Parameters that haven't been bound by a previous call to curry().</p>
+     * @return the parameters or null
+     * @since 3.2
+     */
+    String[] getUnboundParameters();
+
+    /**
+     * Gets this script variables.
+     * <p>Note that since variables can be in an ant-ish form (ie foo.bar.quux), each variable is returned as
+     * a list of strings where each entry is a fragment of the variable ({"foo", "bar", "quux"} in the example.</p>
+     *
+     * @return the variables or null
+     * @since 2.1
+     */
+    Set<List<String>> getVariables();
 }
