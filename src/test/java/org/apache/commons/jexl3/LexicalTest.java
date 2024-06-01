@@ -581,13 +581,8 @@ public class LexicalTest {
         f.lexical(true);
         f.lexicalShade(true);
         final JexlEngine jexl = createEngine(f);
-        try {
-            final JexlScript script = jexl.createScript("for(var x : 1..3) { var c = 0} for(var x : 1..3) { var c = 0}; return x");
-            fail("Should not have been parsed");
-        } catch (final JexlException ex) {
-           // OK
-           assertTrue(ex instanceof JexlException);
-        }
+        assertThrows(JexlException.class, () -> jexl.createScript("for(var x : 1..3) { var c = 0} for(var x : 1..3) { var c = 0}; return x"),
+                "Should not have been parsed");
     }
 
     @Test
@@ -596,13 +591,8 @@ public class LexicalTest {
         f.lexical(true);
         f.lexicalShade(true);
         final JexlEngine jexl = createEngine(f);
-        try {
-            final JexlScript script = jexl.createScript("for(let x : 1..3) { let c = 0} for(let x : 1..3) { var c = 0}; return x");
-            fail("Should not have been parsed");
-        } catch (final JexlException ex) {
-            // OK
-            assertTrue(ex instanceof JexlException);
-        }
+        assertThrows(JexlException.class, () -> jexl.createScript("for(let x : 1..3) { let c = 0} for(let x : 1..3) { var c = 0}; return x"),
+                "Should not have been parsed");
     }
 
     @Test
@@ -610,10 +600,12 @@ public class LexicalTest {
         final JexlFeatures f = new JexlFeatures();
         f.lexical(true);
         final JexlEngine jexl = new JexlBuilder().strict(true).features(f).create();
+        // @formatter:off
         final JexlScript script = jexl.createScript(
                 "var x = 32; ("
                         + "()->{ for(var x : null) { var c = 0; {return x; }} })"
                         + "();");
+        // @formatter:on
         assertNull(script.execute(null));
     }
 
@@ -715,28 +707,18 @@ public class LexicalTest {
         final JexlOptions options = ctxt.getEngineOptions();
         // ensure errors will throw
         options.setLexical(true);
-        JexlScript script;
         Object result;
 
-        script = jexl.createScript("var x = 0; for(var y : [1]) { var x = 42; return x; };");
-        try {
-        result = script.execute(ctxt);
-        //assertEquals(42, result);
-            fail();
-        } catch (final JexlException xany) {
-            final String ww = xany.toString();
-        }
+        final JexlScript script = jexl.createScript("var x = 0; for(var y : [1]) { var x = 42; return x; };");
+        JexlException xany = assertThrows(JexlException.class, () -> script.execute(ctxt));
+        assertNotNull(xany.toString());
 
-        try {
-            script = jexl.createScript("(x)->{ if (x) { var x = 7 * (x + x); x; } }");
-            result = script.execute(ctxt, 3);
-            fail();
-        } catch (final JexlException xany) {
-            final String ww = xany.toString();
-        }
+        final JexlScript script1 = jexl.createScript("(x)->{ if (x) { var x = 7 * (x + x); x; } }");
+        xany = assertThrows(JexlException.class, () -> script.execute(ctxt, 3));
+        assertNotNull(xany.toString());
 
-        script = jexl.createScript("{ var x = 0; } var x = 42; x");
-        result = script.execute(ctxt, 21);
+        final JexlScript script3 = jexl.createScript("{ var x = 0; } var x = 42; x");
+        result = script3.execute(ctxt, 21);
         assertEquals(42, result);
     }
 
