@@ -17,12 +17,12 @@
 
 package org.apache.commons.jexl3;
 
-import org.apache.commons.jexl3.internal.SoftCache;
-
 import java.util.AbstractMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
+
+import org.apache.commons.jexl3.internal.SoftCache;
 
 /**
  * Creates a cache using an array of synchronized LinkedHashMap as backing store to spread contention.
