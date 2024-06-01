@@ -662,12 +662,8 @@ public class Issues300Test {
         assertEquals(42, expr0.evaluate(null));
         final String parsed = expr0.getParsedText();
         assertEquals(src42, parsed);
-        try {
-            final JexlExpression expr = jexl.createExpression("new()");
-            fail("should not parse");
-        } catch (final JexlException.Parsing xparse) {
-            assertTrue(xparse.toString().contains(")"));
-        }
+        final JexlException.Parsing xparse = assertThrows(JexlException.Parsing.class, () -> jexl.createExpression("new()"), "should not parse");
+        assertTrue(xparse.toString().contains(")"));
     }
 
     @Test
