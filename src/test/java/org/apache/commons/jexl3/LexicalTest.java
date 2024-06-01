@@ -832,12 +832,8 @@ public class LexicalTest {
         final JexlEngine jexl = new JexlBuilder().strict(true).lexical(true).lexicalShade(true).create();
         final JexlScript e = jexl.createScript(str);
         final JexlContext ctxt = new MapContext();
-        try {
-            final Object o = e.execute(ctxt);
-            fail("i should be shaded");
-        } catch (final JexlException xany) {
-            assertNotNull(xany);
-        }
+        JexlException  xany = assertThrows(JexlException.class, () -> e.execute(ctxt), "i should be shaded");
+        assertNotNull(xany.toString());
     }
 
     @Test public void testManyConst() {
