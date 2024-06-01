@@ -19,7 +19,7 @@ package org.apache.commons.jexl3.jexl342;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -78,42 +78,33 @@ public class OptionalTest {
         final JexlEngine jexl = builder.uberspect(new ReferenceUberspect(uber)).safe(false).create();
         final JexlInfo info = new JexlInfo("test352", 1, 1);
         final Thing thing = new Thing();
-        JexlScript script;
+        JexlScript script1;
 
-        script = jexl.createScript(info.at(53, 1),"thing.name.length()", "thing");
-        Object result = script.execute(null, thing);
+        script1 = jexl.createScript(info.at(53, 1),"thing.name.length()", "thing");
+        Object result = script1.execute(null, thing);
         assertNull(result);
 
         thing.name = "foo";
-        result = script.execute(null, thing);
+        result = script1.execute(null, thing);
         assertEquals(3, result);
 
-        try {
-            script = jexl.createScript(info.at(62, 1), "thing.name.size()", "thing");
-            result = script.execute(null, thing);
-            fail("should have thrown");
-        } catch (final JexlException.Method xmethod) {
-            assertEquals("size", xmethod.getDetail());
-            assertEquals("test352@62:11 unsolvable function/method 'size'", xmethod.getMessage());
-        }
-
-        try {
-            script = jexl.createScript(info.at(71, 1), "thing.name?.size()", "thing");
-            result = script.execute(null, thing);
-        } catch (final JexlException.Method xmethod) {
-            fail("should not have thrown");
-        }
-
+        final JexlScript script2 = jexl.createScript(info.at(62, 1), "thing.name.size()", "thing");
+        JexlException.Method xmethod = assertThrows(JexlException.Method.class, () -> script2.execute(null, thing));
+        assertEquals("size", xmethod.getDetail());
+        assertEquals("test352@62:11 unsolvable function/method 'size'", xmethod.getMessage());
+        final JexlScript script3 = jexl.createScript(info.at(71, 1), "thing.name?.size()", "thing");
+        result = script3.execute(null, thing);
+        
         thing.name = null;
-        script = jexl.createScript(info,"thing.names.size()", "thing");
-        result = script.execute(null, thing);
+        script1 = jexl.createScript(info,"thing.names.size()", "thing");
+        result = script1.execute(null, thing);
         assertNull(result);
         thing.name = "froboz";
-        script = jexl.createScript(info,"thing.names", "thing");
-        result = script.execute(null, thing);
+        script1 = jexl.createScript(info,"thing.names", "thing");
+        result = script1.execute(null, thing);
         assertNotNull(result);
-        script = jexl.createScript(info,"thing.names.size()", "thing");
-        result = script.execute(null, thing);
+        script1 = jexl.createScript(info,"thing.names.size()", "thing");
+        result = script1.execute(null, thing);
         assertEquals(1, result);
     }
 
