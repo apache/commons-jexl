@@ -32,8 +32,19 @@ import org.apache.commons.jexl3.introspection.JexlUberspect;
  * @since 3.0
  */
 public final class SandboxUberspect implements JexlUberspect {
+    /**
+     * Identity equality.
+     * <p>Spotbugs just <em>hates</em> string identity...</p>
+     * @param lhs left hand side
+     * @param rhs right hand side
+     * @return true if left is identical to right
+     */
+    private static boolean eq(final Object lhs, final Object rhs) {
+        return lhs == rhs;
+    }
     /** The base uberspect. */
     private final JexlUberspect uberspect;
+
     /**  The sandbox. */
     private final JexlSandbox sandbox;
 
@@ -54,23 +65,18 @@ public final class SandboxUberspect implements JexlUberspect {
     }
 
     @Override
-    public void setClassLoader(final ClassLoader loader) {
-        uberspect.setClassLoader(loader);
-    }
-
-    @Override
-    public ClassLoader getClassLoader() {
-        return uberspect.getClassLoader();
-    }
-
-    @Override
-    public int getVersion() {
-        return uberspect.getVersion();
+    public JexlArithmetic.Uberspect getArithmetic(final JexlArithmetic arithmetic) {
+        return uberspect.getArithmetic(arithmetic);
     }
 
     @Override
     public Class<?> getClassByName(final String className) {
         return uberspect.getClassByName(className);
+    }
+
+    @Override
+    public ClassLoader getClassLoader() {
+        return uberspect.getClassLoader();
     }
 
     @Override
@@ -87,6 +93,11 @@ public final class SandboxUberspect implements JexlUberspect {
     }
 
     @Override
+    public Iterator<?> getIterator(final Object obj) {
+        return uberspect.getIterator(obj);
+    }
+
+    @Override
     public JexlMethod getMethod(final Object obj, final String method, final Object... args) {
         if (obj != null && method != null) {
             final Class<?> clazz = obj instanceof Class ? (Class<?>) obj : obj.getClass();
@@ -96,27 +107,6 @@ public final class SandboxUberspect implements JexlUberspect {
             }
         }
         return null;
-    }
-
-    @Override
-    public List<PropertyResolver> getResolvers(final JexlOperator op, final Object obj) {
-        return uberspect.getResolvers(op, obj);
-    }
-
-    @Override
-    public JexlPropertyGet getPropertyGet(final Object obj, final Object identifier) {
-        return getPropertyGet(null, obj, identifier);
-    }
-
-    /**
-     * Identity equality.
-     * <p>Spotbugs just <em>hates</em> string identity...</p>
-     * @param lhs left hand side
-     * @param rhs right hand side
-     * @return true if left is identical to right
-     */
-    private static boolean eq(final Object lhs, final Object rhs) {
-        return lhs == rhs;
     }
 
     @Override
@@ -144,8 +134,8 @@ public final class SandboxUberspect implements JexlUberspect {
     }
 
     @Override
-    public JexlPropertySet getPropertySet(final Object obj,final Object identifier,final Object arg) {
-        return getPropertySet(null, obj, identifier, arg);
+    public JexlPropertyGet getPropertyGet(final Object obj, final Object identifier) {
+        return getPropertyGet(null, obj, identifier);
     }
 
     @Override
@@ -174,12 +164,22 @@ public final class SandboxUberspect implements JexlUberspect {
     }
 
     @Override
-    public Iterator<?> getIterator(final Object obj) {
-        return uberspect.getIterator(obj);
+    public JexlPropertySet getPropertySet(final Object obj,final Object identifier,final Object arg) {
+        return getPropertySet(null, obj, identifier, arg);
     }
 
     @Override
-    public JexlArithmetic.Uberspect getArithmetic(final JexlArithmetic arithmetic) {
-        return uberspect.getArithmetic(arithmetic);
+    public List<PropertyResolver> getResolvers(final JexlOperator op, final Object obj) {
+        return uberspect.getResolvers(op, obj);
+    }
+
+    @Override
+    public int getVersion() {
+        return uberspect.getVersion();
+    }
+
+    @Override
+    public void setClassLoader(final ClassLoader loader) {
+        uberspect.setClassLoader(loader);
     }
 }
