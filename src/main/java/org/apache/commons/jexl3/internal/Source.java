@@ -47,18 +47,6 @@ public final class Source implements Comparable<Source> {
         this.hashCode = hash;
     }
 
-    /**
-     * @return the length of the script source
-     */
-    int length() {
-        return str.length();
-    }
-
-    @Override
-    public int hashCode() {
-        return hashCode;
-    }
-
     @Override
     public int compareTo(Source s) {
         return str.compareTo(s.str);
@@ -85,16 +73,28 @@ public final class Source implements Comparable<Source> {
         return true;
     }
 
-    @Override
-    public String toString() {
-        return str;
-    }
-
     /**
      * @return the features associated with the source
      */
     public JexlFeatures getFeatures() {
         return features;
+    }
+
+    @Override
+    public int hashCode() {
+        return hashCode;
+    }
+
+    /**
+     * @return the length of the script source
+     */
+    int length() {
+        return str.length();
+    }
+
+    @Override
+    public String toString() {
+        return str;
     }
 
 }
