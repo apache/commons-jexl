@@ -21,7 +21,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.Arrays;
 import java.util.Date;
@@ -726,23 +725,19 @@ public class MethodTest extends JexlTestCase {
         final JexlUberspect uber = JEXL.getUberspect();
         final JexlScript method = JEXL.createScript("(x, y)->{ func.over(x, y) }");
         // tryInvoke
-        //JexlMethod method = uber.getMethod(func, "over", "foo", 42);
+        // JexlMethod method = uber.getMethod(func, "over", "foo", 42);
         assertNotNull(method);
         // tryInvoke succeeds
         result = method.execute(ctxt, "foo", 42);
         assertEquals("foo + 42", result);
         // tryInvoke fails
         func.setKill(true);
-        try {
-            /*result = */method.execute(ctxt, "foo", 42);
-            fail("should throw TryFailed");
-        } catch (final JexlException xfail) {
-            assertEquals(UnsupportedOperationException.class, xfail.getCause().getClass());
-        }
+        JexlException xfail = assertThrows(JexlException.class, () -> method.execute(ctxt, "foo", 42), "should throw TryFailed");
+        assertEquals(UnsupportedOperationException.class, xfail.getCause().getClass());
 
         func.setKill(false);
         final JexlScript setter = JEXL.createScript("(x)->{ func.under = x }");
-        //JexlPropertySet setter = uber.getPropertySet(func, "under", "42");
+        // JexlPropertySet setter = uber.getPropertySet(func, "under", "42");
         result = setter.execute(ctxt, "42");
         assertEquals("42", result);
 
@@ -750,23 +745,16 @@ public class MethodTest extends JexlTestCase {
         assertEquals("42", result);
 
         func.setKill(true);
-        try {
-            /*result = */setter.execute(ctxt, "42");
-            fail("should throw TryFailed");
-        } catch (final JexlException xfail) {
-            assertEquals(UnsupportedOperationException.class, xfail.getCause().getClass());
-        }
+        xfail = assertThrows(JexlException.class, () -> setter.execute(ctxt, "42"), "should throw TryFailed");
+        assertEquals(UnsupportedOperationException.class, xfail.getCause().getClass());
+
         func.setKill(false);
         result = setter.execute(ctxt, "-42");
         assertEquals("-42", result);
 
         func.setKill(true);
-        try {
-            /*result = */getter.execute(ctxt);
-            fail("should throw TryFailed");
-        } catch (final JexlException xfail) {
-            assertEquals(UnsupportedOperationException.class, xfail.getCause().getClass());
-        }
+        xfail = assertThrows(JexlException.class, () -> getter.execute(ctxt), "should throw TryFailed");
+        assertEquals(UnsupportedOperationException.class, xfail.getCause().getClass());
 
         func.setKill(false);
         result = getter.execute(ctxt);
