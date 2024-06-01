@@ -103,7 +103,7 @@ public class Issues300Test {
         }
     }
 
-    static private class Class397 implements Interface397i {
+    private static class Class397 implements Interface397i {
         @Override public String summary() {
             return getClass().getName();
         }
