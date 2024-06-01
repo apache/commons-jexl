@@ -16,7 +16,7 @@
  */
 package org.example;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -32,7 +32,6 @@ import org.apache.commons.jexl3.internal.Engine;
 import org.apache.commons.jexl3.internal.TemplateInterpreter;
 import org.apache.commons.jexl3.introspection.JexlPermissions;
 import org.apache.commons.jexl3.parser.JexlNode;
-import org.junit.Assert;
 import org.junit.Test;
 
 public class SomeTest {
