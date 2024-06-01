@@ -227,10 +227,12 @@ public class JXLTTest extends JexlTestCase {
     public void test311a(final JexlBuilder builder) throws Exception {
         init(builder);
         final JexlContext ctx = null;
+        // @formatter:off
         final String rpt
                 = "$$((a)->{\n"
                 + "<p>Universe ${a}</p>\n"
                 + "$$})(42)";
+        // @formatter:on
         final JxltEngine.Template t = JXLT.createTemplate("$$", new StringReader(rpt));
         final StringWriter strw = new StringWriter();
         t.evaluate(ctx, strw);
@@ -243,10 +245,12 @@ public class JXLTTest extends JexlTestCase {
     public void test311b(final JexlBuilder builder) throws Exception {
         init(builder);
         final JexlContext ctx311 = new Context311();
+        // @formatter:off
         final String rpt
                 = "$$ exec('42').execute(()->{\n"
                 + "<p>Universe 42</p>\n"
                 + "$$})";
+        // @formatter:on
         final JxltEngine.Template t = JXLT.createTemplate("$$", new StringReader(rpt));
         final StringWriter strw = new StringWriter();
         t.evaluate(ctx311, strw, 42);
@@ -260,10 +264,12 @@ public class JXLTTest extends JexlTestCase {
         init(builder);
         final Context311 ctx311 = new Context311();
         ctx311.newOptions().setLexical(true);
+        // @formatter:off
         final String rpt
                 = "$$ exec('42').execute((a)->{"
                 + "\n<p>Universe ${a}</p>"
                 + "\n$$})";
+        // @formatter:on
         final JxltEngine.Template t = JXLT.createTemplate("$$", new StringReader(rpt));
         final StringWriter strw = new StringWriter();
         t.evaluate(ctx311, strw, 42);
@@ -277,10 +283,12 @@ public class JXLTTest extends JexlTestCase {
         init(builder);
         final Context311 ctx311 = new Context311();
         ctx311.newOptions().setLexical(true);
+        // @formatter:off
         final String rpt
                 = "$$ exec('4').execute((a, b)->{"
                 + "\n<p>Universe ${a}${b}</p>"
                 + "\n$$}, '2')";
+        // @formatter:on
         final JxltEngine.Template t = JXLT.createTemplate("$$", new StringReader(rpt));
         final StringWriter strw = new StringWriter();
         t.evaluate(ctx311, strw, 42);
@@ -294,10 +302,12 @@ public class JXLTTest extends JexlTestCase {
         init(builder);
         final Context311 ctx311 = new Context311();
         ctx311.newOptions().setLexical(true);
+        // @formatter:off
         final String rpt
                 = "exec('4').execute((a, b)->{"
                 + " '<p>Universe ' + a + b + '</p>'"
                 + "}, '2')";
+        // @formatter:on
         final JexlScript script = JEXL.createScript(rpt);
         final String output = script.execute(ctx311, 42).toString();
         assertEquals("<p>Universe 42</p>", output);
@@ -309,10 +319,12 @@ public class JXLTTest extends JexlTestCase {
         init(builder);
         final Context311 ctx311 = new Context311();
         ctx311.newOptions().setLexical(true);
+        // @formatter:off
         final String rpt
                 = "exec('4').execute((a, b)->{"
                 + " `<p>Universe ${a}${b}</p>`"
                 + "}, '2')";
+        // @formatter:on
         final JexlScript script = JEXL.createScript(rpt);
         final String output = script.execute(ctx311, 42).toString();
         assertEquals("<p>Universe 42</p>", output);
@@ -324,10 +336,12 @@ public class JXLTTest extends JexlTestCase {
         init(builder);
         final Context311 ctx311 = new Context311();
         ctx311.newOptions().setLexical(true);
+        // @formatter:off
         final String rpt
                 = "(a, b)->{"
                 + " `<p>Universe ${a}${b}</p>`"
                 + "}";
+        // @formatter:on
         final JexlScript script = JEXL.createScript(rpt);
         final String output = script.execute(ctx311, "4", "2").toString();
         assertEquals("<p>Universe 42</p>", output);
@@ -350,10 +364,12 @@ public class JXLTTest extends JexlTestCase {
     public void test311i(final JexlBuilder builder) throws Exception {
         init(builder);
         final JexlContext ctx311 = new Context311();
+        // @formatter:off
         final String rpt
                 = "$$var u = 'Universe'; exec('4').execute((a, b)->{"
                 + "\n<p>${u} ${a}${b}</p>"
                 + "\n$$}, '2')";
+        // @formatter:on
         final JxltEngine.Template t = JXLT.createTemplate("$$", new StringReader(rpt));
         final StringWriter strw = new StringWriter();
         t.evaluate(ctx311, strw, 42);
@@ -396,6 +412,7 @@ public class JXLTTest extends JexlTestCase {
     @MethodSource("engines")
     public void test42(final JexlBuilder builder) throws Exception {
         init(builder);
+        // @formatter:off
         final String test42
                 = "$$ for(var x : list) {\n"
                 + "$$   if (x == 42) {\n"
@@ -406,17 +423,20 @@ public class JXLTTest extends JexlTestCase {
                 + "The value ${x} is under fourty-two\n"
                 + "$$   }\n"
                 + "$$ }\n";
+        // @formatter:on
         final JxltEngine.Template t = JXLT.createTemplate("$$", new StringReader(test42), "list");
         final StringWriter strw = new StringWriter();
         final int[] list = {1, 3, 5, 42, 169};
         t.evaluate(context, strw, list);
         final String output = strw.toString();
+        // @formatter:off
         final String out42
                 = "The value 1 is under fourty-two\n"
                 + "The value 3 is under fourty-two\n"
                 + "The value 5 is under fourty-two\n"
                 + "Life, the universe, and everything\n"
                 + "The value 169 is over fourty-two\n";
+        // @formatter:on
         assertEquals(out42, output);
 
         final String dstr = t.asString();
@@ -446,9 +466,9 @@ public class JXLTTest extends JexlTestCase {
     @MethodSource("engines")
     public void testBadContextNested(final JexlBuilder builder) throws Exception {
         init(builder);
+        final JxltEngine.Expression expr = JXLT.createExpression("#{${hi}+'.world'}");
+        final JexlContext none = null;
         try {
-            final JxltEngine.Expression expr = JXLT.createExpression("#{${hi}+'.world'}");
-            final JexlContext none = null;
             expr.evaluate(none);
             fail("should be malformed");
         } catch (final JxltEngine.Exception xjexl) {
@@ -467,7 +487,6 @@ public class JXLTTest extends JexlTestCase {
         JxltEngine.Expression expr = JXLT.createExpression("${foo.substring(2,4)/*comment*/}");
         Object o = expr.evaluate(context);
         assertEquals("cd", o);
-
         context.set("bar", "foo");
         try {
             options.setSilent(true);
@@ -489,6 +508,7 @@ public class JXLTTest extends JexlTestCase {
         final JexlEngine jexl = new JexlBuilder().create();
         final JxltEngine jxlt = jexl.createJxltEngine();
         JxltEngine.Template tmplt;
+        // @formatter:off
         final String src = "$$/*\n"
                 + "Hello\n"
                 + "$$*/";
@@ -507,6 +527,7 @@ public class JXLTTest extends JexlTestCase {
         final JexlEngine jexl = new JexlBuilder().create();
         final JxltEngine jxlt = jexl.createJxltEngine();
         JxltEngine.Template tmplt;
+        // @formatter:off
         final String src = "$$/*\n"
                 + "one\n"
                 + "$$*/\n"
@@ -514,6 +535,7 @@ public class JXLTTest extends JexlTestCase {
                 + "$$/*\n"
                 + "three\n"
                 + "$$*/\n";
+        // @formatter:on
         tmplt = jxlt.createTemplate(src);
         assertNotNull(tmplt);
         final Writer strw = new StringWriter();
@@ -603,12 +625,14 @@ public class JXLTTest extends JexlTestCase {
     @MethodSource("engines")
     public void testConstantTemplate(final JexlBuilder builder) {
         init(builder);
+        // @formatter:off
         final String src = "<script>\n" +
                 "      function test(src){\n" +
                 "        var res = src.replace(/\\n\\t\\s/g, '\\n');\n" +
                 "      }\n" +
                 "      test();\n" +
                 "    </script>";
+        // @formatter:on
         final JexlContext ctxt = new MapContext();
         final JexlEngine jexl = new JexlBuilder().create();
         final JxltEngine jxlt = jexl.createJxltEngine();
@@ -625,6 +649,7 @@ public class JXLTTest extends JexlTestCase {
     @MethodSource("engines")
     public void testDbgEscapes(final JexlBuilder builder) throws Exception {
         init(builder);
+        // @formatter:off
         final String[] srcs = {
                 "jexl:print('hello\\'\\nworld')",
                 "'hello\\tworld'",
@@ -632,6 +657,7 @@ public class JXLTTest extends JexlTestCase {
                 "'hello\\fworld'",
                 "'hello\\rworld'"
         };
+        // @formatter:on
         for(final String src : srcs) {
             final JexlScript script = ENGINE.createScript(src);
             final Debugger dbg = new Debugger();
@@ -705,6 +731,7 @@ public class JXLTTest extends JexlTestCase {
         init(builder);
         context.set("tables", new String[]{"table1", "table2"});
         context.set("w" ,"x=1");
+        // @formatter:off
         final JxltEngine.Template t = JXLT.createTemplate("$$", new StringReader(
              "select * from \n"+
              "$$var comma = false; \n"+
@@ -714,6 +741,7 @@ public class JXLTTest extends JexlTestCase {
              "\n$$}\n"+
              "where ${w}\n"
         ));
+        // @formatter:on
         final StringWriter strw = new StringWriter();
         //vars.clear();
         t.evaluate(context, strw);
@@ -820,12 +848,13 @@ public class JXLTTest extends JexlTestCase {
         opts.setSafe(true);
         opts.setLexical(false);
         opts.setLexicalShade(false);
+        // @formatter:off
         final String src0 = "${$options.strict?'+':'-'}strict"
                 + " ${$options.cancellable?'+':'-'}cancellable"
                 + " ${$options.lexical?'+':'-'}lexical"
                 + " ${$options.lexicalShade?'+':'-'}lexicalShade"
                 + " ${$options.safe?'+':'-'}safe";
-
+        // @formatter:on
         final JxltEngine.Template tmplt0 = JXLT.createTemplate("$$", new StringReader(src0));
         final Writer strw0 = new StringWriter();
         tmplt0.evaluate(ctxt, strw0);
@@ -997,10 +1026,12 @@ public class JXLTTest extends JexlTestCase {
     @MethodSource("engines")
     public void testPrepareTemplate(final JexlBuilder builder) throws Exception {
         init(builder);
+        // @formatter:off
         final String source
                 = "$$ for(var x : list) {\n"
                 + "${l10n}=#{x}\n"
                 + "$$ }\n";
+        // @formatter:on
         final int[] args = {42};
         final JxltEngine.Template tl10n = JXLT.createTemplate(source, "list");
         final String dstr = tl10n.asString();
@@ -1030,6 +1061,7 @@ public class JXLTTest extends JexlTestCase {
     @MethodSource("engines")
     public void testReport(final JexlBuilder builder) throws Exception {
         init(builder);
+        // @formatter:off
         final String rpt
                 = "<report>\n"
                 + "\n"
@@ -1040,6 +1072,7 @@ public class JXLTTest extends JexlTestCase {
                 + "\n"
                 + "\n        ${x + y}"
                 + "\n</report>\n";
+        // @formatter:on
         final JxltEngine.Template t = JXLT.createTemplate("$$", new StringReader(rpt));
         final StringWriter strw = new StringWriter();
         t.evaluate(context, strw);
@@ -1057,6 +1090,7 @@ public class JXLTTest extends JexlTestCase {
     @MethodSource("engines")
     public void testReport1(final JexlBuilder builder) throws Exception {
         init(builder);
+        // @formatter:off
         final String rpt
                 = "<report>\n"
                 + "this is ${x}\n"
@@ -1064,6 +1098,7 @@ public class JXLTTest extends JexlTestCase {
                 + "${x + 2}\n"
                 + "${x + 3}\n"
                 + "</report>\n";
+        // @formatter:on
         final JxltEngine.Template t = JXLT.createTemplate("$$", new StringReader(rpt));
         final StringWriter strw = new StringWriter();
         context.set("x", 42);
@@ -1087,6 +1122,7 @@ public class JXLTTest extends JexlTestCase {
     @MethodSource("engines")
     public void testReport2(final JexlBuilder builder) throws Exception {
         init(builder);
+        // @formatter:off
         final String rpt
                 = "<report>\n"
                 + "this is ${x}\n"
@@ -1094,6 +1130,7 @@ public class JXLTTest extends JexlTestCase {
                 + "${x + 2}\n"
                 + "${x + 3}\n"
                 + "</report>\n";
+        // @formatter:on
         final JxltEngine.Template t = JXLT.createTemplate("$$", new StringReader(rpt), "x");
         final StringWriter strw = new StringWriter();
         t.evaluate(context, strw, 42);
@@ -1127,10 +1164,12 @@ public class JXLTTest extends JexlTestCase {
         final JexlEngine jexl= new JexlBuilder().uberspect(uberspect).create();
         final JxltEngine jxlt = jexl.createJxltEngine();
         final JexlContext ctx311 = new Context311();
+        // @formatter:off
         final String rpt
                 = "$$var u = 'Universe'; exec('4').execute((a, b)->{"
                 + "\n<p>${u} ${a}${b}</p>"
                 + "\n$$}, '2')";
+        // @formatter:on
         final JxltEngine.Template t = jxlt.createTemplate("$$", new StringReader(rpt));
         final StringWriter strw = new StringWriter();
         t.evaluate(ctx311, strw, 42);
@@ -1318,9 +1357,11 @@ public class JXLTTest extends JexlTestCase {
         opts.setLexicalShade(false);
         opts.setSharedInstance(true);
         final JexlContext ctxt = new PragmaticContext(opts);
+        // @formatter:off
         final String src = "$$ #pragma script.mode pro50\n"
                 + "$$ var tab = null;\n"
                 + "$$ tab.dummy();";
+        // @formatter:on
         final JxltEngine.Template tmplt = JXLT.createTemplate("$$", new StringReader(src));
         final Writer strw = new StringWriter();
         try {
