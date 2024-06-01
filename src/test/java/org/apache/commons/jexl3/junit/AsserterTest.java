@@ -17,7 +17,7 @@
 
 package org.apache.commons.jexl3.junit;
 
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.apache.commons.jexl3.Foo;
 import org.apache.commons.jexl3.JexlTestCase;
@@ -37,13 +37,7 @@ public class AsserterTest extends JexlTestCase {
         final Asserter asserter = new Asserter(JEXL);
         asserter.setVariable("this", new Foo());
         asserter.assertExpression("this.repeat('abc')", "Repeat : abc");
-        try {
-            asserter.assertExpression("this.count", "Wrong Value");
-            fail("This method should have thrown an assertion exception");
-        }
-        catch (final AssertionError e) {
-            // it worked!
-        }
+        assertThrows(AssertionError.class, () -> asserter.assertExpression("this.count", "Wrong Value"));
     }
 
     @Test
@@ -59,12 +53,6 @@ public class AsserterTest extends JexlTestCase {
         asserter.assertExpression("foo.getCount()", Integer.valueOf(5));
         asserter.assertExpression("foo.count", Integer.valueOf(5));
 
-        try {
-            asserter.assertExpression("bar.count", Integer.valueOf(5));
-            fail("This method should have thrown an assertion exception");
-        }
-        catch (final AssertionError e) {
-            // it worked!
-        }
+        assertThrows(AssertionError.class, () -> asserter.assertExpression("bar.count", Integer.valueOf(5)));
     }
 }
