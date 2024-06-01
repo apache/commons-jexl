@@ -45,6 +45,10 @@ public final class Scope {
         }
     };
     /**
+     * The empty string array.
+     */
+    private static final String[] EMPTY_STRS = {};
+    /**
      * The parent scope.
      */
     private final Scope parent;
@@ -66,15 +70,11 @@ public final class Scope {
      * The map of local captured variables to parent scope variables, ie closure.
      */
     private Map<Integer, Integer> capturedVariables;
+
     /**
      * Let symbols.
      */
     private LexicalScope lexicalVariables;
-
-    /**
-     * The empty string array.
-     */
-    private static final String[] EMPTY_STRS = {};
 
     /**
      * Creates a new scope with a list of parameters.
@@ -96,41 +96,6 @@ public final class Scope {
     }
 
     /**
-     * Checks whether an identifier is a local variable or argument, ie a symbol.
-     * If this fails, look in parents for symbol that can be captured.
-     * @param name the symbol name
-     * @return the symbol index
-     */
-    public Integer getSymbol(final String name) {
-        return getSymbol(name, true);
-    }
-
-    /**
-     * Checks whether an identifier is a local variable or argument, ie a symbol.
-     * @param name the symbol name
-     * @param capture whether solving by capturing a parent symbol is allowed
-     * @return the symbol index
-     */
-    private Integer getSymbol(final String name, final boolean capture) {
-        Integer register = namedVariables != null ? namedVariables.get(name) : null;
-        if (register == null && capture && parent != null) {
-            final Integer pr = parent.getSymbol(name, true);
-            if (pr != null) {
-                if (capturedVariables == null) {
-                    capturedVariables = new LinkedHashMap<>();
-                }
-                if (namedVariables == null) {
-                    namedVariables = new LinkedHashMap<>();
-                }
-                register = namedVariables.size();
-                namedVariables.put(name, register);
-                capturedVariables.put(register, pr);
-            }
-        }
-        return register;
-    }
-
-    /**
      * Marks a symbol as a lexical, declared through let or const.
      * @param s the symbol
      * @return true if the symbol was not already present in the lexical set
@@ -143,21 +108,27 @@ public final class Scope {
     }
 
     /**
-     * Checks whether a symbol is declared through a let or const.
-     * @param s the symbol
-     * @return true if symbol was declared through let or const
+     * Creates a frame by copying values up to the number of parameters.
+     * <p>This captures the captured variables values.</p>
+     * @param frame the caller frame
+     * @param args the arguments
+     * @return the arguments array
      */
-    public boolean isLexical(final int s) {
-        return lexicalVariables != null && s >= 0 && lexicalVariables.hasSymbol(s);
-    }
-
-    /**
-     * Checks whether a given symbol is captured.
-     * @param symbol the symbol number
-     * @return true if captured, false otherwise
-     */
-    public boolean isCapturedSymbol(final int symbol) {
-        return capturedVariables != null && capturedVariables.containsKey(symbol);
+    public Frame createFrame(final Frame frame, final Object...args) {
+        if (namedVariables == null) {
+            return null;
+        }
+        final Object[] arguments = new Object[namedVariables.size()];
+        Arrays.fill(arguments, UNDECLARED);
+        if (frame != null && capturedVariables != null && parent != null) {
+            for (final Map.Entry<Integer, Integer> capture : capturedVariables.entrySet()) {
+                final Integer target = capture.getKey();
+                final Integer source = capture.getValue();
+                final Object arg = frame.get(source);
+                arguments[target] = arg;
+            }
+        }
+        return new Frame(this, arguments, 0).assign(args);
     }
 
     /**
@@ -215,27 +186,11 @@ public final class Scope {
     }
 
     /**
-     * Creates a frame by copying values up to the number of parameters.
-     * <p>This captures the captured variables values.</p>
-     * @param frame the caller frame
-     * @param args the arguments
-     * @return the arguments array
+     * Gets the (maximum) number of arguments this script expects.
+     * @return the number of parameters
      */
-    public Frame createFrame(final Frame frame, final Object...args) {
-        if (namedVariables == null) {
-            return null;
-        }
-        final Object[] arguments = new Object[namedVariables.size()];
-        Arrays.fill(arguments, UNDECLARED);
-        if (frame != null && capturedVariables != null && parent != null) {
-            for (final Map.Entry<Integer, Integer> capture : capturedVariables.entrySet()) {
-                final Integer target = capture.getKey();
-                final Integer source = capture.getValue();
-                final Object arg = frame.get(source);
-                arguments[target] = arg;
-            }
-        }
-        return new Frame(this, arguments, 0).assign(args);
+    public int getArgCount() {
+        return parms;
     }
 
     /**
@@ -287,19 +242,21 @@ public final class Scope {
     }
 
     /**
-     * Gets the (maximum) number of arguments this script expects.
-     * @return the number of parameters
+     * Gets this script local variable, i.e. symbols assigned to local variables excluding captured variables.
+     * @return the local variable names
      */
-    public int getArgCount() {
-        return parms;
-    }
-
-    /**
-     * Gets this script symbols names, i.e. parameters and local variables.
-     * @return the symbol names
-     */
-    public String[] getSymbols() {
-        return namedVariables != null ? namedVariables.keySet().toArray(new String[0]) : EMPTY_STRS;
+    public String[] getLocalVariables() {
+        if (namedVariables == null || vars <= 0) {
+            return EMPTY_STRS;
+        }
+        final List<String> locals = new ArrayList<>(vars);
+        for (final Map.Entry<String, Integer> entry : namedVariables.entrySet()) {
+            final int symnum = entry.getValue();
+            if (symnum >= parms && (capturedVariables == null || !capturedVariables.containsKey(symnum))) {
+                locals.add(entry.getKey());
+            }
+        }
+        return locals.toArray(new String[0]);
     }
 
     /**
@@ -331,25 +288,68 @@ public final class Scope {
         return pa;
     }
 
-    /**
-     * Gets this script local variable, i.e. symbols assigned to local variables excluding captured variables.
-     * @return the local variable names
-     */
-    public String[] getLocalVariables() {
-        if (namedVariables == null || vars <= 0) {
-            return EMPTY_STRS;
-        }
-        final List<String> locals = new ArrayList<>(vars);
-        for (final Map.Entry<String, Integer> entry : namedVariables.entrySet()) {
-            final int symnum = entry.getValue();
-            if (symnum >= parms && (capturedVariables == null || !capturedVariables.containsKey(symnum))) {
-                locals.add(entry.getKey());
-            }
-        }
-        return locals.toArray(new String[0]);
-    }
-
     Scope getParent() {
         return parent;
+    }
+
+    /**
+     * Checks whether an identifier is a local variable or argument, ie a symbol.
+     * If this fails, look in parents for symbol that can be captured.
+     * @param name the symbol name
+     * @return the symbol index
+     */
+    public Integer getSymbol(final String name) {
+        return getSymbol(name, true);
+    }
+
+    /**
+     * Checks whether an identifier is a local variable or argument, ie a symbol.
+     * @param name the symbol name
+     * @param capture whether solving by capturing a parent symbol is allowed
+     * @return the symbol index
+     */
+    private Integer getSymbol(final String name, final boolean capture) {
+        Integer register = namedVariables != null ? namedVariables.get(name) : null;
+        if (register == null && capture && parent != null) {
+            final Integer pr = parent.getSymbol(name, true);
+            if (pr != null) {
+                if (capturedVariables == null) {
+                    capturedVariables = new LinkedHashMap<>();
+                }
+                if (namedVariables == null) {
+                    namedVariables = new LinkedHashMap<>();
+                }
+                register = namedVariables.size();
+                namedVariables.put(name, register);
+                capturedVariables.put(register, pr);
+            }
+        }
+        return register;
+    }
+
+    /**
+     * Gets this script symbols names, i.e. parameters and local variables.
+     * @return the symbol names
+     */
+    public String[] getSymbols() {
+        return namedVariables != null ? namedVariables.keySet().toArray(new String[0]) : EMPTY_STRS;
+    }
+
+    /**
+     * Checks whether a given symbol is captured.
+     * @param symbol the symbol number
+     * @return true if captured, false otherwise
+     */
+    public boolean isCapturedSymbol(final int symbol) {
+        return capturedVariables != null && capturedVariables.containsKey(symbol);
+    }
+
+    /**
+     * Checks whether a symbol is declared through a let or const.
+     * @param s the symbol
+     * @return true if symbol was declared through let or const
+     */
+    public boolean isLexical(final int s) {
+        return lexicalVariables != null && s >= 0 && lexicalVariables.hasSymbol(s);
     }
 }
