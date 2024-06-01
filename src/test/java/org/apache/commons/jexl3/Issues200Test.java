@@ -600,16 +600,11 @@ public class Issues200Test extends JexlTestCase {
     @Test
     public void test275b() throws Exception {
         final JexlContext ctxt = new MapContext();
-        //ctxt.set("out", System.out);
+        // ctxt.set("out", System.out);
         final JexlEngine jexl = new JexlBuilder().strict(true).safe(true).create();
         final JexlScript e = jexl.createScript("var xyz = xyz");
-        try {
-            final Object o = e.execute(ctxt);
-            assertNull(o);
-        } catch (final JexlException.Variable xvar) {
-            fail("should not have thrown");
-            // assertEquals("xyz", xvar.getVariable());
-        }
+        final Object o = e.execute(ctxt);
+        assertNull(o);
     }
 
     @Test
