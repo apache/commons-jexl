@@ -60,10 +60,6 @@ public class JexlScriptEngineTest {
                                                             "application/x-jexl2",
                                                             "application/x-jexl3");
 
-    @BeforeEach
-    public void setUp() {
-    }
-
     @AfterEach
     public void tearDown() {
         JexlBuilder.setDefaultPermissions(null);
