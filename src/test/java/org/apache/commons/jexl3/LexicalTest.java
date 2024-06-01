@@ -779,7 +779,7 @@ public class LexicalTest {
         final JexlEngine jexl = new JexlBuilder().strict(true).lexical(true).create();
         final JexlContext ctxt = new DebugContext();
         Object result;
-        JexlScript script = jexl.createScript("var x = 42; var y = () -> { {var x = debug(-42); }; return x; }; y()");
+        final JexlScript script = jexl.createScript("var x = 42; var y = () -> { {var x = debug(-42); }; return x; }; y()");
         result = script.execute(ctxt);
         assertEquals(42, result);
     }
@@ -812,7 +812,7 @@ public class LexicalTest {
         final JexlEngine jexl = new JexlBuilder().strict(true).lexical(true).lexicalShade(true).create();
         final JexlScript e = jexl.createScript(str);
         final JexlContext ctxt = new MapContext();
-        JexlException  xany = assertThrows(JexlException.class, () -> e.execute(ctxt), "i should be shaded");
+        final JexlException  xany = assertThrows(JexlException.class, () -> e.execute(ctxt), "i should be shaded");
         assertNotNull(xany.toString());
     }
 
@@ -832,7 +832,7 @@ public class LexicalTest {
         final JexlEngine jexl = new JexlBuilder().strict(true).lexical(true).lexicalShade(true).create();
         final JexlScript e = jexl.createScript(str);
         final JexlContext ctxt = new MapContext();
-        JexlException  xany = assertThrows(JexlException.class, () -> e.execute(ctxt), "i should be shaded");
+        final JexlException  xany = assertThrows(JexlException.class, () -> e.execute(ctxt), "i should be shaded");
         assertNotNull(xany.toString());
     }
 
@@ -942,7 +942,7 @@ public class LexicalTest {
         final JexlEngine jexl = new JexlBuilder().strict(false).create();
         final JexlScript e = jexl.createScript(str);
         final JexlContext ctxt = new MapContext();
-        JexlException  xany = assertThrows(JexlException.class, () -> e.execute(ctxt), "i should be shaded");
+        final JexlException  xany = assertThrows(JexlException.class, () -> e.execute(ctxt), "i should be shaded");
         assertNotNull(xany.toString());
     }
 
@@ -999,13 +999,7 @@ public class LexicalTest {
         f.lexical(true);
         f.lexicalShade(true);
         final JexlEngine jexl = createEngine(f);
-        try {
-            final JexlScript script = jexl.createScript("{var x = 0}; return x");
-            fail("Should not have been parsed");
-        } catch (final Exception ex) {
-           // OK
-           assertTrue(ex instanceof JexlException);
-        }
+        assertThrows(JexlException.class, () -> jexl.createScript("{var x = 0}; return x"), "Should not have been parsed");
     }
 
     @Test
