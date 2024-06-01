@@ -34,11 +34,29 @@ package org.apache.commons.jexl3.parser;
  * </p>
  */
 public class StringParser {
-    /** Default constructor.  */
-    protected StringParser() {
-        // nothing to initialize
-    }
+    /** The length of an escaped unicode sequence. */
+    private static final int UCHAR_LEN = 4;
 
+    /** Initial shift value for composing a Unicode char from 4 nibbles (16 - 4). */
+    private static final int SHIFT = 12;
+
+    /** The base 10 offset used to convert hexa characters to decimal. */
+    private static final int BASE10 = 10;
+
+    /** The last 7bits ascii character. */
+    private static final char LAST_ASCII = 127;
+
+    /** The first printable 7bits ascii character. */
+    private static final char FIRST_ASCII = 32;
+
+    /**
+     * Builds a regex pattern string, handles escaping '/' through '\/' syntax.
+     * @param str the string to build from
+     * @return the built string
+     */
+    public static String buildRegex(final CharSequence str) {
+        return buildString(str.subSequence(1, str.length()), true);
+    }
     /**
      * Builds a string, handles escaping through '\' syntax.
      * @param str the string to build from
@@ -47,16 +65,6 @@ public class StringParser {
      */
     public static String buildString(final CharSequence str, final boolean eatsep) {
         return buildString(str, eatsep, true);
-    }
-
-    /**
-     * Builds a template, does not escape characters.
-     * @param str the string to build from
-     * @param eatsep whether the separator, the first character, should be considered
-     * @return the built string
-     */
-    public static String buildTemplate(final CharSequence str, final boolean eatsep) {
-        return buildString(str, eatsep, false);
     }
 
     /**
@@ -74,31 +82,114 @@ public class StringParser {
         read(strb, str, begin, end, sep, esc);
         return strb.toString();
     }
-
     /**
-     * Builds a regex pattern string, handles escaping '/' through '\/' syntax.
+     * Builds a template, does not escape characters.
      * @param str the string to build from
+     * @param eatsep whether the separator, the first character, should be considered
      * @return the built string
      */
-    public static String buildRegex(final CharSequence str) {
-        return buildString(str.subSequence(1, str.length()), true);
+    public static String buildTemplate(final CharSequence str, final boolean eatsep) {
+        return buildString(str, eatsep, false);
+    }
+    /**
+     * Adds a escape char ('\') where needed in a string form of an ide
+     * @param str the identifier un-escaped string
+     * @return the string with added  backslash character before space, quote, double-quote and backslash
+     */
+    public static String escapeIdentifier(final String str) {
+        StringBuilder strb = null;
+        if (str != null) {
+            int n = 0;
+            final int last = str.length();
+            while (n < last) {
+                final char c = str.charAt(n);
+                switch (c) {
+                    case ' ':
+                    case '\'':
+                    case '"':
+                    case '\\': {
+                        if (strb == null) {
+                            strb = new StringBuilder(last);
+                            strb.append(str, 0, n);
+                        }
+                        strb.append('\\');
+                        strb.append(c);
+                        break;
+                    }
+                    default:
+                        if (strb != null) {
+                            strb.append(c);
+                        }
+                }
+                n += 1;
+            }
+        }
+        return strb == null ? str : strb.toString();
     }
 
     /**
-     * Read the remainder of a string till a given separator,
-     * handles escaping through '\' syntax.
-     * @param strb the destination buffer to copy characters into
-     * @param str the origin
-     * @param index the offset into the origin
-     * @param sep the separator, single or double quote, marking end of string
-     * @return the offset in origin
+     * Escapes a String representation, expand non-ASCII characters as Unicode escape sequence.
+     * @param delim the delimiter character
+     * @param str the string to escape
+     * @return the escaped representation
      */
-    public static int readString(final StringBuilder strb, final CharSequence str, final int index, final char sep) {
-        return read(strb, str, index, str.length(), sep, true);
+    public static String escapeString(final String str, final char delim) {
+        if (str == null) {
+            return null;
+        }
+        final int length = str.length();
+        final StringBuilder strb = new StringBuilder(length + 2);
+        strb.append(delim);
+        for (int i = 0; i < length; ++i) {
+            final char c = str.charAt(i);
+            switch (c) {
+                case 0:
+                    continue;
+                case '\b':
+                    strb.append('\\');
+                    strb.append('b');
+                    break;
+                case '\t':
+                    strb.append('\\');
+                    strb.append('t');
+                    break;
+                case '\n':
+                    strb.append('\\');
+                    strb.append('n');
+                    break;
+                case '\f':
+                    strb.append('\\');
+                    strb.append('f');
+                    break;
+                case '\r':
+                    strb.append('\\');
+                    strb.append('r');
+                    break;
+                case '\\':
+                    strb.append('\\');
+                    strb.append('\\');
+                    break;
+                default:
+                    if (c == delim) {
+                        strb.append('\\');
+                        strb.append(delim);
+                    } else if (c >= FIRST_ASCII && c <= LAST_ASCII) {
+                        strb.append(c);
+                    } else {
+                        // convert to Unicode escape sequence
+                        strb.append('\\');
+                        strb.append('u');
+                        final String hex = Integer.toHexString(c);
+                        for (int h = hex.length(); h < UCHAR_LEN; ++h) {
+                            strb.append('0');
+                        }
+                        strb.append(hex);
+                    }
+            }
+        }
+        strb.append(delim);
+        return strb.toString();
     }
-    /** The length of an escaped unicode sequence. */
-    private static final int UCHAR_LEN = 4;
-
     /**
      * Read the remainder of a string till a given separator,
      * handles escaping through '\' syntax.
@@ -165,10 +256,18 @@ public class StringParser {
         }
         return index;
     }
-    /** Initial shift value for composing a Unicode char from 4 nibbles (16 - 4). */
-    private static final int SHIFT = 12;
-    /** The base 10 offset used to convert hexa characters to decimal. */
-    private static final int BASE10 = 10;
+    /**
+     * Read the remainder of a string till a given separator,
+     * handles escaping through '\' syntax.
+     * @param strb the destination buffer to copy characters into
+     * @param str the origin
+     * @param index the offset into the origin
+     * @param sep the separator, single or double quote, marking end of string
+     * @return the offset in origin
+     */
+    public static int readString(final StringBuilder strb, final CharSequence str, final int index, final char sep) {
+        return read(strb, str, index, str.length(), sep, true);
+    }
 
     /**
      * Reads a Unicode escape character.
@@ -198,74 +297,6 @@ public class StringParser {
         strb.append(xc);
         return UCHAR_LEN;
     }
-    /** The last 7bits ascii character. */
-    private static final char LAST_ASCII = 127;
-    /** The first printable 7bits ascii character. */
-    private static final char FIRST_ASCII = 32;
-
-    /**
-     * Escapes a String representation, expand non-ASCII characters as Unicode escape sequence.
-     * @param delim the delimiter character
-     * @param str the string to escape
-     * @return the escaped representation
-     */
-    public static String escapeString(final String str, final char delim) {
-        if (str == null) {
-            return null;
-        }
-        final int length = str.length();
-        final StringBuilder strb = new StringBuilder(length + 2);
-        strb.append(delim);
-        for (int i = 0; i < length; ++i) {
-            final char c = str.charAt(i);
-            switch (c) {
-                case 0:
-                    continue;
-                case '\b':
-                    strb.append('\\');
-                    strb.append('b');
-                    break;
-                case '\t':
-                    strb.append('\\');
-                    strb.append('t');
-                    break;
-                case '\n':
-                    strb.append('\\');
-                    strb.append('n');
-                    break;
-                case '\f':
-                    strb.append('\\');
-                    strb.append('f');
-                    break;
-                case '\r':
-                    strb.append('\\');
-                    strb.append('r');
-                    break;
-                case '\\':
-                    strb.append('\\');
-                    strb.append('\\');
-                    break;
-                default:
-                    if (c == delim) {
-                        strb.append('\\');
-                        strb.append(delim);
-                    } else if (c >= FIRST_ASCII && c <= LAST_ASCII) {
-                        strb.append(c);
-                    } else {
-                        // convert to Unicode escape sequence
-                        strb.append('\\');
-                        strb.append('u');
-                        final String hex = Integer.toHexString(c);
-                        for (int h = hex.length(); h < UCHAR_LEN; ++h) {
-                            strb.append('0');
-                        }
-                        strb.append(hex);
-                    }
-            }
-        }
-        strb.append(delim);
-        return strb.toString();
-    }
 
     /**
      * Remove escape char ('\') from an identifier.
@@ -293,39 +324,8 @@ public class StringParser {
         return strb == null ? str : strb.toString();
     }
 
-    /**
-     * Adds a escape char ('\') where needed in a string form of an ide
-     * @param str the identifier un-escaped string
-     * @return the string with added  backslash character before space, quote, double-quote and backslash
-     */
-    public static String escapeIdentifier(final String str) {
-        StringBuilder strb = null;
-        if (str != null) {
-            int n = 0;
-            final int last = str.length();
-            while (n < last) {
-                final char c = str.charAt(n);
-                switch (c) {
-                    case ' ':
-                    case '\'':
-                    case '"':
-                    case '\\': {
-                        if (strb == null) {
-                            strb = new StringBuilder(last);
-                            strb.append(str, 0, n);
-                        }
-                        strb.append('\\');
-                        strb.append(c);
-                        break;
-                    }
-                    default:
-                        if (strb != null) {
-                            strb.append(c);
-                        }
-                }
-                n += 1;
-            }
-        }
-        return strb == null ? str : strb.toString();
+    /** Default constructor.  */
+    protected StringParser() {
+        // nothing to initialize
     }
 }
