@@ -22,6 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -307,12 +308,8 @@ public class Issues400Test {
         options.setLexical(true);
         final JexlEngine jexl = builder.create();
         final JexlScript script = jexl.createScript("var c = 42; var f = y -> c += y; f(z)", "z");
-        try {
-            final Number result = (Number) script.execute(null, 12);
-            fail("c should be const");
-        } catch (final JexlException.Variable xvar) {
-            assertEquals("c", xvar.getVariable());
-        }
+        final JexlException.Variable xvar = assertThrows(JexlException.Variable.class, () -> script.execute(null, 12), "c should be const");
+        assertEquals("c", xvar.getVariable());
     }
 
     @Test
