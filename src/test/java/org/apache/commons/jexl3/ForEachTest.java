@@ -19,9 +19,8 @@ package org.apache.commons.jexl3;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -44,13 +43,10 @@ public class ForEachTest extends JexlTestCase {
 
     @Test
     public void testForEachBreakBroken() throws Exception {
-        try {
-            final JexlScript e = JEXL.createScript("if (true) { break; }");
-            fail("break is out of loop!");
-        } catch (final JexlException.Parsing xparse) {
-            final String str = xparse.detailedMessage();
-            assertTrue(str.contains("break"));
-        }
+        final JexlException.Parsing xparse = assertThrows(JexlException.Parsing.class, () -> JEXL.createScript("if (true) { break; }"),
+                "break is out of loop!");
+        assertTrue(xparse.detailedMessage().contains("break"));
+
     }
 
     @Test
@@ -66,13 +62,9 @@ public class ForEachTest extends JexlTestCase {
 
     @Test
     public void testForEachContinueBroken() throws Exception {
-        try {
-            final JexlScript e = JEXL.createScript("var rr = 0; continue;");
-            fail("continue is out of loop!");
-        } catch (final JexlException.Parsing xparse) {
-            final String str = xparse.detailedMessage();
-            assertTrue(str.contains("continue"));
-        }
+        final JexlException.Parsing xparse = assertThrows(JexlException.Parsing.class, () -> JEXL.createScript("var rr = 0; continue;"),
+                "continue is out of loop!");
+        assertTrue(xparse.detailedMessage().contains("continue"));
     }
 
     @Test
