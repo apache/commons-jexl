@@ -91,8 +91,8 @@ class SpreadMap<K, V> extends AbstractMap<K, V> {
 
   @Override
   public void clear() {
-    for (int m = 0; m < maps.length; ++m) {
-      maps[m].clear();
+    for (final Map<K, V> map : maps) {
+      map.clear();
     }
   }
 
@@ -139,8 +139,8 @@ class SpreadMap<K, V> extends AbstractMap<K, V> {
   @Override
   public int size() {
     int size = 0;
-    for (int m = 0; m < maps.length; ++m) {
-      size += maps[m].size();
+    for (final Map<K, V> map : maps) {
+      size += map.size();
     }
     return size;
   }
