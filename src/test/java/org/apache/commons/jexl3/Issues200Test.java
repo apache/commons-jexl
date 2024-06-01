@@ -576,27 +576,15 @@ public class Issues200Test extends JexlTestCase {
     public void test274() throws Exception {
         JexlEngine jexl = new JexlBuilder().strict(true).safe(true).stackOverflow(5).create();
         final JexlContext ctxt = new MapContext();
-        JexlScript script= jexl.createScript("var f = (x)->{ x > 1? x * f(x - 1) : x }; f(a)", "a");
+        final JexlScript script = jexl.createScript("var f = (x)->{ x > 1? x * f(x - 1) : x }; f(a)", "a");
         Object result = script.execute(ctxt, 3);
         assertEquals(6, result);
-        try {
-            result = script.execute(ctxt, 32);
-            fail("should have overflown");
-        } catch (final JexlException.StackOverflow xstack) {
-            // expected
-            final String sxs = xstack.toString();
-            assertTrue(sxs.contains("jexl"));
-        }
+        JexlException.StackOverflow xstack = assertThrows(JexlException.StackOverflow.class, () -> script.execute(ctxt, 32));
+        assertTrue(xstack.toString().contains("jexl"));
         jexl = new JexlBuilder().strict(true).create();
-        script= jexl.createScript("var f = (x)->{ x * f(x - 1) }; f(a)", "a");
-        try {
-            result = script.execute(ctxt, 32);
-            fail("should have overflown");
-        } catch (final JexlException.StackOverflow xstack) {
-            // expected
-            final String sxs = xstack.toString();
-            assertTrue(sxs.contains("jvm"));
-        }
+        final JexlScript script2 = jexl.createScript("var f = (x)->{ x * f(x - 1) }; f(a)", "a");
+        xstack = assertThrows(JexlException.StackOverflow.class, () -> script2.execute(ctxt, 32));
+        assertTrue(xstack.toString().contains("jvm"));
     }
 
     @Test
