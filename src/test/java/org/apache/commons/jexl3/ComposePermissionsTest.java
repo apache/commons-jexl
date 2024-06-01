@@ -45,8 +45,11 @@ public class ComposePermissionsTest extends JexlTestCase {
         final String check = "http://example.com/content.jpg";
         final File jsonFile = new File(SAMPLE_JSON);
         final Gson gson = new Gson();
-        final Object json = gson.fromJson(new FileReader(jsonFile), Object.class);
-        assertNotNull(json);
+        final Object json;
+        try (final FileReader reader = new FileReader(jsonFile)) {
+            json = gson.fromJson(reader, Object.class);
+            assertNotNull(json);
+        }
 
         // will succeed because java.util.Map is allowed and gson LinkedTreeMap is one
         final JexlEngine j0 = createEngine(false, p);
@@ -69,7 +72,7 @@ public class ComposePermissionsTest extends JexlTestCase {
         // will not fail since gson objects
         j1 = createEngine(false, JexlPermissions.RESTRICTED);
         final JexlScript s3 = j1.createScript("json.pageInfo.pagePic", "json");
-        final Object r1 = s3.execute(null, json);
+        s3.execute(null, json);
         assertEquals(check, r0);
     }
 
