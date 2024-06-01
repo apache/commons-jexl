@@ -16,9 +16,14 @@
  */
 package org.apache.commons.jexl3;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 import static org.apache.commons.jexl3.JexlTestCase.createEngine;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -32,7 +37,6 @@ import java.util.concurrent.Callable;
 
 import org.apache.commons.jexl3.internal.LexicalScope;
 import org.apache.commons.jexl3.internal.Script;
-import org.junit.Assert;
 import org.junit.Test;
 
 /**
