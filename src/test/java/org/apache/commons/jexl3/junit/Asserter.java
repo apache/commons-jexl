@@ -16,8 +16,6 @@
  */
 package org.apache.commons.jexl3.junit;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.math.BigInteger;
