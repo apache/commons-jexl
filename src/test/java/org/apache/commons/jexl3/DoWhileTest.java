@@ -19,8 +19,8 @@ package org.apache.commons.jexl3;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -31,7 +31,7 @@ import org.junit.jupiter.api.Test;
 /**
  * Tests do while statement.
  */
-@SuppressWarnings({"UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
+@SuppressWarnings({ "UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes" })
 public class DoWhileTest extends JexlTestCase {
 
     public DoWhileTest() {
@@ -56,24 +56,18 @@ public class DoWhileTest extends JexlTestCase {
 
     @Test
     public void testForEachBreakInsideFunction() throws Exception {
-        try {
-            final JexlScript e = JEXL.createScript("for (i : 1..2) {  y = function() { break; } }");
-            fail("break is out of loop!");
-        } catch (final JexlException.Parsing xparse) {
-            final String str = xparse.detailedMessage();
-            assertTrue(str.contains("break"));
-        }
+        final JexlException.Parsing xparse = assertThrows(JexlException.Parsing.class, () -> JEXL.createScript("for (i : 1..2) {  y = function() { break; } }"),
+                "break is out of loop!");
+        final String str = xparse.detailedMessage();
+        assertTrue(str.contains("break"));
     }
 
     @Test
     public void testForEachContinueInsideFunction() throws Exception {
-        try {
-            final JexlScript e = JEXL.createScript("for (i : 1..2) {  y = function() { continue; } }");
-            fail("continue is out of loop!");
-        } catch (final JexlException.Parsing xparse) {
-            final String str = xparse.detailedMessage();
-            assertTrue(str.contains("continue"));
-        }
+        final JexlException.Parsing xparse = assertThrows(JexlException.Parsing.class, () -> JEXL.createScript("for (i : 1..2) {  y = function() { continue; } }"),
+                "break is out of loop!");
+        final String str = xparse.detailedMessage();
+        assertTrue(str.contains("continue"));
     }
 
     @Test
@@ -82,7 +76,8 @@ public class DoWhileTest extends JexlTestCase {
         assertNotNull(e);
     }
 
-    @Test public void testForLoop0() {
+    @Test
+    public void testForLoop0() {
         final String src = "(l)->{ for(let x = 0; x < 4; ++x) { l.add(x); } }";
         final JexlEngine jexl = new JexlBuilder().safe(true).create();
         final JexlScript script = jexl.createScript(src);
@@ -92,7 +87,8 @@ public class DoWhileTest extends JexlTestCase {
         assertEquals(Arrays.asList(0, 1, 2, 3), l);
     }
 
-    @Test public void testForLoop1() {
+    @Test
+    public void testForLoop1() {
         final String src = "(l)->{ for(var x = 0; x < 4; ++x) { l.add(x); } }";
         final JexlEngine jexl = new JexlBuilder().safe(true).create();
         final JexlScript script = jexl.createScript(src);
@@ -102,7 +98,8 @@ public class DoWhileTest extends JexlTestCase {
         assertEquals(Arrays.asList(0, 1, 2, 3), l);
     }
 
-    @Test public void testForLoop2() {
+    @Test
+    public void testForLoop2() {
         final String src = "(l)->{ for(x = 0; x < 4; ++x) { l.add(x); } }";
         final JexlEngine jexl = new JexlBuilder().safe(true).create();
         final JexlScript script = jexl.createScript(src);
