@@ -89,7 +89,7 @@ public class ScriptCallableTest extends JexlTestCase {
             return 1;
         }
 
-        public int interrupt() throws InterruptedException {
+        public int interrupt() {
             Thread.currentThread().interrupt();
             return 42;
         }
