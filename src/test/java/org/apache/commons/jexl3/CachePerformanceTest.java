@@ -58,7 +58,7 @@ public class CachePerformanceTest {
     private final JexlEngine jexl;
     private final BlockingQueue<?> queue;
 
-    Task(JexlEngine jexl, BlockingQueue<?> queue) {
+    Task(final JexlEngine jexl, final BlockingQueue<?> queue) {
       this.jexl = jexl;
       this.queue = queue;
     }
@@ -74,8 +74,8 @@ public class CachePerformanceTest {
             for (int c = 0; c < CACHED; ++c) {
               final int ctl = rnd.nextInt(SCRIPTS);
               for (int r = 0; r < HIT; ++r) {
-                JexlScript script = jexl.createScript(Integer.toString(ctl));
-                Object result = script.execute(null);
+                final JexlScript script = jexl.createScript(Integer.toString(ctl));
+                final Object result = script.execute(null);
                 assert ((Number) result).intValue() == ctl;
                 count += 1;
               }
@@ -83,7 +83,7 @@ public class CachePerformanceTest {
           }
         }
         return count;
-      } catch (InterruptedException e) {
+      } catch (final InterruptedException e) {
         throw new RuntimeException(e);
       }
     }
@@ -93,8 +93,8 @@ public class CachePerformanceTest {
     long end;
 
     String elapse() {
-      long delta = end - begin;
-      NumberFormat fmt = new DecimalFormat("#.###");
+      final long delta = end - begin;
+      final NumberFormat fmt = new DecimalFormat("#.###");
       return fmt.format(delta / 1000.d);
     }
     void start() {
@@ -125,20 +125,20 @@ public class CachePerformanceTest {
    * @param jexl the jexl engine
    * @throws Exception if something goes wrong
    */
-  protected void runTest(String name, JexlEngine jexl) throws Exception {
-    ExecutorService exec = Executors.newFixedThreadPool(THREADS);
-    BlockingQueue<Object> queue = new ArrayBlockingQueue<>(THREADS);
-    List<Future<Integer>> results = new ArrayList<>(THREADS);
+  protected void runTest(final String name, final JexlEngine jexl) throws Exception {
+    final ExecutorService exec = Executors.newFixedThreadPool(THREADS);
+    final BlockingQueue<Object> queue = new ArrayBlockingQueue<>(THREADS);
+    final List<Future<Integer>> results = new ArrayList<>(THREADS);
     // seed the cache
     for(int i = 0; i < CACHED; ++i) {
-      JexlScript script = jexl.createScript(Integer.toString(i));
+      final JexlScript script = jexl.createScript(Integer.toString(i));
       assertNotNull(script);
     }
     // create a set of tasks ready to go
     for(int t = 0; t < THREADS; ++t) {
       results.add(exec.submit(new Task(jexl, queue)));
     }
-    Timer tt = new Timer();
+    final Timer tt = new Timer();
     tt.start();
     // run each with its own sequence of random seeded by t
     for(int t = 0; t < THREADS; ++t) {
@@ -149,7 +149,7 @@ public class CachePerformanceTest {
       queue.put(Task.class);
     }
     int total = 0;
-    for(Future<Integer> result : results) {
+    for(final Future<Integer> result : results) {
       total += result.get();
     }
     exec.shutdown();
