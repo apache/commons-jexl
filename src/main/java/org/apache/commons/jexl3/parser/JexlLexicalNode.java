@@ -40,13 +40,8 @@ public abstract class JexlLexicalNode extends JexlNode implements JexlParser.Lex
     }
 
     @Override
-    public boolean isConstant(final int symbol) {
-        return lexicalScope != null && lexicalScope.isConstant(symbol);
-    }
-
-    @Override
-    public void setConstant(final int symbol) {
-        lexicalScope.addConstant(symbol);
+    public LexicalScope getLexicalScope() {
+        return lexicalScope;
     }
 
     @Override
@@ -60,12 +55,17 @@ public abstract class JexlLexicalNode extends JexlNode implements JexlParser.Lex
     }
 
     @Override
-    public LexicalScope getLexicalScope() {
-        return lexicalScope;
+    public boolean isConstant(final int symbol) {
+        return lexicalScope != null && lexicalScope.isConstant(symbol);
     }
 
     @Override
     public void jjtClose() {
 
+    }
+
+    @Override
+    public void setConstant(final int symbol) {
+        lexicalScope.addConstant(symbol);
     }
 }
