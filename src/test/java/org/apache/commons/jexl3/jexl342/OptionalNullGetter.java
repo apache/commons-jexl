@@ -16,8 +16,6 @@
  */
 package org.apache.commons.jexl3.jexl342;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 import java.util.Objects;
 
 import org.apache.commons.jexl3.JexlEngine;
