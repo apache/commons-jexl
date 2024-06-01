@@ -75,20 +75,20 @@ public class FeaturesTest extends JexlTestCase {
 
     @Test
     public void test410a() {
-        long x = JexlFeatures.createAll().getFlags();
+        final long x = JexlFeatures.createAll().getFlags();
         assertEquals(CONST_CAPTURE + 1, Long.bitCount(x));
-        assertTrue((x & (1L << CONST_CAPTURE)) != 0);
+        assertTrue((x & 1L << CONST_CAPTURE) != 0);
 
-        JexlFeatures all = JexlFeatures.createAll();
+        final JexlFeatures all = JexlFeatures.createAll();
         final JexlEngine jexl = new JexlBuilder().features(all).create();
-        JexlScript script = jexl.createScript("#0 * #1", "#0", "#1");
-        Object r = script.execute(null, 6, 7);
+        final JexlScript script = jexl.createScript("#0 * #1", "#0", "#1");
+        final Object r = script.execute(null, 6, 7);
         assertEquals(42, r);
     }
 
     @Test
     public void test410b() {
-        JexlFeatures features = JexlFeatures.createScript();
+        final JexlFeatures features = JexlFeatures.createScript();
         assertTrue(features.isLexical());
         assertTrue(features.isLexicalShade());
         assertTrue(features.supportsConstCapture());
@@ -98,9 +98,9 @@ public class FeaturesTest extends JexlTestCase {
         assertFalse(features.supportsComparatorNames());
 
         final JexlEngine jexl = new JexlBuilder().features(features).create();
-        Collection<String> reserved = features.getReservedNames();
-        for(String varName : reserved) {
-            String src = "var " + varName;
+        final Collection<String> reserved = features.getReservedNames();
+        for(final String varName : reserved) {
+            final String src = "var " + varName;
             //JexlScript script = jexl.createScript(src);
             assertThrows(JexlException.Feature.class, () -> jexl.createScript(src), src);
         }
@@ -112,7 +112,7 @@ public class FeaturesTest extends JexlTestCase {
             "4 gt 2",
             "3 ge 2"
         };
-        for(String src : cmpNameScripts) {
+        for(final String src : cmpNameScripts) {
             assertThrows(JexlException.Ambiguous.class, () -> jexl.createScript(src));
         }
     }
@@ -186,7 +186,7 @@ public class FeaturesTest extends JexlTestCase {
         assertFalse(f.isLexicalShade());
         assertFalse(f.supportsConstCapture());
 
-        JexlEngine jnof = new JexlBuilder().features(f).create();
+        final JexlEngine jnof = new JexlBuilder().features(f).create();
         assertThrows(JexlException.Feature.class, ()->jnof.createScript("{ 3 + 4 }"));
         assertNotNull(jnof.createExpression("3 + 4"));
     }
