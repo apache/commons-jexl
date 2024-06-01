@@ -34,16 +34,20 @@ public interface JexlCache<K, V> {
   int capacity();
 
   /**
- * Returns the cache size, the actual number of elements it contains.
- *
- * @return the cache size
- */
-  int size();
-
-  /**
    * Clears the cache.
    */
   void clear();
+
+  /**
+   * Produces the cache entry set.
+   * <p>
+   * For implementations testing only
+   * </p>
+   * @return the cache entry list
+   */
+  default Collection<Map.Entry<K, V>> entries() {
+    return Collections.emptyList();
+  }
 
   /**
    * Gets a value from cache.
@@ -63,13 +67,9 @@ public interface JexlCache<K, V> {
   V put(K key, V script);
 
   /**
-   * Produces the cache entry set.
-   * <p>
-   * For implementations testing only
-   * </p>
-   * @return the cache entry list
-   */
-  default Collection<Map.Entry<K, V>> entries() {
-    return Collections.emptyList();
-  }
+ * Returns the cache size, the actual number of elements it contains.
+ *
+ * @return the cache size
+ */
+  int size();
 }
