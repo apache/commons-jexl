@@ -18,8 +18,8 @@ package org.apache.commons.jexl3;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 
 import org.junit.jupiter.api.Test;
 
@@ -307,16 +307,10 @@ public class IfTest extends JexlTestCase {
         final JexlEvalContext jc = new JexlEvalContext();
         final JexlOptions options = jc.getEngineOptions();
         final JexlExpression e = JEXL.createExpression("false ? bar : quux");
-        Object o;
         options.setStrict(true);
         options.setSilent(false);
-        try {
-           o = e.evaluate(jc);
-           fail("Should have failed");
-        } catch (final JexlException xjexl) {
-           // OK
-           assertTrue(xjexl.toString().contains("quux"));
-        }
+        final JexlException xjexl = assertThrows(JexlException.class, () -> e.evaluate(jc));
+        assertTrue(xjexl.toString().contains("quux"));
     }
 
     /**
