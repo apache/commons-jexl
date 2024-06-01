@@ -16,10 +16,15 @@
  */
 package org.apache.commons.jexl3;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 import static org.apache.commons.jexl3.internal.Util.debuggerCheck;
 import static org.apache.commons.jexl3.introspection.JexlPermissions.RESTRICTED;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -41,7 +46,6 @@ import java.util.stream.Stream;
 import org.apache.commons.jexl3.internal.Engine32;
 import org.apache.commons.jexl3.internal.OptionsContext;
 import org.apache.commons.jexl3.introspection.JexlSandbox;
-import org.junit.Assert;
 import org.junit.Test;
 
 /**
