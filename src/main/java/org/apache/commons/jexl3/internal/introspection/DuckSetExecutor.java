@@ -38,11 +38,6 @@ import org.apache.commons.jexl3.JexlException;
  * @since 2.0
  */
 public final class DuckSetExecutor extends AbstractExecutor.Set {
-    /** The property, may be null. */
-    private final Object property;
-    /** The property value class. */
-    private final Class<?> valueClass;
-
     /**
      * Discovers a DuckSetExecutor.
      *
@@ -59,6 +54,11 @@ public final class DuckSetExecutor extends AbstractExecutor.Set {
         }
         return method == null ? null : new DuckSetExecutor(clazz, method, key, value);
     }
+    /** The property, may be null. */
+    private final Object property;
+
+    /** The property value class. */
+    private final Class<?> valueClass;
 
     /**
      * Creates an instance.
