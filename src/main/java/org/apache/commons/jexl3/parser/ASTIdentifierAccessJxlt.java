@@ -29,6 +29,10 @@ public class ASTIdentifierAccessJxlt extends ASTIdentifierAccess {
         super(id);
     }
 
+    public JxltEngine.Expression getExpression() {
+        return jxltExpression;
+    }
+
     @Override
     public boolean isExpression() {
         return true;
@@ -36,10 +40,6 @@ public class ASTIdentifierAccessJxlt extends ASTIdentifierAccess {
 
     public void setExpression(final JxltEngine.Expression tp) {
         jxltExpression = tp;
-    }
-
-    public JxltEngine.Expression getExpression() {
-        return jxltExpression;
     }
 
 }
