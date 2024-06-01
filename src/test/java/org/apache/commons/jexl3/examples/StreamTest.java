@@ -16,9 +16,9 @@
  */
 package org.apache.commons.jexl3.examples;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 import static java.lang.Boolean.TRUE;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.net.URI;
 import java.util.Arrays;
@@ -37,7 +37,6 @@ import org.apache.commons.jexl3.JexlScript;
 import org.apache.commons.jexl3.MapContext;
 import org.apache.commons.jexl3.introspection.JexlPermissions;
 import org.apache.commons.jexl3.introspection.JexlPermissions.ClassPermissions;
-import org.junit.Assert;
 import org.junit.Test;
 
 /**
