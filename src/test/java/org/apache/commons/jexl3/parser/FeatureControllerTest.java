@@ -16,8 +16,6 @@
  */
 package org.apache.commons.jexl3.parser;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 import org.apache.commons.jexl3.JexlBuilder;
 import org.apache.commons.jexl3.JexlEngine;
 import org.apache.commons.jexl3.JexlFeatures;
