@@ -20,7 +20,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.Arrays;
 
@@ -80,7 +79,7 @@ public class AssignTest extends JexlTestCase {
         final JexlContext jc = new MapContext();
         final Froboz froboz = new Froboz(-169);
         jc.set("froboz", froboz);
-        RuntimeException xrt = assertThrows(RuntimeException.class, () -> assign.evaluate(jc));
+        final RuntimeException xrt = assertThrows(RuntimeException.class, () -> assign.evaluate(jc));
         assertTrue(xrt.toString().contains("nosuchbean"));
     }
 
@@ -137,16 +136,9 @@ public class AssignTest extends JexlTestCase {
 
     @Test
     public void testGetInError1() {
-        try {
-            JEXL.getProperty("the_x_value", "y");
-        } catch (final JexlException.Property xprop) {
-            assertEquals("y", xprop.getProperty());
-        }
-        try {
-            JEXL.getProperty(null, "y");
-        } catch (final JexlException xprop) {
-            //
-        }
+        final JexlException.Property e = assertThrows(JexlException.Property.class, () -> JEXL.getProperty("the_x_value", "y"));
+        assertEquals("y", e.getProperty());
+        assertThrows(JexlException.class, () -> JEXL.getProperty(null, "y"));
     }
 
     @Test
@@ -176,55 +168,32 @@ public class AssignTest extends JexlTestCase {
 
     @Test
     public void testPropertyInError0() {
-        JexlScript script;
-        for(final String op : Arrays.asList(
-                " = ", "+= ", " -= "," *= "," /= "," %= ",
-                " &= ", " |= ", " ^= ",
-                " <<= ", " >>= ", " >>>= ")) {
-            script = JEXL.createScript("x -> x.y " +op+ "42");
-            try {
-                script.execute(null, "the_x_value");
-            } catch (final JexlException.Property xprop) {
-                assertEquals("y", xprop.getProperty());
-            }
-        }
-        script = JEXL.createScript("x -> x.y ");
-        try {
-            script.execute(null, "the_x_value");
-        } catch (final JexlException.Property xprop) {
+        for (final String op : Arrays.asList(" = ", "+= ", " -= ", " *= ", " /= ", " %= ", " &= ", " |= ", " ^= ", " <<= ", " >>= ", " >>>= ")) {
+            final JexlScript script = JEXL.createScript("x -> x.y " + op + "42");
+            JexlException.Property xprop = assertThrows(JexlException.Property.class, () -> script.execute(null, "the_x_value"));
             assertEquals("y", xprop.getProperty());
         }
+        final JexlScript script = JEXL.createScript("x -> x.y ");
+        JexlException.Property xprop = assertThrows(JexlException.Property.class, () -> script.execute(null, "the_x_value"));
+        assertEquals("y", xprop.getProperty());
     }
 
     @Test
     public void testRejectLocal() {
         final JexlContext jc = new MapContext();
-        JexlScript assign = JEXL.createScript("var quux = null; quux.froboz.value = 10");
-        try {
-            final Object o = assign.execute(jc);
-            fail("quux is local and null, should fail");
-        } catch (final JexlException xjexl) {
-            final String x = xjexl.toString();
-            final String y = x;
-        }
+        final JexlScript assign = JEXL.createScript("var quux = null; quux.froboz.value = 10");
+        assertNotNull(assertThrows(JexlException.class, () -> assign.execute(jc)).toString()); 
         // quux is a global antish var
-        assign = JEXL.createScript("quux.froboz.value = 10");
-        final Object o = assign.execute(jc);
+        final JexlScript assign2 = JEXL.createScript("quux.froboz.value = 10");
+        final Object o = assign2.execute(jc);
         assertEquals(10, o);
     }
 
     @Test
     public void testSetInError1() {
-        try {
-            JEXL.setProperty("the_x_value", "y", 42);
-        } catch (final JexlException.Property xprop) {
-            assertEquals("y", xprop.getProperty());
-        }
-        try {
-            JEXL.setProperty(null, "y", 42);
-        } catch (final JexlException xprop) {
-            //
-        }
+        JexlException.Property xprop = assertThrows(JexlException.Property.class, () -> JEXL.setProperty("the_x_value", "y", 42));
+        assertEquals("y", xprop.getProperty());
+        assertThrows(JexlException.Property.class, () -> JEXL.setProperty(null, "y", 42));
     }
     @Test
     public void testUtil() {
