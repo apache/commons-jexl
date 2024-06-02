@@ -25,6 +25,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.time.Duration;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
@@ -33,6 +34,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.apache.commons.lang3.ThreadUtils;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -102,31 +104,19 @@ public class PragmaTest extends JexlTestCase {
          * @param ms time to sleep in ms
          */
         public void sleep(final long ms) {
-            try {
-                Thread.sleep(ms);
-            } catch (final InterruptedException e) {
-                // ignore
-            }
+            ThreadUtils.sleepQuietly(Duration.ofMillis(ms));
         }
     }
 
     public static class Sleeper {
         public void sleep(final long ms) {
-            try {
-                Thread.sleep(ms);
-            } catch (final InterruptedException e) {
-                // ignore
-            }
+            ThreadUtils.sleepQuietly(Duration.ofMillis(ms));
         }
     }
 
     public static class StaticSleeper {
         public static void sleep(final long ms) {
-            try {
-                Thread.sleep(ms);
-            } catch (final InterruptedException e) {
-                // ignore
-            }
+            ThreadUtils.sleepQuietly(Duration.ofMillis(ms));
         }
 
         // precludes instantiation
