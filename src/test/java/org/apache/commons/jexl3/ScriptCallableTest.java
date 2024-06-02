@@ -59,9 +59,7 @@ public class ScriptCallableTest extends JexlTestCase {
                         future = executor.submit(statement);
                         return future.get(ms, TimeUnit.MILLISECONDS);
                     } catch (final TimeoutException xtimeout) {
-                        if (future != null) {
-                            future.cancel(true);
-                        }
+                        future.cancel(true);
                     } finally {
                         executor.shutdown();
                     }
@@ -190,9 +188,7 @@ public class ScriptCallableTest extends JexlTestCase {
                 t = f.get(100L, TimeUnit.MILLISECONDS);
                 fail("should timeout");
             } catch (final TimeoutException xtimeout) {
-                if (f != null) {
-                    f.cancel(true);
-                }
+                f.cancel(true);
             }
             assertNotEquals(42, t);
 
@@ -217,9 +213,7 @@ public class ScriptCallableTest extends JexlTestCase {
                 t = f.get(100L, TimeUnit.MILLISECONDS);
                 fail("should timeout");
             } catch (final TimeoutException xtimeout) {
-                if (f != null) {
-                    f.cancel(true);
-                }
+                f.cancel(true);
             }
             assertNotEquals(42, t);
 
