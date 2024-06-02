@@ -391,22 +391,15 @@ public class ScriptCallableTest extends JexlTestCase {
     public void testFuture() throws Exception {
         final JexlScript e = JEXL.createScript("while(true);");
         final FutureTask<Object> future = new FutureTask<>(e.callable(null));
-
         final ExecutorService executor = Executors.newFixedThreadPool(1);
-        executor.submit(future);
-        Object t = 42;
         try {
-            t = future.get(100, TimeUnit.MILLISECONDS);
-            fail("should have timed out");
-        } catch (final TimeoutException xtimeout) {
-            // ok, ignore
+            executor.submit(future);
+            assertThrows(TimeoutException.class, () -> future.get(100, TimeUnit.MILLISECONDS));
             future.cancel(true);
         } finally {
             executor.shutdown();
         }
-
         assertTrue(future.isCancelled());
-        assertEquals(42, t);
     }
 
     @Test
