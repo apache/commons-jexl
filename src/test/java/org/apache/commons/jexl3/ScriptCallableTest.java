@@ -21,7 +21,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 
 import java.time.Duration;
 import java.util.List;
@@ -463,51 +462,26 @@ public class ScriptCallableTest extends JexlTestCase {
     public void testTimeout() throws Exception {
         JexlScript script = JEXL.createScript("(flag)->{ @timeout(100) { while(flag); return 42 }; 'cancelled' }");
         final JexlContext ctxt = new AnnotationContext();
-        Object result = null;
-        try {
-            result = script.execute(ctxt, true);
-        } catch (final Exception xany) {
-            if (xany.getCause() != null) {
-                fail(xany.getCause().toString());
-            } else {
-                fail(xany.toString());
-            }
-        }
+        Object result = script.execute(ctxt, true);
         assertEquals("cancelled", result);
 
         result = script.execute(ctxt, false);
         assertEquals(42, result);
         script = JEXL.createScript("(flag)->{ @timeout(100, 'cancelled') { while(flag); 42; } }");
-        try {
-            result = script.execute(ctxt, true);
-        } catch (final Exception xany) {
-            fail(xany.toString());
-        }
+        result = script.execute(ctxt, true);
         assertEquals("cancelled", result);
 
         result = script.execute(ctxt, false);
         assertEquals(42, result);
         script = JEXL.createScript("@timeout(100) {sleep(1000); 42; } -42;");
-        try {
-            result = script.execute(ctxt);
-        } catch (final Exception xany) {
-            fail(xany.toString());
-        }
+        result = script.execute(ctxt);
         assertEquals(-42, result);
 
         script = JEXL.createScript("@timeout(100) {sleep(1000); return 42; } return -42;");
-        try {
-            result = script.execute(ctxt);
-        } catch (final Exception xany) {
-            fail(xany.toString());
-        }
+        result = script.execute(ctxt);
         assertEquals(-42, result);
         script = JEXL.createScript("@timeout(1000) {sleep(100); return 42; } return -42;");
-        try {
-            result = script.execute(ctxt);
-        } catch (final Exception xany) {
-            fail(xany.toString());
-        }
+        result = script.execute(ctxt);
         assertEquals(42, result);
     }
 
