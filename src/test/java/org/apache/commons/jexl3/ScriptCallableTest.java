@@ -273,25 +273,28 @@ public class ScriptCallableTest extends JexlTestCase {
 
     @Test
     public void testCallableClosure() throws Exception {
-        List<Runnable> lr = null;
         final JexlScript e = JEXL.createScript("function(t) {while(t);}");
         final Callable<Object> c = e.callable(null, Boolean.TRUE);
         Object t = 42;
 
+        final List<Runnable> list;
         final ExecutorService executor = Executors.newFixedThreadPool(1);
-        final Future<?> future = executor.submit(c);
+        final Future<?> future;
         try {
-            t = future.get(100, TimeUnit.MILLISECONDS);
-            fail("should have timed out");
-        } catch (final TimeoutException xtimeout) {
-            // ok, ignore
-            future.cancel(true);
+            future = executor.submit(c);
+            try {
+                t = future.get(100, TimeUnit.MILLISECONDS);
+                fail("should have timed out");
+            } catch (final TimeoutException xtimeout) {
+                // ok, ignore
+                future.cancel(true);
+            }
         } finally {
-            lr = executor.shutdownNow();
+            list = executor.shutdownNow();
         }
         assertTrue(future.isCancelled());
         assertEquals(42, t);
-        assertTrue(lr.isEmpty());
+        assertTrue(list.isEmpty());
     }
 
     @Test
