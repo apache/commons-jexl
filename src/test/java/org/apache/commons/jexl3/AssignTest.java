@@ -170,11 +170,11 @@ public class AssignTest extends JexlTestCase {
     public void testPropertyInError0() {
         for (final String op : Arrays.asList(" = ", "+= ", " -= ", " *= ", " /= ", " %= ", " &= ", " |= ", " ^= ", " <<= ", " >>= ", " >>>= ")) {
             final JexlScript script = JEXL.createScript("x -> x.y " + op + "42");
-            JexlException.Property xprop = assertThrows(JexlException.Property.class, () -> script.execute(null, "the_x_value"));
+            final JexlException.Property xprop = assertThrows(JexlException.Property.class, () -> script.execute(null, "the_x_value"));
             assertEquals("y", xprop.getProperty());
         }
         final JexlScript script = JEXL.createScript("x -> x.y ");
-        JexlException.Property xprop = assertThrows(JexlException.Property.class, () -> script.execute(null, "the_x_value"));
+        final JexlException.Property xprop = assertThrows(JexlException.Property.class, () -> script.execute(null, "the_x_value"));
         assertEquals("y", xprop.getProperty());
     }
 
@@ -182,7 +182,7 @@ public class AssignTest extends JexlTestCase {
     public void testRejectLocal() {
         final JexlContext jc = new MapContext();
         final JexlScript assign = JEXL.createScript("var quux = null; quux.froboz.value = 10");
-        assertNotNull(assertThrows(JexlException.class, () -> assign.execute(jc)).toString()); 
+        assertNotNull(assertThrows(JexlException.class, () -> assign.execute(jc)).toString());
         // quux is a global antish var
         final JexlScript assign2 = JEXL.createScript("quux.froboz.value = 10");
         final Object o = assign2.execute(jc);
@@ -191,7 +191,7 @@ public class AssignTest extends JexlTestCase {
 
     @Test
     public void testSetInError1() {
-        JexlException.Property xprop = assertThrows(JexlException.Property.class, () -> JEXL.setProperty("the_x_value", "y", 42));
+        final JexlException.Property xprop = assertThrows(JexlException.Property.class, () -> JEXL.setProperty("the_x_value", "y", 42));
         assertEquals("y", xprop.getProperty());
         assertThrows(JexlException.Property.class, () -> JEXL.setProperty(null, "y", 42));
     }
