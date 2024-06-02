@@ -19,6 +19,7 @@ package org.apache.commons.jexl3;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -137,11 +138,8 @@ public class TryCatchFinallyTest extends JexlTestCase {
     @Test
     public void testRedefinition0() {
         final String src = "try(let x = c) { let x = 3; -42; }";
-        try {
-            final JexlScript script = JEXL.createScript(src, "c");
-        } catch (final JexlException.Parsing xvar) {
-            assertTrue(xvar.getMessage().contains("x: variable is already declared"));
-        }
+        final JexlException.Parsing xvar = assertThrows(JexlException.Parsing.class, () -> JEXL.createScript(src, "c"));
+        assertTrue(xvar.getMessage().contains("x: variable is already declared"));
     }
 
     @Test
