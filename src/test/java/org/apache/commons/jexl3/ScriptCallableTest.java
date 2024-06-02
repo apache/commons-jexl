@@ -275,8 +275,6 @@ public class ScriptCallableTest extends JexlTestCase {
     public void testCallableClosure() throws Exception {
         final JexlScript e = JEXL.createScript("function(t) {while(t);}");
         final Callable<Object> c = e.callable(null, Boolean.TRUE);
-        final Object t = 42;
-
         final List<Runnable> list;
         final ExecutorService executor = Executors.newFixedThreadPool(1);
         final Future<?> future;
@@ -288,7 +286,6 @@ public class ScriptCallableTest extends JexlTestCase {
             list = executor.shutdownNow();
         }
         assertTrue(future.isCancelled());
-        assertEquals(42, t);
         assertTrue(list.isEmpty());
     }
 
@@ -297,11 +294,8 @@ public class ScriptCallableTest extends JexlTestCase {
         final Semaphore latch = new Semaphore(0);
         final JexlContext ctxt = new MapContext();
         ctxt.set("latch", latch);
-
         final JexlScript e = JEXL.createScript("latch.release(); while(true);");
         final Callable<Object> c = e.callable(ctxt);
-        final Object t = 42;
-
         final List<Runnable> list;
         final ExecutorService executor = Executors.newFixedThreadPool(1);
         final Future<?> future;
@@ -314,7 +308,6 @@ public class ScriptCallableTest extends JexlTestCase {
             list = executor.shutdownNow();
         }
         assertTrue(future.isCancelled());
-        assertEquals(42, t);
         assertTrue(list.isEmpty());
     }
 
@@ -330,18 +323,14 @@ public class ScriptCallableTest extends JexlTestCase {
         final List<Runnable> list;
         final ExecutorService executor = Executors.newFixedThreadPool(1);
         final Future<?> future;
-        Object t;
         try {
             future = executor.submit(c);
-            t = 42;
-            latch.acquire();
             assertThrows(TimeoutException.class, () -> future.get(100, TimeUnit.MILLISECONDS));
             future.cancel(true);
         } finally {
             list = executor.shutdownNow();
         }
         assertTrue(future.isCancelled());
-        assertEquals(42, t);
         assertTrue(list.isEmpty());
     }
 
@@ -352,7 +341,6 @@ public class ScriptCallableTest extends JexlTestCase {
         final Callable<Object> c = e.callable(new TestContext());
         final ExecutorService executor = Executors.newFixedThreadPool(1);
         final Future<?> future;
-        final Object t = 42;
         try {
             future = executor.submit(c);
             assertThrows(TimeoutException.class, () -> future.get(100, TimeUnit.MILLISECONDS));
@@ -361,7 +349,6 @@ public class ScriptCallableTest extends JexlTestCase {
             list = executor.shutdownNow();
         }
         assertTrue(future.isCancelled());
-        assertEquals(42, t);
         assertTrue(list.isEmpty());
     }
 
