@@ -240,7 +240,9 @@ public class ScriptCallableTest extends JexlTestCase {
         assertTrue(list == null || list.isEmpty());
     }
 
-    // JEXL-317
+    /**
+     * Tests JEXL-317.
+     */
     @Test
     public void testCallableCancellation() throws Exception {
         final Semaphore latch = new Semaphore(0);
