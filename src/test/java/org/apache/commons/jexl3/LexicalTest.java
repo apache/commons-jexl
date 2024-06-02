@@ -149,15 +149,13 @@ public class LexicalTest {
     }
 
     private void runLexical0(final JexlEngine jexl, final JexlEvalContext ctxt, final String source, final boolean feature) {
-        try {
+        final JexlException xany = assertThrows(JexlException.class, () -> {
             JexlScript script = jexl.createScript(source);
             if (!feature) {
                 script.execute(ctxt);
             }
-            fail();
-        } catch (final JexlException xany) {
-            final String ww = xany.toString();
-        }
+        });
+        assertNotNull(xany.toString());
     }
 
     void runLexical0(final boolean feature) {
