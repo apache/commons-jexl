@@ -148,6 +148,18 @@ public class LexicalTest {
         checkParse(null, srcs, expected);
     }
 
+    private void runLexical0(final JexlEngine jexl, final JexlEvalContext ctxt, final String source, final boolean feature) {
+        try {
+            JexlScript script = jexl.createScript(source);
+            if (!feature) {
+                script.execute(ctxt);
+            }
+            fail();
+        } catch (final JexlException xany) {
+            final String ww = xany.toString();
+        }
+    }
+
     void runLexical0(final boolean feature) {
         final JexlFeatures f = new JexlFeatures();
         f.lexical(feature);
@@ -157,60 +169,12 @@ public class LexicalTest {
         // ensure errors will throw
         options.setLexical(true);
         JexlScript script;
-        try {
-            script = jexl.createScript("var x = 0; var x = 1;");
-            if (!feature) {
-                script.execute(ctxt);
-            }
-            fail();
-        } catch (final JexlException xany) {
-            final String ww = xany.toString();
-        }
-        try {
-            script = jexl.createScript("var x = 0; for(var y : null) { var y = 1;");
-            if (!feature) {
-                script.execute(ctxt);
-            }
-            fail();
-        } catch (final JexlException xany) {
-            final String ww = xany.toString();
-        }
-        try {
-            script = jexl.createScript("var x = 0; for(var x : null) {};");
-            if (!feature) {
-                script.execute(ctxt);
-            }
-            fail();
-        } catch (final JexlException xany) {
-            final String ww = xany.toString();
-        }
-        try {
-            script = jexl.createScript("(x)->{ var x = 0; x; }");
-            if (!feature) {
-                script.execute(ctxt);
-            }
-            fail();
-        } catch (final JexlException xany) {
-            final String ww = xany.toString();
-        }
-        try {
-            script = jexl.createScript("var x; if (true) { if (true) { var x = 0; x; } }");
-            if (!feature) {
-                script.execute(ctxt);
-            }
-            fail();
-        } catch (final JexlException xany) {
-            final String ww = xany.toString();
-        }
-        try {
-            script = jexl.createScript("if (a) { var y = (x)->{ var x = 0; x; }; y(2) }", "a");
-            if (!feature) {
-                script.execute(ctxt);
-            }
-            fail();
-        } catch (final JexlException xany) {
-            final String ww = xany.toString();
-        }
+        runLexical0(jexl, ctxt, "var x = 0; var x = 1;", feature);
+        runLexical0(jexl, ctxt, "var x = 0; for(var y : null) { var y = 1;", feature);
+        runLexical0(jexl, ctxt, "var x = 0; for(var x : null) {};", feature);
+        runLexical0(jexl, ctxt, "(x)->{ var x = 0; x; }", feature);
+        runLexical0(jexl, ctxt, "var x; if (true) { if (true) { var x = 0; x; } }", feature);
+        runLexical0(jexl, ctxt, "if (a) { var y = (x)->{ var x = 0; x; }; y(2) }", feature);
         try {
             script = jexl.createScript("(x)->{ for(var x : null) { x; } }");
             if (!feature) {
