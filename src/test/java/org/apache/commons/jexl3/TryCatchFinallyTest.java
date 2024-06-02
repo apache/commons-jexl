@@ -207,8 +207,8 @@ public class TryCatchFinallyTest extends JexlTestCase {
         final String src = "try(let x = 42) { throw x } catch(const y) { throw -(y.value) } ";
         final JexlScript script = JEXL.createScript(src);
         assertNotNull(script);
-        final JexlException.Throw xvar = assertThrows(JexlException.Throw.class, () -> script.execute(null));
-        assertEquals(-42, xvar.getValue());
+        final JexlException.Throw xthrow = assertThrows(JexlException.Throw.class, () -> script.execute(null));
+        assertEquals(-42, xthrow.getValue());
     }
 
     @Test
@@ -216,12 +216,8 @@ public class TryCatchFinallyTest extends JexlTestCase {
         final String src = "try(let x = 42) { throw x } catch(const y) { throw -(y.value) } finally { throw 169 }";
         final JexlScript script = JEXL.createScript(src);
         assertNotNull(script);
-        try {
-            final Object result = script.execute(null);
-            fail("throw did not throw");
-        } catch (final JexlException.Throw xthrow) {
-            assertEquals(169, xthrow.getValue());
-        }
+        final JexlException.Throw xthrow = assertThrows(JexlException.Throw.class, () -> script.execute(null));
+        assertEquals(169, xthrow.getValue());
     }
 
     @Test
