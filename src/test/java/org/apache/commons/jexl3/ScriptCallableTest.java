@@ -354,14 +354,31 @@ public class ScriptCallableTest extends JexlTestCase {
 
     @Test
     public void testCancelWait() throws Exception {
-        List<Runnable> lr = null;
+        final List<Runnable> list;
         final JexlScript e = JEXL.createScript("wait(10)");
         final Callable<Object> c = e.callable(new TestContext());
-
         final ExecutorService executor = Executors.newFixedThreadPool(1);
         try {
             final Future<?> future = executor.submit(c);
-            Object t = 42;
+            assertThrows(TimeoutException.class, () -> future.get(100, TimeUnit.MILLISECONDS));
+            future.cancel(true);
+            assertTrue(future.isCancelled());
+        } finally {
+            list = executor.shutdownNow();
+        }
+        assertTrue(list.isEmpty());
+    }
+
+    @Test
+    public void testCancelWaitInterrupt() throws Exception {
+        final List<Runnable> list;
+        final JexlScript e = JEXL.createScript("waitInterrupt(42)");
+        final Callable<Object> c = e.callable(new TestContext());
+        final ExecutorService executor = Executors.newFixedThreadPool(1);
+        final Future<?> future;
+        Object t = 42;
+        try {
+            future = executor.submit(c);
             try {
                 t = future.get(100, TimeUnit.MILLISECONDS);
                 fail("should have timed out");
@@ -369,36 +386,12 @@ public class ScriptCallableTest extends JexlTestCase {
                 // ok, ignore
                 future.cancel(true);
             }
-            assertTrue(future.isCancelled());
-            assertEquals(42, t);
         } finally {
-            lr = executor.shutdownNow();
-        }
-        assertTrue(lr.isEmpty());
-    }
-
-    @Test
-    public void testCancelWaitInterrupt() throws Exception {
-        List<Runnable> lr = null;
-        final JexlScript e = JEXL.createScript("waitInterrupt(42)");
-        final Callable<Object> c = e.callable(new TestContext());
-
-        final ExecutorService executor = Executors.newFixedThreadPool(1);
-        final Future<?> future = executor.submit(c);
-        Object t = 42;
-
-        try {
-            t = future.get(100, TimeUnit.MILLISECONDS);
-            fail("should have timed out");
-        } catch (final TimeoutException xtimeout) {
-            // ok, ignore
-            future.cancel(true);
-        } finally {
-            lr = executor.shutdownNow();
+            list = executor.shutdownNow();
         }
         assertTrue(future.isCancelled());
         assertEquals(42, t);
-        assertTrue(lr.isEmpty());
+        assertTrue(list.isEmpty());
     }
 
     @Test
