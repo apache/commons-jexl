@@ -18,7 +18,7 @@ package org.apache.commons.jexl3;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.HashMap;
@@ -193,63 +193,44 @@ public class PropertyAccessTest extends JexlTestCase {
         final HashMap<Object, Object> x = new HashMap<>();
         x.put(2, "123456789");
         ctx.set("x", x);
+        // @formatter:off
         final JexlEngine engine = new JexlBuilder()
                 .uberspect(new Uberspect(null, null, JexlPermissions.UNRESTRICTED))
                 .strict(true).silent(false).create();
+        // @formatter:on
         String stmt = "x.2.class.name";
         JexlScript script = engine.createScript(stmt);
         Object result = script.execute(ctx);
         assertEquals("java.lang.String", result);
 
-        try {
-            stmt = "x.3?.class.name";
-            script = engine.createScript(stmt);
-            result = script.execute(ctx);
-            assertNull(result);
-        } catch (final JexlException xany) {
-            fail("Should have evaluated to null");
-        }
-        try {
-            stmt = "x?.3.class.name";
-            script = engine.createScript(stmt);
-            result = script.execute(ctx);
-            fail("Should have thrown, fail on 3");
-            assertNull(result);
-        } catch (final JexlException xany) {
-            assertTrue(xany.detailedMessage().contains("3"));
-        }
-        try {
-            stmt = "x?.3?.class.name";
-            script = engine.createScript(stmt);
-            result = script.execute(ctx);
-            assertNull(result);
-        } catch (final JexlException xany) {
-            fail("Should have evaluated to null");
-        }
-        try {
-            stmt = "y?.3.class.name";
-            script = engine.createScript(stmt);
-            result = script.execute(ctx);
-            assertNull(result);
-        } catch (final JexlException xany) {
-            fail("Should have evaluated to null");
-        }
-        try {
-            stmt = "x?.y?.z";
-            script = engine.createScript(stmt);
-            result = script.execute(ctx);
-            assertNull(result);
-        } catch (final JexlException xany) {
-            fail("Should have evaluated to null");
-        }
-        try {
-            stmt = "x? (x.y? (x.y.z ?: null) :null) : null";
-            script = engine.createScript(stmt);
-            result = script.execute(ctx);
-            assertNull(result);
-        } catch (final JexlException xany) {
-            fail("Should have evaluated to null");
-        }
+        stmt = "x.3?.class.name";
+        script = engine.createScript(stmt);
+        result = script.execute(ctx);
+        assertNull(result);
+
+        stmt = "x?.3.class.name";
+        final JexlScript script1 = engine.createScript(stmt);
+        assertThrows(JexlException.class, () -> script1.execute(ctx));
+
+        stmt = "x?.3?.class.name";
+        script = engine.createScript(stmt);
+        result = script.execute(ctx);
+        assertNull(result);
+
+        stmt = "y?.3.class.name";
+        script = engine.createScript(stmt);
+        result = script.execute(ctx);
+        assertNull(result);
+
+        stmt = "x?.y?.z";
+        script = engine.createScript(stmt);
+        result = script.execute(ctx);
+        assertNull(result);
+
+        stmt = "x? (x.y? (x.y.z ?: null) :null) : null";
+        script = engine.createScript(stmt);
+        result = script.execute(ctx);
+        assertNull(result);
     }
 
     @Test
