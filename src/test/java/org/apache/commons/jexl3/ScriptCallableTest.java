@@ -221,7 +221,6 @@ public class ScriptCallableTest extends JexlTestCase {
 
         final JexlScript e = JEXL.createScript("latch.release(); while(true);");
         final Script.Callable c = (Script.Callable) e.callable(ctxt);
-        Object t = 42;
         final Callable<Object> kc = () -> {
             latch.acquire();
             return c.cancel();
@@ -231,14 +230,9 @@ public class ScriptCallableTest extends JexlTestCase {
         try {
             final Future<?> future = executor.submit(c);
             final Future<?> kfc = executor.submit(kc);
-            try {
-                assertTrue((Boolean) kfc.get());
-                t = future.get();
-                fail("should have been cancelled");
-            } catch (final ExecutionException xexec) {
-                // ok, ignore
-                assertTrue(xexec.getCause() instanceof JexlException.Cancel);
-            }
+            assertTrue((Boolean) kfc.get());
+            final ExecutionException xexec = assertThrows(ExecutionException.class, future::get);
+            assertTrue(xexec.getCause() instanceof JexlException.Cancel);
         } finally {
             list = executor.shutdownNow();
         }
