@@ -22,54 +22,58 @@ import java.util.Map;
 
 /**
  * Caching scripts or templates interface.
+ *
  * @param <K> source
  * @param <V> script or template
  */
 public interface JexlCache<K, V> {
-  /**
-   * Returns the cache capacity, the maximum number of elements it can contain.
-   *
-   * @return the cache capacity
-   */
-  int capacity();
 
-  /**
-   * Clears the cache.
-   */
-  void clear();
+    /**
+     * Returns the cache capacity, the maximum number of elements it can contain.
+     *
+     * @return the cache capacity
+     */
+    int capacity();
 
-  /**
-   * Produces the cache entry set.
-   * <p>
-   * For implementations testing only
-   * </p>
-   * @return the cache entry list
-   */
-  default Collection<Map.Entry<K, V>> entries() {
-    return Collections.emptyList();
-  }
+    /**
+     * Clears the cache.
+     */
+    void clear();
 
-  /**
-   * Gets a value from cache.
-   *
-   * @param key the cache entry key
-   * @return the cache entry value
-   */
-  V get(K key);
+    /**
+     * Produces the cache entry set.
+     *
+     * <p>
+     * For implementations testing only
+     * </p>
+     *
+     * @return the cache entry list
+     */
+    default Collection<Map.Entry<K, V>> entries() {
+        return Collections.emptyList();
+    }
 
-  /**
-   * Puts a value in cache.
-   *
-   * @param key    the cache entry key
-   * @param script the cache entry value
-   * @return the previously associated value if any
-   */
-  V put(K key, V script);
+    /**
+     * Gets a value from cache.
+     *
+     * @param key the cache entry key
+     * @return the cache entry value
+     */
+    V get(K key);
 
-  /**
- * Returns the cache size, the actual number of elements it contains.
- *
- * @return the cache size
- */
-  int size();
+    /**
+     * Puts a value in cache.
+     *
+     * @param key    the cache entry key
+     * @param script the cache entry value
+     * @return the previously associated value if any
+     */
+    V put(K key, V script);
+
+    /**
+     * Returns the cache size, the actual number of elements it contains.
+     *
+     * @return the cache size
+     */
+    int size();
 }
