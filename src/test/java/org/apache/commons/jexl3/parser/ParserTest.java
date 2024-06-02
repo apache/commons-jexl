@@ -64,7 +64,7 @@ public class ParserTest {
         final String[] ops = { "=", "+=", "-=", "/=", "*=", "^=", "&=", "|=" };
         for (final String op : ops) {
             final Parser parser = new Parser(";");
-            JexlException.Parsing xparse = assertThrows(JexlException.Parsing.class, () -> parser.parse(null, FEATURES, "foo() " + op + " 1;", null),
+            final JexlException.Parsing xparse = assertThrows(JexlException.Parsing.class, () -> parser.parse(null, FEATURES, "foo() " + op + " 1;", null),
                     () -> "should have failed on invalid assignment " + op);
             assertNotNull(xparse.getDetail());
             assertNotNull(xparse.toString());
