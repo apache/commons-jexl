@@ -226,22 +226,24 @@ public class ScriptCallableTest extends JexlTestCase {
             latch.acquire();
             return c.cancel();
         };
+        final List<Runnable> list;
         final ExecutorService executor = Executors.newFixedThreadPool(2);
-        final Future<?> future = executor.submit(c);
-        final Future<?> kfc = executor.submit(kc);
-        List<Runnable> lr;
         try {
-            assertTrue((Boolean) kfc.get());
-            t = future.get();
-            fail("should have been cancelled");
-        } catch (final ExecutionException xexec) {
-            // ok, ignore
-            assertTrue(xexec.getCause() instanceof JexlException.Cancel);
+            final Future<?> future = executor.submit(c);
+            final Future<?> kfc = executor.submit(kc);
+            try {
+                assertTrue((Boolean) kfc.get());
+                t = future.get();
+                fail("should have been cancelled");
+            } catch (final ExecutionException xexec) {
+                // ok, ignore
+                assertTrue(xexec.getCause() instanceof JexlException.Cancel);
+            }
         } finally {
-            lr = executor.shutdownNow();
+            list = executor.shutdownNow();
         }
         assertTrue(c.isCancelled());
-        assertTrue(lr == null || lr.isEmpty());
+        assertTrue(list == null || list.isEmpty());
     }
 
     // JEXL-317
