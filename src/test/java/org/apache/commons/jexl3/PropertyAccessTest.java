@@ -19,7 +19,6 @@ package org.apache.commons.jexl3;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -237,39 +236,30 @@ public class PropertyAccessTest extends JexlTestCase {
     public void test275a() throws Exception {
         final JexlEngine jexl = new JexlBuilder().strict(true).safe(false).create();
         final JexlContext ctxt = new MapContext();
-        JexlScript script;
         Object result = null;
         final Prompt p0 = new Prompt();
         p0.set("stuff", 42);
         ctxt.set("$in", p0);
 
         // unprotected navigation
-        script = jexl.createScript("$in[p].intValue()", "p");
-        try {
-            result = script.execute(ctxt, "fail");
-            fail("should have thrown a " + JexlException.Property.class);
-        } catch (final JexlException xany) {
-            assertEquals(JexlException.Property.class, xany.getClass());
-        }
+        final JexlScript script0 = jexl.createScript("$in[p].intValue()", "p");
+        assertThrows(JexlException.Property.class, () -> script0.execute(ctxt, "fail"));
+
         assertNull(result);
-        result = script.execute(ctxt, "stuff");
+        result = script0.execute(ctxt, "stuff");
         assertEquals(42, result);
 
         // protected navigation
-        script = jexl.createScript("$in[p]?.intValue()", "p");
+        JexlScript script = jexl.createScript("$in[p]?.intValue()", "p");
         result = script.execute(ctxt, "fail");
         assertNull(result);
         result = script.execute(ctxt, "stuff");
         assertEquals(42, result);
 
         // unprotected navigation
-        script = jexl.createScript("$in.`${p}`.intValue()", "p");
-        try {
-            result = script.execute(ctxt, "fail");
-            fail("should have thrown a " + JexlException.Property.class);
-        } catch (final JexlException xany) {
-            assertEquals(JexlException.Property.class, xany.getClass());
-        }
+        final JexlScript script1 = jexl.createScript("$in.`${p}`.intValue()", "p");
+        assertThrows(JexlException.Property.class, () -> script1.execute(ctxt, "fail"));
+
         result = script.execute(ctxt, "stuff");
         assertEquals(42, result);
 
