@@ -19,6 +19,7 @@ package org.apache.commons.jexl3;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -139,12 +140,12 @@ public class ScriptCallableTest extends JexlTestCase {
 
     /**
      * Redundant test with previous ones but impervious to JEXL engine configuration.
-     * 
+     *
      * @throws Exception if there is a regression
      */
     private void runInterrupt(final JexlEngine jexl) throws Exception {
         List<Runnable> lr = null;
-        final ExecutorService exec = Executors.newFixedThreadPool(2);
+        final ExecutorService executorService = Executors.newFixedThreadPool(2);
         try {
             final JexlContext ctxt = new TestContext();
 
@@ -162,10 +163,9 @@ public class ScriptCallableTest extends JexlTestCase {
             assertNotEquals(42, t);
 
             // self interrupt
-            Future<Object> f = null;
             c = (Script.Callable) sint.callable(ctxt);
+            final Future<Object> f = executorService.submit(c);
             try {
-                f = exec.submit(c);
                 t = f.get();
                 assertFalse(c.isCancellable(), "should have thrown a Cancel");
             } catch (final ExecutionException xexec) {
@@ -176,56 +176,39 @@ public class ScriptCallableTest extends JexlTestCase {
 
             // timeout a sleep
             final JexlScript ssleep = jexl.createScript("sleep(30000); return 42");
-            f = exec.submit(ssleep.callable(ctxt));
-            try {
-                t = f.get(100L, TimeUnit.MILLISECONDS);
-                fail("should timeout");
-            } catch (final TimeoutException xtimeout) {
-                f.cancel(true);
-            }
+            final Future<Object> f0 = executorService.submit(ssleep.callable(ctxt));
+            assertThrows(TimeoutException.class, () -> f0.get(100L, TimeUnit.MILLISECONDS));
+            f0.cancel(true);
             assertNotEquals(42, t);
 
             // cancel a sleep
-            final Future<Object> fc0 = exec.submit(ssleep.callable(ctxt));
+            final Future<Object> fc0 = executorService.submit(ssleep.callable(ctxt));
             final Runnable cancels0 = () -> {
                 ThreadUtils.sleepQuietly(Duration.ofMillis(200));
                 fc0.cancel(true);
             };
-            try {
-                exec.submit(cancels0);
-                t = f.get(100L, TimeUnit.MILLISECONDS);
-                fail("should be cancelled");
-            } catch (final CancellationException xexec) {
-                // this is the expected result
-            }
+            executorService.submit(cancels0);
+            assertThrows(CancellationException.class, () -> f0.get(100L, TimeUnit.MILLISECONDS));
 
             // timeout a while(true)
             final JexlScript swhile = jexl.createScript("while(true); return 42");
-            f = exec.submit(swhile.callable(ctxt));
-            try {
-                t = f.get(100L, TimeUnit.MILLISECONDS);
-                fail("should timeout");
-            } catch (final TimeoutException xtimeout) {
-                f.cancel(true);
-            }
+            final Future<Object> f1 = executorService.submit(swhile.callable(ctxt));
+            assertThrows(TimeoutException.class, () -> f1.get(100L, TimeUnit.MILLISECONDS));
+            f1.cancel(true);
+
             assertNotEquals(42, t);
 
             // cancel a while(true)
-            final Future<Object> fc = exec.submit(swhile.callable(ctxt));
+            final Future<Object> fc = executorService.submit(swhile.callable(ctxt));
             final Runnable cancels = () -> {
                 ThreadUtils.sleepQuietly(Duration.ofMillis(200));
                 fc.cancel(true);
             };
-            exec.submit(cancels);
-            try {
-                t = fc.get();
-                fail("should be cancelled");
-            } catch (final CancellationException xexec) {
-                // this is the expected result
-            }
+            executorService.submit(cancels);
+            assertThrows(CancellationException.class, fc::get);
             assertNotEquals(42, t);
         } finally {
-            lr = exec.shutdownNow();
+            lr = executorService.shutdownNow();
         }
         assertTrue(lr.isEmpty());
     }
