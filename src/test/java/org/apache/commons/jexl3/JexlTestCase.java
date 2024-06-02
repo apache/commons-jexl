@@ -151,7 +151,7 @@ public class JexlTestCase {
      */
     public static void runTest(final String tname, final String mname) throws Exception {
         final String testClassName = "org.apache.commons.jexl3." + tname;
-        Class<JexlTestCase> clazz = null;
+        final Class<JexlTestCase> clazz = null;
         JexlTestCase test = null;
         // find the class
         assertThrows(ClassNotFoundException.class, () -> Class.forName(testClassName), () -> "no such class: " + testClassName);
