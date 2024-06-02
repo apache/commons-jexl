@@ -479,21 +479,13 @@ public class SideEffectTest extends JexlTestCase {
 
         final JexlEngine engine = new JexlBuilder().arithmetic(new Arithmetic248(true)).create();
         final JexlScript foo12 = engine.createScript("foo[1..2]");
-        try {
-            final Object r = foo12.execute(ctx);
-            assertEquals(Arrays.asList(20, 30), r);
-        } catch (final JexlException xp) {
-            assertTrue(xp instanceof JexlException.Property);
-        }
+        Object r = foo12.execute(ctx);
+        assertEquals(Arrays.asList(20, 30), r);
 
         final JexlScript foo12assign = engine.createScript("foo[1..2] = x", "x");
-        try {
-            final Object r = foo12assign.execute(ctx, 25);
-            assertEquals(25, r);
-            assertEquals(Arrays.asList(10, 25, 25, 40), foo);
-        } catch (final JexlException xp) {
-            assertTrue(xp instanceof JexlException.Property);
-        }
+        r = foo12assign.execute(ctx, 25);
+        assertEquals(25, r);
+        assertEquals(Arrays.asList(10, 25, 25, 40), foo);
     }
 
     @Test
