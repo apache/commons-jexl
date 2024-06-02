@@ -373,7 +373,7 @@ public class AnnotationTest extends JexlTestCase {
         assertEquals(42, r);
         // assertEquals(42, r);
         assertTrue(options.isStrict());
-        JexlScript e2 = JEXL.createScript("@scale(5) 42;");
+        final JexlScript e2 = JEXL.createScript("@scale(5) 42;");
         r = e2.execute(jc);
         assertEquals(42, r);
         assertTrue(options.isStrict());
