@@ -553,14 +553,14 @@ public class VarTest extends JexlTestCase {
         options.setSilent(false);
         options.setSafe(false);
 
-        JexlScript e0 = JEXL.createScript("x");
+        final JexlScript e0 = JEXL.createScript("x");
         assertThrows(JexlException.class, () -> e0.execute(ctxt), "should have thrown an unknown var exception");
 
-        JexlScript e1 = JEXL.createScript("x = 42");
+        final JexlScript e1 = JEXL.createScript("x = 42");
         assertThrows(JexlException.class, () -> e1.execute(ctxt), "should have thrown a readonly context exception");
 
         env.set("x", "fourty-two");
-        JexlScript e2 = JEXL.createScript("x.theAnswerToEverything()");
+        final JexlScript e2 = JEXL.createScript("x.theAnswerToEverything()");
         assertThrows(JexlException.class, () -> e2.execute(ctxt), "should have thrown an unknown method exception");
     }
 
