@@ -43,16 +43,14 @@ import org.junit.jupiter.api.Test;
 /**
  * Tests around asynchronous script execution and interrupts.
  */
-@SuppressWarnings({"UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
+@SuppressWarnings({ "UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes" })
 public class ScriptCallableTest extends JexlTestCase {
     public static class AnnotationContext extends MapContext implements JexlContext.AnnotationProcessor {
         @Override
         public Object processAnnotation(final String name, final Object[] args, final Callable<Object> statement) throws Exception {
             if ("timeout".equals(name) && args != null && args.length > 0) {
-                final long ms = args[0] instanceof Number
-                          ? ((Number) args[0]).longValue()
-                          : Long.parseLong(args[0].toString());
-                final Object def = args.length > 1? args[1] : null;
+                final long ms = args[0] instanceof Number ? ((Number) args[0]).longValue() : Long.parseLong(args[0].toString());
+                final Object def = args.length > 1 ? args[1] : null;
                 if (ms > 0) {
                     final ExecutorService executor = Executors.newFixedThreadPool(1);
                     Future<?> future = null;
@@ -72,7 +70,7 @@ public class ScriptCallableTest extends JexlTestCase {
         }
 
         public void sleep(final long ms) throws InterruptedException {
-           Thread.sleep(ms);
+            Thread.sleep(ms);
         }
 
     }
@@ -83,6 +81,7 @@ public class ScriptCallableTest extends JexlTestCase {
         CancellationContext(final AtomicBoolean c) {
             cancellation = c;
         }
+
         @Override
         public AtomicBoolean getCancellation() {
             return cancellation;
@@ -133,13 +132,14 @@ public class ScriptCallableTest extends JexlTestCase {
         }
     }
 
-    //private Log logger = LogFactory.getLog(JexlEngine.class);
+    // private Log logger = LogFactory.getLog(JexlEngine.class);
     public ScriptCallableTest() {
         super("ScriptCallableTest");
     }
 
     /**
      * Redundant test with previous ones but impervious to JEXL engine configuration.
+     * 
      * @throws Exception if there is a regression
      */
     private void runInterrupt(final JexlEngine jexl) throws Exception {
