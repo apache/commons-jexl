@@ -250,7 +250,6 @@ public class ScriptCallableTest extends JexlTestCase {
 
         final JexlScript e = JEXL.createScript("latch.release(); while(true);");
         final Script.Callable c = (Script.Callable) e.callable(ctxt);
-        Object t = 42;
         final Callable<Object> kc = () -> {
             latch.acquire();
             return cancel.compareAndSet(false, true);
@@ -261,7 +260,7 @@ public class ScriptCallableTest extends JexlTestCase {
         List<Runnable> lr;
         try {
             assertTrue((Boolean) kfc.get());
-            t = future.get();
+            future.get();
             fail("should have been cancelled");
         } catch (final ExecutionException xexec) {
             // ok, ignore
