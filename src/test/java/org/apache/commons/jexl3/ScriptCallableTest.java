@@ -294,7 +294,6 @@ public class ScriptCallableTest extends JexlTestCase {
 
     @Test
     public void testCallableTimeout() throws Exception {
-        List<Runnable> lr = null;
         final Semaphore latch = new Semaphore(0);
         final JexlContext ctxt = new MapContext();
         ctxt.set("latch", latch);
@@ -303,21 +302,25 @@ public class ScriptCallableTest extends JexlTestCase {
         final Callable<Object> c = e.callable(ctxt);
         Object t = 42;
 
+        final List<Runnable> list;
         final ExecutorService executor = Executors.newFixedThreadPool(1);
-        final Future<?> future = executor.submit(c);
+        final Future<?> future;
         try {
+            future = executor.submit(c);
             latch.acquire();
-            t = future.get(100, TimeUnit.MILLISECONDS);
-            fail("should have timed out");
-        } catch (final TimeoutException xtimeout) {
-            // ok, ignore
-            future.cancel(true);
+            try {
+                t = future.get(100, TimeUnit.MILLISECONDS);
+                fail("should have timed out");
+            } catch (final TimeoutException xtimeout) {
+                // ok, ignore
+                future.cancel(true);
+            }
         } finally {
-            lr = executor.shutdownNow();
+            list = executor.shutdownNow();
         }
         assertTrue(future.isCancelled());
         assertEquals(42, t);
-        assertTrue(lr.isEmpty());
+        assertTrue(list.isEmpty());
     }
 
     @Test
