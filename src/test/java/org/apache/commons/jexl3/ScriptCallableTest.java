@@ -185,8 +185,8 @@ public class ScriptCallableTest extends JexlTestCase {
 
             // timeout a sleep
             final JexlScript ssleep = jexl.createScript("sleep(30000); return 42");
+            f = exec.submit(ssleep.callable(ctxt));
             try {
-                f = exec.submit(ssleep.callable(ctxt));
                 t = f.get(100L, TimeUnit.MILLISECONDS);
                 fail("should timeout");
             } catch (final TimeoutException xtimeout) {
@@ -197,13 +197,13 @@ public class ScriptCallableTest extends JexlTestCase {
             assertNotEquals(42, t);
 
             // cancel a sleep
+            final Future<Object> fc0 = exec.submit(ssleep.callable(ctxt));
+            final Runnable cancels0 = () -> {
+                ThreadUtils.sleepQuietly(Duration.ofMillis(200));
+                fc0.cancel(true);
+            };
             try {
-                final Future<Object> fc = exec.submit(ssleep.callable(ctxt));
-                final Runnable cancels = () -> {
-                    ThreadUtils.sleepQuietly(Duration.ofMillis(200));
-                    fc.cancel(true);
-                };
-                exec.submit(cancels);
+                exec.submit(cancels0);
                 t = f.get(100L, TimeUnit.MILLISECONDS);
                 fail("should be cancelled");
             } catch (final CancellationException xexec) {
@@ -212,8 +212,8 @@ public class ScriptCallableTest extends JexlTestCase {
 
             // timeout a while(true)
             final JexlScript swhile = jexl.createScript("while(true); return 42");
+            f = exec.submit(swhile.callable(ctxt));
             try {
-                f = exec.submit(swhile.callable(ctxt));
                 t = f.get(100L, TimeUnit.MILLISECONDS);
                 fail("should timeout");
             } catch (final TimeoutException xtimeout) {
@@ -224,13 +224,13 @@ public class ScriptCallableTest extends JexlTestCase {
             assertNotEquals(42, t);
 
             // cancel a while(true)
+            final Future<Object> fc = exec.submit(swhile.callable(ctxt));
+            final Runnable cancels = () -> {
+                ThreadUtils.sleepQuietly(Duration.ofMillis(200));
+                fc.cancel(true);
+            };
+            exec.submit(cancels);
             try {
-                final Future<Object> fc = exec.submit(swhile.callable(ctxt));
-                final Runnable cancels = () -> {
-                    ThreadUtils.sleepQuietly(Duration.ofMillis(200));
-                    fc.cancel(true);
-                };
-                exec.submit(cancels);
                 t = fc.get();
                 fail("should be cancelled");
             } catch (final CancellationException xexec) {
