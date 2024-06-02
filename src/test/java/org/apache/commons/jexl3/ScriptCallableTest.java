@@ -376,21 +376,14 @@ public class ScriptCallableTest extends JexlTestCase {
         final Callable<Object> c = e.callable(new TestContext());
         final ExecutorService executor = Executors.newFixedThreadPool(1);
         final Future<?> future;
-        Object t = 42;
         try {
             future = executor.submit(c);
-            try {
-                t = future.get(100, TimeUnit.MILLISECONDS);
-                fail("should have timed out");
-            } catch (final TimeoutException xtimeout) {
-                // ok, ignore
-                future.cancel(true);
-            }
+            assertThrows(TimeoutException.class, () -> future.get(100, TimeUnit.MILLISECONDS));
+            future.cancel(true);
         } finally {
             list = executor.shutdownNow();
         }
         assertTrue(future.isCancelled());
-        assertEquals(42, t);
         assertTrue(list.isEmpty());
     }
 
