@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.net.BindException;
 import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
 import java.net.URL;
@@ -83,7 +84,7 @@ public class ScriptTest extends JexlTestCase {
         for(int port = 8001; server == null && port < 8127; ++port) {
             try {
                 server = HttpServer.create(new InetSocketAddress("localhost", port), 0);
-            } catch (final java.net.BindException xbind) {
+            } catch (final BindException xbind) {
                 xlatest = xbind;
             }
         }
