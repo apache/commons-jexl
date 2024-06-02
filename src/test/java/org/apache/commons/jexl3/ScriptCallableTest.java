@@ -17,6 +17,7 @@
 package org.apache.commons.jexl3;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -153,13 +154,9 @@ public class ScriptCallableTest extends JexlTestCase {
             Script.Callable c = (Script.Callable) sint.callable(ctxt);
             try {
                 t = c.call();
-                if (c.isCancellable()) {
-                    fail("should have thrown a Cancel");
-                }
+                assertFalse(c.isCancellable(), "should have thrown a Cancel");
             } catch (final JexlException.Cancel xjexl) {
-                if (!c.isCancellable()) {
-                    fail("should not have thrown " + xjexl);
-                }
+                assertTrue(c.isCancellable(), () -> "should not have thrown " + xjexl);
             }
             assertTrue(c.isCancelled());
             assertNotEquals(42, t);
@@ -170,13 +167,9 @@ public class ScriptCallableTest extends JexlTestCase {
             try {
                 f = exec.submit(c);
                 t = f.get();
-                if (c.isCancellable()) {
-                    fail("should have thrown a Cancel");
-                }
+                assertFalse(c.isCancellable(), "should have thrown a Cancel");
             } catch (final ExecutionException xexec) {
-                if (!c.isCancellable()) {
-                    fail("should not have thrown " + xexec);
-                }
+                assertTrue(c.isCancellable(), () -> "should not have thrown " + xexec);
             }
             assertTrue(c.isCancelled());
             assertNotEquals(42, t);
