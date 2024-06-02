@@ -409,10 +409,12 @@ public class ScriptCallableTest extends JexlTestCase {
         final ExecutorService executor = Executors.newFixedThreadPool(1);
         try {
             final Future<?> future = executor.submit(c);
-            future.get(1, TimeUnit.SECONDS);
-            fail("hangs should not be solved");
-        } catch (final ExecutionException xexec) {
-            assertTrue(xexec.getCause() instanceof JexlException.Method);
+            try {
+                future.get(1, TimeUnit.SECONDS);
+                fail("hangs should not be solved");
+            } catch (final ExecutionException xexec) {
+                assertTrue(xexec.getCause() instanceof JexlException.Method);
+            }
         } finally {
             executor.shutdown();
         }
