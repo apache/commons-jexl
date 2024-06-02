@@ -39,8 +39,6 @@
         <commons.site.path>jexl</commons.site.path>
         <commons.scmPubUrl>https://svn.apache.org/repos/infra/websites/production/commons/content/proper/commons-jexl</commons.scmPubUrl>
         <commons.scmPubCheckoutDirectory>site-content</commons.scmPubCheckoutDirectory>
-        <!-- The RC version used in the staging repository URL. -->
-        <commons.rc.version>RC1</commons.rc.version>
         <commons.release.2.version>2.1.1</commons.release.2.version>
         <!-- Override the default, which is ${project.artifactId}-${commons.release.[23].version} -->
         <commons.release.name>commons-jexl-${commons.release.version}</commons.release.name>
