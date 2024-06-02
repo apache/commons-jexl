@@ -832,20 +832,20 @@ public final class TemplateEngine extends JxltEngine {
 
     /**
      * Creates a new instance of {@link JxltEngine} creating a local cache.
-     * @param aJexl     the JexlEngine to use.
+     * @param jexl     the JexlEngine to use.
      * @param noScript  whether this engine only allows JEXL expressions or scripts
      * @param cacheSize the number of expressions in this cache, default is 256
      * @param immediate the immediate template expression character, default is '$'
      * @param deferred  the deferred template expression character, default is '#'
      */
-    public TemplateEngine(final Engine aJexl,
+    public TemplateEngine(final Engine jexl,
                           final boolean noScript,
                           final int cacheSize,
                           final char immediate,
                           final char deferred) {
-        this.jexl = aJexl;
-        this.logger = aJexl.logger;
-        this.cache = (JexlCache<String, TemplateExpression>) aJexl.cacheFactory.apply(cacheSize);
+        this.jexl = jexl;
+        this.logger = jexl.logger;
+        this.cache = (JexlCache<String, TemplateExpression>) jexl.cacheFactory.apply(cacheSize);
         immediateChar = immediate;
         deferredChar = deferred;
         noscript = noScript;
