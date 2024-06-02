@@ -663,8 +663,10 @@ public final class TemplateEngine extends JxltEngine {
 
         /**
          * Prepares this expression.
+         *
          * @param frame the frame storing parameters and local variables
          * @param context the context storing global variables
+         * @param opts flags and properties that can alter the evaluation behavior.
          * @return the expression value
          * @throws JexlException
          */
