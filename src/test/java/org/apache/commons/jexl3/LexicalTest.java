@@ -148,16 +148,6 @@ public class LexicalTest {
         checkParse(null, srcs, expected);
     }
 
-    private void runLexical0(final JexlEngine jexl, final JexlEvalContext ctxt, final String source, final boolean feature) {
-        final JexlException xany = assertThrows(JexlException.class, () -> {
-            final JexlScript script = jexl.createScript(source);
-            if (!feature) {
-                script.execute(ctxt);
-            }
-        });
-        assertNotNull(xany.toString());
-    }
-
     void runLexical0(final boolean feature) {
         final JexlFeatures f = new JexlFeatures();
         f.lexical(feature);
@@ -184,6 +174,16 @@ public class LexicalTest {
         if (!feature) {
             script.execute(ctxt, 42);
         }
+    }
+
+    private void runLexical0(final JexlEngine jexl, final JexlEvalContext ctxt, final String source, final boolean feature) {
+        final JexlException xany = assertThrows(JexlException.class, () -> {
+            final JexlScript script = jexl.createScript(source);
+            if (!feature) {
+                script.execute(ctxt);
+            }
+        });
+        assertNotNull(xany.toString());
     }
 
     void runLexical1(final boolean shade) {
