@@ -19,6 +19,7 @@ package org.apache.commons.jexl3;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -142,8 +143,8 @@ public class PragmaTest extends JexlTestCase {
     void runPragmaModule(final ModuleContext ctxt, final CachingModuleContext cmCtxt) {
         ctxt.script("module0", JEXL.createScript("function f42(x) { 42 + x; } function f43(x) { 43 + x; }; { 'f42' : f42, 'f43' : f43 }"));
         final ConcurrentMap<String, Object> modules = new ConcurrentHashMap<>();
-        JexlScript script ;
-        Object result ;
+        JexlScript script;
+        Object result;
         script = JEXL.createScript("#pragma jexl.module.m0 \"script('module0')\"\n m0:f42(10);");
         result = script.execute(ctxt);
         assertEquals(52, result);
@@ -161,13 +162,9 @@ public class PragmaTest extends JexlTestCase {
         if (cmCtxt != null) {
             assertEquals(1, cmCtxt.getCountCompute());
         }
-        try {
-            script = JEXL.createScript("#pragma jexl.module.m0 ''\n#pragma jexl.module.m0 \"fubar('module0')\"\n m0:f43(10);");
-            result = script.execute(ctxt);
-            fail("fubar sshoud fail");
-        } catch (final JexlException.Method xmethod) {
-            assertEquals("fubar", xmethod.getMethod());
-        }
+        JexlScript script1 = JEXL.createScript("#pragma jexl.module.m0 ''\n#pragma jexl.module.m0 \"fubar('module0')\"\n m0:f43(10);");
+        JexlException.Method xmethod = assertThrows(JexlException.Method.class, () -> script1.execute(ctxt));
+        assertEquals("fubar", xmethod.getMethod());
     }
 
     @Test public void test354() {
@@ -219,12 +216,10 @@ public class PragmaTest extends JexlTestCase {
         final JexlFeatures features = new JexlFeatures();
         features.importPragma(false);
         final JexlEngine jexl = new JexlBuilder().features(features).create();
-        try {
-            final JexlScript script = jexl.createScript(src);
-        } catch (final JexlException.Parsing xparse) {
-            assertTrue(xparse.getMessage().contains("import pragma"));
-        }
+        JexlException.Parsing xparse = assertThrows(JexlException.Parsing.class, () -> jexl.createScript(src));
+        assertTrue(xparse.getMessage().contains("import pragma"));
     }
+
     @Test
     public void testImportPragmaValueSet() {
         final String src =
@@ -319,16 +314,12 @@ public class PragmaTest extends JexlTestCase {
     @Test
     public void testPragmaOptions1() {
         final String str = "i; #pragma jexl.options '-strict'\n";
+        // @formatter:off
         final JexlEngine jexl = new JexlBuilder()
                 .features(new JexlFeatures().pragmaAnywhere(false))
                 .strict(true).create();
-        final JexlContext ctxt = new MapContext();
-        try {
-            final JexlScript e = jexl.createScript(str);
-            fail("i should not be resolved");
-        } catch (final JexlException xany) {
-            assertNotNull(xany);
-        }
+        // @formatter:on
+        assertThrows(JexlException.class, () -> jexl.createScript(str), "i should not be resolved");
     }
 
     /**
