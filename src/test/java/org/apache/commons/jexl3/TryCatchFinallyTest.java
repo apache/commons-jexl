@@ -225,12 +225,8 @@ public class TryCatchFinallyTest extends JexlTestCase {
         final String src = "function fact(x, f) { if (x == 1) throw f; fact(x - 1, f * x); } fact(7, 1);";
         final JexlScript script = JEXL.createScript(src);
         assertNotNull(script);
-        try {
-            final Object result = script.execute(null);
-            fail("throw did not throw");
-        } catch (final JexlException.Throw xthrow) {
-            assertEquals(5040, xthrow.getValue());
-        }
+        final JexlException.Throw xthrow = assertThrows(JexlException.Throw.class, () -> script.execute(null));
+        assertEquals(5040, xthrow.getValue());
     }
 
     @Test
