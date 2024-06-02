@@ -89,12 +89,12 @@ public class OptionalTest {
         assertEquals(3, result);
 
         final JexlScript script2 = jexl.createScript(info.at(62, 1), "thing.name.size()", "thing");
-        JexlException.Method xmethod = assertThrows(JexlException.Method.class, () -> script2.execute(null, thing));
+        final JexlException.Method xmethod = assertThrows(JexlException.Method.class, () -> script2.execute(null, thing));
         assertEquals("size", xmethod.getDetail());
         assertEquals("test352@62:11 unsolvable function/method 'size'", xmethod.getMessage());
         final JexlScript script3 = jexl.createScript(info.at(71, 1), "thing.name?.size()", "thing");
         result = script3.execute(null, thing);
-        
+
         thing.name = null;
         script1 = jexl.createScript(info,"thing.names.size()", "thing");
         result = script1.execute(null, thing);
