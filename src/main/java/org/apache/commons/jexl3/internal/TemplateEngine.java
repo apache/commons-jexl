@@ -573,18 +573,17 @@ public final class TemplateEngine extends JxltEngine {
 
         /**
          * Evaluates this expression.
+         *
          * @param frame the frame storing parameters and local variables
          * @param context the context storing global variables
+         * @param options flags and properties that can alter the evaluation behavior.
          * @return the expression value
          * @throws JexlException
          */
-        protected final Object evaluate( final JexlContext context, final Frame frame, final JexlOptions options) {
+        protected final Object evaluate(final JexlContext context, final Frame frame, final JexlOptions options) {
             try {
-                final TemplateInterpreter.Arguments args = new TemplateInterpreter
-                        .Arguments(jexl)
-                        .context(context)
-                        .options(options != null ? options : options(context))
-                        .frame(frame);
+                final TemplateInterpreter.Arguments args = new TemplateInterpreter.Arguments(jexl).context(context)
+                        .options(options != null ? options : options(context)).frame(frame);
                 final Interpreter interpreter = jexl.createTemplateInterpreter(args);
                 return evaluate(interpreter);
             } catch (final JexlException xjexl) {
