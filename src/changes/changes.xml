@@ -27,7 +27,7 @@
         <author email="dev@commons.apache.org">Commons Developers</author>
     </properties>
     <body>
-        <release version="3.4.0" date="2024-06-01" description="Java 8 is required.">
+        <release version="3.4.0" date="2024-06-02" description="Java 8 is required.">
             <!-- ADD -->
             <action dev="henrib" type="add" issue="JEXL-423">
                 Add support for instanceof / !instanceof
