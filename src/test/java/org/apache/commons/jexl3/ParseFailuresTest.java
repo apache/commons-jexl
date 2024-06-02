@@ -41,7 +41,7 @@ public class ParseFailuresTest extends JexlTestCase {
     public void testMalformedExpression1() throws Exception {
         // this will throw a JexlException
         final String badExpression = "eq";
-        JexlException pe = assertThrows(JexlException.class, () -> JEXL.createExpression(badExpression),
+        final JexlException pe = assertThrows(JexlException.class, () -> JEXL.createExpression(badExpression),
                 () -> "Parsing \"" + badExpression + "\" should result in a JexlException");
         LOGGER.debug(pe);
     }
@@ -50,7 +50,7 @@ public class ParseFailuresTest extends JexlTestCase {
     public void testMalformedExpression2() throws Exception {
         // this will throw a TokenMgrErr, which we rethrow as a JexlException
         final String badExpression = "?";
-        JexlException pe = assertThrows(JexlException.class, () -> JEXL.createExpression(badExpression),
+        final JexlException pe = assertThrows(JexlException.class, () -> JEXL.createExpression(badExpression),
                 () -> "Parsing \"" + badExpression + "\" should result in a JexlException");
         LOGGER.debug(pe);
     }
@@ -59,7 +59,7 @@ public class ParseFailuresTest extends JexlTestCase {
     public void testMalformedScript1() throws Exception {
         // this will throw a TokenMgrErr, which we rethrow as a JexlException
         final String badScript = "eq";
-        JexlException pe = assertThrows(JexlException.class, () -> JEXL.createExpression(badScript),
+        final JexlException pe = assertThrows(JexlException.class, () -> JEXL.createExpression(badScript),
                 () -> "Parsing \"" + badScript + "\" should result in a JexlException");
         LOGGER.debug(pe);
     }
@@ -68,7 +68,7 @@ public class ParseFailuresTest extends JexlTestCase {
     public void testMalformedScript2() throws Exception {
         // this will throw a TokenMgrErr, which we rethrow as a JexlException
         final String badScript = "?";
-        JexlException pe = assertThrows(JexlException.class, () -> JEXL.createExpression(badScript),
+        final JexlException pe = assertThrows(JexlException.class, () -> JEXL.createExpression(badScript),
                 () -> "Parsing \"" + badScript + "\" should result in a JexlException");
         LOGGER.debug(pe);
     }
@@ -77,7 +77,7 @@ public class ParseFailuresTest extends JexlTestCase {
     public void testMalformedScript3() throws Exception {
         // this will throw a TokenMgrErr, which we rethrow as a JexlException
         final String badScript = "foo=1;bar=2;a?b:c:d;";
-        JexlException pe = assertThrows(JexlException.class, () -> JEXL.createExpression(badScript),
+        final JexlException pe = assertThrows(JexlException.class, () -> JEXL.createExpression(badScript),
                 () -> "Parsing \"" + badScript + "\" should result in a JexlException");
         LOGGER.debug(pe);
     }
