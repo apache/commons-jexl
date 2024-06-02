@@ -24,7 +24,7 @@
     </parent>
 
     <artifactId>commons-jexl3</artifactId>
-    <version>3.4.0-SNAPSHOT</version>
+    <version>3.4.0</version>
     <name>Apache Commons JEXL</name>
     <description>Apache Commons JEXL is a library facilitates the implementation of scripting features in
         applications and frameworks written in Java.</description>
@@ -74,7 +74,7 @@
         <project.build.sourceEncoding>${commons.encoding}</project.build.sourceEncoding>
         <!-- This is used by reporting plugins -->
         <project.reporting.outputEncoding>${commons.encoding}</project.reporting.outputEncoding>
-        <project.build.outputTimestamp>2024-01-01T00:00:00Z</project.build.outputTimestamp>
+        <project.build.outputTimestamp>2024-06-02T13:52:21Z</project.build.outputTimestamp>
 
         <!-- Commons release plugin -->
         <commons.bc.version>3.3</commons.bc.version>
