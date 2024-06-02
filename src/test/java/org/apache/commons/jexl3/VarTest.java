@@ -18,6 +18,7 @@ package org.apache.commons.jexl3;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -551,31 +552,16 @@ public class VarTest extends JexlTestCase {
         options.setStrict(true);
         options.setSilent(false);
         options.setSafe(false);
-        JexlScript e;
 
-        e = JEXL.createScript("x");
-        try {
-            final Object o = e.execute(ctxt);
-            fail("should have thrown an unknown var exception");
-        } catch (final JexlException xjexl) {
-            // ok since we are strict and x does not exist
-        }
-        e = JEXL.createScript("x = 42");
-        try {
-            final Object o = e.execute(ctxt);
-            fail("should have thrown a readonly context exception");
-        } catch (final JexlException xjexl) {
-            // ok since we are strict and context is readonly
-        }
+        JexlScript e0 = JEXL.createScript("x");
+        assertThrows(JexlException.class, () -> e0.execute(ctxt), "should have thrown an unknown var exception");
+
+        JexlScript e1 = JEXL.createScript("x = 42");
+        assertThrows(JexlException.class, () -> e1.execute(ctxt), "should have thrown a readonly context exception");
 
         env.set("x", "fourty-two");
-        e = JEXL.createScript("x.theAnswerToEverything()");
-        try {
-            final Object o = e.execute(ctxt);
-            fail("should have thrown an unknown method exception");
-        } catch (final JexlException xjexl) {
-            // ok since we are strict and method does not exist
-        }
+        JexlScript e2 = JEXL.createScript("x.theAnswerToEverything()");
+        assertThrows(JexlException.class, () -> e2.execute(ctxt), "should have thrown an unknown method exception");
     }
 
     @Test
