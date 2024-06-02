@@ -18,8 +18,7 @@ package org.apache.commons.jexl3;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -135,20 +134,14 @@ public class SetLiteralTest extends JexlTestCase {
     @Test
     public void testSetLiteralWithStrings() throws Exception {
         final List<String> sources = Arrays.asList("{ 'foo', 'bar' }", "{ 'foo', 'bar', ... }", "{ 'foo', 'bar', }");
-        for(final String src : sources) {
+        for (final String src : sources) {
             final JexlExpression e = JEXL.createExpression(src);
             final JexlContext jc = new MapContext();
-
             final Object o = e.evaluate(jc);
             final Set<?> check = createSet("foo", "bar");
             assertEquals(check, o);
         }
-        try {
-            JEXL.createExpression("{ , }");
-            fail("syntax");
-        } catch(final JexlException.Parsing parsing) {
-            assertNotNull(parsing);
-        }
+        assertThrows(JexlException.Parsing.class, () -> JEXL.createExpression("{ , }"), "syntax");
     }
 
     @Test
