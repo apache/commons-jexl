@@ -23,15 +23,17 @@ import org.apache.commons.jexl3.internal.Engine;
 
 /**
  * Command line interface for JEXL for use in testing
+ * 
  * @since 1.0
  */
 public class Jexl {
+
     public static void main(final String[] args) {
         final JexlEngine JEXL = new Engine();
-        final Map<Object,Object> m = System.getProperties();
+        final Map<Object, Object> m = System.getProperties();
         // dummy context to get variables
         final JexlContext context = new MapContext();
-        for(final Map.Entry<Object,Object> e : m.entrySet()) {
+        for (final Map.Entry<Object, Object> e : m.entrySet()) {
             context.set(e.getKey().toString(), e.getValue());
         }
         try {
@@ -44,5 +46,6 @@ public class Jexl {
         }
     }
 
-    private Jexl() {}
+    private Jexl() {
+    }
 }
