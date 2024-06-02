@@ -282,13 +282,8 @@ public class ScriptCallableTest extends JexlTestCase {
         final Future<?> future;
         try {
             future = executor.submit(c);
-            try {
-                t = future.get(100, TimeUnit.MILLISECONDS);
-                fail("should have timed out");
-            } catch (final TimeoutException xtimeout) {
-                // ok, ignore
-                future.cancel(true);
-            }
+            assertThrows(TimeoutException.class, () -> future.get(100, TimeUnit.MILLISECONDS));
+            future.cancel(true);
         } finally {
             list = executor.shutdownNow();
         }
