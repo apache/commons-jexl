@@ -17,6 +17,7 @@
 package org.apache.commons.jexl3.junit;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import java.lang.reflect.Array;
@@ -105,15 +106,10 @@ public class Asserter {
          failExpression(expression, matchException, String::matches);
     }
 
-    public void failExpression(final String expression, final String matchException, final BiPredicate<String,String> predicate) throws Exception {
-        try {
-            final JexlScript exp = engine.createScript(expression);
-            exp.execute(context);
-            fail("expression: " + expression);
-        } catch (final JexlException xjexl) {
-            if (matchException != null && !predicate.test(xjexl.getMessage(), matchException)) {
-                fail("expression: " + expression + ", expected: " + matchException + ", got " + xjexl.getMessage());
-            }
+    public void failExpression(final String expression, final String matchException, final BiPredicate<String, String> predicate) throws Exception {
+        final JexlException xjexl = assertThrows(JexlException.class, () -> engine.createScript(expression).execute(context));
+        if (matchException != null && !predicate.test(xjexl.getMessage(), matchException)) {
+            fail("expression: " + expression + ", expected: " + matchException + ", got " + xjexl.getMessage());
         }
     }
 
