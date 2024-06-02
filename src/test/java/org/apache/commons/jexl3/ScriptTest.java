@@ -199,21 +199,19 @@ public class ScriptTest extends JexlTestCase {
     }
 
     @Test
-    public void testScriptJsonFromFileJava() {
+    public void testScriptJsonFromFileJava() throws IOException {
         HttpServer server = null;
         try {
             final String response = "{  \"id\": 101}";
             server = createJsonServer(h -> response);
-            final String url = "http:/"+server.getAddress().toString()+"/test";
-            final String testScript = "httpr.execute('"+url+"', null)";
+            final String url = "http:/" + server.getAddress().toString() + "/test";
+            final String testScript = "httpr.execute('" + url + "', null)";
             final JexlScript s = JEXL.createScript(testScript);
             final JexlContext jc = new MapContext();
             jc.set("httpr", new HttpPostRequest());
             final Object result = s.execute(jc);
             assertNotNull(result);
             assertEquals(response, result);
-        } catch (final IOException xio) {
-            fail(xio.getMessage());
         } finally {
             if (server != null) {
                 server.stop(0);
@@ -222,7 +220,7 @@ public class ScriptTest extends JexlTestCase {
     }
 
     @Test
-    public void testScriptJsonFromFileJexl() {
+    public void testScriptJsonFromFileJexl() throws IOException {
         HttpServer server = null;
         try {
             final String response = "{  \"id\": 101}";
@@ -232,13 +230,11 @@ public class ScriptTest extends JexlTestCase {
             final JexlContext jc = new MapContext();
             final Object httpr = httprScript.execute(jc);
             final JexlScript s = JEXL.createScript("(httpr,url)->httpr.execute(url, null)");
-            //jc.set("httpr", new HttpPostRequest());
-            final String url = "http:/"+server.getAddress().toString()+"/test";
-            final Object result = s.execute(jc, httpr,url);
+            // jc.set("httpr", new HttpPostRequest());
+            final String url = "http:/" + server.getAddress().toString() + "/test";
+            final Object result = s.execute(jc, httpr, url);
             assertNotNull(result);
             assertEquals(response, result);
-        } catch (final IOException xio) {
-            fail(xio.getMessage());
         } finally {
             if (server != null) {
                 server.stop(0);
