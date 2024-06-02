@@ -406,11 +406,10 @@ public class ScriptCallableTest extends JexlTestCase {
     public void testHangs() throws Exception {
         final JexlScript e = JEXL.createScript("hangs()");
         final Callable<Object> c = e.callable(new TestContext());
-
         final ExecutorService executor = Executors.newFixedThreadPool(1);
         try {
             final Future<?> future = executor.submit(c);
-            final Object t = future.get(1, TimeUnit.SECONDS);
+            future.get(1, TimeUnit.SECONDS);
             fail("hangs should not be solved");
         } catch (final ExecutionException xexec) {
             assertTrue(xexec.getCause() instanceof JexlException.Method);
