@@ -287,7 +287,7 @@ public class SandboxTest extends JexlTestCase {
     @Test
     public void testGetBlock() throws Exception {
         final String expr = "foo.alias";
-        JexlScript script = JEXL.createScript(expr, "foo");
+        final JexlScript script = JEXL.createScript(expr, "foo");
         final Foo foo = new Foo("42");
         Object result;
         result = script.execute(null, foo);
@@ -386,7 +386,7 @@ public class SandboxTest extends JexlTestCase {
     @Test
     public void testMethodBlock() throws Exception {
         final String expr = "foo.Quux()";
-        JexlScript script = JEXL.createScript(expr, "foo");
+        final JexlScript script = JEXL.createScript(expr, "foo");
         final Foo foo = new Foo("42");
         Object result;
         result = script.execute(null, foo);
@@ -396,7 +396,7 @@ public class SandboxTest extends JexlTestCase {
         sandbox.block(Foo.class.getName()).execute("Quux");
         final JexlEngine sjexl = new JexlBuilder().sandbox(sandbox).strict(true).safe(false).create();
 
-        JexlScript script2 = sjexl.createScript(expr, "foo");
+        final JexlScript script2 = sjexl.createScript(expr, "foo");
         assertThrows(JexlException.Method.class, () -> script2.execute(null, foo), "Quux should not be accessible");
     }
 
@@ -404,7 +404,7 @@ public class SandboxTest extends JexlTestCase {
     public void testMethodNoJexl() throws Exception {
         final Foo foo = new Foo("42");
         // @formatter:off
-        final String[] exprs = { 
+        final String[] exprs = {
                 "foo.cantCallMe()",
                 "foo.tryMe()",
                 "foo.tryMeARiver()",
@@ -543,7 +543,7 @@ public class SandboxTest extends JexlTestCase {
         sandbox.block(Foo.class.getName()).write("alias");
         final JexlEngine sjexl = new JexlBuilder().sandbox(sandbox).strict(true).safe(false).create();
 
-        JexlScript script2 = sjexl.createScript(expr, "foo", "$0");
+        final JexlScript script2 = sjexl.createScript(expr, "foo", "$0");
         assertThrows(JexlException.class, () -> script2.execute(null, foo, "43"), "alias should not be accessible");
 
     }
@@ -591,7 +591,7 @@ public class SandboxTest extends JexlTestCase {
         p.write().add("quux");
         final JexlEngine jexl = new JexlBuilder().arithmetic(a350).sandbox(sandbox).create();
         // can write bar
-        JexlExpression expression = jexl.createExpression("{'bar' : 'foo'}['bar'] = '42'");
+        final JexlExpression expression = jexl.createExpression("{'bar' : 'foo'}['bar'] = '42'");
         expression.evaluate(null);
         final Map<?, ?> map = a350.getLastMap();
         assertEquals("42", map.get("bar"));
