@@ -145,11 +145,8 @@ public class TryCatchFinallyTest extends JexlTestCase {
     @Test
     public void testRedefinition1() {
         final String src = "const x = 33; try(let x = c) { 169; }";
-        try {
-            final JexlScript script = JEXL.createScript(src, "c");
-        } catch (final JexlException.Parsing xvar) {
-            assertTrue(xvar.getMessage().contains("x: variable is already declared"));
-        }
+        final JexlException.Parsing xvar = assertThrows(JexlException.Parsing.class, () -> JEXL.createScript(src, "c"));
+        assertTrue(xvar.getMessage().contains("x: variable is already declared"));
     }
 
     @Test
