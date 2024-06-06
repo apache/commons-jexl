@@ -149,7 +149,7 @@ patches, or suggestions for improvement, see the ${project.name} website:
 
 ${project.url}
 
-Download page: ${project.url}download_io.cgi
+Download page: ${project.url}download_jexl.cgi
 
 Have fun!
 -Apache Commons Team

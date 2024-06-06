@@ -60,7 +60,7 @@ patches, or suggestions for improvement, see the Apache Commons JEXL website:
 
 https://commons.apache.org/proper/commons-jexl/
 
-Download page: https://commons.apache.org/proper/commons-jexl/download_io.cgi
+Download page: https://commons.apache.org/proper/commons-jexl/download_jexl.cgi
 
 Have fun!
 -Apache Commons Team
