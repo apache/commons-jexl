@@ -1929,7 +1929,7 @@ public class Interpreter extends InterpreterBase {
                 if (node.isSafeLhs(isSafe())) {
                     return null;
                 }
-                final String aname = ant != null ? ant.toString() : "?";
+                final String aname = Objects.toString(ant, "?");
                 final boolean defined = isVariableDefined(frame, block, aname);
                 // defined but null; arg of a strict operator?
                 if (defined && !isStrictOperand(node)) {
