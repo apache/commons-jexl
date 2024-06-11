@@ -16,6 +16,7 @@
  */
 package org.apache.commons.jexl3.parser;
 
+import java.util.Objects;
 import java.util.regex.Pattern;
 
 public final class ASTRegexLiteral extends JexlNode implements JexlNode.Constant<Pattern> {
@@ -56,6 +57,6 @@ public final class ASTRegexLiteral extends JexlNode implements JexlNode.Constant
 
     @Override
     public String toString() {
-        return literal != null ? literal.toString() : "";
+        return Objects.toString(literal, "");
     }
 }
