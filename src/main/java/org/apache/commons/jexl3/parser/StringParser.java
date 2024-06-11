@@ -16,6 +16,8 @@
  */
 package org.apache.commons.jexl3.parser;
 
+import java.util.Objects;
+
 /**
  * Common constant strings utilities.
  * <p>
@@ -124,7 +126,7 @@ public class StringParser {
                 n += 1;
             }
         }
-        return strb == null ? str : strb.toString();
+        return Objects.toString(strb, str);
     }
 
     /**
@@ -321,7 +323,7 @@ public class StringParser {
                 n += 1;
             }
         }
-        return strb == null ? str : strb.toString();
+        return Objects.toString(strb, str);
     }
 
     /** Default constructor.  */
