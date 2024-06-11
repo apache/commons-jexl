@@ -1278,7 +1278,7 @@ public class Interpreter extends InterpreterBase {
         } catch (final JexlException.Method xmethod) {
             throw xmethod;
         } catch (final Exception xany) {
-            final String tstr = target != null ? target.toString() : "?";
+            final String tstr = Objects.toString(target, "?");
             throw invocationException(node, tstr, xany);
         }
     }
