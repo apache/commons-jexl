@@ -20,6 +20,7 @@ package org.apache.commons.jexl3.introspection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -67,7 +68,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public final class JexlSandbox {
     /**
-     * A allow set of names.
+     * An allow set of names.
      */
     static class AllowSet extends Names {
         /** The map of controlled names and aliases. */
@@ -108,12 +109,19 @@ public final class JexlSandbox {
             }
             return actual;
         }
+
+        @Override
+        public String toString() {
+            return "allow{" + (names == null? "all" : Objects.toString(names.entrySet())) + "}";
+        }
     }
+
     /**
      * @deprecated since 3.2, use {@link BlockSet}
      */
     @Deprecated
     public static final class BlackSet extends BlockSet {}
+
     /**
      * A block set of names.
      */
@@ -141,12 +149,17 @@ public final class JexlSandbox {
             // if name is null and contained in set, explicit null aka NULL
             return names != null && !names.contains(name) ? name : name != null ? null : NULL;
         }
+
+        @Override
+        public String toString() {
+            return "block{" + (names == null? "all" :Objects.toString(names)) + "}";
+        }
     }
+
     /**
      * A base set of names.
      */
     public abstract static class Names {
-
         /**
          * Adds a name to this set.
          *
@@ -259,7 +272,7 @@ public final class JexlSandbox {
         }
 
         /**
-         * @return whether these permissions applies to derived classes.
+         * @return whether these permissions apply to derived classes.
          */
         public boolean isInheritable() {
             return inheritable;
@@ -331,8 +344,8 @@ public final class JexlSandbox {
         }
 
         @Override
-        protected Names copy() {
-            return this;
+        public String toString() {
+            return "allowAll";
         }
     };
 
@@ -346,13 +359,13 @@ public final class JexlSandbox {
         }
 
         @Override
-        protected Names copy() {
-            return this;
+        public String get(final String name) {
+            return name == null ? NULL : null;
         }
 
         @Override
-        public String get(final String name) {
-            return name == null ? NULL : null;
+        public String toString() {
+            return "blockAll";
         }
     };
 
@@ -533,12 +546,23 @@ public final class JexlSandbox {
      */
     @SuppressWarnings("null") // clazz can not be null since permissions would be not null and block;
     public Permissions get(final Class<?> clazz) {
-        Permissions permissions = clazz == null ? BLOCK_ALL : sandbox.get(clazz.getName());
+        // we only store the result for classes we actively seek permissions for
+        return clazz == null ? BLOCK_ALL : compute(clazz, true);
+    }
+
+    /**
+     * Computes and optionally the permissions associated to a class.
+     * @param clazz the class
+     * @param store whether the resulting permissions should be stored in the sandbox
+     * @return the permissions
+     */
+    private Permissions compute(final Class<?> clazz, boolean store) {
+        Permissions permissions = sandbox.get(clazz.getName());
         if (permissions == null) {
             if (inherit) {
                 // find first inherited interface that defines permissions
                 for (final Class<?> inter : clazz.getInterfaces()) {
-                    permissions = sandbox.get(inter.getName());
+                    permissions = compute(inter, false);
                     if (permissions != null) {
                         if (permissions.isInheritable()) {
                             break;
@@ -548,11 +572,11 @@ public final class JexlSandbox {
                 }
                 // nothing defined yet, find first superclass that defines permissions
                 if (permissions == null) {
-                    // lets walk all super classes
+                    // let's walk all super classes
                     Class<?> zuper = clazz.getSuperclass();
                     // walk all superclasses
                     while (zuper != null) {
-                        permissions = sandbox.get(zuper.getName());
+                        permissions = compute(zuper, false);
                         if (permissions != null) {
                             if (permissions.isInheritable()) {
                                 break;
@@ -566,8 +590,10 @@ public final class JexlSandbox {
                 if (permissions == null) {
                     permissions = allow ? ALLOW_ALL : BLOCK_ALL;
                 }
-                // store the info to avoid doing this costly look up
-                sandbox.put(clazz.getName(), permissions);
+                // store the info to avoid doing this costly look-up
+                if (store) {
+                    sandbox.put(clazz.getName(), permissions);
+                }
             } else {
                 permissions = allow ? ALLOW_ALL : BLOCK_ALL;
             }

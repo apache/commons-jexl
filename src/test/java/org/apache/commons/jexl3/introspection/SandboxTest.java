@@ -24,6 +24,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -602,4 +603,40 @@ public class SandboxTest extends JexlTestCase {
                     .contains("undefined"));
         }
     }
+    interface I{}
+    static class A implements I{}
+    static class B extends A{}
+
+    @Test
+    public void testPermission0() {
+        JexlSandbox sandbox = new JexlSandbox(false, true);
+        sandbox.permissions(I.class.getName(), true, true, true, false);
+        System.out.println("permission A=" + sandbox.get(A.class.getName()).write());
+        System.out.println("permission B=" + sandbox.get(B.class.getName()).write());
+    }
+    @Test
+    public void testPermission1() {
+        JexlSandbox sandbox = new JexlSandbox(false, true);
+        sandbox.permissions(I.class.getName(), true, true, true, false);
+        System.out.println("permission B=" + sandbox.get(B.class.getName()).write());
+        System.out.println("permission A=" + sandbox.get(A.class.getName()).write());
+    }
+
+    @Test
+    public void testIssue424() {
+        JexlSandbox sandbox = new JexlSandbox(false, true);
+        sandbox.permissions(Map.class.getName(), true, true, true, true);
+        String jexlCode = "x.foo = 'bar'";
+        JexlEngine engine = new JexlBuilder()
+                    .sandbox(sandbox)
+                    .safe(false)
+                    .strict(true).create();
+        JexlContext context = new MapContext();
+        Map<String, Object> x = new LinkedHashMap<>();
+        context.set("x",  x);
+        Object result = engine.createScript(jexlCode).execute(context);
+        assertEquals("bar", result);
+        assertEquals("bar", x.get("foo"));
+    }
+
 }
