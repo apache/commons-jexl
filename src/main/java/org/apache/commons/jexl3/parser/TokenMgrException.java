@@ -22,7 +22,7 @@ package org.apache.commons.jexl3.parser;
 public class TokenMgrException extends RuntimeException implements JavaccError {
     /**
      * The version identifier for this Serializable class.
-     * Increment only if the <i>serialized</i> form of the
+     * Increment only if the <em>serialized</em> form of the
      * class changes.
      */
     private static final long serialVersionUID = 1L;

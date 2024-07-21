@@ -1827,7 +1827,7 @@ public class JexlArithmetic {
      * Calculate the <code>size</code> of various types: Collection, Array, Map, String.
      *
      * @param object the object to get the size of
-     * @return the <i>size</i> of object, 0 if null, 1 if there is no <i>better</i> solution
+     * @return the <em>size</em> of object, 0 if null, 1 if there is no <em>better</em> solution
      */
     public Integer size(final Object object) {
         return size(object, object == null ? 0 : 1);

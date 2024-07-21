@@ -278,8 +278,8 @@
  * assertEquals(Double.valueOf(-1),o);
  * </code></pre>
  * <p>
- * If the <i>namespace</i> is a Class and that class declares a constructor that takes a JexlContext (or
- * a class extending JexlContext), one <i>namespace</i> instance is created on first usage in an
+ * If the <em>namespace</em> is a Class and that class declares a constructor that takes a JexlContext (or
+ * a class extending JexlContext), one <em>namespace</em> instance is created on first usage in an
  * expression; this instance lifetime is limited to the expression evaluation.
  * </p>
  * <p>
