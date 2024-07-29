@@ -74,7 +74,7 @@ public class CachePerformanceTest {
                             for (int r = 0; r < HIT; ++r) {
                                 final JexlScript script = jexl.createScript(Integer.toString(ctl));
                                 final Object result = script.execute(null);
-                                assert ((Number) result).intValue() == ctl;
+                                assertEquals(((Number) result).intValue(), ctl);
                                 count += 1;
                             }
                         }
@@ -118,7 +118,7 @@ public class CachePerformanceTest {
     /** Number of concurrent threads. */
     private static final int THREADS = 8;
 
-    /** Teh logger. */
+    /** The logger. */
     Log LOGGER = LogFactory.getLog(getClass());
 
     /**
