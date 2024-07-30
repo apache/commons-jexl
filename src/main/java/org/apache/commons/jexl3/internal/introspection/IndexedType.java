@@ -24,7 +24,7 @@ import org.apache.commons.jexl3.introspection.JexlPropertyGet;
 
 /**
  * Abstract an indexed property container.
- * <p>This allows getting properties from expressions like <code>var.container.property</code>.
+ * <p>This allows getting properties from expressions like {@code var.container.property}.
  * This stores the container name and class as well as the list of available getter and setter methods.
  * It implements JexlPropertyGet since such a container can only be accessed from its owning instance (not set).
  */

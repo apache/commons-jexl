@@ -212,17 +212,17 @@ public abstract class JxltEngine {
      * It is thus possible to use looping or conditional construct "around" expressions generating output.
      * </p>
      * For instance:
-     * <blockquote><pre>
-     * $$ for(var x : [1, 3, 5, 42, 169]) {
+     * <blockquote><pre>{@code
+     * $$ for (var x : [1, 3, 5, 42, 169]) {
      * $$   if (x == 42) {
      * Life, the universe, and everything
-     * $$   } else if (x &gt; 42) {
+     * $$   } else if (x > 42) {
      * The value $(x} is over forty-two
      * $$   } else {
      * The value ${x} is under forty-two
      * $$   }
      * $$ }
-     * </pre></blockquote>
+     * }</pre></blockquote>
      *
      * <p>Will evaluate as:</p>
      *

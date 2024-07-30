@@ -106,10 +106,10 @@ final class ClassTool {
      * Checks whether a class is exported by its module (Java 9+).
      * The code performs the following sequence through reflection (since the same jar can run
      * on a Java8 or Java9+ runtime and the module features does not exist on 8).
-     * <code>
+     * {@code 
      * Module module = declarator.getModule();
      * return module.isExported(declarator.getPackageName());
-     * </code>
+     * }
      * This is required since some classes and methods may not be exported thus not callable through
      * reflection.
      *

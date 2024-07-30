@@ -214,8 +214,8 @@ public class Uberspect implements JexlUberspect {
 
     /**
      * Gets the field named by
-     * <code>key</code> for the class
-     * <code>c</code>.
+     * {@code key} for the class
+     * {@code c}.
      *
      * @param c   Class in which the field search is taking place
      * @param key Name of the field being searched for
@@ -273,8 +273,8 @@ public class Uberspect implements JexlUberspect {
 
     /**
      * Gets the method defined by
-     * <code>key</code> and for the Class
-     * <code>c</code>.
+     * {@code key} and for the Class
+     * {@code c}.
      *
      * @param c   Class in which the method search is taking place
      * @param key MethodKey of the method being searched for
@@ -288,9 +288,9 @@ public class Uberspect implements JexlUberspect {
 
     /**
      * Gets the method defined by
-     * <code>name</code> and
-     * <code>params</code> for the Class
-     * <code>c</code>.
+     * {@code name} and
+     * {@code params} for the Class
+     * {@code c}.
      *
      * @param c      Class in which the method search is taking place
      * @param name   Name of the method being searched for

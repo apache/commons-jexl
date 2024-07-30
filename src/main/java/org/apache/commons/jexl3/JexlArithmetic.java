@@ -45,7 +45,7 @@ import org.apache.commons.jexl3.introspection.JexlMethod;
  *   <li>If both are null, result is 0 if arithmetic (or operator) is non-strict, ArithmeticException is thrown
  *   otherwise</li>
  *   <li>If both arguments are numberable - any kind of integer including boolean -, coerce both to Long and coerce
- *   result to the most precise argument class (boolean &lt; byte &lt; short &lt; int &lt; long);
+ *   result to the most precise argument class ({@code boolean < byte < short < int < long});
  *   if long operation would cause overflow, return a BigInteger</li>
  *   <li>If either argument is a BigDecimal, coerce both to BigDecimal, operator returns BigDecimal</li>
  *   <li>If either argument is a floating point number, coerce both to Double, operator returns Double</li>
@@ -540,7 +540,7 @@ public class JexlArithmetic {
      * Test if left contains right (right matches/in left).
      * <p>Beware that this &quot;contains &quot; method arguments order is the opposite of the
      * &quot;in/matches&quot; operator arguments.
-     * <code>x =~ y</code> means <code>y contains x</code> thus <code>contains(x, y)</code>.</p>
+     * {@code x =~ y} means {@code y contains x} thus {@code contains(x, y)}.</p>
      * <p>When this method returns null during evaluation, the operator code continues trying to find
      * one through the uberspect.</p>
      * @param container the container
@@ -1824,7 +1824,7 @@ public class JexlArithmetic {
     }
 
     /**
-     * Calculate the <code>size</code> of various types: Collection, Array, Map, String.
+     * Calculate the {@code size} of various types: Collection, Array, Map, String.
      *
      * @param object the object to get the size of
      * @return the <em>size</em> of object, 0 if null, 1 if there is no <em>better</em> solution
@@ -1834,7 +1834,7 @@ public class JexlArithmetic {
     }
 
     /**
-     * Calculate the <code>size</code> of various types: Collection, Array, Map, String.
+     * Calculate the {@code size} of various types: Collection, Array, Map, String.
      *
      * @param object the object to get the size of
      * @param def the default value if object size can not be determined

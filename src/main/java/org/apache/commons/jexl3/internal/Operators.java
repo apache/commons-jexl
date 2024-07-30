@@ -259,7 +259,7 @@ public class Operators {
     }
 
     /**
-     * Calculate the <code>size</code> of various types:
+     * Calculate the {@code size} of various types:
      * Collection, Array, Map, String, and anything that has a int size() method.
      * <p>Note that the result may not be an integer.
      *
@@ -343,7 +343,7 @@ public class Operators {
      * <p>
      * This takes care of finding and caching the operator method when appropriate.
      * If an overloads returns Operator.ASSIGN, it means the side-effect is complete.
-     * Otherwise, a += b &lt;=&gt; a = a + b
+     * Otherwise, {@code a += b <=> a = a + b}
      * </p>
      * @param node     the syntactic node
      * @param operator the operator

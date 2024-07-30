@@ -343,13 +343,13 @@ public class JexlScriptEngine extends AbstractScriptEngine implements Compilable
      * <p>This should be called early enough to have an effect, ie before any
      * {@link javax.script.ScriptEngineManager} features.</p>
      * <p>To restore 3.2 script behavior:</p>
-     * <code>
+     * {@code 
      *         JexlScriptEngine.setInstance(new JexlBuilder()
      *                 .cache(512)
      *                 .logger(LogFactory.getLog(JexlScriptEngine.class))
      *                 .permissions(JexlPermissions.UNRESTRICTED)
      *                 .create());
-     * </code>
+     * }
      * @param engine the JexlEngine instance to use
      * @since 3.3
      */
@@ -361,9 +361,9 @@ public class JexlScriptEngine extends AbstractScriptEngine implements Compilable
      * Sets the permissions instance used to create the script engine.
      * <p>Calling this method will force engine instance re-creation.</p>
      * <p>To restore 3.2 script behavior:</p>
-     * <code>
+     * {@code 
      *         JexlScriptEngine.setPermissions(JexlPermissions.UNRESTRICTED);
-     * </code>
+     * }
      * @param permissions the permissions instance to use or null to use the {@link JexlBuilder} default
      * @since 3.3
      */

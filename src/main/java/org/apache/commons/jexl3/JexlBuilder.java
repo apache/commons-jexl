@@ -44,15 +44,15 @@ import org.apache.commons.logging.Log;
  *     Fine error control and runtime-overridable behaviors are implemented through options ({@link JexlOptions}). Most
  * common flags accessible from the builder are reflected in its options ({@link #options()}).
  * </p><p>
- *     The <code>silent</code> flag tells the engine what to do with the error; when true, errors are logged as
+ *     The {@code silent} flag tells the engine what to do with the error; when true, errors are logged as
  * warning, when false, they throw {@link JexlException} exceptions.
  * </p><p>
- *     The <code>strict</code> flag tells the engine when and if null as operand is considered an error. The <code>safe</code>
+ *     The {@code strict} flag tells the engine when and if null as operand is considered an error. The {@code safe}
  * flog determines if safe-navigation is used. Safe-navigation allows an  evaluation shortcut and return null in expressions
  * that attempts dereferencing null, typically a method call or accessing a property.
  * </p><p>
- *     The <code>lexical</code> and <code>lexicalShade</code> flags can be used to enforce a lexical scope for
- * variables and parameters. The <code>lexicalShade</code> can be used to further ensure no global variable can be
+ *     The {@code lexical} and {@code lexicalShade} flags can be used to enforce a lexical scope for
+ * variables and parameters. The {@code lexicalShade} can be used to further ensure no global variable can be
  * used with the same name as a local one even after it goes out of scope. The corresponding feature flags should be
  * preferred since they will detect violations at parsing time. (see {@link JexlFeatures})
  * </p><p>
@@ -169,7 +169,7 @@ public class JexlBuilder {
      * </p><p>
      * In the urgent case of a strict 3.2 compatibility, the simplest and fastest mitigation is to use the 'unrestricted'
      * set of permissions. The builder must be explicit about it either by setting the default permissions with a
-     * statement like <code>JexlBuilder.setDefaultPermissions(JexlPermissions.UNRESTRICTED);</code> or with a more precise
+     * statement like {@code JexlBuilder.setDefaultPermissions(JexlPermissions.UNRESTRICTED);} or with a more precise
      * one like <code>new JexlBuilder().permissions({@link JexlPermissions#UNRESTRICTED})</code>.
      * </p><p>
      * Note that an explicit call to {@link #uberspect(JexlUberspect)} will supersede any permissions related behavior
@@ -225,7 +225,7 @@ public class JexlBuilder {
 
     /**
      * Sets the expression cache size the engine will use.
-     * <p>The cache will contain at most <code>size</code> expressions of at most <code>cacheThreshold</code> length.
+     * <p>The cache will contain at most {@code size} expressions of at most {@code cacheThreshold} length.
      * Note that all JEXL caches are held through SoftReferences and may be garbage-collected.</p>
      *
      * @param size if not strictly positive, no cache is used.
@@ -575,7 +575,7 @@ public JexlBuilder debug(final boolean flag) {
     /**
      * Sets whether the engine considers dereferencing null in navigation expressions
      * as null or triggers an error.
-     * <p><code>x.y()</code> if x is null throws an exception when not safe,
+     * <p>{@code x.y()} if x is null throws an exception when not safe,
      * return null and warns if it is.</p>
      * <p>It is recommended to use <em>safe(false)</em> as an explicit default.</p>
      *

@@ -78,7 +78,7 @@ public class Closure extends Script {
      * <p>Assign this lambda in its own frame if the symbol it is assigned to in its definition scope
      * is captured in its body.</p>
      * <p>This done allow a locally defined function to "see" and call  itself as a local (captured) variable.</p>
-     * Typical case is: <code>const f = (x)->x <= 0? 1 : x*f(x-1)</code>. Since assignment of f occurs after
+     * Typical case is: {@code const f = (x)->x <= 0? 1 : x*f(x-1)}. Since assignment of f occurs after
      * the lambda creation, we need to patch the lambda frame to expose itself through the captured symbol.
      * @param parentFrame the parent calling frame
      * @param symbol the symbol index (in the caller of this closure)

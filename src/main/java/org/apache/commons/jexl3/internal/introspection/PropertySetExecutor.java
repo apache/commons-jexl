@@ -92,14 +92,14 @@ public class PropertySetExecutor extends AbstractExecutor.Set {
     /**
      * Checks whether an argument is an empty array.
      * @param arg the argument
-     * @return true if <code>arg</code> is an empty array
+     * @return true if {@code arg} is an empty array
      */
     private static boolean isEmptyArray(final Object arg) {
         return arg != null && arg.getClass().isArray() && Array.getLength(arg) == 0;
     }
 
     /**
-     * Finds an empty array property setter method by <code>methodName</code>.
+     * Finds an empty array property setter method by {@code methodName}.
      * <p>This checks only one method with that name accepts an array as sole parameter.
      * @param is       the introspector
      * @param clazz    the class to find the get method from

@@ -183,7 +183,7 @@ public class Permissions implements JexlPermissions {
 
     /**
      * Creates a class key joining enclosing ascendants with '$'.
-     * <p>As in <code>outer$inner</code> for <code>class outer { class inner...</code>.</p>
+     * <p>As in {@code outer$inner} for <code>class outer { class inner...</code>.</p>
      * @param clazz the clazz
      * @return the clazz key
      */
@@ -193,7 +193,7 @@ public class Permissions implements JexlPermissions {
 
     /**
      * Creates a class key joining enclosing ascendants with '$'.
-     * <p>As in <code>outer$inner</code> for <code>class outer { class inner...</code>.</p>
+     * <p>As in {@code outer$inner} for <code>class outer { class inner...</code>.</p>
      * @param clazz the clazz
      * @param strb the buffer to compose the key
      * @return the clazz key

@@ -268,19 +268,19 @@ public interface JexlPermissions {
      *  org.apache.commons.jexl3 { JexlBuilder {} }
      *  </pre>
      *  <ul>
-     *  <li>Syntax for wildcards is the name of the package suffixed by <code>.*</code>.</li>
+     *  <li>Syntax for wildcards is the name of the package suffixed by {@code .*}.</li>
      *  <li>Syntax for restrictions is a list of package restrictions.</li>
      *  <li>A package restriction is a package name followed by a block (as in curly-bracket block {})
      *  that contains a list of class restrictions.</li>
-     *  <li>A class restriction is a class name prefixed by an optional <code>-</code> or <code>+</code> sign
+     *  <li>A class restriction is a class name prefixed by an optional {@code -} or {@code +} sign
      *  followed by a block of member restrictions.</li>
      *  <li>A member restriction can be a class restriction - to restrict
-     *  nested classes -, a field which is the Java field name suffixed with <code>;</code>, a method composed of
-     *  its Java name suffixed with <code>();</code>. Constructor restrictions are specified like methods using the
+     *  nested classes -, a field which is the Java field name suffixed with {@code ;}, a method composed of
+     *  its Java name suffixed with {@code ();}. Constructor restrictions are specified like methods using the
      *  class name as method name.</li>
-     *  <li>By default or when prefixed with a <code>-</code>, a class restriction is explicitly denying the members
+     *  <li>By default or when prefixed with a {@code -}, a class restriction is explicitly denying the members
      *  declared in its block (or the whole class)</li>
-     *  <li>When prefixed with a <code>+</code>, a class restriction is explicitly allowing the members
+     *  <li>When prefixed with a {@code +}, a class restriction is explicitly allowing the members
      *  declared in its block (or the whole class)</li>
      *  </ul>
      *  <p>

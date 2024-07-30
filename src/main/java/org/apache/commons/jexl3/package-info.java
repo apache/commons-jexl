@@ -262,13 +262,13 @@
  * namespaces allowing your own functions to be exposed at will.
  * </p>
  * This can be used as in:
- * <pre><code>
+ * <pre>{@code
  * public static MyMath {
  * public double cos(double x) {
  * return Math.cos(x);
  * }
  * }
- * Map&lt;String, Object&gt; funcs = new HashMap&lt;String, Object&gt;();
+ * Map<String, Object> funcs = new HashMap<String, Object>();
  * funcs.put("math", new MyMath());
  * JexlEngine jexl = new JexlBuilder().namespaces(funcs).create();
  * JexlContext jc = new MapContext();
@@ -276,7 +276,7 @@
  * JexlExpression e = JEXL.createExpression("math:cos(pi)");
  * o = e.evaluate(jc);
  * assertEquals(Double.valueOf(-1),o);
- * </code></pre>
+ * }</pre>
  * <p>
  * If the <em>namespace</em> is a Class and that class declares a constructor that takes a JexlContext (or
  * a class extending JexlContext), one <em>namespace</em> instance is created on first usage in an
@@ -347,7 +347,7 @@
  * If you overload some in your JexlArithmetic derived implementation, these methods will be called when the
  * arguments match your method signature.
  * For example, this would be the case if you wanted '+' to operate on arrays; you'd need to derive
- * JexlArithmetic and implement 'public Object add(Set&lt;?;&gt; x, Set&lt;?;&gt; y)' method.
+ * JexlArithmetic and implement '{@code public Object add(Set<?;> x, Set<?;> y)}' method.
  * Note however that you can <em>not</em> change the operator precedence.
  * The list of operator / method matches is described in {@link org.apache.commons.jexl3.JexlOperator}:
  * </p>

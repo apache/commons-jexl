@@ -57,7 +57,7 @@ public interface JexlUberspect {
         /**  Seeks public instance members.*/
         FIELD,
 
-        /** Seeks a getContainer(property) and setContainer(property, value) as in <code>x.container.property</code>. */
+        /** Seeks a getContainer(property) and setContainer(property, value) as in {@code x.container.property}. */
         CONTAINER;
 
         @Override
@@ -119,7 +119,7 @@ public interface JexlUberspect {
      * {@link org.apache.commons.jexl3.JexlBuilder#strategy(JexlUberspect.ResolverStrategy)}
      * as in:</p>
      *
-     * <code>JexlEngine jexl = new JexlBuilder().strategy(MY_STRATEGY).create();</code>
+     * {@code JexlEngine jexl = new JexlBuilder().strategy(MY_STRATEGY).create();}
      *
      * @since 3.0
      */
@@ -256,7 +256,7 @@ public interface JexlUberspect {
     /**
      * Property getter.
      * <p>
-     * Seeks a JexlPropertyGet apropos to an expression like <code>bar.woogie</code>.</p>
+     * Seeks a JexlPropertyGet apropos to an expression like {@code bar.woogie}.</p>
      * See {@link ResolverStrategy#apply(JexlOperator, java.lang.Object) }
      *
      * @param resolvers  the list of property resolvers to try
@@ -270,7 +270,7 @@ public interface JexlUberspect {
     /**
      * Property getter.
      *
-     * <p>returns a JelPropertySet apropos to an expression like <code>bar.woogie</code>.</p>
+     * <p>returns a JelPropertySet apropos to an expression like {@code bar.woogie}.</p>
      *
      * @param obj        the object to get the property from
      * @param identifier property name
@@ -281,7 +281,7 @@ public interface JexlUberspect {
     /**
      * Property setter.
      * <p>
-     * Seeks a JelPropertySet apropos to an expression like <code>foo.bar = "geir"</code>.</p>
+     * Seeks a JelPropertySet apropos to an expression like {@code foo.bar = "geir"}.</p>
      * See {@link ResolverStrategy#apply(JexlOperator, java.lang.Object) }
      *
      * @param resolvers  the list of property resolvers to try,
@@ -296,7 +296,7 @@ public interface JexlUberspect {
     /**
      * Property setter.
      * <p>
-     * Seeks a JelPropertySet apropos to an expression like  <code>foo.bar = "geir"</code>.</p>
+     * Seeks a JelPropertySet apropos to an expression like  {@code foo.bar = "geir"}.</p>
      *
      * @param obj        the object to get the property from.
      * @param identifier property name

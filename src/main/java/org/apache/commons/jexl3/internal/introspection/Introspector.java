@@ -141,7 +141,7 @@ public final class Introspector {
     }
 
     /**
-     * Gets the constructor defined by the <code>MethodKey</code>.
+     * Gets the constructor defined by the {@code MethodKey}.
      * @param c   the class we want to instantiate
      * @param key Key of the constructor being searched for
      * @return The desired constructor object
@@ -216,7 +216,7 @@ public final class Introspector {
     }
 
     /**
-     * Gets the constructor defined by the <code>MethodKey</code>.
+     * Gets the constructor defined by the {@code MethodKey}.
      *
      * @param key Key of the constructor being searched for
      * @return The desired constructor object
@@ -227,7 +227,7 @@ public final class Introspector {
     }
 
     /**
-     * Gets the field named by <code>key</code> for the class <code>c</code>.
+     * Gets the field named by {@code key} for the class {@code c}.
      *
      * @param c   Class in which the field search is taking place
      * @param key Name of the field being searched for
@@ -291,7 +291,7 @@ public final class Introspector {
     }
 
     /**
-     * Gets the method defined by the <code>MethodKey</code> for the class <code>c</code>.
+     * Gets the method defined by the {@code MethodKey} for the class {@code c}.
      *
      * @param c   Class in which the method search is taking place
      * @param key Key of the method being searched for

@@ -29,8 +29,8 @@ import java.util.concurrent.Callable;
  *
  * <p>A script is a group of statements, separated by semicolons.</p>
  *
- * <p>The statements can be <code>blocks</code> (curly braces containing code),
- * Control statements such as <code>if</code> and <code>while</code>
+ * <p>The statements can be {@code blocks} (curly braces containing code),
+ * Control statements such as {@code if} and {@code while}
  * as well as expressions and assignment statements.</p>
  *
  * <p>Do <em>not</em> create classes that implement this interface; delegate or compose instead.</p>

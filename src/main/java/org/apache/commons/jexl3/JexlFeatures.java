@@ -48,14 +48,14 @@ import java.util.function.Predicate;
  * <li>Method calls: calling methods (obj.method(...) or obj['method'](...)); when disabled, leaves function calls
  * - including namespace prefixes - available
  * <li>Structured literals: arrays, lists, maps, sets, ranges
- * <li>Pragma: pragma construct as in <code>#pragma x y</code>
+ * <li>Pragma: pragma construct as in {@code #pragma x y}
  * <li>Annotation: @annotation statement;
- * <li>Thin-arrow: use the thin-arrow, ie <code>-&gt;</code> for lambdas as in <code>x -&gt; x + x</code>
- * <li>Fat-arrow: use the  fat-arrow, ie <code>=&gt;</code> for lambdas as in <code>x =&gt; x + x</code>
- * <li>Namespace pragma: whether the <code>#pragma jexl.namespace.ns namespace</code> syntax is allowed</li>
- * <li>Import pragma: whether the <code>#pragma jexl.import fully.qualified.class.name</code> syntax is allowed</li>
- * <li>Comparator names: whether the comparator operator names can be used (as in <code>gt</code> for &gt;,
- * <code>lt</code> for &lt;, ...)</li>
+ * <li>Thin-arrow: use the thin-arrow, ie {@code ->} for lambdas as in {@code x -> x + x}
+ * <li>Fat-arrow: use the  fat-arrow, ie {@code =>} for lambdas as in {@code x => x + x}
+ * <li>Namespace pragma: whether the {@code #pragma jexl.namespace.ns namespace} syntax is allowed</li>
+ * <li>Import pragma: whether the {@code #pragma jexl.import fully.qualified.class.name} syntax is allowed</li>
+ * <li>Comparator names: whether the comparator operator names can be used (as in {@code gt} for &gt;,
+ * {@code lt} for &lt;, ...)</li>
  * <li>Pragma anywhere: whether pragma, that are <em>not</em> statements and handled before execution begins,
  * can appear anywhere in the source or before any statements - ie at the beginning of a script.</li>
  * <li>Const Capture: whether variables captured by lambdas are read-only (aka const, same as Java) or read-write.</li>
