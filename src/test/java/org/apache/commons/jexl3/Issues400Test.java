@@ -29,6 +29,7 @@ import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -442,5 +443,42 @@ public class Issues400Test {
         r = script.execute(ctxt, true);
         assertNotNull(r);
         assertEquals(42, r);
+    }
+
+    public static class SortingContext extends MapContext {
+        /**
+         * Sorts an array using a script to evaluate the property used to compare elements.
+         * @param array the elements array
+         * @param expr the property evaluation lambda
+         */
+        public void sort(Object[] array, JexlScript expr) {
+            final Comparator<Object> cmp = new Comparator<Object>() {
+                @Override
+                public int compare(Object o1, Object o2) {
+                    Comparable left = (Comparable<?>) expr.execute(SortingContext.this, o1);
+                    Comparable right = (Comparable<?>) expr.execute(SortingContext.this, o2);
+                    return left.compareTo(right);
+                }
+            };
+            Arrays.sort(array, cmp);
+        }
+    }
+
+    @Test
+    public void testSortArray() {
+        final JexlEngine jexl = new JexlBuilder().safe(false).strict(true).silent(false).create();
+        // test data, json like
+        String src = "[{'id':1,'name':'John','type':9},{'id':2,'name':'Doe','type':7},{'id':3,'name':'Doe','type':10}]";
+        Object a =  jexl.createExpression(src).evaluate(null);
+        assertNotNull(a);
+        // row 0 and 1 are not ordered
+        Map[] m = (Map[]) a;
+        assertEquals(9, m[0].get("type"));
+        assertEquals(7, m[1].get("type"));
+        // sort the elements on the type
+        jexl.createScript("array.sort( e -> e.type )", "array").execute(new SortingContext(), a);
+        // row 0 and 1 are now ordered
+        assertEquals(7, m[0].get("type"));
+        assertEquals(9, m[1].get("type"));
     }
 }
