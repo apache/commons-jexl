@@ -249,7 +249,7 @@ public final class JexlOptions {
 
     /**
      * Checks whether the engine considers null in navigation expression as
-     * errors during evaluation..
+     * errors during evaluation.
      * @return true if safe, false otherwise
      */
     public boolean isSafe() {

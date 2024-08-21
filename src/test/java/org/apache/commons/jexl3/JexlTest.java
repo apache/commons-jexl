@@ -511,7 +511,7 @@ public final class JexlTest extends JexlTestCase {
     public void testIntProperty() throws Exception {
         final Foo foo = new Foo();
 
-        // lets check the square function first..
+        // lets check the square function first.
         assertEquals(4, foo.square(2));
         assertEquals(4, foo.square(-2));
 

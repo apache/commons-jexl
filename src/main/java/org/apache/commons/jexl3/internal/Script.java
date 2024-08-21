@@ -300,7 +300,7 @@ public class Script implements JexlScript, JexlExpression {
 
     /**
      * Gets this script pragmas
-     * <p>Pragma keys are ant-ish variables, their values are scalar literals..
+     * <p>Pragma keys are ant-ish variables, their values are scalar literals.
      * @return the pragmas
      */
     @Override
