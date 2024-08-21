@@ -262,6 +262,26 @@ public final class JexlSandbox {
         return clazz == null ? BLOCK_ALL : compute(clazz);
     }
 
+    private static Permissions inheritable(Permissions p) {
+        return p != null && p.isInheritable() ? p : null;
+    }
+
+    /**
+     * Find first inherited interface that defines permissions through recursion.
+     * @param clazz the clazz
+     * @return the array of all its interfaces
+     */
+    private Permissions computeInterfaces(final Class<?> clazz) {
+        Permissions permissions = inheritable(sandbox.get(clazz.getName()));
+        if (permissions == null) {
+            final Class<?>[] interfaces = clazz.getInterfaces();
+            for (int i = 0; permissions == null && i < interfaces.length; ++i) {
+                permissions = computeInterfaces(interfaces[i]);
+            }
+        }
+        return permissions;
+    }
+
     /**
      * Computes and optionally stores the permissions associated to a class.
      *
@@ -273,9 +293,9 @@ public final class JexlSandbox {
         if (permissions == null) {
             if (inherit) {
                 // find first inherited interface that defines permissions
-                Class<?>[] interfaces = clazz.getInterfaces();
+                final Class<?>[] interfaces = clazz.getInterfaces();
                 for (int i = 0; permissions == null && i < interfaces.length; ++i) {
-                    permissions = inheritable(sandbox.get(interfaces[i].getName()));
+                    permissions = computeInterfaces(interfaces[i]);
                 }
                 // nothing defined yet, find first superclass that defines permissions
                 if (permissions == null) {
@@ -295,10 +315,6 @@ public final class JexlSandbox {
             sandbox.put(clazz.getName(), permissions);
         }
         return permissions;
-    }
-
-    private Permissions inheritable(Permissions p) {
-        return p != null && p.isInheritable() ? p : null;
     }
 
     /**

@@ -355,7 +355,7 @@ public class SandboxTest extends JexlTestCase {
         sandbox.permissions(SomeInterface.class.getName(), true, true, true, true);
         final JexlEngine sjexl = new JexlBuilder().sandbox(sandbox).safe(false).strict(true).create();
         final JexlScript someOp = sjexl.createScript("foo.bar()", "foo");
-        assertEquals(42, someOp.execute(null, foo));
+        assertEquals(42, (int) someOp.execute(null, foo));
     }
 
     @Test
@@ -365,7 +365,7 @@ public class SandboxTest extends JexlTestCase {
         sandbox.permissions(Foo386.class.getName(), true, true, true, true);
         final JexlEngine sjexl = new JexlBuilder().sandbox(sandbox).safe(false).strict(true).create();
         final JexlScript someOp = sjexl.createScript("foo.bar()", "foo");
-        assertEquals(-42, someOp.execute(null, foo));
+        assertEquals(-42, (int) someOp.execute(null, foo));
     }
 
     @Test
@@ -484,16 +484,16 @@ public class SandboxTest extends JexlTestCase {
         final JexlScript get = sjexl.createScript("foo[x]", "foo", "x");
 
         result = method.execute(ctxt, foo, "nothing");
-        assertEquals(true, result);
+        assertTrue((boolean) result);
         result = null;
-        result = get.execute(null, foo, 0);
+        result = get.execute(null, foo, Integer.valueOf(0));
         assertEquals("nothing", result);
         result = null;
-        result = set.execute(null, foo, 0, "42");
+        result = set.execute(null, foo, Integer.valueOf(0), "42");
         assertEquals("42", result);
 
         result = null;
-        result = get.execute(null, foo, 0);
+        result = get.execute(null, foo, Integer.valueOf(0));
         assertEquals("42", result);
     }
 
@@ -508,10 +508,10 @@ public class SandboxTest extends JexlTestCase {
         // sandbox.block(Foo.class.getName()).execute();
         final JexlEngine sjexl = new JexlBuilder().sandbox(sandbox).safe(false).strict(true).create();
         final JexlScript someOp = sjexl.createScript("foo.someOp(y)", "foo", "y");
-        result = someOp.execute(ctxt, foo, 30);
-        assertEquals(42, result);
+        result = someOp.execute(ctxt, foo, Integer.valueOf(30));
+        assertEquals(42, (int) result);
         final JexlScript nonCallable = sjexl.createScript("foo.nonCallable(y)", "foo", "y");
-        assertThrows(JexlException.class, () -> nonCallable.execute(null, foo, 0));
+        assertThrows(JexlException.class, () -> nonCallable.execute(null, foo, Integer.valueOf(0)));
     }
 
     @Test
