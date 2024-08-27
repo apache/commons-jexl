@@ -71,7 +71,7 @@ public final class JexlFeatures {
         "global assign/modify", "array reference", "create instance", "loop", "function",
         "method call", "set/map/array literal", "pragma", "annotation", "script", "lexical", "lexicalShade",
         "thin-arrow", "fat-arrow", "namespace pragma", "import pragma", "comparator names", "pragma anywhere",
-        "const capture"
+        "const capture", "ref capture"
     };
     /** Registers feature ordinal. */
     private static final int REGISTER = 0;
@@ -119,11 +119,13 @@ public final class JexlFeatures {
     public static final int PRAGMA_ANYWHERE = 21;
     /** Captured variables are const. */
     public static final int CONST_CAPTURE = 22;
+    /** Captured variables are reference. */
+    public static final int REF_CAPTURE = 23;
     /**
      * All features.
      * N.B. ensure this is updated if additional features are added.
      */
-    private static final long ALL_FEATURES = (1L << CONST_CAPTURE + 1) - 1L; // MUST REMAIN PRIVATE
+    private static final long ALL_FEATURES = (1L << REF_CAPTURE + 1) - 1L; // MUST REMAIN PRIVATE
     /**
      * The default features flag mask.
      * <p>Meant for compatibility with scripts written before 3.3.1</p>
@@ -349,6 +351,22 @@ public final class JexlFeatures {
      */
     public JexlFeatures constCapture(final boolean flag) {
         setFeature(CONST_CAPTURE, flag);
+        return this;
+    }
+
+    /**
+     * Sets whether lambda captured-variables are references or not.
+     * <p>When variables are pass-by-reference, side-effects are visible from inner lexical scopes
+     * to outer-scope.</p>
+     * <p>
+     * When disabled, lambda-captured variables use pass-by-value semantic,
+     * when enabled, those use pass-by-reference semantic.
+     * </p>
+     * @param flag true to enable, false to disable
+     * @return this features instance
+     */
+    public JexlFeatures referenceCapture(final boolean flag) {
+        setFeature(REF_CAPTURE, flag);
         return this;
     }
 
@@ -742,6 +760,13 @@ public final class JexlFeatures {
      */
     public boolean supportsConstCapture() {
         return getFeature(CONST_CAPTURE);
+    }
+
+    /**
+     * @return true if lambda captured-variables are references, false otherwise
+     */
+    public boolean supportsReferenceCapture() {
+        return getFeature(REF_CAPTURE);
     }
 
     /**

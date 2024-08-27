@@ -50,7 +50,7 @@ public class ASTJexlScript extends JexlLexicalNode  {
      * @return the arguments array
      */
     public Frame createFrame(final Frame caller, final Object... values) {
-        return scope != null ? scope.createFrame(caller, values) : null;
+        return scope != null ? scope.createFrame(features.supportsReferenceCapture(), caller, values) : null;
     }
 
     /**
@@ -145,6 +145,7 @@ public class ASTJexlScript extends JexlLexicalNode  {
         if (scope == null && jjtGetNumChildren() == 1 && jjtGetChild(0) instanceof ASTJexlLambda) {
             final ASTJexlLambda lambda = (ASTJexlLambda) jjtGetChild(0);
             lambda.jjtSetParent(null);
+            lambda.setFeatures(getFeatures());
             return lambda;
         }
         return this;

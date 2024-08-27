@@ -2070,6 +2070,14 @@ public class JexlArithmetic {
                 + val.getClass().getName() + ":(" + val + ")");
     }
 
+    public Object falsy(Object arg) {
+        return false;
+    }
+
+    public Object truthy(Object arg) {
+        return true;
+    }
+
     /**
      * Coerce to a primitive boolean.
      * <p>Double.NaN, null, "false" and empty string coerce to false.</p>

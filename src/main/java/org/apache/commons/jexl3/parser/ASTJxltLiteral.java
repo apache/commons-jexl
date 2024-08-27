@@ -18,7 +18,7 @@ package org.apache.commons.jexl3.parser;
 
 import org.apache.commons.jexl3.JxltEngine;
 
-public final class ASTJxltLiteral extends JexlNode {
+public final class ASTJxltLiteral extends JexlNode implements JexlNode.JxltHandle{
     /** Serial uid.*/
     private static final long serialVersionUID = 1L;
     /** The actual literal value. */
@@ -30,6 +30,12 @@ public final class ASTJxltLiteral extends JexlNode {
         super(id);
     }
 
+    @Override
+    public String getExpressionSource() {
+        return literal;
+    }
+
+    @Override
     public JxltEngine.Expression getExpression() {
         return jxltExpression;
     }
@@ -47,6 +53,7 @@ public final class ASTJxltLiteral extends JexlNode {
         return visitor.visit(this, data);
     }
 
+    @Override
     public void setExpression(final JxltEngine.Expression e) {
         this.jxltExpression = e;
     }

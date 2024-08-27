@@ -59,9 +59,10 @@ public final class Parser extends JexlParser
             this.scope = jexlScope;
             token_source.comparatorNames = jexlFeatures.supportsComparatorNames();
             ReInit(jexlSrc);
-            ASTJexlScript script = jexlFeatures.supportsScript()? JexlScript(jexlScope) : JexlExpression(jexlScope);
+            ASTJexlScript script = jexlFeatures.supportsScript()
+                ? JexlScript(jexlScope, jexlFeatures)
+                : JexlExpression(jexlScope, jexlFeatures);
             script.jjtSetValue(info.detach());
-            script.setFeatures(jexlFeatures);
             script.setPragmas(pragmas != null
                              ? Collections.unmodifiableMap(pragmas)
                              : Collections.emptyMap());
@@ -347,8 +348,9 @@ TOKEN_MGR_DECLS : {
  *      Statements
  ***************************************/
 
-ASTJexlScript JexlScript(Scope frame) : {
+ASTJexlScript JexlScript(Scope frame, JexlFeatures features) : {
     jjtThis.setScope(frame);
+    jjtThis.setFeatures(features);
 }
 {
    {
@@ -361,8 +363,9 @@ ASTJexlScript JexlScript(Scope frame) : {
    }
 }
 
-ASTJexlScript JexlExpression(Scope frame) #JexlScript : {
+ASTJexlScript JexlExpression(Scope frame, JexlFeatures features) #JexlScript : {
     jjtThis.setScope(frame);
+    jjtThis.setFeatures(features);
 }
 {
    {
@@ -423,7 +426,7 @@ void Block() #Block : {}
 
 void FunctionStatement() #JexlLambda : {}
 {
-<FUNCTION> DeclareFunction() { pushScope(); pushUnit(jjtThis); } Parameters() ( LOOKAHEAD(3) Block() | Expression()) { popUnit(jjtThis); popScope(); }
+<FUNCTION> DeclareFunction() { pushScope(); jjtThis.setFeatures(this.getFeatures()); pushUnit(jjtThis); } Parameters() ( LOOKAHEAD(3) Block() | Expression()) { popUnit(jjtThis); popScope(); }
 }
 
 void ExpressionStatement() #void : {}
@@ -676,14 +679,14 @@ void ConditionalExpression() #void : {}
 
 void ConditionalOrExpression() #void : {}
 {
-  ConditionalAndExpression()
-  ( LOOKAHEAD(2) ( (<OR>|<_OR>) ConditionalAndExpression() #OrNode(2) ) )*
+  ( ConditionalAndExpression()
+  ( LOOKAHEAD(2) ( (<OR>|<_OR>) ConditionalAndExpression()  ) )* ) #OrNode(>1)
 }
 
 void ConditionalAndExpression() #void : {}
 {
-  InclusiveOrExpression()
-  ( LOOKAHEAD(2) ( (<AND>|<_AND>) InclusiveOrExpression() #AndNode(2) ) )*
+  ( InclusiveOrExpression()
+  ( LOOKAHEAD(2) ( (<AND>|<_AND>) InclusiveOrExpression()  ) )* ) #AndNode(>1)
 }
 
 void InclusiveOrExpression() #void : {}
@@ -1055,11 +1058,11 @@ void Lambda() #JexlLambda :
 }
 {
   <FUNCTION> (LOOKAHEAD(<IDENTIFIER>) DeclareFunction())? {
-   pushScope(); pushUnit(jjtThis); } Parameters() ( LOOKAHEAD(3) Block() | Expression()) { popUnit(jjtThis); popScope(); }
+   pushScope(); jjtThis.setFeatures(this.getFeatures()); pushUnit(jjtThis); } Parameters() ( LOOKAHEAD(3) Block() | Expression()) { popUnit(jjtThis); popScope(); }
   |
-  { pushScope(); pushUnit(jjtThis); } Parameters() (arrow=<LAMBDA> | arrow=<FATARROW>) ( LOOKAHEAD(3) Block() | Expression()) { checkLambda(arrow); popUnit(jjtThis); popScope(); }
+  { pushScope(); jjtThis.setFeatures(this.getFeatures()); pushUnit(jjtThis); } Parameters() (arrow=<LAMBDA> | arrow=<FATARROW>) ( LOOKAHEAD(3) Block() | Expression()) { checkLambda(arrow); popUnit(jjtThis); popScope(); }
   |
-  { pushScope(); pushUnit(jjtThis); } Parameter() (arrow=<LAMBDA> | arrow=<FATARROW>)( LOOKAHEAD(3) Block() | Expression()) { checkLambda(arrow); popUnit(jjtThis); popScope(); }
+  { pushScope(); jjtThis.setFeatures(this.getFeatures()); pushUnit(jjtThis); } Parameter() (arrow=<LAMBDA> | arrow=<FATARROW>)( LOOKAHEAD(3) Block() | Expression()) { checkLambda(arrow); popUnit(jjtThis); popScope(); }
 }
 
 

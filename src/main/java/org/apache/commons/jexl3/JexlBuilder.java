@@ -367,15 +367,15 @@ public class JexlBuilder {
     }
 
    /**
- * Sets whether the engine will report debugging information when error occurs.
- *
- * @param flag true implies debug is on, false implies debug is off.
- * @return this builder
- */
-public JexlBuilder debug(final boolean flag) {
-    this.debug = flag;
-    return this;
-}
+     * Sets whether the engine will report debugging information when error occurs.
+     *
+     * @param flag true implies debug is on, false implies debug is off.
+     * @return this builder
+     */
+    public JexlBuilder debug(final boolean flag) {
+        this.debug = flag;
+        return this;
+    }
 
     /** @return the features */
     public JexlFeatures features() {
@@ -673,6 +673,15 @@ public JexlBuilder debug(final boolean flag) {
     public JexlBuilder strict(final boolean flag) {
         options.setStrict(flag);
         return this;
+    }
+
+    public JexlBuilder strictInterpolation(final boolean flag) {
+        options.setStrictInterpolation(flag);
+        return this;
+    }
+
+    public boolean strictInterpolation() {
+        return options.isStrictInterpolation();
     }
 
     /** @return the uberspect */

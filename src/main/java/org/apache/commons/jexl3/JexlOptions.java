@@ -36,12 +36,16 @@ import org.apache.commons.jexl3.internal.Engine;
  * <li>strict: whether unknown or unsolvable identifiers are errors</li>
  * <li>strictArithmetic: whether null as operand is an error</li>
  * <li>sharedInstance: whether these options can be modified at runtime during execution (expert)</li>
+ * <li>constCapture: whether captured variables will throw an error if an attempt is made to change their value</li>
+ * <li>strictInterpolation: whether interpolation strings always return a string or attempt to parse and return integer</li>
  * </ul>
  * The sensible default is cancellable, strict and strictArithmetic.
  * <p>This interface replaces the now deprecated JexlEngine.Options.
  * @since 3.2
  */
 public final class JexlOptions {
+    /** The interpolation string bit. */
+    private static final int STRICT_INTERPOLATION= 9;
     /** The const capture bit. */
     private static final int CONST_CAPTURE = 8;
     /** The shared instance bit. */
@@ -62,7 +66,8 @@ public final class JexlOptions {
     private static final int CANCELLABLE = 0;
     /** The flag names ordered. */
     private static final String[] NAMES = {
-        "cancellable", "strict", "silent", "safe", "lexical", "antish", "lexicalShade", "sharedInstance", "constCapture"
+        "cancellable", "strict", "silent", "safe", "lexical", "antish",
+        "lexicalShade", "sharedInstance", "constCapture", "strictInterpolation"
     };
     /** Default mask .*/
     private static int DEFAULT = 1 /*<< CANCELLABLE*/ | 1 << STRICT | 1 << ANTISH | 1 << SAFE;
@@ -292,6 +297,13 @@ public final class JexlOptions {
     }
 
     /**
+     * @return true if interpolation strings always return string, false otherwise
+     */
+    public boolean isStrictInterpolation() {
+        return isSet(STRICT_INTERPOLATION, flags);
+    }
+
+    /**
      * Sets options from engine.
      * @param jexl the engine
      * @return this instance
@@ -345,7 +357,7 @@ public final class JexlOptions {
      * @param flag true to enable, false to disable
      */
     public void setConstCapture(final boolean flag) {
-        flags = set(CONST_CAPTURE, flags, true);
+        flags = set(CONST_CAPTURE, flags, flag);
     }
 
     /**
@@ -457,6 +469,14 @@ public final class JexlOptions {
      */
     public void setStrictArithmetic(final boolean stricta) {
         this.strictArithmetic = stricta;
+    }
+
+    /**
+     * Sets the strict interpolation flag.
+     * @param flag true or false
+     */
+    public void setStrictInterpolation(final boolean flag) {
+        flags = set(STRICT_INTERPOLATION, flags, flag);
     }
 
     @Override public String toString() {

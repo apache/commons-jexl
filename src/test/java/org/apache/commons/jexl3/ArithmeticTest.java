@@ -876,6 +876,7 @@ public class ArithmeticTest extends JexlTestCase {
     public void testAtomicBoolean() {
         // in a condition
         JexlScript e = JEXL.createScript("if (x) 1 else 2;", "x");
+        JexlArithmetic jexla = JEXL.getArithmetic();
         final JexlContext jc = new MapContext();
         final AtomicBoolean ab = new AtomicBoolean(false);
         Object o;
@@ -888,16 +889,16 @@ public class ArithmeticTest extends JexlTestCase {
         e = JEXL.createScript("x && y", "x", "y");
         ab.set(true);
         o = e.execute(jc, ab, Boolean.FALSE);
-        assertFalse((Boolean) o);
+        assertFalse(jexla.toBoolean(o));
         ab.set(true);
         o = e.execute(jc, ab, Boolean.TRUE);
-        assertTrue((Boolean) o);
+        assertTrue(jexla.toBoolean(o));
         ab.set(false);
         o = e.execute(jc, ab, Boolean.FALSE);
-        assertFalse((Boolean) o);
+        assertFalse(jexla.toBoolean(o));
         ab.set(false);
         o = e.execute(jc, ab, Boolean.FALSE);
-        assertFalse((Boolean) o);
+        assertFalse(jexla.toBoolean(o));
         // in arithmetic op
         e = JEXL.createScript("x + y", "x", "y");
         ab.set(true);

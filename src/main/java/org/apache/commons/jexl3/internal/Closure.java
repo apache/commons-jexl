@@ -87,7 +87,7 @@ public class Closure extends Script {
         if (script instanceof ASTJexlLambda) {
             final Scope parentScope = parentFrame != null ? parentFrame.getScope() : null;
             final Scope localScope = frame != null ? frame.getScope() : null;
-            if (parentScope != null  && localScope != null && parentScope == localScope.getParent()) {
+            if (parentScope != null && localScope != null && parentScope == localScope.getParent()) {
                 final Integer reg = localScope.getCaptured(symbol);
                 if (reg != null) {
                     frame.set(reg, this);

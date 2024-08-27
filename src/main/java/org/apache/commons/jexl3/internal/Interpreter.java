@@ -439,6 +439,11 @@ public class Interpreter extends InterpreterBase {
         }
     }
 
+    @Override
+    protected Object visit(final ASTJxltLiteral node, final Object data) {
+        return evalJxltHandle(node);
+    }
+
     /**
      * Evaluates an access identifier based on the 2 main implementations;
      * static (name or numbered identifier) or dynamic (jxlt).
@@ -449,27 +454,49 @@ public class Interpreter extends InterpreterBase {
         if (!(node instanceof ASTIdentifierAccessJxlt)) {
             return node.getIdentifier();
         }
-        final ASTIdentifierAccessJxlt accessJxlt = (ASTIdentifierAccessJxlt) node;
-        final String src = node.getName();
+        ASTIdentifierAccessJxlt jxltNode = (ASTIdentifierAccessJxlt) node;
         Throwable cause = null;
-        TemplateEngine.TemplateExpression expr = (TemplateEngine.TemplateExpression) accessJxlt.getExpression();
         try {
-            if (expr == null) {
-                final TemplateEngine jxlt = jexl.jxlt();
-                expr = jxlt.parseExpression(node.jexlInfo(), src, frame != null ? frame.getScope() : null);
-                accessJxlt.setExpression(expr);
-            }
-            if (expr != null) {
-                final Object name = expr.evaluate(context, frame, options);
-                if (name != null) {
-                    final Integer id = ASTIdentifierAccess.parseIdentifier(name.toString());
-                    return id != null ? id : name;
-                }
+            final Object name = evalJxltHandle(jxltNode);
+            if (name != null) {
+                return name;
             }
         } catch (final JxltEngine.Exception xjxlt) {
             cause = xjxlt;
         }
-        return node.isSafe() ? null : unsolvableProperty(node, src, true, cause);
+        return node.isSafe() ? null : unsolvableProperty(jxltNode, jxltNode.getExpressionSource(), true, cause);
+    }
+
+    /**
+     * Evaluates a JxltHandle node.
+     * <p>This parses and stores the JXLT template if necessary (upon first execution)</p>
+     * @param node the node
+     * @return the JXLT template evaluation.
+     * @param <NODE> the node type
+     */
+    private <NODE extends JexlNode & JexlNode.JxltHandle> Object evalJxltHandle(NODE node) {
+        JxltEngine.Expression expr = node.getExpression();
+        if (expr == null) {
+            final TemplateEngine jxlt = jexl.jxlt();
+            JexlInfo info = node.jexlInfo();
+            if (this.block != null) {
+                info = new JexlNode.Info(node, info);
+            }
+            expr = jxlt.parseExpression(info, node.getExpressionSource(), frame != null ? frame.getScope() : null);
+            node.setExpression(expr);
+        }
+        // internal classes to evaluate in context
+        if (expr instanceof TemplateEngine.TemplateExpression ) {
+           Object eval = ((TemplateEngine.TemplateExpression ) expr).evaluate(context, frame, options);
+            if (eval != null) {
+                if (options.isStrictInterpolation()) {
+                    return eval.toString();
+                }
+                final Integer id = ASTIdentifierAccess.parseIdentifier(eval.toString());
+                return id != null ? id : eval;
+            }
+        }
+        return null;
     }
 
     /**
@@ -1056,25 +1083,20 @@ public class Interpreter extends InterpreterBase {
          * the ex will traverse up to the interpreter. In cases where this is not convenient/possible, JexlException
          * must be caught explicitly and rethrown.
          */
-        final Object left = node.jjtGetChild(0).jjtAccept(this, data);
-        try {
-            final boolean leftValue = arithmetic.toBoolean(left);
-            if (!leftValue) {
-                return Boolean.FALSE;
+        final int last = node.jjtGetNumChildren();
+        Object argument = null;
+        for (int c = 0; c < last; ++c) {
+            argument = node.jjtGetChild(c).jjtAccept(this, data);
+            try {
+                // short-circuit
+                if (!arithmetic.toBoolean(argument)) {
+                    break;
+                }
+            } catch (final ArithmeticException xrt) {
+                throw new JexlException(node.jjtGetChild(0), "boolean coercion error", xrt);
             }
-        } catch (final ArithmeticException xrt) {
-            throw new JexlException(node.jjtGetChild(0), "boolean coercion error", xrt);
         }
-        final Object right = node.jjtGetChild(1).jjtAccept(this, data);
-        try {
-            final boolean rightValue = arithmetic.toBoolean(right);
-            if (!rightValue) {
-                return Boolean.FALSE;
-            }
-        } catch (final ArithmeticException xrt) {
-            throw new JexlException(node.jjtGetChild(1), "boolean coercion error", xrt);
-        }
-        return Boolean.TRUE;
+        return argument;
     }
 
     @Override
@@ -1538,26 +1560,6 @@ public class Interpreter extends InterpreterBase {
         }
     }
 
-    @Override
-    protected Object visit(final ASTJxltLiteral node, final Object data) {
-        final Object cache = node.getExpression();
-        TemplateEngine.TemplateExpression tp;
-        if (cache instanceof TemplateEngine.TemplateExpression) {
-            tp = (TemplateEngine.TemplateExpression) cache;
-        } else {
-            final TemplateEngine jxlt = jexl.jxlt();
-            JexlInfo info = node.jexlInfo();
-            if (this.block != null) {
-                info = new JexlNode.Info(node, info);
-            }
-            tp = jxlt.parseExpression(info, node.getLiteral(), frame != null ? frame.getScope() : null);
-            node.setExpression(tp);
-        }
-        if (tp != null) {
-            return tp.evaluate(context, frame, options);
-        }
-        return null;
-    }
 
     @Override
     protected Object visit(final ASTLENode node, final Object data) {
@@ -1786,25 +1788,20 @@ public class Interpreter extends InterpreterBase {
 
     @Override
     protected Object visit(final ASTOrNode node, final Object data) {
-        final Object left = node.jjtGetChild(0).jjtAccept(this, data);
-        try {
-            final boolean leftValue = arithmetic.toBoolean(left);
-            if (leftValue) {
-                return Boolean.TRUE;
+        final int last = node.jjtGetNumChildren();
+        Object argument = null;
+        for (int c = 0; c < last; ++c) {
+            argument = node.jjtGetChild(c).jjtAccept(this, data);
+            try {
+                // short-circuit
+                if (arithmetic.toBoolean(argument)) {
+                    break;
+                }
+            } catch (final ArithmeticException xrt) {
+                throw new JexlException(node.jjtGetChild(0), "boolean coercion error", xrt);
             }
-        } catch (final ArithmeticException xrt) {
-            throw new JexlException(node.jjtGetChild(0), "boolean coercion error", xrt);
         }
-        final Object right = node.jjtGetChild(1).jjtAccept(this, data);
-        try {
-            final boolean rightValue = arithmetic.toBoolean(right);
-            if (rightValue) {
-                return Boolean.TRUE;
-            }
-        } catch (final ArithmeticException xrt) {
-            throw new JexlException(node.jjtGetChild(1), "boolean coercion error", xrt);
-        }
-        return Boolean.FALSE;
+        return argument;
     }
 
     @Override

@@ -17,6 +17,7 @@
 package org.apache.commons.jexl3;
 
 import static org.apache.commons.jexl3.JexlFeatures.CONST_CAPTURE;
+import static org.apache.commons.jexl3.JexlFeatures.REF_CAPTURE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -71,8 +72,8 @@ public class FeaturesTest extends JexlTestCase {
     @Test
     public void test410a() {
         final long x = JexlFeatures.createAll().getFlags();
-        assertEquals(CONST_CAPTURE + 1, Long.bitCount(x));
-        assertTrue((x & 1L << CONST_CAPTURE) != 0);
+        assertEquals(REF_CAPTURE + 1, Long.bitCount(x));
+        assertTrue((x & 1L << REF_CAPTURE) != 0);
 
         final JexlFeatures all = JexlFeatures.createAll();
         final JexlEngine jexl = new JexlBuilder().features(all).create();

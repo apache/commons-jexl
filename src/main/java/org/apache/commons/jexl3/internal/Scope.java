@@ -114,21 +114,27 @@ public final class Scope {
      * @param args the arguments
      * @return the arguments array
      */
-    public Frame createFrame(final Frame frame, final Object...args) {
+    public Frame createFrame(boolean ref, final Frame frame, final Object...args) {
         if (namedVariables == null) {
             return null;
         }
         final Object[] arguments = new Object[namedVariables.size()];
         Arrays.fill(arguments, UNDECLARED);
+        final Frame newFrame;
         if (frame != null && capturedVariables != null && parent != null) {
             for (final Map.Entry<Integer, Integer> capture : capturedVariables.entrySet()) {
                 final Integer target = capture.getKey();
                 final Integer source = capture.getValue();
-                final Object arg = frame.get(source);
+                final Object arg = frame.capture(source); //frame.get(source);
                 arguments[target] = arg;
             }
+            newFrame = frame.newFrame(this, arguments, 0);
+        } else {
+            newFrame = ref
+            ? new ReferenceFrame(this, arguments, 0)
+            : new Frame(this, arguments, 0);
         }
-        return new Frame(this, arguments, 0).assign(args);
+        return newFrame.assign(args);
     }
 
     /**

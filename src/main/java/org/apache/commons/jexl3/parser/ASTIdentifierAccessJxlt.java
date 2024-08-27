@@ -22,13 +22,19 @@ import org.apache.commons.jexl3.JxltEngine;
 /**
  * x.`expr`.
  */
-public class ASTIdentifierAccessJxlt extends ASTIdentifierAccess {
+public class ASTIdentifierAccessJxlt extends ASTIdentifierAccess implements JexlNode.JxltHandle{
     protected transient JxltEngine.Expression jxltExpression;
 
     ASTIdentifierAccessJxlt(final int id) {
         super(id);
     }
 
+    @Override
+    public String getExpressionSource() {
+        return getName();
+    }
+
+    @Override
     public JxltEngine.Expression getExpression() {
         return jxltExpression;
     }
@@ -38,6 +44,7 @@ public class ASTIdentifierAccessJxlt extends ASTIdentifierAccess {
         return true;
     }
 
+    @Override
     public void setExpression(final JxltEngine.Expression tp) {
         jxltExpression = tp;
     }

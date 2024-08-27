@@ -143,8 +143,8 @@ public class Issues400Test {
                 assertTrue(result instanceof Map);
                 final Map<?, ?> map = (Map<?, ?>) result;
                 assertEquals(1, map.size());
-                assertTrue(map.containsKey(1));
-                assertTrue(map.containsValue(1));
+                Object val = jexl.createScript("m -> m[1]").execute(null, map);
+                assertEquals(1, val);
             }
         }
     }
@@ -480,5 +480,59 @@ public class Issues400Test {
         // row 0 and 1 are now ordered
         assertEquals(7, m[0].get("type"));
         assertEquals(9, m[1].get("type"));
+    }
+
+    @Test public void test425() {
+        final JexlBuilder builder = new JexlBuilder().strictInterpolation(true);
+        final JexlEngine jexl = builder.create();
+        JexlScript script;
+        Object result;
+        script = jexl.createScript("let x = 42; let y = `${x}`; y");
+        result = script.execute(null);
+        assertTrue(result instanceof String);
+        assertEquals("42", result);
+    }
+
+    @Test public void test426() {
+        String src = "let x = 10;\n" +
+                "let foo = () -> {\n" +
+                "x += 2;\n" +
+                "}\n" +
+                "x = 40;\n" +
+                "foo();\n" +
+                "x";
+        final JexlBuilder builder = new JexlBuilder().features(new JexlFeatures().constCapture(false).referenceCapture(true));
+        final JexlEngine jexl = builder.create();
+        JexlScript script;
+        Object result;
+        script = jexl.createScript(src);
+        result = script.execute(null);
+        assertEquals(42, result);
+    }
+
+    @Test public void test427a() {
+        String src = "(x, y, z) -> x && y && z";
+        final JexlBuilder builder = new JexlBuilder().features(new JexlFeatures().constCapture(true));
+        final JexlEngine jexl = builder.create();
+        JexlScript script;
+        Object result;
+        script = jexl.createScript(src);
+        result = script.execute(null, true, "foo", 42);
+        assertEquals(42, result);
+        result = script.execute(null, true, "", 42);
+        assertEquals("", result);
+    }
+
+    @Test public void test427b() {
+        String src = "(x, y, z) -> x || y || z";
+        final JexlBuilder builder = new JexlBuilder().features(new JexlFeatures().constCapture(true));
+        final JexlEngine jexl = builder.create();
+        JexlScript script;
+        Object result;
+        script = jexl.createScript(src);
+        result = script.execute(null, 0, "", 42);
+        assertEquals(42, result);
+        result = script.execute(null, true, 42, null);
+        assertEquals(true, result);
     }
 }

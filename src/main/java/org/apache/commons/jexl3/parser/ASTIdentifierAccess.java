@@ -55,8 +55,8 @@ public class ASTIdentifierAccess extends JexlNode {
         }
         return null;
     }
-    private String name;
 
+    private String name;
     private Integer identifier;
 
     ASTIdentifierAccess(final int id) {

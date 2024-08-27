@@ -18,6 +18,7 @@ package org.apache.commons.jexl3.parser;
 
 import org.apache.commons.jexl3.JexlArithmetic;
 import org.apache.commons.jexl3.JexlInfo;
+import org.apache.commons.jexl3.JxltEngine;
 import org.apache.commons.jexl3.introspection.JexlMethod;
 import org.apache.commons.jexl3.introspection.JexlPropertyGet;
 import org.apache.commons.jexl3.introspection.JexlPropertySet;
@@ -39,6 +40,15 @@ public abstract class JexlNode extends SimpleNode {
      * Marker interface for cachable function calls.
      */
     public interface Funcall {}
+
+    /**
+     * Marker interface for nodes hosting a JxltExpression
+     */
+    public interface JxltHandle {
+        String getExpressionSource();
+        JxltEngine.Expression getExpression();
+        void setExpression(JxltEngine.Expression expr);
+    }
 
     /**
      * An info bound to its node.

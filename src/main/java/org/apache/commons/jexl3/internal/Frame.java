@@ -17,16 +17,17 @@
 package org.apache.commons.jexl3.internal;
 
 import java.util.Arrays;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * A call frame, created from a scope, stores the arguments and local variables in a "stack frame" (sic).
  * @since 3.0
  */
-public final class Frame {
+public class Frame {
     /** The scope. */
     private final Scope scope;
     /** The actual stack frame. */
-    private final Object[] stack;
+    protected final Object[] stack;
     /** Number of curried parameters. */
     private final int curried;
 
@@ -36,7 +37,7 @@ public final class Frame {
      * @param r the stack frame
      * @param c the number of curried parameters
      */
-    Frame(final Scope s, final Object[] r, final int c) {
+    protected Frame(final Scope s, final Object[] r, final int c) {
         scope = s;
         stack = r;
         curried = c;
@@ -58,9 +59,29 @@ public final class Frame {
             }
             // unbound parameters are defined as null
             Arrays.fill(copy, curried + ncopy, nparm, null);
-            return new Frame(scope, copy, curried + ncopy);
+            return newFrame(scope, copy, curried + ncopy);
         }
         return this;
+    }
+
+    /**
+     * Creates a new from of this frame&quote;s class.
+     * @param s the scope
+     * @param r the arguments
+     * @param c the number of curried parameters
+     * @return a new instance of frame
+     */
+    Frame newFrame(final Scope s, final Object[] r, final int c) {
+        return new Frame(s, r, c);
+    }
+
+    /**
+     * Captures a value.
+     * @param s the offset in this frame
+     * @return the stacked value
+     */
+    Object capture(int s) {
+        return stack[s];
     }
 
     /**
@@ -70,6 +91,15 @@ public final class Frame {
      */
     Object get(final int s) {
         return stack[s];
+    }
+
+    /**
+     * Sets a value.
+     * @param r the offset in this frame
+     * @param value the value to set in this frame
+     */
+    void set(final int r, final Object value) {
+        stack[r] = value;
     }
 
     /**
@@ -117,14 +147,57 @@ public final class Frame {
         }
         return ns;
     }
+}
 
-    /**
-     * Sets a value.
-     * @param r the offset in this frame
-     * @param value the value to set in this frame
-     */
-    void set(final int r, final Object value) {
-        stack[r] = value;
+class ReferenceFrame extends Frame {
+    ReferenceFrame(Scope s, Object[] r, int c) {
+        super(s, r, c);
     }
 
+    @Override
+    Frame newFrame(final Scope s, final Object[] r, final int c) {
+        return new ReferenceFrame(s, r, c);
+    }
+
+    @Override
+    CaptureReference capture(int s) {
+        synchronized(stack) {
+            Object o = stack[s];
+            if (o instanceof CaptureReference) {
+                return (CaptureReference) o;
+            } else {
+                CaptureReference captured = new CaptureReference(o);
+                stack[s] = captured;
+                return captured;
+            }
+        }
+    }
+
+    @Override
+    Object get(final int s) {
+        synchronized(stack) {
+            Object o = stack[s];
+            return o instanceof CaptureReference ? ((CaptureReference) o).get() : o;
+        }
+    }
+
+    @Override
+    void set(final int r, final Object value) {
+        synchronized (stack) {
+            Object o = stack[r];
+            if (o instanceof CaptureReference) {
+                if (value != Scope.UNDEFINED && value != Scope.UNDECLARED) {
+                    ((CaptureReference) o).set(value);
+                }
+            } else {
+                stack[r] = value;
+            }
+        }
+    }
+}
+
+class CaptureReference extends AtomicReference<Object> {
+    CaptureReference(Object o) {
+        super(o);
+    }
 }
