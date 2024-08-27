@@ -493,7 +493,7 @@ public class Issues400Test {
         assertEquals("42", result);
     }
 
-    @Test public void test426() {
+    @Test public void test426a() {
         String src = "let x = 10;\n" +
                 "let foo = () -> {\n" +
                 "x += 2;\n" +
@@ -509,6 +509,46 @@ public class Issues400Test {
         result = script.execute(null);
         assertEquals(42, result);
     }
+
+    @Test public void test426b() {
+        String src = "let x = 10; let f = () -> { x + 2 }; x = 40; f()";
+        final JexlBuilder builder = new JexlBuilder().features(new JexlFeatures().constCapture(true).referenceCapture(true));
+        final JexlEngine jexl = builder.create();
+        JexlScript script;
+        Object result;
+        script = jexl.createScript(src);
+        result = script.execute(null);
+        assertEquals(42, result);
+    }
+
+    @Test public void test426c() {
+        String src = "let x = 10; let f = () -> { x + 2 }; x = 40; f";
+        final JexlBuilder builder = new JexlBuilder().features(new JexlFeatures().constCapture(true).referenceCapture(true));
+        final JexlEngine jexl = builder.create();
+        JexlScript script;
+        Object result;
+        script = jexl.createScript(src);
+        result = script.execute(null);
+        assertTrue(result instanceof JexlScript);
+        script = jexl.createScript("f()", "f");
+        result = script.execute(null, result);
+        assertEquals(42, result);
+    }
+
+    @Test public void test426d() {
+        String src = "let x = 10; let f = () -> { let x = 142; x }; x = 40; f";
+        final JexlBuilder builder = new JexlBuilder().features(new JexlFeatures().referenceCapture(true));
+        final JexlEngine jexl = builder.create();
+        JexlScript script;
+        Object result;
+        script = jexl.createScript(src);
+        result = script.execute(null);
+        assertTrue(result instanceof JexlScript);
+        script = jexl.createScript("f()", "f");
+        result = script.execute(null, result);
+        assertEquals(142, result);
+    }
+
 
     @Test public void test427a() {
         String src = "(x, y, z) -> x && y && z";

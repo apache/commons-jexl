@@ -55,7 +55,7 @@ public abstract class JexlNode extends SimpleNode {
      * <p>Used to parse expressions for templates.
      */
     public static class Info extends JexlInfo {
-        JexlNode node = null;
+        JexlNode node;
 
         /**
          * Default ctor.

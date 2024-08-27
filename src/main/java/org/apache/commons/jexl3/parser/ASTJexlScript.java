@@ -31,9 +31,9 @@ public class ASTJexlScript extends JexlLexicalNode  {
     /** The pragmas. */
     private Map<String, Object> pragmas;
     /** Features. */
-    private transient JexlFeatures features = null;
+    private transient JexlFeatures features;
     /** The script scope. */
-    private transient Scope scope = null;
+    private transient Scope scope;
 
     public ASTJexlScript(final int id) {
         super(id);

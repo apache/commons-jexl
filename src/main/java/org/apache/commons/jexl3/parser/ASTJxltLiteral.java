@@ -24,7 +24,7 @@ public final class ASTJxltLiteral extends JexlNode implements JexlNode.JxltHandl
     /** The actual literal value. */
     private String literal;
     /** The expression (parsed). */
-    private transient JxltEngine.Expression jxltExpression = null;
+    private transient JxltEngine.Expression jxltExpression;
 
     ASTJxltLiteral(final int id) {
         super(id);

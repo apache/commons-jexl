@@ -16,7 +16,6 @@
  */
 package org.apache.commons.jexl3;
 
-import static org.apache.commons.jexl3.JexlFeatures.CONST_CAPTURE;
 import static org.apache.commons.jexl3.JexlFeatures.REF_CAPTURE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
