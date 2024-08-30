@@ -38,12 +38,15 @@ import org.apache.commons.jexl3.internal.Engine;
  * <li>sharedInstance: whether these options can be modified at runtime during execution (expert)</li>
  * <li>constCapture: whether captured variables will throw an error if an attempt is made to change their value</li>
  * <li>strictInterpolation: whether interpolation strings always return a string or attempt to parse and return integer</li>
+ * <li>booleanLogical: whether logical expressions (&quot;&quot; , ||) coerce their result to boolean</li>
  * </ul>
  * The sensible default is cancellable, strict and strictArithmetic.
  * <p>This interface replaces the now deprecated JexlEngine.Options.
  * @since 3.2
  */
 public final class JexlOptions {
+    /** The boolean logical flag. */
+    private static final int BOOLEAN_LOGICAL = 10;
     /** The interpolation string bit. */
     private static final int STRICT_INTERPOLATION= 9;
     /** The const capture bit. */
@@ -67,10 +70,12 @@ public final class JexlOptions {
     /** The flag names ordered. */
     private static final String[] NAMES = {
         "cancellable", "strict", "silent", "safe", "lexical", "antish",
-        "lexicalShade", "sharedInstance", "constCapture", "strictInterpolation"
+        "lexicalShade", "sharedInstance", "constCapture", "strictInterpolation",
+        "booleanShortCircuit"
     };
     /** Default mask .*/
     private static int DEFAULT = 1 /*<< CANCELLABLE*/ | 1 << STRICT | 1 << ANTISH | 1 << SAFE;
+
     /**
      * Checks the value of a flag in the mask.
      * @param ordinal the flag ordinal
@@ -80,6 +85,7 @@ public final class JexlOptions {
     private static boolean isSet(final int ordinal, final int mask) {
         return (mask & 1 << ordinal) != 0;
     }
+
     /**
      * Parses flags by name.
      * <p>A '+flag' or 'flag' will set flag as true, '-flag' set as false.
@@ -115,6 +121,7 @@ public final class JexlOptions {
         }
         return mask;
     }
+
     /**
      * Sets the value of a flag in a mask.
      * @param ordinal the flag ordinal
@@ -125,6 +132,7 @@ public final class JexlOptions {
     private static int set(final int ordinal, final int mask, final boolean value) {
         return value? mask | 1 << ordinal : mask & ~(1 << ordinal);
     }
+
     /**
      * Sets the default (static, shared) option flags.
      * <p>
@@ -140,8 +148,10 @@ public final class JexlOptions {
     public static void setDefaultFlags(final String...flags) {
         DEFAULT = parseFlags(DEFAULT, flags);
     }
+
     /** The arithmetic math context. */
     private MathContext mathContext;
+
     /** The arithmetic math scale. */
     private int mathScale = Integer.MIN_VALUE;
 
@@ -210,6 +220,17 @@ public final class JexlOptions {
      */
     public boolean isAntish() {
         return isSet(ANTISH, flags);
+    }
+
+    /**
+     * Gets whether logical expressions (&quot;&quot; , ||) coerce their result to boolean; if set,
+     * an expression like (3 &quot;&quot; 4 &quot;&quot; 5) will evaluate to true. If not, it will evaluate to 5.
+     * To preserve strict compatibility with 3.4, set the flag to true.
+     * @return true if short-circuit logicals coerce their result to boolean, false otherwise
+     * @since 3.4.1
+     */
+    public boolean isBooleanLogical() {
+        return isSet(BOOLEAN_LOGICAL, flags);
     }
 
     /**
@@ -337,6 +358,14 @@ public final class JexlOptions {
      */
     public void setAntish(final boolean flag) {
         flags = set(ANTISH, flags, flag);
+    }
+
+    /**
+     * Sets whether logical expressions (&quot;&quot; , ||) coerce their result to boolean.
+     * @param flag true or false
+     */
+    public void setBooleanLogical(final boolean flag) {
+        flags = set(BOOLEAN_LOGICAL, flags, flag);
     }
 
     /**
@@ -473,10 +502,15 @@ public final class JexlOptions {
 
     /**
      * Sets the strict interpolation flag.
-     * @param flag true or false
+     * <p>When strict, interpolation strings composed only of an expression (ie `${...}`) are evaluated
+     * as strings; when not strict, integer results are left untouched.</p>
+     * This can affect the results of expressions like <code>map.`${key}`</code> when key is
+     * an integer (or a string); it is almost always possible to use <code>map[key]</code> to ensure
+     * that the key type is not altered.
+     * @param strict true or false
      */
-    public void setStrictInterpolation(final boolean flag) {
-        flags = set(STRICT_INTERPOLATION, flags, flag);
+    public void setStrictInterpolation(final boolean strict) {
+        flags = set(STRICT_INTERPOLATION, flags, strict);
     }
 
     @Override public String toString() {

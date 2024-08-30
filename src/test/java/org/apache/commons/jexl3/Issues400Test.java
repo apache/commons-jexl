@@ -100,7 +100,7 @@ public class Issues400Test {
     }
 
     @Test
-    public void test402() {
+    void test402() {
         final JexlContext jc = new MapContext();
       // @formatter:off
       final String[] sources = {
@@ -118,7 +118,7 @@ public class Issues400Test {
     }
 
     @Test
-    public void test403() {
+    void test403() {
         // @formatter:off
         final String[] strings = {
             "  map1.`${item.a}` = 1;\n",
@@ -150,7 +150,7 @@ public class Issues400Test {
     }
 
     @Test
-    public void test404a() {
+    void test404a() {
         final JexlEngine jexl = new JexlBuilder().cache(64).strict(true).safe(false).create();
         Map<String, Object> a = Collections.singletonMap("b", 42);
         // access is constant
@@ -172,7 +172,7 @@ public class Issues400Test {
     }
 
     @Test
-    public void test404b() {
+    void test404b() {
       // @formatter:off
       final JexlEngine jexl = new JexlBuilder()
           .cache(64)
@@ -213,7 +213,7 @@ public class Issues400Test {
     }
 
     @Test
-    public void test406a() {
+    void test406a() {
         // @formatter:off
         final JexlEngine jexl = new JexlBuilder()
             .cache(64)
@@ -251,7 +251,7 @@ public class Issues400Test {
     }
 
     @Test
-    public void test407() {
+    void test407() {
         // Java version
         final double r = 99.0d + 7.82d - 99.0d - 7.82d;
         assertEquals(0d, r, 8.e-15); // Not zero, IEEE 754
@@ -267,7 +267,7 @@ public class Issues400Test {
     }
 
     @Test
-    public void test412() {
+    void test412() {
         final Map<Object, Object> ctl = new HashMap<>();
         ctl.put("one", 1);
         ctl.put("two", 2);
@@ -292,7 +292,7 @@ public class Issues400Test {
     }
 
     @Test
-    public void test413a() {
+    void test413a() {
         final JexlBuilder builder = new JexlBuilder();
         final JexlEngine jexl = builder.create();
         final JexlScript script = jexl.createScript("var c = 42; var f = y -> c += y; f(z)", "z");
@@ -301,7 +301,7 @@ public class Issues400Test {
     }
 
     @Test
-    public void test413b() {
+    void test413b() {
         final JexlBuilder builder = new JexlBuilder();
         final JexlOptions options = builder.options();
         options.setConstCapture(true);
@@ -313,7 +313,7 @@ public class Issues400Test {
     }
 
     @Test
-    public void test413c() {
+    void test413c() {
         final JexlBuilder builder = new JexlBuilder();
         final JexlEngine jexl = builder.create();
         final JexlScript script = jexl.createScript("#pragma jexl.options '+constCapture'\nvar c = 42; var f = y -> c += y; f(z)", "z");
@@ -322,7 +322,7 @@ public class Issues400Test {
     }
 
     @Test
-    public void test413d() {
+    void test413d() {
         final JexlBuilder builder = new JexlBuilder().features(new JexlFeatures().constCapture(true));
         final JexlEngine jexl = builder.create();
         final JexlException.Parsing xparse = assertThrows(JexlException.Parsing.class, () -> jexl.createScript("var c = 42; var f = y -> c += y; f(z)", "z"),
@@ -331,7 +331,7 @@ public class Issues400Test {
     }
 
     @Test
-    public void test415() {
+    void test415() {
         final JexlBuilder builder = new JexlBuilder().features(new JexlFeatures().constCapture(true));
         final JexlEngine jexl = builder.create();
         JexlScript script;
@@ -354,7 +354,7 @@ public class Issues400Test {
     }
 
     @Test
-    public void test419() throws NoSuchMethodException {
+    void test419() throws NoSuchMethodException {
         // check RESTRICTED permissions denies call to System::currentTimeMillis()
         final Method currentTimeMillis = System.class.getMethod("currentTimeMillis");
         assertFalse(RESTRICTED.allow(currentTimeMillis));
@@ -382,7 +382,7 @@ public class Issues400Test {
     }
 
     @Test
-    public void testDocBreakContinue() {
+    void testDocBreakContinue() {
         final JexlBuilder builder = new JexlBuilder().features(new JexlFeatures().constCapture(true));
         final JexlEngine jexl = builder.create();
         JexlScript script;
@@ -406,7 +406,7 @@ public class Issues400Test {
     }
 
     @Test
-    public void testNamespaceVsTernary0() {
+    void testNamespaceVsTernary0() {
         final VinzContext ctxt = new VinzContext();
         ctxt.set("Users", "USERS");
         final JexlEngine jexl = new JexlBuilder().safe(false).strict(true).silent(false).create();
@@ -425,7 +425,7 @@ public class Issues400Test {
     }
 
     @Test
-    public void testNamespaceVsTernary1() {
+    void testNamespaceVsTernary1() {
         final VinzContext ctxt = new VinzContext();
         ctxt.set("Users", "USERS");
         ctxt.set("vinz", new VinzCaller(ctxt));
@@ -465,7 +465,7 @@ public class Issues400Test {
     }
 
     @Test
-    public void testSortArray() {
+    void testSortArray() {
         final JexlEngine jexl = new JexlBuilder().safe(false).strict(true).silent(false).create();
         // test data, json like
         String src = "[{'id':1,'name':'John','type':9},{'id':2,'name':'Doe','type':7},{'id':3,'name':'Doe','type':10}]";
@@ -482,7 +482,7 @@ public class Issues400Test {
         assertEquals(9, m[1].get("type"));
     }
 
-    @Test public void test425() {
+    @Test void test425() {
         final JexlBuilder builder = new JexlBuilder().strictInterpolation(true);
         final JexlEngine jexl = builder.create();
         JexlScript script;
@@ -493,7 +493,7 @@ public class Issues400Test {
         assertEquals("42", result);
     }
 
-    @Test public void test426a() {
+    @Test void test426a() {
         String src = "let x = 10;\n" +
                 "let foo = () -> {\n" +
                 "x += 2;\n" +
@@ -510,7 +510,7 @@ public class Issues400Test {
         assertEquals(42, result);
     }
 
-    @Test public void test426b() {
+    @Test void test426b() {
         String src = "let x = 10; let f = () -> { x + 2 }; x = 40; f()";
         final JexlBuilder builder = new JexlBuilder().features(new JexlFeatures().constCapture(true).referenceCapture(true));
         final JexlEngine jexl = builder.create();
@@ -521,7 +521,7 @@ public class Issues400Test {
         assertEquals(42, result);
     }
 
-    @Test public void test426c() {
+    @Test void test426c() {
         String src = "let x = 10; let f = () -> { x + 2 }; x = 40; f";
         final JexlBuilder builder = new JexlBuilder().features(new JexlFeatures().constCapture(true).referenceCapture(true));
         final JexlEngine jexl = builder.create();
@@ -535,7 +535,7 @@ public class Issues400Test {
         assertEquals(42, result);
     }
 
-    @Test public void test426d() {
+    @Test void test426d() {
         String src = "let x = 10; let f = () -> { let x = 142; x }; x = 40; f";
         final JexlBuilder builder = new JexlBuilder().features(new JexlFeatures().referenceCapture(true));
         final JexlEngine jexl = builder.create();
@@ -550,7 +550,7 @@ public class Issues400Test {
     }
 
 
-    @Test public void test427a() {
+    @Test void test427a() {
         String src = "(x, y, z) -> x && y && z";
         final JexlBuilder builder = new JexlBuilder().features(new JexlFeatures().constCapture(true));
         final JexlEngine jexl = builder.create();
@@ -563,16 +563,51 @@ public class Issues400Test {
         assertEquals("", result);
     }
 
-    @Test public void test427b() {
+    @Test void test427b() {
+        OptContext optc = new OptContext();
         String src = "(x, y, z) -> x || y || z";
         final JexlBuilder builder = new JexlBuilder().features(new JexlFeatures().constCapture(true));
         final JexlEngine jexl = builder.create();
+        JexlOptions options = builder.options();
+        optc.setOptions(options);
         JexlScript script;
         Object result;
         script = jexl.createScript(src);
-        result = script.execute(null, 0, "", 42);
+        result = script.execute(optc, 0, "", 42);
         assertEquals(42, result);
-        result = script.execute(null, true, 42, null);
+        result = script.execute(optc, true, 42, null);
         assertEquals(true, result);
+
+        options.setBooleanLogical(true);
+        result = script.execute(optc, 0, "", Double.NaN);
+        assertEquals(false, result);
+        result = script.execute(optc, 0, "", Collections.emptySet());
+        assertEquals(true, result);
+
+    }
+
+    @Test void test427c() {
+        String src = "function sanitize(const n) { n == 0 ? NaN : n }; sanitize(x) && 420 / x";
+        final JexlEngine jexl = new JexlBuilder().create();
+        JexlScript script;
+        Object result;
+        script = jexl.createScript(src, "x");
+        result = script.execute(null, 10);
+        assertEquals(42, result);
+        result = script.execute(null, 0);
+        assertTrue(Double.isNaN(((Number) result).doubleValue()));
+    }
+
+    public static class OptContext extends MapContext implements JexlContext.OptionsHandle {
+        private JexlOptions options;
+
+        @Override
+        public JexlOptions getEngineOptions() {
+            return options;
+        }
+
+        void setOptions(JexlOptions options) {
+            this.options = options;
+        }
     }
 }

@@ -37,7 +37,7 @@ import org.apache.commons.jexl3.introspection.JexlUberspect;
 
 /**
  * An Uberspect that handles references (java.lang.ref.Reference) and optionals (java.util.Optional).
- * <p>This illustrates JEXL&quote;s low level customization capabilities.</p>
+ * <p>This illustrates JEXL&quot;s low level customization capabilities.</p>
  * see JEXL-342.
  */
 public class ReferenceUberspect implements JexlUberspect {

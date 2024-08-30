@@ -42,7 +42,7 @@ public class FeaturesTest extends JexlTestCase {
         super("FeaturesTest");
     }
 
-    private void assertOk(final JexlFeatures features, final String[] scripts) {
+    private void assertOk(final String[] scripts) {
         for(final String str : scripts) {
             try {
                 final JexlScript e = jexl.createScript(str);
@@ -55,8 +55,8 @@ public class FeaturesTest extends JexlTestCase {
     /**
      * Checks that the script is valid with all features on then verifies it
      * throws a feature exception with the given set (in features param).
-     * @param features
-     * @param scripts
+     * @param features the features
+     * @param scripts the scripts
      * @throws Exception
      */
     private void checkFeature(final JexlFeatures features, final String[] scripts) throws Exception {
@@ -69,7 +69,7 @@ public class FeaturesTest extends JexlTestCase {
     }
 
     @Test
-    public void test410a() {
+    void test410a() {
         final long x = JexlFeatures.createAll().getFlags();
         assertEquals(REF_CAPTURE + 1, Long.bitCount(x));
         assertTrue((x & 1L << REF_CAPTURE) != 0);
@@ -82,7 +82,7 @@ public class FeaturesTest extends JexlTestCase {
     }
 
     @Test
-    public void test410b() {
+    void test410b() {
         final JexlFeatures features = JexlFeatures.createScript();
         assertTrue(features.isLexical());
         assertTrue(features.isLexicalShade());
@@ -113,7 +113,7 @@ public class FeaturesTest extends JexlTestCase {
     }
 
     @Test
-    public void testAnnotations() throws Exception {
+    void testAnnotations() throws Exception {
         final JexlFeatures f = new JexlFeatures().annotation(false);
         final String[] scripts = {
             "@synchronized(2) { return 42; }",
@@ -123,7 +123,7 @@ public class FeaturesTest extends JexlTestCase {
     }
 
     @Test
-    public void testArrayRefs() throws Exception {
+    void testArrayRefs() throws Exception {
         final JexlFeatures f = new JexlFeatures().arrayReferenceExpr(false);
 
         final String[] scripts = {
@@ -133,7 +133,7 @@ public class FeaturesTest extends JexlTestCase {
             "x.y['a'][b]"
         };
         checkFeature(f, scripts);
-        assertOk(f, scripts);
+        assertOk(scripts);
         // same ones with constant array refs should work
         final String[] scriptsOk = {
             "x['y']",
@@ -141,11 +141,11 @@ public class FeaturesTest extends JexlTestCase {
             "x()['a']['b']",
             "x.y['a']['b']"
         };
-        assertOk(f, scriptsOk);
+        assertOk(scriptsOk);
     }
 
     @Test
-    public void testConstCapture() throws Exception {
+    void testConstCapture() throws Exception {
         final JexlFeatures f = new JexlFeatures().constCapture(true);
         final String[] scripts = {
             "let x = 0; const f = y -> x += y; f(42)",
@@ -153,11 +153,11 @@ public class FeaturesTest extends JexlTestCase {
         };
         checkFeature(f, scripts);
         final JexlFeatures nof = new JexlFeatures().constCapture(true);
-        assertOk(nof, scripts);
+        assertOk(scripts);
     }
 
     @Test
-    public void testCreate() {
+    void testCreate() {
         final JexlFeatures f = JexlFeatures.createNone();
         assertTrue(f.supportsExpression());
 
@@ -187,7 +187,7 @@ public class FeaturesTest extends JexlTestCase {
     }
 
     @Test
-    public void testIssue409() {
+    void testIssue409() {
         final JexlFeatures baseFeatures =  JexlFeatures.createDefault();
         assertFalse(baseFeatures.isLexical());
         assertFalse(baseFeatures.isLexicalShade());
@@ -202,7 +202,7 @@ public class FeaturesTest extends JexlTestCase {
     }
 
     @Test
-    public void testMethodCalls() throws Exception {
+    void testMethodCalls() throws Exception {
         final JexlFeatures f = new JexlFeatures().methodCall(false);
         final String[] scripts = {
             "x.y(z)",
@@ -217,11 +217,11 @@ public class FeaturesTest extends JexlTestCase {
             "x('a')[1]",
             "x()['a']['b']",
         };
-        assertOk(f, scriptsOk);
+        assertOk(scriptsOk);
     }
 
     @Test
-    public void testMixedFeatures() throws Exception {
+    void testMixedFeatures() throws Exception {
         // no new, no local, no lambda, no loops, no-side effects
         final JexlFeatures f = new JexlFeatures()
                 .newInstance(false)
@@ -241,7 +241,7 @@ public class FeaturesTest extends JexlTestCase {
         checkFeature(f, scripts);
     }
     @Test
-    public void testNoComparatorNames() throws Exception {
+    void testNoComparatorNames() throws Exception {
         final JexlFeatures f = new JexlFeatures().comparatorNames(false);
         final String[] scripts = {
             "1 eq 1",
@@ -255,7 +255,7 @@ public class FeaturesTest extends JexlTestCase {
     }
 
     @Test
-    public void testNoLambda() throws Exception {
+    void testNoLambda() throws Exception {
         final JexlFeatures f = new JexlFeatures().lambda(false);
         final String[] scripts = {
             "var x  = ()->{ return 0 };",
@@ -269,7 +269,7 @@ public class FeaturesTest extends JexlTestCase {
     }
 
     @Test
-    public void testNoLocals() throws Exception {
+    void testNoLocals() throws Exception {
         final JexlFeatures f = new JexlFeatures().localVar(false);
         final String[] scripts = {
             "var x = 0;",
@@ -279,7 +279,7 @@ public class FeaturesTest extends JexlTestCase {
     }
 
     @Test
-    public void testNoLoop() throws Exception {
+    void testNoLoop() throws Exception {
         final JexlFeatures f = new JexlFeatures().loops(false);
         final String[] scripts = {
             "while(true);",
@@ -288,7 +288,7 @@ public class FeaturesTest extends JexlTestCase {
         checkFeature(f, scripts);
     }
     @Test
-    public void testNoNew() throws Exception {
+    void testNoNew() throws Exception {
         final JexlFeatures f = new JexlFeatures().newInstance(false);
         final String[] scripts = {
             "return new(clazz);",
@@ -298,7 +298,7 @@ public class FeaturesTest extends JexlTestCase {
     }
 
     @Test
-    public void testNoScript() throws Exception {
+    void testNoScript() throws Exception {
         final JexlFeatures f = new JexlFeatures().script(false);
         assertTrue(f.supportsExpression());
         final String[] scripts = {
@@ -311,7 +311,7 @@ public class FeaturesTest extends JexlTestCase {
     }
 
     @Test
-    public void testNoSideEffects() throws Exception {
+    void testNoSideEffects() throws Exception {
         final JexlFeatures f = new JexlFeatures().sideEffect(false);
         final String[] scripts = {
             "x = 1",
@@ -335,7 +335,7 @@ public class FeaturesTest extends JexlTestCase {
     }
 
     @Test
-    public void testNoSideEffectsGlobal() throws Exception {
+    void testNoSideEffectsGlobal() throws Exception {
         final JexlFeatures f = new JexlFeatures().sideEffectGlobal(false);
         final String[] scripts = {
             "x = 1",
@@ -366,7 +366,7 @@ public class FeaturesTest extends JexlTestCase {
     }
 
     @Test
-    public void testPragma() throws Exception {
+    void testPragma() throws Exception {
         final JexlFeatures f = new JexlFeatures().pragma(false);
         final String[] scripts = {
             "#pragma foo 42",
@@ -376,7 +376,7 @@ public class FeaturesTest extends JexlTestCase {
     }
 
     @Test
-    public void testPragmaAnywhere() throws Exception {
+    void testPragmaAnywhere() throws Exception {
         final JexlFeatures f = new JexlFeatures().pragmaAnywhere(false);
         final String[] scripts = {
                 "var x = 3;\n#pragma foo 42",
@@ -385,7 +385,7 @@ public class FeaturesTest extends JexlTestCase {
     }
 
     @Test
-    public void testReservedVars() throws Exception {
+    void testReservedVars() throws Exception {
         final JexlFeatures f = new JexlFeatures().reservedNames(Arrays.asList("foo", "bar"));
         final String[] scripts = {
             "var foo = 0;",
@@ -398,11 +398,11 @@ public class FeaturesTest extends JexlTestCase {
             "(bar1)->{ bar }",
             "var f = function(bar2) { bar2; }"
         };
-        assertOk(f, scriptsOk);
+        assertOk(scriptsOk);
     }
 
     @Test
-    public void testStructuredLiterals() throws Exception {
+    void testStructuredLiterals() throws Exception {
         final JexlFeatures f = new JexlFeatures().structuredLiteral(false);
         final String[] scripts = {
             "{1, 2, 3}",
@@ -411,6 +411,6 @@ public class FeaturesTest extends JexlTestCase {
             "(1 .. 5)"
         };
         checkFeature(f, scripts);
-        assertOk(f, scripts);
+        assertOk(scripts);
     }
 }

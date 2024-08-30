@@ -426,7 +426,7 @@ void Block() #Block : {}
 
 void FunctionStatement() #JexlLambda : {}
 {
-<FUNCTION> DeclareFunction() { pushScope(); jjtThis.setFeatures(this.getFeatures()); pushUnit(jjtThis); } Parameters() ( LOOKAHEAD(3) Block() | Expression()) { popUnit(jjtThis); popScope(); }
+<FUNCTION> DeclareFunction() { beginLambda(jjtThis); } Parameters() ( LOOKAHEAD(3) Block() | Expression()) { endLambda(jjtThis); }
 }
 
 void ExpressionStatement() #void : {}
@@ -1058,11 +1058,11 @@ void Lambda() #JexlLambda :
 }
 {
   <FUNCTION> (LOOKAHEAD(<IDENTIFIER>) DeclareFunction())? {
-   pushScope(); jjtThis.setFeatures(this.getFeatures()); pushUnit(jjtThis); } Parameters() ( LOOKAHEAD(3) Block() | Expression()) { popUnit(jjtThis); popScope(); }
+   beginLambda(jjtThis); } Parameters() ( LOOKAHEAD(3) Block() | Expression()) { endLambda(jjtThis); }
   |
-  { pushScope(); jjtThis.setFeatures(this.getFeatures()); pushUnit(jjtThis); } Parameters() (arrow=<LAMBDA> | arrow=<FATARROW>) ( LOOKAHEAD(3) Block() | Expression()) { checkLambda(arrow); popUnit(jjtThis); popScope(); }
+  { beginLambda(jjtThis); } Parameters() (arrow=<LAMBDA> | arrow=<FATARROW>) ( LOOKAHEAD(3) Block() | Expression()) { checkLambda(arrow); endLambda(jjtThis); }
   |
-  { pushScope(); jjtThis.setFeatures(this.getFeatures()); pushUnit(jjtThis); } Parameter() (arrow=<LAMBDA> | arrow=<FATARROW>)( LOOKAHEAD(3) Block() | Expression()) { checkLambda(arrow); popUnit(jjtThis); popScope(); }
+  { beginLambda(jjtThis); } Parameter() (arrow=<LAMBDA> | arrow=<FATARROW>)( LOOKAHEAD(3) Block() | Expression()) { checkLambda(arrow); endLambda(jjtThis); }
 }
 
 

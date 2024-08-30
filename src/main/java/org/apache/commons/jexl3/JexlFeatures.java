@@ -59,6 +59,7 @@ import java.util.function.Predicate;
  * <li>Pragma anywhere: whether pragma, that are <em>not</em> statements and handled before execution begins,
  * can appear anywhere in the source or before any statements - ie at the beginning of a script.</li>
  * <li>Const Capture: whether variables captured by lambdas are read-only (aka const, same as Java) or read-write.</li>
+ * <li>Reference Capture: whether variables captured by lambdas are pass-by-reference or pass-by-value.</li>
  * </ul>
  * @since 3.2
  */
@@ -341,7 +342,7 @@ public final class JexlFeatures {
     }
 
     /**
-     * Sets whether lambda captured-variables are const or not.
+     * Sets whether lambda captured-variables are constant or mutable.
      * <p>
      * When disabled, lambda-captured variables are implicitly converted to read-write local variable (let),
      * when enabled, those are implicitly converted to read-only local variables (const).
@@ -355,7 +356,7 @@ public final class JexlFeatures {
     }
 
     /**
-     * Sets whether lambda captured-variables are references or not.
+     * Sets whether lambda captured-variables are references or values.
      * <p>When variables are pass-by-reference, side-effects are visible from inner lexical scopes
      * to outer-scope.</p>
      * <p>

@@ -21,7 +21,9 @@ import java.util.Deque;
 
 /**
  * The set of valued symbols defined in a lexical frame.
- * <p>The symbol identifiers are determined by the functional scope.
+ * <p>The symbol identifiers are determined by the functional scope. Since the frame contains values of
+ * all symbols in the functional scope, the lexical frame preserves values of symbols reused for local
+ * definition.
  */
 public class LexicalFrame extends LexicalScope {
     /**
@@ -34,6 +36,7 @@ public class LexicalFrame extends LexicalScope {
     protected final LexicalFrame previous;
     /**
      * The stack of values in the lexical frame.
+     * <p>[symbol identifier, value] are stacked in pairs</p>
      */
     private Deque<Object> stack;
 
@@ -105,7 +108,7 @@ public class LexicalFrame extends LexicalScope {
      */
     public LexicalFrame pop() {
         // undefine all symbols
-        clearSymbols(s ->   frame.set(s, Scope.UNDEFINED) );
+        clearSymbols(s -> frame.set(s, Scope.UNDEFINED) );
         // restore values of captured symbols that were overwritten
         if (stack != null) {
             while (!stack.isEmpty()) {

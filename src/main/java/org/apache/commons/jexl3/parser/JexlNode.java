@@ -42,11 +42,19 @@ public abstract class JexlNode extends SimpleNode {
     public interface Funcall {}
 
     /**
-     * Marker interface for nodes hosting a JxltExpression
+     * Marker interface for nodes hosting a JxltExpression.
      */
     public interface JxltHandle {
+        /** @return the expression source. */
         String getExpressionSource();
+
+        /**@return the expression instance, should be a TemplateEngine.TemplateExpression. */
         JxltEngine.Expression getExpression();
+
+        /**
+         * Sets the template expression.
+         * @param expr a TemplateEngine.TemplateExpression instance
+         */
         void setExpression(JxltEngine.Expression expr);
     }
 

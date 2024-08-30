@@ -301,11 +301,11 @@ public abstract class JexlParser extends StringParser {
                 }
                 identifier.setSymbol(symbol, name);
                 if (!declared) {
-                    identifier.setShaded(true);
-                    if (/*identifier.isLexical() ||*/ getFeatures().isLexicalShade()) {
+                    if (getFeatures().isLexicalShade()) {
                         // can not reuse a local as a global
                         throw new JexlException.Parsing(info, name + ": variable is not declared").clean();
                     }
+                    identifier.setShaded(true);
                 }
             }
         }
@@ -480,9 +480,9 @@ public abstract class JexlParser extends StringParser {
      * </p>
      *
      * @param variable the identifier used to declare
-     * @param lexical whether the symbol is lexical
+     * @param lexical  whether the symbol is lexical
      * @param constant whether the symbol is constant
-     * @param token      the variable name toekn
+     * @param token    the variable name token
      */
     protected void declareVariable(final ASTVar variable, final Token token, final boolean lexical, final boolean constant) {
         final String name = token.image;
@@ -717,10 +717,26 @@ public abstract class JexlParser extends StringParser {
      * @param node the node
      */
     protected void jjtreeOpenNodeScope(final JexlNode node) {
-//        if (node instanceof ASTBlock || node instanceof ASTForeachStatement) {
-//            final LexicalUnit unit = (LexicalUnit) node;
-//            unit.setScope(scope);
-//        }
+        // nothing
+    }
+
+    /**
+     * Starts the definition of a lambda.
+     * @param jjtThis the script
+     */
+    protected void beginLambda(final ASTJexlScript jjtThis) {
+        jjtThis.setFeatures(this.getFeatures());
+        pushScope();
+        pushUnit(jjtThis);
+    }
+
+    /**
+     * Ends the definition of a lambda.
+     * @param jjtThis the script
+     */
+    protected void endLambda(final ASTJexlScript jjtThis) {
+        popUnit(jjtThis);
+        popScope();
     }
 
     /**

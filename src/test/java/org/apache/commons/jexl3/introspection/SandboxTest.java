@@ -46,7 +46,7 @@ import org.junit.jupiter.api.Test;
  * Tests sandbox features.
  */
 @SuppressWarnings({ "UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes" })
-public class SandboxTest extends JexlTestCase {
+class SandboxTest extends JexlTestCase {
     public abstract static class AbstractCallMeNot {
         public @NoJexl String NONO = "should not be accessible!";
 
@@ -213,7 +213,7 @@ public class SandboxTest extends JexlTestCase {
     }
 
     @Test
-    public void testCantSeeMe() throws Exception {
+    void testCantSeeMe() {
         final JexlContext jc = new MapContext();
         final String expr = "foo.doIt()";
         JexlScript script;
@@ -233,7 +233,7 @@ public class SandboxTest extends JexlTestCase {
     }
 
     @Test
-    public void testCtorAllow() throws Exception {
+    void testCtorAllow() {
         final String expr = "new('" + Foo.class.getName() + "', '42')";
         JexlScript script;
         Object result;
@@ -248,7 +248,7 @@ public class SandboxTest extends JexlTestCase {
     }
 
     @Test
-    public void testCtorBlock() throws Exception {
+    void testCtorBlock() {
         final String expr = "new('" + Foo.class.getName() + "', '42')";
         final JexlScript script = JEXL.createScript(expr);
         Object result;
@@ -265,7 +265,7 @@ public class SandboxTest extends JexlTestCase {
     }
 
     @Test
-    public void testGetAllow() throws Exception {
+    void testGetAllow() {
         final Foo foo = new Foo("42");
         final String expr = "foo.alias";
         JexlScript script;
@@ -286,7 +286,7 @@ public class SandboxTest extends JexlTestCase {
     }
 
     @Test
-    public void testGetBlock() throws Exception {
+    void testGetBlock() {
         final String expr = "foo.alias";
         final JexlScript script = JEXL.createScript(expr, "foo");
         final Foo foo = new Foo("42");
@@ -303,7 +303,7 @@ public class SandboxTest extends JexlTestCase {
     }
 
     @Test
-    public void testGetNullKeyAllowed0() throws Exception {
+    void testGetNullKeyAllowed0() {
         final JexlEngine jexl = new JexlBuilder().sandbox(new JexlSandbox(true)).create();
         final JexlExpression expression = jexl.createExpression("{null : 'foo'}[null]");
         final Object o = expression.evaluate(null);
@@ -311,7 +311,7 @@ public class SandboxTest extends JexlTestCase {
     }
 
     @Test
-    public void testGetNullKeyAllowed1() throws Exception {
+    void testGetNullKeyAllowed1() {
         final JexlSandbox sandbox = new JexlSandbox(true, true);
         final JexlSandbox.Permissions p = sandbox.permissions("java.util.Map", false, true, true);
         p.read().add("quux");
@@ -330,7 +330,7 @@ public class SandboxTest extends JexlTestCase {
     }
 
     @Test
-    public void testGetNullKeyBlocked() throws Exception {
+    void testGetNullKeyBlocked() {
         final JexlSandbox sandbox = new JexlSandbox(true, true);
         final JexlSandbox.Permissions p = sandbox.permissions("java.util.Map", false, true, true);
         p.read().add(null);
@@ -349,7 +349,7 @@ public class SandboxTest extends JexlTestCase {
     }
 
     @Test
-    public void testInheritedPermission0() {
+    void testInheritedPermission0() {
         final Foo386 foo = new Foo386();
         final JexlSandbox sandbox = new JexlSandbox(false, true);
         sandbox.permissions(SomeInterface.class.getName(), true, true, true, true);
@@ -359,7 +359,7 @@ public class SandboxTest extends JexlTestCase {
     }
 
     @Test
-    public void testInheritedPermission1() {
+    void testInheritedPermission1() {
         final Quux386 foo = new Quux386();
         final JexlSandbox sandbox = new JexlSandbox(false, true);
         sandbox.permissions(Foo386.class.getName(), true, true, true, true);
@@ -369,7 +369,7 @@ public class SandboxTest extends JexlTestCase {
     }
 
     @Test
-    public void testMethodAllow() throws Exception {
+    void testMethodAllow() {
         final Foo foo = new Foo("42");
         final String expr = "foo.Quux()";
         JexlScript script;
@@ -385,7 +385,7 @@ public class SandboxTest extends JexlTestCase {
     }
 
     @Test
-    public void testMethodBlock() throws Exception {
+    void testMethodBlock() {
         final String expr = "foo.Quux()";
         final JexlScript script = JEXL.createScript(expr, "foo");
         final Foo foo = new Foo("42");
@@ -402,7 +402,7 @@ public class SandboxTest extends JexlTestCase {
     }
 
     @Test
-    public void testMethodNoJexl() throws Exception {
+    void testMethodNoJexl() {
         final Foo foo = new Foo("42");
         // @formatter:off
         final String[] exprs = {
@@ -421,7 +421,7 @@ public class SandboxTest extends JexlTestCase {
     }
 
     @Test
-    public void testNoJexl312() throws Exception {
+    void testNoJexl312() {
         final JexlContext ctxt = new MapContext();
         final JexlEngine sjexl = new JexlBuilder().safe(false).strict(true).create();
         final JexlScript foo = sjexl.createScript("x.getFoo()", "x");
@@ -429,7 +429,7 @@ public class SandboxTest extends JexlTestCase {
     }
 
     @Test
-    public void testNonInheritedPermission0() {
+    void testNonInheritedPermission0() {
         final Foo386 foo = new Foo386();
         final JexlSandbox sandbox = new JexlSandbox(false, true);
         sandbox.permissions(SomeInterface.class.getName(), false, true, true, true);
@@ -439,7 +439,7 @@ public class SandboxTest extends JexlTestCase {
     }
 
     @Test
-    public void testNonInheritedPermission1() {
+    void testNonInheritedPermission1() {
         final Quux386 foo = new Quux386();
         final JexlSandbox sandbox = new JexlSandbox(false, true);
         sandbox.permissions(Foo386.class.getName(), false, true, true, true);
@@ -449,11 +449,11 @@ public class SandboxTest extends JexlTestCase {
     }
 
     @Test
-    public void testRestrict() throws Exception {
+    void testRestrict() {
         final JexlContext context = new MapContext();
         context.set("System", System.class);
         final JexlSandbox sandbox = new JexlSandbox();
-        // only allow call to currentTimeMillis (avoid exit, gc, loadLibrary, etc)
+        // only allow call to currentTimeMillis (avoid exit, gc, loadLibrary, etc.)
         sandbox.allow(System.class.getName()).execute("currentTimeMillis");
         // can not create a new file
         sandbox.block(java.io.File.class.getName()).execute("");
@@ -471,7 +471,7 @@ public class SandboxTest extends JexlTestCase {
     }
 
     @Test
-    public void testSandboxInherit0() throws Exception {
+    void testSandboxInherit0() {
         Object result;
         final JexlContext ctxt = null;
         final List<String> foo = new ArrayList<>();
@@ -485,20 +485,16 @@ public class SandboxTest extends JexlTestCase {
 
         result = method.execute(ctxt, foo, "nothing");
         assertTrue((boolean) result);
-        result = null;
         result = get.execute(null, foo, Integer.valueOf(0));
         assertEquals("nothing", result);
-        result = null;
         result = set.execute(null, foo, Integer.valueOf(0), "42");
         assertEquals("42", result);
-
-        result = null;
         result = get.execute(null, foo, Integer.valueOf(0));
         assertEquals("42", result);
     }
 
     @Test
-    public void testSandboxInherit1() throws Exception {
+    void testSandboxInherit1() {
         Object result;
         final JexlContext ctxt = null;
         final Operation2 foo = new Operation2(12);
@@ -515,7 +511,7 @@ public class SandboxTest extends JexlTestCase {
     }
 
     @Test
-    public void testSetAllow() throws Exception {
+    void testSetAllow() {
         final Foo foo = new Foo("42");
         final String expr = "foo.alias = $0";
         JexlScript script;
@@ -532,7 +528,7 @@ public class SandboxTest extends JexlTestCase {
     }
 
     @Test
-    public void testSetBlock() throws Exception {
+    void testSetBlock() {
         final String expr = "foo.alias = $0";
         final JexlScript script1 = JEXL.createScript(expr, "foo", "$0");
         final Foo foo = new Foo("42");
@@ -550,7 +546,7 @@ public class SandboxTest extends JexlTestCase {
     }
 
     @Test
-    public void testSetNullKeyAllowed0() throws Exception {
+    void testSetNullKeyAllowed0() {
         final Arithmetic350 a350 = new Arithmetic350(true);
         final JexlEngine jexl = new JexlBuilder().arithmetic(a350).sandbox(new JexlSandbox(true)).create();
         final JexlContext jc = new MapContext();
@@ -561,7 +557,7 @@ public class SandboxTest extends JexlTestCase {
     }
 
     @Test
-    public void testSetNullKeyAllowed1() throws Exception {
+    void testSetNullKeyAllowed1() {
         final Arithmetic350 a350 = new Arithmetic350(true);
         final JexlSandbox sandbox = new JexlSandbox(true, true);
         final JexlSandbox.Permissions p = sandbox.permissions("java.util.Map", true, false, true);
@@ -584,7 +580,7 @@ public class SandboxTest extends JexlTestCase {
     }
 
     @Test
-    public void testSetNullKeyBlocked() throws Exception {
+    void testSetNullKeyBlocked() {
         final Arithmetic350 a350 = new Arithmetic350(true);
         final JexlSandbox sandbox = new JexlSandbox(true, true);
         final JexlSandbox.Permissions p = sandbox.permissions("java.util.Map", true, false, true);
@@ -608,14 +604,14 @@ public class SandboxTest extends JexlTestCase {
     static class B extends A{}
 
     @Test
-    public void testPermission0() {
+    void testPermission0() {
         JexlSandbox sandbox = new JexlSandbox(false, true);
         sandbox.permissions(I.class.getName(), true, true, true, false);
         System.out.println("permission A=" + sandbox.get(A.class.getName()).write());
         System.out.println("permission B=" + sandbox.get(B.class.getName()).write());
     }
     @Test
-    public void testPermission1() {
+    void testPermission1() {
         JexlSandbox sandbox = new JexlSandbox(false, true);
         sandbox.permissions(I.class.getName(), true, true, true, false);
         System.out.println("permission B=" + sandbox.get(B.class.getName()).write());
@@ -623,7 +619,7 @@ public class SandboxTest extends JexlTestCase {
     }
 
     @Test
-    public void testIssue424() {
+    void testIssue424() {
         JexlSandbox sandbox = new JexlSandbox(false, true);
         sandbox.permissions(Map.class.getName(), true, true, true, true);
         String jexlCode = "x.foo = 'bar'";

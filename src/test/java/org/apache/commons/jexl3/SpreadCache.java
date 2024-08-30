@@ -28,8 +28,8 @@ import org.apache.commons.jexl3.internal.SoftCache;
  * Creates a cache using an array of synchronized LinkedHashMap as backing store to spread contention.
  * <p>Just meant as a contention reducing mechanism for cache tests.</p>
  *
- * @param <K> the cached element&quote;s key
- * @param <V> the cached element&quote;s value
+ * @param <K> the cached element&quot;s key
+ * @param <V> the cached element&quot;s value
  * @return the cache instance
  */
 public class SpreadCache<K, V> extends SoftCache<K, V> {

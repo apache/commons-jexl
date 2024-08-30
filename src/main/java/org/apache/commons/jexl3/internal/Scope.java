@@ -70,7 +70,6 @@ public final class Scope {
      * The map of local captured variables to parent scope variables, ie closure.
      */
     private Map<Integer, Integer> capturedVariables;
-
     /**
      * Let symbols.
      */
@@ -125,7 +124,7 @@ public final class Scope {
             for (final Map.Entry<Integer, Integer> capture : capturedVariables.entrySet()) {
                 final Integer target = capture.getKey();
                 final Integer source = capture.getValue();
-                final Object arg = frame.capture(source); //frame.get(source);
+                final Object arg = frame.capture(source);
                 arguments[target] = arg;
             }
             newFrame = frame.newFrame(this, arguments, 0);

@@ -65,7 +65,7 @@ public class Frame {
     }
 
     /**
-     * Creates a new from of this frame&quote;s class.
+     * Creates a new from of this frame&quot;s class.
      * @param s the scope
      * @param r the arguments
      * @param c the number of curried parameters
@@ -149,6 +149,9 @@ public class Frame {
     }
 }
 
+/**
+ * Pass-by-reference frame.
+ */
 class ReferenceFrame extends Frame {
     ReferenceFrame(Scope s, Object[] r, int c) {
         super(s, r, c);
@@ -160,42 +163,40 @@ class ReferenceFrame extends Frame {
     }
 
     @Override
-    CaptureReference capture(int s) {
-        synchronized(stack) {
-            Object o = stack[s];
-            if (o instanceof CaptureReference) {
-                return (CaptureReference) o;
-            } else {
-                CaptureReference captured = new CaptureReference(o);
-                stack[s] = captured;
-                return captured;
-            }
+    CaptureReference capture(final int s) {
+        final Object o = stack[s];
+        if (o instanceof CaptureReference) {
+            return (CaptureReference) o;
+        } else {
+            // change the type of the captured register, wrap the value in a reference
+            CaptureReference captured = new CaptureReference(o);
+            stack[s] = captured;
+            return captured;
         }
     }
 
     @Override
     Object get(final int s) {
-        synchronized(stack) {
-            Object o = stack[s];
-            return o instanceof CaptureReference ? ((CaptureReference) o).get() : o;
-        }
+        final Object o = stack[s];
+        return o instanceof CaptureReference ? ((CaptureReference) o).get() : o;
     }
 
     @Override
     void set(final int r, final Object value) {
-        synchronized (stack) {
-            Object o = stack[r];
-            if (o instanceof CaptureReference) {
-                if (value != Scope.UNDEFINED && value != Scope.UNDECLARED) {
-                    ((CaptureReference) o).set(value);
-                }
-            } else {
-                stack[r] = value;
+        final Object o = stack[r];
+        if (o instanceof CaptureReference) {
+            if (value != Scope.UNDEFINED && value != Scope.UNDECLARED) {
+                ((CaptureReference) o).set(value);
             }
+        } else {
+            stack[r] = value;
         }
     }
 }
 
+/**
+ * Captured variable reference.
+ */
 class CaptureReference extends AtomicReference<Object> {
     CaptureReference(Object o) {
         super(o);

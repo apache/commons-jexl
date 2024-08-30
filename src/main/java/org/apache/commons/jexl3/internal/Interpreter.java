@@ -489,10 +489,11 @@ public class Interpreter extends InterpreterBase {
         if (expr instanceof TemplateEngine.TemplateExpression ) {
            Object eval = ((TemplateEngine.TemplateExpression ) expr).evaluate(context, frame, options);
             if (eval != null) {
+                String inter = eval.toString();
                 if (options.isStrictInterpolation()) {
-                    return eval.toString();
+                    return inter;
                 }
-                final Integer id = ASTIdentifierAccess.parseIdentifier(eval.toString());
+                final Integer id = ASTIdentifierAccess.parseIdentifier(inter);
                 return id != null ? id : eval;
             }
         }
@@ -1076,8 +1077,14 @@ public class Interpreter extends InterpreterBase {
         }
     }
 
-    @Override
-    protected Object visit(final ASTAndNode node, final Object data) {
+    /**
+     * Short-circuit evaluation of logical expression.
+     * @param check the fuse value that will stop evaluation, true for OR, false for AND
+     * @param node a ASTAndNode or a ASTOrNode
+     * @param data
+     * @return true or false if boolean logical option is true, the last evaluated argument otherwise
+     */
+    private Object shortCircuit(final boolean check, final JexlNode node, final Object data) {
         /*
          * The pattern for exception mgmt is to let the child*.jjtAccept out of the try/catch loop so that if one fails,
          * the ex will traverse up to the interpreter. In cases where this is not convenient/possible, JexlException
@@ -1085,19 +1092,32 @@ public class Interpreter extends InterpreterBase {
          */
         final int last = node.jjtGetNumChildren();
         Object argument = null;
+        boolean result = false;
         for (int c = 0; c < last; ++c) {
             argument = node.jjtGetChild(c).jjtAccept(this, data);
             try {
                 // short-circuit
-                if (!arithmetic.toBoolean(argument)) {
+                result = arithmetic.toBoolean(argument);
+                if (result == check) {
                     break;
                 }
             } catch (final ArithmeticException xrt) {
                 throw new JexlException(node.jjtGetChild(0), "boolean coercion error", xrt);
             }
         }
-        return argument;
+        return options.isBooleanLogical()? result : argument;
     }
+
+    @Override
+    protected Object visit(final ASTAndNode node, final Object data) {
+        return shortCircuit(false, node, data);
+    }
+
+    @Override
+    protected Object visit(final ASTOrNode node, final Object data) {
+        return shortCircuit(true, node, data);
+    }
+
 
     @Override
     protected Object visit(final ASTAnnotatedStatement node, final Object data) {
@@ -1787,24 +1807,6 @@ public class Interpreter extends InterpreterBase {
     }
 
     @Override
-    protected Object visit(final ASTOrNode node, final Object data) {
-        final int last = node.jjtGetNumChildren();
-        Object argument = null;
-        for (int c = 0; c < last; ++c) {
-            argument = node.jjtGetChild(c).jjtAccept(this, data);
-            try {
-                // short-circuit
-                if (arithmetic.toBoolean(argument)) {
-                    break;
-                }
-            } catch (final ArithmeticException xrt) {
-                throw new JexlException(node.jjtGetChild(0), "boolean coercion error", xrt);
-            }
-        }
-        return argument;
-    }
-
-    @Override
     protected Object visit(final ASTQualifiedIdentifier node, final Object data) {
         return resolveClassName(node.getName());
     }
@@ -2113,13 +2115,13 @@ public class Interpreter extends InterpreterBase {
         }
         // ternary as in "x ? y : z"
         if (node.jjtGetNumChildren() == 3) {
-            if (condition != null && arithmetic.toBoolean(condition)) {
+            if (condition != null && arithmetic.testPredicate(condition)) {
                 return node.jjtGetChild(1).jjtAccept(this, data);
             }
             return node.jjtGetChild(2).jjtAccept(this, data);
         }
         // elvis as in "x ?: z"
-        if (condition != null && arithmetic.toBoolean(condition)) {
+        if (condition != null && arithmetic.testPredicate(condition)) {
             return condition;
         }
         return node.jjtGetChild(1).jjtAccept(this, data);

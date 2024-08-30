@@ -29,7 +29,6 @@ public class ASTIdentifier extends JexlNode {
     private static final int SHADED = 1;
     /** The captured variable flag. */
     private static final int CAPTURED = 2;
-
     /** The lexical variable flag. */
     private static final int LEXICAL = 3;
     /** The const variable flag. */

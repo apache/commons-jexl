@@ -187,15 +187,15 @@ public class JexlBuilder {
     }
 
     /**
-         * Sets whether the engine will resolve antish variable names.
-         *
-         * @param flag true means antish resolution is enabled, false disables it
-         * @return this builder
-         */
-        public JexlBuilder antish(final boolean flag) {
-            options.setAntish(flag);
-            return this;
-        }
+     * Sets whether the engine will resolve antish variable names.
+     *
+     * @param flag true means antish resolution is enabled, false disables it
+     * @return this builder
+     */
+    public JexlBuilder antish(final boolean flag) {
+        options.setAntish(flag);
+        return this;
+    }
 
     /** @return the arithmetic */
     public JexlArithmetic arithmetic() {
@@ -214,6 +214,16 @@ public class JexlBuilder {
         options.setMathContext(a.getMathContext());
         options.setMathScale(a.getMathScale());
         return this;
+    }
+
+    /**
+     * Sets whether logical expressions (&quot;&quot; , ||) coerce their result to boolean.
+     * @param flag true or false
+     * @return this builder
+     */
+    public JexlBuilder booleanLogical(final boolean flag) {
+      options.setBooleanLogical(flag);
+      return this;
     }
 
     /**
@@ -431,7 +441,12 @@ public class JexlBuilder {
         return imports(Arrays.asList(imports));
     }
 
-    /** @return whether lexical scope is enabled */
+    /**
+     * @see JexlOptions#isLexical()
+     * @return whether lexical scope is enabled
+     * @deprecated 3.4.1
+     */
+    @Deprecated
     public boolean lexical() {
         return options.isLexical();
     }
@@ -448,7 +463,12 @@ public class JexlBuilder {
         return this;
     }
 
-    /** @return whether lexical shading is enabled */
+    /**
+     * @see JexlOptions#isLexicalShade()
+     * @return whether lexical shading is enabled
+     * @deprecated 3.4.1
+     */
+    @Deprecated
     public boolean lexicalShade() {
         return options.isLexicalShade();
     }
@@ -546,9 +566,11 @@ public class JexlBuilder {
         return this;
     }
 
-    /** @return the current set of options */
+    /**
+     * @return the current set of options
+     */
     public JexlOptions options() {
-        return options;
+      return options;
     }
 
     /** @return the permissions */
@@ -675,13 +697,14 @@ public class JexlBuilder {
         return this;
     }
 
+    /**
+     * @see JexlOptions#setStrictInterpolation(boolean)
+     * @param flag strict interpolation flag
+     * @return this builder
+     */
     public JexlBuilder strictInterpolation(final boolean flag) {
         options.setStrictInterpolation(flag);
         return this;
-    }
-
-    public boolean strictInterpolation() {
-        return options.isStrictInterpolation();
     }
 
     /** @return the uberspect */
