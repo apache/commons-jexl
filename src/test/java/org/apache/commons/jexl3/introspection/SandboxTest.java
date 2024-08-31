@@ -604,18 +604,16 @@ class SandboxTest extends JexlTestCase {
     static class B extends A{}
 
     @Test
-    void testPermission0() {
-        JexlSandbox sandbox = new JexlSandbox(false, true);
-        sandbox.permissions(I.class.getName(), true, true, true, false);
-        System.out.println("permission A=" + sandbox.get(A.class.getName()).write());
-        System.out.println("permission B=" + sandbox.get(B.class.getName()).write());
-    }
-    @Test
-    void testPermission1() {
-        JexlSandbox sandbox = new JexlSandbox(false, true);
-        sandbox.permissions(I.class.getName(), true, true, true, false);
-        System.out.println("permission B=" + sandbox.get(B.class.getName()).write());
-        System.out.println("permission A=" + sandbox.get(A.class.getName()).write());
+    void testPermissionOrder() {
+        // permissions should not be dependent on order of evaluation
+        JexlSandbox sandboxAB = new JexlSandbox(false, true);
+        sandboxAB.permissions(I.class.getName(), true, true, true, false);
+        assertEquals("allow{all}", sandboxAB.get(A.class.getName()).write().toString());
+        assertEquals("allow{all}", sandboxAB.get(B.class.getName()).write().toString());
+        JexlSandbox sandboxBA = new JexlSandbox(false, true);
+        sandboxBA.permissions(I.class.getName(), true, true, true, false);
+        assertEquals("allow{all}", sandboxBA.get(B.class.getName()).write().toString());
+        assertEquals("allow{all}", sandboxBA.get(A.class.getName()).write().toString());
     }
 
     @Test

@@ -250,6 +250,16 @@ public final class JexlSandbox {
     }
 
     /**
+     * Gets the set of permissions associated to a class.
+     *
+     * @param clazz the class name
+     * @return the defined permissions or an all-allow permission instance if none were defined
+     */
+    public Permissions get(final String clazz) {
+        return get(forName(clazz));
+    }
+
+    /**
      * Gets the permissions associated to a class.
      *
      * @param clazz the class
@@ -259,80 +269,55 @@ public final class JexlSandbox {
     public Permissions get(final Class<?> clazz) {
         // argument clazz can not be null since permissions would be not null and block:
         // we only store the result for classes we actively seek permissions for.
-        return clazz == null ? BLOCK_ALL : compute(clazz);
+        return compute(clazz, true);
     }
 
-    private static Permissions inheritable(Permissions p) {
+    private static Permissions inheritable(final Permissions p) {
         return p != null && p.isInheritable() ? p : null;
-    }
-
-    /**
-     * Find first inherited interface that defines permissions through recursion.
-     * @param clazz the clazz
-     * @return the array of all its interfaces
-     */
-    private Permissions computeInterfaces(final Class<?> clazz) {
-        Permissions permissions = inheritable(sandbox.get(clazz.getName()));
-        if (permissions == null) {
-            final Class<?>[] interfaces = clazz.getInterfaces();
-            for (int i = 0; permissions == null && i < interfaces.length; ++i) {
-                permissions = computeInterfaces(interfaces[i]);
-            }
-        }
-        return permissions;
     }
 
     /**
      * Computes and optionally stores the permissions associated to a class.
      *
      * @param clazz the class
+     * @param store whether the computed permissions should be stored in the sandbox
      * @return the permissions
      */
-    private Permissions compute(final Class<?> clazz) {
-        Permissions permissions = sandbox.get(clazz.getName());
+    private Permissions compute(final Class<?> clazz, final boolean store) {
+        // belt and suspender; recursion should not lead here
+        if (clazz == null) {
+            return BLOCK_ALL;
+        }
+        final String className = clazz.getName();
+        Permissions permissions = sandbox.get(className);
         if (permissions == null) {
             if (inherit) {
                 // find first inherited interface that defines permissions
                 final Class<?>[] interfaces = clazz.getInterfaces();
                 for (int i = 0; permissions == null && i < interfaces.length; ++i) {
-                    permissions = computeInterfaces(interfaces[i]);
+                    permissions = inheritable(compute(interfaces[i], false));
                 }
                 // nothing defined yet, find first superclass that defines permissions
                 if (permissions == null) {
-                    // let's walk all super classes
-                    for (Class<?> zuper = clazz.getSuperclass();
-                         permissions == null && zuper != null;
-                         zuper = zuper.getSuperclass()) {
-                        permissions = inheritable(sandbox.get(zuper.getName()));
+                    // let's recurse on super classes
+                    Class<?> superClazz = clazz.getSuperclass();
+                    if (Object.class != superClazz) {
+                        permissions = inheritable(compute(superClazz, false));
                     }
                 }
             }
-            // nothing was determined through inheritance
+            // nothing was inheritable
             if (permissions == null) {
                 permissions = allow ? ALLOW_ALL : BLOCK_ALL;
             }
             // store the info to avoid doing this costly look-up
-            sandbox.put(clazz.getName(), permissions);
+            if (store) {
+                sandbox.put(className, permissions);
+            }
         }
         return permissions;
     }
 
-    /**
-     * Gets the set of permissions associated to a class.
-     *
-     * @param clazz the class name
-     * @return the defined permissions or an all-allow permission instance if none were defined
-     */
-    public Permissions get(final String clazz) {
-        if (inherit) {
-            return get(forName(clazz));
-        }
-        final Permissions permissions = sandbox.get(clazz);
-        if (permissions == null) {
-            return allow ? ALLOW_ALL : BLOCK_ALL;
-        }
-        return permissions;
-    }
 
     /**
      * Creates the set of permissions for a given class.
