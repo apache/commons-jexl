@@ -30,9 +30,12 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.jexl3.internal.Debugger;
@@ -44,6 +47,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
@@ -138,14 +142,14 @@ public class JXLTTest extends JexlTestCase {
         }
     };
 
-       public static List<JexlBuilder> engines() {
-           final JexlFeatures f = new JexlFeatures();
-           f.lexical(true).lexicalShade(true);
-          return Arrays.<JexlBuilder>asList(
-                  new JexlBuilder().silent(false).lexical(true).lexicalShade(true).cache(128).strict(true),
-                  new JexlBuilder().features(f).silent(false).cache(128).strict(true),
-                  new JexlBuilder().silent(false).cache(128).strict(true));
-       }
+   public static List<JexlBuilder> engines() {
+       final JexlFeatures f = new JexlFeatures();
+       f.lexical(true).lexicalShade(true);
+      return Arrays.asList(
+              new JexlBuilder().silent(false).lexical(true).lexicalShade(true).cache(128).strict(true),
+              new JexlBuilder().features(f).silent(false).cache(128).strict(true),
+              new JexlBuilder().silent(false).cache(128).strict(true));
+   }
 
    private static String refactor(final TemplateDebugger td, final JxltEngine.Template ts) {
     final boolean dbg = td.debug(ts);
@@ -210,7 +214,7 @@ public class JXLTTest extends JexlTestCase {
 
     @BeforeEach
     @Override
-    public void setUp() throws Exception {
+    public void setUp() {
         // ensure jul logging is only error
         java.util.logging.Logger.getLogger(org.apache.commons.jexl3.JexlEngine.class.getName()).setLevel(java.util.logging.Level.SEVERE);
         context = new JexlEvalContext(vars);
@@ -225,7 +229,7 @@ public class JXLTTest extends JexlTestCase {
 
     @ParameterizedTest
     @MethodSource("engines")
-    public void test311a(final JexlBuilder builder) throws Exception {
+    void test311a(final JexlBuilder builder) {
         init(builder);
         final JexlContext ctx = null;
         // @formatter:off
@@ -243,7 +247,7 @@ public class JXLTTest extends JexlTestCase {
 
     @ParameterizedTest
     @MethodSource("engines")
-    public void test311b(final JexlBuilder builder) throws Exception {
+    void test311b(final JexlBuilder builder) {
         init(builder);
         final JexlContext ctx311 = new Context311();
         // @formatter:off
@@ -261,7 +265,7 @@ public class JXLTTest extends JexlTestCase {
 
     @ParameterizedTest
     @MethodSource("engines")
-    public void test311c(final JexlBuilder builder) throws Exception {
+    void test311c(final JexlBuilder builder) {
         init(builder);
         final Context311 ctx311 = new Context311();
         ctx311.newOptions().setLexical(true);
@@ -280,7 +284,7 @@ public class JXLTTest extends JexlTestCase {
 
     @ParameterizedTest
     @MethodSource("engines")
-    public void test311d(final JexlBuilder builder) throws Exception {
+    void test311d(final JexlBuilder builder) {
         init(builder);
         final Context311 ctx311 = new Context311();
         ctx311.newOptions().setLexical(true);
@@ -299,7 +303,7 @@ public class JXLTTest extends JexlTestCase {
 
     @ParameterizedTest
     @MethodSource("engines")
-    public void test311e(final JexlBuilder builder) throws Exception {
+    void test311e(final JexlBuilder builder) {
         init(builder);
         final Context311 ctx311 = new Context311();
         ctx311.newOptions().setLexical(true);
@@ -316,7 +320,7 @@ public class JXLTTest extends JexlTestCase {
 
     @ParameterizedTest
     @MethodSource("engines")
-    public void test311f(final JexlBuilder builder) throws Exception {
+    void test311f(final JexlBuilder builder) {
         init(builder);
         final Context311 ctx311 = new Context311();
         ctx311.newOptions().setLexical(true);
@@ -333,7 +337,7 @@ public class JXLTTest extends JexlTestCase {
 
     @ParameterizedTest
     @MethodSource("engines")
-    public void test311g(final JexlBuilder builder) throws Exception {
+    void test311g(final JexlBuilder builder) {
         init(builder);
         final Context311 ctx311 = new Context311();
         ctx311.newOptions().setLexical(true);
@@ -350,7 +354,7 @@ public class JXLTTest extends JexlTestCase {
 
     @ParameterizedTest
     @MethodSource("engines")
-    public void test311h(final JexlBuilder builder) throws Exception {
+    void test311h(final JexlBuilder builder) {
         init(builder);
         final Context311 ctx311 = new Context311();
         ctx311.newOptions().setLexical(true);
@@ -362,7 +366,7 @@ public class JXLTTest extends JexlTestCase {
 
     @ParameterizedTest
     @MethodSource("engines")
-    public void test311i(final JexlBuilder builder) throws Exception {
+    void test311i(final JexlBuilder builder) {
         init(builder);
         final JexlContext ctx311 = new Context311();
         // @formatter:off
@@ -380,7 +384,7 @@ public class JXLTTest extends JexlTestCase {
 
     @ParameterizedTest
     @MethodSource("engines")
-    public void test315(final JexlBuilder builder) throws Exception {
+    void test315(final JexlBuilder builder) {
         init(builder);
         String s315;
         StringWriter strw;
@@ -411,7 +415,7 @@ public class JXLTTest extends JexlTestCase {
 
     @ParameterizedTest
     @MethodSource("engines")
-    public void test42(final JexlBuilder builder) throws Exception {
+    void test42(final JexlBuilder builder) {
         init(builder);
         // @formatter:off
         final String test42
@@ -449,9 +453,141 @@ public class JXLTTest extends JexlTestCase {
         assertEquals(test42, refactored);
     }
 
+
+    @Test
+    void testParseIdentifier() {
+        assertNull(JexlArithmetic.parseIdentifier(null));
+        assertNull(JexlArithmetic.parseIdentifier(""));
+        assertNull(JexlArithmetic.parseIdentifier("za"));
+        assertNull(JexlArithmetic.parseIdentifier("a"));
+        assertNull(JexlArithmetic.parseIdentifier("00"));
+        assertNull(JexlArithmetic.parseIdentifier("01"));
+        assertNull(JexlArithmetic.parseIdentifier("001"));
+        assertNull(JexlArithmetic.parseIdentifier("12345678901"));
+
+        assertEquals(0, JexlArithmetic.parseIdentifier("0"));
+        assertEquals(10, JexlArithmetic.parseIdentifier("10"));
+        assertEquals(100, JexlArithmetic.parseIdentifier("100"));
+        assertEquals(42, JexlArithmetic.parseIdentifier("42"));
+        assertEquals(42000, JexlArithmetic.parseIdentifier("42000"));
+
+        assertEquals(42, JexlArithmetic.parseIdentifier(42));
+    }
+
+    /**
+     * A remediation to strict interpolation that consistently attempts to coerce to integer
+     * index for lists and keys for maps. (see JEXL-425)
+     */
+    public static class Arithmetic425 extends JexlArithmetic {
+        public Arithmetic425(boolean astrict) {
+            super(astrict);
+        }
+
+        public Object propertyGet(List list, String property) {
+            Integer id = JexlArithmetic.parseIdentifier(property);
+            return id == null? JexlEngine.TRY_FAILED : list.get(id);
+        }
+
+        public Object propertySet(List list, String property, Object value) {
+            Integer id = JexlArithmetic.parseIdentifier(property);
+            if (id != null) {
+                return list.set(id, value);
+            }
+            return JexlEngine.TRY_FAILED;
+        }
+
+        public Object propertyGet(Map list, String property) {
+            // determine if keys are integers by performing a check on first one
+            if (list.keySet().stream().findFirst().orElse(null) instanceof Number) {
+                Integer id = JexlArithmetic.parseIdentifier(property);
+                if (id != null) {
+                    return list.get(id);
+                }
+            }
+            return JexlEngine.TRY_FAILED;
+        }
+
+        public Object propertySet(Map list, String property, Object value) {
+            // determine if keys are integers by performing a check on first one
+            if (list.keySet().stream().findFirst().orElse(null) instanceof Number) {
+                Integer id = JexlArithmetic.parseIdentifier(property);
+                if (id != null) {
+                    list.put(id, value);
+                    return value;
+                }
+            }
+            return JexlEngine.TRY_FAILED;
+        }
+    }
+
+    @Test void test425a() {
+        final String S42 = "fourty-two";
+        final JexlBuilder builder = new JexlBuilder().strictInterpolation(true);
+        final JexlEngine jexl = builder.create();
+        JexlScript script;
+        Object result;
+        script = jexl.createScript("let x = 42; let y = `${x}`; y");
+        result = script.execute(null);
+        assertTrue(result instanceof String);
+        assertEquals("42", result);
+        Map<Object,Object> map = Collections.singletonMap("42", S42);
+
+        script = jexl.createScript("let x = 42; map.`${x}`", "map");
+        result = script.execute(null, map);
+        assertEquals(S42, result);
+        List<String> list = Collections.singletonList(S42);
+
+        JexlScript finalScript = script;
+        assertThrows(JexlException.Property.class, () -> finalScript.execute(null, list));
+        script = jexl.createScript("let x = 0; list[x]", "list");
+        assertEquals(S42, result);
+    }
+
+    @Test void test425b() {
+        final String S42 = "fourty-two";
+        final JexlEngine jexl = new JexlBuilder().strictInterpolation(false).create();
+        run425bc(jexl, false);
+        run425bc(jexl, false);
+    }
+
+    @Test void test425c() {
+        JexlEngine jexl = new JexlBuilder()
+                .cache(8)
+                .arithmetic(new Arithmetic425(true))
+                .strictInterpolation(true).create();
+        run425bc(jexl, true);
+        run425bc(jexl, true);
+    }
+
+    void run425bc(JexlEngine jexl, boolean strictInterpolation) {
+        final String S42 = "fourty-two";
+        JexlScript script;
+        Object result;
+        script = jexl.createScript("let x = 42; let y = `${x}`; y");
+        result = script.execute(null);
+        assertEquals(!strictInterpolation? 42 : "42", result);
+        Map<Object,Object> map = Collections.singletonMap(0, S42);
+        script = jexl.createScript("let x = 0; map.`${x}`", "map");
+        result = script.execute(null, map);
+        assertEquals(S42, result);
+        List<String> list = Collections.singletonList(S42);
+        result = script.execute(null, list);
+        assertEquals(S42, result);
+
+        map = new HashMap<>(map);
+        map.put(0, "nothing");
+        script = jexl.createScript("let x = 0; map.`${x}` = S42", "map", "S42");
+        result = script.execute(null, map, S42);
+        assertEquals(S42, result);
+        list = new ArrayList<>(list);
+        list.set(0, "nothing");
+        result = script.execute(null, map, S42);
+        assertEquals(S42, result);
+    }
+
     @ParameterizedTest
     @MethodSource("engines")
-    public void testAssign(final JexlBuilder builder) throws Exception {
+    void testAssign(final JexlBuilder builder) {
         init(builder);
         final Froboz froboz = new Froboz(32);
         context.set("froboz", froboz);
@@ -465,7 +601,7 @@ public class JXLTTest extends JexlTestCase {
 
     @ParameterizedTest
     @MethodSource("engines")
-    public void testBadContextNested(final JexlBuilder builder) throws Exception {
+    void testBadContextNested(final JexlBuilder builder) {
         init(builder);
         final JxltEngine.Expression expr = JXLT.createExpression("#{${hi}+'.world'}");
         final JexlContext none = null;
@@ -475,7 +611,7 @@ public class JXLTTest extends JexlTestCase {
 
     @ParameterizedTest
     @MethodSource("engines")
-    public void testCharAtBug(final JexlBuilder builder) throws Exception {
+    void testCharAtBug(final JexlBuilder builder) {
         init(builder);
         context.set("foo", "abcdef");
         final JexlOptions options = context.getEngineOptions();
@@ -492,12 +628,11 @@ public class JXLTTest extends JexlTestCase {
         } finally {
             options.setSilent(false);
         }
-
     }
 
     @ParameterizedTest
     @MethodSource("engines")
-    public void testCommentedTemplate0(final JexlBuilder builder) throws Exception {
+    void testCommentedTemplate0(final JexlBuilder builder) {
         init(builder);
         final JexlContext ctxt = new MapContext();
         final JexlEngine jexl = new JexlBuilder().create();
@@ -516,7 +651,7 @@ public class JXLTTest extends JexlTestCase {
 
     @ParameterizedTest
     @MethodSource("engines")
-    public void testCommentedTemplate1(final JexlBuilder builder) throws Exception {
+    void testCommentedTemplate1(final JexlBuilder builder) {
         init(builder);
         final JexlContext ctxt = new MapContext();
         final JexlEngine jexl = new JexlBuilder().create();
@@ -540,7 +675,7 @@ public class JXLTTest extends JexlTestCase {
 
     @ParameterizedTest
     @MethodSource("engines")
-    public void testComposite(final JexlBuilder builder) throws Exception {
+    void testComposite(final JexlBuilder builder) {
         init(builder);
         final String source = "Dear ${p} ${name};";
         final JxltEngine.Expression expr = JXLT.createExpression(source);
@@ -558,7 +693,7 @@ public class JXLTTest extends JexlTestCase {
 
     @ParameterizedTest
     @MethodSource("engines")
-    public void testConstant0(final JexlBuilder builder) throws Exception {
+    void testConstant0(final JexlBuilder builder) {
         init(builder);
         final JexlContext none = null;
         final String source = "Hello World!";
@@ -573,7 +708,7 @@ public class JXLTTest extends JexlTestCase {
 
     @ParameterizedTest
     @MethodSource("engines")
-    public void testConstant2(final JexlBuilder builder) throws Exception {
+    void testConstant2(final JexlBuilder builder) {
         init(builder);
         final JexlContext none = null;
         final String source = "${size({'map':123,'map2':456})}";
@@ -588,7 +723,7 @@ public class JXLTTest extends JexlTestCase {
 
     @ParameterizedTest
     @MethodSource("engines")
-    public void testConstant3(final JexlBuilder builder) throws Exception {
+    void testConstant3(final JexlBuilder builder) {
         init(builder);
         final JexlContext none = null;
         final String source = "#{size({'map':123,'map2':456})}";
@@ -603,7 +738,7 @@ public class JXLTTest extends JexlTestCase {
 
     @ParameterizedTest
     @MethodSource("engines")
-    public void testConstant4(final JexlBuilder builder) throws Exception {
+    void testConstant4(final JexlBuilder builder) {
         init(builder);
         final JexlContext none = null;
         final String source = "#{ ${size({'1':2,'2': 3})} }";
@@ -618,7 +753,7 @@ public class JXLTTest extends JexlTestCase {
 
     @ParameterizedTest
     @MethodSource("engines")
-    public void testConstantTemplate(final JexlBuilder builder) {
+    void testConstantTemplate(final JexlBuilder builder) {
         init(builder);
         // @formatter:off
         final String src = "<script>\n" +
@@ -642,7 +777,7 @@ public class JXLTTest extends JexlTestCase {
 
     @ParameterizedTest
     @MethodSource("engines")
-    public void testDbgEscapes(final JexlBuilder builder) throws Exception {
+    void testDbgEscapes(final JexlBuilder builder) {
         init(builder);
         // @formatter:off
         final String[] srcs = {
@@ -664,7 +799,7 @@ public class JXLTTest extends JexlTestCase {
 
     @ParameterizedTest
     @MethodSource("engines")
-    public void testDeferred(final JexlBuilder builder) throws Exception {
+    void testDeferred(final JexlBuilder builder) {
         init(builder);
         final JexlContext none = null;
         final String source = "#{'world'}";
@@ -680,7 +815,7 @@ public class JXLTTest extends JexlTestCase {
 
     @ParameterizedTest
     @MethodSource("engines")
-    public void testEscape(final JexlBuilder builder) throws Exception {
+    void testEscape(final JexlBuilder builder) {
         init(builder);
         final JexlContext none = null;
         JxltEngine.Expression expr;
@@ -696,7 +831,7 @@ public class JXLTTest extends JexlTestCase {
 
     @ParameterizedTest
     @MethodSource("engines")
-    public void testEscapeString(final JexlBuilder builder) throws Exception {
+    void testEscapeString(final JexlBuilder builder) {
         init(builder);
         final JxltEngine.Expression expr = JXLT.createExpression("\\\"${'world\\'s finest'}\\\"");
         final JexlContext none = null;
@@ -706,7 +841,7 @@ public class JXLTTest extends JexlTestCase {
 
     @ParameterizedTest
     @MethodSource("engines")
-    public void testImmediate(final JexlBuilder builder) throws Exception {
+    void testImmediate(final JexlBuilder builder) {
         init(builder);
         final JexlContext none = null;
         final String source = "${'Hello ' + 'World!'}";
@@ -722,7 +857,7 @@ public class JXLTTest extends JexlTestCase {
 
     @ParameterizedTest
     @MethodSource("engines")
-    public void testImmediateTemplate(final JexlBuilder builder) throws Exception {
+    void testImmediateTemplate(final JexlBuilder builder) {
         init(builder);
         context.set("tables", new String[]{"table1", "table2"});
         context.set("w" ,"x=1");
@@ -745,7 +880,7 @@ public class JXLTTest extends JexlTestCase {
     }
     @ParameterizedTest
     @MethodSource("engines")
-    public void testInheritedDebugger(final JexlBuilder builder) throws Exception {
+    void testInheritedDebugger(final JexlBuilder builder) {
         init(builder);
         final String src = "if ($A) { $B + 1; } else { $C - 2 }";
         final JexlEngine jexl = JXLT.getEngine();
@@ -763,7 +898,7 @@ public class JXLTTest extends JexlTestCase {
 
     @ParameterizedTest
     @MethodSource("engines")
-    public void testInterpolation(final JexlBuilder builder) throws Exception {
+    void testInterpolation(final JexlBuilder builder) {
         init(builder);
         final String expr =  "`Hello \n${user}`";
         final JexlScript script = ENGINE.createScript(expr);
@@ -777,7 +912,7 @@ public class JXLTTest extends JexlTestCase {
 
     @ParameterizedTest
     @MethodSource("engines")
-    public void testInterpolationGlobal(final JexlBuilder builder) throws Exception {
+    void testInterpolationGlobal(final JexlBuilder builder) {
         init(builder);
         if (isLexicalShade()) {
             context.set("user", null);
@@ -789,7 +924,7 @@ public class JXLTTest extends JexlTestCase {
 
     @ParameterizedTest
     @MethodSource("engines")
-    public void testInterpolationLocal(final JexlBuilder builder) throws Exception {
+    void testInterpolationLocal(final JexlBuilder builder) {
         init(builder);
         final String expr =  "var user='Henrib'; `Hello \n${user}`";
         final Object value = ENGINE.createScript(expr).execute(context);
@@ -798,7 +933,7 @@ public class JXLTTest extends JexlTestCase {
 
     @ParameterizedTest
     @MethodSource("engines")
-    public void testInterpolationLvsG(final JexlBuilder builder) throws Exception {
+    void testInterpolationLvsG(final JexlBuilder builder) {
         init(builder);
         if (isLexicalShade()) {
             context.set("user", null);
@@ -810,7 +945,7 @@ public class JXLTTest extends JexlTestCase {
 
     @ParameterizedTest
     @MethodSource("engines")
-    public void testInterpolationLvsG2(final JexlBuilder builder) throws Exception {
+    void testInterpolationLvsG2(final JexlBuilder builder) {
         init(builder);
         if (isLexicalShade()) {
             context.set("user", null);
@@ -822,7 +957,7 @@ public class JXLTTest extends JexlTestCase {
 
     @ParameterizedTest
     @MethodSource("engines")
-    public void testInterpolationParameter(final JexlBuilder builder) throws Exception {
+    void testInterpolationParameter(final JexlBuilder builder) {
         init(builder);
         final String expr =  "(user)->{`Hello \n${user}`}";
         final JexlScript script = ENGINE.createScript(expr);
@@ -834,7 +969,7 @@ public class JXLTTest extends JexlTestCase {
 
     @ParameterizedTest
     @MethodSource("engines")
-    public void testLexicalTemplate(final JexlBuilder builder) throws Exception {
+    void testLexicalTemplate(final JexlBuilder builder) {
         init(builder);
         final JexlOptions opts = new JexlOptions();
         final JexlContext ctxt = new PragmaticContext(opts);
@@ -872,7 +1007,7 @@ public class JXLTTest extends JexlTestCase {
 
     @ParameterizedTest
     @MethodSource("engines")
-    public void testMalformed(final JexlBuilder builder) throws Exception {
+    void testMalformed(final JexlBuilder builder) {
         init(builder);
         final JxltEngine.Exception xjexl = assertThrows(JxltEngine.Exception.class, () -> JXLT.createExpression("${'world'"), "should be malformed");
         LOGGER.debug(xjexl.getMessage());
@@ -880,7 +1015,7 @@ public class JXLTTest extends JexlTestCase {
 
     @ParameterizedTest
     @MethodSource("engines")
-    public void testMalformedNested(final JexlBuilder builder) throws Exception {
+    void testMalformedNested(final JexlBuilder builder) {
         init(builder);
         final JxltEngine.Exception xjexl = assertThrows(JxltEngine.Exception.class, () -> JXLT.createExpression("#{${hi} world}"), "should be malformed");
         LOGGER.debug(xjexl.getMessage());
@@ -888,7 +1023,7 @@ public class JXLTTest extends JexlTestCase {
 
     @ParameterizedTest
     @MethodSource("engines")
-    public void testMalformedNested2(final JexlBuilder builder) throws Exception {
+    void testMalformedNested2(final JexlBuilder builder) {
         init(builder);
         final JxltEngine.Exception xjexl = assertThrows(JxltEngine.Exception.class, () -> JXLT.createExpression("#{${hi} world}"), "should be malformed");
         LOGGER.debug(xjexl.getMessage());
@@ -896,7 +1031,7 @@ public class JXLTTest extends JexlTestCase {
 
     @ParameterizedTest
     @MethodSource("engines")
-    public void testNested(final JexlBuilder builder) throws Exception {
+    void testNested(final JexlBuilder builder) {
         init(builder);
         final String source = "#{${hi}+'.world'}";
         final JxltEngine.Expression expr = JXLT.createExpression(source);
@@ -916,7 +1051,7 @@ public class JXLTTest extends JexlTestCase {
 
     @ParameterizedTest
     @MethodSource("engines")
-    public void testNestedTemplate(final JexlBuilder builder) throws Exception {
+    void testNestedTemplate(final JexlBuilder builder) {
         init(builder);
         final String source = "#{${hi}+'.world'}";
         final JxltEngine.Template expr = JXLT.createTemplate(source, "hi");
@@ -932,7 +1067,7 @@ public class JXLTTest extends JexlTestCase {
 
     @ParameterizedTest
     @MethodSource("engines")
-    public void testNonEscapeString(final JexlBuilder builder) throws Exception {
+    void testNonEscapeString(final JexlBuilder builder) {
         init(builder);
         final JxltEngine.Expression expr = JXLT.createExpression("c:\\some\\windows\\path");
         final JexlContext none = null;
@@ -942,7 +1077,7 @@ public class JXLTTest extends JexlTestCase {
 
     @ParameterizedTest
     @MethodSource("engines")
-    public void testOneLiner(final JexlBuilder builder) throws Exception {
+    void testOneLiner(final JexlBuilder builder) {
         init(builder);
         final JxltEngine.Template t = JXLT.createTemplate("$$", new StringReader("fourty-two"));
         final StringWriter strw = new StringWriter();
@@ -953,7 +1088,7 @@ public class JXLTTest extends JexlTestCase {
 
     @ParameterizedTest
     @MethodSource("engines")
-    public void testOneLinerVar(final JexlBuilder builder) throws Exception {
+    void testOneLinerVar(final JexlBuilder builder) {
         init(builder);
         final JxltEngine.Template t = JXLT.createTemplate("$$", new StringReader("fourty-${x}"));
         final StringWriter strw = new StringWriter();
@@ -965,7 +1100,7 @@ public class JXLTTest extends JexlTestCase {
 
     @ParameterizedTest
     @MethodSource("engines")
-    public void testPrepareEvaluate(final JexlBuilder builder) throws Exception {
+    void testPrepareEvaluate(final JexlBuilder builder) {
         init(builder);
         final String source = "Dear #{p} ${name};";
         final JxltEngine.Expression expr = JXLT.createExpression("Dear #{p} ${name};");
@@ -994,7 +1129,7 @@ public class JXLTTest extends JexlTestCase {
 
     @ParameterizedTest
     @MethodSource("engines")
-    public void testPrepareTemplate(final JexlBuilder builder) throws Exception {
+    void testPrepareTemplate(final JexlBuilder builder) {
         init(builder);
         // @formatter:off
         final String source
@@ -1029,7 +1164,7 @@ public class JXLTTest extends JexlTestCase {
 
     @ParameterizedTest
     @MethodSource("engines")
-    public void testReport(final JexlBuilder builder) throws Exception {
+    void testReport(final JexlBuilder builder) {
         init(builder);
         // @formatter:off
         final String rpt
@@ -1058,7 +1193,7 @@ public class JXLTTest extends JexlTestCase {
 
     @ParameterizedTest
     @MethodSource("engines")
-    public void testReport1(final JexlBuilder builder) throws Exception {
+    void testReport1(final JexlBuilder builder) {
         init(builder);
         // @formatter:off
         final String rpt
@@ -1090,7 +1225,7 @@ public class JXLTTest extends JexlTestCase {
 
     @ParameterizedTest
     @MethodSource("engines")
-    public void testReport2(final JexlBuilder builder) throws Exception {
+    void testReport2(final JexlBuilder builder) {
         init(builder);
         // @formatter:off
         final String rpt
@@ -1126,7 +1261,7 @@ public class JXLTTest extends JexlTestCase {
 
     @ParameterizedTest
     @MethodSource("engines")
-    public void testSanboxed311i(final JexlBuilder builder) throws Exception {
+    void testSanboxed311i(final JexlBuilder builder) {
         init(builder);
         /// this uberspect can not access jexl3 classes (besides test)
         final Uberspect uberspect = new Uberspect(LogFactory.getLog(JXLTTest.class), null, NOJEXL3);
@@ -1149,7 +1284,7 @@ public class JXLTTest extends JexlTestCase {
 
     @ParameterizedTest
     @MethodSource("engines")
-    public void testSanboxedTemplate(final JexlBuilder builder) throws Exception {
+    void testSanboxedTemplate(final JexlBuilder builder) {
         init(builder);
         final String src = "Hello ${user}";
         final JexlContext ctxt = new MapContext();
@@ -1171,7 +1306,7 @@ public class JXLTTest extends JexlTestCase {
 
     @ParameterizedTest
     @MethodSource("engines")
-    public void testStatement(final JexlBuilder builder) throws Exception {
+    void testStatement(final JexlBuilder builder) {
         init(builder);
         final Froboz froboz = new Froboz(32);
         context.set("froboz", froboz);
@@ -1185,7 +1320,7 @@ public class JXLTTest extends JexlTestCase {
 
     @ParameterizedTest
     @MethodSource("engines")
-    public void testTemplate0(final JexlBuilder builder) throws Exception {
+    void testTemplate0(final JexlBuilder builder) {
         init(builder);
         final String source = "   $$ if(x) {\nx is ${x}\n   $$ } else {\n${'no x'}\n$$ }\n";
         StringWriter strw;
@@ -1211,7 +1346,7 @@ public class JXLTTest extends JexlTestCase {
 
     @ParameterizedTest
     @MethodSource("engines")
-    public void testTemplate1(final JexlBuilder builder) throws Exception {
+    void testTemplate1(final JexlBuilder builder) {
         init(builder);
         final String source = "$$ if(x) {\nx is ${x}\n$$ } else {\n${'no x'}\n$$ }\n";
         StringWriter strw;
@@ -1234,7 +1369,7 @@ public class JXLTTest extends JexlTestCase {
 
     @ParameterizedTest
     @MethodSource("engines")
-    public void testTemplate10(final JexlBuilder builder) throws Exception {
+    void testTemplate10(final JexlBuilder builder) {
         init(builder);
         final String source = "$$(x)->{ if(x) {\nx is ${x}\n$$ } else {\n${'no x'}\n$$ } }\n";
         StringWriter strw;
@@ -1255,7 +1390,7 @@ public class JXLTTest extends JexlTestCase {
 
     @ParameterizedTest
     @MethodSource("engines")
-    public void testTemplate2(final JexlBuilder builder) throws Exception {
+    void testTemplate2(final JexlBuilder builder) {
         init(builder);
         final String source = "The answer: ${x}";
         StringWriter strw;
@@ -1273,7 +1408,7 @@ public class JXLTTest extends JexlTestCase {
 
     @ParameterizedTest
     @MethodSource("engines")
-    public void testTemplateOutOfScope(final JexlBuilder builder) throws Exception {
+    void testTemplateOutOfScope(final JexlBuilder builder) {
         init(builder);
         final JexlOptions opts = new JexlOptions();
         opts.setCancellable(false);
@@ -1306,7 +1441,7 @@ public class JXLTTest extends JexlTestCase {
 
     @ParameterizedTest
     @MethodSource("engines")
-    public void testTemplatePragmaPro50(final JexlBuilder builder) throws Exception {
+    void testTemplatePragmaPro50(final JexlBuilder builder) {
         init(builder);
         final JexlOptions opts = new JexlOptions();
         opts.setCancellable(false);
@@ -1330,7 +1465,7 @@ public class JXLTTest extends JexlTestCase {
 
     @ParameterizedTest
     @MethodSource("engines")
-    public void testWriter(final JexlBuilder builder) throws Exception {
+    void testWriter(final JexlBuilder builder) {
         init(builder);
         final Froboz froboz = new Froboz(42);
         final Writer writer = new FrobozWriter(new StringWriter());

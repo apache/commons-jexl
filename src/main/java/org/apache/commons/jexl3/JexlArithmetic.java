@@ -1716,6 +1716,38 @@ public class JexlArithmetic {
     }
 
     /**
+     * Parse an identifier which must be of the form:
+     * 0|([1-9][0-9]*)
+     * @param id the identifier
+     * @return an integer or null
+     */
+    public static Integer parseIdentifier(final Object id) {
+        if (id instanceof Number) {
+            return ((Number) id).intValue();
+        }
+        // hand coded because the was no way to fail on leading '0's using NumberFormat
+        if (id instanceof CharSequence) {
+            final CharSequence str = (CharSequence) id;
+            final int length = str.length();
+            // can not be empty string and can not be longer than Integer.MAX_VALUE representation
+            if (length > 0 && length <= 10) {
+                int val = 0;
+                for (int i = 0; i < length; ++i) {
+                    final char c = str.charAt(i);
+                    // leading 0s but no just 0, numeric only
+                    if ((c == '0' && val == 0 && length > 1) || (c < '0' || c > '9')) {
+                        return null;
+                    }
+                    val *= 10;
+                    val += c - '0';
+                }
+                return val;
+            }
+        }
+        return null;
+    }
+
+    /**
      * Positivize value (unary plus for numbers).
      * <p>C/C++/C#/Java perform integral promotion of the operand, ie
      * cast to int if type can be represented as int without loss of precision.

@@ -493,7 +493,7 @@ public class Interpreter extends InterpreterBase {
                 if (options.isStrictInterpolation()) {
                     return inter;
                 }
-                final Integer id = ASTIdentifierAccess.parseIdentifier(inter);
+                final Integer id = JexlArithmetic.parseIdentifier(inter);
                 return id != null ? id : eval;
             }
         }

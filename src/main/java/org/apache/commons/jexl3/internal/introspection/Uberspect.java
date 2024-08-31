@@ -331,7 +331,7 @@ public class Uberspect implements JexlUberspect {
     public JexlPropertyGet getPropertyGet(
             final List<PropertyResolver> resolvers, final Object obj, final Object identifier
     ) {
-        final Class<?> claz = obj.getClass();
+        final Class<?> clazz = obj.getClass();
         final String property = AbstractExecutor.castString(identifier);
         final Introspector is = base();
         final List<PropertyResolver> r = resolvers == null ? strategy.apply(null, obj) : resolvers;
@@ -341,33 +341,33 @@ public class Uberspect implements JexlUberspect {
                 switch ((JexlResolver) resolver) {
                     case PROPERTY:
                         // first try for a getFoo() type of property (also getfoo() )
-                        executor = PropertyGetExecutor.discover(is, claz, property);
+                        executor = PropertyGetExecutor.discover(is, clazz, property);
                         if (executor == null) {
-                            executor = BooleanGetExecutor.discover(is, claz, property);
+                            executor = BooleanGetExecutor.discover(is, clazz, property);
                         }
                         break;
                     case MAP:
                         // let's see if we are a map...
-                        executor = MapGetExecutor.discover(is, claz, identifier);
+                        executor = MapGetExecutor.discover(is, clazz, identifier);
                         break;
                     case LIST:
                         // let's see if this is a list or array
                         final Integer index = AbstractExecutor.castInteger(identifier);
                         if (index != null) {
-                            executor = ListGetExecutor.discover(is, claz, index);
+                            executor = ListGetExecutor.discover(is, clazz, index);
                         }
                         break;
                     case DUCK:
                         // if that didn't work, look for get(foo)
-                        executor = DuckGetExecutor.discover(is, claz, identifier);
+                        executor = DuckGetExecutor.discover(is, clazz, identifier);
                         if (executor == null && property != null && property != identifier) {
                             // look for get("foo") if we did not try yet (just above)
-                            executor = DuckGetExecutor.discover(is, claz, property);
+                            executor = DuckGetExecutor.discover(is, clazz, property);
                         }
                         break;
                     case FIELD:
                         // a field may be? (can not be a number)
-                        executor = FieldGetExecutor.discover(is, claz, property);
+                        executor = FieldGetExecutor.discover(is, clazz, property);
                         // static class fields (enums included)
                         if (obj instanceof Class<?>) {
                             executor = FieldGetExecutor.discover(is, (Class<?>) obj, property);
@@ -399,7 +399,7 @@ public class Uberspect implements JexlUberspect {
     public JexlPropertySet getPropertySet(
             final List<PropertyResolver> resolvers, final Object obj, final Object identifier, final Object arg
     ) {
-        final Class<?> claz = obj.getClass();
+        final Class<?> clazz = obj.getClass();
         final String property = AbstractExecutor.castString(identifier);
         final Introspector is = base();
         final List<PropertyResolver> actual = resolvers == null ? strategy.apply(null, obj) : resolvers;
@@ -409,30 +409,30 @@ public class Uberspect implements JexlUberspect {
                 switch ((JexlResolver) resolver) {
                     case PROPERTY:
                         // first try for a setFoo() type of property (also setfoo() )
-                        executor = PropertySetExecutor.discover(is, claz, property, arg);
+                        executor = PropertySetExecutor.discover(is, clazz, property, arg);
                         break;
                     case MAP:
                         // let's see if we are a map...
-                        executor = MapSetExecutor.discover(is, claz, identifier, arg);
+                        executor = MapSetExecutor.discover(is, clazz, identifier, arg);
                         break;
                     case LIST:
                         // let's see if we can convert the identifier to an int,
                         // if obj is an array or a list, we can still do something
                         final Integer index = AbstractExecutor.castInteger(identifier);
                         if (index != null) {
-                            executor = ListSetExecutor.discover(is, claz, identifier, arg);
+                            executor = ListSetExecutor.discover(is, clazz, identifier, arg);
                         }
                         break;
                     case DUCK:
                         // if that didn't work, look for set(foo)
-                        executor = DuckSetExecutor.discover(is, claz, identifier, arg);
+                        executor = DuckSetExecutor.discover(is, clazz, identifier, arg);
                         if (executor == null && property != null && property != identifier) {
-                            executor = DuckSetExecutor.discover(is, claz, property, arg);
+                            executor = DuckSetExecutor.discover(is, clazz, property, arg);
                         }
                         break;
                     case FIELD:
                         // a field may be?
-                        executor = FieldSetExecutor.discover(is, claz, property, arg);
+                        executor = FieldSetExecutor.discover(is, clazz, property, arg);
                         break;
                     case CONTAINER:
                     default:

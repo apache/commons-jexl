@@ -555,4 +555,66 @@ public class LambdaTest extends JexlTestCase {
         assertEquals(42, result);
     }
 
+    /**
+     * see JEXL-426
+     */
+    @Test void testRefCapture1() {
+        String src = "let x = 10;\n" +
+                "let foo = () -> {\n" +
+                "x += 2;\n" +
+                "}\n" +
+                "x = 40;\n" +
+                "foo();\n" +
+                "x";
+        final JexlEngine jexl = new JexlBuilder()
+                .features(new JexlFeatures().referenceCapture(true))
+                .create();
+        JexlScript script;
+        Object result;
+        script = jexl.createScript(src);
+        result = script.execute(null);
+        assertEquals(42, result);
+    }
+
+    @Test void testRefCapture2() {
+        String src = "let x = 10; let f = () -> { x + 2 }; x = 40; f()";
+        final JexlEngine jexl = new JexlBuilder()
+                .features(new JexlFeatures().constCapture(true).referenceCapture(true))
+                .create();
+        JexlScript script;
+        Object result;
+        script = jexl.createScript(src);
+        result = script.execute(null);
+        assertEquals(42, result);
+    }
+
+    @Test void testRefCapture3() {
+        String src = "let x = 10; let f = () -> { x + 2 }; x = 40; f";
+        final JexlEngine jexl = new JexlBuilder()
+                .features(new JexlFeatures().constCapture(true).referenceCapture(true))
+                .create();
+        JexlScript script;
+        Object result;
+        script = jexl.createScript(src);
+        result = script.execute(null);
+        assertTrue(result instanceof JexlScript);
+        script = jexl.createScript("f()", "f");
+        result = script.execute(null, result);
+        assertEquals(42, result);
+    }
+
+    @Test void testRefCapture4() {
+        String src = "let x = 10; let f = () -> { let x = 142; x }; x = 40; f";
+        final JexlEngine jexl = new JexlBuilder()
+                .features(new JexlFeatures().referenceCapture(true))
+                .create();
+        JexlScript script;
+        Object result;
+        script = jexl.createScript(src);
+        result = script.execute(null);
+        assertTrue(result instanceof JexlScript);
+        script = jexl.createScript("f()", "f");
+        result = script.execute(null, result);
+        assertEquals(142, result);
+    }
 }

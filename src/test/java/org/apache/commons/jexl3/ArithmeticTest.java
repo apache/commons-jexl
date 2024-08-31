@@ -31,6 +31,7 @@ import java.math.BigInteger;
 import java.math.MathContext;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -2252,6 +2253,67 @@ public class ArithmeticTest extends JexlTestCase {
             // test fails in java > 11 because modules, etc; need investigation
             assertTrue(xprop.getMessage().contains("info"));
             assertTrue(getJavaVersion() > 11);
+        }
+    }
+
+    @Test void testShortCircuitAnd() {
+        String src = "(x, y, z) -> x && y && z";
+        final JexlBuilder builder = new JexlBuilder();
+        final JexlEngine jexl = builder.create();
+        JexlScript script;
+        Object result;
+        script = jexl.createScript(src);
+        result = script.execute(null, true, "foo", 42);
+        assertEquals(42, result);
+        result = script.execute(null, true, "", 42);
+        assertEquals("", result);
+    }
+
+    @Test void testShortCircuitOr() {
+        OptContext optc = new OptContext();
+        String src = "(x, y, z) -> x || y || z";
+        final JexlBuilder builder = new JexlBuilder();
+        final JexlEngine jexl = builder.create();
+        JexlOptions options = builder.options();
+        optc.setOptions(options);
+        JexlScript script;
+        Object result;
+        script = jexl.createScript(src);
+        result = script.execute(optc, 0, "", 42);
+        assertEquals(42, result);
+        result = script.execute(optc, true, 42, null);
+        assertEquals(true, result);
+
+        options.setBooleanLogical(true);
+        result = script.execute(optc, 0, "", Double.NaN);
+        assertEquals(false, result);
+        result = script.execute(optc, 0, "", Collections.emptySet());
+        assertEquals(true, result);
+
+    }
+
+    @Test void testLogicalValue() {
+        String src = "function sanitize(const n) { n == 0 ? NaN : n }; sanitize(x) && 420 / x";
+        final JexlEngine jexl = new JexlBuilder().create();
+        JexlScript script;
+        Object result;
+        script = jexl.createScript(src, "x");
+        result = script.execute(null, 10);
+        assertEquals(42, result);
+        result = script.execute(null, 0);
+        assertTrue(Double.isNaN(((Number) result).doubleValue()));
+    }
+
+    public static class OptContext extends MapContext implements JexlContext.OptionsHandle {
+        private JexlOptions options;
+
+        @Override
+        public JexlOptions getEngineOptions() {
+            return options;
+        }
+
+        void setOptions(JexlOptions options) {
+            this.options = options;
         }
     }
 }

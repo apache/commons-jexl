@@ -37,7 +37,7 @@ public class BuilderTest {
     }
 
     @Test
-    public void testFlags() {
+    void testFlags() {
         assertTrue(builder().antish(true).antish());
         assertFalse(builder().antish(false).antish());
         assertTrue(builder().cancellable(true).cancellable());
@@ -54,10 +54,14 @@ public class BuilderTest {
         assertFalse(builder().silent(false).silent());
         assertTrue(builder().strict(true).strict());
         assertFalse(builder().strict(false).strict());
+        assertTrue(builder().booleanLogical(true).options().isBooleanLogical());
+        assertFalse(builder().booleanLogical(false).options().isBooleanLogical());
+        assertTrue(builder().strictInterpolation(true).options().isStrictInterpolation());
+        assertFalse(builder().strictInterpolation(false).options().isStrictInterpolation());
     }
 
     @Test
-    public void testOther() {
+    void testOther() {
         final ClassLoader cls = getClass().getClassLoader().getParent();
         assertEquals(cls, builder().loader(cls).loader());
         final Charset cs = StandardCharsets.UTF_16;
@@ -71,7 +75,7 @@ public class BuilderTest {
     }
 
     @Test
-    public void testValues() {
+    void testValues() {
         assertEquals(1, builder().collectMode(1).collectMode());
         assertEquals(0, builder().collectMode(0).collectMode());
         assertEquals(32, builder().cacheThreshold(32).cacheThreshold());
