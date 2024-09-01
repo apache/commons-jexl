@@ -18,6 +18,7 @@ package org.apache.commons.jexl3;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -281,7 +282,7 @@ public class LambdaTest extends JexlTestCase {
         strs = "(x)->{ (y)->{ x + y } }";
         s42 = jexl.createScript(strs);
         result = s42.execute(ctx, 15);
-        assertTrue(result instanceof JexlScript);
+        assertInstanceOf(JexlScript.class, result);
         s15 = (JexlScript) result;
         localv = s15.getLocalVariables();
         assertEquals(0, localv.length);
@@ -294,7 +295,7 @@ public class LambdaTest extends JexlTestCase {
         strs = "(x)->{ (y)->{ var z = 169; var x; x + y } }";
         s42 = jexl.createScript(strs);
         result = s42.execute(ctx, 15);
-        assertTrue(result instanceof JexlScript);
+        assertInstanceOf(JexlScript.class, result);
         s15 = (JexlScript) result;
         localv = s15.getLocalVariables();
         assertNotNull(localv);
@@ -381,7 +382,7 @@ public class LambdaTest extends JexlTestCase {
         final JexlEngine jexl = createEngine();
         final JexlScript script = jexl.createScript(src);
         final Object result = script.execute(null, 21);
-        assertTrue(result instanceof Set);
+        assertInstanceOf(Set.class, result);
         final Set<?> set = (Set<?>) result;
         assertEquals(1, set.size());
         assertTrue(set.contains(42));
@@ -392,7 +393,7 @@ public class LambdaTest extends JexlTestCase {
         final JexlEngine jexl = createEngine();
         final JexlScript script = jexl.createScript(src);
         final Object result = script.execute(null, 21);
-        assertTrue(result instanceof Set);
+        assertInstanceOf(Set.class, result);
         final Set<?> set = (Set<?>) result;
         assertEquals(1, set.size());
         assertTrue(set.contains(42));
@@ -443,7 +444,7 @@ public class LambdaTest extends JexlTestCase {
         assertEquals(s42.hashCode(), s42b.hashCode());
         assertEquals(s42, s42b);
         Object result = s42.execute(null, 15);
-        assertTrue(result instanceof JexlScript);
+        assertInstanceOf(JexlScript.class, result);
         final Object resultb = s42.execute(null, 15);
         assertEquals(result.hashCode(), resultb.hashCode());
         assertEquals(result, resultb);
@@ -597,7 +598,7 @@ public class LambdaTest extends JexlTestCase {
         Object result;
         script = jexl.createScript(src);
         result = script.execute(null);
-        assertTrue(result instanceof JexlScript);
+        assertInstanceOf(JexlScript.class, result);
         script = jexl.createScript("f()", "f");
         result = script.execute(null, result);
         assertEquals(42, result);
@@ -612,7 +613,7 @@ public class LambdaTest extends JexlTestCase {
         Object result;
         script = jexl.createScript(src);
         result = script.execute(null);
-        assertTrue(result instanceof JexlScript);
+        assertInstanceOf(JexlScript.class, result);
         script = jexl.createScript("f()", "f");
         result = script.execute(null, result);
         assertEquals(142, result);

@@ -17,6 +17,7 @@
 package org.apache.commons.jexl3;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -569,7 +570,7 @@ public class Issues200Test extends JexlTestCase {
         // explicitly returning the lambda
         script = jexl.createScript("return (x, y)->{ x + y}");
         result = script.execute(ctxt);
-        assertTrue(result instanceof JexlScript);
+        assertInstanceOf(JexlScript.class, result);
     }
 
     @Test

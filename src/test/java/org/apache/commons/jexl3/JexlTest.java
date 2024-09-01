@@ -18,6 +18,7 @@ package org.apache.commons.jexl3;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -599,7 +600,7 @@ public final class JexlTest extends JexlTestCase {
         Object result;
         expr = jexl.createExpression("new LinkedList([1,2,3,...])");
         result = expr.evaluate(null);
-        assertTrue(result instanceof LinkedList);
+        assertInstanceOf(LinkedList.class, result);
     }
 
     /**
@@ -683,7 +684,7 @@ public final class JexlTest extends JexlTestCase {
         jc.set("foo", new Foo());
         final Object o = e.evaluate(jc);
 
-        assertTrue(o instanceof String, "o not instanceof String");
+        assertInstanceOf(String.class, o, "o not instanceof String");
         assertEquals(GET_METHOD_STRING, o, "o incorrect");
     }
 

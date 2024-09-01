@@ -17,6 +17,7 @@
 package org.apache.commons.jexl3;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -219,7 +220,7 @@ public class PragmaTest extends JexlTestCase {
         final JexlScript script = JEXL.createScript(src);
         final Map<String, Object> pragmas = script.getPragmas();
         final Object importz = pragmas.get("jexl.import");
-        assertTrue(importz instanceof Set<?>);
+        assertInstanceOf(Set.class, importz);
         final Set<String> importzz = (Set<String>) importz;
         assertTrue(importzz.contains("java.util"));
         assertTrue(importzz.contains("java.io"));

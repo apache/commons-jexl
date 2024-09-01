@@ -18,6 +18,7 @@ package org.apache.commons.jexl3;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.Serializable;
@@ -149,6 +150,6 @@ public class ArrayTypeTest {
     script = jexl.createScript("[ a, b, c, d, ... ]", "a", "b", "c", "d");
     // intersect a, b, c, c -> classA
     result = script.execute(null, a, b, c, c);
-    assertTrue(result instanceof List);
+    assertInstanceOf(List.class, result);
   }
 }

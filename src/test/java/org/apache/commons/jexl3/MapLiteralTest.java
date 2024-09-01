@@ -18,9 +18,9 @@ package org.apache.commons.jexl3;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -176,7 +176,7 @@ public class MapLiteralTest extends JexlTestCase {
     public void testVariableMap() throws Exception {
         final JexlScript script = JEXL.createScript("{ ['1', '2'.toString()] : someValue }", "someValue");
         final Object result = script.execute(null, 42);
-        assertTrue(result instanceof Map);
+        assertInstanceOf(Map.class, result);
         Object key = null;
         Object value = null;
         for(final Map.Entry<?,?> e : ((Map<?,?>) result).entrySet()) {

@@ -19,6 +19,7 @@ package org.apache.commons.jexl3;
 import static org.apache.commons.jexl3.JexlTestCase.createEngine;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -515,7 +516,7 @@ public class LexicalTest {
         // run it a second time, new 3.2 semantics, lexical/shade = true
         result = runner.execute(ctxt, true, tested, catchFn);
         // result is exception!
-        assertTrue(result instanceof JexlException.Variable);
+        assertInstanceOf(JexlException.Variable.class, result);
     }
 
     @Test

@@ -17,9 +17,9 @@
 package org.apache.commons.jexl3;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -299,7 +299,7 @@ public class SideEffectTest extends JexlTestCase {
         try {
             script.execute(ctx, "42");
             zz = ctx.get("z");
-            assertTrue(zz instanceof List<?>);
+            assertInstanceOf(List.class, zz);
             z = (List<String>) zz;
             assertEquals(1, z.size());
         } catch (JexlException | ArithmeticException xjexl) {
@@ -321,7 +321,7 @@ public class SideEffectTest extends JexlTestCase {
         final AtomicInteger i11 = new AtomicInteger(3115);
         for(final Object v : Arrays.asList(v11, i11)) {
             final Object result = script.execute(jc, v);
-            assertTrue(result instanceof int[]);
+            assertInstanceOf(int[].class, result);
             final int[] r = (int[]) result;
             assertEquals(3115, r[0]);
             assertEquals(3115, r[1]);
@@ -333,7 +333,7 @@ public class SideEffectTest extends JexlTestCase {
         final AtomicInteger i12 = new AtomicInteger(3189);
         for(final Object v : Arrays.asList(v12, i12)) {
             final Object result = script.execute(jc, v);
-            assertTrue(result instanceof int[]);
+            assertInstanceOf(int[].class, result);
             final int[] r = (int[]) result;
             assertEquals(3189, r[0]);
             assertEquals(3190, r[1]);
@@ -344,7 +344,7 @@ public class SideEffectTest extends JexlTestCase {
         final Var v13 = new Var(3115);
         for(final Object v : Arrays.asList(v13)) {
             final Object result = script.execute(jc, v13);
-            assertTrue(result instanceof int[]);
+            assertInstanceOf(int[].class, result);
             final int[] r = (int[]) result;
             assertEquals(3115, r[0]);
             assertEquals(3115, r[1]);
@@ -355,7 +355,7 @@ public class SideEffectTest extends JexlTestCase {
         final Var v14 = new Var(3189);
         for(final Object v : Arrays.asList(v14)) {
             final Object result = script.execute(jc, v);
-            assertTrue(result instanceof int[]);
+            assertInstanceOf(int[].class, result);
             final int[] r = (int[]) result;
             assertEquals(3189, r[0]);
             assertEquals(3188, r[1]);

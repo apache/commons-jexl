@@ -18,11 +18,13 @@ package org.apache.commons.jexl3;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -95,7 +97,7 @@ public class TryCatchFinallyTest extends JexlTestCase {
         final JexlScript e = JEXL.createScript("try { 'asb'.getBytes('NoSuchCharacterSet'); } catch (let ex) { ex }");
         final JexlContext jc = new MapContext();
         final Object o = e.execute(jc);
-        assertTrue(o instanceof java.io.UnsupportedEncodingException);
+        assertInstanceOf(UnsupportedEncodingException.class, o);
     }
 
     @Test

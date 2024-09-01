@@ -18,7 +18,7 @@
 package org.apache.commons.jexl3.scripting;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 
 import java.io.StringWriter;
 
@@ -36,7 +36,7 @@ public class JexlScriptEngineOptionalTest {
 
     @Test
     public void testCompilable() throws Exception {
-        assertTrue(engine instanceof Compilable, "Engine should implement Compilable");
+        assertInstanceOf(Compilable.class, engine, "Engine should implement Compilable");
         final Compilable cengine = (Compilable) engine;
         final CompiledScript script = cengine.compile("40 + 2");
         assertEquals(42, script.eval());

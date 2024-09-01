@@ -18,6 +18,7 @@ package org.apache.commons.jexl3.examples;
 
 import static java.lang.Boolean.TRUE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.net.URI;
@@ -134,7 +135,7 @@ public class StreamTest {
             "list.filter(uri -> uri.scheme =^ 'http')",
             "list");
         final Object filtered = filter.execute(sctxt, uris);
-        assertTrue(filtered instanceof List<?>);
+        assertInstanceOf(List.class, filtered);
         List<URI> result = (List<URI>) filtered;
         assertEquals(2, result.size());
         for(final URI uri : result) {
@@ -146,7 +147,7 @@ public class StreamTest {
             "list.map(uri -> uri.scheme =^ 'http'? URI:create(`https://${uri.host}`) : null)",
             "list");
         final Object transformed = mapper.execute(sctxt, uris);
-        assertTrue(transformed instanceof List<?>);
+        assertInstanceOf(List.class, transformed);
         result = (List<URI>) transformed;
         assertEquals(2, result.size());
         for(final URI uri : result) {
@@ -186,7 +187,7 @@ public class StreamTest {
         sctxt.set("mapper", mapper);
 
         final Object transformed = transform.execute(sctxt, uris);
-        assertTrue(transformed instanceof List<?>);
+        assertInstanceOf(List.class, transformed);
         assertEquals(control, transformed);
     }
 }

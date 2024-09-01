@@ -18,6 +18,7 @@ package org.apache.commons.jexl3;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -317,10 +318,10 @@ public static class Foo125 {
 
         expr = jexl.createScript("if (false) { [] } else { {:} }");
         value = expr.execute(null);
-        assertTrue(value instanceof Map<?, ?>);
+        assertInstanceOf(Map.class, value);
         expr = jexl.createScript(expr.getParsedText());
         value = expr.execute(null);
-        assertTrue(value instanceof Map<?, ?>);
+        assertInstanceOf(Map.class, value);
     }
 
     @Test
@@ -647,13 +648,13 @@ public static class Foo125 {
         String src = "u.asList(['foo', 'bar'])";
         JexlScript e = jexl.createScript(src);
         Object o = e.execute(jc);
-        assertTrue(o instanceof List);
+        assertInstanceOf(List.class, o);
         assertEquals(Arrays.asList("foo", "bar"), o);
 
         src = "u.asList([1, 2])";
         e = jexl.createScript(src);
         o = e.execute(jc);
-        assertTrue(o instanceof List);
+        assertInstanceOf(List.class, o);
         assertEquals(Arrays.asList(1, 2), o);
     }
 
@@ -675,7 +676,7 @@ public static class Foo125 {
         final String src = "x = new ('java.util.HashSet'); x.add(1); x";
         final JexlScript e = jexl.createScript(src);
         final Object o = e.execute(jc);
-        assertTrue(o instanceof Set);
+        assertInstanceOf(Set.class, o);
         assertTrue(((Set) o).contains(1));
     }
 

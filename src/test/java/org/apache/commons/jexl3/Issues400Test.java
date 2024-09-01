@@ -20,6 +20,7 @@ import static org.apache.commons.jexl3.introspection.JexlPermissions.RESTRICTED;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -140,7 +141,7 @@ public class Issues400Test {
             final JexlScript script = jexl.createScript(src);
             for (int i = 0; i < 2; ++i) {
                 final Object result = script.execute(null);
-                assertTrue(result instanceof Map);
+                assertInstanceOf(Map.class, result);
                 final Map<?, ?> map = (Map<?, ?>) result;
                 assertEquals(1, map.size());
                 Object val = jexl.createScript("m -> m[1]").execute(null, map);
@@ -285,7 +286,7 @@ public class Issues400Test {
             final JexlEngine jexl = new JexlBuilder().create();
             final JexlScript e = jexl.createScript(fnsrc);
             final Object o = e.execute(jc);
-            assertTrue(o instanceof Map);
+            assertInstanceOf(Map.class, o);
             final Map<?, ?> map = (Map<?, ?>) o;
             assertEquals(map, ctl);
         }

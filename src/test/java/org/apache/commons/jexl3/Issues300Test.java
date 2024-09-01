@@ -20,6 +20,7 @@ import static org.apache.commons.jexl3.internal.Util.debuggerCheck;
 import static org.apache.commons.jexl3.introspection.JexlPermissions.RESTRICTED;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -569,7 +570,7 @@ public class Issues300Test {
                 "x");
         // @formatter:on
         result = script.execute(ctxt, 21);
-        assertTrue(result instanceof JexlScript);
+        assertInstanceOf(JexlScript.class, result);
         script = (JexlScript) result;
         info = JexlInfo.from(script);
         assertNotNull(info);
@@ -922,7 +923,7 @@ public class Issues300Test {
         assertNotNull(script);
         final Object result = script.execute(null);
         assertNotNull(result);
-        assertTrue(result instanceof LinkedHashMap);
+        assertInstanceOf(LinkedHashMap.class, result);
         assertEquals(1, ((Map) result).size());
     }
 
@@ -1118,11 +1119,11 @@ public class Issues300Test {
         final JexlEngine jexl = new JexlBuilder().create();
         final JexlScript script = jexl.createScript(src);
         Object r = script.execute(null, 2023, 3, 1);
-        assertTrue(r instanceof Number);
+        assertInstanceOf(Number.class, r);
         Number dow = (Number) r;
         assertEquals(3, dow.intValue());
         r = script.execute(null, 1969, 7, 20);
-        assertTrue(r instanceof Number);
+        assertInstanceOf(Number.class, r);
         dow = (Number) r;
         assertEquals(0, dow.intValue());
     }
@@ -1170,7 +1171,7 @@ public class Issues300Test {
         final JexlEngine jexl = new JexlBuilder().create();
         final JexlScript script = jexl.createScript(src);
         final Object result = script.execute(null);
-        assertTrue(result instanceof Map);
+        assertInstanceOf(Map.class, result);
         final Map<?, ?> map = (Map<?, ?>) result;
         assertEquals(2, map.size());
     }
@@ -1191,7 +1192,7 @@ public class Issues300Test {
         final JexlEngine jexl = new JexlBuilder().create();
         JexlScript script = jexl.createScript(src);
         Object result = script.execute(ctxt);
-        assertTrue(result instanceof Map);
+        assertInstanceOf(Map.class, result);
         Map<?, ?> map = (Map<?, ?>) result;
         assertEquals(2, map.size());
         assertEquals(1, map.get("x"));
@@ -1199,7 +1200,7 @@ public class Issues300Test {
 
         script = jexl.createScript(src, "foo", "bar");
         result = script.execute(null, foo, bar);
-        assertTrue(result instanceof Map);
+        assertInstanceOf(Map.class, result);
         map = (Map<?, ?>) result;
         assertEquals(2, map.size());
         assertEquals(1, map.get("x"));

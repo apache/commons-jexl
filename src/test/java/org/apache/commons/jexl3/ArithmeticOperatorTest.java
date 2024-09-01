@@ -18,8 +18,8 @@
 package org.apache.commons.jexl3;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.StringWriter;
@@ -397,7 +397,7 @@ public class ArithmeticOperatorTest extends JexlTestCase {
 
         script = jexl.createScript("1 .. 3");
         result = script.execute(null);
-        assertTrue(result instanceof Iterable<?>);
+        assertInstanceOf(Iterable.class, result);
         Iterator<Integer> ii = ((Iterable<Integer>) result).iterator();
         assertEquals(Integer.valueOf(1), ii.next());
         assertEquals(Integer.valueOf(2), ii.next());
@@ -405,7 +405,7 @@ public class ArithmeticOperatorTest extends JexlTestCase {
 
         script = jexl.createScript("(4 - 3) .. (9 / 3)");
         result = script.execute(null);
-        assertTrue(result instanceof Iterable<?>);
+        assertInstanceOf(Iterable.class, result);
         ii = ((Iterable<Integer>) result).iterator();
         assertEquals(Integer.valueOf(1), ii.next());
         assertEquals(Integer.valueOf(2), ii.next());

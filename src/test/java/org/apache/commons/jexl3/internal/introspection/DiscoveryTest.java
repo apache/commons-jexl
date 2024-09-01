@@ -17,9 +17,9 @@
 package org.apache.commons.jexl3.internal.introspection;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -149,8 +149,8 @@ public class DiscoveryTest extends JexlTestCase {
 
         final JexlPropertyGet get = uber.getPropertyGet(bean, "value");
         final JexlPropertySet set = uber.getPropertySet(bean, "value", "foo");
-        assertTrue(get instanceof PropertyGetExecutor, "bean property getter");
-        assertTrue(set instanceof PropertySetExecutor, "bean property setter");
+        assertInstanceOf(PropertyGetExecutor.class, get, "bean property getter");
+        assertInstanceOf(PropertySetExecutor.class, set, "bean property setter");
         // introspector and uberspect should return same result
         assertEquals(get, uber.getPropertyGet(bean, "value"));
         assertEquals(set, uber.getPropertySet(bean, "value", "foo"));
@@ -178,8 +178,8 @@ public class DiscoveryTest extends JexlTestCase {
 
         final JexlPropertyGet get = uber.getPropertyGet(duck, "value");
         final JexlPropertySet set = uber.getPropertySet(duck, "value", "foo");
-        assertTrue(get instanceof DuckGetExecutor, "duck property getter");
-        assertTrue(set instanceof DuckSetExecutor, "duck property setter");
+        assertInstanceOf(DuckGetExecutor.class, get, "duck property getter");
+        assertInstanceOf(DuckSetExecutor.class, set, "duck property setter");
         // introspector and uberspect should return same result
         assertEquals(get, uber.getPropertyGet(duck, "value"));
         assertEquals(set, uber.getPropertySet(duck, "value", "foo"));
@@ -208,8 +208,8 @@ public class DiscoveryTest extends JexlTestCase {
 
         final JexlPropertyGet get = uber.getPropertyGet(list, 1);
         final JexlPropertySet set = uber.getPropertySet(list, 1, "foo");
-        assertTrue(get instanceof ListGetExecutor, "list property getter");
-        assertTrue(set instanceof ListSetExecutor, "list property setter");
+        assertInstanceOf(ListGetExecutor.class, get, "list property getter");
+        assertInstanceOf(ListSetExecutor.class, set, "list property setter");
         // introspector and uberspect should return same result
         assertEquals(get, uber.getPropertyGet(list, 1));
         assertEquals(set, uber.getPropertySet(list, 1, "foo"));
@@ -239,8 +239,8 @@ public class DiscoveryTest extends JexlTestCase {
 
         final JexlPropertyGet get = uber.getPropertyGet(map, "value");
         final JexlPropertySet set = uber.getPropertySet(map, "value", "foo");
-        assertTrue(get instanceof MapGetExecutor, "map property getter");
-        assertTrue(set instanceof MapSetExecutor, "map property setter");
+        assertInstanceOf(MapGetExecutor.class, get, "map property getter");
+        assertInstanceOf(MapSetExecutor.class, set, "map property setter");
         // introspector and uberspect should return same result
         assertEquals(get, uber.getPropertyGet(map, "value"));
         assertEquals(set, uber.getPropertySet(map, "value", "foo"));

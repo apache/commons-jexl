@@ -18,8 +18,8 @@ package org.apache.commons.jexl3;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Collection;
 
@@ -55,7 +55,7 @@ public class RangeTest extends JexlTestCase {
 
         final Object o0 = e.evaluate(jc);
         final Object o = e.evaluate(jc);
-        assertTrue(o instanceof Collection<?>);
+        assertInstanceOf(Collection.class, o);
         final Collection<?> c = (Collection<?>) o;
         assertEquals(32, c.size());
 
@@ -101,7 +101,7 @@ public class RangeTest extends JexlTestCase {
         final JexlContext jc = new MapContext();
 
         final Object o = e.evaluate(jc);
-        assertTrue(o instanceof Collection<?>);
+        assertInstanceOf(Collection.class, o);
         final Collection<?> c = (Collection<?>) o;
         assertEquals(1, c.size());
         final Object[] a = c.toArray();
@@ -139,7 +139,7 @@ public class RangeTest extends JexlTestCase {
 
         final Object o0 = e.evaluate(jc);
         final Object o = e.evaluate(jc);
-        assertTrue(o instanceof Collection<?>);
+        assertInstanceOf(Collection.class, o);
         final Collection<?> c = (Collection<?>) o;
         assertEquals(32, c.size());
         assertFalse((Boolean) JEXL.createScript("empty x", "x").execute(null, e));

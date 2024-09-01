@@ -19,6 +19,7 @@ package org.apache.commons.jexl3;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -60,10 +61,10 @@ public class ArrayLiteralTest extends JexlTestCase {
         final JexlContext jc = new MapContext();
         Object o;
         o = JEXL.createExpression("[]").evaluate(jc);
-        assertTrue(o instanceof Object[]);
+        assertInstanceOf(Object[].class, o);
         assertEquals(0, ((Object[]) o).length);
         o = JEXL.createExpression("[...]").evaluate(jc);
-        assertTrue(o instanceof List<?>);
+        assertInstanceOf(List.class, o);
         assertEquals(0, ((List<?>) o).size());
         assertThrows(JexlException.Parsing.class, () -> JEXL.createExpression("[ , ]"));
         assertThrows(JexlException.Parsing.class, () -> JEXL.createExpression("[ ... , ]"));

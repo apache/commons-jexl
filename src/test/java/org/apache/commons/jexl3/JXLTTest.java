@@ -19,6 +19,7 @@ package org.apache.commons.jexl3;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
@@ -528,7 +529,7 @@ public class JXLTTest extends JexlTestCase {
         Object result;
         script = jexl.createScript("let x = 42; let y = `${x}`; y");
         result = script.execute(null);
-        assertTrue(result instanceof String);
+        assertInstanceOf(String.class, result);
         assertEquals("42", result);
         Map<Object,Object> map = Collections.singletonMap("42", S42);
 

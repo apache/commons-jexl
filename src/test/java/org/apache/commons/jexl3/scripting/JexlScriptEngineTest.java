@@ -18,6 +18,7 @@
 package org.apache.commons.jexl3.scripting;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -121,7 +122,7 @@ public class JexlScriptEngineTest {
         assertNull(engine.get("this.is.a.test"));
         assertEquals(Boolean.TRUE, engine.eval("empty(this.is.a.test)"));
         final Object mymap = engine.eval("testmap={ 'key1' : 'value1', 'key2' : 'value2' }");
-        assertTrue(mymap instanceof Map<?, ?>);
+        assertInstanceOf(Map.class, mymap);
         assertEquals(2,((Map<?, ?>)mymap).size());
     }
 
