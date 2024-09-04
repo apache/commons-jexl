@@ -28,6 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
+import java.math.MathContext;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
@@ -37,6 +38,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.regex.Pattern;
 
 import org.apache.commons.jexl3.introspection.JexlPermissions;
 import org.junit.jupiter.api.Test;
@@ -483,4 +485,28 @@ public class Issues400Test {
         assertEquals(9, m[1].get("type"));
     }
 
+
+    public static class MatchingArithmetic extends JexlArithmetic {
+        public MatchingArithmetic(boolean astrict) {
+            super(astrict);
+        }
+
+        public boolean contains(Pattern[] container, String str) {
+            for(Pattern pattern : container) {
+                if (pattern.matcher(str).matches()) {
+                    return true;
+                }
+            }
+            return false;
+        }
+    }
+
+    @Test
+    void testPatterns() {
+        final JexlEngine jexl = new JexlBuilder().arithmetic(new MatchingArithmetic(true)).create();
+        JexlScript script = jexl.createScript("str =~ [~/abc.*/, ~/def.*/]", "str");
+        assertTrue((boolean) script.execute(null, "abcdef"));
+        assertTrue((boolean) script.execute(null, "defghi"));
+        assertFalse((boolean) script.execute(null, "ghijkl"));
+    }
 }
