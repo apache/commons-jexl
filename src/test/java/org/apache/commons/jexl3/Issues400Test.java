@@ -145,7 +145,7 @@ public class Issues400Test {
                 assertInstanceOf(Map.class, result);
                 final Map<?, ?> map = (Map<?, ?>) result;
                 assertEquals(1, map.size());
-                Object val = jexl.createScript("m -> m[1]").execute(null, map);
+                final Object val = jexl.createScript("m -> m[1]").execute(null, map);
                 assertEquals(1, val);
             }
         }
@@ -453,14 +453,11 @@ public class Issues400Test {
          * @param array the elements array
          * @param expr the property evaluation lambda
          */
-        public void sort(Object[] array, JexlScript expr) {
-            final Comparator<Object> cmp = new Comparator<Object>() {
-                @Override
-                public int compare(Object o1, Object o2) {
-                    Comparable left = (Comparable<?>) expr.execute(SortingContext.this, o1);
-                    Comparable right = (Comparable<?>) expr.execute(SortingContext.this, o2);
-                    return left.compareTo(right);
-                }
+        public void sort(final Object[] array, final JexlScript expr) {
+            final Comparator<Object> cmp = (o1, o2) -> {
+                final Comparable left = (Comparable<?>) expr.execute(SortingContext.this, o1);
+                final Comparable right = (Comparable<?>) expr.execute(SortingContext.this, o2);
+                return left.compareTo(right);
             };
             Arrays.sort(array, cmp);
         }
@@ -470,11 +467,11 @@ public class Issues400Test {
     void testSortArray() {
         final JexlEngine jexl = new JexlBuilder().safe(false).strict(true).silent(false).create();
         // test data, json like
-        String src = "[{'id':1,'name':'John','type':9},{'id':2,'name':'Doe','type':7},{'id':3,'name':'Doe','type':10}]";
-        Object a =  jexl.createExpression(src).evaluate(null);
+        final String src = "[{'id':1,'name':'John','type':9},{'id':2,'name':'Doe','type':7},{'id':3,'name':'Doe','type':10}]";
+        final Object a =  jexl.createExpression(src).evaluate(null);
         assertNotNull(a);
         // row 0 and 1 are not ordered
-        Map[] m = (Map[]) a;
+        final Map[] m = (Map[]) a;
         assertEquals(9, m[0].get("type"));
         assertEquals(7, m[1].get("type"));
         // sort the elements on the type
@@ -486,12 +483,12 @@ public class Issues400Test {
 
 
     public static class MatchingArithmetic extends JexlArithmetic {
-        public MatchingArithmetic(boolean astrict) {
+        public MatchingArithmetic(final boolean astrict) {
             super(astrict);
         }
 
-        public boolean contains(Pattern[] container, String str) {
-            for(Pattern pattern : container) {
+        public boolean contains(final Pattern[] container, final String str) {
+            for(final Pattern pattern : container) {
                 if (pattern.matcher(str).matches()) {
                     return true;
                 }
@@ -503,7 +500,7 @@ public class Issues400Test {
     @Test
     void testPatterns() {
         final JexlEngine jexl = new JexlBuilder().arithmetic(new MatchingArithmetic(true)).create();
-        JexlScript script = jexl.createScript("str =~ [~/abc.*/, ~/def.*/]", "str");
+        final JexlScript script = jexl.createScript("str =~ [~/abc.*/, ~/def.*/]", "str");
         assertTrue((boolean) script.execute(null, "abcdef"));
         assertTrue((boolean) script.execute(null, "defghi"));
         assertFalse((boolean) script.execute(null, "ghijkl"));
