@@ -877,7 +877,7 @@ public class ArithmeticTest extends JexlTestCase {
     public void testAtomicBoolean() {
         // in a condition
         JexlScript e = JEXL.createScript("if (x) 1 else 2;", "x");
-        JexlArithmetic jexla = JEXL.getArithmetic();
+        final JexlArithmetic jexla = JEXL.getArithmetic();
         final JexlContext jc = new MapContext();
         final AtomicBoolean ab = new AtomicBoolean(false);
         Object o;
@@ -2257,7 +2257,7 @@ public class ArithmeticTest extends JexlTestCase {
     }
 
     @Test void testShortCircuitAnd() {
-        String src = "(x, y, z) -> x && y && z";
+        final String src = "(x, y, z) -> x && y && z";
         final JexlBuilder builder = new JexlBuilder();
         final JexlEngine jexl = builder.create();
         JexlScript script;
@@ -2270,11 +2270,11 @@ public class ArithmeticTest extends JexlTestCase {
     }
 
     @Test void testShortCircuitOr() {
-        OptContext optc = new OptContext();
-        String src = "(x, y, z) -> x || y || z";
+        final OptContext optc = new OptContext();
+        final String src = "(x, y, z) -> x || y || z";
         final JexlBuilder builder = new JexlBuilder();
         final JexlEngine jexl = builder.create();
-        JexlOptions options = builder.options();
+        final JexlOptions options = builder.options();
         optc.setOptions(options);
         JexlScript script;
         Object result;
@@ -2293,7 +2293,7 @@ public class ArithmeticTest extends JexlTestCase {
     }
 
     @Test void testLogicalValue() {
-        String src = "function sanitize(const n) { n == 0 ? NaN : n }; sanitize(x) && 420 / x";
+        final String src = "function sanitize(const n) { n == 0 ? NaN : n }; sanitize(x) && 420 / x";
         final JexlEngine jexl = new JexlBuilder().create();
         JexlScript script;
         Object result;
@@ -2312,7 +2312,7 @@ public class ArithmeticTest extends JexlTestCase {
             return options;
         }
 
-        void setOptions(JexlOptions options) {
+        void setOptions(final JexlOptions options) {
             this.options = options;
         }
     }
