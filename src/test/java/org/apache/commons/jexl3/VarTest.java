@@ -130,15 +130,15 @@ public class VarTest extends JexlTestCase {
          * @return the string representation of year, month or day
          */
         public String get(final String property) {
-            if ("yyyy".equals(property)) {
+            switch (property) {
+            case "yyyy":
                 return Integer.toString(cal.get(Calendar.YEAR));
-            }
-            if ("MM".equals(property)) {
+            case "MM":
                 return Integer.toString(cal.get(Calendar.MONTH) + 1);
-            }
-
-            if ("dd".equals(property)) {
+            case "dd":
                 return Integer.toString(cal.get(Calendar.DAY_OF_MONTH));
+            default:
+                break;
             }
             return null;
         }
