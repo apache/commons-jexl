@@ -76,14 +76,15 @@ public class ArithmeticOperatorTest extends JexlTestCase {
             try {
                 final Calendar cal = Calendar.getInstance(UTC);
                 cal.setTime(date);
-                if ("yyyy".equals(key)) {
+                switch (key) {
+                case "yyyy":
                     return cal.get(Calendar.YEAR);
-                }
-                if ("MM".equals(key)) {
+                case "MM":
                     return cal.get(Calendar.MONTH) + 1;
-                }
-                if ("dd".equals(key)) {
+                case "dd":
                     return cal.get(Calendar.DAY_OF_MONTH);
+                default:
+                    break;
                 }
                 // Otherwise treat as format mask
                 final SimpleDateFormat df = new SimpleDateFormat(key); //, dfs);
@@ -113,12 +114,18 @@ public class ArithmeticOperatorTest extends JexlTestCase {
         protected Object setDateValue(final Date date, final String key, final Object value) throws Exception {
             final Calendar cal = Calendar.getInstance(UTC);
             cal.setTime(date);
-            if ("yyyy".equals(key)) {
+            switch (key) {
+            case "yyyy":
                 cal.set(Calendar.YEAR, toInteger(value));
-            } else if ("MM".equals(key)) {
+                break;
+            case "MM":
                 cal.set(Calendar.MONTH, toInteger(value) - 1);
-            } else if ("dd".equals(key)) {
+                break;
+            case "dd":
                 cal.set(Calendar.DAY_OF_MONTH, toInteger(value));
+                break;
+            default:
+                break;
             }
             date.setTime(cal.getTimeInMillis());
             return date;
