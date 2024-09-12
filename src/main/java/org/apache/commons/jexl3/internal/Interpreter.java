@@ -454,7 +454,7 @@ public class Interpreter extends InterpreterBase {
         if (!(node instanceof ASTIdentifierAccessJxlt)) {
             return node.getIdentifier();
         }
-        ASTIdentifierAccessJxlt jxltNode = (ASTIdentifierAccessJxlt) node;
+        final ASTIdentifierAccessJxlt jxltNode = (ASTIdentifierAccessJxlt) node;
         Throwable cause = null;
         try {
             final Object name = evalJxltHandle(jxltNode);
@@ -474,7 +474,7 @@ public class Interpreter extends InterpreterBase {
      * @return the JXLT template evaluation.
      * @param <NODE> the node type
      */
-    private <NODE extends JexlNode & JexlNode.JxltHandle> Object evalJxltHandle(NODE node) {
+    private <NODE extends JexlNode & JexlNode.JxltHandle> Object evalJxltHandle(final NODE node) {
         JxltEngine.Expression expr = node.getExpression();
         if (expr == null) {
             final TemplateEngine jxlt = jexl.jxlt();
@@ -487,9 +487,9 @@ public class Interpreter extends InterpreterBase {
         }
         // internal classes to evaluate in context
         if (expr instanceof TemplateEngine.TemplateExpression ) {
-           Object eval = ((TemplateEngine.TemplateExpression ) expr).evaluate(context, frame, options);
+           final Object eval = ((TemplateEngine.TemplateExpression ) expr).evaluate(context, frame, options);
             if (eval != null) {
-                String inter = eval.toString();
+                final String inter = eval.toString();
                 if (options.isStrictInterpolation()) {
                     return inter;
                 }
