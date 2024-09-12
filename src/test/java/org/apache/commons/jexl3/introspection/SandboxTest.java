@@ -606,11 +606,11 @@ class SandboxTest extends JexlTestCase {
     @Test
     void testPermissionOrder() {
         // permissions should not be dependent on order of evaluation
-        JexlSandbox sandboxAB = new JexlSandbox(false, true);
+        final JexlSandbox sandboxAB = new JexlSandbox(false, true);
         sandboxAB.permissions(I.class.getName(), true, true, true, false);
         assertEquals("allow{all}", sandboxAB.get(A.class.getName()).write().toString());
         assertEquals("allow{all}", sandboxAB.get(B.class.getName()).write().toString());
-        JexlSandbox sandboxBA = new JexlSandbox(false, true);
+        final JexlSandbox sandboxBA = new JexlSandbox(false, true);
         sandboxBA.permissions(I.class.getName(), true, true, true, false);
         assertEquals("allow{all}", sandboxBA.get(B.class.getName()).write().toString());
         assertEquals("allow{all}", sandboxBA.get(A.class.getName()).write().toString());
@@ -618,17 +618,17 @@ class SandboxTest extends JexlTestCase {
 
     @Test
     void testIssue424() {
-        JexlSandbox sandbox = new JexlSandbox(false, true);
+        final JexlSandbox sandbox = new JexlSandbox(false, true);
         sandbox.permissions(Map.class.getName(), true, true, true, true);
-        String jexlCode = "x.foo = 'bar'";
-        JexlEngine engine = new JexlBuilder()
+        final String jexlCode = "x.foo = 'bar'";
+        final JexlEngine engine = new JexlBuilder()
                     .sandbox(sandbox)
                     .safe(false)
                     .strict(true).create();
-        JexlContext context = new MapContext();
-        Map<String, Object> x = new LinkedHashMap<>();
+        final JexlContext context = new MapContext();
+        final Map<String, Object> x = new LinkedHashMap<>();
         context.set("x",  x);
-        Object result = engine.createScript(jexlCode).execute(context);
+        final Object result = engine.createScript(jexlCode).execute(context);
         assertEquals("bar", result);
         assertEquals("bar", x.get("foo"));
     }
