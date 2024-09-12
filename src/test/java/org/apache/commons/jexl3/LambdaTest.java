@@ -560,7 +560,7 @@ public class LambdaTest extends JexlTestCase {
      * see JEXL-426
      */
     @Test void testRefCapture1() {
-        String src = "let x = 10;\n" +
+        final String src = "let x = 10;\n" +
                 "let foo = () -> {\n" +
                 "x += 2;\n" +
                 "}\n" +
@@ -578,7 +578,7 @@ public class LambdaTest extends JexlTestCase {
     }
 
     @Test void testRefCapture2() {
-        String src = "let x = 10; let f = () -> { x + 2 }; x = 40; f()";
+        final String src = "let x = 10; let f = () -> { x + 2 }; x = 40; f()";
         final JexlEngine jexl = new JexlBuilder()
                 .features(new JexlFeatures().constCapture(true).referenceCapture(true))
                 .create();
@@ -590,7 +590,7 @@ public class LambdaTest extends JexlTestCase {
     }
 
     @Test void testRefCapture3() {
-        String src = "let x = 10; let f = () -> { x + 2 }; x = 40; f";
+        final String src = "let x = 10; let f = () -> { x + 2 }; x = 40; f";
         final JexlEngine jexl = new JexlBuilder()
                 .features(new JexlFeatures().constCapture(true).referenceCapture(true))
                 .create();
@@ -605,7 +605,7 @@ public class LambdaTest extends JexlTestCase {
     }
 
     @Test void testRefCapture4() {
-        String src = "let x = 10; let f = () -> { let x = 142; x }; x = 40; f";
+        final String src = "let x = 10; let f = () -> { let x = 142; x }; x = 40; f";
         final JexlEngine jexl = new JexlBuilder()
                 .features(new JexlFeatures().referenceCapture(true))
                 .create();
