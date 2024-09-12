@@ -56,17 +56,20 @@ public class AnnotationTest extends JexlTestCase {
         public Object processAnnotation(final String name, final Object[] args, final Callable<Object> statement) throws Exception {
             count += 1;
             names.add(name);
-            if ("one".equals(name)) {
+            switch (name) {
+            case "one":
                 names.add(args[0].toString());
-            } else if ("two".equals(name)) {
+                break;
+            case "two":
                 names.add(args[0].toString());
                 names.add(args[1].toString());
-            } else if ("error".equals(name)) {
+                break;
+            case "error":
                 names.add(args[0].toString());
                 throw new IllegalArgumentException(args[0].toString());
-            } else if ("unknown".equals(name)) {
+            case "unknown":
                 return null;
-            } else if ("synchronized".equals(name)) {
+            case "synchronized": {
                 if (statement instanceof Interpreter.AnnotatedCall) {
                     final Object sa = ((Interpreter.AnnotatedCall) statement).getStatement();
                     if (sa != null) {
@@ -81,6 +84,10 @@ public class AnnotationTest extends JexlTestCase {
                         return statement.call();
                     }
                 }
+                break;
+            }
+            default:
+                break;
             }
             return statement.call();
         }
@@ -110,7 +117,12 @@ public class AnnotationTest extends JexlTestCase {
         public Object processAnnotation(final String name, final Object[] args, final Callable<Object> statement) throws Exception {
             final JexlOptions options = getEngineOptions();
             // transient side effect for strict
-            if ("strict".equals(name)) {
+            
+            // transient side effect for silent
+            
+            // durable side effect for scale
+            switch (name) {
+            case "strict": {
                 final boolean s = (Boolean) args[0];
                 final boolean b = options.isStrict();
                 options.setStrict(s);
@@ -118,8 +130,7 @@ public class AnnotationTest extends JexlTestCase {
                 options.setStrict(b);
                 return r;
             }
-            // transient side effect for silent
-            if ("silent".equals(name)) {
+            case "silent": {
                 if (args != null && args.length != 0) {
                     final boolean s = (Boolean) args[0];
                     final boolean b = options.isSilent();
@@ -138,10 +149,11 @@ public class AnnotationTest extends JexlTestCase {
                     options.setSilent(b);
                 }
             }
-            // durable side effect for scale
-            if ("scale".equals(name)) {
+            case "scale":
                 options.setMathScale((Integer) args[0]);
                 return statement.call();
+            default:
+                break;
             }
             return statement.call();
         }
