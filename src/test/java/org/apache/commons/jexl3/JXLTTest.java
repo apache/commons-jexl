@@ -480,27 +480,27 @@ public class JXLTTest extends JexlTestCase {
      * index for lists and keys for maps. (see JEXL-425)
      */
     public static class Arithmetic425 extends JexlArithmetic {
-        public Arithmetic425(boolean astrict) {
+        public Arithmetic425(final boolean astrict) {
             super(astrict);
         }
 
-        public Object propertyGet(List list, String property) {
-            Integer id = JexlArithmetic.parseIdentifier(property);
+        public Object propertyGet(final List list, final String property) {
+            final Integer id = JexlArithmetic.parseIdentifier(property);
             return id == null? JexlEngine.TRY_FAILED : list.get(id);
         }
 
-        public Object propertySet(List list, String property, Object value) {
-            Integer id = JexlArithmetic.parseIdentifier(property);
+        public Object propertySet(final List list, final String property, final Object value) {
+            final Integer id = JexlArithmetic.parseIdentifier(property);
             if (id != null) {
                 return list.set(id, value);
             }
             return JexlEngine.TRY_FAILED;
         }
 
-        public Object propertyGet(Map list, String property) {
+        public Object propertyGet(final Map list, final String property) {
             // determine if keys are integers by performing a check on first one
             if (list.keySet().stream().findFirst().orElse(null) instanceof Number) {
-                Integer id = JexlArithmetic.parseIdentifier(property);
+                final Integer id = JexlArithmetic.parseIdentifier(property);
                 if (id != null) {
                     return list.get(id);
                 }
@@ -508,10 +508,10 @@ public class JXLTTest extends JexlTestCase {
             return JexlEngine.TRY_FAILED;
         }
 
-        public Object propertySet(Map list, String property, Object value) {
+        public Object propertySet(final Map list, final String property, final Object value) {
             // determine if keys are integers by performing a check on first one
             if (list.keySet().stream().findFirst().orElse(null) instanceof Number) {
-                Integer id = JexlArithmetic.parseIdentifier(property);
+                final Integer id = JexlArithmetic.parseIdentifier(property);
                 if (id != null) {
                     list.put(id, value);
                     return value;
@@ -531,14 +531,14 @@ public class JXLTTest extends JexlTestCase {
         result = script.execute(null);
         assertInstanceOf(String.class, result);
         assertEquals("42", result);
-        Map<Object,Object> map = Collections.singletonMap("42", S42);
+        final Map<Object,Object> map = Collections.singletonMap("42", S42);
 
         script = jexl.createScript("let x = 42; map.`${x}`", "map");
         result = script.execute(null, map);
         assertEquals(S42, result);
-        List<String> list = Collections.singletonList(S42);
+        final List<String> list = Collections.singletonList(S42);
 
-        JexlScript finalScript = script;
+        final JexlScript finalScript = script;
         assertThrows(JexlException.Property.class, () -> finalScript.execute(null, list));
         script = jexl.createScript("let x = 0; list[x]", "list");
         assertEquals(S42, result);
@@ -552,7 +552,7 @@ public class JXLTTest extends JexlTestCase {
     }
 
     @Test void test425c() {
-        JexlEngine jexl = new JexlBuilder()
+        final JexlEngine jexl = new JexlBuilder()
                 .cache(8)
                 .arithmetic(new Arithmetic425(true))
                 .strictInterpolation(true).create();
@@ -560,7 +560,7 @@ public class JXLTTest extends JexlTestCase {
         run425bc(jexl, true);
     }
 
-    void run425bc(JexlEngine jexl, boolean strictInterpolation) {
+    void run425bc(final JexlEngine jexl, final boolean strictInterpolation) {
         final String S42 = "fourty-two";
         JexlScript script;
         Object result;
