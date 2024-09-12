@@ -725,7 +725,7 @@ public abstract class JexlParser extends StringParser {
      * @param jjtThis the script
      */
     protected void beginLambda(final ASTJexlScript jjtThis) {
-        jjtThis.setFeatures(this.getFeatures());
+        jjtThis.setFeatures(getFeatures());
         pushScope();
         pushUnit(jjtThis);
     }
