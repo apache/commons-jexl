@@ -49,14 +49,15 @@ public final class JexlTest extends JexlTestCase {
 
         @SuppressWarnings("boxing")
         public Integer get(final String val) {
-            if ("zero".equals(val)) {
+            switch (val) {
+            case "zero":
                 return 0;
-            }
-            if ("one".equals(val)) {
+            case "one":
                 return 1;
-            }
-            if ("user".equals(val)) {
+            case "user":
                 return user;
+            default:
+                break;
             }
             return -1;
         }
