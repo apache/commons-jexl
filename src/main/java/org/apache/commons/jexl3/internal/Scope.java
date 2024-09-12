@@ -113,7 +113,7 @@ public final class Scope {
      * @param args the arguments
      * @return the arguments array
      */
-    public Frame createFrame(boolean ref, final Frame frame, final Object...args) {
+    public Frame createFrame(final boolean ref, final Frame frame, final Object...args) {
         if (namedVariables == null) {
             return null;
         }
