@@ -80,7 +80,7 @@ public class Frame {
      * @param s the offset in this frame
      * @return the stacked value
      */
-    Object capture(int s) {
+    Object capture(final int s) {
         return stack[s];
     }
 
@@ -153,7 +153,7 @@ public class Frame {
  * Pass-by-reference frame.
  */
 class ReferenceFrame extends Frame {
-    ReferenceFrame(Scope s, Object[] r, int c) {
+    ReferenceFrame(final Scope s, final Object[] r, final int c) {
         super(s, r, c);
     }
 
@@ -169,7 +169,7 @@ class ReferenceFrame extends Frame {
             return (CaptureReference) o;
         } else {
             // change the type of the captured register, wrap the value in a reference
-            CaptureReference captured = new CaptureReference(o);
+            final CaptureReference captured = new CaptureReference(o);
             stack[s] = captured;
             return captured;
         }
@@ -198,7 +198,7 @@ class ReferenceFrame extends Frame {
  * Captured variable reference.
  */
 class CaptureReference extends AtomicReference<Object> {
-    CaptureReference(Object o) {
+    CaptureReference(final Object o) {
         super(o);
     }
 }
