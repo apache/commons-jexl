@@ -1735,7 +1735,7 @@ public class JexlArithmetic {
                 for (int i = 0; i < length; ++i) {
                     final char c = str.charAt(i);
                     // leading 0s but no just 0, numeric only
-                    if ((c == '0' && val == 0 && length > 1) || (c < '0' || c > '9')) {
+                    if (c == '0' && val == 0 && length > 1 || c < '0' || c > '9') {
                         return null;
                     }
                     val *= 10;
