@@ -300,7 +300,7 @@ public final class JexlSandbox {
                 // nothing defined yet, find first superclass that defines permissions
                 if (permissions == null) {
                     // let's recurse on super classes
-                    Class<?> superClazz = clazz.getSuperclass();
+                    final Class<?> superClazz = clazz.getSuperclass();
                     if (Object.class != superClazz) {
                         permissions = inheritable(compute(superClazz, false));
                     }
