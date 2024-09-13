@@ -50,7 +50,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class Uberspect implements JexlUberspect {
     /**
-     * The concrete uberspect Arithmetic class.
+     * The concrete Uberspect Arithmetic class.
      */
     protected class ArithmeticUberspect implements JexlArithmetic.Uberspect {
         /** The arithmetic instance being analyzed. */
@@ -71,8 +71,8 @@ public class Uberspect implements JexlUberspect {
         @Override
         public JexlMethod getOperator(final JexlOperator operator, final Object... args) {
             return overloads.contains(operator) && args != null
-                   ? getMethod(arithmetic, operator.getMethodName(), args)
-                   : null;
+                    ? uberspectOperator(arithmetic, operator, args)
+                    : null;
         }
 
         @Override
@@ -80,6 +80,7 @@ public class Uberspect implements JexlUberspect {
             return overloads.contains(operator);
         }
     }
+
     /** Publicly exposed special failure object returned by tryInvoke. */
     public static final Object TRY_FAILED = JexlEngine.TRY_FAILED;
     /** The logger to use for all warnings and errors. */
@@ -94,7 +95,6 @@ public class Uberspect implements JexlUberspect {
     private volatile Reference<Introspector> ref;
     /** The class loader reference; used to recreate the introspector when necessary. */
     private volatile Reference<ClassLoader> loader;
-
     /**
      * The map from arithmetic classes to overloaded operator sets.
      * <p>
@@ -190,6 +190,25 @@ public class Uberspect implements JexlUberspect {
             jau = new ArithmeticUberspect(arithmetic, ops);
         }
         return jau;
+    }
+
+    /**
+     * Seeks an implementation of an operator method in an arithmetic instance.
+     * <p>Method must <em><>not/em belong to JexlArithmetic</p>
+     * @param arithmetic the arithmetic instance
+     * @param operator the operator
+     * @param args the arguments
+     * @return a JexlMethod instance or null
+     */
+    final JexlMethod uberspectOperator(final JexlArithmetic arithmetic,
+                                       final JexlOperator operator,
+                                       final Object... args) {
+        final JexlMethod me = getMethod(arithmetic, operator.getMethodName(), args);
+        if (!(me instanceof MethodExecutor) ||
+            !JexlArithmetic.class.equals(((MethodExecutor) me).getMethod().getDeclaringClass())) {
+            return me;
+        }
+        return null;
     }
 
     /**

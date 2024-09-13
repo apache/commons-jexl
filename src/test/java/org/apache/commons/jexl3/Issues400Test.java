@@ -28,6 +28,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
+import java.math.MathContext;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
@@ -505,4 +507,40 @@ public class Issues400Test {
         assertTrue((boolean) script.execute(null, "defghi"));
         assertFalse((boolean) script.execute(null, "ghijkl"));
     }
+
+
+    public static class Arithmetic428 extends JexlArithmetic {
+        public Arithmetic428(boolean strict) {
+            this( strict, null, Integer.MIN_VALUE);
+        }
+
+        private Arithmetic428(boolean strict, MathContext context, int scale) {
+            super(strict, context, scale);
+        }
+
+        public int compare(Instant lhs, String str) {
+            Instant rhs = Instant.parse(str);
+            return lhs.compareTo(rhs);
+        }
+
+        public int compare(String str, Instant date) {
+            return -compare(date, str);
+        }
+    }
+
+    @Test
+    void testIssue428() {
+        final JexlEngine jexl = new JexlBuilder().cache(32).arithmetic(new Arithmetic428(true)).create();
+        Instant rhs = Instant.parse("2024-09-09T10:42:42.00Z");
+        String lhs = "2020-09-09T01:24:24.00Z";
+        JexlScript script;
+        script = jexl.createScript("x < y", "x", "y");
+        assertTrue((boolean) script.execute(null, lhs, rhs));
+        assertTrue((boolean) script.execute(null, lhs, rhs));
+        assertFalse((boolean) script.execute(null, rhs, lhs));
+        assertFalse((boolean) script.execute(null, rhs, lhs));
+        assertTrue((boolean) script.execute(null, lhs, rhs));
+        assertFalse((boolean) script.execute(null, rhs, lhs));
+    }
+
 }

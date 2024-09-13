@@ -47,7 +47,6 @@ package org.apache.commons.jexl3;
  * @since 3.0
  */
 public enum JexlOperator {
-
     /**
      * Add operator.
      * <br><strong>Syntax:</strong> {@code x + y}
@@ -379,6 +378,7 @@ public enum JexlOperator {
      * Marker for side effect.
      * <br>Returns this from 'self*' overload method to let the engine know the side effect has been performed and
      * there is no need to assign the result.
+     * @deprecated 3.4.1
      */
     ASSIGN("=", null, null),
 
@@ -424,7 +424,32 @@ public enum JexlOperator {
      * <br><strong>Method:</strong> {@code boolean testCondition(R y);}.
      * @since 3.3
      */
-    CONDITION("?", "testCondition", 1);
+    CONDITION("?", "testCondition", 1),
+
+    /**
+     * Compare overload as in compare(x, y).
+     * <br><strong>Method:</strong> {@code boolean compare(L x, R y);}.
+     * @since 3.4.1
+     */
+    COMPARE("<>", "compare", 2),
+
+    /**
+     * Not-Contains operator.
+     * <p>Not overridable, calls !(contain(...))</p>
+     */
+    NOT_CONTAINS("!~", null, CONTAINS),
+
+    /**
+     * Not-Starts-With operator.
+     * <p>Not overridable, calls !(startsWith(...))</p>
+     */
+    NOT_STARTSWITH("!^", null, STARTSWITH),
+
+    /**
+     * Not-Ends-With operator.
+     * <p>Not overridable, calls !(endsWith(...))</p>
+     */
+    NOT_ENDSWITH("!$", null, ENDSWITH),;
 
     /**
      * The operator symbol.

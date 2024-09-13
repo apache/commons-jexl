@@ -56,24 +56,6 @@ import org.apache.commons.logging.Log;
  */
 public abstract class InterpreterBase extends ParserVisitor {
     /**
-     * Cached arithmetic function call.
-     */
-    protected static class ArithmeticFuncall extends Funcall {
-        /**
-         * Constructs a new instance.
-         * @param jme  the method
-         * @param flag the narrow flag
-         */
-        protected ArithmeticFuncall(final JexlMethod jme, final boolean flag) {
-            super(jme, flag);
-        }
-
-        @Override
-        protected Object tryInvoke(final InterpreterBase ii, final String name, final Object target, final Object[] args) {
-            return me.tryInvoke(name, ii.arithmetic, ii.functionArguments(target, narrow, args));
-        }
-    }
-    /**
      * Helping dispatch function calls.
      */
     protected class CallDispatcher {
@@ -208,6 +190,26 @@ public abstract class InterpreterBase extends ParserVisitor {
             return JexlEngine.TRY_FAILED;
         }
     }
+
+    /**
+     * Cached arithmetic function call.
+     */
+    protected static class ArithmeticFuncall extends Funcall {
+        /**
+         * Constructs a new instance.
+         * @param jme  the method
+         * @param flag the narrow flag
+         */
+        protected ArithmeticFuncall(final JexlMethod jme, final boolean flag) {
+            super(jme, flag);
+        }
+
+        @Override
+        protected Object tryInvoke(final InterpreterBase ii, final String name, final Object target, final Object[] args) {
+            return me.tryInvoke(name, ii.arithmetic, ii.functionArguments(target, narrow, args));
+        }
+    }
+
     /**
      * Cached context function call.
      */
@@ -274,8 +276,10 @@ public abstract class InterpreterBase extends ParserVisitor {
             return me.tryInvoke(name, target, ii.functionArguments(null, narrow, args));
         }
     }
+
     /** Empty parameters for method matching. */
     protected static final Object[] EMPTY_PARAMS = {};
+
     /**
      * Pretty-prints a failing property value (de)reference.
      * <p>Used by calls to unsolvableProperty(...).</p>
@@ -285,6 +289,7 @@ public abstract class InterpreterBase extends ParserVisitor {
     protected static String stringifyPropertyValue(final JexlNode node) {
         return node != null ? new Debugger().depth(1).data(node) : "???";
     }
+
     /** The JEXL engine. */
     protected final Engine jexl;
     /** The logger. */
@@ -774,7 +779,7 @@ public abstract class InterpreterBase extends ParserVisitor {
     /**
      * Triggered when an operator fails.
      * @param node     the node where the error originated from
-     * @param operator the method name
+     * @param operator the operator symbol
      * @param cause    the cause of error (if any)
      * @return throws JexlException if strict and not silent, null otherwise
      */

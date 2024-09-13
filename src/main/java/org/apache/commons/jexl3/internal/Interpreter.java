@@ -1421,14 +1421,14 @@ public class Interpreter extends InterpreterBase {
         final Object right = node.jjtGetChild(1).jjtAccept(this, data);
         // note the arguments inversion between 'in'/'matches' and 'contains'
         // if x in y then y contains x
-        return operators.contains(node, "=~", right, left);
+        return operators.contains(node, JexlOperator.CONTAINS, right, left);
     }
 
     @Override
     protected Object visit(final ASTEWNode node, final Object data) {
         final Object left = node.jjtGetChild(0).jjtAccept(this, data);
         final Object right = node.jjtGetChild(1).jjtAccept(this, data);
-        return operators.endsWith(node, "$=", left, right);
+        return operators.endsWith(node, JexlOperator.ENDSWITH, left, right);
     }
 
     @Override
@@ -1740,7 +1740,7 @@ public class Interpreter extends InterpreterBase {
     protected Object visit(final ASTNEWNode node, final Object data) {
         final Object left = node.jjtGetChild(0).jjtAccept(this, data);
         final Object right = node.jjtGetChild(1).jjtAccept(this, data);
-        return !operators.endsWith(node, "$!", left, right);
+        return operators.endsWith(node, JexlOperator.NOT_ENDSWITH, left, right);
     }
 
     @Override
@@ -1768,14 +1768,14 @@ public class Interpreter extends InterpreterBase {
         final Object right = node.jjtGetChild(1).jjtAccept(this, data);
         // note the arguments inversion between (not) 'in'/'matches' and  (not) 'contains'
         // if x not-in y then y not-contains x
-        return !operators.contains(node, "!~", right, left);
+        return operators.contains(node, JexlOperator.NOT_CONTAINS, right, left);
     }
 
     @Override
     protected Object visit(final ASTNSWNode node, final Object data) {
         final Object left = node.jjtGetChild(0).jjtAccept(this, data);
         final Object right = node.jjtGetChild(1).jjtAccept(this, data);
-        return !operators.startsWith(node, "^!", left, right);
+        return operators.startsWith(node, JexlOperator.NOT_STARTSWITH, left, right);
     }
 
     @Override
@@ -2099,7 +2099,7 @@ public class Interpreter extends InterpreterBase {
     protected Object visit(final ASTSWNode node, final Object data) {
         final Object left = node.jjtGetChild(0).jjtAccept(this, data);
         final Object right = node.jjtGetChild(1).jjtAccept(this, data);
-        return operators.startsWith(node, "^=", left, right);
+        return operators.startsWith(node, JexlOperator.STARTSWITH, left, right);
     }
 
     @Override
@@ -2244,7 +2244,7 @@ public class Interpreter extends InterpreterBase {
     protected Object visit(final ASTUnaryMinusNode node, final Object data) {
         // use cached value if literal
         final Object value = node.jjtGetValue();
-        if (value != null && !(value instanceof JexlMethod)) {
+        if (value instanceof Number) {
             return value;
         }
         final JexlNode valNode = node.jjtGetChild(0);
@@ -2273,7 +2273,7 @@ public class Interpreter extends InterpreterBase {
     protected Object visit(final ASTUnaryPlusNode node, final Object data) {
         // use cached value if literal
         final Object value = node.jjtGetValue();
-        if (value != null && !(value instanceof JexlMethod)) {
+        if (value instanceof Number) {
             return value;
         }
         final JexlNode valNode = node.jjtGetChild(0);
