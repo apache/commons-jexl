@@ -53,6 +53,7 @@ import java.util.function.Predicate;
  * <li>Thin-arrow: use the thin-arrow, ie {@code ->} for lambdas as in {@code x -> x + x}
  * <li>Fat-arrow: use the  fat-arrow, ie {@code =>} for lambdas as in {@code x => x + x}
  * <li>Namespace pragma: whether the {@code #pragma jexl.namespace.ns namespace} syntax is allowed</li>
+ * <li>Namespace identifier: whether the {@code ns:fun(...)} parser treats the ns:fun as one identifier, no spaces allowed</li>
  * <li>Import pragma: whether the {@code #pragma jexl.import fully.qualified.class.name} syntax is allowed</li>
  * <li>Comparator names: whether the comparator operator names can be used (as in {@code gt} for &gt;,
  * {@code lt} for &lt;, ...)</li>
@@ -71,7 +72,7 @@ public final class JexlFeatures {
         "register", "reserved variable", "local variable", "assign/modify",
         "global assign/modify", "array reference", "create instance", "loop", "function",
         "method call", "set/map/array literal", "pragma", "annotation", "script", "lexical", "lexicalShade",
-        "thin-arrow", "fat-arrow", "namespace pragma", "import pragma", "comparator names", "pragma anywhere",
+        "thin-arrow", "fat-arrow", "namespace pragma", "namespace identifier", "import pragma", "comparator names", "pragma anywhere",
         "const capture", "ref capture"
     };
     /** Registers feature ordinal. */
@@ -112,16 +113,18 @@ public final class JexlFeatures {
     public static final int FAT_ARROW = 17;
     /** Namespace pragma feature ordinal. */
     public static final int NS_PRAGMA = 18;
+    /** Namespace syntax as an identifier (no space). */
+    public static final int NS_IDENTIFIER = 19;
     /** Import pragma feature ordinal. */
-    public static final int IMPORT_PRAGMA = 19;
+    public static final int IMPORT_PRAGMA = 20;
     /** Comparator names (legacy) syntax. */
-    public static final int COMPARATOR_NAMES = 20;
+    public static final int COMPARATOR_NAMES = 21;
     /** The pragma anywhere feature ordinal. */
-    public static final int PRAGMA_ANYWHERE = 21;
+    public static final int PRAGMA_ANYWHERE = 22;
     /** Captured variables are const. */
-    public static final int CONST_CAPTURE = 22;
+    public static final int CONST_CAPTURE = 23;
     /** Captured variables are reference. */
-    public static final int REF_CAPTURE = 23;
+    public static final int REF_CAPTURE = 24;
     /**
      * All features.
      * N.B. ensure this is updated if additional features are added.
@@ -575,6 +578,21 @@ public final class JexlFeatures {
     }
 
     /**
+     * Sets whether namespace as identifier syntax is enabled.
+     * <p>
+     * When enabled, a namespace call must be of the form <code>ns:fun(...)</code> with no
+     * spaces between the namespace name and the function.
+     * </p>
+     * @param flag true to enable, false to disable
+     * @return this features instance
+     * @since 3.4.1
+     */
+    public JexlFeatures namespaceIdentifier(final boolean flag) {
+        setFeature(NS_IDENTIFIER, flag);
+        return this;
+    }
+
+    /**
      * @return the declared namespaces test.
      */
     public Predicate<String> namespaceTest() {
@@ -827,6 +845,13 @@ public final class JexlFeatures {
      */
     public boolean supportsNamespacePragma() {
         return getFeature(NS_PRAGMA);
+    }
+    /**
+     * @return true if namespace identifier syntax is enabled, false otherwise
+     * @since 3.4.1
+     */
+    public boolean supportsNamespaceIdentifier() {
+        return getFeature(NS_IDENTIFIER);
     }
 
     /**

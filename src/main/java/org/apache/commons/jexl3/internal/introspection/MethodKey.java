@@ -589,7 +589,7 @@ public final class MethodKey {
      * @param aMethod the method to generate the key from
      * @param args    the intended method arguments
      */
-    public MethodKey(final String aMethod, final Object[] args) {
+    public MethodKey(final String aMethod, final Object... args) {
         // !! keep this in sync with the other ctor (hash code) !!
         this.method = aMethod;
         int hash = this.method.hashCode();

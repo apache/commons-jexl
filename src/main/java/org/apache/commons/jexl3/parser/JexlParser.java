@@ -628,11 +628,18 @@ public abstract class JexlParser extends StringParser {
         if (!"(".equals(paren.image)) {
             return false;
         }
-        // if namespace name is shared with a variable name, use syntactic hint
-        final String name = ns.image;
-        if (isVariable(name)) {
+        // namespace as identifier means no spaces in between ns, colon and fun, no matter what
+        if (featureController.getFeatures().supportsNamespaceIdentifier()) {
+            return colon.beginColumn - 1 == ns.endColumn
+                    && colon.endColumn == fun.beginColumn - 1;
+        }
+        // if namespace name is shared with a variable name
+        // or if fun is a variable name (likely a function call),
+        // use syntactic hint
+        if (isVariable(ns.image) || isVariable(fun.image)) {
             // the namespace sticks to the colon as in 'ns:fun()' (vs 'ns : fun()')
-            return colon.beginColumn - 1 == ns.endColumn && (colon.endColumn == fun.beginColumn - 1 || isNamespace(name));
+            return colon.beginColumn - 1 == ns.endColumn
+                    && (colon.endColumn == fun.beginColumn - 1 || isNamespace(ns.image));
         }
         return true;
     }

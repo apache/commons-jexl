@@ -32,6 +32,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.commons.jexl3.JexlArithmetic;
 import org.apache.commons.jexl3.JexlEngine;
 import org.apache.commons.jexl3.JexlOperator;
+import org.apache.commons.jexl3.internal.Operators;
 import org.apache.commons.jexl3.introspection.JexlMethod;
 import org.apache.commons.jexl3.introspection.JexlPermissions;
 import org.apache.commons.jexl3.introspection.JexlPropertyGet;
@@ -49,38 +50,6 @@ import org.apache.commons.logging.LogFactory;
  * @since 1.0
  */
 public class Uberspect implements JexlUberspect {
-    /**
-     * The concrete Uberspect Arithmetic class.
-     */
-    protected class ArithmeticUberspect implements JexlArithmetic.Uberspect {
-        /** The arithmetic instance being analyzed. */
-        private final JexlArithmetic arithmetic;
-        /** The set of overloaded operators. */
-        private final Set<JexlOperator> overloads;
-
-        /**
-         * Creates an instance.
-         * @param theArithmetic the arithmetic instance
-         * @param theOverloads  the overloaded operators
-         */
-        ArithmeticUberspect(final JexlArithmetic theArithmetic, final Set<JexlOperator> theOverloads) {
-            this.arithmetic = theArithmetic;
-            this.overloads = theOverloads;
-        }
-
-        @Override
-        public JexlMethod getOperator(final JexlOperator operator, final Object... args) {
-            return overloads.contains(operator) && args != null
-                    ? uberspectOperator(arithmetic, operator, args)
-                    : null;
-        }
-
-        @Override
-        public boolean overloads(final JexlOperator operator) {
-            return overloads.contains(operator);
-        }
-    }
-
     /** Publicly exposed special failure object returned by tryInvoke. */
     public static final Object TRY_FAILED = JexlEngine.TRY_FAILED;
     /** The logger to use for all warnings and errors. */
@@ -154,8 +123,8 @@ public class Uberspect implements JexlUberspect {
     // CSON: DoubleCheckedLocking
 
     @Override
-    public JexlArithmetic.Uberspect getArithmetic(final JexlArithmetic arithmetic) {
-        JexlArithmetic.Uberspect jau = null;
+    public Operators getArithmetic(final JexlArithmetic arithmetic) {
+        Operators jau = null;
         if (arithmetic != null) {
             final Class<? extends JexlArithmetic> aclass = arithmetic.getClass();
             final Set<JexlOperator> ops = operatorMap.computeIfAbsent(aclass, k -> {
@@ -187,28 +156,9 @@ public class Uberspect implements JexlUberspect {
                 }
                 return newOps;
             });
-            jau = new ArithmeticUberspect(arithmetic, ops);
+            jau = new Operators(this, arithmetic, ops);
         }
         return jau;
-    }
-
-    /**
-     * Seeks an implementation of an operator method in an arithmetic instance.
-     * <p>Method must <em><>not/em belong to JexlArithmetic</p>
-     * @param arithmetic the arithmetic instance
-     * @param operator the operator
-     * @param args the arguments
-     * @return a JexlMethod instance or null
-     */
-    final JexlMethod uberspectOperator(final JexlArithmetic arithmetic,
-                                       final JexlOperator operator,
-                                       final Object... args) {
-        final JexlMethod me = getMethod(arithmetic, operator.getMethodName(), args);
-        if (!(me instanceof MethodExecutor) ||
-            !JexlArithmetic.class.equals(((MethodExecutor) me).getMethod().getDeclaringClass())) {
-            return me;
-        }
-        return null;
     }
 
     /**

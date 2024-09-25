@@ -28,18 +28,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
-import java.math.MathContext;
-import java.time.Instant;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.regex.Pattern;
 
 import org.apache.commons.jexl3.introspection.JexlPermissions;
 import org.junit.jupiter.api.Test;
@@ -449,98 +445,52 @@ public class Issues400Test {
         assertEquals(42, r);
     }
 
-    public static class SortingContext extends MapContext {
-        /**
-         * Sorts an array using a script to evaluate the property used to compare elements.
-         * @param array the elements array
-         * @param expr the property evaluation lambda
-         */
-        public void sort(final Object[] array, final JexlScript expr) {
-            final Comparator<Object> cmp = (o1, o2) -> {
-                final Comparable left = (Comparable<?>) expr.execute(SortingContext.this, o1);
-                final Comparable right = (Comparable<?>) expr.execute(SortingContext.this, o2);
-                return left.compareTo(right);
-            };
-            Arrays.sort(array, cmp);
+    public static class Ns429 {
+        public int f(final int x) {
+            return x * 10000 + 42;
         }
     }
 
     @Test
-    void testSortArray() {
-        final JexlEngine jexl = new JexlBuilder().safe(false).strict(true).silent(false).create();
-        // test data, json like
-        final String src = "[{'id':1,'name':'John','type':9},{'id':2,'name':'Doe','type':7},{'id':3,'name':'Doe','type':10}]";
-        final Object a =  jexl.createExpression(src).evaluate(null);
-        assertNotNull(a);
-        // row 0 and 1 are not ordered
-        final Map[] m = (Map[]) a;
-        assertEquals(9, m[0].get("type"));
-        assertEquals(7, m[1].get("type"));
-        // sort the elements on the type
-        jexl.createScript("array.sort( e -> e.type )", "array").execute(new SortingContext(), a);
-        // row 0 and 1 are now ordered
-        assertEquals(7, m[0].get("type"));
-        assertEquals(9, m[1].get("type"));
-    }
+    void test429a() {
+        MapContext ctxt = new MapContext();
+        //ctxt.set("b", 1);
+        JexlFeatures features = JexlFeatures.createDefault();
+        final JexlEngine jexl = new JexlBuilder()
+                .features(features)
+                .safe(false).strict(true).silent(false).create();
+        JexlScript f = jexl.createScript("x -> x");
+        ctxt.set("f", f);
+        String src = "#pragma jexl.namespace.b "+Ns429.class.getName()  +"\n"
+                +"b ? b : f(2);";
+        JexlScript script = jexl.createScript(src, "b");
+        assertEquals(1, (int) script.execute(ctxt, 1));
 
-
-    public static class MatchingArithmetic extends JexlArithmetic {
-        public MatchingArithmetic(final boolean astrict) {
-            super(astrict);
-        }
-
-        public boolean contains(final Pattern[] container, final String str) {
-            for(final Pattern pattern : container) {
-                if (pattern.matcher(str).matches()) {
-                    return true;
-                }
-            }
-            return false;
-        }
+        src = "#pragma jexl.namespace.b "+Ns429.class.getName()  +"\n"
+                +"b ? b:f(2) : 1;";
+        script = jexl.createScript(src, "b");
+        assertEquals(20042, (int) script.execute(ctxt, 1));
     }
 
     @Test
-    void testPatterns() {
-        final JexlEngine jexl = new JexlBuilder().arithmetic(new MatchingArithmetic(true)).create();
-        final JexlScript script = jexl.createScript("str =~ [~/abc.*/, ~/def.*/]", "str");
-        assertTrue((boolean) script.execute(null, "abcdef"));
-        assertTrue((boolean) script.execute(null, "defghi"));
-        assertFalse((boolean) script.execute(null, "ghijkl"));
+    void test429b() {
+        MapContext ctxt = new MapContext();
+        ctxt.set("b", 1);
+        JexlFeatures features = JexlFeatures.createDefault();
+        features.namespaceIdentifier(true);
+        final JexlEngine jexl = new JexlBuilder()
+                .features(features)
+                .safe(false).strict(true).silent(false).create();
+        JexlScript f = jexl.createScript("x -> x");
+        ctxt.set("f", f);
+        String src = "#pragma jexl.namespace.b "+Ns429.class.getName()  +"\n"
+                +"b ? b : f(2);";
+        JexlScript script = jexl.createScript(src);
+        assertEquals(1, (int) script.execute(ctxt));
+
+        src = "#pragma jexl.namespace.b "+Ns429.class.getName()  +"\n"
+                +"b ? b:f(2) : 1;";
+        script = jexl.createScript(src);
+        assertEquals(20042, (int) script.execute(ctxt));
     }
-
-
-    public static class Arithmetic428 extends JexlArithmetic {
-        public Arithmetic428(boolean strict) {
-            this( strict, null, Integer.MIN_VALUE);
-        }
-
-        private Arithmetic428(boolean strict, MathContext context, int scale) {
-            super(strict, context, scale);
-        }
-
-        public int compare(Instant lhs, String str) {
-            Instant rhs = Instant.parse(str);
-            return lhs.compareTo(rhs);
-        }
-
-        public int compare(String str, Instant date) {
-            return -compare(date, str);
-        }
-    }
-
-    @Test
-    void testIssue428() {
-        final JexlEngine jexl = new JexlBuilder().cache(32).arithmetic(new Arithmetic428(true)).create();
-        Instant rhs = Instant.parse("2024-09-09T10:42:42.00Z");
-        String lhs = "2020-09-09T01:24:24.00Z";
-        JexlScript script;
-        script = jexl.createScript("x < y", "x", "y");
-        assertTrue((boolean) script.execute(null, lhs, rhs));
-        assertTrue((boolean) script.execute(null, lhs, rhs));
-        assertFalse((boolean) script.execute(null, rhs, lhs));
-        assertFalse((boolean) script.execute(null, rhs, lhs));
-        assertTrue((boolean) script.execute(null, lhs, rhs));
-        assertFalse((boolean) script.execute(null, rhs, lhs));
-    }
-
 }

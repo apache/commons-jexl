@@ -304,22 +304,16 @@ public abstract class InterpreterBase extends ParserVisitor {
     protected final JexlOptions options;
     /** Cache executors. */
     protected final boolean cache;
-
     /** Cancellation support. */
     protected final AtomicBoolean cancelled;
-
     /** The namespace resolver. */
     protected final JexlContext.NamespaceResolver ns;
-
     /** The class name resolver. */
     protected final JexlContext.ClassNameResolver fqcnSolver;
-
     /** The operators evaluation delegate. */
     protected final Operators operators;
-
     /** The map of 'prefix:function' to object resolving as namespaces. */
     protected final Map<String, Object> functions;
-
     /** The map of dynamically created namespaces, NamespaceFunctor or duck-types of those. */
     protected Map<String, Object> functors;
 
@@ -355,7 +349,7 @@ public abstract class InterpreterBase extends ParserVisitor {
         this.cancelled = acancel != null ? acancel : new AtomicBoolean();
         this.functions = options.getNamespaces();
         this.functors = null;
-        this.operators = new Operators(this);
+        this.operators = (Operators) uberspect.getArithmetic(arithmetic);
         // the import package facility
         final Collection<String> imports = options.getImports();
         this.fqcnSolver = imports.isEmpty()

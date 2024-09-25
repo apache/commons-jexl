@@ -18,16 +18,22 @@
 package org.apache.commons.jexl3;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.StringWriter;
+import java.math.MathContext;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -39,6 +45,7 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TimeZone;
 import java.util.TreeSet;
+import java.util.regex.Pattern;
 
 import org.apache.commons.jexl3.junit.Asserter;
 import org.junit.jupiter.api.BeforeEach;
@@ -641,4 +648,219 @@ public class ArithmeticOperatorTest extends JexlTestCase {
         asserter.assertExpression("x.y =$ 'foo'", Boolean.TRUE);
     }
 
+
+    /**
+     * A comparator using an evaluated expression on objects as comparison arguments.
+     */
+    public static class PropertyComparator implements JexlCache.Reference, Comparator<Object> {
+        private final JexlContext context = JexlEngine.getThreadContext();
+        private final JexlArithmetic arithmetic;
+        private final JexlArithmetic.Uberspect uber;
+        private final JexlScript expr;
+        private Object cache;
+
+        PropertyComparator(JexlArithmetic jexla, JexlScript expr) {
+            this.arithmetic = jexla;
+            this.uber = JexlEngine.getThreadEngine().getUberspect().getArithmetic(arithmetic);
+            this.expr = expr;
+        }
+        @Override
+        public int compare(Object o1, Object o2) {
+            final Object left = expr.execute(context, o1);
+            final Object right = expr.execute(context, o2);
+            Object result = uber.tryEval(this, JexlOperator.COMPARE, left, right);
+            if (result instanceof Integer) {
+                return (int) result;
+            }
+            return arithmetic.compare(left, right, JexlOperator.COMPARE);
+        }
+
+        @Override
+        public Object getCache() {
+            return cache;
+        }
+
+        @Override
+        public void setCache(Object cache) {
+            this.cache = cache;
+        }
+    }
+
+    public static class SortingArithmetic extends JexlArithmetic {
+        public SortingArithmetic(boolean strict) {
+            this( strict, null, Integer.MIN_VALUE);
+        }
+
+        private SortingArithmetic(boolean strict, MathContext context, int scale) {
+            super(strict, context, scale);
+        }
+
+        public int compare(Integer left, Integer right) {
+            return left.compareTo(right);
+        }
+
+        public int compare(String left, String right) {
+            return left.compareTo(right);
+        }
+
+        /**
+         * Sorts an array using a script to evaluate the property used to compare elements.
+         * @param array the elements array
+         * @param expr the property evaluation lambda
+         */
+        public void sort(final Object[] array, final JexlScript expr) {
+            Arrays.sort(array, new PropertyComparator(this, expr));
+        }
+    }
+
+    @Test
+    void testSortArray() {
+        final JexlEngine jexl = new JexlBuilder().arithmetic(new SortingArithmetic(true)).safe(false).strict(true).silent(false).create();
+        // test data, json like
+        final String src = "[{'id':1,'name':'John','type':9},{'id':2,'name':'Doe','type':7},{'id':3,'name':'Doe','type':10}]";
+        final Object a =  jexl.createExpression(src).evaluate(null);
+        assertNotNull(a);
+        // row 0 and 1 are not ordered
+        final Map[] m = (Map[]) a;
+        assertEquals(9, m[0].get("type"));
+        assertEquals(7, m[1].get("type"));
+        // sort the elements on the type
+        jexl.createScript("array.sort( e -> e.type )", "array").execute(null, a);
+        // row 0 and 1 are now ordered
+        assertEquals(7, m[0].get("type"));
+        assertEquals(9, m[1].get("type"));
+    }
+
+
+    public static class MatchingArithmetic extends JexlArithmetic {
+        public MatchingArithmetic(final boolean astrict) {
+            super(astrict);
+        }
+
+        public boolean contains(final Pattern[] container, final String str) {
+            for(final Pattern pattern : container) {
+                if (pattern.matcher(str).matches()) {
+                    return true;
+                }
+            }
+            return false;
+        }
+    }
+
+    @Test
+    void testPatterns() {
+        final JexlEngine jexl = new JexlBuilder().arithmetic(new MatchingArithmetic(true)).create();
+        final JexlScript script = jexl.createScript("str =~ [~/abc.*/, ~/def.*/]", "str");
+        assertTrue((boolean) script.execute(null, "abcdef"));
+        assertTrue((boolean) script.execute(null, "defghi"));
+        assertFalse((boolean) script.execute(null, "ghijkl"));
+    }
+
+
+    public static class Arithmetic428 extends JexlArithmetic {
+        public Arithmetic428(boolean strict) {
+            this( strict, null, Integer.MIN_VALUE);
+        }
+
+        private Arithmetic428(boolean strict, MathContext context, int scale) {
+            super(strict, context, scale);
+        }
+
+        public int compare(Instant lhs, String str) {
+            Instant rhs = Instant.parse(str);
+            return lhs.compareTo(rhs);
+        }
+    }
+
+    @Test
+    void test428() {
+        // see JEXL-428
+        final JexlEngine jexl = new JexlBuilder().cache(32).arithmetic(new Arithmetic428(true)).create();
+        final String rhsstr ="2024-09-09T10:42:42.00Z";
+        final Instant rhs = Instant.parse(rhsstr);
+        final String lhs = "2020-09-09T01:24:24.00Z";
+        JexlScript script;
+        script = jexl.createScript("x < y", "x", "y");
+        final JexlScript s0 = script;
+        assertThrows(JexlException.class, () -> s0.execute(null, 42, rhs));
+        assertTrue((boolean) script.execute(null, lhs, rhs));
+        assertTrue((boolean) script.execute(null, lhs, rhs));
+        assertFalse((boolean) script.execute(null, rhs, lhs));
+        assertFalse((boolean) script.execute(null, rhs, lhs));
+        assertTrue((boolean) script.execute(null, lhs, rhs));
+        assertFalse((boolean) script.execute(null, rhs, lhs));
+
+        script = jexl.createScript("x <= y", "x", "y");
+        final JexlScript s1 = script;
+        assertThrows(JexlException.class, () -> s1.execute(null, 42, rhs));
+        assertTrue((boolean) script.execute(null, lhs, rhs));
+        assertFalse((boolean) script.execute(null, rhs, lhs));
+
+        script = jexl.createScript("x >= y", "x", "y");
+        final JexlScript s2 = script;
+        assertThrows(JexlException.class, () -> s2.execute(null, 42, rhs));
+        assertFalse((boolean) script.execute(null, lhs, rhs));
+        assertFalse((boolean) script.execute(null, lhs, rhs));
+        assertTrue((boolean) script.execute(null, rhs, lhs));
+        assertTrue((boolean) script.execute(null, rhs, lhs));
+        assertFalse((boolean) script.execute(null, lhs, rhs));
+        assertTrue((boolean) script.execute(null, rhs, lhs));
+
+        script = jexl.createScript("x > y", "x", "y");
+        final JexlScript s3 = script;
+        assertThrows(JexlException.class, () -> s3.execute(null, 42, rhs));
+        assertFalse((boolean) script.execute(null, lhs, rhs));
+        assertTrue((boolean) script.execute(null, rhs, lhs));
+
+        script = jexl.createScript("x == y", "x", "y");
+        assertFalse((boolean) script.execute(null, 42, rhs));
+        assertFalse((boolean) script.execute(null, lhs, rhs));
+        assertFalse((boolean) script.execute(null, lhs, rhs));
+        assertTrue((boolean) script.execute(null, rhs, rhsstr));
+        assertTrue((boolean) script.execute(null, rhsstr, rhs));
+        assertFalse((boolean) script.execute(null, lhs, rhs));
+
+        script = jexl.createScript("x != y", "x", "y");
+        assertTrue((boolean) script.execute(null, 42, rhs));
+        assertTrue((boolean) script.execute(null, lhs, rhs));
+        assertFalse((boolean) script.execute(null, rhs, rhsstr));
+    }
+
+    public static class Arithmetic429 extends JexlArithmetic {
+        public Arithmetic429(boolean astrict) {
+            super(astrict);
+        }
+
+        public int compare(String lhs, Number rhs) {
+            return lhs.compareTo(rhs.toString());
+        }
+    }
+
+    @Test
+    void test429a() {
+        final JexlEngine jexl = new JexlBuilder()
+                .arithmetic(new Arithmetic429(true))
+                .cache(32)
+                .create();
+        String src;
+        JexlScript script;
+        src = "'1.1' > 0";
+        script = jexl.createScript(src);
+        assertTrue((boolean) script.execute(null));
+        src = "1.2 <= '1.20'";
+        script = jexl.createScript(src);
+        assertTrue((boolean) script.execute(null));
+        src = "1.2 >= '1.2'";
+        script = jexl.createScript(src);
+        assertTrue((boolean) script.execute(null));
+        src = "1.2 < '1.2'";
+        script = jexl.createScript(src);
+        assertFalse((boolean) script.execute(null));
+        src = "1.2 > '1.2'";
+        script = jexl.createScript(src);
+        assertFalse((boolean) script.execute(null));
+        src = "1.20 == 'a'";
+        script = jexl.createScript(src);
+        assertFalse((boolean) script.execute(null));
+    }
 }
