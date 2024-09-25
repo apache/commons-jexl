@@ -27,8 +27,8 @@ import org.apache.commons.jexl3.JexlException;
 import org.apache.commons.jexl3.JexlOperator;
 import org.apache.commons.jexl3.internal.introspection.MethodExecutor;
 import org.apache.commons.jexl3.internal.introspection.MethodKey;
-import org.apache.commons.jexl3.introspection.JexlMethod;
 import org.apache.commons.jexl3.internal.introspection.Uberspect;
+import org.apache.commons.jexl3.introspection.JexlMethod;
 import org.apache.commons.jexl3.parser.JexlNode;
 
 /**
