@@ -37,11 +37,11 @@ import org.apache.commons.jexl3.parser.JexlNode;
  */
 public final class Operators implements JexlArithmetic.Uberspect {
     /** The uberspect. */
-    protected final Uberspect uberspect;
+    private final Uberspect uberspect;
     /** The arithmetic instance being analyzed. */
-    protected final JexlArithmetic arithmetic;
+    private final JexlArithmetic arithmetic;
     /** The set of overloaded operators. */
-    protected final Set<JexlOperator> overloads;
+    private final Set<JexlOperator> overloads;
 
     /**
      * The comparison operators.
@@ -71,7 +71,7 @@ public final class Operators implements JexlArithmetic.Uberspect {
 
     @Override
     public JexlMethod getOperator(final JexlOperator operator, final Object... args) {
-        return overloads.contains(operator) && args != null
+        return overloads.contains(operator) && args != null && args.length == operator.getArity()
                 ? uberspectOperator(arithmetic, operator, args)
                 : null;
     }
