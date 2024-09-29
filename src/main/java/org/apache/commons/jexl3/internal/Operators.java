@@ -36,12 +36,11 @@ import org.apache.commons.jexl3.parser.JexlNode;
  * @since 3.0
  */
 public final class Operators implements JexlArithmetic.Uberspect {
-    /** The uberspect. */
-    private final Uberspect uberspect;
-    /** The arithmetic instance being analyzed. */
-    private final JexlArithmetic arithmetic;
-    /** The set of overloaded operators. */
-    private final Set<JexlOperator> overloads;
+    private static final String METHOD_IS_EMPTY = "isEmpty";
+    private static final String METHOD_SIZE = "size";
+    private static final String METHOD_CONTAINS = "contains";
+    private static final String METHOD_STARTS_WITH = "startsWith";
+    private static final String METHOD_ENDS_WITH = "endsWith";
 
     /**
      * The comparison operators.
@@ -56,6 +55,15 @@ public final class Operators implements JexlArithmetic.Uberspect {
      */
     private static final Set<JexlOperator> POSTFIX_OPS =
             EnumSet.of(JexlOperator.GET_AND_INCREMENT, JexlOperator.GET_AND_DECREMENT);
+
+    /** The uberspect. */
+    private final Uberspect uberspect;
+    /** The arithmetic instance being analyzed. */
+    private final JexlArithmetic arithmetic;
+    /** The set of overloaded operators. */
+    private final Set<JexlOperator> overloads;
+    /** Caching state: -1 unknown, 0 false, 1 true. */
+    private volatile int caching = -1;
 
     /**
      * Creates an instance.
@@ -79,6 +87,23 @@ public final class Operators implements JexlArithmetic.Uberspect {
     @Override
     public boolean overloads(final JexlOperator operator) {
         return overloads.contains(operator);
+    }
+
+    /**
+     * @return whether caching is enabled in the engine
+     */
+    private boolean isCaching() {
+        int c = caching;
+        if (c < 0) {
+            synchronized(this) {
+                c = caching;
+                if (c < 0) {
+                    JexlEngine jexl = JexlEngine.getThreadEngine();
+                    caching = c = (jexl instanceof Engine) && ((Engine) jexl).cache != null ? 1 : 0;
+                }
+            }
+        }
+        return c > 0;
     }
 
     /**
@@ -221,12 +246,12 @@ public final class Operators implements JexlArithmetic.Uberspect {
                 result = false;
                 // check if there is an isEmpty method on the object that returns a
                 // boolean and if so, just use it
-                final JexlMethod vm = uberspect.getMethod(object, "isEmpty", InterpreterBase.EMPTY_PARAMS);
+                final JexlMethod vm = uberspect.getMethod(object, METHOD_IS_EMPTY, InterpreterBase.EMPTY_PARAMS);
                 if (returnsBoolean(vm)) {
                     try {
                         result = vm.invoke(object, InterpreterBase.EMPTY_PARAMS);
                     } catch (final Exception xany) {
-                        return operatorError(node, JexlOperator.EMPTY, xany);
+                        operatorError(node, JexlOperator.EMPTY, xany);
                     }
                 }
             }
@@ -255,7 +280,7 @@ public final class Operators implements JexlArithmetic.Uberspect {
             if (result == null) {
                 // check if there is a size method on the object that returns an
                 // integer and if so, just use it
-                final JexlMethod vm = uberspect.getMethod(object, "size", InterpreterBase.EMPTY_PARAMS);
+                final JexlMethod vm = uberspect.getMethod(object, METHOD_SIZE, InterpreterBase.EMPTY_PARAMS);
                 if (returnsInteger(vm)) {
                     try {
                         result = vm.invoke(object, InterpreterBase.EMPTY_PARAMS);
@@ -296,7 +321,7 @@ public final class Operators implements JexlArithmetic.Uberspect {
                     contained = matched;
                 } else {
                     // try a left.contains(right) method
-                    final Boolean duck = booleanDuckCall("contains", left, right);
+                    final Boolean duck = booleanDuckCall(METHOD_CONTAINS, left, right);
                     if (duck != null) {
                         contained = duck;
                     } else {
@@ -337,7 +362,7 @@ public final class Operators implements JexlArithmetic.Uberspect {
                     starts = matched;
                 } else {
                     // try a left.startsWith(right) method
-                    final Boolean duck = booleanDuckCall("startsWith", left, right);
+                    final Boolean duck = booleanDuckCall(METHOD_STARTS_WITH, left, right);
                     if (duck != null) {
                         starts = duck;
                     } else {
@@ -378,7 +403,7 @@ public final class Operators implements JexlArithmetic.Uberspect {
                     ends = matched;
                 } else {
                     // try a left.endsWith(right) method
-                    final Boolean duck = booleanDuckCall("endsWith", left, right);
+                    final Boolean duck = booleanDuckCall(METHOD_ENDS_WITH, left, right);
                     if (duck != null) {
                         ends = duck;
                     } else {
@@ -409,90 +434,70 @@ public final class Operators implements JexlArithmetic.Uberspect {
      *         the value to use as the side effect argument otherwise
      */
     Object tryAssignOverload(final JexlNode node,
-                               final JexlOperator operator,
-                               final Consumer<Object> assignFun,
-                               final Object...args) {
+                             final JexlOperator operator,
+                             final Consumer<Object> assignFun,
+                             final Object... args) {
         if (args.length < operator.getArity()) {
             return JexlEngine.TRY_FAILED;
         }
-        Object result;
+        Object result = JexlEngine.TRY_FAILED;
         try {
-        // try to call overload with side effect; the object is modified
-        if (overloads(operator)) {
-            result = tryOverload(node, operator, arguments(operator, args));
-            if (result != JexlEngine.TRY_FAILED) {
-                return result; // 1
+            // attempt assignment operator overload
+            if (overloads(operator)) {
+                result = tryOverload(node, operator, arguments(operator, args));
+                if (result != JexlEngine.TRY_FAILED) {
+                    return result;
+                }
             }
-        }
-        // try to call base overload (ie + for +=)
-        final JexlOperator base = operator.getBaseOperator();
-        if (base != null && overloads(base)) {
-            result = tryOverload(node, base, arguments(base, args));
+            // let's attempt base operator overload
+            final JexlOperator base = operator.getBaseOperator();
+            if (base != null && overloads(base)) {
+                result = tryOverload(node, base, arguments(base, args));
+            }
+            // no overload or overload failed, use base operator
+            if (result == JexlEngine.TRY_FAILED) {
+                result = performBaseOperation(operator, args);
+            }
+            // on success, assign value
             if (result != JexlEngine.TRY_FAILED) {
                 assignFun.accept(result);
-                return POSTFIX_OPS.contains(operator) ? args[0] : result; // 2
+                // postfix implies return initial argument value
+                return POSTFIX_OPS.contains(operator) ? args[0] : result;
             }
-        }
-        // default implementation for self-* operators
-        switch (operator) {
-            case SELF_ADD:
-                result = arithmetic.add(args[0], args[1]);
-                break;
-            case SELF_SUBTRACT:
-                result = arithmetic.subtract(args[0], args[1]);
-                break;
-            case SELF_MULTIPLY:
-                result = arithmetic.multiply(args[0], args[1]);
-                break;
-            case SELF_DIVIDE:
-                result = arithmetic.divide(args[0], args[1]);
-                break;
-            case SELF_MOD:
-                result = arithmetic.mod(args[0], args[1]);
-                break;
-            case SELF_AND:
-                result = arithmetic.and(args[0], args[1]);
-                break;
-            case SELF_OR:
-                result = arithmetic.or(args[0], args[1]);
-                break;
-            case SELF_XOR:
-                result = arithmetic.xor(args[0], args[1]);
-                break;
-            case SELF_SHIFTLEFT:
-                result = arithmetic.shiftLeft(args[0], args[1]);
-                break;
-            case SELF_SHIFTRIGHT:
-                result = arithmetic.shiftRight(args[0], args[1]);
-                break;
-            case SELF_SHIFTRIGHTU:
-                result = arithmetic.shiftRightUnsigned(args[0], args[1]);
-                break;
-            case INCREMENT_AND_GET:
-                result = arithmetic.increment(args[0]);
-                break;
-            case DECREMENT_AND_GET:
-                result = arithmetic.decrement(args[0]);
-                break;
-            case GET_AND_INCREMENT:
-                result = args[0];
-                assignFun.accept(arithmetic.increment(result));
-                return result; // 3
-            case GET_AND_DECREMENT: {
-                result = args[0];
-                assignFun.accept(arithmetic.decrement(result));
-                return result; // 4
-            }
-            default:
-                // unexpected, new operator added?
-                throw new UnsupportedOperationException(operator.getOperatorSymbol());
-            }
-            assignFun.accept(result);
-            return result; // 5
         } catch (final Exception xany) {
             operatorError(node, operator, xany);
         }
         return JexlEngine.TRY_FAILED;
+    }
+
+    /**
+     * Performs the base operation of an assignment.
+     * @param operator the operator
+     * @param args the arguments
+     * @return the result
+     */
+    private Object performBaseOperation(final JexlOperator operator, final Object... args) {
+        switch (operator) {
+            case SELF_ADD: return arithmetic.add(args[0], args[1]);
+            case SELF_SUBTRACT: return arithmetic.subtract(args[0], args[1]);
+            case SELF_MULTIPLY: return arithmetic.multiply(args[0], args[1]);
+            case SELF_DIVIDE: return arithmetic.divide(args[0], args[1]);
+            case SELF_MOD: return arithmetic.mod(args[0], args[1]);
+            case SELF_AND: return arithmetic.and(args[0], args[1]);
+            case SELF_OR: return arithmetic.or(args[0], args[1]);
+            case SELF_XOR: return arithmetic.xor(args[0], args[1]);
+            case SELF_SHIFTLEFT: return arithmetic.shiftLeft(args[0], args[1]);
+            case SELF_SHIFTRIGHT: return arithmetic.shiftRight(args[0], args[1]);
+            case SELF_SHIFTRIGHTU: return arithmetic.shiftRightUnsigned(args[0], args[1]);
+            case INCREMENT_AND_GET:
+            case GET_AND_INCREMENT:
+                return arithmetic.increment(args[0]);
+            case DECREMENT_AND_GET:
+            case GET_AND_DECREMENT:
+                return arithmetic.decrement(args[0]);
+            default:
+                throw new UnsupportedOperationException(operator.getOperatorSymbol());
+        }
     }
 
     /**
@@ -510,9 +515,8 @@ public final class Operators implements JexlArithmetic.Uberspect {
      */
     Object tryOverload(final JexlCache.Reference node, final JexlOperator operator, final Object... args) {
         controlNullOperands(arithmetic, operator, args);
-        Engine engine = (Engine) JexlEngine.getThreadEngine();
         try {
-            return tryEval(engine == null || engine.cache != null ? node : null, operator, args);
+            return tryEval(isCaching() ? node : null, operator, args);
         } catch (final Exception xany) {
             // ignore return if lenient, will return try_failed
             operatorError(node, operator, xany);
@@ -634,8 +638,9 @@ public final class Operators implements JexlArithmetic.Uberspect {
                 case LTE: return cmp <= 0;
                 case GT: return cmp > 0;
                 case GTE: return cmp >= 0;
+                default:
+                    throw new ArithmeticException("unexpected operator " + operator);
             }
-            throw new ArithmeticException("unexpected operator " + operator);
         }
     }
 
@@ -652,10 +657,7 @@ public final class Operators implements JexlArithmetic.Uberspect {
         @Override
         public Object tryInvoke(String name, Object arithmetic, Object... params) throws JexlException.TryFailed {
             Object cmp = compare.tryInvoke(JexlOperator.COMPARE.getMethodName(), arithmetic, params[1], params[0]);
-            if (cmp instanceof Integer) {
-                return operate(-(int) cmp);
-            }
-            return JexlEngine.TRY_FAILED;
+            return cmp instanceof Integer? operate(-(int) cmp) : JexlEngine.TRY_FAILED;
         }
 
         @Override

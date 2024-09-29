@@ -772,6 +772,8 @@ public class ArithmeticOperatorTest extends JexlTestCase {
         }
     }
 
+    static final List<Integer> LOOPS = new ArrayList<>(Arrays.asList(0, 1));
+
     @Test
     void test428() {
         // see JEXL-428
@@ -783,12 +785,12 @@ public class ArithmeticOperatorTest extends JexlTestCase {
         script = jexl.createScript("x < y", "x", "y");
         final JexlScript s0 = script;
         assertThrows(JexlException.class, () -> s0.execute(null, 42, rhs));
-        assertTrue((boolean) script.execute(null, lhs, rhs));
-        assertTrue((boolean) script.execute(null, lhs, rhs));
-        assertFalse((boolean) script.execute(null, rhs, lhs));
-        assertFalse((boolean) script.execute(null, rhs, lhs));
-        assertTrue((boolean) script.execute(null, lhs, rhs));
-        assertFalse((boolean) script.execute(null, rhs, lhs));
+        for(int i : LOOPS) { assertTrue((boolean) script.execute(null, lhs, rhs)); }
+        for(int i : LOOPS) { assertTrue((boolean) script.execute(null, lhs, rhs)); }
+        for(int i : LOOPS) { assertFalse((boolean) script.execute(null, rhs, lhs)); }
+        for(int i : LOOPS) { assertFalse((boolean) script.execute(null, rhs, lhs)); }
+        for(int i : LOOPS) { assertTrue((boolean) script.execute(null, lhs, rhs)); }
+        for(int i : LOOPS) { assertFalse((boolean) script.execute(null, rhs, lhs)); }
 
         script = jexl.createScript("x <= y", "x", "y");
         final JexlScript s1 = script;
