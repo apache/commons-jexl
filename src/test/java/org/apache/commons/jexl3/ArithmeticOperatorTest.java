@@ -118,7 +118,7 @@ public class ArithmeticOperatorTest extends JexlTestCase {
             return setDateValue(date, identifier, value);
         }
 
-        protected Object setDateValue(final Date date, final String key, final Object value) throws Exception {
+        protected Object setDateValue(final Date date, final String key, final Object value) {
             final Calendar cal = Calendar.getInstance(UTC);
             cal.setTime(date);
             switch (key) {
@@ -248,24 +248,24 @@ public class ArithmeticOperatorTest extends JexlTestCase {
         asserter.setStrict(false);
     }
 
-    @Test public void test373a() {
+    @Test void test373a() {
         testSelfAssignOperators("y.add(x++)", 42, 42, 43);
     }
 
-    @Test public void test373b() {
+    @Test void test373b() {
         testSelfAssignOperators("y.add(++x)", 42, 43, 43);
     }
 
-    @Test public void test373c() {
+    @Test void test373c() {
         testSelfAssignOperators("y.add(x--)", 42, 42, 41);
     }
 
-    @Test public void test373d() {
+    @Test void test373d() {
         testSelfAssignOperators("y.add(--x)", 42, 41, 41);
     }
 
     @Test
-    public void test391() throws Exception {
+    void test391() throws Exception {
         // with literals
         for(final String src : Arrays.asList(
                 "2 =~ [1, 2, 3, 4]",
@@ -292,7 +292,7 @@ public class ArithmeticOperatorTest extends JexlTestCase {
     }
 
     @Test
-    public void testDateArithmetic() throws Exception {
+    void testDateArithmetic() {
         final Date d = new Date();
         final JexlContext jc = new MapContext();
         final JexlEngine jexl = new JexlBuilder().cache(32).arithmetic(new DateArithmetic(true)).create();
@@ -307,7 +307,7 @@ public class ArithmeticOperatorTest extends JexlTestCase {
     }
 
     @Test
-    public void testFormatArithmetic() throws Exception {
+    void testFormatArithmetic() {
         final Calendar cal = Calendar.getInstance(UTC);
         cal.set(1969, Calendar.AUGUST, 20);
         final Date x0 = cal.getTime();
@@ -351,7 +351,7 @@ public class ArithmeticOperatorTest extends JexlTestCase {
     }
 
     @Test
-    public void testFormatArithmeticJxlt() throws Exception {
+    void testFormatArithmeticJxlt() throws Exception {
         final Map<String, Object> ns = new HashMap<>();
         ns.put("calc", Aggregate.class);
         final Calendar cal = Calendar.getInstance(UTC);
@@ -388,7 +388,7 @@ public class ArithmeticOperatorTest extends JexlTestCase {
     }
 
     @Test
-    public void testIncrementOperatorOnNull() throws Exception {
+    void testIncrementOperatorOnNull() {
         final JexlEngine jexl = new JexlBuilder().strict(false).create();
         JexlScript script;
         Object result;
@@ -402,7 +402,7 @@ public class ArithmeticOperatorTest extends JexlTestCase {
 
     @Test
     @SuppressWarnings("unchecked")
-    public void testInterval() throws Exception {
+    void testInterval() {
         final Map<String, Object> ns = new HashMap<>();
         ns.put("calc", Aggregate.class);
         final JexlEngine jexl = new JexlBuilder().namespaces(ns).create();
@@ -440,7 +440,7 @@ public class ArithmeticOperatorTest extends JexlTestCase {
     }
 
     @Test
-    public void testMatch() throws Exception {
+    void testMatch() throws Exception {
         // check in/not-in on array, list, map, set and duck-type collection
         final int[] ai = {2, 4, 42, 54};
         final List<Integer> al = new ArrayList<>();
@@ -457,8 +457,8 @@ public class ArithmeticOperatorTest extends JexlTestCase {
         final Set<Integer> as = ad.values;
         final Object[] vars = {ai, al, am, ad, as, ic};
 
-        for (final Object var : vars) {
-            asserter.setVariable("container", var);
+        for (final Object variable : vars) {
+            asserter.setVariable("container", variable);
             for (final int x : ai) {
                 asserter.setVariable("x", x);
                 asserter.assertExpression("x =~ container", Boolean.TRUE);
@@ -469,7 +469,7 @@ public class ArithmeticOperatorTest extends JexlTestCase {
     }
 
     @Test
-    public void testNotStartsEndsWith() throws Exception {
+    void testNotStartsEndsWith() throws Exception {
         asserter.setVariable("x", "foobar");
         asserter.assertExpression("x !^ 'foo'", Boolean.FALSE);
         asserter.assertExpression("x !$ 'foo'", Boolean.TRUE);
@@ -489,7 +489,7 @@ public class ArithmeticOperatorTest extends JexlTestCase {
     }
 
     @Test
-    public void testNotStartsEndsWithString() throws Exception {
+    void testNotStartsEndsWithString() throws Exception {
         asserter.setVariable("x", "foobar");
         asserter.assertExpression("x !^ 'foo'", Boolean.FALSE);
         asserter.assertExpression("x !$ 'foo'", Boolean.TRUE);
@@ -499,7 +499,7 @@ public class ArithmeticOperatorTest extends JexlTestCase {
     }
 
     @Test
-    public void testNotStartsEndsWithStringBuilder() throws Exception {
+    void testNotStartsEndsWithStringBuilder() throws Exception {
         asserter.setVariable("x", new StringBuilder("foobar"));
         asserter.assertExpression("x !^ 'foo'", Boolean.FALSE);
         asserter.assertExpression("x !$ 'foo'", Boolean.TRUE);
@@ -509,7 +509,7 @@ public class ArithmeticOperatorTest extends JexlTestCase {
     }
 
     @Test
-    public void testNotStartsEndsWithStringDot() throws Exception {
+    void testNotStartsEndsWithStringDot() throws Exception {
         asserter.setVariable("x.y", "foobar");
         asserter.assertExpression("x.y !^ 'foo'", Boolean.FALSE);
         asserter.assertExpression("x.y !$ 'foo'", Boolean.TRUE);
@@ -519,12 +519,12 @@ public class ArithmeticOperatorTest extends JexlTestCase {
     }
 
     @Test
-    public void testOperatorError() throws Exception {
-        testOperatorError(true);
-        testOperatorError(false);
+    void testOperatorError() throws Exception {
+        runOperatorError(true);
+        runOperatorError(false);
     }
 
-    private void testOperatorError(final boolean silent) throws Exception {
+    private void runOperatorError(final boolean silent) {
         final CaptureLog log = new CaptureLog();
         final DateContext jc = new DateContext();
         final Date d = new Date();
@@ -547,7 +547,7 @@ public class ArithmeticOperatorTest extends JexlTestCase {
     }
 
     @Test
-    public void testRegexp() throws Exception {
+    void testRegexp() throws Exception {
         asserter.setVariable("str", "abc456");
         asserter.assertExpression("str =~ '.*456'", Boolean.TRUE);
         asserter.assertExpression("str !~ 'ABC.*'", Boolean.TRUE);
@@ -577,7 +577,7 @@ public class ArithmeticOperatorTest extends JexlTestCase {
     }
 
     @Test
-    public void testRegexp2() throws Exception {
+    void testRegexp2() throws Exception {
         asserter.setVariable("str", "abc456");
         asserter.assertExpression("str =~ ~/.*456/", Boolean.TRUE);
         asserter.assertExpression("str !~ ~/ABC.*/", Boolean.TRUE);
@@ -600,7 +600,7 @@ public class ArithmeticOperatorTest extends JexlTestCase {
         assertEquals(y0, y.get(0), "y0");
     }
     @Test
-    public void testStartsEndsWith() throws Exception {
+    void testStartsEndsWith() throws Exception {
         asserter.setVariable("x", "foobar");
         asserter.assertExpression("x =^ 'foo'", Boolean.TRUE);
         asserter.assertExpression("x =$ 'foo'", Boolean.FALSE);
@@ -619,7 +619,7 @@ public class ArithmeticOperatorTest extends JexlTestCase {
         asserter.assertExpression("x =^ [42, 54]", Boolean.TRUE);
     }
     @Test
-    public void testStartsEndsWithString() throws Exception {
+    void testStartsEndsWithString() throws Exception {
         asserter.setVariable("x", "foobar");
         asserter.assertExpression("x =^ 'foo'", Boolean.TRUE);
         asserter.assertExpression("x =$ 'foo'", Boolean.FALSE);
@@ -629,7 +629,7 @@ public class ArithmeticOperatorTest extends JexlTestCase {
     }
 
     @Test
-    public void testStartsEndsWithStringBuilder() throws Exception {
+    void testStartsEndsWithStringBuilder() throws Exception {
         asserter.setVariable("x", new StringBuilder("foobar"));
         asserter.assertExpression("x =^ 'foo'", Boolean.TRUE);
         asserter.assertExpression("x =$ 'foo'", Boolean.FALSE);
@@ -639,7 +639,7 @@ public class ArithmeticOperatorTest extends JexlTestCase {
     }
 
     @Test
-    public void testStartsEndsWithStringDot() throws Exception {
+    void testStartsEndsWithStringDot() throws Exception {
         asserter.setVariable("x.y", "foobar");
         asserter.assertExpression("x.y =^ 'foo'", Boolean.TRUE);
         asserter.assertExpression("x.y =$ 'foo'", Boolean.FALSE);
@@ -651,24 +651,25 @@ public class ArithmeticOperatorTest extends JexlTestCase {
 
     /**
      * A comparator using an evaluated expression on objects as comparison arguments.
+     * <p>Lifetime is the sort method; it is thus safe to encapsulate the context</p>
      */
-    public static class PropertyComparator implements JexlCache.Reference, Comparator<Object> {
+     private static class PropertyComparator implements JexlCache.Reference, Comparator<Object> {
         private final JexlContext context = JexlEngine.getThreadContext();
         private final JexlArithmetic arithmetic;
-        private final JexlArithmetic.Uberspect uber;
+        private final JexlOperator.Uberspect operator;
         private final JexlScript expr;
         private Object cache;
 
         PropertyComparator(JexlArithmetic jexla, JexlScript expr) {
             this.arithmetic = jexla;
-            this.uber = JexlEngine.getThreadEngine().getUberspect().getArithmetic(arithmetic);
+            this.operator = JexlEngine.getThreadEngine().getUberspect().getOperator(arithmetic);
             this.expr = expr;
         }
         @Override
         public int compare(Object o1, Object o2) {
             final Object left = expr.execute(context, o1);
             final Object right = expr.execute(context, o2);
-            Object result = uber.tryEval(this, JexlOperator.COMPARE, left, right);
+            Object result = operator.tryOverload(this, JexlOperator.COMPARE, left, right);
             if (result instanceof Integer) {
                 return (int) result;
             }
@@ -715,7 +716,10 @@ public class ArithmeticOperatorTest extends JexlTestCase {
 
     @Test
     void testSortArray() {
-        final JexlEngine jexl = new JexlBuilder().arithmetic(new SortingArithmetic(true)).safe(false).strict(true).silent(false).create();
+        final JexlEngine jexl = new JexlBuilder()
+                .cache(32)
+                .arithmetic(new SortingArithmetic(true))
+                .silent(false).create();
         // test data, json like
         final String src = "[{'id':1,'name':'John','type':9},{'id':2,'name':'Doe','type':7},{'id':3,'name':'Doe','type':10}]";
         final Object a =  jexl.createExpression(src).evaluate(null);

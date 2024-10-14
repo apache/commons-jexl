@@ -17,6 +17,8 @@
 
 package org.apache.commons.jexl3;
 
+import java.util.function.Consumer;
+
 /**
  * The JEXL operators.
  *
@@ -36,7 +38,7 @@ package org.apache.commons.jexl3;
  * <li>Operators may return JexlEngine.TRY_AGAIN to fallback on default JEXL implementation</li>
  * </ul>
  *
- * For side effect operators, operators that modify the left-hand size value (+=, -=, etc), the user implemented
+ * For side effect operators, operators that modify the left-hand size value (+=, -=, etc.), the user implemented
  * overload methods may return:
  * <ul>
  *     <li>JexlEngine.TRY_FAIL to let the default fallback behavior be executed.</li>
@@ -544,4 +546,116 @@ public enum JexlOperator {
         return operator;
     }
 
+    /**
+     * Uberspect that solves and evaluates JexlOperator overloads.
+     * <p>This is used by the interpreter to find and execute operator overloads implemented in a derived
+     * JexlArithmetic - or in some cases, as methods of the left argument type (contains, size, ...).</p>
+     * <p>This also allows reusing the core logic when extending the applicative type-system; for
+     * instance, implementing a Comparator class that calls compare
+     * (<code>operator.tryOverload(this, JexlOperator.COMPARE, left, right)</code>, etc.</p>
+     * @since 3.4.1
+     */
+    public interface Uberspect extends JexlArithmetic.Uberspect {
+        /**
+         * Try to find the most specific method and evaluate an operator.
+         * <p>This method does not call {@link #overloads(JexlOperator)} and shall not be called with an
+         * assignment operator; use {@link #tryAssignOverload(JexlCache.Reference, JexlOperator, Consumer, Object...)}
+         * in that case.</p>
+         *
+         * @param reference an optional reference caching resolved method or failing signature
+         * @param operator the operator
+         * @param args      the arguments
+         * @return TRY_FAILED if no specific method could be found, the evaluation result otherwise
+         */
+        Object tryOverload(JexlCache.Reference reference, JexlOperator operator, Object...args);
+
+        /**
+         * Evaluates an assign operator.
+         * <p>
+         * This takes care of finding and caching the operator method when appropriate.
+         * If an overloads returns a value not-equal to TRY_FAILED, it means the side-effect is complete.
+         * Otherwise, {@code a += b <=> a = a + b}
+         * </p>
+         * @param node     an optional reference caching resolved method or failing signature
+         * @param operator the operator
+         * @param assign   the actual function that performs the side effect
+         * @param args     the arguments, the first one being the target of assignment
+         * @return JexlEngine.TRY_FAILED if no operation was performed,
+         *         the value to use as the side effect argument otherwise
+         */
+        Object tryAssignOverload(final JexlCache.Reference node,
+                                 final JexlOperator operator,
+                                 final Consumer<Object> assign,
+                                 final Object... args);
+
+        /**
+         * Calculate the {@code size} of various types:
+         * Collection, Array, Map, String, and anything that has an int size() method.
+         * <p>Seeks an overload or use the default arithmetic implementation.</p>
+         * <p>Note that the result may not be an integer.
+         *
+         * @param node   an optional reference caching resolved method or failing signature
+         * @param object the object to get the size of
+         * @return the evaluation result
+         */
+        Object size(final JexlCache.Reference node, final Object object);
+
+        /**
+         * Check for emptiness of various types: Collection, Array, Map, String, and anything that has a boolean isEmpty()
+         * method.
+         * <p>Seeks an overload or use the default arithmetic implementation.</p>
+         * <p>Note that the result may not be a boolean.
+         *
+         * @param node   the node holding the object
+         * @param object the object to check the emptiness of
+         * @return the evaluation result
+         */
+        Object empty(final JexlCache.Reference node, final Object object);
+
+        /**
+         * The 'match'/'in' operator implementation.
+         * <p>Seeks an overload or use the default arithmetic implementation.</p>
+         * <p>
+         * Note that 'x in y' or 'x matches y' means 'y contains x' ;
+         * the JEXL operator arguments order syntax is the reverse of this method call.
+         * </p>
+         * @param node  an optional reference caching resolved method or failing signature
+         * @param operator    the calling operator, =~ or !~
+         * @param right the left operand
+         * @param left  the right operand
+         * @return true if left matches right, false otherwise
+         */
+        boolean contains(final JexlCache.Reference node,
+                         final JexlOperator operator,
+                         final Object left,
+                         final Object right);
+
+        /**
+         * The 'startsWith' operator implementation.
+         * <p>Seeks an overload or use the default arithmetic implementation.</p>
+         * @param node     an optional reference caching resolved method or failing signature
+         * @param operator the calling operator, $= or $!
+         * @param left     the left operand
+         * @param right    the right operand
+         * @return true if left starts with right, false otherwise
+         */
+        boolean startsWith(final JexlCache.Reference node,
+                           final JexlOperator operator,
+                           final Object left,
+                           final Object right);
+
+        /**
+         * The 'endsWith' operator implementation.
+         * <p>Seeks an overload or use the default arithmetic implementation.</p>
+         * @param node     an optional reference caching resolved method or failing signature
+         * @param operator the calling operator, ^= or ^!
+         * @param left     the left operand
+         * @param right    the right operand
+         * @return true if left ends with right, false otherwise
+         */
+        boolean endsWith(final JexlCache.Reference node,
+                         final JexlOperator operator,
+                         final Object left,
+                         final Object right);
+    }
 }

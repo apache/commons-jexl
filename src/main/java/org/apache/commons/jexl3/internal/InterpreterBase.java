@@ -311,7 +311,7 @@ public abstract class InterpreterBase extends ParserVisitor {
     /** The class name resolver. */
     protected final JexlContext.ClassNameResolver fqcnSolver;
     /** The operators evaluation delegate. */
-    protected final Operators operators;
+    protected final JexlOperator.Uberspect operators;
     /** The map of 'prefix:function' to object resolving as namespaces. */
     protected final Map<String, Object> functions;
     /** The map of dynamically created namespaces, NamespaceFunctor or duck-types of those. */
@@ -349,7 +349,11 @@ public abstract class InterpreterBase extends ParserVisitor {
         this.cancelled = acancel != null ? acancel : new AtomicBoolean();
         this.functions = options.getNamespaces();
         this.functors = null;
-        this.operators = (Operators) uberspect.getArithmetic(arithmetic);
+        JexlOperator.Uberspect ops = uberspect.getOperator(arithmetic);
+        if (ops == null) {
+            ops = new Operator(uberspect, arithmetic);
+        }
+        this.operators = ops;
         // the import package facility
         final Collection<String> imports = options.getImports();
         this.fqcnSolver = imports.isEmpty()
@@ -467,28 +471,28 @@ public abstract class InterpreterBase extends ParserVisitor {
     /**
      * Triggered when a captured variable is const and assignment is attempted.
      * @param node  the node where the error originated from
-     * @param var   the variable name
+     * @param variable   the variable name
      * @return throws JexlException if strict and not silent, null otherwise
      */
-    protected Object constVariable(final JexlNode node, final String var) {
-        return variableError(node, var, VariableIssue.CONST);
+    protected Object constVariable(final JexlNode node, final String variable) {
+        return variableError(node, variable, VariableIssue.CONST);
     }
 
     /**
      * Defines a variable.
-     * @param var the variable to define
+     * @param variable the variable to define
      * @param frame the frame in which it will be defined
      * @return true if definition succeeded, false otherwise
      */
-    protected boolean defineVariable(final ASTVar var, final LexicalFrame frame) {
-        final int symbol = var.getSymbol();
+    protected boolean defineVariable(final ASTVar variable, final LexicalFrame frame) {
+        final int symbol = variable.getSymbol();
         if (symbol < 0) {
             return false;
         }
-        if (var.isRedefined()) {
+        if (variable.isRedefined()) {
             return false;
         }
-        return frame.defineSymbol(symbol, var.isCaptured());
+        return frame.defineSymbol(symbol, variable.isCaptured());
     }
 
     /**
@@ -508,6 +512,9 @@ public abstract class InterpreterBase extends ParserVisitor {
         return node;
     }
 
+    /**
+     * @deprecated
+     */
     @Deprecated
     protected JexlNode findNullOperand(final RuntimeException xrt, final JexlNode node, final Object left, final Object right) {
         return findNullOperand(node, left, right);
@@ -689,7 +696,7 @@ public abstract class InterpreterBase extends ParserVisitor {
      * @return true if cancelled, false otherwise
      */
     protected boolean isCancelled() {
-        return cancelled.get() | Thread.currentThread().isInterrupted();
+        return cancelled.get() || Thread.currentThread().isInterrupted();
     }
 
     /**
@@ -790,11 +797,11 @@ public abstract class InterpreterBase extends ParserVisitor {
     /**
      * Triggered when a variable is lexically known as being redefined.
      * @param node  the node where the error originated from
-     * @param var   the variable name
+     * @param variable   the variable name
      * @return throws JexlException if strict and not silent, null otherwise
      */
-    protected Object redefinedVariable(final JexlNode node, final String var) {
-        return variableError(node, var, VariableIssue.REDEFINED);
+    protected Object redefinedVariable(final JexlNode node, final String variable) {
+        return variableError(node, variable, VariableIssue.REDEFINED);
     }
 
     /**
@@ -862,11 +869,11 @@ public abstract class InterpreterBase extends ParserVisitor {
                             if (functor != null) {
                                 // wrap the namespace in a NamespaceFunctor to shield us from the actual
                                 // number of arguments to call it with.
-                                final Object ns = namespace;
+                                final Object nsFinal = namespace;
                                 // make it a class (not a lambda!) so instanceof (see *2) will catch it
                                 namespace = (NamespaceFunctor) context -> withContext
-                                        ? ctor.tryInvoke(null, ns, context)
-                                        : ctor.tryInvoke(null, ns);
+                                        ? ctor.tryInvoke(null, nsFinal, context)
+                                        : ctor.tryInvoke(null, nsFinal);
                                 if (cacheable && ctor.isCacheable()) {
                                     nsNode.jjtSetValue(namespace);
                                 }
@@ -1026,11 +1033,11 @@ public abstract class InterpreterBase extends ParserVisitor {
     /**
      * Triggered when a variable is lexically known as undefined.
      * @param node  the node where the error originated from
-     * @param var   the variable name
+     * @param variable   the variable name
      * @return throws JexlException if strict and not silent, null otherwise
      */
-    protected Object undefinedVariable(final JexlNode node, final String var) {
-        return variableError(node, var, VariableIssue.UNDEFINED);
+    protected Object undefinedVariable(final JexlNode node, final String variable) {
+        return variableError(node, variable, VariableIssue.UNDEFINED);
     }
 
     /**
@@ -1081,27 +1088,27 @@ public abstract class InterpreterBase extends ParserVisitor {
     /**
      * Triggered when a variable can not be resolved.
      * @param node  the node where the error originated from
-     * @param var   the variable name
+     * @param variable   the variable name
      * @param undef whether the variable is undefined or null
      * @return throws JexlException if strict and not silent, null otherwise
      */
-    protected Object unsolvableVariable(final JexlNode node, final String var, final boolean undef) {
-        return variableError(node, var, undef? VariableIssue.UNDEFINED : VariableIssue.NULLVALUE);
+    protected Object unsolvableVariable(final JexlNode node, final String variable, final boolean undef) {
+        return variableError(node, variable, undef? VariableIssue.UNDEFINED : VariableIssue.NULLVALUE);
     }
 
     /**
      * Triggered when a variable generates an issue.
      * @param node  the node where the error originated from
-     * @param var   the variable name
+     * @param variable   the variable name
      * @param issue the issue type
      * @return throws JexlException if strict and not silent, null otherwise
      */
-    protected Object variableError(final JexlNode node, final String var, final VariableIssue issue) {
+    protected Object variableError(final JexlNode node, final String variable, final VariableIssue issue) {
         if (isStrictEngine() && !isTernaryProtected(node)) {
-            throw new JexlException.Variable(node, var, issue);
+            throw new JexlException.Variable(node, variable, issue);
         }
         if (logger.isDebugEnabled()) {
-            logger.debug(JexlException.variableError(node, var, issue));
+            logger.debug(JexlException.variableError(node, variable, issue));
         }
         return null;
     }

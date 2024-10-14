@@ -157,22 +157,10 @@ public class JexlArithmetic {
          * Gets the most specific method for an operator.
          *
          * @param operator the operator
-         * @param args      the arguments
+         * @param args     the arguments
          * @return the most specific method or null if no specific override could be found
          */
         JexlMethod getOperator(JexlOperator operator, Object... args);
-
-        /**
-         * Try to find the most specific method and evaluate an operator.
-         * <p>This method does not call {@link #overloads(JexlOperator)} and shall not be called with an
-         * assignment operator.</p>
-         *
-         * @param reference an optional cache reference storing actual method or failing signature
-         * @param operator the operator
-         * @param args      the arguments
-         * @return TRY_FAILED if no specific method could be found, the evaluation result otherwise
-         */
-        Object tryEval(JexlCache.Reference reference, JexlOperator operator, Object...args);
 
         /**
          * Checks whether this uberspect has overloads for a given operator.
@@ -413,8 +401,7 @@ public class JexlArithmetic {
             return (Number) value;
         }
         if (value instanceof Boolean) {
-            final Boolean b = (Boolean) value;
-            return b ? 1L : 0L;
+            return (boolean) value ? 1L : 0L;
         }
         if (value instanceof AtomicBoolean) {
             final AtomicBoolean b = (AtomicBoolean) value;
@@ -1043,7 +1030,7 @@ public class JexlArithmetic {
         }
         if (val instanceof CharSequence) {
             final Matcher m = FLOAT_PATTERN.matcher((CharSequence) val);
-            // first group is decimal, second is exponent;
+            // first matcher group is decimal, second is exponent
             // one of them must exist hence start({1,2}) >= 0
             return m.matches() && (m.start(1) >= 0 || m.start(2) >= 0);
         }
@@ -1187,6 +1174,7 @@ public class JexlArithmetic {
      * Creates a map-builder.
      * @param size the number of elements in the map
      * @return a map-builder instance
+     * @deprecated 3.3
      */
     @Deprecated
     public MapBuilder mapBuilder(final int size) {
@@ -1591,10 +1579,7 @@ public class JexlArithmetic {
     @Deprecated
     public JexlArithmetic options(final JexlEngine.Options options) {
         if (options != null) {
-            Boolean ostrict = options.isStrictArithmetic();
-            if (ostrict == null) {
-                ostrict = isStrict();
-            }
+            boolean isstrict = Boolean.TRUE == options.isStrictArithmetic() || isStrict();
             MathContext bigdContext = options.getArithmeticMathContext();
             if (bigdContext == null) {
                 bigdContext = getMathContext();
@@ -1603,10 +1588,10 @@ public class JexlArithmetic {
             if (bigdScale == Integer.MIN_VALUE) {
                 bigdScale = getMathScale();
             }
-            if (ostrict != isStrict()
+            if (isstrict != isStrict()
                 || bigdScale != getMathScale()
                 || bigdContext != getMathContext()) {
-                return createWithOptions(ostrict, bigdContext, bigdScale);
+                return createWithOptions(isstrict, bigdContext, bigdScale);
             }
         }
         return this;
@@ -2046,7 +2031,7 @@ public class JexlArithmetic {
             return roundBigDecimal(parseBigDecimal(val.toString()));
         }
         if (val instanceof Boolean) {
-            return BigDecimal.valueOf((Boolean) val ? 1. : 0.);
+            return BigDecimal.valueOf((boolean) val ? 1. : 0.);
         }
         if (val instanceof AtomicBoolean) {
             return BigDecimal.valueOf(((AtomicBoolean) val).get() ? 1L : 0L);
@@ -2106,7 +2091,7 @@ public class JexlArithmetic {
             return BigInteger.valueOf(((Number) val).longValue());
         }
         if (val instanceof Boolean) {
-            return BigInteger.valueOf((Boolean) val ? 1L : 0L);
+            return BigInteger.valueOf((boolean) val ? 1L : 0L);
         }
         if (val instanceof AtomicBoolean) {
             return BigInteger.valueOf(((AtomicBoolean) val).get() ? 1L : 0L);
@@ -2198,7 +2183,7 @@ public class JexlArithmetic {
             return ((Number) val).doubleValue();
         }
         if (val instanceof Boolean) {
-            return (Boolean) val ? 1. : 0.;
+            return (boolean) val ? 1. : 0.;
         }
         if (val instanceof AtomicBoolean) {
             return ((AtomicBoolean) val).get() ? 1. : 0.;
@@ -2252,7 +2237,7 @@ public class JexlArithmetic {
             return parseInteger((String) val);
         }
         if (val instanceof Boolean) {
-            return (Boolean) val ? 1 : 0;
+            return (boolean) val ? 1 : 0;
         }
         if (val instanceof AtomicBoolean) {
             return ((AtomicBoolean) val).get() ? 1 : 0;
@@ -2303,7 +2288,7 @@ public class JexlArithmetic {
             return parseLong((String) val);
         }
         if (val instanceof Boolean) {
-            return (Boolean) val ? 1L : 0L;
+            return (boolean) val ? 1L : 0L;
         }
         if (val instanceof AtomicBoolean) {
             return ((AtomicBoolean) val).get() ? 1L : 0L;

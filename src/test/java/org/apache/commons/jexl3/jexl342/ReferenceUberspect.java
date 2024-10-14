@@ -56,7 +56,7 @@ public class ReferenceUberspect implements JexlUberspect {
     /** A static signature for method(). */
     private static final Object[] EMPTY_PARAMS = {};
     /**
-     * Discovers a an optional getter.
+     * Discovers an optional getter.
      * <p>The method to be found should be named "{find}{P,p}property and return an Optional&lt;?&gt;.</p>
      *
      * @param is the uberspector
@@ -212,8 +212,13 @@ public class ReferenceUberspect implements JexlUberspect {
     }
 
     @Override
-    public JexlArithmetic.Uberspect getArithmetic(final JexlArithmetic arithmetic) {
-        return uberspect.getArithmetic(arithmetic);
+    public JexlArithmetic.Uberspect getArithmetic(JexlArithmetic arithmetic) {
+        return getOperator(arithmetic);
+    }
+
+    @Override
+    public JexlOperator.Uberspect getOperator(final JexlArithmetic arithmetic) {
+        return uberspect.getOperator(arithmetic);
     }
 
     @Override
