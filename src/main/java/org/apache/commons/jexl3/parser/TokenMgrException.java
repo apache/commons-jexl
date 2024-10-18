@@ -126,7 +126,9 @@ public class TokenMgrException extends RuntimeException implements JavaccError {
      */
     private int column;
 
-    /** Full Constructor. */
+    /**
+     * Constructs a new instance.
+     */
     public TokenMgrException(final boolean EOFSeen, final int lexState, final int errorLine, final int errorColumn,
                              final String errorAfter, final int curChar, final int reason) {
         eof = EOFSeen;
