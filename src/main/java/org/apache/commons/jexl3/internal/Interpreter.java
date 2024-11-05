@@ -565,7 +565,7 @@ public class Interpreter extends InterpreterBase {
                     return actual; // 1
                 }
                 object = getVariable(frame, block, variable);
-                // top level is a symbol, can not be an antish var
+                // top level is a symbol, cannot be an antish var
                 antish = false;
             } else {
                 // check we are not assigning direct global
@@ -582,7 +582,7 @@ public class Interpreter extends InterpreterBase {
                     return actual; // 2
                 }
                 object = context.get(name);
-                // top level accesses object, can not be an antish var
+                // top level accesses object, cannot be an antish var
                 if (object != null) {
                     antish = false;
                 }
@@ -673,7 +673,7 @@ public class Interpreter extends InterpreterBase {
             throw new JexlException(objectNode, "illegal assignment form");
         }
         // we may have a null property as in map[null], no check needed.
-        // we can not *have* a null object though.
+        // we cannot *have* a null object though.
         if (object == null) {
             // no object, we fail
             return unsolvableProperty(objectNode, "<null>.<?>", true, null);

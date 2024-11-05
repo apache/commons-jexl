@@ -494,7 +494,7 @@ public class Issues200Test extends JexlTestCase {
             @Override
             public void set(final String name, final Object value) {
                 if ("java".equals(name)) {
-                    throw new JexlException(null, "can not set " + name);
+                    throw new JexlException(null, "cannot set " + name);
                 }
                 super.set(name, value);
             }

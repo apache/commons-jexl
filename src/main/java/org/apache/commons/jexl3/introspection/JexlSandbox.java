@@ -267,7 +267,7 @@ public final class JexlSandbox {
      */
     @SuppressWarnings("null")
     public Permissions get(final Class<?> clazz) {
-        // argument clazz can not be null since permissions would be not null and block:
+        // argument clazz cannot be null since permissions would be not null and block:
         // we only store the result for classes we actively seek permissions for.
         return compute(clazz, true);
     }

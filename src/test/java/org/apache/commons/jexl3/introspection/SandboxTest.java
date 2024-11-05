@@ -340,7 +340,7 @@ class SandboxTest extends JexlTestCase {
         final JexlExpression e0 = jexl.createExpression("{'bar' : 'foo'}['bar']");
         final Object r0 = e0.evaluate(null);
         assertEquals("foo", r0);
-        // can not read quux, null
+        // cannot read quux, null
         for (final String k : Arrays.asList("'quux'", "null")) {
             final JexlExpression expression = jexl.createExpression("{" + k + " : 'foo'}[" + k + "]");
             assertTrue(
@@ -455,7 +455,7 @@ class SandboxTest extends JexlTestCase {
         final JexlSandbox sandbox = new JexlSandbox();
         // only allow call to currentTimeMillis (avoid exit, gc, loadLibrary, etc.)
         sandbox.allow(System.class.getName()).execute("currentTimeMillis");
-        // can not create a new file
+        // cannot create a new file
         sandbox.block(java.io.File.class.getName()).execute("");
         final JexlEngine sjexl = new JexlBuilder().permissions(JexlPermissions.UNRESTRICTED).sandbox(sandbox).safe(false).strict(true).create();
         Object result;
@@ -563,7 +563,7 @@ class SandboxTest extends JexlTestCase {
         final JexlSandbox.Permissions p = sandbox.permissions("java.util.Map", true, false, true);
         p.write().add("quux");
         final JexlEngine jexl = new JexlBuilder().arithmetic(a350).sandbox(sandbox).create();
-        // can not write quux
+        // cannot write quux
         final String q = "'quux'"; // quotes are important!
         final JexlExpression expression1 = jexl.createExpression("{" + q + " : 'foo'}[" + q + "] = '42'");
         assertTrue(assertThrows(JexlException.Property.class, () -> expression1.evaluate(null), "should have blocked " + q).getMessage().contains("undefined"));
@@ -592,7 +592,7 @@ class SandboxTest extends JexlTestCase {
         expression.evaluate(null);
         final Map<?, ?> map = a350.getLastMap();
         assertEquals("42", map.get("bar"));
-        // can not write quux, null
+        // cannot write quux, null
         for (final String k : Arrays.asList("'quux'", "null")) {
             final JexlExpression expression2 = jexl.createExpression("{" + k + " : 'foo'}[" + k + "] = '42'");
             assertTrue(assertThrows(JexlException.Property.class, () -> expression2.evaluate(null), "should have blocked " + k).getMessage()

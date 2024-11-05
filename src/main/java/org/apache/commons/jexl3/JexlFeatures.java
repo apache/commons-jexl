@@ -36,7 +36,7 @@ import java.util.function.Predicate;
  * are the recommended starting points to selectively enable or disable chosen features.</p>
  * <ul>
  * <li>Registers: register syntax (#number), used internally for {g,s}etProperty
- * <li>Reserved Names: a set of reserved variable names that can not be used as local variable (or parameter) names
+ * <li>Reserved Names: a set of reserved variable names that cannot be used as local variable (or parameter) names
  * <li>Global Side Effect : assigning/modifying values on global variables (=, += , -=, ...)
  * <li>Lexical: lexical scope, prevents redefining local variables
  * <li>Lexical Shade: local variables shade globals, prevents confusing a global variable with a local one
@@ -265,7 +265,7 @@ public final class JexlFeatures {
     /** The feature flags. */
     private long flags;
 
-    /** The set of reserved names, aka global variables that can not be masked by local variables or parameters. */
+    /** The set of reserved names, aka global variables that cannot be masked by local variables or parameters. */
     private Set<String> reservedNames;
 
     /** The namespace names. */

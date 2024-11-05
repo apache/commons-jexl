@@ -104,7 +104,7 @@ public final class TemplateScript implements JxltEngine.Template {
      * Creates a new template from an character input.
      * @param engine the template engine
      * @param jexlInfo the source info
-     * @param directive the prefix for lines of code; can not be "$", "${", "#" or "#{"
+     * @param directive the prefix for lines of code; cannot be "$", "${", "#" or "#{"
                   since this would preclude being able to differentiate directives and jxlt expressions
      * @param reader    the input reader
      * @param parms     the parameter names

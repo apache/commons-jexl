@@ -1264,7 +1264,7 @@ public class JXLTTest extends JexlTestCase {
     @MethodSource("engines")
     void testSanboxed311i(final JexlBuilder builder) {
         init(builder);
-        /// this uberspect can not access jexl3 classes (besides test)
+        /// this uberspect cannot access jexl3 classes (besides test)
         final Uberspect uberspect = new Uberspect(LogFactory.getLog(JXLTTest.class), null, NOJEXL3);
         final Method method = uberspect.getMethod(TemplateInterpreter.class, "print", new Object[]{Integer.TYPE});
         final JexlEngine jexl= new JexlBuilder().uberspect(uberspect).create();
@@ -1290,7 +1290,7 @@ public class JXLTTest extends JexlTestCase {
         final String src = "Hello ${user}";
         final JexlContext ctxt = new MapContext();
         ctxt.set("user", "Francesco");
-        /// this uberspect can not access jexl3 classes (besides test)
+        /// this uberspect cannot access jexl3 classes (besides test)
         final Uberspect uberspect = new Uberspect(LogFactory.getLog(JXLTTest.class), null, NOJEXL3);
         final Method method = uberspect.getMethod(TemplateInterpreter.class, "print", new Object[]{Integer.TYPE});
         assertNull(method);

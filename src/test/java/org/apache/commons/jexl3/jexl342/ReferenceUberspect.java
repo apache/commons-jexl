@@ -113,7 +113,7 @@ public class ReferenceUberspect implements JexlUberspect {
     /**
      * Find a reference handler for a given instance.
      * @param ref the reference
-     * @return the handler or null if object can not be handled
+     * @return the handler or null if object cannot be handled
      */
     private static ReferenceHandler discoverHandler(final Object ref) {
         // optional support
@@ -291,7 +291,7 @@ public class ReferenceUberspect implements JexlUberspect {
             return null;
         }
         // obj is null means proper dereference of an optional; we don't have an object,
-        // we can not determine jexlGet, not a pb till we call with a not-null object
+        // we cannot determine jexlGet, not a pb till we call with a not-null object
         // since the result is likely to be not null... TryInvoke will fail and invoke will throw.
         // from that object, get the property getter if any
         JexlPropertyGet jexlGet = null;

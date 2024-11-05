@@ -55,10 +55,10 @@ public final class SandboxUberspect implements JexlUberspect {
      */
     public SandboxUberspect(final JexlUberspect theUberspect, final JexlSandbox theSandbox) {
         if (theSandbox == null) {
-            throw new NullPointerException("sandbox can not be null");
+            throw new NullPointerException("sandbox cannot be null");
         }
         if (theUberspect == null) {
-            throw new NullPointerException("uberspect can not be null");
+            throw new NullPointerException("uberspect cannot be null");
         }
         this.uberspect = theUberspect;
         this.sandbox = theSandbox.copy();

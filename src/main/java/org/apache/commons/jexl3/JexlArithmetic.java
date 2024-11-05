@@ -981,7 +981,7 @@ public class JexlArithmetic {
      * Check for emptiness of various types: Number, Collection, Array, Map, String.
      *
      * @param object the object to check the emptiness of
-     * @param def the default value if object emptiness can not be determined
+     * @param def the default value if object emptiness cannot be determined
      * @return the boolean or null if there is no arithmetic solution
      */
     public Boolean isEmpty(final Object object, final Boolean def) {
@@ -1453,7 +1453,7 @@ public class JexlArithmetic {
                     value = big.longValueExact();
                     // continue in sequence to try and further reduce
                 } catch (final ArithmeticException xa) {
-                    // if it is bigger than a double, it can not be narrowed
+                    // if it is bigger than a double, it cannot be narrowed
                     if (big.compareTo(BIGD_DOUBLE_MAX_VALUE) > 0
                         || big.compareTo(BIGD_DOUBLE_MIN_VALUE) < 0) {
                         return original;
@@ -1472,7 +1472,7 @@ public class JexlArithmetic {
                     // else it can be represented as a long
                 } else if (original instanceof BigInteger) {
                     final BigInteger bigi = (BigInteger) original;
-                    // if it is bigger than a Long, it can not be narrowed
+                    // if it is bigger than a Long, it cannot be narrowed
                     if (!BigInteger.valueOf(bigi.longValue()).equals(bigi)) {
                         return original;
                     }
@@ -1642,7 +1642,7 @@ public class JexlArithmetic {
      * <>Empty string is considered as 0.</>
      * @param arg the arg
      * @return a BigDecimal
-     * @throws CoercionException if the string can not be coerced into a BigDecimal
+     * @throws CoercionException if the string cannot be coerced into a BigDecimal
      */
     private BigDecimal parseBigDecimal(final String arg) throws ArithmeticException {
         try {
@@ -1659,7 +1659,7 @@ public class JexlArithmetic {
      * <>Empty string is considered as 0.</>
      * @param arg the arg
      * @return a big integer
-     * @throws ArithmeticException if the string can not be coerced into a big integer
+     * @throws ArithmeticException if the string cannot be coerced into a big integer
      */
     private BigInteger parseBigInteger(final String arg) throws ArithmeticException {
         try {
@@ -1676,7 +1676,7 @@ public class JexlArithmetic {
      * <>Empty string is considered as NaN.</>
      * @param arg the arg
      * @return a double
-     * @throws ArithmeticException if the string can not be coerced into a double
+     * @throws ArithmeticException if the string cannot be coerced into a double
      */
     private double parseDouble(final String arg) throws ArithmeticException {
         try {
@@ -1693,7 +1693,7 @@ public class JexlArithmetic {
      * <p>This ensure the represented number is a natural (not a real).</p>
      * @param arg the arg
      * @return an int
-     * @throws ArithmeticException if the string can not be coerced into a long
+     * @throws ArithmeticException if the string cannot be coerced into a long
      */
     private int parseInteger(final String arg) throws ArithmeticException {
         final long l = parseLong(arg);
@@ -1709,7 +1709,7 @@ public class JexlArithmetic {
      * <p>This ensure the represented number is a natural (not a real).</p>
      * @param arg the arg
      * @return a long
-     * @throws ArithmeticException if the string can not be coerced into a long
+     * @throws ArithmeticException if the string cannot be coerced into a long
      */
     private long parseLong(final String arg) throws ArithmeticException {
         final double d = parseDouble(arg);
@@ -1737,7 +1737,7 @@ public class JexlArithmetic {
         if (id instanceof CharSequence) {
             final CharSequence str = (CharSequence) id;
             final int length = str.length();
-            // can not be empty string and can not be longer than Integer.MAX_VALUE representation
+            // cannot be empty string and cannot be longer than Integer.MAX_VALUE representation
             if (length > 0 && length <= 10) {
                 int val = 0;
                 for (int i = 0; i < length; ++i) {
@@ -1877,7 +1877,7 @@ public class JexlArithmetic {
      * Calculate the {@code size} of various types: Collection, Array, Map, String.
      *
      * @param object the object to get the size of
-     * @param def the default value if object size can not be determined
+     * @param def the default value if object size cannot be determined
      * @return the size of object or null if there is no arithmetic solution
      */
     public Integer size(final Object object, final Integer def) {

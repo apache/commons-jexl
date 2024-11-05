@@ -128,7 +128,7 @@ public interface JexlUberspect {
          * Applies this strategy to a list of resolver types.
          *
          * @param operator the property access operator, may be null
-         * @param obj      the instance we seek to obtain a property setter/getter from, can not be null
+         * @param obj      the instance we seek to obtain a property setter/getter from, cannot be null
          * @return the ordered list of resolvers types, must not be null
          */
         List<PropertyResolver> apply(JexlOperator operator, Object obj);

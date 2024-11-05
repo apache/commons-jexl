@@ -302,7 +302,7 @@ public abstract class JexlParser extends StringParser {
                 identifier.setSymbol(symbol, name);
                 if (!declared) {
                     if (getFeatures().isLexicalShade()) {
-                        // can not reuse a local as a global
+                        // cannot reuse a local as a global
                         throw new JexlException.Parsing(info, name + ": variable is not declared").clean();
                     }
                     identifier.setShaded(true);
@@ -836,7 +836,7 @@ public abstract class JexlParser extends StringParser {
      * Throws a feature exception.
      * @param feature the feature code
      * @param trigger the token that triggered it
-     * @throws JexlException.Parsing if actual error token can not be found
+     * @throws JexlException.Parsing if actual error token cannot be found
      * @throws JexlException.Feature in all other cases
      */
     protected void throwFeatureException(final int feature, final Token trigger) {

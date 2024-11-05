@@ -315,7 +315,7 @@ public class ClassCreatorTest extends JexlTestCase {
 
     @Test
     public void testMany() throws Exception {
-        // abort test if class creator can not run
+        // abort test if class creator cannot run
         if (!ClassCreator.canRun) {
             return;
         }
@@ -407,7 +407,7 @@ public class ClassCreatorTest extends JexlTestCase {
 
     @Test
     public void testOne() throws Exception {
-        // abort test if class creator can not run
+        // abort test if class creator cannot run
         if (!ClassCreator.canRun) {
             logger.warn("unable to create classes");
             return;

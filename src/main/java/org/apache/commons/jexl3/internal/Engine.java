@@ -365,7 +365,7 @@ public class Engine extends JexlEngine {
         this.cache = (JexlCache<Source, ASTJexlScript>) (conf.cache() > 0 ? factory.apply(conf.cache()) : null);
         this.cacheThreshold = conf.cacheThreshold();
         if (uberspect == null) {
-            throw new IllegalArgumentException("uberspect can not be null");
+            throw new IllegalArgumentException("uberspect cannot be null");
         }
     }
 

@@ -348,7 +348,7 @@ public class Uberspect implements JexlUberspect {
                         }
                         break;
                     case FIELD:
-                        // a field may be? (can not be a number)
+                        // a field may be? (cannot be a number)
                         executor = FieldGetExecutor.discover(is, clazz, property);
                         // static class fields (enums included)
                         if (obj instanceof Class<?>) {

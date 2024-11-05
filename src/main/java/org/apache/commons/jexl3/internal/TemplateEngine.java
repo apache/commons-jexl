@@ -224,7 +224,7 @@ public final class TemplateEngine extends JxltEngine {
         ConstantExpression(final Object val, final TemplateExpression source) {
             super(source);
             if (val == null) {
-                throw new NullPointerException("constant can not be null");
+                throw new NullPointerException("constant cannot be null");
             }
             this.value = val instanceof String
                     ? StringParser.buildTemplate((String) val, false)
@@ -487,7 +487,7 @@ public final class TemplateEngine extends JxltEngine {
         NestedExpression(final CharSequence expr, final JexlNode node, final TemplateExpression source) {
             super(expr, node, source);
             if (this.source != this) {
-                throw new IllegalArgumentException("Nested TemplateExpression can not have a source");
+                throw new IllegalArgumentException("Nested TemplateExpression cannot have a source");
             }
         }
 

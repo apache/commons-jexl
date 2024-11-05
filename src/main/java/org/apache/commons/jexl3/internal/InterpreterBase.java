@@ -1041,7 +1041,7 @@ public abstract class InterpreterBase extends ParserVisitor {
     }
 
     /**
-     * Triggered when a method can not be resolved.
+     * Triggered when a method cannot be resolved.
      * @param node   the node where the error originated from
      * @param method the method name
      * @return throws JexlException if strict and not silent, null otherwise
@@ -1051,7 +1051,7 @@ public abstract class InterpreterBase extends ParserVisitor {
     }
 
     /**
-     * Triggered when a method can not be resolved.
+     * Triggered when a method cannot be resolved.
      * @param node   the node where the error originated from
      * @param method the method name
      * @param args the method arguments
@@ -1068,7 +1068,7 @@ public abstract class InterpreterBase extends ParserVisitor {
     }
 
     /**
-     * Triggered when a property can not be resolved.
+     * Triggered when a property cannot be resolved.
      * @param node  the node where the error originated from
      * @param property   the property node
      * @param cause the cause if any
@@ -1086,7 +1086,7 @@ public abstract class InterpreterBase extends ParserVisitor {
     }
 
     /**
-     * Triggered when a variable can not be resolved.
+     * Triggered when a variable cannot be resolved.
      * @param node  the node where the error originated from
      * @param variable   the variable name
      * @param undef whether the variable is undefined or null

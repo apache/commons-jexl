@@ -62,7 +62,7 @@ import org.apache.commons.jexl3.introspection.JexlUberspect;
      */
     FqcnResolver(final FqcnResolver solver) {
         if (solver == null) {
-            throw new NullPointerException("parent solver can not be null");
+            throw new NullPointerException("parent solver cannot be null");
         }
         this.parent = solver;
         this.uberspect = solver.uberspect;

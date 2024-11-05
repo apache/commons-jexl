@@ -177,7 +177,7 @@ public abstract class JexlNode extends SimpleNode implements JexlCache.Reference
 
     /**
      * Whether this node is a constant node.
-     * <p>Its value can not change after the first evaluation and can be cached
+     * <p>Its value cannot change after the first evaluation and can be cached
      * indefinitely.</p>
      *
      * @return true if constant, false otherwise

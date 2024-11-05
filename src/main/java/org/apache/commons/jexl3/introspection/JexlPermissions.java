@@ -299,15 +299,15 @@ public interface JexlPermissions {
      *   class0 {
      *     class1 {} # the whole class1 is hidden
      *     class2 {
-     *         class2(); # class2 constructors can not be invoked
+     *         class2(); # class2 constructors cannot be invoked
      *         class3 {
-     *             aMethod(); # aMethod can not be called
-     *             aField; # aField can not be accessed
+     *             aMethod(); # aMethod cannot be called
+     *             aField; # aField cannot be accessed
      *         }
      *     } # end of class2
-     *     class0(); # class0 constructors can not be invoked
-     *     method(); # method can not be called
-     *     field; # field can not be accessed
+     *     class0(); # class0 constructors cannot be invoked
+     *     method(); # method cannot be called
+     *     field; # field cannot be accessed
      *   } # end class0
      * } # end package my.package
      * </pre>
@@ -323,7 +323,7 @@ public interface JexlPermissions {
     /**
      * Checks whether a class allows JEXL introspection.
      * <p>If the class disallows JEXL introspection, none of its constructors, methods or fields
-     * as well as derived classes are visible to JEXL and can not be used in scripts or expressions.
+     * as well as derived classes are visible to JEXL and cannot be used in scripts or expressions.
      * If one of its super-classes is not allowed, tbe class is not allowed either.</p>
      * <p>For interfaces, only methods and fields are disallowed in derived interfaces or implementing classes.</p>
      * @param clazz the class to check
@@ -334,7 +334,7 @@ public interface JexlPermissions {
 
     /**
      * Checks whether a constructor allows JEXL introspection.
-     * <p>If a constructor is not allowed, the new operator can not be used to instantiate its declared class
+     * <p>If a constructor is not allowed, the new operator cannot be used to instantiate its declared class
      * in scripts or expressions.</p>
      * @param ctor the constructor to check
      * @return true if JEXL is allowed to introspect, false otherwise
@@ -344,7 +344,7 @@ public interface JexlPermissions {
 
     /**
      * Checks whether a field explicitly disallows JEXL introspection.
-     * <p>If a field is not allowed, it can not resolved and accessed in scripts or expressions.</p>
+     * <p>If a field is not allowed, it cannot resolved and accessed in scripts or expressions.</p>
      * @param field the field to check
      * @return true if JEXL is allowed to introspect, false otherwise
      * @since 3.3
@@ -352,7 +352,7 @@ public interface JexlPermissions {
     boolean allow(final Field field);
     /**
      * Checks whether a method allows JEXL introspection.
-     * <p>If a method is not allowed, it can not resolved and called in scripts or expressions.</p>
+     * <p>If a method is not allowed, it cannot resolved and called in scripts or expressions.</p>
      * <p>Since methods can be overridden and overloaded, this also checks that no superclass or interface
      * explicitly disallows this methods.</p>
      * @param method the method to check
@@ -364,7 +364,7 @@ public interface JexlPermissions {
     /**
      * Checks whether a package allows JEXL introspection.
      * <p>If the package disallows JEXL introspection, none of its classes or interfaces are visible
-     * to JEXL and can not be used in scripts or expression.</p>
+     * to JEXL and cannot be used in scripts or expression.</p>
      * @param pack the package
      * @return true if JEXL is allowed to introspect, false otherwise
      * @since 3.3
