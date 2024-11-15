@@ -18,7 +18,7 @@
 /**
  * Provides low-level introspective services.
  * <p>
- * This internal package is not intended for public usage and there is <b>no</b>
+ * This internal package is not intended for public usage and there is <strong>no</strong>
  * guarantee that its public classes or methods will remain as is in subsequent
  * versions.
  * </p>

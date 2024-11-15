@@ -28,7 +28,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * A sandbox describes permissions on a class by explicitly allowing or forbidding
  * access to methods and properties through "allowlists" and "blocklists".
  *
- * <p>A <b>allowlist</b> explicitly allows methods/properties for a class;</p>
+ * <p>A <strong>allowlist</strong> explicitly allows methods/properties for a class;</p>
  *
  * <ul>
  *   <li>If a allowlist is empty and thus does not contain any names,
@@ -36,7 +36,7 @@ import java.util.concurrent.ConcurrentHashMap;
  *   <li>If it is not empty, the only allowed properties/methods are the ones contained.</li>
  * </ul>
  *
- * <p>A <b>blocklist</b> explicitly forbids methods/properties for a class;</p>
+ * <p>A <strong>blocklist</strong> explicitly forbids methods/properties for a class;</p>
  *
  * <ul>
  *   <li>If a blocklist is empty and thus does not contain any names,
@@ -48,9 +48,9 @@ import java.util.concurrent.ConcurrentHashMap;
  * "allow" or "block":</p>
  *
  * <ul>
- *   <li><b>read</b> controls readable properties </li>
- *   <li><b>write</b> controls writable properties</li>
- *   <li><b>execute</b> controls executable methods and constructor</li>
+ *   <li><strong>read</strong> controls readable properties </li>
+ *   <li><strong>write</strong> controls writable properties</li>
+ *   <li><strong>execute</strong> controls executable methods and constructor</li>
  * </ul>
  *
  * <p>When specified, permissions - allow or block lists - can be created inheritable
