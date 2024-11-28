@@ -45,7 +45,6 @@ public class Main {
      * This is done so that interactive testing is easier.
      *
      * @param args (optional) file name to evaluate. Stored in the args variable.
-     *
      * @throws Exception if parsing or IO fail
      */
     public static void main(final String[] args) throws Exception {

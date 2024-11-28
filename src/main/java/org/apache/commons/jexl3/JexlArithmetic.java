@@ -668,7 +668,6 @@ public class JexlArithmetic {
      * Creates a JexlArithmetic instance.
      * Called by options(...) method when another instance of the same class of arithmetic is required.
      * @see #options(org.apache.commons.jexl3.JexlEngine.Options)
-     *
      * @param astrict     whether this arithmetic is lenient or strict
      * @param bigdContext the math context instance to use for +,-,/,*,% operations on big decimals.
      * @param bigdScale   the scale used for big decimals.
@@ -1553,7 +1552,6 @@ public class JexlArithmetic {
     /**
      * Apply options to this arithmetic which eventually may create another instance.
      * @see #createWithOptions(boolean, java.math.MathContext, int)
-     *
      * @param context the context that may extend {@link JexlContext.OptionsHandle} to use
      * @return a new arithmetic instance or this
      * @since 3.1
@@ -1571,7 +1569,6 @@ public class JexlArithmetic {
     /**
      * Apply options to this arithmetic which eventually may create another instance.
      * @see #createWithOptions(boolean, java.math.MathContext, int)
-     *
      * @param options the {@link JexlEngine.Options} to use
      * @return an arithmetic with those options set
      * @deprecated 3.2
@@ -1600,7 +1597,6 @@ public class JexlArithmetic {
     /**
      * Apply options to this arithmetic which eventually may create another instance.
      * @see #createWithOptions(boolean, java.math.MathContext, int)
-     *
      * @param options the {@link JexlEngine.Options} to use
      * @return an arithmetic with those options set
      */
