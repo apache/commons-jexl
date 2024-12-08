@@ -420,7 +420,7 @@ public class JXLTTest extends JexlTestCase {
         init(builder);
         // @formatter:off
         final String test42
-                = "$$ for(var x : list) {\n"
+                = "$$ for (var x : list) {\n"
                 + "$$   if (x == 42) {\n"
                 + "Life, the universe, and everything\n"
                 + "$$   } else if (x > 42) {\n"

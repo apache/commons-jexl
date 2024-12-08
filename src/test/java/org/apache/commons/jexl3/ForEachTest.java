@@ -53,7 +53,7 @@ public class ForEachTest extends JexlTestCase {
     @Test
     public void testForEachBreakMethod() throws Exception {
         final JexlScript e = JEXL.createScript(
-                "var rr = -1; for(var item : [1, 2, 3 ,4 ,5, 6]) { if (item == 3) { rr = item; break; }} rr"
+                "var rr = -1; for (var item : [1, 2, 3 ,4 ,5, 6]) { if (item == 3) { rr = item; break; }} rr"
         );
         final JexlContext jc = new MapContext();
         jc.set("list", new Foo());
@@ -71,7 +71,7 @@ public class ForEachTest extends JexlTestCase {
     @Test
     public void testForEachContinueMethod() throws Exception {
         final JexlScript e = JEXL.createScript(
-                "var rr = 0; for(var item : [1, 2, 3 ,4 ,5, 6]) { if (item <= 3) continue; rr = rr + item;}"
+                "var rr = 0; for (var item : [1, 2, 3 ,4 ,5, 6]) { if (item <= 3) continue; rr = rr + item;}"
         );
         final JexlContext jc = new MapContext();
         jc.set("list", new Foo());
@@ -81,7 +81,7 @@ public class ForEachTest extends JexlTestCase {
 
     @Test
     public void testForEachWithArray() throws Exception {
-        final JexlScript e = JEXL.createScript("for(item : list) item");
+        final JexlScript e = JEXL.createScript("for (item : list) item");
         final JexlContext jc = new MapContext();
         jc.set("list", new Object[]{"Hello", "World"});
         final Object o = e.execute(jc);
@@ -90,7 +90,7 @@ public class ForEachTest extends JexlTestCase {
 
     @Test
     public void testForEachWithBlock() throws Exception {
-        final JexlScript exs0 = JEXL.createScript("for(var in : list) { x = x + in; }");
+        final JexlScript exs0 = JEXL.createScript("for (var in : list) { x = x + in; }");
         final JexlContext jc = new MapContext();
         jc.set("list", new Object[]{2, 3});
             jc.set("x", Integer.valueOf(1));
@@ -101,7 +101,7 @@ public class ForEachTest extends JexlTestCase {
 
     @Test
     public void testForEachWithCollection() throws Exception {
-        final JexlScript e = JEXL.createScript("for(var item : list) item");
+        final JexlScript e = JEXL.createScript("for (var item : list) item");
         final JexlContext jc = new MapContext();
         jc.set("list", Arrays.asList("Hello", "World"));
         final Object o = e.execute(jc);
@@ -110,7 +110,7 @@ public class ForEachTest extends JexlTestCase {
 
     @Test
     public void testForEachWithEmptyList() throws Exception {
-        final JexlScript e = JEXL.createScript("for(item : list) 1+1");
+        final JexlScript e = JEXL.createScript("for (item : list) 1+1");
         final JexlContext jc = new MapContext();
         jc.set("list", Collections.emptyList());
 
@@ -120,7 +120,7 @@ public class ForEachTest extends JexlTestCase {
 
     @Test
     public void testForEachWithEmptyStatement() throws Exception {
-        final JexlScript e = JEXL.createScript("for(item : list) ;");
+        final JexlScript e = JEXL.createScript("for (item : list) ;");
         final JexlContext jc = new MapContext();
         jc.set("list", Collections.emptyList());
 
@@ -130,7 +130,7 @@ public class ForEachTest extends JexlTestCase {
 
     @Test
     public void testForEachWithEnumeration() throws Exception {
-        final JexlScript e = JEXL.createScript("for(var item : list) item");
+        final JexlScript e = JEXL.createScript("for (var item : list) item");
         final JexlContext jc = new MapContext();
         jc.set("list", new StringTokenizer("Hello,World", ","));
         final Object o = e.execute(jc);
@@ -139,7 +139,7 @@ public class ForEachTest extends JexlTestCase {
 
     @Test
     public void testForEachWithIterator() throws Exception {
-        final JexlScript e = JEXL.createScript("for(var item : list) item");
+        final JexlScript e = JEXL.createScript("for (var item : list) item");
         final JexlContext jc = new MapContext();
         jc.set("list", Arrays.asList("Hello", "World").iterator());
         final Object o = e.execute(jc);
@@ -148,7 +148,7 @@ public class ForEachTest extends JexlTestCase {
 
     @Test
     public void testForEachWithIteratorMethod() throws Exception {
-        final JexlScript e = JEXL.createScript("for(var item : list.cheezy) item");
+        final JexlScript e = JEXL.createScript("for (var item : list.cheezy) item");
         final JexlContext jc = new MapContext();
         jc.set("list", new Foo());
         final Object o = e.execute(jc);
@@ -157,7 +157,7 @@ public class ForEachTest extends JexlTestCase {
 
     @Test
     public void testForEachWithListExpression() throws Exception {
-        final JexlScript e = JEXL.createScript("for(var item : list.keySet()) item");
+        final JexlScript e = JEXL.createScript("for (var item : list.keySet()) item");
         final JexlContext jc = new MapContext();
         final Map<?, ?> map = System.getProperties();
         final String lastKey = (String) new ArrayList<Object>(map.keySet()).get(System.getProperties().size() - 1);
@@ -187,7 +187,7 @@ public class ForEachTest extends JexlTestCase {
     }
 
     @Test public void testForLoop0a() {
-        final String src = "(l)->{ for(let x = 0; x < 4; ++x) { l.add(x); } }";
+        final String src = "(l)->{ for (let x = 0; x < 4; ++x) { l.add(x); } }";
         final JexlEngine jexl = new JexlBuilder().safe(false).create();
         final JexlScript script = jexl.createScript(src);
         final List<Integer> l = new ArrayList<>();
@@ -199,7 +199,7 @@ public class ForEachTest extends JexlTestCase {
     }
 
     @Test public void testForLoop0b0() {
-        final String src = "(l)->{ for(let x = 0, y = 0; x < 4; ++x) l.add(x) }";
+        final String src = "(l)->{ for (let x = 0, y = 0; x < 4; ++x) l.add(x) }";
         final JexlEngine jexl = new JexlBuilder().safe(false).create();
         final JexlScript script = jexl.createScript(src);
         final List<Integer> l = new ArrayList<>();

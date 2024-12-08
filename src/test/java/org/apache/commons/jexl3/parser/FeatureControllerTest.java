@@ -53,7 +53,7 @@ public class FeatureControllerTest extends JexlTestCase {
         offAsserter.setVariable("cond", true);
         offAsserter.setVariable("i", 0);
         String matchException = "@1:1 loop error in 'while (...) ...'";
-        final String whileExpr = "while(cond) { i++;  cond = false; }; i;";
+        final String whileExpr = "while (cond) { i++;  cond = false; }; i;";
         onAsserter.assertExpression(whileExpr, 1);
         offAsserter.failExpression(whileExpr, matchException, String::equals);
 
@@ -64,7 +64,7 @@ public class FeatureControllerTest extends JexlTestCase {
         onAsserter.assertExpression(doWhileExpr, 1);
         offAsserter.failExpression(doWhileExpr, matchException, String::equals);
 
-        matchException = "@1:1 loop error in 'for(... : ...) ...'";
+        matchException = "@1:1 loop error in 'for (... : ...) ...'";
         onAsserter.setVariable("i", 0);
         offAsserter.setVariable("i", 0);
         String forExpr = "for (let j : [1, 2]) { i = i + j; }; i;";
@@ -76,7 +76,7 @@ public class FeatureControllerTest extends JexlTestCase {
         offAsserter.setVariable("a", a);
         onAsserter.setVariable("i", 0);
         offAsserter.setVariable("i", 0);
-        forExpr = "for(let j = 0; j < 2; ++j) { i = i + a[j]; } i;";
+        forExpr = "for (let j = 0; j < 2; ++j) { i = i + a[j]; } i;";
         onAsserter.assertExpression(forExpr, 3);
         offAsserter.failExpression(forExpr, matchException, String::equals);
     }

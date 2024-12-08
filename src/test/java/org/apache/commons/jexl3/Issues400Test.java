@@ -493,4 +493,14 @@ public class Issues400Test {
         script = jexl.createScript(src);
         assertEquals(20042, (int) script.execute(ctxt));
     }
+
+    @Test
+    void test431() {
+        JexlEngine jexl = new JexlBuilder().create();
+        final String src = "let x = 0; try { x += 19 } catch (let error) { return 169 } try { x += 23 } catch (let error) { return 169 }";
+        final JexlScript script = jexl.createScript(src);
+        assertNotNull(script);
+        final Object result = script.execute(null);
+        assertEquals(42, result);
+    }
 }

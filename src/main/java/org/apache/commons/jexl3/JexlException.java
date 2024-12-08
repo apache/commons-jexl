@@ -658,7 +658,7 @@ public class JexlException extends RuntimeException {
     private static final long serialVersionUID = 20210606123900L;
 
     /** Maximum number of characters around exception location. */
-    private static final int MAX_EXCHARLOC = 42;
+    private static final int MAX_EXCHARLOC = 128;
 
     /** Used 3 times. */
     private static final String VARQUOTE = "variable '";

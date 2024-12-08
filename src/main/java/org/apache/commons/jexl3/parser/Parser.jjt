@@ -444,9 +444,15 @@ void IfStatement() : {}
 
 void TryStatement() : {}
 {
+    {
+         pushUnit(jjtThis);
+     }
      <TRY> (LOOKAHEAD(1) (TryResources() ) | Block())
      (LOOKAHEAD(1) <CATCH> <LPAREN> InlineVar() <RPAREN> Block() { jjtThis.catchClause(); })?
      (LOOKAHEAD(1) <FINALLY>  Block() { jjtThis.finallyClause(); })?
+    {
+         popUnit(jjtThis);
+     }
 }
 
 void TryResources() : {}

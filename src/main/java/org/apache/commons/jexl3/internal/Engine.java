@@ -796,11 +796,8 @@ public class Engine extends JexlEngine {
         ASTJexlScript script;
         if (source != null) {
             script = cache.get(source);
-            if (script != null) {
-                final Scope f = script.getScope();
-                if (f == null && scope == null || f != null && f.equals(scope)) {
-                    return script;
-                }
+            if (script != null && (scope == null || scope.equals(script.getScope()))) {
+                return script;
             }
         }
         final JexlInfo ninfo = info == null && debug ? createInfo() : info;

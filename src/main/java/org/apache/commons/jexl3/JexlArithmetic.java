@@ -804,7 +804,7 @@ public class JexlArithmetic {
                 @SuppressWarnings("unchecked") // OK because of instanceof check above
                 final Comparable<Object> comparable = (Comparable<Object>) right;
                 try {
-                    return -comparable.compareTo(left);
+                    return -Integer.signum(comparable.compareTo(left));
                 } catch (final ClassCastException castException) {
                     // ignore it, continue in sequence
                 }

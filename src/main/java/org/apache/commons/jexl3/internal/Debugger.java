@@ -876,7 +876,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     @Override
     protected Object visit(final ASTForeachStatement node, final Object data) {
         final int form = node.getLoopForm();
-        builder.append("for(");
+        builder.append("for (");
         final JexlNode body;
         if (form == 0) {
             // for( .. : ...)
@@ -1411,7 +1411,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     @Override
     protected Object visit(final ASTTryResources node, final Object data) {
         final int tryBody = node.jjtGetNumChildren() - 1;
-        builder.append('(');
+        builder.append(" (");
         accept(node.jjtGetChild(0), data);
         for(int c = 1; c < tryBody; ++c) {
             builder.append("; ");
@@ -1430,7 +1430,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
         accept(node.jjtGetChild(nc++), data);
         // catch-body
         if (node.hasCatchClause()) {
-            builder.append("catch(");
+            builder.append("catch (");
             accept(node.jjtGetChild(nc++), data);
             builder.append(") ");
             accept(node.jjtGetChild(nc++), data);

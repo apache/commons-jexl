@@ -502,7 +502,8 @@ public abstract class JexlParser extends StringParser {
         // if not the first time we declare this symbol...
         if (!declareSymbol(symbol)) {
             if (lexical || scope.isLexical(symbol) || getFeatures().isLexical()) {
-                throw new JexlException.Parsing(variable.jexlInfo(), name + ": variable is already declared").clean();
+                final JexlInfo location = info.at(token.beginLine, token.beginColumn);
+                throw new JexlException.Parsing(location, name + ": variable is already declared").clean();
             }
             // not lexical, redefined nevertheless
             variable.setRedefined(true);
@@ -555,6 +556,7 @@ public abstract class JexlParser extends StringParser {
     protected void Identifier(final boolean top) throws ParseException {
         // Overridden by generated code
     }
+
     /**
      * Checks whether a symbol has been declared as a const in the current stack of lexical units.
      * @param symbol the symbol
@@ -603,10 +605,7 @@ public abstract class JexlParser extends StringParser {
             return true;
         }
         // declared through engine features ?
-        if (getFeatures().namespaceTest().test(name)) {
-            return true;
-        }
-        return false;
+        return getFeatures().namespaceTest().test(name);
     }
 
     /**
@@ -814,7 +813,7 @@ public abstract class JexlParser extends StringParser {
      * @throws JexlException.Ambiguous in all cases
      */
     protected void throwAmbiguousException(final JexlNode node) {
-        final JexlInfo begin = node.jexlInfo();
+        final JexlInfo begin = node.jexlInfo(info.getName());
         final Token t = getToken(0);
         final JexlInfo end = info.at(t.beginLine, t.endColumn);
         final String msg = readSourceLine(source, end.getLine());

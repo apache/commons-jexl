@@ -645,7 +645,7 @@ public final class Operator implements JexlOperator.Uberspect {
         @Override
         public Object tryInvoke(String name, Object arithmetic, Object... params) throws JexlException.TryFailed {
             final Object cmp = compare.tryInvoke(JexlOperator.COMPARE.getMethodName(), arithmetic, params[1], params[0]);
-            return cmp instanceof Integer? operate(-(int) cmp) : JexlEngine.TRY_FAILED;
+            return cmp instanceof Integer? operate(-Integer.signum((Integer) cmp)) : JexlEngine.TRY_FAILED;
         }
     }
 }
