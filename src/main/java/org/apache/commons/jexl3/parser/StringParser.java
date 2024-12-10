@@ -45,10 +45,10 @@ public class StringParser {
     /** The base 10 offset used to convert hexa characters to decimal. */
     private static final int BASE10 = 10;
 
-    /** The last 7bits ascii character. */
+    /** The last 7bits ASCII character. */
     private static final char LAST_ASCII = 127;
 
-    /** The first printable 7bits ascii character. */
+    /** The first printable 7bits ASCII character. */
     private static final char FIRST_ASCII = 32;
 
     /**
