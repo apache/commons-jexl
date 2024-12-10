@@ -24,8 +24,11 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.BufferedReader;
+import java.io.PrintWriter;
 import java.io.Reader;
 import java.io.StringReader;
+import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -40,6 +43,7 @@ import org.apache.commons.jexl3.JexlBuilder;
 import org.apache.commons.jexl3.JexlException;
 import org.apache.commons.jexl3.introspection.JexlPermissions;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 public class JexlScriptEngineTest {
@@ -61,14 +65,14 @@ public class JexlScriptEngineTest {
                                                             "application/x-jexl3");
 
     @AfterEach
-    public void tearDown() {
+    void tearDown() {
         JexlBuilder.setDefaultPermissions(null);
         JexlScriptEngine.setInstance(null);
         JexlScriptEngine.setPermissions(null);
     }
 
     @Test
-    public void testCompile() throws Exception {
+    void testCompile() throws Exception {
         final ScriptEngineManager manager = new ScriptEngineManager();
         final JexlScriptEngine engine = (JexlScriptEngine) manager.getEngineByName("JEXL");
         final ScriptContext ctxt = engine.getContext();
@@ -106,14 +110,14 @@ public class JexlScriptEngineTest {
     }
 
     @Test
-    public void testDirectNew() throws Exception {
+    void testDirectNew() throws Exception {
         final ScriptEngine engine = new JexlScriptEngine();
         final Integer initialValue = 123;
         assertEquals(initialValue,engine.eval("123"));
     }
 
     @Test
-    public void testDottedNames() throws Exception {
+    void testDottedNames() throws Exception {
         final ScriptEngineManager manager = new ScriptEngineManager();
         assertNotNull(manager, "Manager should not be null");
         final ScriptEngine engine = manager.getEngineByName("JEXL");
@@ -127,7 +131,7 @@ public class JexlScriptEngineTest {
     }
 
     @Test
-    public void testErrors() throws Exception {
+    void testErrors() throws Exception {
         final ScriptEngineManager manager = new ScriptEngineManager();
         final JexlScriptEngine engine = (JexlScriptEngine) manager.getEngineByName("JEXL");
         final ScriptContext ctxt = engine.getContext();
@@ -141,7 +145,7 @@ public class JexlScriptEngineTest {
     }
 
     @Test
-    public void testNulls() throws Exception {
+    void testNulls() throws Exception {
         final ScriptEngineManager manager = new ScriptEngineManager();
         assertNotNull(manager, "Manager should not be null");
         final ScriptEngine engine = manager.getEngineByName("jexl3");
@@ -155,7 +159,7 @@ public class JexlScriptEngineTest {
     }
 
     @Test
-    public void testScopes() throws Exception {
+    void testScopes() throws Exception {
         final ScriptEngineManager manager = new ScriptEngineManager();
         assertNotNull(manager, "Manager should not be null");
         final ScriptEngine engine = manager.getEngineByName("jexl3");
@@ -177,7 +181,7 @@ public class JexlScriptEngineTest {
     }
 
     @Test
-    public void testScriptEngineFactory() throws Exception {
+    void testScriptEngineFactory() throws Exception {
         final JexlScriptEngineFactory factory = new JexlScriptEngineFactory();
         assertEquals("JEXL Engine", factory.getParameter(ScriptEngine.ENGINE));
         assertEquals("3.4", factory.getParameter(ScriptEngine.ENGINE_VERSION));
@@ -193,7 +197,7 @@ public class JexlScriptEngineTest {
     }
 
     @Test
-    public void testScripting() throws Exception {
+    void testScripting() throws Exception {
         final ScriptEngineManager manager = new ScriptEngineManager();
         assertNotNull(manager, "Manager should not be null");
         final ScriptEngine engine = manager.getEngineByName("jexl3");
@@ -219,7 +223,7 @@ public class JexlScriptEngineTest {
     }
 
     @Test
-    public void testScriptingGetBy() throws Exception {
+    void testScriptingGetBy() throws Exception {
         final ScriptEngineManager manager = new ScriptEngineManager();
         assertNotNull(manager, "Manager should not be null");
         for (final String name : NAMES) {
@@ -236,7 +240,7 @@ public class JexlScriptEngineTest {
         }
     }
     @Test
-    public void testScriptingInstance0() throws Exception {
+    void testScriptingInstance0() throws Exception {
         JexlScriptEngine.setPermissions(JexlPermissions.UNRESTRICTED);
         final ScriptEngineManager manager = new ScriptEngineManager();
         final ScriptEngine engine = manager.getEngineByName("jexl3");
@@ -247,7 +251,7 @@ public class JexlScriptEngineTest {
     }
 
     @Test
-    public void testScriptingPermissions1() throws Exception {
+    void testScriptingPermissions1() throws Exception {
         JexlBuilder.setDefaultPermissions(JexlPermissions.UNRESTRICTED);
         JexlScriptEngine.setPermissions(null);
         final ScriptEngineManager manager = new ScriptEngineManager();
@@ -257,4 +261,28 @@ public class JexlScriptEngineTest {
                         + "now=sys.currentTimeMillis();");
         assertTrue(time2 <= System.currentTimeMillis());
     }
+
+
+    @Test
+    void testMain0() throws Exception {
+        StringWriter strw = new StringWriter();
+        StringReader strr = new StringReader("a=20\nb=22\na+b\n//q!\n");
+        Main.run(new BufferedReader(strr), new PrintWriter(strw), new String[0]);
+        String ctl = "> >> 20\n" +
+                "> >> 22\n" +
+                "> >> 42\n" +
+                "> ";
+        Assertions.assertEquals(ctl, strw.toString());
+    }
+
+
+    @Test
+    void testMain1() throws Exception {
+        StringWriter strw = new StringWriter();
+        StringReader strr = new StringReader("args[0]+args[1]");
+        Main.run(new BufferedReader(strr), new PrintWriter(strw), 20, 22);
+        String ctl = ">>: 42\n";
+        Assertions.assertEquals(ctl, strw.toString());
+    }
+
 }

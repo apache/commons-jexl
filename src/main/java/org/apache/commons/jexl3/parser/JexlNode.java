@@ -18,6 +18,7 @@ package org.apache.commons.jexl3.parser;
 
 import org.apache.commons.jexl3.JexlArithmetic;
 import org.apache.commons.jexl3.JexlCache;
+import org.apache.commons.jexl3.JexlContext.NamespaceFunctor;
 import org.apache.commons.jexl3.JexlInfo;
 import org.apache.commons.jexl3.JxltEngine;
 import org.apache.commons.jexl3.introspection.JexlMethod;
@@ -159,7 +160,8 @@ public abstract class JexlNode extends SimpleNode implements JexlCache.Reference
             || value instanceof JexlPropertySet
             || value instanceof JexlMethod
             || value instanceof Funcall
-            || value instanceof Class  ) {
+            || value instanceof Class
+            || value instanceof NamespaceFunctor) {
             jjtSetValue(null);
         }
         for (int n = 0; n < jjtGetNumChildren(); ++n) {

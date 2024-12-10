@@ -18,11 +18,13 @@
 package org.apache.commons.jexl3.scripting;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptException;
@@ -36,35 +38,44 @@ public class Main {
 
     /**
      * Test application for JexlScriptEngine (JSR-223 implementation).
-     *
+     * <p>
      * If a single argument is present, it is treated as a file name of a JEXL
      * script to be evaluated. Any exceptions terminate the application.
-     *
+     * </p>
      * Otherwise, lines are read from standard input and evaluated.
      * ScriptExceptions are logged, and do not cause the application to exit.
      * This is done so that interactive testing is easier.
+     * The line //q! ends the loop.
      *
      * @param args (optional) file name to evaluate. Stored in the args variable.
      * @throws Exception if parsing or IO fail
      */
     public static void main(final String[] args) throws Exception {
+        try(BufferedReader in = args.length == 1? read(Paths.get(args[0])) : read(null);
+            PrintWriter out =  new PrintWriter(System.out);) {
+            run(in, out, args);
+        }
+    }
+
+    static void run(BufferedReader in, PrintWriter out, final Object... args) throws Exception {
         final JexlScriptEngineFactory fac = new JexlScriptEngineFactory();
         final ScriptEngine engine = fac.getScriptEngine();
-        final PrintStream out = System.out;
-        engine.put("args", args);
-        if (args.length == 1){
-            final Object value = engine.eval(read(null, args[0]));
-            out.println("Return value: "+value);
+        if (args.length > 0) {
+            engine.put("args", args);
+            final Object value = engine.eval(in);
+            out.println(">>: " + value);
         } else {
-            final BufferedReader console = read(null, null);
             String line;
-            System.out.print("> ");
-            while(null != (line=console.readLine())){
+            out.print("> ");
+            while (null != (line = in.readLine())) {
+                if ("//q!".equals(line)) {
+                    break;
+                }
                 try {
                     final Object value = engine.eval(line);
-                    out.println("Return value: "+value);
+                    out.println(">> " + value);
                 } catch (final ScriptException e) {
-                    out.println(e.getLocalizedMessage());
+                    out.println("!!>" + e.getLocalizedMessage());
                 }
                 out.print("> ");
             }
@@ -74,19 +85,13 @@ public class Main {
     /**
      * Reads an input.
      *
-     * @param charset the charset or null for default charset
-     * @param fileName the file name or null for stdin
+     * @param path the file path or null for stdin
      * @return the reader
-     * @throws Exception if anything goes wrong
+     * @throws IOException if anything goes wrong
      */
-    static BufferedReader read(final Charset charset, final String fileName) throws Exception {
-        return new BufferedReader(
-            new InputStreamReader(
-                    fileName == null
-                        ? System.in
-                        : new FileInputStream(new File(fileName)),
-                    charset == null
-                        ? Charset.defaultCharset()
-                        : charset));
+    static BufferedReader read(final Path path) throws IOException {
+        return new BufferedReader(new InputStreamReader(path == null
+            ? System.in
+            : Files.newInputStream(path), Charset.defaultCharset()));
     }
 }

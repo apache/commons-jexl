@@ -197,7 +197,7 @@ public class ClassCreatorTest extends JexlTestCase {
     }
 
     @Test
-    public void testBasicCtor() throws Exception {
+    void testBasicCtor() throws Exception {
         final JexlScript s = jexl.createScript("(c, v)->{ var ct2 = new(c, v); ct2.value; }");
         Object r = s.execute(null, TwoCtors.class, 10);
         assertEquals(10, r);
@@ -210,7 +210,7 @@ public class ClassCreatorTest extends JexlTestCase {
     }
 
     @Test
-    public void testContextualCtor() throws Exception {
+    void testContextualCtor() throws Exception {
         final MapContext ctxt = new MapContext();
         ctxt.set("value", 42);
         JexlScript s = jexl.createScript("(c)->{ new(c).value }");
@@ -222,17 +222,17 @@ public class ClassCreatorTest extends JexlTestCase {
     }
 
     @Test
-    public void testFunctor2Class() throws Exception {
+    void testFunctor2Class() throws Exception {
         functorTwo(new NsTest(ClassCreator.GEN_CLASS + "foo2"));
     }
 
     @Test
-    public void testFunctor2Name() throws Exception {
+    void testFunctor2Name() throws Exception {
         functorTwo(ClassCreator.GEN_CLASS + "foo2");
     }
 
     @Test
-    public void testFunctorOne() throws Exception {
+    void testFunctorOne() throws Exception {
         final JexlContext ctxt = new MapContext();
         ctxt.set("value", 1000);
 
@@ -275,7 +275,7 @@ public class ClassCreatorTest extends JexlTestCase {
     }
 
     @Test
-    public void testFunctorThree() throws Exception {
+    void testFunctorThree() throws Exception {
         final JexlContext ctxt = new MapContext();
         ctxt.set("value", 1000);
 
@@ -314,7 +314,7 @@ public class ClassCreatorTest extends JexlTestCase {
     }
 
     @Test
-    public void testMany() throws Exception {
+    void testMany() throws Exception {
         // abort test if class creator cannot run
         if (!ClassCreator.canRun) {
             return;
@@ -406,7 +406,7 @@ public class ClassCreatorTest extends JexlTestCase {
     }
 
     @Test
-    public void testOne() throws Exception {
+    void testOne() throws Exception {
         // abort test if class creator cannot run
         if (!ClassCreator.canRun) {
             logger.warn("unable to create classes");
@@ -417,5 +417,35 @@ public class ClassCreatorTest extends JexlTestCase {
         final Class<?> foo1 = cctor.createClass();
         assertEquals("foo1", foo1.getSimpleName());
         cctor.clear();
+    }
+    @Test
+    void test432() throws Exception {
+        final ClassCreator cctor = new ClassCreator(jexl, base);
+        cctor.setSeed(2);
+        cctor.setCtorBody("value = (Integer) ctxt.get(\"value\") + 10;");
+        Class<?> foo1 = cctor.createClass(true);
+        assertSame(foo1.getClassLoader(), cctor.getClassLoader());
+        assertEquals("foo2", foo1.getSimpleName());
+        final Map<String, Object> ns = new HashMap<>();
+        ns.put("test", foo1.getName());
+        // use cache
+        final JexlEngine jexl2 = new JexlBuilder().namespaces(ns).cache(16).create();
+        jexl2.setClassLoader(cctor.getClassLoader());
+        cctor.clear();
+        final JexlContext ctxt = new MapContext();
+        ctxt.set("value", 1000);
+        final JexlScript script = jexl2.createScript("test:getValue()");
+        Object result = script.execute(ctxt);
+        assertEquals(1010, result);        cctor.setSeed(2);
+        cctor.setCtorBody("value = (Integer) ctxt.get(\"value\") + 99;");
+        final Class<?> foo11 = cctor.createClass(true);
+        assertEquals("foo2", foo1.getSimpleName());
+        assertNotSame(foo11, foo1);
+        foo1 = foo11;
+        // drum rolll....
+        jexl2.setClassLoader(foo1.getClassLoader());
+        result = script.execute(ctxt);
+        // tada!
+        assertEquals(1099, result);
     }
 }

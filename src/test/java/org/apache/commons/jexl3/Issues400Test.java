@@ -17,15 +17,9 @@
 package org.apache.commons.jexl3;
 
 import static org.apache.commons.jexl3.introspection.JexlPermissions.RESTRICTED;
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
+import java.io.Closeable;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -37,6 +31,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicLong;
 
+import org.apache.commons.jexl3.internal.Debugger;
 import org.apache.commons.jexl3.introspection.JexlPermissions;
 import org.junit.jupiter.api.Test;
 
@@ -495,12 +490,62 @@ public class Issues400Test {
     }
 
     @Test
-    void test431() {
+    void test431a() {
         JexlEngine jexl = new JexlBuilder().create();
         final String src = "let x = 0; try { x += 19 } catch (let error) { return 169 } try { x += 23 } catch (let error) { return 169 }";
         final JexlScript script = jexl.createScript(src);
         assertNotNull(script);
         final Object result = script.execute(null);
         assertEquals(42, result);
+    }
+
+    Closeable foo() {
+        return null;
+    }
+
+    @Test
+    void test431b() {
+        JexlEngine jexl = new JexlBuilder().create();
+        final String src = "let x = 0; try(let error) { x += 19 } catch (let error) { return 169 } try { x += 23 } catch (let error) { return 169 }";
+        final JexlScript script = jexl.createScript(src);
+        assertNotNull(script);
+        final Object result = script.execute(null);
+        assertEquals(42, result);
+    }
+
+    @Test
+    void test431c() {
+        JexlEngine jexl = new JexlBuilder().create();
+        final String src = "let xx = 0; try { xx += 19 } catch (let xx) { return 169 }";
+        try {
+            final JexlScript script = jexl.createScript(src);
+            fail("xx is already defined in scope");
+        } catch(JexlException.Parsing parsing) {
+            assertTrue(parsing.getDetail().contains("xx"));
+        }
+    }
+
+    @Test
+    void test433() {
+        JexlEngine jexl = new JexlBuilder().create();
+        final String src = "let condition = true; if (condition) { return; }";
+        final JexlScript script = jexl.createScript(src);
+        assertNotNull(script);
+        Object result = script.execute(null);
+        assertNull(result);
+        Debugger debugger = new Debugger();
+        assertTrue(debugger.debug(script));
+        String dbgStr = debugger.toString();
+        assertTrue(JexlTestCase.equalsIgnoreWhiteSpace(src, dbgStr));
+    }
+
+    @Test
+    void test434() {
+        JexlEngine jexl = new JexlBuilder().safe(false).strict(true).create();
+        final String src = "let foo = null; let value = foo?[bar]";
+        final JexlScript script = jexl.createScript(src);
+        assertNotNull(script);
+        final Object result = script.execute(null);
+        assertNull(result);
     }
 }

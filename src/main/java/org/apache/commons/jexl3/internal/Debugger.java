@@ -736,7 +736,8 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
                 }
             }
         }
-        if (!Character.isSpaceChar(builder.charAt(builder.length() - 1))) {
+        char lastChar = builder.charAt(builder.length() - 1);
+        if (!Character.isSpaceChar(lastChar) && lastChar != '\n') {
             builder.append(' ');
         }
         builder.append('}');
@@ -1262,8 +1263,11 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
 
     @Override
     protected Object visit(final ASTReturnStatement node, final Object data) {
-        builder.append("return ");
-        accept(node.jjtGetChild(0), data);
+        builder.append("return");
+        if (node.jjtGetNumChildren() > 0) {
+            builder.append(' ');
+            accept(node.jjtGetChild(0), data);
+        }
         return data;
     }
 

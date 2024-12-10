@@ -444,15 +444,9 @@ void IfStatement() : {}
 
 void TryStatement() : {}
 {
-    {
-         pushUnit(jjtThis);
-     }
-     <TRY> (LOOKAHEAD(1) (TryResources() ) | Block())
-     (LOOKAHEAD(1) <CATCH> <LPAREN> InlineVar() <RPAREN> Block() { jjtThis.catchClause(); })?
+     <TRY> (LOOKAHEAD(1) TryResources() | Block())
+     (LOOKAHEAD(1) <CATCH> { pushUnit(jjtThis); } <LPAREN> InlineVar() <RPAREN> Block() { jjtThis.catchClause(); popUnit(jjtThis);})?
      (LOOKAHEAD(1) <FINALLY>  Block() { jjtThis.finallyClause(); })?
-    {
-         popUnit(jjtThis);
-     }
 }
 
 void TryResources() : {}
@@ -471,7 +465,7 @@ void TryResources() : {}
 
 void TryResource() #void : {}
 {
-(LOOKAHEAD(2) Var() | Identifier(true))
+LOOKAHEAD(2) Var() | Identifier(true)
 }
 
 void WhileStatement() : {}
