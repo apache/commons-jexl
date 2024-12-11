@@ -262,12 +262,11 @@ public class JexlScriptEngineTest {
         assertTrue(time2 <= System.currentTimeMillis());
     }
 
-
     @Test
     void testMain0() throws Exception {
         StringWriter strw = new StringWriter();
         StringReader strr = new StringReader("a=20\nb=22\na+b\n//q!\n");
-        Main.run(new BufferedReader(strr), new PrintWriter(strw), new String[0]);
+        Main.run(new BufferedReader(strr), new PrintWriter(strw), null);
         String ctl = "> >> 20\n" +
                 "> >> 22\n" +
                 "> >> 42\n" +
@@ -275,12 +274,11 @@ public class JexlScriptEngineTest {
         Assertions.assertEquals(ctl, strw.toString());
     }
 
-
     @Test
     void testMain1() throws Exception {
         StringWriter strw = new StringWriter();
         StringReader strr = new StringReader("args[0]+args[1]");
-        Main.run(new BufferedReader(strr), new PrintWriter(strw), 20, 22);
+        Main.run(new BufferedReader(strr), new PrintWriter(strw), new Object[]{20, 22});
         String ctl = ">>: 42\n";
         Assertions.assertEquals(ctl, strw.toString());
     }

@@ -20,6 +20,7 @@ package org.apache.commons.jexl3.scripting;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
@@ -52,15 +53,16 @@ public class Main {
      */
     public static void main(final String[] args) throws Exception {
         try(BufferedReader in = args.length == 1? read(Paths.get(args[0])) : read(null);
-            PrintWriter out =  new PrintWriter(System.out);) {
+            PrintWriter out =  new PrintWriter(
+                new OutputStreamWriter(System.out, Charset.defaultCharset()),true)) {
             run(in, out, args);
         }
     }
 
-    static void run(BufferedReader in, PrintWriter out, final Object... args) throws Exception {
+    static void run(BufferedReader in, PrintWriter out, final Object[] args) throws Exception {
         final JexlScriptEngineFactory fac = new JexlScriptEngineFactory();
         final ScriptEngine engine = fac.getScriptEngine();
-        if (args.length > 0) {
+        if (args != null && args.length > 0) {
             engine.put("args", args);
             final Object value = engine.eval(in);
             out.println(">>: " + value);
