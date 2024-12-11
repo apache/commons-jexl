@@ -136,16 +136,16 @@ public class JexlScriptEngineTest {
         final JexlScriptEngine engine = (JexlScriptEngine) manager.getEngineByName("JEXL");
         final ScriptContext ctxt = engine.getContext();
         engine.put("errors", new Errors());
-        assertTrue(assertThrows(ScriptException.class, () -> engine.eval("errors.npe()")).getCause() instanceof NullPointerException);
-        assertTrue(assertThrows(ScriptException.class, () -> engine.eval("errors.illegal()")).getCause() instanceof IllegalArgumentException);
+        assertInstanceOf(NullPointerException.class, assertThrows(ScriptException.class, () -> engine.eval("errors.npe()")).getCause());
+        assertInstanceOf(IllegalArgumentException.class, assertThrows(ScriptException.class, () -> engine.eval("errors.illegal()")).getCause());
         final CompiledScript script0 = engine.compile("errors.npe()");
-        assertTrue(assertThrows(ScriptException.class, () -> script0.eval()).getCause() instanceof NullPointerException);
+        assertInstanceOf(NullPointerException.class, assertThrows(ScriptException.class, script0::eval).getCause());
         final CompiledScript script1 = engine.compile("errors.illegal()");
-        assertTrue(assertThrows(ScriptException.class, () -> script1.eval()).getCause() instanceof IllegalArgumentException);
+        assertInstanceOf(IllegalArgumentException.class, assertThrows(ScriptException.class, script1::eval).getCause());
     }
 
     @Test
-    void testNulls() throws Exception {
+    void testNulls() {
         final ScriptEngineManager manager = new ScriptEngineManager();
         assertNotNull(manager, "Manager should not be null");
         final ScriptEngine engine = manager.getEngineByName("jexl3");
@@ -181,7 +181,7 @@ public class JexlScriptEngineTest {
     }
 
     @Test
-    void testScriptEngineFactory() throws Exception {
+    void testScriptEngineFactory() {
         final JexlScriptEngineFactory factory = new JexlScriptEngineFactory();
         assertEquals("JEXL Engine", factory.getParameter(ScriptEngine.ENGINE));
         assertEquals("3.4", factory.getParameter(ScriptEngine.ENGINE_VERSION));

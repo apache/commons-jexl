@@ -715,9 +715,9 @@ void EqualityExpression() #void : {}
    |
      (<ne> | <NE>) RelationalExpression() #NENode(2)
    |
-     (<eqstrict>) RelationalExpression() #EQSNode(2)
+     <eqstrict> RelationalExpression() #EQSNode(2)
    |
-     (<neqstrict>) RelationalExpression() #NESNode(2)
+     <neqstrict> RelationalExpression() #NESNode(2)
    |
      <range> RelationalExpression() #RangeNode(2) // range
   ) )?
@@ -1098,7 +1098,7 @@ void ArrayAccess() : {
  int s = 0;
  }
 {
-    (LOOKAHEAD(2) (<LBRACKET>|<QLBRACKET> { safe |= (1 << s++); }) Expression() <RBRACKET>)+ { jjtThis.setSafe(safe); }
+    (LOOKAHEAD(2) (<LBRACKET>|<QLBRACKET> { safe |= (1L << s++); }) Expression() <RBRACKET>)+ { jjtThis.setSafe(safe); }
 }
 
 void MemberAccess() #void : {}

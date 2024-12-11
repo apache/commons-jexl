@@ -192,12 +192,12 @@ public class ClassCreatorTest extends JexlTestCase {
 
     @AfterEach
     @Override
-    public void tearDown() throws Exception {
+    public void tearDown() {
         deleteDirectory(base);
     }
 
     @Test
-    void testBasicCtor() throws Exception {
+    void testBasicCtor() {
         final JexlScript s = jexl.createScript("(c, v)->{ var ct2 = new(c, v); ct2.value; }");
         Object r = s.execute(null, TwoCtors.class, 10);
         assertEquals(10, r);
@@ -210,7 +210,7 @@ public class ClassCreatorTest extends JexlTestCase {
     }
 
     @Test
-    void testContextualCtor() throws Exception {
+    void testContextualCtor() {
         final MapContext ctxt = new MapContext();
         ctxt.set("value", 42);
         JexlScript s = jexl.createScript("(c)->{ new(c).value }");
