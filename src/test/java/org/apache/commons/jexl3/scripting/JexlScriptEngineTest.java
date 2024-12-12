@@ -25,10 +25,16 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.ByteArrayOutputStream;
+import java.io.FileWriter;
+import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -63,6 +69,8 @@ public class JexlScriptEngineTest {
     private static final List<String> MIMES = Arrays.asList("application/x-jexl",
                                                             "application/x-jexl2",
                                                             "application/x-jexl3");
+
+    private static final String LF = System.lineSeparator();
 
     @AfterEach
     void tearDown() {
@@ -134,7 +142,6 @@ public class JexlScriptEngineTest {
     void testErrors() throws Exception {
         final ScriptEngineManager manager = new ScriptEngineManager();
         final JexlScriptEngine engine = (JexlScriptEngine) manager.getEngineByName("JEXL");
-        final ScriptContext ctxt = engine.getContext();
         engine.put("errors", new Errors());
         assertInstanceOf(NullPointerException.class, assertThrows(ScriptException.class, () -> engine.eval("errors.npe()")).getCause());
         assertInstanceOf(IllegalArgumentException.class, assertThrows(ScriptException.class, () -> engine.eval("errors.illegal()")).getCause());
@@ -223,7 +230,7 @@ public class JexlScriptEngineTest {
     }
 
     @Test
-    void testScriptingGetBy() throws Exception {
+    void testScriptingGetBy() {
         final ScriptEngineManager manager = new ScriptEngineManager();
         assertNotNull(manager, "Manager should not be null");
         for (final String name : NAMES) {
@@ -262,14 +269,15 @@ public class JexlScriptEngineTest {
         assertTrue(time2 <= System.currentTimeMillis());
     }
 
+
     @Test
     void testMain0() throws Exception {
         StringWriter strw = new StringWriter();
         StringReader strr = new StringReader("a=20\nb=22\na+b\n//q!\n");
         Main.run(new BufferedReader(strr), new PrintWriter(strw), null);
-        String ctl = "> >> 20\n" +
-                "> >> 22\n" +
-                "> >> 42\n" +
+        String ctl = "> >> 20" + LF +
+                "> >> 22" + LF +
+                "> >> 42" + LF +
                 "> ";
         Assertions.assertEquals(ctl, strw.toString());
     }
@@ -279,8 +287,30 @@ public class JexlScriptEngineTest {
         StringWriter strw = new StringWriter();
         StringReader strr = new StringReader("args[0]+args[1]");
         Main.run(new BufferedReader(strr), new PrintWriter(strw), new Object[]{20, 22});
-        String ctl = ">>: 42\n";
+        String ctl = ">>: 42" + LF;
         Assertions.assertEquals(ctl, strw.toString());
+    }
+
+    @Test
+    void testMain2() throws Exception {
+        final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
+        final PrintStream originalOut = System.out;
+        Path file = null;
+        try {
+            System.setOut(new PrintStream(outContent));
+            file = Files.createTempFile("test-jsr233", ".jexl");
+            BufferedWriter writer = new BufferedWriter(new FileWriter(file.toFile()));
+            writer.write("a=20;\nb=22;\na+b\n");
+            writer.close();
+            String ctl = ">>: 42" + LF;
+            Main.main(new String[]{file.toString()});
+            Assertions.assertEquals(ctl, outContent.toString());
+        } finally {
+            System.setOut(originalOut);
+            if (file != null) {
+                Files.delete(file);
+            }
+        }
     }
 
 }
