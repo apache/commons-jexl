@@ -555,5 +555,29 @@ public class Issues400Test {
         assertNotNull(script);
         final Object result = script.execute(null);
         assertNull(result);
+
+    }
+
+    public static class Arithmetic435 extends JexlArithmetic {
+        public Arithmetic435(boolean strict) {
+            super(strict);
+        }
+        public Object empty(String type) {
+            if ("list".equals(type)) {
+                return Collections.emptyList();
+            }
+            return null;
+        }
+    }
+
+    @Test
+    void test() {
+        JexlArithmetic arithmetic = new Arithmetic435(true);
+        JexlEngine jexl = new JexlBuilder().arithmetic(arithmetic).create();
+        final String src = "empty('list')";
+        final JexlScript script = jexl.createScript(src);
+        assertNotNull(script);
+        final Object result = script.execute(null);
+        assertInstanceOf(List.class, result);
     }
 }

@@ -291,7 +291,7 @@ public final class Operator implements JexlOperator.Uberspect {
                 }
             }
         }
-        return !(result instanceof Boolean) || (Boolean) result;
+        return result;
     }
 
     @Override

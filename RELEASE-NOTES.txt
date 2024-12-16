@@ -1,144 +1,6 @@
 
-Apache Commons JEXL 3.4.0 Release Notes
-
-Introduction
-------------
-
-Apache Commons JEXL is a library facilitates the implementation of scripting features in
-        applications and frameworks written in Java.
-
-Java 8 is required.
-
-New features
-------------
-
-o JEXL-423:  Add support for instanceof / !instanceof 
-o JEXL-422:  Add strict equality (===) and inequality (!==) operators 
-o JEXL-421:  ArrayBuilder: array type should reflect common class of its entries 
-o JEXL-419:  Add permission syntax to allow class/method/field 
-o JEXL-418:  Add try-catch support Thanks to Xu Pengcheng. 
-o JEXL-408:  Using JexlFeatures is tedious Thanks to sebb. 
-o JEXL-404:  Support array-access safe navigation (x?[y]) Thanks to Xu Pengcheng. 
-o JEXL-401:  Captured variables should be read-only 
-o JEXL-398:  Allow 'trailing commas' or ellipsis while defining array, map and set literals Thanks to Xu Pengcheng. 
-o          Add Maven property project.build.outputTimestamp for build reproducibility. Thanks to Gary Gregory. 
-
-Fixed Bugs
-----------
-
-o JEXL-420:  Error while comparing float and string value Thanks to Xu Pengcheng. 
-o JEXL-417:  JexlArithmetic looses precision during arithmetic operator execution Thanks to Robert Lucas. 
-o JEXL-416:  Null-valued pragma throws NPE in 3.3 Thanks to William Price. 
-o JEXL-415:  Incorrect template eval result. Thanks to Xu Pengcheng. 
-o JEXL-414:  SoftCache may suffer from race conditions. Thanks to Holger Sunke. 
-o JEXL-412:  Ambiguous syntax between namespace function call and map object definition. Thanks to Xu Pengcheng. 
-o JEXL-410:  JexlFeatures: ctor does not enable all features. Thanks to sebb. 
-o JEXL-409:  Disable LEXICAL should disable LEXICAL_SHADE. Thanks to sebb. 
-o JEXL-405:  Recursive functions corrupt evaluation frame if reassigned. 
-o JEXL-403:  Exception while evaluating template literal used in array assignment in loop. Thanks to Xu Pengcheng. 
-o JEXL-402:  Parse failed with empty return value. Thanks to Xu Pengcheng. 
-o          [StepSecurity] ci: Harden GitHub Actions #180. Thanks to step-security-bot, Gary Gregory. 
-o          Guard logging calls. Thanks to PMD, Gary Gregory. 
-o          Deprecate SimpleNode.SimpleNode(Parser, int) in favor of SimpleNode.SimpleNode(int). Thanks to PMD, Gary Gregory. 
-o          Deprecate JexlNode.JexlNode(Parser, int) in favor of JexlNode.JexlNode(int). Thanks to PMD, Gary Gregory. 
-
-Changes
--------
-
-o          Bump commons-parent from 67 to 69. Thanks to dependabot. 
-o          Bump github actions. Thanks to dependabot. 
-o          Bump commons-parent from 57 to 70. Thanks to Gary Gregory, Dependabot. 
-o          Bump org.ow2.asm:asm from 9.5 to 9.7 #200, #242. Thanks to dependabot. 
-o          Bump commons-logging from 1.2 to 1.3.2 #241, #255. Thanks to Gary Gregory, Dependabot. 
-o          Bump com.google.code.gson:gson from 2.10.1 to 2.11.0 #258. Thanks to Gary Gregory, Dependabot. 
-
-
-Historical list of changes: https://commons.apache.org/proper/commons-jexl/changes-report.html
-
-For complete information on Apache Commons JEXL, including instructions on how to submit bug reports,
-patches, or suggestions for improvement, see the Apache Commons JEXL website:
-
-https://commons.apache.org/proper/commons-jexl/
-
-Download page: https://commons.apache.org/proper/commons-jexl/download_jexl.cgi
-
-Have fun!
--Apache Commons Team
-
-------------------------------------------------------------------------------
-
-
-Apache Commons JEXL 3.4.0 Release Notes
-
-Introduction
-------------
-
-Apache Commons JEXL is a library facilitates the implementation of scripting features in
-applications and frameworks written in Java.
-
-Java 8 is required.
-
-New features
-------------
-
-o JEXL-423:  Add support for instanceof / !instanceof 
-o JEXL-422:  Add strict equality (===) and inequality (!==) operators 
-o JEXL-421:  ArrayBuilder: array type should reflect common class of its entries 
-o JEXL-419:  Add permission syntax to allow class/method/field 
-o JEXL-418:  Add try-catch support Thanks to Xu Pengcheng. 
-o JEXL-408:  Using JexlFeatures is tedious Thanks to sebb. 
-o JEXL-404:  Support array-access safe navigation (x?[y]) Thanks to Xu Pengcheng. 
-o JEXL-401:  Captured variables should be read-only 
-o JEXL-398:  Allow 'trailing commas' or ellipsis while defining array, map and set literals Thanks to Xu Pengcheng. 
-o            Add Maven property project.build.outputTimestamp for build reproducibility. Thanks to Gary Gregory. 
-
-Fixed Bugs
-----------
-
-o JEXL-420:  Error while comparing float and string value Thanks to Xu Pengcheng. 
-o JEXL-417:  JexlArithmetic looses precision during arithmetic operator execution Thanks to Robert Lucas. 
-o JEXL-416:  Null-valued pragma throws NPE in 3.3 Thanks to William Price. 
-o JEXL-415:  Incorrect template eval result. Thanks to Xu Pengcheng. 
-o JEXL-414:  SoftCache may suffer from race conditions. Thanks to Holger Sunke. 
-o JEXL-412:  Ambiguous syntax between namespace function call and map object definition. Thanks to Xu Pengcheng. 
-o JEXL-410:  JexlFeatures: ctor does not enable all features. Thanks to sebb. 
-o JEXL-409:  Disable LEXICAL should disable LEXICAL_SHADE. Thanks to sebb. 
-o JEXL-405:  Recursive functions corrupt evaluation frame if reassigned. 
-o JEXL-403:  Exception while evaluating template literal used in array assignment in loop. Thanks to Xu Pengcheng. 
-o JEXL-402:  Parse failed with empty return value. Thanks to Xu Pengcheng. 
-o            [StepSecurity] ci: Harden GitHub Actions #180. Thanks to step-security-bot, Gary Gregory. 
-o            Guard logging calls. Thanks to PMD, Gary Gregory. 
-o            Deprecate SimpleNode.SimpleNode(Parser, int) in favor of SimpleNode.SimpleNode(int). Thanks to PMD, Gary Gregory. 
-o            Deprecate JexlNode.JexlNode(Parser, int) in favor of JexlNode.JexlNode(int). Thanks to PMD, Gary Gregory. 
-
-Changes
--------
-
-o          Bump commons-parent from 67 to 69. Thanks to dependabot. 
-o          Bump github actions. Thanks to dependabot. 
-o          Bump commons-parent from 57 to 70. Thanks to Gary Gregory, Dependabot. 
-o          Bump org.ow2.asm:asm from 9.5 to 9.7 #200, #242. Thanks to dependabot. 
-o          Bump commons-logging from 1.2 to 1.3.2 #241, #255. Thanks to Gary Gregory, Dependabot. 
-o          Bump com.google.code.gson:gson from 2.10.1 to 2.11.0 #258. Thanks to Gary Gregory, Dependabot. 
-
-
-Historical list of changes: https://commons.apache.org/proper/commons-jexl/changes-report.html
-
-For complete information on Apache Commons JEXL, including instructions on how to submit bug reports,
-patches, or suggestions for improvement, see the Apache Commons JEXL website:
-
-https://commons.apache.org/proper/commons-jexl/
-
-Download page: https://commons.apache.org/proper/commons-jexl/download_io.cgi
-
-Have fun!
--Apache Commons Team
-
-------------------------------------------------------------------------------
-
-
                             Apache Commons JEXL
-                                Version 3.4
+                                Version 3.4.1
                                Release Notes
 
 
@@ -153,8 +15,62 @@ constructs seen in shell-script or ECMAScript.
 
 Its goal is to expose scripting features usable by technical operatives or consultants working with enterprise platforms.
 
+Java 8 is required.
 
-  https://commons.apache.org/jexl/
+Historical list of changes: https://commons.apache.org/proper/commons-jexl/changes-report.html
+
+For complete information on Apache Commons JEXL, including instructions on how to submit bug reports,
+patches, or suggestions for improvement, see the Apache Commons JEXL website:
+
+https://commons.apache.org/proper/commons-jexl/
+
+Download page: https://commons.apache.org/proper/commons-jexl/download_io.cgi
+
+Have fun!
+-Apache Commons Team
+
+========================================================================================================================
+Release 3.4.1
+========================================================================================================================
+
+Version 3.4.1 is a minor release.
+
+Compatibility with previous releases
+====================================
+Version 3.4.1 is source and binary compatible with 3.4.
+
+
+What's new in 3.4.1:
+====================
+Operator overloading has been enhanced so that overloading compare() will benefit all comparison operators.
+A feature flag has been introduced to allow pass-by-reference of captured variables closely mimicking
+EcmaScript behavior.
+
+New Features in 3.4.1:
+======================
+* JEXL-428:     Make Comparable object high priority while comparing
+* JEXL-427:     Avoid coercing logical expressions to boolean
+* JEXL-426:     Enable pass-by-reference for Captured Variables
+
+Bugs Fixed in 3.4.1:
+====================
+* JEXL-435:     Changed behavior of empty operator overloading
+* JEXL-434:     The safe-access array operator is not safe
+* JEXL-433:     Debugger does not accept empty return statement
+* JEXL-432:     Namespace functors are not cleared when the classloader is updated
+* JEXL-431:     Parse error with variables declared in a catch clause
+* JEXL-429:     Ternary expression regression
+* JEXL-425:     Multiline format literals does not always return string
+
+Changes in 3.4.1:
+=================
+o               Replace NumberParser use of Locale.ENGLISH with Locale.ROOT
+o               Bump org.apache.commons:commons-parent from 71 to 78
+o               Bump commons-logging:commons-logging from 1.3.2 to 1.3.4
+o               Bump org.codehaus.mojo:animal-sniffer-maven-plugin from 1.23 to 1.24
+o               Bump org.apache.commons:commons-lang3 from 3.14.0 to 3.17.0
+o               Bump org.hamcrest:hamcrest from 2.2 to 3.0
+o               Bump org.ow2.asm:asm from 9.7 to 9.7.1
 
 ========================================================================================================================
 Release 3.4
@@ -185,6 +101,7 @@ New Features in 3.4:
 * JEXL-404:     Support array-access safe navigation (x?[y])
 * JEXL-401:     Captured variables should be read-only
 * JEXL-398:     Allow 'trailing commas' or ellipsis while defining array, map and set literals
+o               Add Maven property project.build.outputTimestamp for build reproducibility. Thanks to Gary Gregory.
 
 Bugs Fixed in 3.4:
 ==================
@@ -199,6 +116,19 @@ Bugs Fixed in 3.4:
 * JEXL-405:     Recursive functions corrupt evaluation frame if reassigned
 * JEXL-403:     Exception while evaluating template literal used in array assignment in loop.
 * JEXL-402:     parse failed with empty return value.
+o               [StepSecurity] ci: Harden GitHub Actions #180. Thanks to step-security-bot, Gary Gregory.
+o               Guard logging calls. Thanks to PMD, Gary Gregory.
+o               Deprecate SimpleNode.SimpleNode(Parser, int) in favor of SimpleNode.SimpleNode(int). Thanks to PMD, Gary Gregory.
+o               Deprecate JexlNode.JexlNode(Parser, int) in favor of JexlNode.JexlNode(int). Thanks to PMD, Gary Gregory.
+
+Changes in 3.4:
+===============
+o              Bump commons-parent from 67 to 69. Thanks to dependabot.
+o              Bump github actions. Thanks to dependabot.
+o              Bump commons-parent from 57 to 70. Thanks to Gary Gregory, Dependabot.
+o              Bump org.ow2.asm:asm from 9.5 to 9.7 #200, #242. Thanks to dependabot.
+o              Bump commons-logging from 1.2 to 1.3.2 #241, #255. Thanks to Gary Gregory, Dependabot.
+o              Bump com.google.code.gson:gson from 2.10.1 to 2.11.0 #258. Thanks to Gary Gregory, Dependabot.
 
 ========================================================================================================================
 Release 3.3
