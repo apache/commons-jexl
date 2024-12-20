@@ -53,6 +53,7 @@
             <action type="fix" dev="ggregory" due-to="Gary Gregory">
               Replace NumberParser use of Locale.ENGLISH with Locale.ROOT.
             </action>
+            <action type="fix" dev="ggregory" due-to="Gary Gregory">Pick up maven-antrun-plugin version from parent POM org.apache:apache.</action>
           <!-- ADD -->
             <action dev="henrib" type="add" issue="JEXL-428" due-to="Xu Pengcheng">
                 Make Comparable object high priority while comparing.
