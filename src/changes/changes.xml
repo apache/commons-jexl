@@ -33,35 +33,35 @@
                 Changed behavior of empty operator overloading Action.
             </action>
             <action dev="henrib" type="fix" issue="JEXL-434" due-to="Vincent Bussol">
-                The safe-access array operator is not safe
+                The safe-access array operator is not safe.
             </action>
             <action dev="henrib" type="fix" issue="JEXL-433" due-to="Vincent Bussol">
-                Debugger does not accept empty return statement
+                Debugger does not accept empty return statement.
             </action>
             <action dev="henrib" type="fix" issue="JEXL-432" due-to="Vincent Bussol">
-                Namespace functors are not cleared when the classloader is updated
+                Namespace functors are not cleared when the classloader is updated.
             </action>
             <action dev="henrib" type="fix" issue="JEXL-431" due-to="Vincent Bussol">
-                Parse error with variables declared in a catch clause
+                Parse error with variables declared in a catch clause.
             </action>
             <action dev="henrib" type="fix" issue="JEXL-429" due-to="Shuo Geng">
-                Ternary expression regression
+                Ternary expression regression.
             </action>
             <action dev="henrib" type="fix" issue="JEXL-425" due-to="Xu Pengcheng">
-                Multiline format literals does not always return string
+                Multiline format literals does not always return string.
             </action>
             <action type="fix" dev="ggregory" due-to="Gary Gregory">
               Replace NumberParser use of Locale.ENGLISH with Locale.ROOT.
             </action>
           <!-- ADD -->
             <action dev="henrib" type="add" issue="JEXL-428" due-to="Xu Pengcheng">
-                Make Comparable object high priority while comparing
+                Make Comparable object high priority while comparing.
             </action>
             <action dev="henrib" type="add" issue="JEXL-427" due-to="Xu Pengcheng">
-                Avoid coercing logical expressions to boolean
+                Avoid coercing logical expressions to boolean.
             </action>
             <action dev="henrib" type="add" issue="JEXL-426" due-to="Xu Pengcheng">
-                Enable pass-by-reference for Captured Variables
+                Enable pass-by-reference for Captured Variables.
             </action>
           <!-- UPDATE -->
           <action type="update" dev="ggregory" due-to="Gary Gregory">Bump org.apache.commons:commons-parent from 71 to 78 #279, #282, #287, #291, #295, #301.</action>
