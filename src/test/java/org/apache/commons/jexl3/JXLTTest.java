@@ -454,7 +454,6 @@ public class JXLTTest extends JexlTestCase {
         assertEquals(test42, refactored);
     }
 
-
     @Test
     void testParseIdentifier() {
         assertNull(JexlArithmetic.parseIdentifier(null));

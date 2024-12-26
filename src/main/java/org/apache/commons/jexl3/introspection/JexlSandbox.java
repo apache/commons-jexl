@@ -318,7 +318,6 @@ public final class JexlSandbox {
         return permissions;
     }
 
-
     /**
      * Creates the set of permissions for a given class.
      * <p>The sandbox inheritance property will apply to the permissions created by this method
@@ -366,7 +365,6 @@ public final class JexlSandbox {
     public String read(final Class<?> clazz, final String name) {
         return get(clazz).read().get(name);
     }
-
 
     /**
      * Gets the write permission value for a given property of a class.

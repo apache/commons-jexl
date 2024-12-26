@@ -648,7 +648,6 @@ public class ArithmeticOperatorTest extends JexlTestCase {
         asserter.assertExpression("x.y =$ 'foo'", Boolean.TRUE);
     }
 
-
     /**
      * A comparator using an evaluated expression on objects as comparison arguments.
      * <p>Lifetime is the sort method; it is thus safe to encapsulate the context</p>
@@ -735,7 +734,6 @@ public class ArithmeticOperatorTest extends JexlTestCase {
         assertEquals(9, m[1].get("type"));
     }
 
-
     public static class MatchingArithmetic extends JexlArithmetic {
         public MatchingArithmetic(final boolean astrict) {
             super(astrict);
@@ -759,7 +757,6 @@ public class ArithmeticOperatorTest extends JexlTestCase {
         assertTrue((boolean) script.execute(null, "defghi"));
         assertFalse((boolean) script.execute(null, "ghijkl"));
     }
-
 
     public static class Arithmetic428 extends JexlArithmetic {
         public Arithmetic428(boolean strict) {

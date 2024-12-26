@@ -113,7 +113,6 @@ public class RangeTest extends JexlTestCase {
         assertEquals("??", Scope.UNDECLARED.toString());
     }
 
-
     @Test
     public void testRanges() throws Exception {
         final LongRange lr0 = LongRange.create(20,10);

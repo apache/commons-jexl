@@ -269,7 +269,6 @@ public class JexlScriptEngineTest {
         assertTrue(time2 <= System.currentTimeMillis());
     }
 
-
     @Test
     void testMain0() throws Exception {
         StringWriter strw = new StringWriter();

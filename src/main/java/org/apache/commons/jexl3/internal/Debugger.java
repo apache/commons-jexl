@@ -933,7 +933,6 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
         return data;
     }
 
-
     @Override
     protected Object visit(final ASTGENode node, final Object data) {
         return infixChildren(node, " >= ", false, data);

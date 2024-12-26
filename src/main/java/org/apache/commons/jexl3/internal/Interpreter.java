@@ -1118,7 +1118,6 @@ public class Interpreter extends InterpreterBase {
         return shortCircuit(true, node, data);
     }
 
-
     @Override
     protected Object visit(final ASTAnnotatedStatement node, final Object data) {
         return processAnnotation(node, 0, data);
@@ -1579,7 +1578,6 @@ public class Interpreter extends InterpreterBase {
             block = block.pop();
         }
     }
-
 
     @Override
     protected Object visit(final ASTLENode node, final Object data) {
