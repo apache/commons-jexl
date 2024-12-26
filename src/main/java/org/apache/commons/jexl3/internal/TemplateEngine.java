@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import org.apache.commons.jexl3.JexlCache;
@@ -223,9 +224,7 @@ public final class TemplateEngine extends JxltEngine {
          */
         ConstantExpression(final Object val, final TemplateExpression source) {
             super(source);
-            if (val == null) {
-                throw new NullPointerException("constant cannot be null");
-            }
+            Objects.requireNonNull(val, "val");
             this.value = val instanceof String
                     ? StringParser.buildTemplate((String) val, false)
                     : val;

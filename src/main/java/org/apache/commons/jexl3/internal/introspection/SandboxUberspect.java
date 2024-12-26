@@ -18,6 +18,7 @@ package org.apache.commons.jexl3.internal.introspection;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 
 import org.apache.commons.jexl3.JexlArithmetic;
 import org.apache.commons.jexl3.JexlOperator;
@@ -54,12 +55,8 @@ public final class SandboxUberspect implements JexlUberspect {
      * @param theSandbox the sandbox which is copied to avoid changes at runtime
      */
     public SandboxUberspect(final JexlUberspect theUberspect, final JexlSandbox theSandbox) {
-        if (theSandbox == null) {
-            throw new NullPointerException("sandbox cannot be null");
-        }
-        if (theUberspect == null) {
-            throw new NullPointerException("uberspect cannot be null");
-        }
+        Objects.requireNonNull(theSandbox, "theSandbox");
+        Objects.requireNonNull(theUberspect, "theUberspect");
         this.uberspect = theUberspect;
         this.sandbox = theSandbox.copy();
     }

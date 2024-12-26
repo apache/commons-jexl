@@ -24,6 +24,7 @@ import java.io.Reader;
 import java.io.Writer;
 import java.lang.ref.Reference;
 import java.lang.ref.SoftReference;
+import java.util.Objects;
 
 import javax.script.AbstractScriptEngine;
 import javax.script.Bindings;
@@ -394,14 +395,12 @@ public class JexlScriptEngine extends AbstractScriptEngine implements Compilable
     /**
      * Create a scripting engine using the supplied factory.
      *
-     * @param factory the factory which created this instance.
+     * @param scriptEngineFactory the factory which created this instance.
      * @throws NullPointerException if factory is null
      */
-    public JexlScriptEngine(final ScriptEngineFactory factory) {
-        if (factory == null) {
-            throw new NullPointerException("ScriptEngineFactory must not be null");
-        }
-        parentFactory = factory;
+    public JexlScriptEngine(final ScriptEngineFactory scriptEngineFactory) {
+        Objects.requireNonNull(scriptEngineFactory, "scriptEngineFactory");
+        parentFactory = scriptEngineFactory;
         jexlEngine = getEngine();
         jexlObject = new JexlScriptObject();
     }
@@ -409,18 +408,14 @@ public class JexlScriptEngine extends AbstractScriptEngine implements Compilable
     @Override
     public CompiledScript compile(final Reader script) throws ScriptException {
         // This is mandated by JSR-223
-        if (script == null) {
-            throw new NullPointerException("script must be non-null");
-        }
+        Objects.requireNonNull(script, "script");
         return compile(readerToString(script));
     }
 
     @Override
     public CompiledScript compile(final String script) throws ScriptException {
         // This is mandated by JSR-223
-        if (script == null) {
-            throw new NullPointerException("script must be non-null");
-        }
+        Objects.requireNonNull(script, "script");
         try {
             final JexlScript jexlScript = jexlEngine.createScript(script);
             return new JexlCompiledScript(jexlScript);
@@ -437,18 +432,16 @@ public class JexlScriptEngine extends AbstractScriptEngine implements Compilable
     @Override
     public Object eval(final Reader reader, final ScriptContext context) throws ScriptException {
         // This is mandated by JSR-223 (see SCR.5.5.2   Methods)
-        if (reader == null || context == null) {
-            throw new NullPointerException("script and context must be non-null");
-        }
+        Objects.requireNonNull(reader, "reader");
+        Objects.requireNonNull(context, "context");
         return eval(readerToString(reader), context);
     }
 
     @Override
     public Object eval(final String script, final ScriptContext context) throws ScriptException {
         // This is mandated by JSR-223 (see SCR.5.5.2   Methods)
-        if (script == null || context == null) {
-            throw new NullPointerException("script and context must be non-null");
-        }
+        Objects.requireNonNull(script, "context");
+        Objects.requireNonNull(context, "context");
         // This is mandated by JSR-223 (end of section SCR.4.3.4.1.2 - JexlScript Execution)
         context.setAttribute(CONTEXT_KEY, context, ScriptContext.ENGINE_SCOPE);
         try {

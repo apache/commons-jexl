@@ -25,6 +25,7 @@ import java.io.InputStreamReader;
 import java.math.MathContext;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.util.Objects;
 
 import org.apache.commons.jexl3.introspection.JexlUberspect;
 
@@ -569,9 +570,7 @@ public abstract class JexlEngine {
      * @return the source
      */
     protected String readSource(final File file) {
-        if (file == null) {
-            throw new NullPointerException("source file is null");
-        }
+        Objects.requireNonNull(file, "file");
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file),
                 getCharset()))) {
             return toString(reader);
@@ -587,9 +586,7 @@ public abstract class JexlEngine {
      * @return the source
      */
     protected String readSource(final URL url) {
-        if (url == null) {
-            throw new NullPointerException("source URL is null");
-        }
+        Objects.requireNonNull(url, "url");
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream(), getCharset()))) {
             return toString(reader);
         } catch (final IOException xio) {

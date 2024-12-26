@@ -28,6 +28,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
@@ -399,9 +400,7 @@ public class Engine extends JexlEngine {
 
     @Override
     public Script createScript(final JexlFeatures features, final JexlInfo info, final String scriptText, final String... names) {
-        if (scriptText == null) {
-            throw new NullPointerException("source is null");
-        }
+        Objects.requireNonNull(scriptText, "scriptText");
         final String source = trimSource(scriptText);
         final Scope scope = names == null || names.length == 0? null : new Scope(null, names);
         final JexlFeatures ftrs = features == null ? scriptFeatures : features;

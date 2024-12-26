@@ -21,6 +21,7 @@ import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
 
@@ -116,9 +117,7 @@ public final class TemplateScript implements JxltEngine.Template {
                           final String directive,
                           final Reader reader,
                           final String... parms) {
-        if (directive == null) {
-            throw new NullPointerException("null prefix");
-        }
+        Objects.requireNonNull(directive, "directive");
         final String engineImmediateCharString = Character.toString(engine.getImmediateChar());
         final String engineDeferredCharString = Character.toString(engine.getDeferredChar());
 
@@ -128,9 +127,7 @@ public final class TemplateScript implements JxltEngine.Template {
                 || (engineDeferredCharString + "{").equals(directive)) {
             throw new IllegalArgumentException(directive + ": is not a valid directive pattern");
         }
-        if (reader == null) {
-            throw new NullPointerException("null input");
-        }
+        Objects.requireNonNull(reader, "reader");
         this.jxlt = engine;
         this.prefix = directive;
         final List<Block> blocks = jxlt.readTemplate(prefix, reader);
