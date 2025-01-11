@@ -72,6 +72,7 @@
         <project.build.sourceEncoding>${commons.encoding}</project.build.sourceEncoding>
         <!-- This is used by reporting plugins -->
         <project.reporting.outputEncoding>${commons.encoding}</project.reporting.outputEncoding>
+        <!-- project.build.outputTimestamp is managed by Maven plugins, see https://maven.apache.org/guides/mini/guide-reproducible-builds.html -->
         <project.build.outputTimestamp>2024-06-05T23:56:52Z</project.build.outputTimestamp>
 
         <!-- Commons release plugin -->
