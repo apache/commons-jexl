@@ -486,8 +486,8 @@ public class Interpreter extends InterpreterBase {
             node.setExpression(expr);
         }
         // internal classes to evaluate in context
-        if (expr instanceof TemplateEngine.TemplateExpression ) {
-           final Object eval = ((TemplateEngine.TemplateExpression ) expr).evaluate(context, frame, options);
+        if (expr instanceof TemplateEngine.TemplateExpression) {
+            final Object eval = ((TemplateEngine.TemplateExpression) expr).evaluate(context, frame, options);
             if (eval != null) {
                 final String inter = eval.toString();
                 if (options.isStrictInterpolation()) {
