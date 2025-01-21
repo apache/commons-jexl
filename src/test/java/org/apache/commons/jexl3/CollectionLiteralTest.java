@@ -113,12 +113,12 @@ public class CollectionLiteralTest extends JexlTestCase {
 
         script = jexl.createScript("[ (x)->{ 1 + x; }, (y)->{ y - 1; } ]");
         Object previous = null;
-        for(int i = 0; i < 4; ++i) {
+        for (int i = 0; i < 4; ++i) {
             result = script.execute(null);
             assertNotNull(result);
             assertNotSame(previous, result);
             previous = result;
-            assertEquals( 1 + i, jc.arrays.get());
+            assertEquals(1 + i, jc.arrays.get());
         }
     }
 

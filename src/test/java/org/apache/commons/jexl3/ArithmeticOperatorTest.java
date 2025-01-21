@@ -688,7 +688,7 @@ public class ArithmeticOperatorTest extends JexlTestCase {
 
     public static class SortingArithmetic extends JexlArithmetic {
         public SortingArithmetic(boolean strict) {
-            this( strict, null, Integer.MIN_VALUE);
+            this(strict, null, Integer.MIN_VALUE);
         }
 
         private SortingArithmetic(boolean strict, MathContext context, int scale) {
@@ -705,8 +705,9 @@ public class ArithmeticOperatorTest extends JexlTestCase {
 
         /**
          * Sorts an array using a script to evaluate the property used to compare elements.
+         * 
          * @param array the elements array
-         * @param expr the property evaluation lambda
+         * @param expr  the property evaluation lambda
          */
         public void sort(final Object[] array, final JexlScript expr) {
             Arrays.sort(array, new PropertyComparator(this, expr));
@@ -760,7 +761,7 @@ public class ArithmeticOperatorTest extends JexlTestCase {
 
     public static class Arithmetic428 extends JexlArithmetic {
         public Arithmetic428(boolean strict) {
-            this( strict, null, Integer.MIN_VALUE);
+            this(strict, null, Integer.MIN_VALUE);
         }
 
         private Arithmetic428(boolean strict, MathContext context, int scale) {

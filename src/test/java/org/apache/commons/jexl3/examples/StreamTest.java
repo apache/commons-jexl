@@ -96,7 +96,7 @@ public class StreamTest {
          * @return the mapped stream
          */
         public Stream<?> map(final Stream<?> stream, final JexlScript mapper) {
-            return stream.map( x -> mapper.execute(this, x));
+            return stream.map(x -> mapper.execute(this, x));
         }
     }
 

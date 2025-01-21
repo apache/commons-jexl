@@ -1041,7 +1041,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
             }
             builder.append('(');
             final String[] params = lambda.getParameters();
-            if (params != null ) {
+            if (params != null) {
                 final Scope scope = lambda.getScope();
                 final LexicalScope lexicalScope = lambda.getLexicalScope();
                 for (int p = 0; p < params.length; ++p) {

@@ -92,7 +92,7 @@ public class AssignTest extends JexlTestCase {
         final JexlExpression check = JEXL.createExpression("froboz.value");
         final JexlContext jc = new MapContext();
         Object o = assign.evaluate(jc);
-        assertEquals( Integer.valueOf(10), o);
+        assertEquals(Integer.valueOf(10), o);
         o = check.evaluate(jc);
         assertEquals(Integer.valueOf(10), o);
     }

@@ -128,7 +128,7 @@ public class StrategyTest extends JexlTestCase {
 
     @Test
     public void testMyMapStrategy() throws Exception {
-        final JexlEngine jexl = new JexlBuilder().arithmetic( new MapArithmetic(true)).create();
+        final JexlEngine jexl = new JexlBuilder().arithmetic(new MapArithmetic(true)).create();
         run171(jexl, false);
     }
 

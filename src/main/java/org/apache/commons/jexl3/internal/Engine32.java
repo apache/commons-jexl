@@ -112,7 +112,7 @@ public class Engine32 extends Engine {
             }
 
             @Override
-            protected boolean isTernaryProtected( final JexlNode node) {
+            protected boolean isTernaryProtected(final JexlNode node) {
                 return Engine32.isTernaryProtected(this, node);
             }
         };
@@ -132,7 +132,7 @@ public class Engine32 extends Engine {
             }
 
             @Override
-            protected boolean isTernaryProtected( final JexlNode node) {
+            protected boolean isTernaryProtected(final JexlNode node) {
                 return Engine32.isTernaryProtected(this, node);
             }
         };

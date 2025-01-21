@@ -122,7 +122,7 @@ public class ScriptTest extends JexlTestCase {
         con.setRequestMethod("POST");
         con.setRequestProperty("Accept", "application/json");
         // send data
-        if ( jsonData != null ) {
+        if (jsonData != null) {
             con.setRequestProperty("Content-Type", "application/json");
             con.setDoOutput(true);
 
@@ -133,7 +133,7 @@ public class ScriptTest extends JexlTestCase {
         // read response
         final int responseCode = con.getResponseCode();
         InputStream inputStream = null;
-        inputStream =  con.getInputStream();
+        inputStream = con.getInputStream();
         final StringBuilder response = new StringBuilder();
         if (inputStream != null) {
             try (BufferedReader in = new BufferedReader(new InputStreamReader(inputStream))) {

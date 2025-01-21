@@ -80,7 +80,7 @@ public class JexlTestCase {
     static final JexlOptions MODE_PRO50 = new JexlOptions();
 
     static {
-        MODE_PRO50.setFlags( "+strict +cancellable +lexical +lexicalShade -safe".split(" "));
+        MODE_PRO50.setFlags("+strict +cancellable +lexical +lexicalShade -safe".split(" "));
     }
 
     /**

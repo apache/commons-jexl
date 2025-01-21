@@ -1638,10 +1638,10 @@ public class ArithmeticTest extends JexlTestCase {
         final JexlEngine jexl = new JexlBuilder().create();
         final JexlContext jc = new MapContext();
         final Callable173 c173 = new Callable173();
-        JexlScript e = jexl.createScript( "c173(9, 6)", "c173" );
+        JexlScript e = jexl.createScript("c173(9, 6)", "c173");
         Object result = e.execute(jc, c173);
         assertEquals(54, result);
-        e = jexl.createScript( "c173('fourty', 'two')", "c173" );
+        e = jexl.createScript("c173('fourty', 'two')", "c173");
         result = e.execute(jc, c173);
         assertEquals(42, result);
 
@@ -2035,7 +2035,7 @@ public class ArithmeticTest extends JexlTestCase {
         assertEquals(BigDecimal.ZERO, jexla.toBigDecimal(""));
         assertEquals(BigDecimal.ZERO, jexla.toBigDecimal((char) 0));
 
-        final Double d64d3 = new Double( 6.4 / 3 );
+        final Double d64d3 = new Double(6.4 / 3);
         assertEquals(d64d3, ((Number) JEXL.createExpression("6.4 / 3").evaluate(null)).doubleValue(), EPSILON);
         asserter.assertExpression("6.4 / 3", d64d3);
         assertEquals(d64d3, ((Number) JEXL.createExpression("6.4 / 3d").evaluate(null)).doubleValue(), EPSILON);

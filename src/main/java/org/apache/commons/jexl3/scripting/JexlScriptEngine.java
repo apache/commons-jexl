@@ -289,7 +289,7 @@ public class JexlScriptEngine extends AbstractScriptEngine implements Compilable
                             .safe(false)
                             .logger(JexlScriptEngine.LOG)
                             .cache(JexlScriptEngine.CACHE_SIZE);
-                    if (PERMISSIONS != null ) {
+                    if (PERMISSIONS != null) {
                         builder.permissions(PERMISSIONS);
                     }
                     engine = builder.create();

@@ -108,7 +108,7 @@ public class LexicalFrame extends LexicalScope {
      */
     public LexicalFrame pop() {
         // undefine all symbols
-        clearSymbols(s -> frame.set(s, Scope.UNDEFINED) );
+        clearSymbols(s -> frame.set(s, Scope.UNDEFINED));
         // restore values of captured symbols that were overwritten
         if (stack != null) {
             while (!stack.isEmpty()) {

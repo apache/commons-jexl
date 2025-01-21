@@ -101,7 +101,7 @@ public class SoftCache<K, V> implements JexlCache<K, V> {
     @Override
     public void clear() {
         final SoftReference<Map<K, V>> ref = reference;
-        if (ref != null ) {
+        if (ref != null) {
             reference = null;
             final Map<K, V> map = ref.get();
             if (map != null) {

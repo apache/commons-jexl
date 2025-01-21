@@ -157,10 +157,10 @@ public final class JexlFeatures {
      * <p>Adds lexical, lexical-shade and const-capture but removes comparator-names and pragma-anywhere</p>
      */
     private static final long SCRIPT_FEATURES = // MUST REMAIN PRIVATE
-        ( DEFAULT_FEATURES
+        (DEFAULT_FEATURES
         | 1L << LEXICAL
         | 1L << LEXICAL_SHADE
-        | 1L << CONST_CAPTURE ) // these parentheses are necessary :-)
+        | 1L << CONST_CAPTURE) // these parentheses are necessary :-)
         & ~(1L << COMPARATOR_NAMES)
         & ~(1L << PRAGMA_ANYWHERE);
 
