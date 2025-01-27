@@ -579,7 +579,7 @@
         </release>
         <release version="3.1" date="2017-04-14">
             <action dev="henrib" type="add" issue="JEXL-222" due-to="Dmitri Blinov">
-                The ability to declare indexed property getter/setter in customised JexlArithmetic implementation
+                The ability to declare indexed property getter/setter in customized JexlArithmetic implementation
             </action>
             <action dev="henrib" type="fix" issue="JEXL-221" due-to="Dmitri Blinov">
                 Sporadic undefined property error caused by NPE at MapGetExecutor.tryInvoke()
