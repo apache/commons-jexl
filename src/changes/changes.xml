@@ -30,6 +30,9 @@
         <release version="3.4.1" date="YYYY-MM-DD" description="This is a feature and maintenance release. Java 8 or later is required.">
           <!-- FIX -->
             <action dev="henrib" type="fix" issue="JEXL-435" due-to="Vincent Bussol">
+                The increment (decrement) operator does not check for null operand
+            </action>
+            <action dev="henrib" type="fix" issue="JEXL-435" due-to="Vincent Bussol">
                 Changed behavior of empty operator overloading Action.
             </action>
             <action dev="henrib" type="fix" issue="JEXL-434" due-to="Vincent Bussol">

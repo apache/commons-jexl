@@ -571,7 +571,7 @@ public class Issues400Test {
     }
 
     @Test
-    void test() {
+    void test435() {
         JexlArithmetic arithmetic = new Arithmetic435(true);
         JexlEngine jexl = new JexlBuilder().arithmetic(arithmetic).create();
         final String src = "empty('list')";
@@ -579,5 +579,33 @@ public class Issues400Test {
         assertNotNull(script);
         final Object result = script.execute(null);
         assertInstanceOf(List.class, result);
+    }
+
+    @Test
+    void test436a() {
+        String[] srcs = {"let i = null; ++i", "let i; ++i;", "let i; i--;",  "let i; i++;"};
+        run436(null, srcs);
+    }
+
+    @Test
+    void test436b() {
+        String[] srcs = {"var i = null; ++i", "var i; ++i;", "var i; i--;",  "var i; i++;"};
+        run436(null, srcs);
+    }
+
+    @Test
+    void test436c() {
+        JexlContext ctxt = new MapContext();
+        ctxt.set("i", null);
+        String[] srcs = {"++i", "++i;", "i--;",  "i++;"};
+        run436(null, srcs);
+    }
+
+    void run436(JexlContext ctxt, String[] srcs) {
+        final JexlEngine jexl = new JexlBuilder().create();
+        for(String src : srcs) {
+            JexlScript script = jexl.createScript(src);
+            assertThrows(JexlException.Operator.class, () -> script.execute(ctxt));
+        }
     }
 }

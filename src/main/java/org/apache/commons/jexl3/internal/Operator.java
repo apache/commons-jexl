@@ -429,6 +429,8 @@ public final class Operator implements JexlOperator.Uberspect {
         }
         Object result = JexlEngine.TRY_FAILED;
         try {
+            // if the operator is strict, the left-hand side can not be null
+            controlNullOperands(arithmetic, operator, args[0]);
             // attempt assignment operator overload
             if (overloads(operator)) {
                 result = tryOverload(node, operator, arguments(operator, args));

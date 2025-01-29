@@ -53,6 +53,7 @@ New Features in 3.4.1:
 
 Bugs Fixed in 3.4.1:
 ====================
+* JEXL-436:     The increment (decrement) operator does not check for null operand
 * JEXL-435:     Changed behavior of empty operator overloading
 * JEXL-434:     The safe-access array operator is not safe
 * JEXL-433:     Debugger does not accept empty return statement
