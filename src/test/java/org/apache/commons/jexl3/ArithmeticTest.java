@@ -2035,7 +2035,7 @@ public class ArithmeticTest extends JexlTestCase {
         assertEquals(BigDecimal.ZERO, jexla.toBigDecimal(""));
         assertEquals(BigDecimal.ZERO, jexla.toBigDecimal((char) 0));
 
-        final Double d64d3 = new Double(6.4 / 3);
+        final Double d64d3 = Double.valueOf(6.4 / 3);
         assertEquals(d64d3, ((Number) JEXL.createExpression("6.4 / 3").evaluate(null)).doubleValue(), EPSILON);
         asserter.assertExpression("6.4 / 3", d64d3);
         assertEquals(d64d3, ((Number) JEXL.createExpression("6.4 / 3d").evaluate(null)).doubleValue(), EPSILON);
