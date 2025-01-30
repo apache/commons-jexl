@@ -124,10 +124,10 @@
  * Quux quux = jexl.newInstance(Quux.class, "xuuq", 100);
  * jexl.setProperty(quux, "froboz.value", Integer.valueOf(100));
  * Object o = jexl.getProperty(quux, "froboz.value");
- * assertEquals("Result is not 100", new Integer(100), o);
+ * assertEquals("Result is not 100", Integer.valueOf(100), o);
  * jexl.setProperty(quux, "['froboz'].value", Integer.valueOf(1000));
  * o = jexl.getProperty(quux, "['froboz']['value']");
- * assertEquals("Result is not 1000", new Integer(1000), o);
+ * assertEquals("Result is not 1000", Integer.valueOf(1000), o);
  * </pre>
  * <h3><a id="usage_jexl">Expressions and Scripts</a></h3>
  * <p>
@@ -151,9 +151,9 @@
  * JexlExpression check = jexl.createExpression("quux[\"froboz\"].value");
  * Quux quux = (Quux) create.evaluate(jc);
  * Object o = assign.evaluate(jc);
- * assertEquals("Result is not 10", new Integer(10), o);
+ * assertEquals("Result is not 10", Integer.valueOf(10), o);
  * o = check.evaluate(jc);
- * assertEquals("Result is not 10", new Integer(10), o);
+ * assertEquals("Result is not 10", Integer.valueOf(10), o);
  * </pre>
  * <h3><a id="usage_ujexl">Unified Expressions and Templates</a></h3>
  * <p>

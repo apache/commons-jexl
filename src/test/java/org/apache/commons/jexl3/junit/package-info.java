@@ -36,10 +36,10 @@ import static org.junit.jupiter.api.Assertions.*;
  * asserter.setVariable("foo", new Foo());
  * asserter.setVariable("person", "James");
  * asserter.assertExpression("person", "James");
- * asserter.assertExpression("size(person)", new Integer(5));
+ * asserter.assertExpression("size(person)", Integer.valueOf(5));
  *
- * asserter.assertExpression("foo.getCount()", new Integer(5));
- * asserter.assertExpression("foo.count", new Integer(5));
+ * asserter.assertExpression("foo.getCount()", Integer.valueOf(5));
+ * asserter.assertExpression("foo.count", Integer.valueOf(5));
  * </pre>
  */
 package org.apache.commons.jexl3.junit;
