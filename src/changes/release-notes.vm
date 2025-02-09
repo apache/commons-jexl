@@ -61,7 +61,7 @@ o#if($!issue != "") $issue: #else$indent#end ${action} #if($!dueto != "")Thanks 
 
 #set($issue="")
 #set($dueto="")
-#end 
+#end
 #end
 
 #if ($release.getActions('fix').size() !=0)

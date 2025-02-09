@@ -705,7 +705,7 @@ public class ArithmeticOperatorTest extends JexlTestCase {
 
         /**
          * Sorts an array using a script to evaluate the property used to compare elements.
-         * 
+         *
          * @param array the elements array
          * @param expr  the property evaluation lambda
          */

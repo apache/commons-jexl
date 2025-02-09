@@ -117,9 +117,9 @@ public class AnnotationTest extends JexlTestCase {
         public Object processAnnotation(final String name, final Object[] args, final Callable<Object> statement) throws Exception {
             final JexlOptions options = getEngineOptions();
             // transient side effect for strict
-            
+
             // transient side effect for silent
-            
+
             // durable side effect for scale
             switch (name) {
             case "strict": {
