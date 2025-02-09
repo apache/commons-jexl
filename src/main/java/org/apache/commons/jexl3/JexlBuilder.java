@@ -181,7 +181,10 @@ public class JexlBuilder {
         this.permissions = PERMISSIONS;
     }
 
-    /** @return whether antish resolution is enabled */
+    /**
+     * Is antish resolution enabled?
+     * @return whether antish resolution is enabled
+     */
     public boolean antish() {
         return options.isAntish();
     }
@@ -197,7 +200,10 @@ public class JexlBuilder {
         return this;
     }
 
-    /** @return the arithmetic */
+    /**
+     * Gets the JexlArithmetic instance the engine will use.
+     * @return the arithmetic
+     */
     public JexlArithmetic arithmetic() {
         return this.arithmetic;
     }
@@ -227,6 +233,7 @@ public class JexlBuilder {
     }
 
     /**
+     * Gets the expression cache size the engine will use.
      * @return the cache size
      */
     public int cache() {
@@ -247,6 +254,7 @@ public class JexlBuilder {
     }
 
     /**
+     * Gets the expression factory the engine will use.
      * @return the cache factory
      */
     public IntFunction<JexlCache<?, ?>> cacheFactory() {
@@ -254,7 +262,7 @@ public class JexlBuilder {
     }
 
     /**
-     * Sets the expression cache size the engine will use.
+     * Sets the expression factory the engine will use.
      *
      * @param factory the function to produce a cache.
      * @return this builder
@@ -265,6 +273,7 @@ public class JexlBuilder {
     }
 
     /**
+     * Gets the maximum length for an expression to be cached.
      * @return the cache threshold
      */
     public int cacheThreshold() {
@@ -287,6 +296,7 @@ public class JexlBuilder {
     }
 
     /**
+     * Gets the cancellable information flag
      * @return the cancellable information flag
      * @since 3.1
      */
@@ -308,7 +318,10 @@ public class JexlBuilder {
         return this;
     }
 
-    /** @return the charset */
+    /**
+     * Gets the charset
+     * @return the charset
+     */
     public Charset charset() {
         return charset;
     }
@@ -326,6 +339,7 @@ public class JexlBuilder {
     }
 
     /**
+     * Does the variable collection follow strict syntactic rule?
      * @return true if variable collection follows strict syntactic rule
      * @since 3.2
      */
@@ -345,6 +359,7 @@ public class JexlBuilder {
     }
 
     /**
+     * Gets the collection mode.
      * @return 0 if variable collection follows strict syntactic rule
      * @since 3.2
      */
@@ -365,13 +380,17 @@ public class JexlBuilder {
     }
 
     /**
+     * Create a new engine
      * @return a {@link JexlEngine} instance
      */
     public JexlEngine create() {
         return new Engine(this);
     }
 
-    /** @return the debugging information flag */
+    /**
+     * Gets the debug flag
+     * @return the debugging information flag
+     */
     public Boolean debug() {
         return this.debug;
     }
@@ -387,7 +406,10 @@ public class JexlBuilder {
         return this;
     }
 
-    /** @return the features */
+    /**
+     * Gets the features the engine will use as a base by default.
+     * @return the features
+     */
     public JexlFeatures features() {
         return this.features;
     }
@@ -442,6 +464,7 @@ public class JexlBuilder {
     }
 
     /**
+     * Is lexical scope enabled?
      * @see JexlOptions#isLexical()
      * @return whether lexical scope is enabled
      * @deprecated 3.4.1
@@ -464,6 +487,7 @@ public class JexlBuilder {
     }
 
     /**
+     * Is lexical shading is enabled?
      * @see JexlOptions#isLexicalShade()
      * @return whether lexical shading is enabled
      * @deprecated 3.4.1
@@ -485,7 +509,10 @@ public class JexlBuilder {
         return this;
     }
 
-    /** @return the class loader */
+    /**
+     * Gets the classloader
+     * @return the class loader
+     */
     public ClassLoader loader() {
         return loader;
     }
@@ -513,7 +540,10 @@ public class JexlBuilder {
         return this;
     }
 
-    /** @return the logger */
+    /**
+     * Gets the logger
+     * @return the logger
+     */
     public Log logger() {
         return this.logger;
     }
@@ -530,6 +560,7 @@ public class JexlBuilder {
     }
 
     /**
+     * Gets the map of namespaces.
      * @return the map of namespaces.
      */
     public Map<String, Object> namespaces() {
@@ -567,13 +598,17 @@ public class JexlBuilder {
     }
 
     /**
+     * Gets the current set of options
      * @return the current set of options
      */
     public JexlOptions options() {
       return options;
     }
 
-    /** @return the permissions */
+    /**
+     * Gets the permissions
+     * @return the permissions
+     */
     public JexlPermissions permissions() {
         return this.permissions;
     }
@@ -589,7 +624,10 @@ public class JexlBuilder {
         return this;
     }
 
-    /** @return true if safe, false otherwise */
+    /**
+     * Is it safe to dereference null?
+     * @return true if safe, false otherwise
+     */
     public Boolean safe() {
         return options.isSafe();
     }
@@ -609,7 +647,10 @@ public class JexlBuilder {
         return this;
     }
 
-    /** @return the sandbox */
+    /**
+     * Gets the sandbox
+     * @return the sandbox
+     */
     public JexlSandbox sandbox() {
         return this.sandbox;
     }
@@ -625,7 +666,10 @@ public class JexlBuilder {
         return this;
     }
 
-    /** @return the silent error handling flag */
+    /**
+     * Is error handling silent?
+     * @return the silent error handling flag
+     */
     public Boolean silent() {
         return options.isSilent();
     }
@@ -644,6 +688,7 @@ public class JexlBuilder {
     }
 
     /**
+     * Gets the cache size
      * @return the cache size
      */
     public int stackOverflow() {
@@ -660,7 +705,9 @@ public class JexlBuilder {
         return this;
     }
 
-    /** @return the JexlUberspect strategy */
+    /**
+     * Gets the JexlUberspect strategy
+     * @return the JexlUberspect strategy */
     public JexlUberspect.ResolverStrategy strategy() {
         return this.strategy;
     }
@@ -677,7 +724,9 @@ public class JexlBuilder {
         return this;
     }
 
-    /** @return true if strict, false otherwise */
+    /**
+     * Is it strict mode?
+     * @return true if strict, false otherwise */
     public Boolean strict() {
         return options.isStrict();
     }
@@ -698,6 +747,7 @@ public class JexlBuilder {
     }
 
     /**
+     * Is interpolation strict?
      * @see JexlOptions#setStrictInterpolation(boolean)
      * @param flag strict interpolation flag
      * @return this builder
@@ -707,7 +757,9 @@ public class JexlBuilder {
         return this;
     }
 
-    /** @return the uberspect */
+    /**
+     * Gets the uberspect
+     * @return the uberspect */
     public JexlUberspect uberspect() {
         return this.uberspect;
     }

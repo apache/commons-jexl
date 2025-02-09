@@ -126,6 +126,9 @@ public class JexlArithmetic {
     /** Marker class for null operand exceptions. */
     public static class NullOperand extends ArithmeticException {
         private static final long serialVersionUID = 4720876194840764770L;
+
+        /** Default constructor */
+        public NullOperand() {} ; // satisfy Javadoc
     }
 
     /**
