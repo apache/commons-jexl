@@ -202,7 +202,7 @@ public interface JexlUberspect {
      * @param arithmetic the arithmetic instance
      * @return the arithmetic uberspect or null if no operator method were overridden
      * @since 3.0
-     * @see #getOperator(JexlArithmetic) 
+     * @see #getOperator(JexlArithmetic)
      */
     JexlArithmetic.Uberspect getArithmetic(JexlArithmetic arithmetic);
 
