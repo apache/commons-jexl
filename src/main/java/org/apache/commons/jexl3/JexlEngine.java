@@ -47,6 +47,9 @@ import org.apache.commons.jexl3.introspection.JexlUberspect;
  */
 public abstract class JexlEngine {
 
+    /** Default constructor */
+    public JexlEngine() {}; // Keep Javadoc happy
+
     /**
      * The empty context class, public for instrospection.
      */

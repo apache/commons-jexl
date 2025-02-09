@@ -110,6 +110,7 @@ public class JexlException extends RuntimeException {
         }
 
         /**
+         * Gets the annotation name
          * @return the annotation name
          */
         public String getAnnotation() {
@@ -292,6 +293,7 @@ public class JexlException extends RuntimeException {
         }
 
         /**
+         * Gets the method name
          * @return the method name
          */
         public String getMethod() {
@@ -301,6 +303,7 @@ public class JexlException extends RuntimeException {
         }
 
         /**
+         * Gets  the method signature
          * @return the method signature
          * @since 3.2
          */
@@ -333,6 +336,7 @@ public class JexlException extends RuntimeException {
         }
 
         /**
+         * Gets the method name
          * @return the method name
          */
         public String getSymbol() {
@@ -429,6 +433,7 @@ public class JexlException extends RuntimeException {
         }
 
         /**
+         * Gets the property name
          * @return the property name
          */
         public String getProperty() {
@@ -469,6 +474,7 @@ public class JexlException extends RuntimeException {
         }
 
         /**
+         * Gets the returned value
          * @return the returned value
          */
         public Object getValue() {
@@ -523,6 +529,7 @@ public class JexlException extends RuntimeException {
         }
 
         /**
+         * Gets the thrown value
          * @return the thrown value
          */
         public Object getValue() {
@@ -610,6 +617,7 @@ public class JexlException extends RuntimeException {
         }
 
         /**
+         * Gets the variable name
          * @return the variable name
          */
         public String getVariable() {
@@ -1042,6 +1050,7 @@ public class JexlException extends RuntimeException {
     }
 
     /**
+     * Gets the exception specific detail
      * @return this exception specific detail
      * @since 3.2
      */

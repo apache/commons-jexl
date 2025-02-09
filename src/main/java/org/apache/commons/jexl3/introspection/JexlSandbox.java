@@ -212,6 +212,7 @@ public final class JexlSandbox {
     }
 
     /**
+     * Gets a copy of this sandbox
      * @return a copy of this sandbox
      */
     public JexlSandbox copy() {
@@ -487,6 +488,10 @@ public final class JexlSandbox {
      * A base set of names.
      */
     public abstract static class Names {
+
+        /** Default constructor */
+        public Names() {}; // Keep Javadoc happy
+
         /**
          * Adds a name to this set.
          *
@@ -508,6 +513,7 @@ public final class JexlSandbox {
         }
 
         /**
+         * Gets a copy of these Names
          * @return a copy of these Names
          */
         protected Names copy() {
@@ -607,6 +613,7 @@ public final class JexlSandbox {
         }
 
         /**
+         * Do these permissions apply to derived classes?
          * @return whether these permissions apply to derived classes.
          */
         public boolean isInheritable() {
@@ -662,13 +669,19 @@ public final class JexlSandbox {
      * @deprecated since 3.2, use {@link BlockSet}
      */
     @Deprecated
-    public static final class BlackSet extends BlockSet {}
+    public static final class BlackSet extends BlockSet {
+        /** Default constructor */
+        public BlackSet() { super(); }; // Keep Javadoc happy
+    }
 
     /**
      * @deprecated since 3.2, use {@link AllowSet}
      */
     @Deprecated
-    public static final class WhiteSet extends AllowSet {}
+    public static final class WhiteSet extends AllowSet {
+        /** Default constructor */
+        public WhiteSet() { super(); }; // Keep Javadoc happy
+    }
 
     /**
      * Use block() instead.

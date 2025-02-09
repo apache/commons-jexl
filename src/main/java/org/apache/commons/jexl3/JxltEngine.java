@@ -40,6 +40,9 @@ import java.util.Set;
  */
 public abstract class JxltEngine {
 
+    /** Default constructor */
+    public JxltEngine() {}; // Keep Javadoc happy
+
     /**
      * The sole type of (runtime) exception the JxltEngine can throw.
      */

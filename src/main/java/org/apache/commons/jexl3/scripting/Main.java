@@ -37,6 +37,9 @@ import javax.script.ScriptException;
  */
 public class Main {
 
+    /** Default constructor */
+    public Main() { }; // Keep Javadoc happy
+
     /**
      * Test application for JexlScriptEngine (JSR-223 implementation).
      * <p>

@@ -423,6 +423,7 @@ public final class JexlFeatures {
     }
 
     /**
+     * Gets the feature flags
      * @return these features&quot;s flags
      */
     public long getFlags() {
@@ -430,6 +431,7 @@ public final class JexlFeatures {
     }
 
     /**
+     * Gets the immutable set of reserved names.
      * @return the (unmodifiable) set of reserved names.
      */
     public Set<String> getReservedNames() {
@@ -459,12 +461,16 @@ public final class JexlFeatures {
         return this;
     }
 
-    /** @return whether lexical scope feature is enabled */
+    /**
+     * Is the lexical scope feature enabled?
+     * @return whether lexical scope feature is enabled */
     public boolean isLexical() {
         return getFeature(LEXICAL);
     }
 
-    /** @return whether lexical shade feature is enabled */
+    /**
+     * Is the lexical shade feature enabled?
+     * @return whether lexical shade feature is enabled */
     public boolean isLexicalShade() {
         return getFeature(LEXICAL_SHADE);
     }
@@ -593,6 +599,7 @@ public final class JexlFeatures {
     }
 
     /**
+     * Gets the declared namespaces test.
      * @return the declared namespaces test.
      */
     public Predicate<String> namespaceTest() {
@@ -753,6 +760,7 @@ public final class JexlFeatures {
     }
 
     /**
+     * Does the engine support annotations?
      * @return true if annotation are enabled, false otherwise
      */
     public boolean supportsAnnotation() {
@@ -760,6 +768,7 @@ public final class JexlFeatures {
     }
 
     /**
+     * Does the engine support array references which contain method call expressions?
      * @return true if array references can contain method call expressions, false otherwise
      */
     public boolean supportsArrayReferenceExpr() {
@@ -767,6 +776,7 @@ public final class JexlFeatures {
     }
 
     /**
+     * Does the engine support legacy comparison operator names syntax?
      * @return true if legacy comparison operator names syntax is enabled, false otherwise
      * @since 3.3
      */
@@ -775,6 +785,7 @@ public final class JexlFeatures {
     }
 
     /**
+     * Does the engine support lambda captured-variables as const?
      * @return true if lambda captured-variables are const, false otherwise
      */
     public boolean supportsConstCapture() {
@@ -782,6 +793,7 @@ public final class JexlFeatures {
     }
 
     /**
+     * Does the engine support lambda captured-variables as references?
      * @return true if lambda captured-variables are references, false otherwise
      */
     public boolean supportsReferenceCapture() {
@@ -789,7 +801,7 @@ public final class JexlFeatures {
     }
 
     /**
-     *
+     * Does the engine support expressions (aka not scripts)
      * @return true if expressions (aka not scripts) are enabled, false otherwise
      */
     public boolean supportsExpression() {
@@ -797,6 +809,7 @@ public final class JexlFeatures {
     }
 
     /**
+     * Does the engine support fat-arrow lambda syntax?
      * @return true if fat-arrow lambda syntax is enabled, false otherwise
      * @since 3.3
      */
@@ -805,6 +818,7 @@ public final class JexlFeatures {
     }
 
     /**
+     * Does the engine support import pragma?
      * @return true if import pragma are enabled, false otherwise
      * @since 3.3
      */
@@ -813,6 +827,7 @@ public final class JexlFeatures {
     }
 
     /**
+     * Does the engine support lambdas?
      * @return true if lambda are enabled, false otherwise
      */
     public boolean supportsLambda() {
@@ -820,6 +835,7 @@ public final class JexlFeatures {
     }
 
     /**
+     * Is local variables syntax enabled?
      * @return true if local variables syntax is enabled
      */
     public boolean supportsLocalVar() {
@@ -827,6 +843,7 @@ public final class JexlFeatures {
     }
 
     /**
+     * Are loops enabled?
      * @return true if loops are enabled, false otherwise
      */
     public boolean supportsLoops() {
@@ -834,19 +851,24 @@ public final class JexlFeatures {
     }
 
     /**
+     * Can array references contain expressions?
      * @return true if array references can contain expressions, false otherwise
      */
     public boolean supportsMethodCall() {
         return getFeature(METHOD_CALL);
     }
+
     /**
+     * Is namespace pragma enabled?
      * @return true if namespace pragma are enabled, false otherwise
      * @since 3.3
      */
     public boolean supportsNamespacePragma() {
         return getFeature(NS_PRAGMA);
     }
+
     /**
+     * Is namespace identifier syntax enabled?
      * @return true if namespace identifier syntax is enabled, false otherwise
      * @since 3.4.1
      */
@@ -855,6 +877,7 @@ public final class JexlFeatures {
     }
 
     /**
+     * Is creating new instances enabled?
      * @return true if creating new instances is enabled, false otherwise
      */
     public boolean supportsNewInstance() {
@@ -862,6 +885,7 @@ public final class JexlFeatures {
     }
 
     /**
+     * Is the namespace pragma enabled?
      * @return true if namespace pragma are enabled, false otherwise
      */
     public boolean supportsPragma() {
@@ -869,6 +893,7 @@ public final class JexlFeatures {
     }
 
     /**
+     * Can pragma constructs appear anywhere in the code?
      * @return true if pragma constructs can appear anywhere in the code, false otherwise
      * @since 3.3
      */
@@ -877,6 +902,7 @@ public final class JexlFeatures {
     }
 
     /**
+     * Is register syntax enabled?
      * @return true if register syntax is enabled
      */
     public boolean supportsRegister() {
@@ -884,6 +910,7 @@ public final class JexlFeatures {
     }
 
     /**
+     * Are scripts enabled?
      * @return true if scripts are enabled, false otherwise
      */
     public boolean supportsScript() {
@@ -891,6 +918,7 @@ public final class JexlFeatures {
     }
 
     /**
+     * Are side effects enabled?
      * @return true if side effects are enabled, false otherwise
      */
     public boolean supportsSideEffect() {
@@ -898,6 +926,7 @@ public final class JexlFeatures {
     }
 
     /**
+     * Can global variables be assigned?
      * @return true if global variables can be assigned
      */
     public boolean supportsSideEffectGlobal() {
@@ -905,6 +934,7 @@ public final class JexlFeatures {
     }
 
     /**
+     * Are array/map/set literal expressions supported?
      * @return true if array/map/set literal expressions are supported, false otherwise
      */
     public boolean supportsStructuredLiteral() {
@@ -912,6 +942,7 @@ public final class JexlFeatures {
     }
 
     /**
+     * Is thin-arrow lambda syntax enabled?
      * @return true if thin-arrow lambda syntax is enabled, false otherwise
      * @since 3.3
      */

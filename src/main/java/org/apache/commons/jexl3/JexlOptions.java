@@ -243,6 +243,7 @@ public final class JexlOptions {
     }
 
     /**
+     * Are lambda captured-variables const?
      * @return true if lambda captured-variables are const, false otherwise
      */
     public boolean isConstCapture() {
@@ -283,6 +284,7 @@ public final class JexlOptions {
     }
 
     /**
+     * Gets sharing state
      * @return false if a copy of these options is used during execution,
      * true if those can potentially be modified
      */
@@ -318,6 +320,7 @@ public final class JexlOptions {
     }
 
     /**
+     * Gets strict interpolation status
      * @return true if interpolation strings always return string, false otherwise
      */
     public boolean isStrictInterpolation() {

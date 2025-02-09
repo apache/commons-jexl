@@ -60,6 +60,8 @@ public class ObjectContext<T> implements JexlContext, JexlContext.NamespaceResol
     }
 
     /**
+     * Gets the Jexl engine
+     *
      * @return the Jexl engine
      */
     protected JexlEngine getJexl() {
@@ -67,6 +69,7 @@ public class ObjectContext<T> implements JexlContext, JexlContext.NamespaceResol
     }
 
     /**
+     * Gets the object exposed by this context
      * @return the object exposed by this context
      */
     protected T getObject() {

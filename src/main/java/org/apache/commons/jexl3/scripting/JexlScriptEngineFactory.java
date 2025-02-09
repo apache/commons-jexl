@@ -43,6 +43,9 @@ import org.apache.commons.jexl3.parser.StringParser;
  */
 public class JexlScriptEngineFactory implements ScriptEngineFactory {
 
+    /** Default constructor */
+    public JexlScriptEngineFactory() {}; // Keep Javadoc happy
+
     @Override
     public String getEngineName() {
         return "JEXL Engine";
