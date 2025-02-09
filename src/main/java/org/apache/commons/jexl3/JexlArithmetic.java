@@ -128,7 +128,9 @@ public class JexlArithmetic {
         private static final long serialVersionUID = 4720876194840764770L;
 
         /** Default constructor */
-        public NullOperand() {} ; // satisfy Javadoc
+        public NullOperand() {
+            super();
+        } ; // satisfy Javadoc
     }
 
     /**
