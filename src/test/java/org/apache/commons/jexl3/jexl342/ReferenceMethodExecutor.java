@@ -31,6 +31,7 @@ public class ReferenceMethodExecutor implements JexlMethod {
 
     /**
      * Creates an instance.
+     *
      * @param referenceHandler the reference handler
      * @param jexlMethod the method executor
      */
@@ -43,7 +44,8 @@ public class ReferenceMethodExecutor implements JexlMethod {
     }
 
     /**
-     * Dereference an expected optional or reference .
+     * Dereference an expected optional or reference.
+     *
      * @param opt the reference
      * @return the reference value
      */

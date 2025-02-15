@@ -31,6 +31,7 @@ public class ReferenceSetExecutor implements JexlPropertySet {
 
     /**
      * Creates an instance.
+     *
      * @param referenceHandler the reference handler
      * @param jexlSet the property setter
      */
@@ -43,7 +44,8 @@ public class ReferenceSetExecutor implements JexlPropertySet {
     }
 
     /**
-     * Dereference an expected optional or reference .
+     * Dereference an expected optional or reference.
+     *
      * @param opt the reference
      * @return the reference value, TRY_FAILED if null
      */

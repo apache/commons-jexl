@@ -30,6 +30,7 @@ public class ReferenceGetExecutor implements JexlPropertyGet {
 
     /**
      * Creates an instance.
+     *
      * @param referenceHandler the reference handler
      * @param jexlGet the property getter
      */
@@ -42,7 +43,8 @@ public class ReferenceGetExecutor implements JexlPropertyGet {
     }
 
     /**
-     * Dereference an expected optional or reference .
+     * Dereference an expected optional or reference.
+     *
      * @param ref the reference
      * @return the reference value or the reference
      */

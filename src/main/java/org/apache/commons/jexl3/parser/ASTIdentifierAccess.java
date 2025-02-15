@@ -56,7 +56,7 @@ public class ASTIdentifierAccess extends JexlNode {
 
     /**
      * Whether this is a dot or a question-mark-dot aka safe-navigation access.
-     * @return true is ?., false if .
+     * @return true is ?., false if.
      */
     public boolean isSafe() {
         return false;

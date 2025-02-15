@@ -287,7 +287,7 @@
  * repeatedly in your application, these are worth configuring since expression parsing is quite heavy.
  * Note that all caches created by JEXL are held through SoftReference; under high memory pressure, the GC will be able
  * to reclaim those caches and JEXL will rebuild them if needed. By default, a JexlEngine does create a cache for
- * "small" expressions and a JxltEngine does create one for Expression .
+ * "small" expressions and a JxltEngine does create one for Expression.
  * </p>
  * <p>{@link org.apache.commons.jexl3.JexlBuilder#cache(int)} will set how many expressions can be simultaneously cached by the
  * JEXL engine. JxltEngine allows to define the cache size through its constructor.
