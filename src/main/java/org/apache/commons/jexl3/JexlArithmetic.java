@@ -94,11 +94,24 @@ public class JexlArithmetic {
         private static final long serialVersionUID = 202402081150L;
 
         /**
-         * Simple ctor.
-         * @param msg the exception message
+         * Constructs a new instance.
+         *
+         * @param msg the detail message.
          */
         public CoercionException(final String msg) {
             super(msg);
+        }
+
+        /**
+         * Constructs a new instance.
+         *
+         * @param msg the detail message.
+         * @param cause The cause of this Throwable.
+         * @since 3.5.0
+         */
+        public CoercionException(final String msg, final Throwable cause) {
+            super(msg);
+            initCause(cause);
         }
     }
 
@@ -1649,9 +1662,7 @@ public class JexlArithmetic {
         try {
             return arg.isEmpty()? BigDecimal.ZERO : new BigDecimal(arg, getMathContext());
         } catch (final NumberFormatException e) {
-            final ArithmeticException arithmeticException = new CoercionException("BigDecimal coercion: ("+ arg +")");
-            arithmeticException.initCause(e);
-            throw arithmeticException;
+            throw new CoercionException("BigDecimal coercion: ("+ arg +")", e);
         }
     }
 
@@ -1666,9 +1677,7 @@ public class JexlArithmetic {
         try {
             return arg.isEmpty()? BigInteger.ZERO : new BigInteger(arg);
         } catch (final NumberFormatException e) {
-            final ArithmeticException arithmeticException = new CoercionException("BigDecimal coercion: ("+ arg +")");
-            arithmeticException.initCause(e);
-            throw arithmeticException;
+            throw new CoercionException("BigDecimal coercion: ("+ arg +")", e);
         }
     }
 
@@ -1683,9 +1692,7 @@ public class JexlArithmetic {
         try {
             return arg.isEmpty()? Double.NaN : Double.parseDouble(arg);
         } catch (final NumberFormatException e) {
-            final ArithmeticException arithmeticException = new CoercionException("Double coercion: ("+ arg +")");
-            arithmeticException.initCause(e);
-            throw arithmeticException;
+            throw new CoercionException("Double coercion: ("+ arg +")", e);
         }
     }
 
