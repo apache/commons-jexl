@@ -269,7 +269,7 @@ public interface JexlUberspect {
      * Property getter.
      * <p>
      * Seeks a JexlPropertyGet apropos to an expression like {@code bar.woogie}.</p>
-     * See {@link ResolverStrategy#apply(JexlOperator, java.lang.Object) }
+     * See {@link ResolverStrategy#apply(JexlOperator, java.lang.Object)}
      *
      * @param resolvers  the list of property resolvers to try
      * @param obj        the object to get the property from
@@ -294,7 +294,7 @@ public interface JexlUberspect {
      * Property setter.
      * <p>
      * Seeks a JelPropertySet apropos to an expression like {@code foo.bar = "geir"}.</p>
-     * See {@link ResolverStrategy#apply(JexlOperator, java.lang.Object) }
+     * See {@link ResolverStrategy#apply(JexlOperator, java.lang.Object)}
      *
      * @param resolvers  the list of property resolvers to try,
      * @param obj        the object to get the property from
