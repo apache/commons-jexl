@@ -127,7 +127,7 @@ public final class JexlFeatures {
     public static final int REF_CAPTURE = 24;
     /**
      * All features.
-     * N.B. ensure this is updated if additional features are added.
+     * Ensure this is updated if additional features are added.
      */
     private static final long ALL_FEATURES = (1L << REF_CAPTURE + 1) - 1L; // MUST REMAIN PRIVATE
     /**
