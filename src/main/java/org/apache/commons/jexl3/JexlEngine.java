@@ -19,12 +19,12 @@ package org.apache.commons.jexl3;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.math.MathContext;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.util.Objects;
 
 import org.apache.commons.jexl3.introspection.JexlUberspect;
@@ -48,7 +48,7 @@ import org.apache.commons.jexl3.introspection.JexlUberspect;
 public abstract class JexlEngine {
 
     /** Default constructor */
-    public JexlEngine() {}; // Keep Javadoc happy
+    public JexlEngine() {} // Keep Javadoc happy
 
     /**
      * The empty context class, public for instrospection.
@@ -574,8 +574,7 @@ public abstract class JexlEngine {
      */
     protected String readSource(final File file) {
         Objects.requireNonNull(file, "file");
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file),
-                getCharset()))) {
+        try (BufferedReader reader = Files.newBufferedReader(file.toPath(), getCharset())) {
             return toString(reader);
         } catch (final IOException xio) {
             throw new JexlException(createInfo(file.toString(), 1, 1), "could not read source File", xio);
