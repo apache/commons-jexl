@@ -1183,7 +1183,7 @@ public final class TemplateEngine extends JxltEngine {
     }
 
     /**
-     * Whether a sequence starts with a given set of characters (following spaces).
+     * Tests whether a sequence starts with a given set of characters (following spaces).
      * <p>Space characters at beginning of line before the pattern are discarded.</p>
      * @param sequence the sequence
      * @param pattern  the pattern to match at start of sequence

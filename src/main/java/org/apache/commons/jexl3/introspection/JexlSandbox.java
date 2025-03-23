@@ -521,7 +521,7 @@ public final class JexlSandbox {
         }
 
         /**
-         * Whether a given name is allowed or not.
+         * Gets whether a given name is allowed or not.
          *
          * @param name the method/property name to check
          * @return null (or NULL if name is null) if not allowed, the actual name to use otherwise

@@ -178,7 +178,7 @@ public abstract class JexlNode extends SimpleNode implements JexlCache.Reference
     }
 
     /**
-     * Whether this node is a constant node.
+     * Tests whether this node is a constant node.
      * <p>Its value cannot change after the first evaluation and can be cached
      * indefinitely.</p>
      *
@@ -228,7 +228,7 @@ public abstract class JexlNode extends SimpleNode implements JexlCache.Reference
     }
 
     /**
-     * Whether this node is a left value.
+     * Tests whether this node is a left value.
      * @return true if node is assignable, false otherwise
      */
     public boolean isLeftValue() {
@@ -249,7 +249,7 @@ public abstract class JexlNode extends SimpleNode implements JexlCache.Reference
     }
 
     /**
-     * Whether this node is the left-hand side of a safe access identifier as in.
+     * Tests whether this node is the left-hand side of a safe access identifier as in.
      * For instance, in 'x?.y' , 'x' is safe.
      * @param safe whether the engine is in safe-navigation mode
      * @return true if safe lhs, false otherwise

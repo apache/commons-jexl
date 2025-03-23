@@ -468,7 +468,7 @@ public final class JexlOptions {
     }
 
     /**
-     * Whether these options are immutable at runtime.
+     * Sets wether these options are immutable at runtime.
      * <p>Expert mode; allows instance handled through context to be shared
      * instead of copied.
      * @param flag true if shared, false if not

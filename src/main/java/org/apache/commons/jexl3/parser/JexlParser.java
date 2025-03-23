@@ -230,7 +230,7 @@ public abstract class JexlParser extends StringParser {
     }
 
     /**
-     * Whether a given variable name is allowed.
+     * Tests whether a given variable name is allowed.
      * @param image the name
      * @return true if allowed, false if reserved
      */

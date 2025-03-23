@@ -132,21 +132,21 @@ public abstract class JexlEngine {
         Charset getCharset();
 
         /**
-         * Whether evaluation will throw JexlException.Cancel (true) or return null (false) when interrupted.
+         * Tests whether evaluation will throw JexlException.Cancel (true) or return null (false) when interrupted.
          * @return true when cancellable, false otherwise
          * @since 3.1
          */
         Boolean isCancellable();
 
         /**
-         * Sets whether the engine will throw a {@link JexlException} when an error is encountered during evaluation.
+         * Tests whether the engine will throw a {@link JexlException} when an error is encountered during evaluation.
          *
          * @return true if silent, false otherwise
          */
         Boolean isSilent();
 
         /**
-         * Checks whether the engine considers unknown variables, methods, functions and constructors as errors or
+         * Tests whether the engine considers unknown variables, methods, functions and constructors as errors or
          * evaluates them as null.
          *
          * @return true if strict, false otherwise
@@ -154,7 +154,7 @@ public abstract class JexlEngine {
         Boolean isStrict();
 
         /**
-         * Checks whether the arithmetic triggers errors during evaluation when null is used as an operand.
+         * Tests whether the arithmetic triggers errors during evaluation when null is used as an operand.
          *
          * @return true if strict, false otherwise
          */

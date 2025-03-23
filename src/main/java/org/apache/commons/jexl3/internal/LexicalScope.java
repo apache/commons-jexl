@@ -163,7 +163,7 @@ public class LexicalScope {
     }
 
     /**
-     * Whether a given bit (not symbol) is set.
+     * Tests whether a given bit (not symbol) is set.
      * @param bit the bit
      * @return true if set
      */

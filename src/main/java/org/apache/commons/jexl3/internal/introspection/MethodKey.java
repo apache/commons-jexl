@@ -66,9 +66,12 @@ public final class MethodKey {
         }
 
         /**
-         * Whether this exception is considered severe or benign.
-         * <p>Note that this is meant in the context of an ambiguous exception; benign cases can only be triggered
+         * Tests whether this exception is considered severe or benign.
+         * <p>
+         * Note that this is meant in the context of an ambiguous exception; benign cases can only be triggered
          * by null arguments often related to runtime problems (not simply on overload signatures).
+         * </p>
+         *
          * @return true if severe, false if benign.
          */
         public boolean isSevere() {

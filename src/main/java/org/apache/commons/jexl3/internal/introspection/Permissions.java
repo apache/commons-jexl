@@ -429,7 +429,7 @@ public class Permissions implements JexlPermissions {
     }
 
     /**
-     * Whether a whole class is denied Jexl visibility.
+     * Tests whether a whole class is denied Jexl visibility.
      * <p>Also checks package visibility.</p>
      * @param clazz the class
      * @return true if denied, false otherwise
@@ -449,7 +449,7 @@ public class Permissions implements JexlPermissions {
     }
 
     /**
-     * Whether a constructor is denied Jexl visibility.
+     * Tests whether a constructor is denied Jexl visibility.
      * @param ctor the constructor
      * @return true if denied, false otherwise
      */
@@ -463,7 +463,7 @@ public class Permissions implements JexlPermissions {
     }
 
     /**
-     * Whether a field is denied Jexl visibility.
+     * Tests whether a field is denied Jexl visibility.
      * @param field the field
      * @return true if denied, false otherwise
      */
@@ -477,7 +477,7 @@ public class Permissions implements JexlPermissions {
     }
 
     /**
-     * Whether a method is denied Jexl visibility.
+     * Tests whether a method is denied Jexl visibility.
      * @param method the method
      * @return true if denied, false otherwise
      */
@@ -491,7 +491,7 @@ public class Permissions implements JexlPermissions {
     }
 
     /**
-     * Whether a whole package is denied Jexl visibility.
+     * Tests whether a whole package is denied Jexl visibility.
      * @param pack the package
      * @return true if denied, false otherwise
      */
@@ -505,7 +505,7 @@ public class Permissions implements JexlPermissions {
     }
 
     /**
-     * Checks whether a method is denied.
+     * Tests whether a method is denied.
      * @param method the method
      * @return true if it has been disallowed through annotation or declaration
      */

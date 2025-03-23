@@ -119,7 +119,7 @@ public class Frame {
     }
 
     /**
-     * Whether this frame defines a symbol, ie declared it and assigned it a value.
+     * Tests whether this frame defines a symbol, ie declared it and assigned it a value.
      * @param s the offset in this frame
      * @return true if this symbol has been assigned a value, false otherwise
      */

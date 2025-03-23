@@ -140,7 +140,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
         return lambda.jjtGetNumChildren() == 1 && !isStatement(lambda.jjtGetChild(0));
     }
     /**
-     * Whether a node is a statement (vs an expression).
+     * Tests whether a node is a statement (vs an expression).
      * @param child the node
      * @return true if node is a statement
      */
@@ -156,7 +156,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
                 || child instanceof ASTThrowStatement;
     }
     /**
-     * Whether a script or expression ends with a semicolumn.
+     * Tests whether a script or expression ends with a semicolumn.
      * @param cs the string
      * @return true if a semicolumn is the last non-whitespace character
      */

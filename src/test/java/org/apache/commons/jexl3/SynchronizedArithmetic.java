@@ -49,7 +49,7 @@ public class SynchronizedArithmetic extends JexlArithmetic {
         }
 
         /**
-         * Whether the number of monitor enter is equals to the number of exits.
+         * Tests whether the number of monitor enter is equals to the number of exits.
          * @return true if balanced, false otherwise
          */
         public boolean isBalanced() {

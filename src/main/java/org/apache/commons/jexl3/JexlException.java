@@ -441,7 +441,7 @@ public class JexlException extends RuntimeException {
         }
 
         /**
-         * Whether the variable causing an error is undefined or evaluated as null.
+         * Tests whether the variable causing an error is undefined or evaluated as null.
          *
          * @return true if undefined, false otherwise
          */
@@ -625,7 +625,7 @@ public class JexlException extends RuntimeException {
         }
 
         /**
-         * Whether the variable causing an error is undefined or evaluated as null.
+         * Tests whether the variable causing an error is undefined or evaluated as null.
          *
          * @return true if undefined, false otherwise
          */

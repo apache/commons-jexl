@@ -1055,7 +1055,7 @@ public class JexlArithmetic {
     }
 
     /**
-     * Whether negate called with a given argument will always return the same result.
+     * Tests whether negate called with a given argument will always return the same result.
      * <p>This is used to determine whether negate results on number literals can be cached.
      * If the result on calling negate with the same constant argument may change between calls,
      * which means the function is not deterministic, this method must return false.
@@ -1089,7 +1089,7 @@ public class JexlArithmetic {
     }
 
     /**
-     * Whether positivize called with a given argument will always return the same result.
+     * Tests whether positivize called with a given argument will always return the same result.
      * <p>This is used to determine whether positivize results on number literals can be cached.
      * If the result on calling positivize with the same constant argument may change between calls,
      * which means the function is not deterministic, this method must return false.
@@ -1110,7 +1110,7 @@ public class JexlArithmetic {
     }
 
     /**
-     * Checks whether this arithmetic considers a given operator as strict or null-safe.
+     * Tests whether this arithmetic considers a given operator as strict or null-safe.
      * <p>When an operator is strict, it does <em>not</em> accept null arguments when the arithmetic is strict.
      * If null-safe (ie not-strict), the operator does accept null arguments even if the arithmetic itself is strict.</p>
      * <p>The default implementation considers equal/not-equal operators as null-safe so one can check for null as in
@@ -1143,7 +1143,7 @@ public class JexlArithmetic {
     }
 
     /**
-     * Test if left &lt; right.
+     * Tests if left &lt; right.
      *
      * @param left  left argument
      * @param right right argument
@@ -1158,7 +1158,7 @@ public class JexlArithmetic {
     }
 
     /**
-     * Test if left &lt;= right.
+     * Tests if left &lt;= right.
      *
      * @param left  left argument
      * @param right right argument
@@ -1348,7 +1348,7 @@ public class JexlArithmetic {
     }
 
     /**
-     * Whether we consider the narrow class as a potential candidate for narrowing the source.
+     * Tests whether we consider the narrow class as a potential candidate for narrowing the source.
      *
      * @param narrow the target narrow class
      * @param source the original source class
