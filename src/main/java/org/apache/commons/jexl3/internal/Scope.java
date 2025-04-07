@@ -141,22 +141,20 @@ public final class Scope {
      * <p>
      * This method creates an new entry in the symbol map.
      * </p>
-     * @param name the parameter name
+     * @param param the parameter name
      * @return the register index storing this variable
      */
-    public int declareParameter(final String name) {
+    public int declareParameter(final String param) {
         if (namedVariables == null) {
             namedVariables = new LinkedHashMap<>();
         } else if (vars > 0) {
             throw new IllegalStateException("cant declare parameters after variables");
         }
-        Integer register = namedVariables.get(name);
-        if (register == null) {
-            register = namedVariables.size();
-            namedVariables.put(name, register);
+        return namedVariables.computeIfAbsent(param, name -> {
+            int register = namedVariables.size();
             parms += 1;
-        }
-        return register;
+            return register;
+        });
     }
 
     /**
@@ -164,17 +162,15 @@ public final class Scope {
      * <p>
      * This method creates an new entry in the symbol map.
      * </p>
-     * @param name the variable name
+     * @param varName the variable name
      * @return the register index storing this variable
      */
-    public int declareVariable(final String name) {
+    public int declareVariable(final String varName) {
         if (namedVariables == null) {
             namedVariables = new LinkedHashMap<>();
         }
-        Integer register = namedVariables.get(name);
-        if (register == null) {
-            register = namedVariables.size();
-            namedVariables.put(name, register);
+        return namedVariables.computeIfAbsent(varName, name -> {
+           int register = namedVariables.size();
             vars += 1;
             // check if local is redefining captured
             if (parent != null) {
@@ -186,8 +182,8 @@ public final class Scope {
                     capturedVariables.put(register, pr);
                 }
             }
-        }
-        return register;
+            return register;
+        });
     }
 
     /**
@@ -222,7 +218,7 @@ public final class Scope {
      */
     public int getCaptureDeclaration(final int symbol) {
         final Integer declared = capturedVariables != null ? capturedVariables.get(symbol)  : null;
-        return declared != null ? declared.intValue() : -1;
+        return declared != null ? declared : -1;
     }
 
     /**
