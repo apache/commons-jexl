@@ -140,7 +140,7 @@ public class JexlBuilder {
     private IntFunction<JexlCache<?,?>> cacheFactory = SoftCache::new;
 
    /** The parser class factory. */
-   private Supplier<JexlScriptParser> parserFactory = null;
+   private Supplier<JexlScriptParser> parserFactory;
 
     /** The stack overflow limit. */
     private int stackOverflow = Integer.MAX_VALUE;
