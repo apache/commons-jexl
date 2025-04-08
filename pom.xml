@@ -52,8 +52,6 @@
         <commons.jira.id>JEXL</commons.jira.id>
         <commons.jira.pid>12310479</commons.jira.pid>
         <japicmp.skip>false</japicmp.skip>
-
-        <spotbugs.version>4.9.3.0</spotbugs.version>
         <!-- JaCoCo: Don't make code coverage worse than: -->
         <commons.jacoco.version>0.8.13</commons.jacoco.version>
         <commons.jacoco.haltOnFailure>true</commons.jacoco.haltOnFailure>
@@ -268,7 +266,6 @@
             <plugin>
                 <groupId>com.github.spotbugs</groupId>
                 <artifactId>spotbugs-maven-plugin</artifactId>
-                <version>${spotbugs.version}</version>
                 <configuration>
                     <effort>Max</effort>
                     <threshold>High</threshold>
