@@ -181,7 +181,7 @@ public class JexlScriptEngine extends AbstractScriptEngine implements Compilable
     public class JexlScriptObject {
 
         /** Default constructor */
-        public JexlScriptObject() {}; // Keep Javadoc happy
+        public JexlScriptObject() {} // Keep Javadoc happy
 
         /**
          * Gives access to the underlying JEXL engine shared between all ScriptEngine instances.
