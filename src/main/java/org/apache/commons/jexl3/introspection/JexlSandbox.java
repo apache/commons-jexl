@@ -471,11 +471,11 @@ public final class JexlSandbox {
             // if name is null and contained in set, explicit null aka NULL
             if (names != null && !names.contains(name)) {
                 return name;
-            } else if (name != null) {
-                return null;
-            } else {
-                return NULL;
             }
+            if (name != null) {
+                return null;
+            }
+            return NULL;
         }
 
         @Override
@@ -490,7 +490,7 @@ public final class JexlSandbox {
     public abstract static class Names {
 
         /** Default constructor */
-        public Names() {}; // Keep Javadoc happy
+        public Names() {} // Keep Javadoc happy
 
         /**
          * Adds a name to this set.
@@ -671,7 +671,7 @@ public final class JexlSandbox {
     @Deprecated
     public static final class BlackSet extends BlockSet {
         /** Default constructor */
-        public BlackSet() { super(); }; // Keep Javadoc happy
+        public BlackSet() { } // Keep Javadoc happy
     }
 
     /**
@@ -680,7 +680,7 @@ public final class JexlSandbox {
     @Deprecated
     public static final class WhiteSet extends AllowSet {
         /** Default constructor */
-        public WhiteSet() { super(); }; // Keep Javadoc happy
+        public WhiteSet() { } // Keep Javadoc happy
     }
 
     /**
