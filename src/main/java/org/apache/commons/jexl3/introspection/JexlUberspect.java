@@ -213,7 +213,7 @@ public interface JexlUberspect {
      * @return an operator uberspect instance
      * @since 3.4.1
      */
-    default JexlOperator.Uberspect getOperator(JexlArithmetic arithmetic) {
+    default JexlOperator.Uberspect getOperator(final JexlArithmetic arithmetic) {
         return null;
     }
 

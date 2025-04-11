@@ -271,10 +271,10 @@ public class JexlScriptEngineTest {
 
     @Test
     void testMain0() throws Exception {
-        StringWriter strw = new StringWriter();
-        StringReader strr = new StringReader("a=20\nb=22\na+b\n//q!\n");
+        final StringWriter strw = new StringWriter();
+        final StringReader strr = new StringReader("a=20\nb=22\na+b\n//q!\n");
         Main.run(new BufferedReader(strr), new PrintWriter(strw), null);
-        String ctl = "> >> 20" + LF +
+        final String ctl = "> >> 20" + LF +
                 "> >> 22" + LF +
                 "> >> 42" + LF +
                 "> ";
@@ -283,10 +283,10 @@ public class JexlScriptEngineTest {
 
     @Test
     void testMain1() throws Exception {
-        StringWriter strw = new StringWriter();
-        StringReader strr = new StringReader("args[0]+args[1]");
+        final StringWriter strw = new StringWriter();
+        final StringReader strr = new StringReader("args[0]+args[1]");
         Main.run(new BufferedReader(strr), new PrintWriter(strw), new Object[]{20, 22});
-        String ctl = ">>: 42" + LF;
+        final String ctl = ">>: 42" + LF;
         Assertions.assertEquals(ctl, strw.toString());
     }
 
@@ -298,10 +298,10 @@ public class JexlScriptEngineTest {
         try {
             System.setOut(new PrintStream(outContent));
             file = Files.createTempFile("test-jsr233", ".jexl");
-            BufferedWriter writer = new BufferedWriter(new FileWriter(file.toFile()));
+            final BufferedWriter writer = new BufferedWriter(new FileWriter(file.toFile()));
             writer.write("a=20;\nb=22;\na+b\n");
             writer.close();
-            String ctl = ">>: 42" + LF;
+            final String ctl = ">>: 42" + LF;
             Main.main(new String[]{file.toString()});
             Assertions.assertEquals(ctl, outContent.toString());
         } finally {
