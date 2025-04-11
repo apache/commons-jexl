@@ -79,9 +79,9 @@
         <!-- Attempt at Java 25 -->
         <commons.asm.version>9.8</commons.asm.version>
         <!-- Commons release plugin -->
-        <commons.bc.version>3.3</commons.bc.version>
-        <commons.release.version>3.4.0</commons.release.version>
-        <commons.release.next>3.5.0</commons.release.next>
+        <commons.bc.version>3.4.0</commons.bc.version>
+        <commons.release.version>3.5.0</commons.release.version>
+        <commons.release.next>3.5.1</commons.release.next>
         <commons.rc.version>RC1</commons.rc.version>
         <commons.release.isDistModule>true</commons.release.isDistModule>
         <commons.distSvnStagingUrl>scm:svn:https://dist.apache.org/repos/dist/dev/commons/${commons.componentid}</commons.distSvnStagingUrl>
