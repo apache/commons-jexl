@@ -142,8 +142,7 @@ public class JexlArithmetic {
 
         /** Default constructor */
         public NullOperand() {
-            super();
-        } ; // satisfy Javadoc
+        } // satisfy Javadoc
     }
 
     /**
@@ -1594,7 +1593,7 @@ public class JexlArithmetic {
     @Deprecated
     public JexlArithmetic options(final JexlEngine.Options options) {
         if (options != null) {
-            boolean isstrict = Boolean.TRUE == options.isStrictArithmetic() || isStrict();
+            final boolean isstrict = Boolean.TRUE == options.isStrictArithmetic() || isStrict();
             MathContext bigdContext = options.getArithmeticMathContext();
             if (bigdContext == null) {
                 bigdContext = getMathContext();
