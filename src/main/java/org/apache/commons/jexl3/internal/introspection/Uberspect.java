@@ -162,13 +162,13 @@ public class Uberspect implements JexlUberspect {
 
     @Override
     public JexlArithmetic.Uberspect getArithmetic(final JexlArithmetic arithmetic) {
-        Set<JexlOperator> operators = arithmetic == null ? Collections.emptySet() : getOverloads(arithmetic);
+        final Set<JexlOperator> operators = arithmetic == null ? Collections.emptySet() : getOverloads(arithmetic);
         return operators.isEmpty()? null : new Operator(this, arithmetic, operators);
     }
 
     @Override
     public Operator getOperator(final JexlArithmetic arithmetic) {
-        Set<JexlOperator> operators = arithmetic == null ? Collections.emptySet() : getOverloads(arithmetic);
+        final Set<JexlOperator> operators = arithmetic == null ? Collections.emptySet() : getOverloads(arithmetic);
         return new Operator(this, arithmetic, operators);
     }
 
