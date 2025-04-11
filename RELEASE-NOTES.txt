@@ -29,29 +29,30 @@ Have fun!
 -Apache Commons Team
 
 ========================================================================================================================
-Release 3.4.1
+Release 3.5.0
 ========================================================================================================================
 
-Version 3.4.1 is a minor release.
+Version 3.5.0 is a minor release.
 
 Compatibility with previous releases
 ====================================
-Version 3.4.1 is source and binary compatible with 3.4.
+Version 3.5.0 is source and binary compatible with 3.4.
 
 
-What's new in 3.4.1:
+What's new in 3.5.0:
 ====================
 Operator overloading has been enhanced so that overloading compare() will benefit all comparison operators.
 A feature flag has been introduced to allow pass-by-reference of captured variables closely mimicking
 EcmaScript behavior.
 
-New Features in 3.4.1:
+New Features in 3.5.0:
 ======================
+* JEXL-438:     Allow parser factory specification.
 * JEXL-428:     Make Comparable object high priority while comparing
 * JEXL-427:     Avoid coercing logical expressions to boolean
 * JEXL-426:     Enable pass-by-reference for Captured Variables
 
-Bugs Fixed in 3.4.1:
+Bugs Fixed in 3.5.0:
 ====================
 * JEXL-436:     The increment (decrement) operator does not check for null operand
 * JEXL-435:     Changed behavior of empty operator overloading
