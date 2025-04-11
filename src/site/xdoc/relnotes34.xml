@@ -18,13 +18,13 @@
 
 <document>
   <properties>
-    <title>Apache Commons JEXL 3.4 Release Notes</title>
+    <title>Apache Commons JEXL 3.4.1 Release Notes</title>
   </properties>
 
   <body>
     <section name="Compatibility with previous release">
       <p>
-        Version 3.4 is source and binary compatible with 3.3.
+        Version 3.4.1 is source and binary compatible with 3.3.
       </p>
     </section>
     <section name="Compatibility with older releases (&lt; 3.3, 2.x)">
@@ -49,7 +49,74 @@
         or whether loops or side effects are accessible are part of your choice to make.
       </p>
     </section>
-    <section name="What's new in 3.4:">
+    <section name="What's new in 3.4.1:">
+      <p>
+        A feature that captures variables as references allowing side effect from a lambda to its
+        outer scope; this is mimicking JavaScript scoping rule (JEXL-426).
+      </p>
+    </section>
+    <section name="New Features in 3.4.1:">
+      <p>
+        <table>
+          <tr>
+            <td><a href="https://issues.apache.org/jira/browse/JEXL-438">JEXL-438:</a></td>
+            <td>Allow parser factory specification.</td>
+          </tr>
+          <tr>
+            <td><a href="https://issues.apache.org/jira/browse/JEXL-428">JEXL-428:</a></td>
+            <td>Make Comparable object high priority while comparing.</td>
+          </tr>
+          <tr>
+            <td><a href="https://issues.apache.org/jira/browse/JEXL-427>">JEXL-427:</a></td>
+            <td>Avoid coercing logical expressions to boolean.</td>
+          </tr>
+          <tr>
+            <td><a href="https://issues.apache.org/jira/browse/JEXL-426>">JEXL-426:</a></td>
+            <td>Enable pass-by-reference for Captured Variables</td>
+          </tr>
+        </table>
+      </p>
+    </section>
+    <section name="Bugs Fixed in 3.4.1:">
+      <p>
+        <table>
+          <tr>
+            <td><a href="https://issues.apache.org/jira/browse/JEXL-436>">JEXL-436:</a></td>
+            <td>The increment (decrement) operator does not check for null operand.</td>
+          </tr>
+          <tr>
+            <td><a href="https://issues.apache.org/jira/browse/JEXL-435>">JEXL-435:</a></td>
+            <td>Changed behavior of empty operator overloading action.</td>
+          </tr>
+          <tr>
+            <td><a href="https://issues.apache.org/jira/browse/JEXL-434>">JEXL-434:</a></td>
+            <td>The safe-access array operator is not safe.</td>
+          </tr>
+          <tr>
+            <td><a href="https://issues.apache.org/jira/browse/JEXL-433>">JEXL-433:</a></td>
+            <td>Debugger does not accept empty return statement.</td>
+          </tr>
+          <tr>
+            <td><a href="https://issues.apache.org/jira/browse/JEXL-432>">JEXL-432:</a></td>
+            <td>Namespace functors are not cleared when the classloader is updated.</td>
+          </tr>
+          <tr>
+            <td><a href="https://issues.apache.org/jira/browse/JEXL-431>">JEXL-431:</a></td>
+            <td>Parse error with variables declared in a catch clause.</td>
+          </tr>
+          <tr>
+            <td><a href="https://issues.apache.org/jira/browse/JEXL-429>">JEXL-429:</a></td>
+            <td>Ternary expression regression.</td>
+          </tr>
+          <tr>
+            <td><a href="https://issues.apache.org/jira/browse/JEXL-425>">JEXL-425:</a></td>
+            <td>Multiline format literals does not always return string.</td>
+          </tr>
+        </table>
+      </p>
+    </section>
+
+    <section name="What was new in 3.4:">
       <p>
         Features and permissions are easier to define through new methods.
       </p>
