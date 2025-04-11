@@ -34,6 +34,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.function.IntFunction;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 import org.apache.commons.jexl3.JexlArithmetic;
 import org.apache.commons.jexl3.JexlBuilder;
@@ -60,6 +61,7 @@ import org.apache.commons.jexl3.parser.ASTMethodNode;
 import org.apache.commons.jexl3.parser.ASTNumberLiteral;
 import org.apache.commons.jexl3.parser.ASTStringLiteral;
 import org.apache.commons.jexl3.parser.JexlNode;
+import org.apache.commons.jexl3.parser.JexlScriptParser;
 import org.apache.commons.jexl3.parser.Parser;
 import org.apache.commons.jexl3.parser.StringProvider;
 import org.apache.commons.logging.Log;
@@ -268,6 +270,10 @@ public class Engine extends JexlEngine {
      */
     protected final Charset charset;
     /**
+     * The Jexl script parser factory.
+     */
+    protected final Supplier<JexlScriptParser> parserFactory;
+    /**
      * The atomic parsing flag; true whilst parsing.
      */
     protected final AtomicBoolean parsing = new AtomicBoolean();
@@ -275,7 +281,7 @@ public class Engine extends JexlEngine {
      * The {@link Parser}; when parsing expressions, this engine uses the parser if it
      * is not already in use otherwise it will create a new temporary one.
      */
-    protected final Parser parser = new Parser(new StringProvider(";")); //$NON-NLS-1$
+    protected final JexlScriptParser parser; //$NON-NLS-1$
     /**
      * The expression max length to hit the cache.
      */
@@ -363,11 +369,15 @@ public class Engine extends JexlEngine {
         // caching:
         final IntFunction<JexlCache<?, ?>> factory = conf.cacheFactory();
         this.cacheFactory = factory == null ? SoftCache::new : factory;
-        this.cache = (JexlCache<Source, ASTJexlScript>) (conf.cache() > 0 ? factory.apply(conf.cache()) : null);
+        this.cache = (JexlCache<Source, ASTJexlScript>) (conf.cache() > 0 ? cacheFactory.apply(conf.cache()) : null);
         this.cacheThreshold = conf.cacheThreshold();
         if (uberspect == null) {
             throw new IllegalArgumentException("uberspect cannot be null");
         }
+        this.parserFactory = conf.parserFactory() == null ?
+               () -> new Parser(new StringProvider(";"))
+                : conf.parserFactory();
+        this.parser = parserFactory.get();
     }
 
     @Override
@@ -811,8 +821,7 @@ public class Engine extends JexlEngine {
             }
         } else {
             // ...otherwise parser was in use, create a new temporary one
-            final Parser lparser = new Parser(new StringProvider(";"));
-            script = lparser.parse(ninfo, features, src, scope);
+            script = parserFactory.get().parse(ninfo, features, src, scope);
         }
         if (source != null) {
             cache.put(source, script);

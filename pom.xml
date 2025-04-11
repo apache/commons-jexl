@@ -53,6 +53,7 @@
         <commons.jira.pid>12310479</commons.jira.pid>
         <japicmp.skip>false</japicmp.skip>
         <!-- JaCoCo: Don't make code coverage worse than: -->
+        <commons.jacoco.version>0.8.13</commons.jacoco.version>
         <commons.jacoco.haltOnFailure>true</commons.jacoco.haltOnFailure>
         <commons.jacoco.classRatio>0.96</commons.jacoco.classRatio>
         <commons.jacoco.instructionRatio>0.89</commons.jacoco.instructionRatio>
@@ -75,6 +76,8 @@
         <!-- project.build.outputTimestamp is managed by Maven plugins, see https://maven.apache.org/guides/mini/guide-reproducible-builds.html -->
         <project.build.outputTimestamp>2024-06-05T23:56:52Z</project.build.outputTimestamp>
 
+        <!-- Attempt at Java 25 -->
+        <commons.asm.version>9.8</commons.asm.version>
         <!-- Commons release plugin -->
         <commons.bc.version>3.3</commons.bc.version>
         <commons.release.version>3.4.0</commons.release.version>
@@ -222,6 +225,7 @@
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
+                <version>${commons.jacoco.version}</version>
                 <configuration>
                     <excludes>
                             <exclude>**/generated-sources/**/*</exclude>
@@ -467,6 +471,7 @@
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
+                <version>${commons.jacoco.version}</version>
                 <configuration>
                     <excludes>
                         <exclude>**/generated-sources/**/*</exclude>

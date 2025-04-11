@@ -284,7 +284,7 @@ public final class JexlOptions {
     }
 
     /**
-     * Gets sharing state
+     * Gets sharing state.
      * @return false if a copy of these options is used during execution,
      * true if those can potentially be modified
      */
@@ -320,7 +320,7 @@ public final class JexlOptions {
     }
 
     /**
-     * Gets strict interpolation status
+     * Gets the strict-interpolation flag of this options instance.
      * @return true if interpolation strings always return string, false otherwise
      */
     public boolean isStrictInterpolation() {

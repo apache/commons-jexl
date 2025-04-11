@@ -39,7 +39,7 @@ import org.apache.commons.jexl3.internal.Scope;
 /**
  * The base class for parsing, manages the parameter/local variable frame.
  */
-public abstract class JexlParser extends StringParser {
+public abstract class JexlParser extends StringParser implements JexlScriptParser {
     /**
      * A lexical unit is the container defining local symbols and their
      * visibility boundaries.
@@ -706,11 +706,11 @@ public abstract class JexlParser extends StringParser {
                 throw new JexlException.Assignment(xinfo, msg).clean();
             }
             if (lv instanceof ASTIdentifier && !(lv instanceof ASTVar)) {
-                final ASTIdentifier var = (ASTIdentifier) lv;
-                if (isConstant(var.getSymbol())) { // if constant, fail...
+                final ASTIdentifier varName = (ASTIdentifier) lv;
+                if (isConstant(varName.getSymbol())) { // if constant, fail...
                     JexlInfo xinfo = lv.jexlInfo();
                     xinfo = info.at(xinfo.getLine(), xinfo.getColumn());
-                    throw new JexlException.Assignment(xinfo, var.getName()).clean();
+                    throw new JexlException.Assignment(xinfo, varName.getName()).clean();
                 }
             }
         }

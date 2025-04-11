@@ -25,6 +25,8 @@ import org.apache.commons.jexl3.JexlFeatures;
 import org.apache.commons.jexl3.JexlScript;
 import org.apache.commons.jexl3.parser.ASTJexlScript;
 import org.apache.commons.jexl3.parser.JexlNode;
+import org.apache.commons.jexl3.parser.JexlScriptParser;
+import org.apache.commons.jexl3.parser.Parser;
 
 /**
  * Helper methods for validate sessions.
@@ -77,7 +79,13 @@ public class Util {
             return;
         }
         final Engine jdbg = new Engine();
-        jdbg.parser.allowRegisters(true);
+        JexlScriptParser jexlp = jdbg.parser;;
+        if (!(jexlp instanceof Parser)) {
+            // jexl-438 escape
+            return;
+        }
+        Parser parser = (Parser) jexlp;
+        parser.allowRegisters(true);
         final Debugger dbg = new Debugger();
         // iterate over all expression in
         for (final Map.Entry<Source, ASTJexlScript> entry : jexl.cache.entries()) {

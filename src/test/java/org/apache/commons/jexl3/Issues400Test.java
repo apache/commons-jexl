@@ -40,7 +40,13 @@ import java.util.Objects;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.commons.jexl3.internal.Debugger;
+import org.apache.commons.jexl3.internal.Scope;
 import org.apache.commons.jexl3.introspection.JexlPermissions;
+import org.apache.commons.jexl3.parser.ASTJexlScript;
+import org.apache.commons.jexl3.parser.JexlScriptParser;
+import org.apache.commons.jexl3.parser.Parser;
+import org.apache.commons.jexl3.parser.StringProvider;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -607,5 +613,118 @@ public class Issues400Test {
             JexlScript script = jexl.createScript(src);
             assertThrows(JexlException.Operator.class, () -> script.execute(ctxt));
         }
+    }
+
+    /** The set of characters that may be followed by a '='.*/
+    static final char[] EQ_FRIEND;
+    static {
+        char[] eq = {'!', ':', '<', '>', '^', '|', '&', '+', '-', '/', '*', '~', '='};
+        Arrays.sort(eq);
+        EQ_FRIEND = eq;
+    }
+
+    /**
+     * Transcodes a SQL-inspired expression to a JEXL expression.
+     * @param expr the expression to transcode
+     * @return the resulting expression
+     */
+    private static String transcodeSQLExpr(final CharSequence expr) {
+        final StringBuilder strb = new StringBuilder(expr.length());
+        final int end = expr.length();
+        char previous = 0;
+        for (int i = 0; i < end; ++i) {
+            char c = expr.charAt(i);
+            if (previous == '<') {
+                // previous char a '<' now followed by '>'
+                if (c == '>') {
+                    // replace '<>' with '!='
+                    strb.append("!=");
+                    previous = c;
+                    continue;
+                } else {
+                    strb.append('<');
+                }
+            }
+            if (c != '<') {
+                if (c == '=') {
+                    // replace '=' with '==' when it does not follow a 'friend'
+                    if (Arrays.binarySearch(EQ_FRIEND, previous) >= 0) {
+                        strb.append(c);
+                    } else {
+                        strb.append("==");
+                    }
+                } else {
+                    strb.append(c);
+                    if (c == '"' || c == '\'') {
+                        // read string, escape '\'
+                        boolean escape = false;
+                        for (i += 1; i < end; ++i) {
+                            final char ec = expr.charAt(i);
+                            strb.append(ec);
+                            if (ec == '\\') {
+                                escape = !escape;
+                            } else if (escape) {
+                                escape = false;
+                            } else if (ec == c) {
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+            previous = c;
+        }
+        return strb.toString();
+    }
+
+    public static class SQLParser implements JexlScriptParser {
+        final Parser parser;
+
+        public SQLParser() {
+            parser = new Parser(new StringProvider(";"));
+        }
+
+        @Override
+        public ASTJexlScript parse(JexlInfo info, JexlFeatures features, String src, Scope scope) {
+            return parser.parse(info, features, transcodeSQLExpr(src), scope);
+        }
+    }
+
+
+    @Test
+    void testSQLTranspose() {
+        String[] e = { "a<>b", "a = 2", "a.b.c <> '1<>0'" };
+        String[] j = { "a!=b", "a == 2", "a.b.c != '1<>0'" };
+        for(int i = 0; i < e.length; ++i) {
+            String je = transcodeSQLExpr(e[i]);
+            Assertions.assertEquals(j[i], je);
+        }
+    }
+
+    @Test
+    void testSQLNoChange() {
+        String[] e = { "a <= 2", "a >= 2", "a := 2", "a + 3 << 4 > 5",  };
+        for(int i = 0; i < e.length; ++i) {
+            String je = transcodeSQLExpr(e[i]);
+            Assertions.assertEquals(e[i], je);
+        }
+    }
+
+    @Test
+    void test438() {// no local, no lambda, no loops, no-side effects
+        final JexlFeatures f = new JexlFeatures()
+                .localVar(false)
+                .lambda(false)
+                .loops(false)
+                .sideEffect(false)
+                .sideEffectGlobal(false);
+        JexlBuilder builder = new JexlBuilder().parserFactory(SQLParser::new).cache(32).features(f);
+        JexlEngine sqle = builder.create();
+        Assertions.assertTrue((boolean) sqle.createScript("a <> 25", "a").execute(null, 24));
+        Assertions.assertFalse((boolean) sqle.createScript("a <> 25", "a").execute(null, 25));
+        Assertions.assertFalse((boolean) sqle.createScript("a = 25", "a").execute(null, 24));
+        Assertions.assertTrue((boolean) sqle.createScript("a != 25", "a").execute(null, 24));
+        Assertions.assertTrue((boolean) sqle.createScript("a = 25", "a").execute(null, 25));
+        Assertions.assertFalse((boolean) sqle.createScript("a != 25", "a").execute(null, 25));
     }
 }
