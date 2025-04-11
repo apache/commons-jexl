@@ -167,12 +167,11 @@ class ReferenceFrame extends Frame {
         final Object o = stack[s];
         if (o instanceof CaptureReference) {
             return (CaptureReference) o;
-        } else {
-            // change the type of the captured register, wrap the value in a reference
-            final CaptureReference captured = new CaptureReference(o);
-            stack[s] = captured;
-            return captured;
         }
+        // change the type of the captured register, wrap the value in a reference
+        final CaptureReference captured = new CaptureReference(o);
+        stack[s] = captured;
+        return captured;
     }
 
     @Override
