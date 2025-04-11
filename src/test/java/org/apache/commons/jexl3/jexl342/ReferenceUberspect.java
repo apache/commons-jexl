@@ -212,7 +212,7 @@ public class ReferenceUberspect implements JexlUberspect {
     }
 
     @Override
-    public JexlArithmetic.Uberspect getArithmetic(JexlArithmetic arithmetic) {
+    public JexlArithmetic.Uberspect getArithmetic(final JexlArithmetic arithmetic) {
         return getOperator(arithmetic);
     }
 
