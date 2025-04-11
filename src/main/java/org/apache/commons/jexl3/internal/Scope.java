@@ -151,7 +151,7 @@ public final class Scope {
             throw new IllegalStateException("cant declare parameters after variables");
         }
         return namedVariables.computeIfAbsent(param, name -> {
-            int register = namedVariables.size();
+            final int register = namedVariables.size();
             parms += 1;
             return register;
         });
@@ -170,7 +170,7 @@ public final class Scope {
             namedVariables = new LinkedHashMap<>();
         }
         return namedVariables.computeIfAbsent(varName, name -> {
-           int register = namedVariables.size();
+           final int register = namedVariables.size();
             vars += 1;
             // check if local is redefining captured
             if (parent != null) {
