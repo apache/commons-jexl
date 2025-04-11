@@ -125,6 +125,8 @@ public final class JexlFeatures {
     public static final int CONST_CAPTURE = 23;
     /** Captured variables are reference. */
     public static final int REF_CAPTURE = 24;
+    /** Captured variables are reference. */
+    public static final int STRICT_STATEMENT = 25;
     /**
      * All features.
      * Ensure this is updated if additional features are added.

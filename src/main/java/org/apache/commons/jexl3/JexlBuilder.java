@@ -22,12 +22,14 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
 import java.util.function.IntFunction;
+import java.util.function.Supplier;
 
 import org.apache.commons.jexl3.internal.Engine;
 import org.apache.commons.jexl3.internal.SoftCache;
 import org.apache.commons.jexl3.introspection.JexlPermissions;
 import org.apache.commons.jexl3.introspection.JexlSandbox;
 import org.apache.commons.jexl3.introspection.JexlUberspect;
+import org.apache.commons.jexl3.parser.JexlScriptParser;
 import org.apache.commons.logging.Log;
 
 /**
@@ -136,6 +138,9 @@ public class JexlBuilder {
 
     /** The cache class factory. */
     private IntFunction<JexlCache<?,?>> cacheFactory = SoftCache::new;
+
+   /** The parser class factory. */
+   private Supplier<JexlScriptParser> parserFactory;
 
     /** The stack overflow limit. */
     private int stackOverflow = Integer.MAX_VALUE;
@@ -254,7 +259,7 @@ public class JexlBuilder {
     }
 
     /**
-     * Gets the expression factory the engine will use.
+     * Gets the expression-cache factory the engine will use.
      * @return the cache factory
      */
     public IntFunction<JexlCache<?, ?>> cacheFactory() {
@@ -262,13 +267,34 @@ public class JexlBuilder {
     }
 
     /**
-     * Sets the expression factory the engine will use.
+     * Sets the expression-cache factory the engine will use.
      *
      * @param factory the function to produce a cache.
      * @return this builder
      */
     public JexlBuilder cacheFactory(final IntFunction<JexlCache<?, ?>> factory) {
       this.cacheFactory = factory;
+      return this;
+    }
+
+  /**
+   * Gets the Jexl script parser factory the engine will use.
+   * @return the cache factory
+   * @since 3.4.1
+   */
+  public Supplier<JexlScriptParser> parserFactory() {
+    return this.parserFactory;
+  }
+
+  /**
+   * Sets the Jexl script parser factory the engine will use.
+   *
+   * @param factory the function to produce a cache.
+   * @return this builder
+   * @since 3.4.1
+   */
+    public JexlBuilder parserFactory(final Supplier<JexlScriptParser> factory) {
+      this.parserFactory = factory;
       return this;
     }
 
@@ -487,7 +513,7 @@ public class JexlBuilder {
     }
 
     /**
-     * Is lexical shading is enabled?
+     * Checks whether lexical shading is enabled.
      * @see JexlOptions#isLexicalShade()
      * @return whether lexical shading is enabled
      * @deprecated 3.4.1
