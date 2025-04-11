@@ -38,7 +38,7 @@ import javax.script.ScriptException;
 public class Main {
 
     /** Default constructor */
-    public Main() { }; // Keep Javadoc happy
+    public Main() { } // Keep Javadoc happy
 
     /**
      * Test application for JexlScriptEngine (JSR-223 implementation).
@@ -62,7 +62,7 @@ public class Main {
         }
     }
 
-    static void run(BufferedReader in, PrintWriter out, final Object[] args) throws Exception {
+    static void run(final BufferedReader in, final PrintWriter out, final Object[] args) throws Exception {
         final JexlScriptEngineFactory fac = new JexlScriptEngineFactory();
         final ScriptEngine engine = fac.getScriptEngine();
         if (args != null && args.length > 0) {
