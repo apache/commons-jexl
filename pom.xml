@@ -225,7 +225,6 @@
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>${commons.jacoco.version}</version>
                 <configuration>
                     <excludes>
                             <exclude>**/generated-sources/**/*</exclude>
