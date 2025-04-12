@@ -380,7 +380,7 @@ public enum JexlOperator {
      * Marker for side effect.
      * <br>Returns this from 'self*' overload method to let the engine know the side effect has been performed and
      * there is no need to assign the result.
-     * @deprecated 3.4.1
+     * @deprecated 3.5.0
      */
     ASSIGN("=", null, null),
 
@@ -431,7 +431,7 @@ public enum JexlOperator {
     /**
      * Compare overload as in compare(x, y).
      * <br><strong>Method:</strong> {@code boolean compare(L x, R y);}.
-     * @since 3.4.1
+     * @since 3.5.0
      */
     COMPARE("<>", "compare", 2),
 
@@ -553,7 +553,7 @@ public enum JexlOperator {
      * <p>This also allows reusing the core logic when extending the applicative type-system; for
      * instance, implementing a Comparator class that calls compare
      * (<code>operator.tryOverload(this, JexlOperator.COMPARE, left, right)</code>, etc.</p>
-     * @since 3.4.1
+     * @since 3.5.0
      */
     public interface Uberspect extends JexlArithmetic.Uberspect {
         /**

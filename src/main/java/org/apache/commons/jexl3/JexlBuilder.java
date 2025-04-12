@@ -280,7 +280,7 @@ public class JexlBuilder {
   /**
    * Gets the Jexl script parser factory the engine will use.
    * @return the cache factory
-   * @since 3.4.1
+   * @since 3.5.0
    */
   public Supplier<JexlScriptParser> parserFactory() {
     return this.parserFactory;
@@ -291,7 +291,7 @@ public class JexlBuilder {
    *
    * @param factory the function to produce a cache.
    * @return this builder
-   * @since 3.4.1
+   * @since 3.5.0
    */
     public JexlBuilder parserFactory(final Supplier<JexlScriptParser> factory) {
       this.parserFactory = factory;
@@ -493,7 +493,7 @@ public class JexlBuilder {
      * Is lexical scope enabled?
      * @see JexlOptions#isLexical()
      * @return whether lexical scope is enabled
-     * @deprecated 3.4.1
+     * @deprecated 3.5.0
      */
     @Deprecated
     public boolean lexical() {
@@ -516,7 +516,7 @@ public class JexlBuilder {
      * Checks whether lexical shading is enabled.
      * @see JexlOptions#isLexicalShade()
      * @return whether lexical shading is enabled
-     * @deprecated 3.4.1
+     * @deprecated 3.5.0
      */
     @Deprecated
     public boolean lexicalShade() {

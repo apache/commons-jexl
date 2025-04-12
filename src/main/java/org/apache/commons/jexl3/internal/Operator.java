@@ -552,7 +552,7 @@ public final class Operator implements JexlOperator.Uberspect {
 
     /**
      * Special handling of overloads where another attempt at finding a method may be attempted.
-     * <p>As of 3.4.1, only the comparison operators attempting to use compare() are handled.</p>
+     * <p>As of 3.5.0, only the comparison operators attempting to use compare() are handled.</p>
      * @param operator the operator
      * @param args the arguments
      * @return an instance or null
