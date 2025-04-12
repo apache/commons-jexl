@@ -211,7 +211,7 @@ public interface JexlUberspect {
      *
      * @param arithmetic the arithmetic instance
      * @return an operator uberspect instance
-     * @since 3.4.1
+     * @since 3.5.0
      */
     default JexlOperator.Uberspect getOperator(final JexlArithmetic arithmetic) {
         return null;

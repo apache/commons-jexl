@@ -593,7 +593,7 @@ public final class JexlFeatures {
      * </p>
      * @param flag true to enable, false to disable
      * @return this features instance
-     * @since 3.4.1
+     * @since 3.5.0
      */
     public JexlFeatures namespaceIdentifier(final boolean flag) {
         setFeature(NS_IDENTIFIER, flag);
@@ -872,7 +872,7 @@ public final class JexlFeatures {
     /**
      * Is namespace identifier syntax enabled?
      * @return true if namespace identifier syntax is enabled, false otherwise
-     * @since 3.4.1
+     * @since 3.5.0
      */
     public boolean supportsNamespaceIdentifier() {
         return getFeature(NS_IDENTIFIER);

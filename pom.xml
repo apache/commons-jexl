@@ -22,7 +22,6 @@
         <artifactId>commons-parent</artifactId>
         <version>81</version>
     </parent>
-
     <artifactId>commons-jexl3</artifactId>
     <version>3.5.0</version>
     <name>Apache Commons JEXL</name>
@@ -30,7 +29,6 @@
         applications and frameworks written in Java.</description>
     <url>https://commons.apache.org/proper/commons-jexl/</url>
     <inceptionYear>2001</inceptionYear>
-
     <properties>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
@@ -75,18 +73,16 @@
         <project.reporting.outputEncoding>${commons.encoding}</project.reporting.outputEncoding>
         <!-- project.build.outputTimestamp is managed by Maven plugins, see https://maven.apache.org/guides/mini/guide-reproducible-builds.html -->
         <project.build.outputTimestamp>2025-04-11T22:34:47Z</project.build.outputTimestamp>
-
         <!-- Attempt at Java 25 -->
         <commons.asm.version>9.8</commons.asm.version>
         <!-- Commons release plugin -->
         <commons.bc.version>3.4.0</commons.bc.version>
         <commons.release.version>3.5.0</commons.release.version>
         <commons.release.next>3.5.1</commons.release.next>
-        <commons.rc.version>RC1</commons.rc.version>
+        <commons.rc.version>RC2</commons.rc.version>
         <commons.release.isDistModule>true</commons.release.isDistModule>
         <commons.distSvnStagingUrl>scm:svn:https://dist.apache.org/repos/dist/dev/commons/${commons.componentid}</commons.distSvnStagingUrl>
     </properties>
-
     <scm>
         <connection>scm:git:https://gitbox.apache.org/repos/asf/commons-jexl.git</connection>
         <developerConnection>scm:git:https://gitbox.apache.org/repos/asf/commons-jexl.git</developerConnection>
@@ -104,7 +100,6 @@
             <url>scm:svn:https://svn.apache.org/repos/infra/websites/production/commons/content/proper/commons-jexl/</url>
         </site>
     </distributionManagement>
-
     <dependencies>
         <dependency>
             <groupId>commons-logging</groupId>
@@ -140,7 +135,6 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-
     <build>
         <defaultGoal>clean verify apache-rat:check spotbugs:check japicmp:cmp checkstyle:check javadoc:javadoc</defaultGoal>
         <plugins>
@@ -158,7 +152,6 @@
                     </includes>
                 </configuration>
             </plugin>
-
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <configuration>
@@ -170,7 +163,6 @@
                     <finalName>commons-jexl-${project.version}</finalName>
                 </configuration>
             </plugin>
-
             <plugin>
                 <groupId>com.helger.maven</groupId>
                 <artifactId>ph-javacc-maven-plugin</artifactId>
@@ -188,7 +180,6 @@
                     </execution>
                 </executions>
             </plugin>
-
             <plugin>
                 <artifactId>maven-antrun-plugin</artifactId>
                 <executions>
@@ -211,21 +202,8 @@
                 </executions>
             </plugin>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>test-jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>${commons.jacoco.version}</version>
                 <configuration>
                     <excludes>
                             <exclude>**/generated-sources/**/*</exclude>
@@ -237,7 +215,6 @@
                     </excludes>
                 </configuration>
             </plugin>
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-scm-publish-plugin</artifactId>
@@ -247,7 +224,6 @@
                     </ignorePathsToDelete>
                 </configuration>
             </plugin>
-
             <!-- Allow checkstyle to be run from command-line. Must agree with config in report section. -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -263,7 +239,6 @@
                     <propertyExpansion>config_loc=${basedir}/src/main/config</propertyExpansion>
                 </configuration>
             </plugin>
-
             <!-- Allow Spotbugs to be run from command-line. Must agree with config in report section. -->
             <plugin>
                 <groupId>com.github.spotbugs</groupId>
@@ -282,18 +257,6 @@
                     </dependency>
                 </dependencies>
             </plugin>
-
-            <!-- Allow RAT to be run from command-line. Must agree with config in report section. -->
-            <plugin>
-                <groupId>org.apache.rat</groupId>
-                <artifactId>apache-rat-plugin</artifactId>
-                <configuration>
-                    <excludes>
-                        <exclude>.travis.yml</exclude>
-                    </excludes>
-                </configuration>
-            </plugin>
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-pmd-plugin</artifactId>
@@ -311,7 +274,6 @@
                     </excludes>
                 </configuration>
             </plugin>
-
             <!-- japicmp -->
             <plugin>
                 <groupId>com.github.siom79.japicmp</groupId>
@@ -336,7 +298,6 @@
                     </parameter>
                 </configuration>
             </plugin>
-
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>animal-sniffer-maven-plugin</artifactId>
@@ -345,7 +306,6 @@
                     <ignores>java.lang.invoke.*</ignores>
 		        </configuration>
             </plugin>
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
@@ -359,10 +319,8 @@
 
         </plugins>
     </build>
-
     <reporting>
         <plugins>
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
@@ -373,17 +331,6 @@
                     <show>protected</show>
                 </configuration>
             </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-changes-plugin</artifactId>
-                <configuration>
-                    <issueLinkTemplatePerSystem>
-                        <default>%URL%/%ISSUE%</default>
-                    </issueLinkTemplatePerSystem>
-                </configuration>
-            </plugin>
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
@@ -397,7 +344,6 @@
                     <propertyExpansion>config_loc=${basedir}/src/main/config</propertyExpansion>
                 </configuration>
             </plugin>
-
             <plugin>
                 <groupId>com.github.spotbugs</groupId>
                 <artifactId>spotbugs-maven-plugin</artifactId>
@@ -406,7 +352,6 @@
                     <xmlOutputDirectory>target/site</xmlOutputDirectory>
                 </configuration>
             </plugin>
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-pmd-plugin</artifactId>
@@ -457,17 +402,6 @@
                     </parameter>
                 </configuration>
             </plugin>
-
-            <plugin>
-                <groupId>org.apache.rat</groupId>
-                <artifactId>apache-rat-plugin</artifactId>
-                <configuration>
-                    <excludes>
-                        <exclude>.travis.yml</exclude>
-                    </excludes>
-                </configuration>
-            </plugin>
-
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
@@ -483,7 +417,6 @@
 
         </plugins>
     </reporting>
-
     <developers>
         <developer>
             <name>dIon Gillard</name>
@@ -547,11 +480,9 @@
             </properties>
         </developer>
     </developers>
-
     <contributors>
         <contributor>
             <name>Dmitri Blinov</name>
         </contributor>
     </contributors>
-
 </project>

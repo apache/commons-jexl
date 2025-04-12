@@ -227,7 +227,7 @@ public final class JexlOptions {
      * an expression like (3 &quot;&quot; 4 &quot;&quot; 5) will evaluate to true. If not, it will evaluate to 5.
      * To preserve strict compatibility with 3.4, set the flag to true.
      * @return true if short-circuit logicals coerce their result to boolean, false otherwise
-     * @since 3.4.1
+     * @since 3.5.0
      */
     public boolean isBooleanLogical() {
         return isSet(BOOLEAN_LOGICAL, flags);
