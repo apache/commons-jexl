@@ -23,7 +23,7 @@
         <version>81</version>
     </parent>
     <artifactId>commons-jexl3</artifactId>
-    <version>3.5.0</version>
+    <version>3.5.1-SNAPSHOT</version>
     <name>Apache Commons JEXL</name>
     <description>Apache Commons JEXL is a library that facilitates the implementation of scripting features in
         applications and frameworks written in Java.</description>
@@ -72,7 +72,7 @@
         <!-- This is used by reporting plugins -->
         <project.reporting.outputEncoding>${commons.encoding}</project.reporting.outputEncoding>
         <!-- project.build.outputTimestamp is managed by Maven plugins, see https://maven.apache.org/guides/mini/guide-reproducible-builds.html -->
-        <project.build.outputTimestamp>2025-04-11T22:34:47Z</project.build.outputTimestamp>
+        <project.build.outputTimestamp>2025-04-16T12:37:37Z</project.build.outputTimestamp>
         <!-- Attempt at Java 25 -->
         <commons.asm.version>9.8</commons.asm.version>
         <!-- Commons release plugin -->
