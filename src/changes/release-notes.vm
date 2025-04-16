@@ -15,7 +15,9 @@
 ## specific language governing permissions and limitations
 ## under the License.
 
-Apache Commons JEXL ${version} Release Notes
+${project.name} ${version} Release Notes
+
+The ${developmentTeam} is pleased to announce the release of ${project.name} ${version}.
 
 Introduction
 ------------
