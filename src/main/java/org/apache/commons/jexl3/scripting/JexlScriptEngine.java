@@ -304,7 +304,7 @@ public class JexlScriptEngine extends AbstractScriptEngine implements Compilable
     }
 
     /**
-     * Read from a reader into a local buffer and return a String with
+     * Reads from a reader into a local buffer and return a String with
      * the contents of the reader.
      *
      * @param scriptReader to be read.

@@ -762,7 +762,7 @@ public final class TemplateEngine extends JxltEngine {
     }
 
     /**
-     * Read lines from a (buffered / mark-able) reader keeping all new-lines and line-feeds.
+     * Reads lines from a (buffered / mark-able) reader keeping all new-lines and line-feeds.
      * @param reader the reader
      * @return the line iterator
      */

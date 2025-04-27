@@ -124,7 +124,7 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
         return null;
     }
     /**
-     * Read a given source line.
+     * Reads a given source line.
      * @param src the source
      * @param lineno the line number
      * @return the line

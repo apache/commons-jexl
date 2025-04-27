@@ -193,7 +193,7 @@ public class StringParser {
         return strb.toString();
     }
     /**
-     * Read the remainder of a string till a given separator,
+     * Reads the remainder of a string till a given separator,
      * handles escaping through '\' syntax.
      * @param strb the destination buffer to copy characters into
      * @param str the origin
@@ -259,7 +259,7 @@ public class StringParser {
         return index;
     }
     /**
-     * Read the remainder of a string till a given separator,
+     * Reads the remainder of a string till a given separator,
      * handles escaping through '\' syntax.
      * @param strb the destination buffer to copy characters into
      * @param str the origin
