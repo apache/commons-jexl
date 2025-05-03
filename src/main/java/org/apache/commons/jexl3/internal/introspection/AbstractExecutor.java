@@ -125,8 +125,8 @@ abstract class AbstractExecutor {
     static java.lang.reflect.Method initMarker(final Class<?> clazz, final String name, final Class<?>... parms) {
         try {
             return clazz.getMethod(name, parms);
-        } catch (final Exception xnever) {
-            throw new Error(xnever);
+        } catch (final Exception e) {
+            throw new IllegalArgumentException(e);
         }
     }
 
