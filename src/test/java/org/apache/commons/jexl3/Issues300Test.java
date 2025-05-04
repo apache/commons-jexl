@@ -173,12 +173,12 @@ public class Issues300Test {
             return nested;
         }
 
-        public void setName(final String pName) {
-            this.name = pName;
+        public void setName(final String name) {
+            this.name = name;
         }
 
-        public void setNested(final TestObject374 pNested) {
-            nested = pNested;
+        public void setNested(final TestObject374 nested) {
+            this.nested = nested;
         }
     }
 
