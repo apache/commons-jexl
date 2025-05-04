@@ -156,7 +156,7 @@ public interface JexlContext {
      */
     interface OptionsHandle {
         /**
-         * Retrieves the current set of options though the context.
+         * Gets the current set of options though the context.
          * <p>
          * This method will be called once at beginning of evaluation and an interpreter private copy
          * of the context handled JexlOptions instance used for the duration of the execution;

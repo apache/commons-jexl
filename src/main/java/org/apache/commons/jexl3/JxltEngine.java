@@ -141,7 +141,7 @@ public abstract class JxltEngine {
         Object evaluate(JexlContext context);
 
         /**
-         * Retrieves this expression's source expression.
+         * Gets this expression's source expression.
          * <p>
          * If this expression was prepared, this allows to retrieve the
          * original expression that lead to it.</p>

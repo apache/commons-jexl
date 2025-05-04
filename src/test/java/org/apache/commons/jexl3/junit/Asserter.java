@@ -114,7 +114,7 @@ public class Asserter {
     }
 
     /**
-     * Retrieves the underlying JEXL context.
+     * Gets the underlying JEXL context.
      * @return the JEXL context
      */
     public JexlContext getContext() {
@@ -122,7 +122,7 @@ public class Asserter {
     }
 
     /**
-     * Retrieves the underlying JEXL engine.
+     * Gets the underlying JEXL engine.
      * @return the JEXL engine
      */
     public JexlEngine getEngine() {
