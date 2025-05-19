@@ -76,13 +76,13 @@ public class StrategyTest extends JexlTestCase {
         assertEquals(28, i.get("class"));
         result = jexl.createScript("i.class", "i").execute((JexlContext)null, i);
         if (std) {
-            assertEquals(java.util.HashMap.class, result);
+            assertEquals(HashMap.class, result);
         } else {
             assertEquals(28, result);
         }
         result = jexl.createScript("i.'class'", "i").execute((JexlContext)null, i);
         if (std) {
-            assertEquals(java.util.HashMap.class, result);
+            assertEquals(HashMap.class, result);
         } else {
             assertEquals(28, result);
         }

@@ -476,7 +476,7 @@ class SandboxTest extends JexlTestCase {
         final JexlContext ctxt = null;
         final List<String> foo = new ArrayList<>();
         final JexlSandbox sandbox = new JexlSandbox(false, true);
-        sandbox.allow(java.util.List.class.getName());
+        sandbox.allow(List.class.getName());
 
         final JexlEngine sjexl = new JexlBuilder().sandbox(sandbox).safe(false).strict(true).create();
         final JexlScript method = sjexl.createScript("foo.add(y)", "foo", "y");
