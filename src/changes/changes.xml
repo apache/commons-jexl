@@ -32,7 +32,7 @@
           <action type="fix" dev="ggregory" due-to="Gary Gregory">org.apache.commons.jexl3.internal.introspection.AbstractExecutor.initMarker(Class, String, Class...) throws IllegalArgumentException instead of Error.</action>
           <!-- ADD -->
           <!-- UPDATE -->
-          <action type="update" dev="ggregory" due-to="Gary Gregory, Dependabot">Bump org.apache.commons:commons-parent from 81 to 83 #344.</action>
+          <action type="update" dev="ggregory" due-to="Gary Gregory, Dependabot">Bump org.apache.commons:commons-parent from 81 to 84 #344.</action>
         </release>
         <release version="3.5.0" date="2025-04-11" description="This is a feature and maintenance release. Java 8 or later is required.">
           <!-- FIX -->
