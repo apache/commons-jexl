@@ -21,7 +21,7 @@ import java.util.Deque;
 
 /**
  * The set of valued symbols defined in a lexical frame.
- * <p>The symbol identifiers are determined by the functional scope. Since the frame contains values of
+ * <p>The functional scope determines the symbol identifiers. Since the frame contains values of
  * all symbols in the functional scope, the lexical frame preserves values of symbols reused for local
  * definition.
  */
@@ -83,7 +83,7 @@ public class LexicalFrame extends LexicalScope {
      *
      * @param symbol  the symbol to define
      * @param capture whether this redefines a captured symbol
-     * @return true if symbol is defined, false otherwise
+     * @return true if the symbol is defined, false otherwise
      */
     public boolean defineSymbol(final int symbol, final boolean capture) {
         final boolean declared = addSymbol(symbol);

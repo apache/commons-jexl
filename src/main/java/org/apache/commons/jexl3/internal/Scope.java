@@ -62,7 +62,7 @@ public final class Scope {
     private int vars;
     /**
      * The map of named variables aka script parameters and local variables.
-     * Each parameter is associated to a symbol and is materialized as an offset in the stacked array used
+     * Each parameter is associated with a symbol and is materialized as an offset in the stacked array used
      * during evaluation.
      */
     private Map<String, Integer> namedVariables;
@@ -95,7 +95,7 @@ public final class Scope {
     }
 
     /**
-     * Marks a symbol as a lexical, declared through let or const.
+     * Marks a symbol as lexical, declared through let or const.
      * @param s the symbol
      * @return true if the symbol was not already present in the lexical set
      */
@@ -124,7 +124,8 @@ public final class Scope {
             for (final Map.Entry<Integer, Integer> capture : capturedVariables.entrySet()) {
                 final Integer target = capture.getKey();
                 final Integer source = capture.getValue();
-                final Object arg = frame.capture(source);
+                final boolean lexical = lexicalVariables != null && lexicalVariables.hasSymbol(target);
+                final Object arg = frame.capture(source, lexical);
                 arguments[target] = arg;
             }
             newFrame = frame.newFrame(this, arguments, 0);

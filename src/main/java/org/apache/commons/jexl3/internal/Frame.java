@@ -78,9 +78,10 @@ public class Frame {
     /**
      * Captures a value.
      * @param s the offset in this frame
+     * @param lexical true if this captured symbol is redefined locally
      * @return the stacked value
      */
-    Object capture(final int s) {
+    Object capture(final int s, final boolean lexical) {
         return stack[s];
     }
 
@@ -163,15 +164,17 @@ class ReferenceFrame extends Frame {
     }
 
     @Override
-    CaptureReference capture(final int s) {
+    Object capture(final int s, final boolean lexical) {
         final Object o = stack[s];
         if (o instanceof CaptureReference) {
-            return (CaptureReference) o;
+            final CaptureReference ref = (CaptureReference) o;
+            // if the captured symbol is lexical, it is redefined locally; a new reference is needed to share it with callees
+            // otherwise share the reference
+            return lexical ? (stack[s] = new CaptureReference(ref.get())) : ref;
+        } else {
+            // capture the register, wrap the value in a reference to share it with callees
+            return stack[s] = new CaptureReference(o);
         }
-        // change the type of the captured register, wrap the value in a reference
-        final CaptureReference captured = new CaptureReference(o);
-        stack[s] = captured;
-        return captured;
     }
 
     @Override
