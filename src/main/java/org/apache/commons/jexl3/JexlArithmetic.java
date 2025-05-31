@@ -2098,10 +2098,10 @@ public class JexlArithmetic {
             return BigInteger.valueOf(((Number) val).longValue());
         }
         if (val instanceof Boolean) {
-            return BigInteger.valueOf((boolean) val ? 1L : 0L);
+            return (boolean) val ? BigInteger.ONE : BigInteger.ZERO;
         }
         if (val instanceof AtomicBoolean) {
-            return BigInteger.valueOf(((AtomicBoolean) val).get() ? 1L : 0L);
+            return ((AtomicBoolean) val).get() ? BigInteger.ONE : BigInteger.ZERO;
         }
         if (val instanceof String) {
             return parseBigInteger((String) val);
