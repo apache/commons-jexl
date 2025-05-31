@@ -20,7 +20,7 @@ import java.util.BitSet;
 
 /**
  * The set of symbols declared in a lexical scope.
- * <p>The symbol identifiers are determined by the functional scope.</p>
+ * <p>The functional scope determines the symbol identifiers.</p>
  * <p>We use 2 bits per symbol s; bit (s*2)+0 sets the actual symbol as lexical (let), bit (s*2)+1 as a const.
  * There are actually only 2 used states: 1 and 3</p>
  */

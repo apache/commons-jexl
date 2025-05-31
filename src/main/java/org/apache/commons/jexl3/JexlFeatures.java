@@ -362,7 +362,7 @@ public final class JexlFeatures {
 
     /**
      * Sets whether lambda captured-variables are references or values.
-     * <p>When variables are pass-by-reference, side-effects are visible from inner lexical scopes
+     * <p>When variables are pass-by-reference, side effects are visible from inner lexical scopes
      * to outer-scope.</p>
      * <p>
      * When disabled, lambda-captured variables use pass-by-value semantic,
