@@ -575,42 +575,42 @@ public class SideEffectTest extends JexlTestCase {
         assertEquals(foo[0], (long)(i41 ^ 2));
     }
 
-   @Test
-public void testSideEffectArray() throws Exception {
-    final Integer i41 = Integer.valueOf(4141);
-    final Integer i42 = Integer.valueOf(42);
-    final Integer i43 = Integer.valueOf(43);
-    final String s42 = "fourty-two";
-    final String s43 = "fourty-three";
-    final Object[] foo = new Object[3];
-    foo[1] = i42;
-    foo[2] = i43;
-    asserter.setVariable("foo", foo);
-    foo[0] = i41;
-    asserter.assertExpression("foo[0] += 2", i41 + 2);
-    assertEquals(foo[0], i41 + 2);
-    foo[0] = i41;
-    asserter.assertExpression("foo[0] -= 2", i41 - 2);
-    assertEquals(foo[0], i41 - 2);
-    foo[0] = i41;
-    asserter.assertExpression("foo[0] *= 2", i41 * 2);
-    assertEquals(foo[0], i41 * 2);
-    foo[0] = i41;
-    asserter.assertExpression("foo[0] /= 2", i41 / 2);
-    assertEquals(foo[0], i41 / 2);
-    foo[0] = i41;
-    asserter.assertExpression("foo[0] %= 2", i41 % 2);
-    assertEquals(foo[0], i41 % 2);
-    foo[0] = i41;
-    asserter.assertExpression("foo[0] &= 3", (long) (i41 & 3));
-    assertEquals(foo[0], (long)(i41 & 3));
-    foo[0] = i41;
-    asserter.assertExpression("foo[0] |= 2", (long)(i41 | 2));
-    assertEquals(foo[0], (long)(i41 | 2));
-    foo[0] = i41;
-    asserter.assertExpression("foo[0] ^= 2", (long)(i41 ^ 2));
-    assertEquals(foo[0], (long)(i41 ^ 2));
-}
+    @Test
+    public void testSideEffectArray() throws Exception {
+        final Integer i41 = Integer.valueOf(4141);
+        final Integer i42 = Integer.valueOf(42);
+        final Integer i43 = Integer.valueOf(43);
+        final String s42 = "fourty-two";
+        final String s43 = "fourty-three";
+        final Object[] foo = new Object[3];
+        foo[1] = i42;
+        foo[2] = i43;
+        asserter.setVariable("foo", foo);
+        foo[0] = i41;
+        asserter.assertExpression("foo[0] += 2", i41 + 2);
+        assertEquals(foo[0], i41 + 2);
+        foo[0] = i41;
+        asserter.assertExpression("foo[0] -= 2", i41 - 2);
+        assertEquals(foo[0], i41 - 2);
+        foo[0] = i41;
+        asserter.assertExpression("foo[0] *= 2", i41 * 2);
+        assertEquals(foo[0], i41 * 2);
+        foo[0] = i41;
+        asserter.assertExpression("foo[0] /= 2", i41 / 2);
+        assertEquals(foo[0], i41 / 2);
+        foo[0] = i41;
+        asserter.assertExpression("foo[0] %= 2", i41 % 2);
+        assertEquals(foo[0], i41 % 2);
+        foo[0] = i41;
+        asserter.assertExpression("foo[0] &= 3", (long) (i41 & 3));
+        assertEquals(foo[0], (long) (i41 & 3));
+        foo[0] = i41;
+        asserter.assertExpression("foo[0] |= 2", (long) (i41 | 2));
+        assertEquals(foo[0], (long) (i41 | 2));
+        foo[0] = i41;
+        asserter.assertExpression("foo[0] ^= 2", (long) (i41 ^ 2));
+        assertEquals(foo[0], (long) (i41 ^ 2));
+    }
 
     @Test
     public void testSideEffectBean() throws Exception {
