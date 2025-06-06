@@ -21,9 +21,11 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayDeque;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Deque;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
@@ -222,8 +224,124 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
     protected final Map<LexicalUnit, Scope> blockScopes = new IdentityHashMap<>();
 
     /**
+     * The name of the null case constant.
+     */
+    public static final Object NIL = new Object() {
+        @Override public String toString() {
+        return "null";
+    }};
+    /**
+     * The name of the default case constant.
+     */
+    public static final Object DFLT = new Object() {
+    @Override public String toString() {
+        return "default";
+    }};
+    /**
+     * The name of the default NaN constant.
+     */
+    public static final Object NAN = new Object() {
+    @Override public String toString() {
+        return "NaN";
+    }};
+
+    /**
+     * Encode a value to a switch predicate.
+     * @param value the value
+     * @return the encoded value, which is either the value itself, or NAN (for NaN) or NIL (for null)
+     */
+    static Object switchCode(Object value) {
+        if (value == null) {
+            return NIL;
+        }
+        if (value instanceof Double && ((Double) value).isNaN()) {
+            return NAN;
+        }
+        return value;
+    }
+
+    /**
+     * Decodes a value of a switch predicate.
+     * @param value an encoded value, which is either a value or NAN (for NaN) or NIL (for null)
+     * @return the decoded value
+     */
+    static Object switchDecode(Object value) {
+        if (value == NIL) {
+            return null;
+        }
+        if (value == NAN) {
+            return Double.NaN;
+        }
+        return value;
+    }
+
+    /**
+     * Constructs a set of constants amenable to switch expression.
+     */
+    protected SwitchSet switchSet() {
+        return new SwitchSet();
+    }
+    protected class SwitchSet implements Iterable<Object> {
+        private final Set<Object> values = new LinkedHashSet<>();
+        /**
+         * Adds a collection of values to the set.
+         * @param values the values to add
+         */
+        void addAll(Collection<Object> values) {
+            for (Object value : values) {
+                add(value);
+            }
+        }
+
+        /**
+         * Adds a value to the set.
+         * @param value the value to add
+         */
+        void add(Object value) {
+            Object code = switchCode(value);
+            if (!values.add(code)) {
+                throw new JexlException.Parsing(info, "duplicate constant value: " + value);
+            }
+        }
+
+        void clear() {
+            values.clear();
+        }
+
+        boolean isEmpty() {
+            return values.isEmpty();
+        }
+
+        int size() {
+            return values.size();
+        }
+
+        @Override
+        public Iterator<Object> iterator() {
+            return new Iterator<Object>() {
+                private final Iterator<Object> iter = values.iterator();
+
+                @Override
+                public boolean hasNext() {
+                    return iter.hasNext();
+                }
+
+                @Override
+                public Object next() {
+                    return switchDecode(iter.next());
+                }
+
+                @Override
+                public void remove() {
+                    iter.remove();
+                }
+            };
+        }
+    }
+
+    /**
      * Internal, for debug purpose only.
-     * @param registers whether register syntax is recognized by this parser
+     * @param registers sets whether this parser recognizes the register syntax
      */
     public void allowRegisters(final boolean registers) {
         featureController.setFeatures(new JexlFeatures(featureController.getFeatures()).register(registers));

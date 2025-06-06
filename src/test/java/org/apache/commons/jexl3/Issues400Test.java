@@ -271,7 +271,7 @@ public class Issues400Test {
         Number result = (Number) script.execute(null, 99.0d, 7.82d);
         assertEquals(0d, result.doubleValue(), 8.e-15);
         // using BigdDecimal, more precise, still not zero
-        result = (Number) script.execute(null, new BigDecimal(99.0d), new BigDecimal(7.82d));
+        result = (Number) script.execute(null, new BigDecimal("99.0"), new BigDecimal("7.82"));
         assertEquals(0d, result.doubleValue(), 3.e-32);
     }
 
@@ -561,7 +561,6 @@ public class Issues400Test {
         assertNotNull(script);
         final Object result = script.execute(null);
         assertNull(result);
-
     }
 
     public static class Arithmetic435 extends JexlArithmetic {
@@ -726,5 +725,28 @@ public class Issues400Test {
         Assertions.assertTrue((boolean) sqle.createScript("a != 25", "a").execute(null, 24));
         Assertions.assertTrue((boolean) sqle.createScript("a = 25", "a").execute(null, 25));
         Assertions.assertFalse((boolean) sqle.createScript("a != 25", "a").execute(null, 25));
+    }
+
+    @Test
+    void test440a() {
+        JexlFeatures f = JexlFeatures.createDefault();
+        f.setAmbiguousStatement(true);
+        JexlEngine jexl = new JexlBuilder().features(f).safe(false).strict(true).create();
+        final String src =
+"let y = switch (x) { case 10,11 -> 3 case 20, 21 -> 4\ndefault -> { let z = 4; z + 6 } } y";
+        final JexlScript script = jexl.createScript(src, "x");
+        assertNotNull(script);
+        String dbgStr = script.getParsedText();
+        assertNotNull(dbgStr);
+    }
+    @Test
+    void test440b() {
+        JexlEngine jexl = new JexlBuilder().safe(false).strict(true).create();
+        final String src =
+"switch (x) { case 10 : 3; case 20 : case 21 : 4; default : return 5; } ";
+        final JexlScript script = jexl.createScript(src, "x");
+        assertNotNull(script);
+        String dbgStr = script.getParsedText();
+        assertNotNull(dbgStr);
     }
 }
