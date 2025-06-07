@@ -22,10 +22,6 @@ public class ASTSwitchExpression extends ASTSwitchStatement {
     super(id);
   }
 
-  public ASTSwitchExpression(Parser p, int id) {
-    super(p, id);
-  }
-
   @Override
   public Object jjtAccept(ParserVisitor visitor, Object data) {
     return visitor.visit(this, data);
