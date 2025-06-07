@@ -75,7 +75,7 @@ public class ArrayTest {
      * @throws Exception
      */
     @Test
-    public void testExample() throws Exception {
+    void testExample() throws Exception {
         example(AbstractOutput.JUNIT);
     }
 }

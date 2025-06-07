@@ -257,7 +257,7 @@ public class VarTest extends JexlTestCase {
     }
 
     @Test
-    public void testLiteral() throws Exception {
+    void testLiteral() throws Exception {
         JexlBuilder builder = new JexlBuilder().collectMode(2);
         assertEquals(2, builder.collectMode());
         assertTrue(builder.collectAll());
@@ -306,21 +306,21 @@ public class VarTest extends JexlTestCase {
     }
 
     @Test
-    public void testLocalBasic() throws Exception {
+    void testLocalBasic() throws Exception {
         final JexlScript e = JEXL.createScript("var x; x = 42");
         final Object o = e.execute(null);
         assertEquals(Integer.valueOf(42), o);
     }
 
     @Test
-    public void testLocalFor() throws Exception {
+    void testLocalFor() throws Exception {
         final JexlScript e = JEXL.createScript("var y  = 0; for(var x : [5, 17, 20]) { y = y + x; } y;");
         final Object o = e.execute(null);
         assertEquals(Integer.valueOf(42), o);
     }
 
     @Test
-    public void testLocalForFunc() throws Exception {
+    void testLocalForFunc() throws Exception {
         final JexlContext jc = new NumbersContext();
         final JexlScript e = JEXL.createScript("var y  = 0; for(var x : numbers()) { y = y + x; } y;");
         final Object o = e.execute(jc);
@@ -328,7 +328,7 @@ public class VarTest extends JexlTestCase {
     }
 
     @Test
-    public void testLocalForFuncReturn() throws Exception {
+    void testLocalForFuncReturn() throws Exception {
         final JexlContext jc = new NumbersContext();
         final JexlScript e = JEXL.createScript("var y  = 42; for(var x : numbers()) { if (x > 10) return x } y;");
         final Object o = e.execute(jc);
@@ -338,14 +338,14 @@ public class VarTest extends JexlTestCase {
     }
 
     @Test
-    public void testLocalSimple() throws Exception {
+    void testLocalSimple() throws Exception {
         final JexlScript e = JEXL.createScript("var x = 21; x + x");
         final Object o = e.execute(null);
         assertEquals(Integer.valueOf(42), o);
     }
 
     @Test
-    public void testMix() throws Exception {
+    void testMix() throws Exception {
         JexlScript e;
         // x is a parameter, y a context variable, z a local variable
         e = JEXL.createScript("if (x) { y } else { var z = 2 * x}", "x");
@@ -361,7 +361,7 @@ public class VarTest extends JexlTestCase {
     }
 
     @Test
-    public void testObjectContext() throws Exception {
+    void testObjectContext() throws Exception {
         final TheVarContext vars = new TheVarContext();
         final JexlContext jc = new ObjectContext<>(JEXL, vars);
         try {
@@ -390,7 +390,7 @@ public class VarTest extends JexlTestCase {
     }
 
     @Test
-    public void testReferenceLiteral() throws Exception {
+    void testReferenceLiteral() throws Exception {
         final JexlEngine jexld = new JexlBuilder().collectMode(2).create();
         JexlScript script;
         List<String> result;
@@ -428,7 +428,7 @@ public class VarTest extends JexlTestCase {
     }
 
     @Test
-    public void testRefs() throws Exception {
+    void testRefs() throws Exception {
         JexlScript e;
         Set<List<String>> vars;
         Set<List<String>> expect;
@@ -545,7 +545,7 @@ public class VarTest extends JexlTestCase {
     }
 
     @Test
-    public void testStrict() throws Exception {
+    void testStrict() throws Exception {
         final JexlEvalContext env = new JexlEvalContext();
         final JexlOptions options = env.getEngineOptions();
         final JexlContext ctxt = new ReadonlyContext(env, options);
@@ -565,7 +565,7 @@ public class VarTest extends JexlTestCase {
     }
 
     @Test
-    public void testSyntacticVariations() throws Exception {
+    void testSyntacticVariations() throws Exception {
         final JexlScript script = JEXL.createScript("sum(TOTAL) - partial.sum() + partial['sub'].avg() - sum(partial.sub)");
         final Set<List<String>> vars = script.getVariables();
 
@@ -573,7 +573,7 @@ public class VarTest extends JexlTestCase {
     }
 
     @Test
-    public void testVarCollectNotAll() throws Exception {
+    void testVarCollectNotAll() throws Exception {
         JexlScript e;
         Set<List<String>> vars;
         Set<List<String>> expect;

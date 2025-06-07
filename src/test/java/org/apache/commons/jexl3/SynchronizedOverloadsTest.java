@@ -43,7 +43,7 @@ public class SynchronizedOverloadsTest extends JexlTestCase {
     }
 
     @Test
-    public void testSynchronized() throws Exception {
+    void testSynchronized() throws Exception {
         final Map<String, Object> ns = new TreeMap<>();
         final JexlContext jc = new SynchronizedContext(new MapContext());
         final JexlEngine jexl = new JexlBuilder().namespaces(ns).create();
@@ -53,7 +53,7 @@ public class SynchronizedOverloadsTest extends JexlTestCase {
     }
 
     @Test
-    public void testSynchronizer() throws Exception {
+    void testSynchronizer() throws Exception {
         final Map<String, Object> ns = new TreeMap<>();
         ns.put("synchronized", SynchronizedContext.class);
         final JexlContext jc = new MapContext();
@@ -64,7 +64,7 @@ public class SynchronizedOverloadsTest extends JexlTestCase {
     }
 
     @Test
-    public void testUnsafeMonitor() throws Exception {
+    void testUnsafeMonitor() throws Exception {
         final SynchronizedArithmetic.AbstractMonitor abstractMonitor = new SynchronizedArithmetic.SafeMonitor();
         final Map<String, Object> foo = new TreeMap<>();
         foo.put("one", 1);

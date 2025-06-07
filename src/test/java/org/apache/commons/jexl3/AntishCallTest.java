@@ -146,7 +146,7 @@ public class AntishCallTest extends JexlTestCase {
     }
 
     @Test
-    public void testAntishArithmetic() throws Exception {
+    void testAntishArithmetic() throws Exception {
         final CallSupportArithmetic ja = new CallSupportArithmetic(true);
         final JexlEngine jexl = new JexlBuilder().cache(512).arithmetic(ja).create();
         final Map<String, Object> lmap = new TreeMap<>();
@@ -160,7 +160,7 @@ public class AntishCallTest extends JexlTestCase {
     }
 
     @Test
-    public void testAntishContextVar() throws Exception {
+    void testAntishContextVar() throws Exception {
         final Map<String,Object> lmap = new TreeMap<>();
         final JexlContext jc = new CallSupportContext(lmap).engine(JEXL);
         runTestCall(JEXL, jc);
@@ -172,7 +172,7 @@ public class AntishCallTest extends JexlTestCase {
 
     // JEXL-300
     @Test
-    public void testSafeAnt() throws Exception {
+    void testSafeAnt() throws Exception {
         final JexlEvalContext ctxt = new JexlEvalContext();
         final JexlOptions options = ctxt.getEngineOptions();
         ctxt.set("x.y.z", 42);

@@ -280,7 +280,7 @@ public class Issues300Test {
     }
 
     @Test
-    public void test301a() {
+    void test301a() {
         final JexlEngine jexl = new JexlBuilder().safe(false).arithmetic(new JexlArithmetic(false)).create();
         final String[] srcs = { "var x = null; x.0", "var x = null; x[0]", "var x = [null,1]; x[0][0]" };
         for (int i = 0; i < srcs.length; ++i) {
@@ -298,7 +298,7 @@ public class Issues300Test {
     }
 
     @Test
-    public void test302() {
+    void test302() {
         final JexlContext jc = new MapContext();
         // @formatter:off
         final String[] strs = {
@@ -318,7 +318,7 @@ public class Issues300Test {
     }
 
     @Test
-    public void test304() {
+    void test304() {
         final JexlEngine jexlEngine = new JexlBuilder().strict(false).create();
         JexlExpression e304 = jexlEngine.createExpression("overview.limit.var");
 
@@ -369,7 +369,7 @@ public class Issues300Test {
     }
 
     @Test
-    public void test305() {
+    void test305() {
         final JexlEngine jexl = new JexlBuilder().create();
         JexlScript e;
         e = jexl.createScript("{while(false) {}; var x = 1;}");
@@ -381,7 +381,7 @@ public class Issues300Test {
     }
 
     @Test
-    public void test306() {
+    void test306() {
         final JexlContext ctxt = new MapContext();
         final JexlEngine jexl = new JexlBuilder().create();
         final JexlScript e = jexl.createScript("x.y ?: 2");
@@ -393,7 +393,7 @@ public class Issues300Test {
     }
 
     @Test
-    public void test306a() {
+    void test306a() {
         final JexlEngine jexl = new JexlBuilder().create();
         final JexlScript e = jexl.createScript("x.y ?: 2", "x");
         Object o = e.execute(null, new Object());
@@ -403,7 +403,7 @@ public class Issues300Test {
     }
 
     @Test
-    public void test306b() {
+    void test306b() {
         final JexlEngine jexl = new JexlBuilder().create();
         final JexlScript e = jexl.createScript("x?.y ?: 2", "x");
         final Object o1 = e.execute(null, new Object());
@@ -413,7 +413,7 @@ public class Issues300Test {
     }
 
     @Test
-    public void test306c() {
+    void test306c() {
         final JexlEngine jexl = new JexlBuilder().safe(true).create();
         final JexlScript e = jexl.createScript("x.y ?: 2", "x");
         Object o = e.execute(null, new Object());
@@ -423,7 +423,7 @@ public class Issues300Test {
     }
 
     @Test
-    public void test306d() {
+    void test306d() {
         final JexlEngine jexl = new JexlBuilder().safe(true).create();
         final JexlScript e = jexl.createScript("x.y[z.t] ?: 2", "x");
         Object o = e.execute(null, new Object());
@@ -433,7 +433,7 @@ public class Issues300Test {
     }
 
     @Test
-    public void test309a() {
+    void test309a() {
         // @formatter:off
         final String src = "<html lang=\"en\">\n"
                 + "  <body>\n"
@@ -450,7 +450,7 @@ public class Issues300Test {
     }
 
     @Test
-    public void test309b() {
+    void test309b() {
         // @formatter:off
         final String src = "<html lang=\"en\">\n"
                 + "  <body>\n"
@@ -467,7 +467,7 @@ public class Issues300Test {
     }
 
     @Test
-    public void test309c() {
+    void test309c() {
         // @formatter:off
         final String src = "<html lang=\"en\">\n"
                 + "  <body>\n"
@@ -486,7 +486,7 @@ public class Issues300Test {
     }
 
     @Test
-    public void test314() {
+    void test314() {
         final JexlEngine jexl = new JexlBuilder().strict(true).safe(false).create();
         final Map<String, Object> vars = new HashMap<>();
         final JexlContext ctxt = new VaContext(vars);
@@ -527,7 +527,7 @@ public class Issues300Test {
     }
 
     @Test
-    public void test315() {
+    void test315() {
         final JexlEngine jexl = new JexlBuilder().strict(true).create();
         final Map<String, Object> vars = new HashMap<>();
         final JexlContext ctxt = new VaContext(vars);
@@ -558,7 +558,7 @@ public class Issues300Test {
     }
 
     @Test
-    public void test317() {
+    void test317() {
         final JexlEngine jexl = new JexlBuilder().strict(true).create();
         final JexlContext ctxt = new MapContext();
         JexlScript script;
@@ -580,7 +580,7 @@ public class Issues300Test {
     }
 
     @Test
-    public void test322a() {
+    void test322a() {
         final JexlEngine jexl = new JexlBuilder().strict(true).create();
         final JxltEngine jxlt = jexl.createJxltEngine();
         final JexlContext context = new MapContext();
@@ -602,7 +602,7 @@ public class Issues300Test {
     }
 
     @Test
-    public void test322b() {
+    void test322b() {
         final JexlContext ctxt = new MapContext();
         final String src = "L'utilisateur ${session.user.name} s'est connecte";
         final JexlEngine jexl = new JexlBuilder().strict(true).create();
@@ -632,7 +632,7 @@ public class Issues300Test {
     }
 
     @Test
-    public void test323() {
+    void test323() {
         final JexlEngine jexl = new JexlBuilder().safe(false).create();
         final Map<String, Object> vars = new HashMap<>();
         final JexlContext jc = new MapContext(vars);
@@ -676,7 +676,7 @@ public class Issues300Test {
     }
 
     @Test
-    public void test324() {
+    void test324() {
         final JexlEngine jexl = new JexlBuilder().create();
         final String src42 = "new('java.lang.Integer', 42)";
         final JexlExpression expr0 = jexl.createExpression(src42);
@@ -688,7 +688,7 @@ public class Issues300Test {
     }
 
     @Test
-    public void test325() {
+    void test325() {
         final JexlEngine jexl = new JexlBuilder().safe(false).create();
         final Map<String, Object> map = new HashMap<String, Object>() {
             private static final long serialVersionUID = 1L;
@@ -719,7 +719,7 @@ public class Issues300Test {
     }
 
     @Test
-    public void test330() {
+    void test330() {
         final JexlEngine jexl = new JexlBuilder().create();
         // Extended form of: 'literal' + VARIABLE 'literal'
         // missing + operator here ---------------^
@@ -738,7 +738,7 @@ public class Issues300Test {
     }
 
     @Test
-    public void test331() {
+    void test331() {
         final JexlEngine jexl = new JexlBuilder().create();
         final JexlContext ctxt = new MapContext();
         JexlScript script;
@@ -749,7 +749,7 @@ public class Issues300Test {
     }
 
     @Test
-    public void test347() {
+    void test347() {
         final String src = "A.B == 5";
         JexlEngine jexl = new JexlBuilder().safe(true).create();
         final JexlScript script = jexl.createScript(src);
@@ -772,7 +772,7 @@ public class Issues300Test {
     }
 
     @Test
-    public void test349() {
+    void test349() {
         final String text = "(A ? C.D : E)";
         final JexlEngine jexl = new JexlBuilder().safe(true).create();
         final JexlExpression expr = jexl.createExpression(text);
@@ -780,59 +780,59 @@ public class Issues300Test {
     }
 
     @Test
-    public void test361_33() {
+    void test361_33() {
         final JexlEngine jexl = new JexlBuilder().safe(false).strict(true).create();
         assertThrows(JexlException.class, () -> run361c(jexl), "null arg should fail");
     }
 
     @Test
-    public void test361a_32() {
+    void test361a_32() {
         final JexlEngine jexl = new Engine32(new JexlBuilder().safe(false));
         final Object result = run361a(jexl);
         assertNotNull(result);
     }
 
     @Test
-    public void test361a_33() {
+    void test361a_33() {
         final JexlEngine jexl = new JexlBuilder().safe(false).strict(true).create();
         assertThrows(JexlException.class, () -> run361a(jexl), "null arg should fail");
     }
 
     @Test
-    public void test361b_32() {
+    void test361b_32() {
         final JexlEngine jexl = new Engine32(new JexlBuilder().safe(false).strict(false));
         final Object result = run361b(jexl);
         assertNotNull(result);
     }
 
     @Test
-    public void test361b_33() {
+    void test361b_33() {
         final JexlEngine jexl = new JexlBuilder().safe(false).strict(true).create();
         assertThrows(JexlException.class, () -> run361b(jexl), "null arg should fail");
     }
 
     @Test
-    public void test361c_32() {
+    void test361c_32() {
         final JexlEngine jexl = new Engine32(new JexlBuilder().safe(false).strict(false));
         final String result = run361c(jexl);
         assertNotNull(result);
     }
 
     @Test
-    public void test361d_32() {
+    void test361d_32() {
         final JexlEngine jexl = new Engine32(new JexlBuilder().lexical(false).lexicalShade(false).safe(false));
         final Object result = run361d(jexl);
         assertNotNull(result);
     }
 
     @Test
-    public void test361d_33() {
+    void test361d_33() {
         final JexlEngine jexl = new JexlBuilder().lexical(true).lexicalShade(true).safe(false).strict(true).create();
         assertThrows(JexlException.class, () -> run361d(jexl), "null arg should fail");
     }
 
     @Test
-    public void test367() {
+    void test367() {
         final String text = "var toto; function foo(x) { x }; var tata = 3; foo(3)";
         final JexlEngine jexl = new JexlBuilder().safe(true).create();
         final JexlScript script = jexl.createScript(text);
@@ -844,7 +844,7 @@ public class Issues300Test {
     }
 
     @Test
-    public void test370() {
+    void test370() {
         final Var370 var370 = new Var370();
         final JexlEngine jexl = new JexlBuilder().safe(true).create();
         final ObjectContext<Var370> ctxt = new ObjectContext<>(jexl, var370);
@@ -865,7 +865,7 @@ public class Issues300Test {
     }
 
     @Test
-    public void test373b() {
+    void test373b() {
         final String src = "var i = ++1";
         final JexlEngine jexl = new JexlBuilder().safe(true).create();
         final JexlInfo info = new JexlInfo("badscript", 0, 0);
@@ -874,7 +874,7 @@ public class Issues300Test {
     }
 
     @Test
-    public void test374() {
+    void test374() {
         final JexlEngine engine = new JexlBuilder().cache(512).strict(true).silent(false).antish(false).safe(false).create();
         // Create expression to evaluate 'name'
         final JexlExpression expr = engine.createExpression("nested.name");
@@ -887,7 +887,7 @@ public class Issues300Test {
     }
 
     @Test
-    public void test375() {
+    void test375() {
         final JexlSandbox jexlSandbox = new JexlSandbox(false);
         jexlSandbox.allow(Type375.class.getName());
         final JexlEngine engine = new JexlBuilder().sandbox(jexlSandbox).create();
@@ -903,7 +903,7 @@ public class Issues300Test {
     }
 
     @Test
-    public void test377() {
+    void test377() {
         final String text = "function add(x, y) { x + y } add(a, b)";
         final JexlEngine jexl = new JexlBuilder().safe(true).create();
         final JexlScript script = jexl.createScript(text, "a", "b");
@@ -912,7 +912,7 @@ public class Issues300Test {
     }
 
     @Test
-    public void test379a() {
+    void test379a() {
         // @formatter:off
         final String src =
                 "#pragma jexl.import java.util\n"+
@@ -928,7 +928,7 @@ public class Issues300Test {
     }
 
     @Test
-    public void test383() {
+    void test383() {
         final JexlEngine jexl = new JexlBuilder().safe(false).arithmetic(new Arithmetic383(true)).create();
         final String src0 = "if (a) 1; else 2;";
         final String src1 = "if (!a) 1; else 2;";
@@ -953,7 +953,7 @@ public class Issues300Test {
     }
 
     @Test
-    public void test384a() {
+    void test384a() {
         final JexlEngine jexl = new JexlBuilder().safe(false).strict(true).create();
         // constant
         for (final String src0 : Arrays.asList("'ABC' + null", "null + 'ABC'")) {
@@ -982,7 +982,7 @@ public class Issues300Test {
     }
 
     @Test
-    public void test384b() {
+    void test384b() {
         // be explicit about + handling null
         // @formatter:off
         final JexlEngine jexl = new JexlBuilder()
@@ -1015,7 +1015,7 @@ public class Issues300Test {
     }
 
     @Test
-    public void test384c() {
+    void test384c() {
         final Arithmetic384c ja = new Arithmetic384c(true);
         // @formatter:off
         final JexlEngine jexl = new JexlBuilder()
@@ -1034,7 +1034,7 @@ public class Issues300Test {
     }
 
     @Test
-    public void test384d() {
+    void test384d() {
         final Arithmetic384c ja = new Arithmetic384d(true);
         // @formatter:off
         final JexlEngine jexl = new JexlBuilder()
@@ -1053,7 +1053,7 @@ public class Issues300Test {
     }
 
     @Test
-    public void test390() throws Exception {
+    void test390() throws Exception {
         // @formatter:off
         final JexlEngine jexl = new JexlBuilder()
                 .safe(false)
@@ -1073,7 +1073,7 @@ public class Issues300Test {
     }
 
     @Test
-    public void test393() {
+    void test393() {
         // @formatter:off
         final String src = "const total = 0;\n" +
                 "if (true) {\n" +
@@ -1090,7 +1090,7 @@ public class Issues300Test {
     }
 
     @Test
-    public void testBackslashes() throws Exception {
+    void testBackslashes() throws Exception {
         final JexlEngine jexl = new JexlBuilder().safe(false).create();
         final String src = "\"\b\t\f\"";
         JexlScript s = jexl.createScript(src);
@@ -1107,7 +1107,7 @@ public class Issues300Test {
     }
 
     @Test
-    public void testDow() {
+    void testDow() {
         // @formatter:off
         final String src = "(y, m, d)->{\n" +
                 "// will return 0 for Sunday, 6 for Saturday\n" +
@@ -1129,7 +1129,7 @@ public class Issues300Test {
     }
 
     @Test
-    public void testIssue394() {
+    void testIssue394() {
         final StringBuilder x = new StringBuilder("foobar");
         assertEquals("foobar", x.toString());
         final String src = "x -> x.setLength(3)";
@@ -1140,7 +1140,7 @@ public class Issues300Test {
     }
 
     @Test
-    public void testIssue397() {
+    void testIssue397() {
         String result;
         final String control = Class397.class.getName();
         final JexlEngine jexl = new JexlBuilder().permissions(RESTRICTED).create();
@@ -1161,7 +1161,7 @@ public class Issues300Test {
     }
 
     @Test
-    public void testIssue398a() {
+    void testIssue398a() {
         // @formatter:off
         final String src = "let m = {\n" +
             "  \"foo\": 1,\n" +
@@ -1177,7 +1177,7 @@ public class Issues300Test {
     }
 
     @Test
-    public void testIssue398b() {
+    void testIssue398b() {
         final Map<String, Object> foo = Collections.singletonMap("X", "x");
         final Map<String, Object> bar = Collections.singletonMap("Y", "y");
         final JexlContext ctxt = new MapContext();
@@ -1208,7 +1208,7 @@ public class Issues300Test {
     }
 
     @Test
-    public void testIssue398c() {
+    void testIssue398c() {
         final JexlEngine jexl = new JexlBuilder().create();
         final Object empty = jexl.createScript("[,...]").execute(null);
         assertNotNull(empty);
@@ -1221,7 +1221,7 @@ public class Issues300Test {
     }
 
     @Test
-    public void testPropagateOptions() {
+    void testPropagateOptions() {
         // @formatter:off
         final String src0 = "`${$options.strict?'+':'-'}strict"
                 + " ${$options.cancellable?'+':'-'}cancellable"
@@ -1259,7 +1259,7 @@ public class Issues300Test {
     }
 
     @Test
-    public void tests301b() {
+    void tests301b() {
         final JexlEngine jexl = new JexlBuilder().safe(false).arithmetic(new JexlArithmetic(false)).create();
         final Object[] xs = { null, null, new Object[] { null, 1 } };
         final String[] srcs = { "x.0", "x[0]", "x[0][0]" };
@@ -1273,7 +1273,7 @@ public class Issues300Test {
     }
 
     @Test
-    public void testSO20220930() {
+    void testSO20220930() {
         // fill some drivers in a list
         final List<Driver0930> values = new ArrayList<>();
         for (int i = 0; i < 8; ++i) {
@@ -1306,7 +1306,7 @@ public class Issues300Test {
     }
 
     @Test
-    public void testUnsolvableMethod() throws Exception {
+    void testUnsolvableMethod() throws Exception {
         final JexlEngine jexl = new JexlBuilder().create();
         // @formatter:off
         final JexlScript script = jexl.createScript(

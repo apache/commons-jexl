@@ -38,7 +38,7 @@ public class IfTest extends JexlTestCase {
      * @throws Exception on any error
      */
     @Test
-    public void testBlockElse() throws Exception {
+    void testBlockElse() throws Exception {
         final JexlScript e = JEXL.createScript("if (false) {1} else {2 ; 3}");
         final JexlContext jc = new MapContext();
 
@@ -52,7 +52,7 @@ public class IfTest extends JexlTestCase {
      * @throws Exception on any error
      */
     @Test
-    public void testBlockIfTrue() throws Exception {
+    void testBlockIfTrue() throws Exception {
         final JexlScript e = JEXL.createScript("if (true) { 'hello'; }");
         final JexlContext jc = new MapContext();
 
@@ -61,7 +61,7 @@ public class IfTest extends JexlTestCase {
     }
 
     @Test
-    public void testIfElseIfExpression() throws Exception {
+    void testIfElseIfExpression() throws Exception {
         final JexlScript e = JEXL.createScript("if (x == 1) { 10; } else if (x == 2) 20  else 30", "x");
         Object o = e.execute(null, 1);
         assertEquals(10, o);
@@ -72,7 +72,7 @@ public class IfTest extends JexlTestCase {
     }
 
     @Test
-    public void testIfElseIfReturnExpression() throws Exception {
+    void testIfElseIfReturnExpression() throws Exception {
         final JexlScript e = JEXL.createScript(
                 "if (x == 1) return 10;  if (x == 2) return 20  else if (x == 3) return 30; else return 40;",
                 "x");
@@ -87,7 +87,7 @@ public class IfTest extends JexlTestCase {
     }
 
     @Test
-    public void testIfElseIfReturnExpression0() throws Exception {
+    void testIfElseIfReturnExpression0() throws Exception {
         final JexlScript e = JEXL.createScript(
                 "if (x == 1) return 10; if (x == 2)  return 20; else if (x == 3) return 30  else { return 40 }",
                 "x");
@@ -107,7 +107,7 @@ public class IfTest extends JexlTestCase {
      * @throws Exception on any error
      */
     @Test
-    public void testIfWithArithmeticExpression() throws Exception {
+    void testIfWithArithmeticExpression() throws Exception {
         final JexlScript e = JEXL.createScript("if ((x * 2) + 1 == 5) true;");
         final JexlContext jc = new MapContext();
         jc.set("x", Integer.valueOf(2));
@@ -122,7 +122,7 @@ public class IfTest extends JexlTestCase {
      * @throws Exception on any error
      */
     @Test
-    public void testIfWithAssignment() throws Exception {
+    void testIfWithAssignment() throws Exception {
         final JexlScript e = JEXL.createScript("if ((x * 2) == 5) {y = 1} else {y = 2;}");
         final JexlContext jc = new MapContext();
         jc.set("x", Float.valueOf(2.5f));
@@ -138,7 +138,7 @@ public class IfTest extends JexlTestCase {
      * @throws Exception on any error
      */
     @Test
-    public void testIfWithDecimalArithmeticExpression() throws Exception {
+    void testIfWithDecimalArithmeticExpression() throws Exception {
         final JexlScript e = JEXL.createScript("if ((x * 2) == 5) true");
         final JexlContext jc = new MapContext();
         jc.set("x", Float.valueOf(2.5f));
@@ -153,7 +153,7 @@ public class IfTest extends JexlTestCase {
      * @throws Exception on any error
      */
     @Test
-    public void testIfWithSimpleExpression() throws Exception {
+    void testIfWithSimpleExpression() throws Exception {
         final JexlScript e = JEXL.createScript("if (x == 1) true;");
         final JexlContext jc = new MapContext();
         jc.set("x", Integer.valueOf(1));
@@ -163,7 +163,7 @@ public class IfTest extends JexlTestCase {
     }
 
     @Test
-    public void testNullCoaelescing() throws Exception {
+    void testNullCoaelescing() throws Exception {
         Object o;
         final JexlEvalContext jc = new JexlEvalContext();
         final JexlExpression xtrue = JEXL.createExpression("x??true");
@@ -182,7 +182,7 @@ public class IfTest extends JexlTestCase {
     }
 
     @Test
-    public void testNullCoaelescingScript() throws Exception {
+    void testNullCoaelescingScript() throws Exception {
         Object o;
         final JexlEvalContext jc = new JexlEvalContext();
         final JexlScript xtrue = JEXL.createScript("x??true");
@@ -206,7 +206,7 @@ public class IfTest extends JexlTestCase {
      * @throws Exception on any error
      */
     @Test
-    public void testSimpleElse() throws Exception {
+    void testSimpleElse() throws Exception {
         final JexlScript e = JEXL.createScript("if (false) 1 else 2;");
         final JexlContext jc = new MapContext();
 
@@ -220,7 +220,7 @@ public class IfTest extends JexlTestCase {
      * @throws Exception on any error
      */
     @Test
-    public void testSimpleIfFalse() throws Exception {
+    void testSimpleIfFalse() throws Exception {
         final JexlScript e = JEXL.createScript("if (false) 1");
         final JexlContext jc = new MapContext();
 
@@ -234,7 +234,7 @@ public class IfTest extends JexlTestCase {
      * @throws Exception on any error
      */
     @Test
-    public void testSimpleIfTrue() throws Exception {
+    void testSimpleIfTrue() throws Exception {
         final JexlScript e = JEXL.createScript("if (true) 1");
         final JexlContext jc = new MapContext();
 
@@ -248,7 +248,7 @@ public class IfTest extends JexlTestCase {
      * @throws Exception
      */
     @Test
-    public void testTernary() throws Exception {
+    void testTernary() throws Exception {
         final JexlEngine jexl = JEXL;
 
         final JexlEvalContext jc = new JexlEvalContext();
@@ -303,7 +303,7 @@ public class IfTest extends JexlTestCase {
     }
 
     @Test
-    public void testTernaryFail() throws Exception {
+    void testTernaryFail() throws Exception {
         final JexlEvalContext jc = new JexlEvalContext();
         final JexlOptions options = jc.getEngineOptions();
         final JexlExpression e = JEXL.createExpression("false ? bar : quux");
@@ -319,7 +319,7 @@ public class IfTest extends JexlTestCase {
      * @throws Exception
      */
     @Test
-    public void testTernaryShorthand() throws Exception {
+    void testTernaryShorthand() throws Exception {
         final JexlEvalContext jc = new JexlEvalContext();
         final JexlOptions options = jc.getEngineOptions();
         final JexlExpression e = JEXL.createExpression("x.y.z = foo?:'quux'");

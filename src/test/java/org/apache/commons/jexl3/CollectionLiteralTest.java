@@ -105,7 +105,7 @@ public class CollectionLiteralTest extends JexlTestCase {
     }
 
     @Test
-    public void testArrayBuilder() {
+    void testArrayBuilder() {
         final Arithmetic363 jc = new Arithmetic363(true);
         final JexlEngine jexl = new JexlBuilder().cache(4).arithmetic(jc).create();
         JexlScript script;
@@ -123,7 +123,7 @@ public class CollectionLiteralTest extends JexlTestCase {
     }
 
     @Test
-    public void testMapLBuilder() {
+    void testMapLBuilder() {
         final Arithmetic363 jc = new Arithmetic363(true);
         final JexlEngine jexl = new JexlBuilder().cache(4).arithmetic(jc).create();
         JexlScript script;
@@ -141,7 +141,7 @@ public class CollectionLiteralTest extends JexlTestCase {
     }
 
     @Test
-    public void testSetBuilder() {
+    void testSetBuilder() {
         final Arithmetic363 jc = new Arithmetic363(true);
         final JexlEngine jexl = new JexlBuilder().cache(4).arithmetic(jc).create();
         JexlScript script;

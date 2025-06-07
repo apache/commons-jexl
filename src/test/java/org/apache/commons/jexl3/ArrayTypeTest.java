@@ -75,7 +75,7 @@ public class ArrayTypeTest {
   public interface InterX extends InterB {}
 
   @Test
-  public void testArrayTypes() {
+  void testArrayTypes() {
     final ArrayBuilder ab = new ArrayBuilder(1);
     // An engine for expressions with args
     final JexlFeatures features = JexlFeatures.createScript().script(false);

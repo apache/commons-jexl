@@ -154,7 +154,7 @@ public class ScriptTest extends JexlTestCase {
     }
 
     @Test
-    public void testArgScriptFromFile() {
+    void testArgScriptFromFile() {
         final File testScript = new File(TEST_ADD);
         final JexlScript s = JEXL.createScript(testScript,"x", "y");
         final JexlContext jc = new MapContext();
@@ -165,7 +165,7 @@ public class ScriptTest extends JexlTestCase {
     }
 
     @Test
-    public void testArgScriptFromURL() throws Exception {
+    void testArgScriptFromURL() throws Exception {
         final URL testUrl = new File(TEST_ADD).toURI().toURL();
         final JexlScript s = JEXL.createScript(testUrl,"x", "y");
         final JexlContext jc = new MapContext();
@@ -176,7 +176,7 @@ public class ScriptTest extends JexlTestCase {
     }
 
     @Test
-    public void testScriptFromFile() {
+    void testScriptFromFile() {
         final File testScript = new File(TEST1);
         final JexlScript s = JEXL.createScript(testScript);
         final JexlContext jc = new MapContext();
@@ -187,7 +187,7 @@ public class ScriptTest extends JexlTestCase {
     }
 
     @Test
-    public void testScriptFromURL() throws Exception {
+    void testScriptFromURL() throws Exception {
         final URL testUrl = new File(TEST1).toURI().toURL();
         final JexlScript s = JEXL.createScript(testUrl);
         final JexlContext jc = new MapContext();
@@ -198,7 +198,7 @@ public class ScriptTest extends JexlTestCase {
     }
 
     @Test
-    public void testScriptJsonFromFileJava() throws IOException {
+    void testScriptJsonFromFileJava() throws IOException {
         HttpServer server = null;
         try {
             final String response = "{  \"id\": 101}";
@@ -219,7 +219,7 @@ public class ScriptTest extends JexlTestCase {
     }
 
     @Test
-    public void testScriptJsonFromFileJexl() throws IOException {
+    void testScriptJsonFromFileJexl() throws IOException {
         HttpServer server = null;
         try {
             final String response = "{  \"id\": 101}";
@@ -242,7 +242,7 @@ public class ScriptTest extends JexlTestCase {
     }
 
     @Test
-    public void testScriptUpdatesContext() {
+    void testScriptUpdatesContext() {
         final String jexlCode = "resultat.setCode('OK')";
         final JexlExpression e = JEXL.createExpression(jexlCode);
         final JexlScript s = JEXL.createScript(jexlCode);
@@ -263,7 +263,7 @@ public class ScriptTest extends JexlTestCase {
      * Test creating a script from a string.
      */
     @Test
-    public void testSimpleScript() {
+    void testSimpleScript() {
         final String code = "while (x < 10) x = x + 1;";
         final JexlScript s = JEXL.createScript(code);
         final JexlContext jc = new MapContext();
@@ -278,7 +278,7 @@ public class ScriptTest extends JexlTestCase {
      * Test creating a script from spaces.
      */
     @Test
-    public void testSpacesScript() {
+    void testSpacesScript() {
         final String code = " ";
         final JexlScript s = JEXL.createScript(code);
         assertNotNull(s);

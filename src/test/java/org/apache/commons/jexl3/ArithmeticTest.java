@@ -765,7 +765,7 @@ public class ArithmeticTest extends JexlTestCase {
 
     // JEXL-24: doubles with exponent
     @Test
-    public void test2DoubleLiterals() {
+    void test2DoubleLiterals() {
         final JexlEvalContext ctxt = new JexlEvalContext();
         final JexlOptions options = ctxt.getEngineOptions();
         options.setStrictArithmetic(true);
@@ -782,7 +782,7 @@ public class ArithmeticTest extends JexlTestCase {
     }
 
     @Test
-    public void testAddWithStringsLenient() {
+    void testAddWithStringsLenient() {
         final JexlEngine jexl = new JexlBuilder().arithmetic(new JexlArithmetic(false)).create();
         JexlScript script;
         Object result;
@@ -820,7 +820,7 @@ public class ArithmeticTest extends JexlTestCase {
     }
 
     @Test
-    public void testAddWithStringsStrict() {
+    void testAddWithStringsStrict() {
         final JexlEngine jexl = new JexlBuilder().arithmetic(new JexlArithmetic(true)).create();
         JexlScript script;
         Object result;
@@ -859,7 +859,7 @@ public class ArithmeticTest extends JexlTestCase {
     }
 
     @Test
-    public void testArithmeticPlus() throws Exception {
+    void testArithmeticPlus() throws Exception {
         final JexlEngine jexl = new JexlBuilder().cache(64).arithmetic(new ArithmeticPlus(false)).create();
         final JexlContext jc = new EmptyTestContext();
         runOverload(jexl, jc);
@@ -867,14 +867,14 @@ public class ArithmeticTest extends JexlTestCase {
     }
 
     @Test
-    public void testArithmeticPlusNoCache() {
+    void testArithmeticPlusNoCache() {
         final JexlEngine jexl = new JexlBuilder().cache(0).arithmetic(new ArithmeticPlus(false)).create();
         final JexlContext jc = new EmptyTestContext();
         runOverload(jexl, jc);
     }
 
     @Test
-    public void testAtomicBoolean() {
+    void testAtomicBoolean() {
         // in a condition
         JexlScript e = JEXL.createScript("if (x) 1 else 2;", "x");
         final JexlArithmetic jexla = JEXL.getArithmetic();
@@ -946,7 +946,7 @@ public class ArithmeticTest extends JexlTestCase {
     }
 
     @Test
-    public void testBigDecimal() throws Exception {
+    void testBigDecimal() throws Exception {
         asserter.setVariable("left", new BigDecimal(2));
         asserter.setVariable("right", new BigDecimal(6));
         asserter.assertExpression("left + right", new BigDecimal(8));
@@ -957,7 +957,7 @@ public class ArithmeticTest extends JexlTestCase {
     }
 
     @Test
-    public void testBigdOp() {
+    void testBigdOp() {
         final BigDecimal sevendot475 = new BigDecimal("7.475");
         final BigDecimal SO = new BigDecimal("325");
         final JexlContext jc = new MapContext();
@@ -971,7 +971,7 @@ public class ArithmeticTest extends JexlTestCase {
 
     // JEXL-24: big decimals with exponent
     @Test
-    public void testBigExponentLiterals() {
+    void testBigExponentLiterals() {
         final JexlEvalContext ctxt = new JexlEvalContext();
         final JexlOptions options = ctxt.getEngineOptions();
         options.setStrictArithmetic(true);
@@ -986,7 +986,7 @@ public class ArithmeticTest extends JexlTestCase {
     }
 
     @Test
-    public void testBigInteger() throws Exception {
+    void testBigInteger() throws Exception {
         asserter.setVariable("left", new BigInteger("2"));
         asserter.setVariable("right", new BigInteger("6"));
         asserter.assertExpression("left + right", new BigInteger("8"));
@@ -998,7 +998,7 @@ public class ArithmeticTest extends JexlTestCase {
 
     // JEXL-24: big integers and big decimals
     @Test
-    public void testBigLiterals() {
+    void testBigLiterals() {
         final JexlEvalContext ctxt = new JexlEvalContext();
         final JexlOptions options = ctxt.getEngineOptions();
         options.setStrictArithmetic(true);
@@ -1012,7 +1012,7 @@ public class ArithmeticTest extends JexlTestCase {
     }
 
     @Test
-    public void testBigLiteralValue() {
+    void testBigLiteralValue() {
         final JexlEvalContext ctxt = new JexlEvalContext();
         final JexlOptions options = ctxt.getEngineOptions();
         options.setStrictArithmetic(true);
@@ -1025,7 +1025,7 @@ public class ArithmeticTest extends JexlTestCase {
      * test some simple mathematical calculations
      */
     @Test
-    public void testCalculations() throws Exception {
+    void testCalculations() throws Exception {
         asserter.setStrict(true, false);
         /*
          * test new null coersion
@@ -1068,7 +1068,7 @@ public class ArithmeticTest extends JexlTestCase {
     }
 
     @Test
-    public void testCoerceBigDecimal() {
+    void testCoerceBigDecimal() {
         final JexlArithmetic ja = JEXL.getArithmetic();
         final JexlEvalContext ctxt = new JexlEvalContext();
         final JexlOptions options = ctxt.getEngineOptions();
@@ -1098,7 +1098,7 @@ public class ArithmeticTest extends JexlTestCase {
     }
 
     @Test
-    public void testCoerceBigInteger() {
+    void testCoerceBigInteger() {
         final JexlArithmetic ja = JEXL.getArithmetic();
         final JexlEvalContext ctxt = new JexlEvalContext();
         final JexlOptions options = ctxt.getEngineOptions();
@@ -1117,7 +1117,7 @@ public class ArithmeticTest extends JexlTestCase {
     }
 
     @Test
-    public void testCoerceDouble() {
+    void testCoerceDouble() {
         final JexlArithmetic ja = JEXL.getArithmetic();
         final JexlEvalContext ctxt = new JexlEvalContext();
         final JexlOptions options = ctxt.getEngineOptions();
@@ -1136,7 +1136,7 @@ public class ArithmeticTest extends JexlTestCase {
     }
 
     @Test
-    public void testCoerceInteger() {
+    void testCoerceInteger() {
         final JexlArithmetic ja = JEXL.getArithmetic();
         final JexlEvalContext ctxt = new JexlEvalContext();
         final JexlOptions options = ctxt.getEngineOptions();
@@ -1155,7 +1155,7 @@ public class ArithmeticTest extends JexlTestCase {
     }
 
     @Test
-    public void testCoerceLong() {
+    void testCoerceLong() {
         final JexlArithmetic ja = JEXL.getArithmetic();
         final JexlEvalContext ctxt = new JexlEvalContext();
         final JexlOptions options = ctxt.getEngineOptions();
@@ -1174,7 +1174,7 @@ public class ArithmeticTest extends JexlTestCase {
     }
 
     @Test
-    public void testCoercions() throws Exception {
+    void testCoercions() throws Exception {
         asserter.assertExpression("1", Integer.valueOf(1)); // numerics default to Integer
         asserter.assertExpression("5L", Long.valueOf(5));
 
@@ -1206,7 +1206,7 @@ public class ArithmeticTest extends JexlTestCase {
     }
 
     @Test
-    public void testCompare() {
+    void testCompare() {
         // JEXL doesn't support more than one operator in the same expression, for example: 1 == 1 == 1
         final Object[] EXPRESSIONS = {
                 // Basic compare
@@ -1287,7 +1287,7 @@ public class ArithmeticTest extends JexlTestCase {
     }
 
     @Test
-    public void testDivClass() {
+    void testDivClass() {
         final JexlEngine jexl = new JexlBuilder().create();
         final JexlContext jc = new MapContext();
         final Object ra = jexl.createExpression("463.0d / 0.1").evaluate(jc);
@@ -1304,7 +1304,7 @@ public class ArithmeticTest extends JexlTestCase {
      * if not silent, all arith exception throw
      */
     @Test
-    public void testDivideByZero() throws Exception {
+    void testDivideByZero() throws Exception {
         final Map<String, Object> vars = new HashMap<>();
         final JexlEvalContext context = new JexlEvalContext(vars);
         final JexlOptions options = context.getEngineOptions();
@@ -1375,7 +1375,7 @@ public class ArithmeticTest extends JexlTestCase {
     }
 
     @Test
-    public void testDivideEdges() {
+    void testDivideEdges() {
         assertNullOperand(() -> jexla.divide(null, null));
         assertEquals(0, jexlb.divide(null, null));
         assertNullOperand(() -> jexla.divide(null, null));
@@ -1389,7 +1389,7 @@ public class ArithmeticTest extends JexlTestCase {
     }
 
     @Test
-    public void testEmpty() throws Exception {
+    void testEmpty() throws Exception {
         final Object[] SCRIPTS = {
             "var x = null; log('x = %s', x);", 0,
             "var x = 'abc'; log('x = %s', x);", 1,
@@ -1426,7 +1426,7 @@ public class ArithmeticTest extends JexlTestCase {
     }
 
     @Test
-    public void testEmptyDouble()  {
+    void testEmptyDouble()  {
         Object x;
         x = JEXL.createScript("4294967296.d").execute(null);
         assertEquals(4294967296.0d, (Double) x, EPSILON);
@@ -1443,7 +1443,7 @@ public class ArithmeticTest extends JexlTestCase {
     }
 
     @Test
-    public void testEmptyFloat()  {
+    void testEmptyFloat()  {
         Object x;
         x = JEXL.createScript("4294967296.f").execute(null);
         assertEquals(4294967296.0f, (Float) x, EPSILON);
@@ -1459,7 +1459,7 @@ public class ArithmeticTest extends JexlTestCase {
     }
 
     @Test
-    public void testEmptyLong()  {
+    void testEmptyLong()  {
         Object x;
         x = JEXL.createScript("new('java.lang.Long', 4294967296)").execute(null);
         assertEquals(4294967296L, ((Long) x).longValue());
@@ -1478,7 +1478,7 @@ public class ArithmeticTest extends JexlTestCase {
     }
 
     @Test
-    public void testFailAllOperators() {
+    void testFailAllOperators() {
         // @formatter:off
         final String[] scripts = {
             "(x, y)->{ x < y }",
@@ -1527,7 +1527,7 @@ public class ArithmeticTest extends JexlTestCase {
     }
 
     @Test
-    public void testInfiniteArithmetic() throws Exception {
+    void testInfiniteArithmetic() throws Exception {
         final Map<String, Object> ns = new HashMap<>();
         ns.put("math", Math.class);
         final JexlEngine jexl = new JexlBuilder().arithmetic(new Arithmetic132()).namespaces(ns).create();
@@ -1555,20 +1555,20 @@ public class ArithmeticTest extends JexlTestCase {
     }
 
     @Test
-    public void testInstanceOf0() throws Exception {
+    void testInstanceOf0() throws Exception {
         final JexlEngine jexl = new JexlBuilder().strict(true).safe(false).create();
         final JexlContext ctxt = new InstanceofContext();
         runInstanceof(jexl, ctxt);
     }
 
     @Test
-    public void testInstanceOf1() throws Exception {
+    void testInstanceOf1() throws Exception {
         final JexlEngine jexl = new JexlBuilder().strict(true).safe(false).imports("java.lang").create();
         runInstanceof(jexl, null);
     }
 
     @Test
-    public void testIntegerCoercionEdges() {
+    void testIntegerCoercionEdges() {
         assertNullOperand(() -> jexla.toBoolean(null));
         assertTrue(jexla.toBoolean(date));
         // int coercions
@@ -1593,7 +1593,7 @@ public class ArithmeticTest extends JexlTestCase {
     }
 
     @Test
-    public void testIsFloatingPointPattern() {
+    void testIsFloatingPointPattern() {
         final JexlArithmetic ja = new JexlArithmetic(true);
 
         assertFalse(ja.isFloatingPointNumber("floating point"));
@@ -1634,7 +1634,7 @@ public class ArithmeticTest extends JexlTestCase {
     }
 
     @Test
-    public void testJexl173() {
+    void testJexl173() {
         final JexlEngine jexl = new JexlBuilder().create();
         final JexlContext jc = new MapContext();
         final Callable173 c173 = new Callable173();
@@ -1648,7 +1648,7 @@ public class ArithmeticTest extends JexlTestCase {
     }
 
     @Test
-    public void testLeftNullOperand() throws Exception {
+    void testLeftNullOperand() throws Exception {
         asserter.setVariable("left", null);
         asserter.setVariable("right", Integer.valueOf(8));
         asserter.setStrict(true);
@@ -1667,7 +1667,7 @@ public class ArithmeticTest extends JexlTestCase {
     }
 
     @Test
-    public void testLeftNullOperand2() throws Exception {
+    void testLeftNullOperand2() throws Exception {
         asserter.setVariable("x.left", null);
         asserter.setVariable("right", Integer.valueOf(8));
         asserter.setStrict(true);
@@ -1687,7 +1687,7 @@ public class ArithmeticTest extends JexlTestCase {
 
     // JEXL-24: long integers (and doubles)
     @Test
-    public void testLongLiterals() {
+    void testLongLiterals() {
         final JexlEvalContext ctxt = new JexlEvalContext();
         final JexlOptions options = ctxt.getEngineOptions();
         options.setStrictArithmetic(true);
@@ -1708,7 +1708,7 @@ public class ArithmeticTest extends JexlTestCase {
     }
 
     @Test
-    public void testMinusClass() {
+    void testMinusClass() {
         final JexlEngine jexl = new JexlBuilder().create();
         final JexlContext jc = new MapContext();
         final Object ra = jexl.createExpression("463.0d - 0.1").evaluate(jc);
@@ -1720,7 +1720,7 @@ public class ArithmeticTest extends JexlTestCase {
     }
 
     @Test
-    public void testMinusMinusPostfix() throws Exception {
+    void testMinusMinusPostfix() throws Exception {
         asserter.setVariable("aByte", Byte.valueOf((byte) 2));
         asserter.setVariable("aShort", Short.valueOf((short) 3));
         asserter.setVariable("anInteger", Integer.valueOf(4));
@@ -1753,7 +1753,7 @@ public class ArithmeticTest extends JexlTestCase {
     }
 
     @Test
-    public void testMinusMinusPrefix() throws Exception {
+    void testMinusMinusPrefix() throws Exception {
         asserter.setVariable("aByte", Byte.valueOf((byte) 2));
         asserter.setVariable("aShort", Short.valueOf((short) 3));
         asserter.setVariable("anInteger", Integer.valueOf(4));
@@ -1777,7 +1777,7 @@ public class ArithmeticTest extends JexlTestCase {
     }
 
     @Test
-    public void testModEdge() {
+    void testModEdge() {
         assertNullOperand(() -> jexla.mod(null, null));
         assertEquals(0, jexlb.mod(null, null));
         assertArithmeticException(() -> jexla.mod(1, 0));
@@ -1793,7 +1793,7 @@ public class ArithmeticTest extends JexlTestCase {
      * JEXL-156.
      */
     @Test
-    public void testMultClass(){
+    void testMultClass(){
         final JexlEngine jexl = new JexlBuilder().create();
         final JexlContext jc = new MapContext();
         final Object ra = jexl.createExpression("463.0d * 0.1").evaluate(jc);
@@ -1805,7 +1805,7 @@ public class ArithmeticTest extends JexlTestCase {
     }
 
     @Test
-    public void testNaN() {
+    void testNaN() {
         final Map<String, Object> ns = new HashMap<>();
         ns.put("double", Double.class);
         final JexlEngine jexl = new JexlBuilder().namespaces(ns).create();
@@ -1826,7 +1826,7 @@ public class ArithmeticTest extends JexlTestCase {
     }
 
     @Test
-    public void testNarrowBigDecimal() throws Exception {
+    void testNarrowBigDecimal() throws Exception {
         final List<String> ls = Arrays.asList("zero", "one", "two");
         asserter.setVariable("list", ls);
         asserter.assertExpression("a -> list.get(a)", "zero", BigDecimal.ZERO);
@@ -1844,7 +1844,7 @@ public class ArithmeticTest extends JexlTestCase {
     }
 
     @Test
-    public void testNarrowBigInteger() throws Exception {
+    void testNarrowBigInteger() throws Exception {
         final List<String> ls = Arrays.asList("zero", "one", "two");
         asserter.setVariable("list",ls);
         asserter.assertExpression("a -> list.get(a)", "zero", BigInteger.ZERO);
@@ -1861,7 +1861,7 @@ public class ArithmeticTest extends JexlTestCase {
     }
 
     @Test
-    public void testNullArgs() {
+    void testNullArgs() {
         final JexlEngine jexl =  new JexlBuilder().arithmetic(new JexlArithmetic(true) {
             @Override public boolean isStrict(final JexlOperator op) {
                 return JexlOperator.ADD == op? false: super.isStrict(op);
@@ -1873,13 +1873,13 @@ public class ArithmeticTest extends JexlTestCase {
     }
 
     @Test
-    public void testNullOperand() throws Exception {
+    void testNullOperand() throws Exception {
         asserter.setVariable("right", null);
         asserter.failExpression("~right", ".*null.*");
     }
 
     @Test
-    public void testNullOperands() throws Exception {
+    void testNullOperands() throws Exception {
         asserter.setVariable("left", null);
         asserter.setVariable("right", null);
         asserter.failExpression("left + right", ".*null.*");
@@ -1893,7 +1893,7 @@ public class ArithmeticTest extends JexlTestCase {
     }
 
     @Test
-    public void testOperatorsEdges() {
+    void testOperatorsEdges() {
         assertNullOperand(() -> jexla.multiply(null, null));
         assertEquals(0, jexlb.multiply(null, null));
         assertNullOperand(() -> jexla.add(null, null));
@@ -1914,7 +1914,7 @@ public class ArithmeticTest extends JexlTestCase {
     }
 
     @Test
-    public void testOption() {
+    void testOption() {
         final Map<String, Object> vars = new HashMap<>();
         final JexlEvalContext context = new JexlEvalContext(vars);
         final JexlOptions options = context.getEngineOptions();
@@ -1932,7 +1932,7 @@ public class ArithmeticTest extends JexlTestCase {
     }
 
     @Test
-    public void testOverflows() throws Exception {
+    void testOverflows() throws Exception {
         asserter.assertExpression("1 + 2147483647", Long.valueOf("2147483648"));
         asserter.assertExpression("3 + " + (Long.MAX_VALUE - 2),  BigInteger.valueOf(Long.MAX_VALUE).add(BigInteger.ONE));
         asserter.assertExpression("-2147483648 - 1", Long.valueOf("-2147483649"));
@@ -1945,7 +1945,7 @@ public class ArithmeticTest extends JexlTestCase {
     }
 
     @Test
-    public void testPlusClass() {
+    void testPlusClass() {
         final JexlEngine jexl = new JexlBuilder().create();
         final JexlContext jc = new MapContext();
         final Object ra = jexl.createExpression("463.0d + 0.1").evaluate(jc);
@@ -1957,7 +1957,7 @@ public class ArithmeticTest extends JexlTestCase {
     }
 
     @Test
-    public void testPlusPlusPostfix() throws Exception {
+    void testPlusPlusPostfix() throws Exception {
         asserter.setVariable("aByte", Byte.valueOf((byte) 0));
         asserter.setVariable("aShort", Short.valueOf((short) 1));
         asserter.setVariable("anInteger", Integer.valueOf(2));
@@ -1990,7 +1990,7 @@ public class ArithmeticTest extends JexlTestCase {
     }
 
     @Test
-    public void testPlusPlusPrefix() throws Exception {
+    void testPlusPlusPrefix() throws Exception {
         asserter.setVariable("aByte", Byte.valueOf((byte) 0));
         asserter.setVariable("aShort", Short.valueOf((short) 1));
         asserter.setVariable("anInteger", Integer.valueOf(2));
@@ -2014,7 +2014,7 @@ public class ArithmeticTest extends JexlTestCase {
     }
 
     @Test
-    public void testRealCoercionEdges() throws Exception {
+    void testRealCoercionEdges() throws Exception {
         assertNullOperand(() -> jexla.toDouble(null));
         assertEquals(0.0d, jexlb.toDouble(null), EPSILON);
         assertEquals(32.0d, jexlb.toDouble((char) 32), EPSILON);
@@ -2045,7 +2045,7 @@ public class ArithmeticTest extends JexlTestCase {
     }
 
     @Test
-    public void testRightNullOperand() throws Exception {
+    void testRightNullOperand() throws Exception {
         asserter.setVariable("left", Integer.valueOf(9));
         asserter.setVariable("right", null);
         asserter.failExpression("left + right", ".*null.*");
@@ -2063,7 +2063,7 @@ public class ArithmeticTest extends JexlTestCase {
     }
 
     @Test
-    public void testRightNullOperand2() throws Exception {
+    void testRightNullOperand2() throws Exception {
         asserter.setVariable("left", Integer.valueOf(9));
         asserter.setVariable("y.right", null);
         asserter.failExpression("left + y.right", ".*null.*");
@@ -2084,7 +2084,7 @@ public class ArithmeticTest extends JexlTestCase {
      * test some simple mathematical calculations
      */
     @Test
-    public void testUnaryMinus() throws Exception {
+    void testUnaryMinus() throws Exception {
         asserter.setVariable("aByte", Byte.valueOf((byte) 1));
         asserter.setVariable("aShort", Short.valueOf((short) 2));
         asserter.setVariable("anInteger", Integer.valueOf(3));
@@ -2110,7 +2110,7 @@ public class ArithmeticTest extends JexlTestCase {
     }
 
     @Test
-    public void testUnaryopsEdges() {
+    void testUnaryopsEdges() {
         assertArithmeticException(() -> jexla.positivize(date));
         assertNullOperand(() -> jexla.positivize(null));
         assertNull(jexlb.positivize(null));
@@ -2131,7 +2131,7 @@ public class ArithmeticTest extends JexlTestCase {
      * test some simple mathematical calculations
      */
     @Test
-    public void testUnaryPlus() throws Exception {
+    void testUnaryPlus() throws Exception {
         asserter.setVariable("aByte", Byte.valueOf((byte) 1));
         asserter.setVariable("aShort", Short.valueOf((short) 2));
         asserter.setVariable("anInteger", Integer.valueOf(3));
@@ -2157,7 +2157,7 @@ public class ArithmeticTest extends JexlTestCase {
     }
 
     @Test
-    public void testUndefinedVar() throws Exception {
+    void testUndefinedVar() throws Exception {
         asserter.failExpression("objects[1].status", ".*variable 'objects' is undefined.*");
     }
 
@@ -2165,7 +2165,7 @@ public class ArithmeticTest extends JexlTestCase {
      * Inspired by JEXL-16{1,2}.
      */
     @Test
-    public void testXmlArithmetic() throws Exception {
+    void testXmlArithmetic() throws Exception {
         Document xml;
         Node x;
         Boolean empty;

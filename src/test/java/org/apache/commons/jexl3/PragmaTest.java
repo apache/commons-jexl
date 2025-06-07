@@ -157,7 +157,7 @@ public class PragmaTest extends JexlTestCase {
         assertEquals("fubar", xmethod.getMethod());
     }
 
-    @Test public void test354() {
+    @Test void test354() {
         final Map<String, Number> values = new TreeMap<>();
         values.put("1", 1);
         values.put("+1", 1);
@@ -197,7 +197,7 @@ public class PragmaTest extends JexlTestCase {
         }
     }
     @Test
-    public void testImportPragmaDisabled() {
+    void testImportPragmaDisabled() {
         final String src =
                 "#pragma jexl.import java.util\n"+
                         "#pragma jexl.import java.io\n"+
@@ -211,7 +211,7 @@ public class PragmaTest extends JexlTestCase {
     }
 
     @Test
-    public void testImportPragmaValueSet() {
+    void testImportPragmaValueSet() {
         final String src =
                 "#pragma jexl.import java.util\n"+
                 "#pragma jexl.import java.io\n"+
@@ -231,7 +231,7 @@ public class PragmaTest extends JexlTestCase {
     }
 
     @Test
-    public void testIssue416() {
+    void testIssue416() {
         final JexlEngine jexl = new JexlBuilder().create();
         final JexlScript script = jexl.createScript("#pragma myNull null\n");
         final Map<String, Object> pragmas = script.getPragmas();
@@ -241,7 +241,7 @@ public class PragmaTest extends JexlTestCase {
 
     @Test
     @SuppressWarnings("AssertEqualsBetweenInconvertibleTypes")
-    public void testJxltPragmas() {
+    void testJxltPragmas() {
         final JxltEngine engine = new JexlBuilder().create().createJxltEngine();
         final JxltEngine.Template tscript = engine.createTemplate("$$ #pragma one 1\n$$ #pragma the.very.hard 'truth'\n2;");
         assertNotNull(tscript);
@@ -253,7 +253,7 @@ public class PragmaTest extends JexlTestCase {
 
     @Test
     @SuppressWarnings("AssertEqualsBetweenInconvertibleTypes")
-    public void testNamespacePragma() {
+    void testNamespacePragma() {
         final JexlContext jc = new SafeContext();
         final String src =
                 "#pragma jexl.namespace.sleeper " + Sleeper.class.getName() + "\n"
@@ -267,7 +267,7 @@ public class PragmaTest extends JexlTestCase {
     }
     @Test
     @SuppressWarnings("AssertEqualsBetweenInconvertibleTypes")
-    public void testNamespacePragmaCtl() {
+    void testNamespacePragmaCtl() {
         final Map<String, Object> ns = Collections.singletonMap("sleeper", Sleeper.class.getName());
         final JexlEngine jexl = new JexlBuilder().namespaces(ns).create();
         final JexlContext jc = new SafeContext();
@@ -278,7 +278,7 @@ public class PragmaTest extends JexlTestCase {
         assertEquals(42, result);
     }
     @Test
-    public void testNamespacePragmaDisabled() {
+    void testNamespacePragmaDisabled() {
         final JexlFeatures features = new JexlFeatures();
         features.namespacePragma(false);
         final JexlEngine jexl = new JexlBuilder().features(features).create();
@@ -291,18 +291,18 @@ public class PragmaTest extends JexlTestCase {
         assertTrue(xparse.getMessage().contains("namespace pragma"));
     }
 
-    @Test public void testPragmaModuleCache() {
+    @Test void testPragmaModuleCache() {
         final CachingModuleContext ctxt = new CachingModuleContext();
         runPragmaModule(ctxt, ctxt);
     }
 
-    @Test public void testPragmaModuleNoCache() {
+    @Test void testPragmaModuleNoCache() {
         final ModuleContext ctxt = new ModuleContext();
         runPragmaModule(ctxt, null);
     }
 
     @Test
-    public void testPragmaOptions1() {
+    void testPragmaOptions1() {
         final String str = "i; #pragma jexl.options '-strict'\n";
         // @formatter:off
         final JexlEngine jexl = new JexlBuilder()
@@ -317,7 +317,7 @@ public class PragmaTest extends JexlTestCase {
      */
     @Test
     @SuppressWarnings("AssertEqualsBetweenInconvertibleTypes")
-    public void testPragmas() {
+    void testPragmas() {
         final JexlScript script = JEXL.createScript("#pragma one 1\n#pragma the.very.hard 'truth'\n2;");
         assertNotNull(script);
         final Map<String, Object> pragmas = script.getPragmas();
@@ -328,7 +328,7 @@ public class PragmaTest extends JexlTestCase {
 
     @Test
     @SuppressWarnings("AssertEqualsBetweenInconvertibleTypes")
-    public void testSafePragma() {
+    void testSafePragma() {
         final SafeContext jc = new SafeContext();
         jc.set("foo", null);
         final JexlScript script = JEXL.createScript("#pragma jexl.safe true\nfoo.bar;");
@@ -343,7 +343,7 @@ public class PragmaTest extends JexlTestCase {
 
     @Test
     @SuppressWarnings("AssertEqualsBetweenInconvertibleTypes")
-    public void testStaticNamespacePragma() {
+    void testStaticNamespacePragma() {
         final JexlContext jc = new SafeContext();
         final JexlScript script = JEXL.createScript(
                 "#pragma jexl.namespace.sleeper " + StaticSleeper.class.getName() + "\n"
@@ -355,7 +355,7 @@ public class PragmaTest extends JexlTestCase {
 
     @Test
     @SuppressWarnings("AssertEqualsBetweenInconvertibleTypes")
-    public void testStatictNamespacePragmaCtl() {
+    void testStatictNamespacePragmaCtl() {
         final Map<String, Object> ns = Collections.singletonMap("sleeper", StaticSleeper.class.getName());
         final JexlEngine jexl = new JexlBuilder().namespaces(ns).create();
         final JexlContext jc = new SafeContext();

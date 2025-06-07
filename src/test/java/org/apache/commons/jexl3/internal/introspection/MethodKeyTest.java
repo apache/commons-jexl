@@ -144,14 +144,14 @@ public class MethodKeyTest {
     }
 
     @Test
-    public void testDebugString() throws Exception {
+    void testDebugString() throws Exception {
         final MethodKey c = KEY_LIST[0];
         final String str = c.debugString();
         assertNotNull(str);
     }
 
     @Test
-    public void testObjectKey() throws Exception {
+    void testObjectKey() throws Exception {
         for (final MethodKey ctl : KEY_LIST) {
             final MethodKey key = makeKey(ctl.getMethod(), ctl.getParameters());
             final String out = BY_KEY.get(key);
@@ -161,7 +161,7 @@ public class MethodKeyTest {
 
     }
     @Test
-    public void testPerfKey() throws Exception {
+    void testPerfKey() throws Exception {
         for (int l = 0; l < LOOP; ++l) {
             for (final MethodKey ctl : KEY_LIST) {
                 final MethodKey key = makeKey(ctl.getMethod(), ctl.getParameters());
@@ -172,7 +172,7 @@ public class MethodKeyTest {
     }
 
     @Test
-    public void testPerfKey2() throws Exception {
+    void testPerfKey2() throws Exception {
         for (int l = 0; l < LOOP; ++l) {
             for (final String method : METHODS) {
                 for (final Object value : ARGS) {
@@ -189,7 +189,7 @@ public class MethodKeyTest {
     }
 
     @Test
-    public void testPerfString() throws Exception {
+    void testPerfString() throws Exception {
         for (int l = 0; l < LOOP; ++l) {
             for (final MethodKey ctl : KEY_LIST) {
                 final String key = makeStringKey(ctl.getMethod(), ctl.getParameters());
@@ -200,7 +200,7 @@ public class MethodKeyTest {
     }
 
     @Test
-    public void testPerfStringKey2() throws Exception {
+    void testPerfStringKey2() throws Exception {
         for (int l = 0; l < LOOP; ++l) {
             for (final String method : METHODS) {
                 for (final Object value : ARGS) {
@@ -217,7 +217,7 @@ public class MethodKeyTest {
     }
 
     @Test
-    public void testStringKey() throws Exception {
+    void testStringKey() throws Exception {
         for (final MethodKey ctl : KEY_LIST) {
             final String key = makeStringKey(ctl.getMethod(), ctl.getParameters());
             final MethodKey out = BY_STRING.get(key);

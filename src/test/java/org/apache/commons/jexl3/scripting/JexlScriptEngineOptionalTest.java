@@ -35,7 +35,7 @@ public class JexlScriptEngineOptionalTest {
     private final ScriptEngine engine = manager.getEngineByName("jexl");
 
     @Test
-    public void testCompilable() throws Exception {
+    void testCompilable() throws Exception {
         assertInstanceOf(Compilable.class, engine, "Engine should implement Compilable");
         final Compilable cengine = (Compilable) engine;
         final CompiledScript script = cengine.compile("40 + 2");
@@ -44,7 +44,7 @@ public class JexlScriptEngineOptionalTest {
     }
 
     @Test
-    public void testError() throws Exception {
+    void testError() throws Exception {
         final String error = "JEXL.err.print('ERROR')";
         // redirect error to capture evaluation result
         final StringWriter outContent = new StringWriter();
@@ -54,7 +54,7 @@ public class JexlScriptEngineOptionalTest {
     }
 
     @Test
-    public void testOutput() throws Exception {
+    void testOutput() throws Exception {
         final String output = factory.getOutputStatement("foo\u00a9bar");
         assertEquals("JEXL.out.print('foo\\u00a9bar')", output);
         // redirect output to capture evaluation result

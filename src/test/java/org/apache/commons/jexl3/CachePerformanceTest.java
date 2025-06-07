@@ -161,21 +161,21 @@ public class CachePerformanceTest {
     }
 
     @Test
-    public void testConcurrent() throws Exception {
+    void testConcurrent() throws Exception {
         final JexlBuilder builder = new JexlBuilder().cacheFactory(ConcurrentCache::new).cache(CACHED);
         final JexlEngine jexl = builder.create();
         runTest("testConcurrent", jexl);
     }
 
     @Test
-    public void testSpread() throws Exception {
+    void testSpread() throws Exception {
         final JexlBuilder builder = new JexlBuilder().cacheFactory(SpreadCache::new).cache(CACHED);
         final JexlEngine jexl = builder.create();
         runTest("testSpread", jexl);
     }
 
     @Test
-    public void testSynchronized() throws Exception {
+    void testSynchronized() throws Exception {
         final JexlBuilder builder = new JexlBuilder().cache(CACHED);
         final JexlEngine jexl = builder.create();
         runTest("testSynchronized", jexl);

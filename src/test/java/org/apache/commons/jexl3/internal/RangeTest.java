@@ -85,7 +85,7 @@ public class RangeTest extends JexlTestCase {
     }
 
     @Test
-    public void testAscIterator() {
+    void testAscIterator() {
         final Iterator<Integer> ii = new AscIntegerIterator(3, 5);
         Integer i = 3;
         while (ii.hasNext()) {
@@ -97,7 +97,7 @@ public class RangeTest extends JexlTestCase {
     }
 
     @Test
-    public void testAscLongIterator() {
+    void testAscLongIterator() {
         final Iterator<Long> ii = new AscLongIterator(3L, 5L);
         Long i = 3L;
         while (ii.hasNext()) {
@@ -108,13 +108,13 @@ public class RangeTest extends JexlTestCase {
         assertThrows(UnsupportedOperationException.class, ii::remove, "remove not implemented");
     }
 
-    @Test public void testMisc() {
+    @Test void testMisc() {
         assertEquals("?", Scope.UNDEFINED.toString());
         assertEquals("??", Scope.UNDECLARED.toString());
     }
 
     @Test
-    public void testRanges() throws Exception {
+    void testRanges() throws Exception {
         final LongRange lr0 = LongRange.create(20,10);
         assertEquals(10L, lr0.getMin());
         assertEquals(20L, lr0.getMax());
@@ -198,7 +198,7 @@ public class RangeTest extends JexlTestCase {
     }
 
     @Test
-    public void testSource() {
+    void testSource() {
         final JexlFeatures features = JexlFeatures.createDefault();
         final Source src0 = new Source(features, "x -> -x");
         final Source src0b = new Source(features, "x -> -x");

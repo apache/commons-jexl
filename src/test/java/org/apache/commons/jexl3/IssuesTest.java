@@ -94,7 +94,7 @@ public class IssuesTest extends JexlTestCase {
 
     // JEXL-10/JEXL-11: variable checking, null operand is error
     @Test
-    public void test11() throws Exception {
+    void test11() throws Exception {
         final JexlEngine jexl = createEngine(false);
         final JexlEvalContext ctxt = new JexlEvalContext();
         final JexlOptions options = ctxt.getEngineOptions();
@@ -118,7 +118,7 @@ public class IssuesTest extends JexlTestCase {
     }
 
     @Test
-    public void test40() throws Exception {
+    void test40() throws Exception {
         final JexlEngine jexl = new Engine();
         final JexlEvalContext ctxt = new JexlEvalContext();
         final JexlOptions options = ctxt.getEngineOptions();
@@ -136,7 +136,7 @@ public class IssuesTest extends JexlTestCase {
     // JEXL-42: NullPointerException evaluating an expression
     // fixed in JexlArithmetic by allowing add operator to deal with string, null
     @Test
-    public void test42() throws Exception {
+    void test42() throws Exception {
         final JexlEngine jexl = new JexlBuilder().create();
         final JxltEngine uel = jexl.createJxltEngine();
         // ensure errors will throw
@@ -155,7 +155,7 @@ public class IssuesTest extends JexlTestCase {
 
     // JEXL-44
     @Test
-    public void test44() throws Exception {
+    void test44() throws Exception {
         final JexlEngine jexl = createEngine(false);
         final JexlEvalContext ctxt = new JexlEvalContext();
         final JexlOptions options = ctxt.getEngineOptions();
@@ -175,7 +175,7 @@ public class IssuesTest extends JexlTestCase {
     // JEXL-47: C style comments (single & multi line) (fixed in Parser.jjt)
     // JEXL-44: comments don't allow double quotes (fixed in Parser.jjt)
     @Test
-    public void test47() throws Exception {
+    void test47() throws Exception {
         final JexlEngine jexl = new Engine();
         final JexlEvalContext ctxt = new JexlEvalContext();
         final JexlOptions options = ctxt.getEngineOptions();
@@ -196,7 +196,7 @@ public class IssuesTest extends JexlTestCase {
     }
 
     @Test
-    public void test48() throws Exception {
+    void test48() throws Exception {
         final JexlEngine jexl = new Engine();
         final JexlEvalContext jc = new JexlEvalContext();
         final JexlOptions options = jc.getEngineOptions();
@@ -210,7 +210,7 @@ public class IssuesTest extends JexlTestCase {
 
     // JEXL-49: blocks not parsed (fixed)
     @Test
-    public void test49() throws Exception {
+    void test49() throws Exception {
         final JexlEngine jexl = new Engine();
         final Map<String, Object> vars = new HashMap<>();
         final JexlContext ctxt = new MapContext(vars);
@@ -222,7 +222,7 @@ public class IssuesTest extends JexlTestCase {
 
     // JEXL-52: can be implemented by deriving Interpreter.{g,s}etAttribute; later
     @Test
-    public void test52base() throws Exception {
+    void test52base() throws Exception {
         final Engine jexl = (Engine) createEngine(false);
         final Uberspect uber = (Uberspect) jexl.getUberspect();
         // most likely, call will be in an Interpreter, getUberspect
@@ -249,7 +249,7 @@ public class IssuesTest extends JexlTestCase {
 
     // JEXL-62
     @Test
-    public void test62() throws Exception {
+    void test62() throws Exception {
         final JexlEngine jexl = createEngine(false);
         final MapContext vars = new MapContext();
         final JexlEvalContext ctxt = new JexlEvalContext(vars);
@@ -282,7 +282,7 @@ public class IssuesTest extends JexlTestCase {
 
     // JEXL-87
     @Test
-    public void test87() throws Exception {
+    void test87() throws Exception {
         final JexlEngine jexl = createEngine(false);
         final JexlEvalContext ctxt = new JexlEvalContext();
         final JexlOptions options = ctxt.getEngineOptions();
@@ -304,7 +304,7 @@ public class IssuesTest extends JexlTestCase {
 
     // JEXL-90
     @Test
-    public void test90() throws Exception {
+    void test90() throws Exception {
         final JexlEngine jexl = createEngine(false);
         final JexlEvalContext ctxt = new JexlEvalContext();
         final JexlOptions options = ctxt.getEngineOptions();
@@ -343,7 +343,7 @@ public class IssuesTest extends JexlTestCase {
     }
 
     @Test
-    public void test97() throws Exception {
+    void test97() throws Exception {
         final JexlEngine jexl = createEngine(false);
         final JexlEvalContext ctxt = new JexlEvalContext();
         final JexlOptions options = ctxt.getEngineOptions();
@@ -368,7 +368,7 @@ public class IssuesTest extends JexlTestCase {
     }
 
     @Test
-    public void test98() throws Exception {
+    void test98() throws Exception {
         final String[] exprs = {
             "fn:replace('DOMAIN\\somename', '\\\\', '\\\\\\\\')",
             "fn:replace(\"DOMAIN\\somename\", \"\\\\\", \"\\\\\\\\\")",

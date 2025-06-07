@@ -36,7 +36,7 @@ public class RangeTest extends JexlTestCase {
     }
 
     @Test
-    public void testIntegerContains() throws Exception {
+    void testIntegerContains() throws Exception {
         final JexlScript e = JEXL.createScript("(x)->{ x =~ (1..10) }");
         final JexlContext jc = new MapContext();
 
@@ -49,7 +49,7 @@ public class RangeTest extends JexlTestCase {
     }
 
     @Test
-    public void testIntegerRange() throws Exception {
+    void testIntegerRange() throws Exception {
         final JexlExpression e = JEXL.createExpression("(1..32)");
         final JexlContext jc = new MapContext();
 
@@ -96,7 +96,7 @@ public class RangeTest extends JexlTestCase {
     }
 
     @Test
-    public void testIntegerRangeOne() throws Exception {
+    void testIntegerRangeOne() throws Exception {
         final JexlExpression e = JEXL.createExpression("(1..1)");
         final JexlContext jc = new MapContext();
 
@@ -111,7 +111,7 @@ public class RangeTest extends JexlTestCase {
     }
 
     @Test
-    public void testIntegerSum() throws Exception {
+    void testIntegerSum() throws Exception {
         final JexlScript e = JEXL.createScript("var s = 0; for(var i : (1..5)) { s = s + i; }; s");
         final JexlContext jc = new MapContext();
 
@@ -120,7 +120,7 @@ public class RangeTest extends JexlTestCase {
     }
 
     @Test
-    public void testLongContains() throws Exception {
+    void testLongContains() throws Exception {
         final JexlScript e = JEXL.createScript("(x)->{ x =~ (90000000001L..90000000010L) }");
         final JexlContext jc = new MapContext();
 
@@ -133,7 +133,7 @@ public class RangeTest extends JexlTestCase {
     }
 
     @Test
-    public void testLongRange() throws Exception {
+    void testLongRange() throws Exception {
         final JexlExpression e = JEXL.createExpression("(6789000001L..6789000032L)");
         final JexlContext jc = new MapContext();
 
@@ -181,7 +181,7 @@ public class RangeTest extends JexlTestCase {
     }
 
     @Test
-    public void testLongSum() throws Exception {
+    void testLongSum() throws Exception {
         final JexlScript e = JEXL.createScript("var s = 0; for(var i : (6789000001L..6789000001L)) { s = s + i; }; s");
         final JexlContext jc = new MapContext();
 

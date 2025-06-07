@@ -40,7 +40,7 @@ public class MapLiteralTest extends JexlTestCase {
     }
 
     @Test
-    public void testCallingMethodsOnNewMapLiteral() throws Exception {
+    void testCallingMethodsOnNewMapLiteral() throws Exception {
         final JexlExpression e = JEXL.createExpression("size({ 'foo' : 'bar' }.values())");
         final JexlContext jc = new MapContext();
 
@@ -49,14 +49,14 @@ public class MapLiteralTest extends JexlTestCase {
     }
 
     @Test
-    public void testEmptyMap() throws Exception {
+    void testEmptyMap() throws Exception {
         final JexlScript script = JEXL.createScript("map['']", "map");
         final Object result = script.execute(null, Collections.singletonMap("", 42));
         assertEquals(42, result);
     }
 
     @Test
-    public void testLiteralWithMultipleEntries() throws Exception {
+    void testLiteralWithMultipleEntries() throws Exception {
         final Map<String, String> expected = new HashMap<>();
         expected.put("foo", "bar");
         expected.put("eat", "food");
@@ -69,7 +69,7 @@ public class MapLiteralTest extends JexlTestCase {
     }
 
     @Test
-    public void testLiteralWithNumbers() throws Exception {
+    void testLiteralWithNumbers() throws Exception {
         JexlExpression e = JEXL.createExpression("{ 5 : 10 }");
         final JexlContext jc = new MapContext();
 
@@ -118,7 +118,7 @@ public class MapLiteralTest extends JexlTestCase {
     }
 
     @Test
-    public void testLiteralWithStrings() throws Exception {
+    void testLiteralWithStrings() throws Exception {
         final List<String> sources = Arrays.asList("{ 'foo' : 'bar' }", "{ 'foo' : 'bar', }");
         for(final String src : sources) {
             final JexlExpression e = JEXL.createExpression(src);
@@ -129,7 +129,7 @@ public class MapLiteralTest extends JexlTestCase {
     }
 
     @Test
-    public void testMapArrayLiteral() throws Exception {
+    void testMapArrayLiteral() throws Exception {
         JexlExpression e = JEXL.createExpression("{'foo' : [ 'inner' , 'bar' ]}");
         final JexlContext jc = new MapContext();
         Object o = e.evaluate(jc);
@@ -142,7 +142,7 @@ public class MapLiteralTest extends JexlTestCase {
     }
 
     @Test
-    public void testMapMapLiteral() throws Exception {
+    void testMapMapLiteral() throws Exception {
         JexlExpression e = JEXL.createExpression("{'foo' : { 'inner' : 'bar' }}");
         final JexlContext jc = new MapContext();
         Object o = e.evaluate(jc);
@@ -155,7 +155,7 @@ public class MapLiteralTest extends JexlTestCase {
     }
 
     @Test
-    public void testNotEmptySimpleMapLiteral() throws Exception {
+    void testNotEmptySimpleMapLiteral() throws Exception {
         final JexlExpression e = JEXL.createExpression("empty({ 'foo' : 'bar' })");
         final JexlContext jc = new MapContext();
 
@@ -164,7 +164,7 @@ public class MapLiteralTest extends JexlTestCase {
     }
 
     @Test
-    public void testSizeOfSimpleMapLiteral() throws Exception {
+    void testSizeOfSimpleMapLiteral() throws Exception {
         final JexlExpression e = JEXL.createExpression("size({ 'foo' : 'bar' })");
         final JexlContext jc = new MapContext();
 
@@ -173,7 +173,7 @@ public class MapLiteralTest extends JexlTestCase {
     }
 
     @Test
-    public void testVariableMap() throws Exception {
+    void testVariableMap() throws Exception {
         final JexlScript script = JEXL.createScript("{ ['1', '2'.toString()] : someValue }", "someValue");
         final Object result = script.execute(null, 42);
         assertInstanceOf(Map.class, result);
