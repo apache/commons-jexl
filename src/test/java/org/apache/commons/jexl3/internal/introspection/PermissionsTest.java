@@ -52,7 +52,7 @@ import org.junit.jupiter.api.Test;
  * Checks the CacheMap.MethodKey implementation
  */
 
-public class PermissionsTest {
+class PermissionsTest {
 
     public static class A {
         public int i;

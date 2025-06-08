@@ -24,7 +24,7 @@ import org.junit.jupiter.api.Test;
 /**
  * Checks the CacheMap.MethodKey implementation
  */
-public class MethodKeyTest {
+class MethodKeyTest {
     // A set of classes (most of them primitives)
     private static final Class<?>[] PRIMS = {
         Boolean.TYPE,

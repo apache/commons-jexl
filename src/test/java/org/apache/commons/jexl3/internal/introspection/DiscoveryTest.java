@@ -37,7 +37,7 @@ import org.junit.jupiter.api.Test;
 /**
  * Tests for checking introspection discovery.
  */
-public class DiscoveryTest extends JexlTestCase {
+class DiscoveryTest extends JexlTestCase {
     public static class Bean {
         private String value;
         private String eulav;

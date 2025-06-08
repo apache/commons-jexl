@@ -27,7 +27,7 @@ import org.junit.jupiter.api.Test;
  * Test cases for the if statement.
  */
 @SuppressWarnings({"UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
-public class IfTest extends JexlTestCase {
+class IfTest extends JexlTestCase {
     public IfTest() {
         super("IfTest");
     }

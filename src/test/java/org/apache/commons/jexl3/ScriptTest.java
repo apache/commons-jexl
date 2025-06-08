@@ -43,7 +43,7 @@ import com.sun.net.httpserver.HttpServer;
  * Tests for JexlScript
  */
 @SuppressWarnings({"AssertEqualsBetweenInconvertibleTypes"})
-public class ScriptTest extends JexlTestCase {
+class ScriptTest extends JexlTestCase {
     /**
      * An object to call from.
      */

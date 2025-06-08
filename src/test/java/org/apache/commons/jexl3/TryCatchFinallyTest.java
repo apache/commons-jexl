@@ -29,7 +29,7 @@ import java.io.UnsupportedEncodingException;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-public class TryCatchFinallyTest extends JexlTestCase {
+class TryCatchFinallyTest extends JexlTestCase {
     public static class Circuit implements AutoCloseable {
         boolean opened = true;
 

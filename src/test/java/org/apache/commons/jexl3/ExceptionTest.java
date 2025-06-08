@@ -30,7 +30,7 @@ import org.junit.jupiter.api.Test;
  * Checks various exception handling cases.
  */
 @SuppressWarnings({"UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
-public class ExceptionTest extends JexlTestCase {
+class ExceptionTest extends JexlTestCase {
     public static class ThrowNPE {
         boolean doThrow;
         public boolean getFail() {

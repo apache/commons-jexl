@@ -31,7 +31,7 @@ import org.junit.jupiter.api.Test;
  * Also tests that a class instance is a functor that invokes the constructor when called.
  */
 @SuppressWarnings({"UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
-public class AntishCallTest extends JexlTestCase {
+class AntishCallTest extends JexlTestCase {
 
     /**
      * An arithmetic that considers class objects as callable.

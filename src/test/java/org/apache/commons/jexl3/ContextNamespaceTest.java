@@ -30,7 +30,7 @@ import org.junit.jupiter.api.Test;
  * Tests JexlContext (advanced) features.
  */
 @SuppressWarnings({"AssertEqualsBetweenInconvertibleTypes"})
-public class ContextNamespaceTest extends JexlTestCase {
+class ContextNamespaceTest extends JexlTestCase {
 
     public static class Context346 extends MapContext {
         public int func(final int y) { return 42 * y;}

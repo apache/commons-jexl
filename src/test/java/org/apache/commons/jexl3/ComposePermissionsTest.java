@@ -32,7 +32,7 @@ import com.google.gson.Gson;
 /**
  * Tests for pragmas
  */
-public class ComposePermissionsTest extends JexlTestCase {
+class ComposePermissionsTest extends JexlTestCase {
     static final String SAMPLE_JSON = "src/test/scripts/sample.json";
 
     /**

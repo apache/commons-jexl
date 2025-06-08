@@ -35,7 +35,7 @@ import org.junit.jupiter.api.Test;
  * Tests for the foreach statement
  */
 @SuppressWarnings({"UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
-public class ForEachTest extends JexlTestCase {
+class ForEachTest extends JexlTestCase {
 
     /** Create a named test */
     public ForEachTest() {

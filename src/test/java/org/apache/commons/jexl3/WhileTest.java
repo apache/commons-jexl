@@ -25,7 +25,7 @@ import org.junit.jupiter.api.Test;
  * Tests for while statement.
  */
 @SuppressWarnings({"UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
-public class WhileTest extends JexlTestCase {
+class WhileTest extends JexlTestCase {
 
     public WhileTest() {
         super("WhileTest");

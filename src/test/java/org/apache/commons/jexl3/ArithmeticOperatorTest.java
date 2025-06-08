@@ -55,7 +55,7 @@ import org.junit.jupiter.api.Test;
  * Tests for the startsWith, endsWith, match and range operators.
  */
 @SuppressWarnings({"UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
-public class ArithmeticOperatorTest extends JexlTestCase {
+class ArithmeticOperatorTest extends JexlTestCase {
     public static class Aggregate {
         public static int sum(final Iterable<Integer> ii) {
             int sum = 0;

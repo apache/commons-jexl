@@ -34,7 +34,7 @@ import org.junit.jupiter.api.Test;
  * Tests for map literals
  */
 @SuppressWarnings({"UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
-public class MapLiteralTest extends JexlTestCase {
+class MapLiteralTest extends JexlTestCase {
     public MapLiteralTest() {
         super("MapLiteralTest");
     }

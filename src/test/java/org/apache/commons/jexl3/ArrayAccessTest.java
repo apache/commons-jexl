@@ -29,7 +29,7 @@ import org.junit.jupiter.api.Test;
  * Tests for array access operator []
  */
 @SuppressWarnings({"UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
-public class ArrayAccessTest extends JexlTestCase {
+class ArrayAccessTest extends JexlTestCase {
 
     public static class Sample {
         private int[] array;

@@ -29,7 +29,7 @@ import org.junit.jupiter.api.Test;
  * Test cases for assignment.
  */
 @SuppressWarnings({"UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
-public class AssignTest extends JexlTestCase {
+class AssignTest extends JexlTestCase {
 
     public static class Froboz {
         int value;

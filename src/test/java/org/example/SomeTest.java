@@ -34,7 +34,7 @@ import org.apache.commons.jexl3.introspection.JexlPermissions;
 import org.apache.commons.jexl3.parser.JexlNode;
 import org.junit.jupiter.api.Test;
 
-public class SomeTest {
+class SomeTest {
 
   /**
    * Engine creating dedicated template interpreter.

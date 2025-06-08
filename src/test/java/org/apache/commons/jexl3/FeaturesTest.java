@@ -33,7 +33,7 @@ import org.junit.jupiter.api.Test;
  * Tests for blocks
  */
 @SuppressWarnings({"AssertEqualsBetweenInconvertibleTypes"})
-public class FeaturesTest extends JexlTestCase {
+class FeaturesTest extends JexlTestCase {
     private final JexlEngine jexl = new JexlBuilder().create();
     /**
      * Create the test

@@ -27,7 +27,7 @@ import org.junit.jupiter.api.Test;
  * Tests shift operators.
  */
 @SuppressWarnings({"UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
-public class ShiftOperatorsTest extends JexlTestCase {
+class ShiftOperatorsTest extends JexlTestCase {
     public static class ShiftArithmetic extends JexlArithmetic {
         ShiftArithmetic(final boolean flag) {
             super(flag);

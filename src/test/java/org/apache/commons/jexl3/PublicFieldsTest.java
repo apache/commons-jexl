@@ -27,7 +27,7 @@ import org.junit.jupiter.api.Test;
  * Tests public field set/get.
  */
 @SuppressWarnings({"UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
-public class PublicFieldsTest extends JexlTestCase {
+class PublicFieldsTest extends JexlTestCase {
     public enum Gender { MALE, FEMALE }
     /**
      * An Inner class.

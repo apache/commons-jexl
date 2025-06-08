@@ -32,7 +32,7 @@ import org.junit.jupiter.api.Test;
  * Tests do while statement.
  */
 @SuppressWarnings({ "UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes" })
-public class DoWhileTest extends JexlTestCase {
+class DoWhileTest extends JexlTestCase {
 
     public DoWhileTest() {
         super("DoWhileTest");

@@ -43,7 +43,7 @@ import org.junit.jupiter.api.Test;
 /**
  * A test around scripting streams.
  */
-public class StreamTest {
+class StreamTest {
 
     /**
      * A MapContext that can operate on streams and collections.

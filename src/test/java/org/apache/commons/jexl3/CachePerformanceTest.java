@@ -48,7 +48,7 @@ import org.junit.jupiter.api.Test;
  * latter being the Google based cache). This indicates that the basic caching mechanism will likely not be a performance bottleneck in normal usage.
  * </p>
  */
-public class CachePerformanceTest {
+class CachePerformanceTest {
     /**
      * A task randomly chooses to run scripts (CACHED * HIT times). Tasks will be run
      */

@@ -44,7 +44,7 @@ import org.junit.jupiter.api.Test;
 /**
  * Test cases for lexical option and feature.
  */
-public class LexicalTest {
+class LexicalTest {
 
     public static class DebugContext extends MapContext {
         public DebugContext() {

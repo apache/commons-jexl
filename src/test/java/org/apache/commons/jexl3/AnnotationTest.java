@@ -38,7 +38,7 @@ import org.junit.jupiter.api.Test;
  */
 @SuppressWarnings({"UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
 
-public class AnnotationTest extends JexlTestCase {
+class AnnotationTest extends JexlTestCase {
 
     public static class AnnotationContext extends MapContext implements JexlContext.AnnotationProcessor {
         private int count;

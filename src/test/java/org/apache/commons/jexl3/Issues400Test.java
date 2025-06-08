@@ -52,7 +52,7 @@ import org.junit.jupiter.api.Test;
 /**
  * Test cases for reported issue between JEXL-300 and JEXL-399.
  */
-public class Issues400Test {
+class Issues400Test {
 
     public static class VinzCaller {
         private final JexlContext context;

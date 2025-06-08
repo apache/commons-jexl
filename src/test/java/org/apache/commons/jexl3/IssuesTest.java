@@ -35,7 +35,7 @@ import org.junit.jupiter.api.Test;
  * Test cases for reported issue between JEXL-1 and JEXL-100.
  */
 @SuppressWarnings({"boxing", "UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
-public class IssuesTest extends JexlTestCase {
+class IssuesTest extends JexlTestCase {
     // JEXL-48: bad assignment detection
     public static class Another {
         public String name = "whatever";

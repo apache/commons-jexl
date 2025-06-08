@@ -31,7 +31,7 @@ import org.junit.jupiter.api.Test;
  * Checks the CacheMap.MethodKey implementation
  */
 
-public class MiscIntrospectionTest {
+class MiscIntrospectionTest {
     @Test
     void testArrayIterator() {
         // not on lists

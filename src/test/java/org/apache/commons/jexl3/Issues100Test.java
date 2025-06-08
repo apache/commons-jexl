@@ -44,7 +44,7 @@ import org.junit.jupiter.api.Test;
  * Test cases for reported issue between JEXL-100 and JEXL-199.
  */
 @SuppressWarnings({"boxing", "UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
-public class Issues100Test extends JexlTestCase {
+class Issues100Test extends JexlTestCase {
     // A's class definition
     public static class A105 {
         String nameA;

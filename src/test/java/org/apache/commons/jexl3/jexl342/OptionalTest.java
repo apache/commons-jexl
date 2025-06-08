@@ -39,7 +39,7 @@ import org.apache.commons.jexl3.MapContext;
 import org.apache.commons.jexl3.introspection.JexlUberspect;
 import org.junit.jupiter.api.Test;
 
-public class OptionalTest {
+class OptionalTest {
 
     public static class StreamContext extends MapContext {
         public Stream map(final Collection<Object> c, final JexlScript s) {

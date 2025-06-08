@@ -50,7 +50,7 @@ import org.junit.jupiter.api.Test;
  * Test cases for reported issue between JEXL-200 and JEXL-299.
  */
 @SuppressWarnings({"boxing", "UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
-public class Issues200Test extends JexlTestCase {
+class Issues200Test extends JexlTestCase {
     public static class Arithmetic266 extends JexlArithmetic {
         static final ThreadLocal<Deque<Iterator266>> TLS_FOREACH = new ThreadLocal<Deque<Iterator266>>() {
             @Override

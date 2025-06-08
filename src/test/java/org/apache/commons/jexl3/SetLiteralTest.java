@@ -32,7 +32,7 @@ import org.junit.jupiter.api.Test;
  * Tests for set literals
  */
 @SuppressWarnings({"UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
-public class SetLiteralTest extends JexlTestCase {
+class SetLiteralTest extends JexlTestCase {
 
     private static Set<?> createSet(final Object... args) {
         return new HashSet<>(Arrays.asList(args));

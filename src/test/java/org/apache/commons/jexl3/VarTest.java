@@ -44,7 +44,7 @@ import org.junit.jupiter.api.Test;
  * Tests local variables.
  */
 @SuppressWarnings({"UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
-public class VarTest extends JexlTestCase {
+class VarTest extends JexlTestCase {
     public static class NumbersContext extends MapContext implements JexlContext.NamespaceResolver {
         public Object numbers() {
             return new int[]{5, 17, 20};

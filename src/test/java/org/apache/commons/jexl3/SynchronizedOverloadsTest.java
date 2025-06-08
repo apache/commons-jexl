@@ -30,7 +30,7 @@ import org.junit.jupiter.api.Test;
  * <p>May be a base for synchronized calls.
  */
 @SuppressWarnings({"boxing", "UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
-public class SynchronizedOverloadsTest extends JexlTestCase {
+class SynchronizedOverloadsTest extends JexlTestCase {
     public SynchronizedOverloadsTest() {
         super("SynchronizedOverloadsTest", null);
     }

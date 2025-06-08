@@ -26,7 +26,7 @@ import org.junit.jupiter.api.Test;
  * Tests for malformed expressions and scripts. ({@link org.apache.commons.jexl3.JexlEngine#createExpression(String)} and
  * {@link org.apache.commons.jexl3.JexlEngine#createScript(String)} should throw {@link org.apache.commons.jexl3.JexlException}s).
  */
-public class ParseFailuresTest extends JexlTestCase {
+class ParseFailuresTest extends JexlTestCase {
 
     static final Log LOGGER = LogFactory.getLog(ParseFailuresTest.class.getName());
 

@@ -27,7 +27,7 @@ import org.junit.jupiter.api.Test;
 
 /**
  */
-public class ParserTest {
+class ParserTest {
     static final JexlFeatures FEATURES = new JexlFeatures();
     public ParserTest() {}
 

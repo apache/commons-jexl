@@ -37,7 +37,7 @@ import org.junit.jupiter.api.Test;
  * Basic checks on ranges.
  */
 @SuppressWarnings({"UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
-public class RangeTest extends JexlTestCase {
+class RangeTest extends JexlTestCase {
 
     public RangeTest() {
         super("InternalTest");

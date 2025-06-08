@@ -44,7 +44,7 @@ import org.junit.jupiter.api.Test;
  * Tests around asynchronous script execution and interrupts.
  */
 @SuppressWarnings({ "UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes" })
-public class ScriptCallableTest extends JexlTestCase {
+class ScriptCallableTest extends JexlTestCase {
     public static class AnnotationContext extends MapContext implements JexlContext.AnnotationProcessor {
         @Override
         public Object processAnnotation(final String name, final Object[] args, final Callable<Object> statement) throws Exception {

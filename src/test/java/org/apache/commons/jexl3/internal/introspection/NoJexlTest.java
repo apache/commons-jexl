@@ -31,7 +31,7 @@ import org.junit.jupiter.api.Test;
  * Checks the CacheMap.MethodKey implementation
  */
 
-public class NoJexlTest {
+class NoJexlTest {
 
     public static class A {
         public int i;

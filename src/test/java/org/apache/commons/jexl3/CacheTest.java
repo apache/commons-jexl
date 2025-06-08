@@ -37,7 +37,7 @@ import org.junit.jupiter.api.Test;
  * Verifies cache & tryExecute
  */
 @SuppressWarnings({"UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
-public class CacheTest extends JexlTestCase {
+class CacheTest extends JexlTestCase {
     /**
      * A task to check boolean assignment.
      */

@@ -40,7 +40,7 @@ import org.junit.jupiter.api.Test;
 /**
  * Tests for pragmas
  */
-public class PragmaTest extends JexlTestCase {
+class PragmaTest extends JexlTestCase {
     public static class CachingModuleContext extends ModuleContext implements JexlContext.ModuleProcessor {
         private final ConcurrentMap<String, Object> modules = new ConcurrentHashMap<>();
         private final AtomicInteger count = new AtomicInteger();

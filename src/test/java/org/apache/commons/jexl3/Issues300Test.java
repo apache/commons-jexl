@@ -53,7 +53,7 @@ import org.junit.jupiter.api.Test;
 /**
  * Test cases for reported issue between JEXL-300 and JEXL-399.
  */
-public class Issues300Test {
+class Issues300Test {
     public static class Arithmetic383 extends JexlArithmetic {
         public Arithmetic383(final boolean astrict) {
             super(astrict);

@@ -24,7 +24,7 @@ import org.junit.jupiter.api.Test;
  * Tests for the bitwise operators.
  */
 @SuppressWarnings({"UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
-public class BitwiseOperatorTest extends JexlTestCase {
+class BitwiseOperatorTest extends JexlTestCase {
     private Asserter asserter;
 
     /**

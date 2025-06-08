@@ -40,7 +40,7 @@ import org.junit.jupiter.api.Test;
  * Ensure ArrayBuilder types its output by finding some common ancestor class or interface (besides Object.class)
  * from its entries when possible.
  */
-public class ArrayTypeTest {
+class ArrayTypeTest {
   public abstract static class Class0 implements Inter0 {
     private final int value;
     public Class0(final int v) {

@@ -35,7 +35,7 @@ import org.junit.jupiter.api.Test;
  * Test cases for the if statement.
  */
 @SuppressWarnings({"UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
-public class StrategyTest extends JexlTestCase {
+class StrategyTest extends JexlTestCase {
     // JEXL-174
     public static class MapArithmetic extends JexlArithmetic {
         public MapArithmetic(final boolean flag) {

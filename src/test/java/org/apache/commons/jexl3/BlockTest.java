@@ -25,7 +25,7 @@ import org.junit.jupiter.api.Test;
  * Tests for blocks
  */
 @SuppressWarnings({"UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
-public class BlockTest extends JexlTestCase {
+class BlockTest extends JexlTestCase {
 
     /**
      * Create the test

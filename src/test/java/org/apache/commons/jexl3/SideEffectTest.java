@@ -41,7 +41,7 @@ import org.junit.jupiter.api.Test;
  * Tests for array access operator []
  */
 @SuppressWarnings({"UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
-public class SideEffectTest extends JexlTestCase {
+class SideEffectTest extends JexlTestCase {
 
     /**
      * An arithmetic that implements 2 selfAdd methods.

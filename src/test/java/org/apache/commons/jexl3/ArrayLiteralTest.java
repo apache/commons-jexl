@@ -32,7 +32,7 @@ import org.junit.jupiter.api.Test;
  * Tests for array literals.
  */
 @SuppressWarnings({"UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
-public class ArrayLiteralTest extends JexlTestCase {
+class ArrayLiteralTest extends JexlTestCase {
 
     public ArrayLiteralTest() {
         super("ArrayLiteralTest");

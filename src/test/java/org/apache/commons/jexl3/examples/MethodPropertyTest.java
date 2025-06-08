@@ -27,7 +27,7 @@ import org.junit.jupiter.api.Test;
 /**
  *  Simple example to show how to access method and properties.
  */
-public class MethodPropertyTest {
+class MethodPropertyTest {
     /**
      * Helper example class.
      */

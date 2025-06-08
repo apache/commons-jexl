@@ -29,7 +29,7 @@ import javax.script.ScriptEngineManager;
 
 import org.junit.jupiter.api.Test;
 
-public class JexlScriptEngineOptionalTest {
+class JexlScriptEngineOptionalTest {
     private final JexlScriptEngineFactory factory = new JexlScriptEngineFactory();
     private final ScriptEngineManager manager = new ScriptEngineManager();
     private final ScriptEngine engine = manager.getEngineByName("jexl");

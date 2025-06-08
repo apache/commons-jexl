@@ -39,7 +39,7 @@ import org.junit.jupiter.api.Test;
  * Tests for calling methods on objects
  */
 @SuppressWarnings({"UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
-public class MethodTest extends JexlTestCase {
+class MethodTest extends JexlTestCase {
     public static class ContextualFunctor {
         private final EnhancedContext context;
 

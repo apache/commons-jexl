@@ -35,7 +35,7 @@ import org.junit.jupiter.api.Test;
  * Tests for property access operator '.'
  */
 @SuppressWarnings({"UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
-public class PropertyAccessTest extends JexlTestCase {
+class PropertyAccessTest extends JexlTestCase {
 
     public static class Container extends PropertyContainer {
         public Container(final String name, final int number) {

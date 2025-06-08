@@ -27,7 +27,7 @@ import org.junit.jupiter.api.Test;
  *  Simple tests
  */
 @SuppressWarnings({"UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
-public class AsserterTest extends JexlTestCase {
+class AsserterTest extends JexlTestCase {
     public AsserterTest() {
         super("AsserterTest");
     }
