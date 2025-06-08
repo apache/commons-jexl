@@ -26,7 +26,7 @@ public class ASTCaseStatement extends JexlNode {
   private static final long serialVersionUID = 1L;
 
   /** The values of the case statement. */
-  protected transient List<Object> values = Collections.emptyList();
+  protected List<Object> values = Collections.emptyList();
 
   public ASTCaseStatement(int id) {
     super(id);

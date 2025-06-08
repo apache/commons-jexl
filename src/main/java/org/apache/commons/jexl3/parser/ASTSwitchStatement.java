@@ -29,7 +29,7 @@ public class ASTSwitchStatement extends JexlNode {
   /**
    * The map of cases, where the key is the case value and the value is the switch index.
    */
-  protected transient Map<Object, Integer> cases = Collections.emptyMap();
+  protected Map<Object, Integer> cases = Collections.emptyMap();
 
   public ASTSwitchStatement(int id) {
     super(id);
