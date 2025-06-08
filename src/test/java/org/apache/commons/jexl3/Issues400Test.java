@@ -732,18 +732,27 @@ public class Issues400Test {
         JexlFeatures f = JexlFeatures.createDefault();
         f.setAmbiguousStatement(true);
         JexlEngine jexl = new JexlBuilder().features(f).safe(false).strict(true).create();
-        final String src =
+        String src =
 "let y = switch (x) { case 10,11 -> 3 case 20, 21 -> 4\ndefault -> { let z = 4; z + 6 } } y";
-        final JexlScript script = jexl.createScript(src, "x");
+        JexlScript script = jexl.createScript(src, "x");
         assertNotNull(script);
         String dbgStr = script.getParsedText();
         assertNotNull(dbgStr);
+        src =
+                "let y = switch (x) { case 10,11 -> break; case 20, 21 -> 4 } y";
+        try {
+            script = jexl.createScript(src, "x");
+            fail("should not be able to create script with break in switch");
+        } catch (JexlException.Parsing xparse) {
+            assertTrue(xparse.getMessage().contains("break"));
+        }
+        assertNotNull(script);
     }
     @Test
     void test440b() {
         JexlEngine jexl = new JexlBuilder().safe(false).strict(true).create();
         final String src =
-"switch (x) { case 10 : 3; case 20 : case 21 : 4; default : return 5; } ";
+"switch (x) { case 10 : 3; case 20 : case 21 : 4; case 32: break; default : return 5; } ";
         final JexlScript script = jexl.createScript(src, "x");
         assertNotNull(script);
         String dbgStr = script.getParsedText();

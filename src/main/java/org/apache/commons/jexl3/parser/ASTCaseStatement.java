@@ -22,6 +22,10 @@ import java.util.Collections;
 import java.util.List;
 
 public class ASTCaseStatement extends JexlNode {
+  /** Pointless serial UID */
+  private static final long serialVersionUID = 1L;
+
+  /** The values of the case statement. */
   private transient List<Object> values = Collections.emptyList();
 
   public ASTCaseStatement(int id) {

@@ -611,13 +611,11 @@ void SwitchStatementCase(SwitchSet cases) #CaseStatement :
     loopCount += 1;
 }
 {
-    ( LOOKAHEAD(3)
-       ( <CASE> constant=constLiteral() <COLON> )+
+    ( ( LOOKAHEAD(2) <CASE> constant=constLiteral() <COLON> )+
         { constants = Collections.singletonList(constant); jjtThis.setValues(constants); cases.addAll(constants); }
         |
-        <CASE_DEFAULT> <COLON>
-    )
-    ( LOOKAHEAD(1) Block() | StatementNoVar() )
+        <CASE_DEFAULT> <COLON> )
+    ( LOOKAHEAD(<LCURLY>) Block() | (StatementNoVar())+ )?
 {
     loopCount -= 1;
 }
@@ -627,6 +625,7 @@ void SwitchExpression() #SwitchExpression :
 {
     ASTSwitchStatement.Helper helper = new ASTSwitchStatement.Helper();
     SwitchSet cases = switchSet();
+    pushLoop();
 }
 {
     <SWITCH> <LPAREN> Expression() <RPAREN> <LCURLY>
@@ -634,12 +633,13 @@ void SwitchExpression() #SwitchExpression :
     <RCURLY>
 {
     helper.defineSwitch(jjtThis);
+    popLoop();
 }
 }
 
 void SwitchExpressionCase(SwitchSet cases) #CaseExpression :
 {
-    List<Object> constants = new ArrayList(1);
+    List<Object> constants = new ArrayList<Object>(1);
 }
 {
     ( LOOKAHEAD(2)

@@ -23,6 +23,14 @@ import java.util.List;
 import java.util.Map;
 
 public class ASTSwitchStatement extends JexlNode {
+  /** Pointless serial UID */
+  private static final long serialVersionUID = 1L;
+
+  /**
+   * The map of cases, where the key is the case value and the value is the switch index.
+   */
+  protected transient Map<Object, Integer> cases = Collections.emptyMap();
+
   public ASTSwitchStatement(int id) {
     super(id);
   }
@@ -31,11 +39,6 @@ public class ASTSwitchStatement extends JexlNode {
   public Object jjtAccept(ParserVisitor visitor, Object data) {
     return visitor.visit(this, data);
   }
-
-  /**
-   * The map of cases, where the key is the case value and the value is the switch index.
-   */
-  protected transient Map<Object, Integer> cases = Collections.emptyMap();
 
   /**
    * Returns the array of cases values.
@@ -83,6 +86,10 @@ public class ASTSwitchStatement extends JexlNode {
     return -1;
   }
 
+  /**
+   * Helper for switch statements.
+   * <p>It detects duplicates cases and default.</p>
+   */
   public static class Helper {
     private int nswitch = 0;
     private boolean defaultDefined = false;

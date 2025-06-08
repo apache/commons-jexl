@@ -916,6 +916,17 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
         block = unit;
     }
 
+    protected void pushLoop() {
+        loopCounts.push(loopCount);
+        loopCount = 0;
+    }
+
+    protected void popLoop() {
+        if (!loopCounts.isEmpty()) {
+            loopCount = loopCounts.pop();
+        }
+    }
+
     /**
      * Sets a new set of options.
      * @param features the parser features
