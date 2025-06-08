@@ -172,7 +172,7 @@ public final class JexlFeatures {
      * @since 3.3.1
      */
     private static final Set<String> RESERVED_WORDS =
-        Collections.unmodifiableSet(new HashSet<>(Arrays.asList( "class", "jexl", "$jexl")));
+        Collections.unmodifiableSet(new HashSet<>(Arrays.asList("class", "jexl", "$jexl")));
 
     /*
      * *WARNING*
