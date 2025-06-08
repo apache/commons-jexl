@@ -733,11 +733,22 @@ public class Issues400Test {
         f.setAmbiguousStatement(true);
         JexlEngine jexl = new JexlBuilder().features(f).safe(false).strict(true).create();
         String src =
-"let y = switch (x) { case 10,11 -> 3 case 20, 21 -> 4\ndefault -> { let z = 4; z + 6 } } y";
+"let y = switch (x) { case 10,11 -> 3 case 20, 21 -> 4\ndefault -> { let z = 4; z + x } } y";
         JexlScript script = jexl.createScript(src, "x");
         assertNotNull(script);
         String dbgStr = script.getParsedText();
         assertNotNull(dbgStr);
+
+        Object result = script.execute(null, 10);
+        Assertions.assertEquals(3, result);
+        result = script.execute(null, 11);
+        Assertions.assertEquals(3, result);
+        result = script.execute(null, 20);
+        Assertions.assertEquals(4, result);
+        result = script.execute(null, 21);
+        Assertions.assertEquals(4, result);
+        result = script.execute(null, 38);
+        Assertions.assertEquals(42, result);
         src =
                 "let y = switch (x) { case 10,11 -> break; case 20, 21 -> 4 } y";
         try {
@@ -752,10 +763,21 @@ public class Issues400Test {
     void test440b() {
         JexlEngine jexl = new JexlBuilder().safe(false).strict(true).create();
         final String src =
-"switch (x) { case 10 : 3; case 20 : case 21 : 4; case 32: break; default : return 5; } ";
+"switch (x) { case 10 : return 3; case 20 : case 21 : return 4; case 32: break; default : return x + 4; } 169";
         final JexlScript script = jexl.createScript(src, "x");
         assertNotNull(script);
         String dbgStr = script.getParsedText();
         assertNotNull(dbgStr);
+
+        Object result = script.execute(null, 10);
+        Assertions.assertEquals(3, result);
+        result = script.execute(null, 20);
+        Assertions.assertEquals(4, result);
+        result = script.execute(null, 21);
+        Assertions.assertEquals(4, result);
+        result = script.execute(null, 32);
+        Assertions.assertEquals(169, result);
+        result = script.execute(null, 38);
+        Assertions.assertEquals(42, result);
     }
 }

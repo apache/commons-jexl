@@ -172,8 +172,7 @@ public final class JexlFeatures {
      * @since 3.3.1
      */
     private static final Set<String> RESERVED_WORDS =
-        Collections.unmodifiableSet(
-            new HashSet<>(Arrays.asList( "class", "jexl", "$jexl")));
+        Collections.unmodifiableSet(new HashSet<>(Arrays.asList( "class", "jexl", "$jexl")));
 
     /*
      * *WARNING*
@@ -718,10 +717,28 @@ public final class JexlFeatures {
         }
     }
 
+    /**
+     * Sets whether statements can be ambiguous.
+     * <p>
+     * When enabled, the semicolumn is not required between expressions that otherwise are considered
+     * ambiguous. The default will report ambiguity in cases like <code>if (true) { x 5 }</code> considering this
+     * may be missing an operator or that the intent is not clear.
+     * </p>
+     * @param flag true to enable, false to disable
+     */
     public void setAmbiguousStatement(final boolean flag) {
         setFeature(AMBIGUOUS_STATEMENT, flag);
     }
 
+    /**
+     * Checks whether statements can be ambiguous.
+     * <p>
+     * When enabled, the semicolumn is not required between expressions that otherwise are considered
+     * ambiguous. The default will report ambiguity in cases like <code>if (true) { x 5 }</code> considering this
+     * may be missing an operator or that the intent is not clear.
+     * </p>
+     * @return true if statements can be ambiguous, false otherwise
+     */
     public boolean supportsAmbiguousStatement() {
         return getFeature(AMBIGUOUS_STATEMENT);
     }

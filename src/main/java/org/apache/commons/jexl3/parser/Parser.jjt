@@ -440,7 +440,7 @@ void FunctionStatement() #JexlLambda : {}
 
 void ExpressionStatement() #void : {}
 {
-    Expression() (LOOKAHEAD(Expression()/*, { getFeatures().supportsAmbiguousStatement() }*/) Expression() #Ambiguous(1))* (LOOKAHEAD(1) <SEMICOL>)?
+    Expression() (LOOKAHEAD(Expression(), { !getFeatures().supportsAmbiguousStatement() } ) Expression() #Ambiguous(1))* (LOOKAHEAD(1) <SEMICOL>)?
 }
 
 
@@ -611,8 +611,8 @@ void SwitchStatementCase(SwitchSet cases) #CaseStatement :
     loopCount += 1;
 }
 {
-    ( ( LOOKAHEAD(2) <CASE> constant=constLiteral() <COLON> )+
-        { constants = Collections.singletonList(constant); jjtThis.setValues(constants); cases.addAll(constants); }
+    ( ( LOOKAHEAD(2) <CASE> constant=constLiteral() <COLON>
+        { constants = Collections.singletonList(constant); jjtThis.setValues(constants); cases.addAll(constants); } )+
         |
         <CASE_DEFAULT> <COLON> )
     ( LOOKAHEAD(<LCURLY>) Block() | (StatementNoVar())+ )?

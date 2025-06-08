@@ -1231,23 +1231,18 @@ public class Interpreter extends InterpreterBase {
     }
 
     @Override
-    protected Object visit(ASTSwitchStatement node, Object data) {
-        return null;
-    }
-
-    @Override
     protected Object visit(ASTCaseStatement node, Object data) {
-        return null;
-    }
-
-    @Override
-    protected Object visit(ASTSwitchExpression node, Object data) {
-        return null;
+        final int argc = node.jjtGetNumChildren();
+        Object result = null;
+        for (int i = 0; i < argc; i++) {
+            result = node.jjtGetChild(i).jjtAccept(this, data);
+        }
+        return result;
     }
 
     @Override
     protected Object visit(ASTCaseExpression node, Object data) {
-        return null;
+        return node.jjtGetChild(0).jjtAccept(this, data);
     }
 
     @Override
@@ -2024,6 +2019,35 @@ public class Interpreter extends InterpreterBase {
         final Object left = node.jjtGetChild(0).jjtAccept(this, data);
         final Object right = node.jjtGetChild(1).jjtAccept(this, data);
         return operators.startsWith(node, JexlOperator.STARTSWITH, left, right);
+    }
+
+
+    @Override
+    protected Object visit(final ASTSwitchExpression node, final Object data) {
+        final Object value = node.jjtGetChild(0).jjtAccept(this, data);
+        final int index = node.switchIndex(value);
+        return index >= 0 ? node.jjtGetChild(index).jjtAccept(this, data) : null;
+    }
+
+    @Override
+    protected Object visit(final ASTSwitchStatement node, final Object data) {
+        final int count = node.jjtGetNumChildren();
+        Object value = node.jjtGetChild(0).jjtAccept(this, data);
+        int index = node.switchIndex(value);
+        if (index > 0) {
+            for (int i = index; i < count; ++i) {
+                try {
+                    // evaluate the switch body
+                    value = node.jjtGetChild(i).jjtAccept(this, data);
+                } catch (final JexlException.Break xbreak) {
+                   break; // break out of the switch
+                } catch (final JexlException.Continue xcontinue) {
+                    // continue to next case
+                }
+            }
+            return value;
+        }
+        return null;
     }
 
     @Override

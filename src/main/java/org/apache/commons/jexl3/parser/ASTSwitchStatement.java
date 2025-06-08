@@ -80,7 +80,7 @@ public class ASTSwitchStatement extends JexlNode {
     if (index == null) {
       index = cases.get(JexlParser.DFLT);
     }
-    if (index != null && index >= 0 && index < jjtGetNumChildren()) {
+    if (index != null && index >= 1 && index < jjtGetNumChildren()) {
       return index; // index is 1-based, children are 0-based
     }
     return -1;
@@ -91,7 +91,7 @@ public class ASTSwitchStatement extends JexlNode {
    * <p>It detects duplicates cases and default.</p>
    */
   public static class Helper {
-    private int nswitch = 0;
+    private int nswitch = 1; // switch index, starts at 1 since the first child is the switch expression
     private boolean defaultDefined = false;
     private final Map<Object, Integer> dispatch = new LinkedHashMap<>();
 
