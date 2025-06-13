@@ -591,8 +591,8 @@ class LambdaTest extends JexlTestCase {
     }
 
     @Test void testRefCapture5() {
-        JexlFeatures f426 = new JexlFeatures().referenceCapture(true);
-        JexlEngine jexl = new JexlBuilder().features(f426).create();
+        final JexlFeatures f426 = new JexlFeatures().referenceCapture(true);
+        final JexlEngine jexl = new JexlBuilder().features(f426).create();
         final String src = "let z = 32; let x = 40; function foo() { x += 2; }; function bar() { let x = -169; foo(); x;}; bar();";
         final JexlScript script = jexl.createScript(src);
         assertNotNull(script);
@@ -601,8 +601,8 @@ class LambdaTest extends JexlTestCase {
     }
 
     @Test void testRefCapture6() {
-        JexlFeatures f426 = new JexlFeatures().referenceCapture(true);
-        JexlEngine jexl = new JexlBuilder().features(f426).create();
+        final JexlFeatures f426 = new JexlFeatures().referenceCapture(true);
+        final JexlEngine jexl = new JexlBuilder().features(f426).create();
         final String src = "let x = 40; function foo() { x += 2; }; function bar() { x = -169; () -> { foo(); }}; bar();";
         JexlScript script = jexl.createScript(src);
         assertNotNull(script);

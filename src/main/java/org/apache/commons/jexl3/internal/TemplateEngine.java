@@ -936,146 +936,135 @@ public final class TemplateEngine extends JxltEngine {
         for (int column = 0; column < size; ++column) {
             final char c = expr.charAt(column);
             switch (state) {
-                case CONST:
-                    if (c == immediateChar) {
-                        state = ParseState.IMMEDIATE0;
-                    } else if (c == deferredChar) {
-                        inested = column;
-                        state = ParseState.DEFERRED0;
-                    } else if (c == '\\') {
-                        state = ParseState.ESCAPE;
-                    } else {
-                        // do buildup expr
-                        strb.append(c);
-                    }
-                    break;
-                case IMMEDIATE0: // $
-                    if (c == '{') {
-                        state = ParseState.IMMEDIATE1;
-                        // if chars in buffer, create constant
-                        if (strb.length() > 0) {
-                            final TemplateExpression cexpr = new ConstantExpression(strb.toString(), null);
-                            builder.add(cexpr);
-                            strb.delete(0, Integer.MAX_VALUE);
-                        }
-                    } else {
-                        // revert to CONST
-                        strb.append(immediateChar);
-                        state = ParseState.CONST;
-                        // 'unread' the current character
-                        column -= 1;
-                        continue;
-                    }
-                    break;
-                case DEFERRED0: // #
-                    if (c == '{') {
-                        state = ParseState.DEFERRED1;
-                        // if chars in buffer, create constant
-                        if (strb.length() > 0) {
-                            final TemplateExpression cexpr = new ConstantExpression(strb.toString(), null);
-                            builder.add(cexpr);
-                            strb.delete(0, Integer.MAX_VALUE);
-                        }
-                    } else {
-                        // revert to CONST
-                        strb.append(deferredChar);
-                        state = ParseState.CONST;
-                        // 'unread' the current character
-                        column -= 1;
-                        continue;
-                    }
-                    break;
-                case IMMEDIATE1: // ${...
-                    if (c == '}') {
-                        if (immediate1 > 0) {
-                            immediate1 -= 1;
-                            strb.append(c);
-                        } else {
-                            // materialize the immediate expr
-                            final String src = strb.toString();
-                            final TemplateExpression iexpr = new ImmediateExpression(
-                                    src,
-                                    jexl.parse(info.at(lineno, column), noscript, src, scope),
-                                    null);
-                            builder.add(iexpr);
-                            strb.delete(0, Integer.MAX_VALUE);
-                            state = ParseState.CONST;
-                        }
-                    } else {
-                        if (c == '{') {
-                            immediate1 += 1;
-                        }
-                        // do buildup expr
-                        column = append(strb, expr, column, c);
-                    }
-                    break;
-                case DEFERRED1: // #{...
-                    // skip inner strings (for '}')
-                    // nested immediate in deferred; need to balance count of '{' & '}'
-                    // closing '}'
-                    switch (c) {
-                        case '"':
-                        case '\'':
-                            strb.append(c);
-                            column = StringParser.readString(strb, expr, column + 1, c);
-                            continue;
-                        case '{':
-                            if (expr.charAt(column - 1) == immediateChar) {
-                                inner1 += 1;
-                                strb.deleteCharAt(strb.length() - 1);
-                                nested = true;
-                            } else {
-                                deferred1 += 1;
-                                strb.append(c);
-                            }
-                            continue;
-                        case '}':
-                            // balance nested immediate
-                            if (deferred1 > 0) {
-                                deferred1 -= 1;
-                                strb.append(c);
-                            } else if (inner1 > 0) {
-                                inner1 -= 1;
-                            } else  {
-                                // materialize the nested/deferred expr
-                                final String src = strb.toString();
-                                TemplateExpression dexpr;
-                                if (nested) {
-                                    dexpr = new NestedExpression(
-                                            expr.substring(inested, column + 1),
-                                            jexl.parse(info.at(lineno, column), noscript, src, scope),
-                                            null);
-                                } else {
-                                    dexpr = new DeferredExpression(
-                                            strb.toString(),
-                                            jexl.parse(info.at(lineno, column), noscript, src, scope),
-                                            null);
-                                }
-                                builder.add(dexpr);
-                                strb.delete(0, Integer.MAX_VALUE);
-                                nested = false;
-                                state = ParseState.CONST;
-                            }
-                            break;
-                        default:
-                            // do buildup expr
-                            column = append(strb, expr, column, c);
-                            break;
-                        }
-                    break;
-                case ESCAPE:
-                    if (c == deferredChar) {
-                        strb.append(deferredChar);
-                    } else if (c == immediateChar) {
-                        strb.append(immediateChar);
-                    } else {
-                        strb.append('\\');
-                        strb.append(c);
-                    }
+            case CONST:
+                if (c == immediateChar) {
+                    state = ParseState.IMMEDIATE0;
+                } else if (c == deferredChar) {
+                    inested = column;
+                    state = ParseState.DEFERRED0;
+                } else if (c == '\\') {
+                    state = ParseState.ESCAPE;
+                } else {
+                    // do buildup expr
+                    strb.append(c);
+                }
+                break;
+            case IMMEDIATE0: // $
+                if (c != '{') {
+                    // revert to CONST
+                    strb.append(immediateChar);
                     state = ParseState.CONST;
+                    // 'unread' the current character
+                    column -= 1;
+                    continue;
+                }
+                state = ParseState.IMMEDIATE1;
+                // if chars in buffer, create constant
+                if (strb.length() > 0) {
+                    final TemplateExpression cexpr = new ConstantExpression(strb.toString(), null);
+                    builder.add(cexpr);
+                    strb.delete(0, Integer.MAX_VALUE);
+                }
+                break;
+            case DEFERRED0: // #
+                if (c != '{') {
+                    // revert to CONST
+                    strb.append(deferredChar);
+                    state = ParseState.CONST;
+                    // 'unread' the current character
+                    column -= 1;
+                    continue;
+                }
+                state = ParseState.DEFERRED1;
+                // if chars in buffer, create constant
+                if (strb.length() > 0) {
+                    final TemplateExpression cexpr = new ConstantExpression(strb.toString(), null);
+                    builder.add(cexpr);
+                    strb.delete(0, Integer.MAX_VALUE);
+                }
+                break;
+            case IMMEDIATE1: // ${...
+                if (c == '}') {
+                    if (immediate1 > 0) {
+                        immediate1 -= 1;
+                        strb.append(c);
+                    } else {
+                        // materialize the immediate expr
+                        final String src = strb.toString();
+                        final TemplateExpression iexpr = new ImmediateExpression(src, jexl.parse(info.at(lineno, column), noscript, src, scope), null);
+                        builder.add(iexpr);
+                        strb.delete(0, Integer.MAX_VALUE);
+                        state = ParseState.CONST;
+                    }
+                } else {
+                    if (c == '{') {
+                        immediate1 += 1;
+                    }
+                    // do buildup expr
+                    column = append(strb, expr, column, c);
+                }
+                break;
+            case DEFERRED1: // #{...
+                // skip inner strings (for '}')
+                // nested immediate in deferred; need to balance count of '{' & '}'
+                // closing '}'
+                switch (c) {
+                case '"':
+                case '\'':
+                    strb.append(c);
+                    column = StringParser.readString(strb, expr, column + 1, c);
+                    continue;
+                case '{':
+                    if (expr.charAt(column - 1) == immediateChar) {
+                        inner1 += 1;
+                        strb.deleteCharAt(strb.length() - 1);
+                        nested = true;
+                    } else {
+                        deferred1 += 1;
+                        strb.append(c);
+                    }
+                    continue;
+                case '}':
+                    // balance nested immediate
+                    if (deferred1 > 0) {
+                        deferred1 -= 1;
+                        strb.append(c);
+                    } else if (inner1 > 0) {
+                        inner1 -= 1;
+                    } else {
+                        // materialize the nested/deferred expr
+                        final String src = strb.toString();
+                        TemplateExpression dexpr;
+                        if (nested) {
+                            dexpr = new NestedExpression(expr.substring(inested, column + 1), jexl.parse(info.at(lineno, column), noscript, src, scope), null);
+                        } else {
+                            dexpr = new DeferredExpression(strb.toString(), jexl.parse(info.at(lineno, column), noscript, src, scope), null);
+                        }
+                        builder.add(dexpr);
+                        strb.delete(0, Integer.MAX_VALUE);
+                        nested = false;
+                        state = ParseState.CONST;
+                    }
                     break;
-                default: // in case we ever add new unified expression type
-                    throw new UnsupportedOperationException("unexpected unified expression type");
+                default:
+                    // do buildup expr
+                    column = append(strb, expr, column, c);
+                    break;
+                }
+                break;
+            case ESCAPE:
+                if (c == deferredChar) {
+                    strb.append(deferredChar);
+                } else if (c == immediateChar) {
+                    strb.append(immediateChar);
+                } else {
+                    strb.append('\\');
+                    strb.append(c);
+                }
+                state = ParseState.CONST;
+                break;
+            default: // in case we ever add new unified expression type
+                throw new UnsupportedOperationException("unexpected unified expression type");
             }
             if (c == '\n') {
                 lineno += 1;

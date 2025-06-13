@@ -171,10 +171,9 @@ class ReferenceFrame extends Frame {
             // if the captured symbol is lexical, it is redefined locally; a new reference is needed to share it with callees
             // otherwise share the reference
             return lexical ? (stack[s] = new CaptureReference(ref.get())) : ref;
-        } else {
-            // capture the register, wrap the value in a reference to share it with callees
-            return stack[s] = new CaptureReference(o);
         }
+        // capture the register, wrap the value in a reference to share it with callees
+        return stack[s] = new CaptureReference(o);
     }
 
     @Override

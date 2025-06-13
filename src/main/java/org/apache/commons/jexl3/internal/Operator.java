@@ -139,8 +139,8 @@ public final class Operator implements JexlOperator.Uberspect {
             synchronized(this) {
                 c = caching;
                 if (c < 0) {
-                    JexlEngine jexl = JexlEngine.getThreadEngine();
-                    caching = c = (jexl instanceof Engine) && ((Engine) jexl).cache != null ? 1 : 0;
+                    final JexlEngine jexl = JexlEngine.getThreadEngine();
+                    caching = c = jexl instanceof Engine && ((Engine) jexl).cache != null ? 1 : 0;
                 }
             }
         }
@@ -210,9 +210,9 @@ public final class Operator implements JexlOperator.Uberspect {
      * @param <T>      the return type
      * @return throws JexlException if strict and not silent, null otherwise
      */
-    private <T> T operatorError(final JexlCache.Reference ref, final JexlOperator operator, final Throwable cause, T alt) {
-        JexlNode node = (ref instanceof JexlNode) ? (JexlNode) ref : null;
-        Engine engine = (Engine) JexlEngine.getThreadEngine();
+    private <T> T operatorError(final JexlCache.Reference ref, final JexlOperator operator, final Throwable cause, final T alt) {
+        final JexlNode node = ref instanceof JexlNode ? (JexlNode) ref : null;
+        final Engine engine = (Engine) JexlEngine.getThreadEngine();
         if (engine == null || engine.isStrict()) {
             throw new JexlException.Operator(node, operator.getOperatorSymbol(), cause);
         }
@@ -347,7 +347,7 @@ public final class Operator implements JexlOperator.Uberspect {
                 }
             }
             // not-contains is !contains
-            return (JexlOperator.CONTAINS == operator) == contained;
+            return JexlOperator.CONTAINS == operator == contained;
         } catch (final Exception any) {
             return operatorError(node, operator, any, false);
         }
@@ -380,7 +380,7 @@ public final class Operator implements JexlOperator.Uberspect {
                 }
             }
             // not-startswith is !starts-with
-            return (JexlOperator.STARTSWITH == operator) == starts;
+            return JexlOperator.STARTSWITH == operator == starts;
         } catch (final Exception any) {
             return operatorError(node, operator, any, false);
         }
@@ -413,7 +413,7 @@ public final class Operator implements JexlOperator.Uberspect {
                 }
             }
             // not-endswith is !ends-with
-            return (JexlOperator.ENDSWITH == operator) == ends;
+            return JexlOperator.ENDSWITH == operator == ends;
         } catch (final Exception any) {
             return operatorError(node, operator, any, false);
         }
@@ -544,7 +544,7 @@ public final class Operator implements JexlOperator.Uberspect {
         }
         if (node != null) {
             // *2: could not find an overload for this operator and arguments, keep track of the fail
-            MethodKey key = new MethodKey(operator.getMethodName(), args);
+            final MethodKey key = new MethodKey(operator.getMethodName(), args);
             node.setCache(key);
         }
         return JexlEngine.TRY_FAILED;
@@ -592,7 +592,7 @@ public final class Operator implements JexlOperator.Uberspect {
         }
 
         @Override
-        public Object invoke(Object arithmetic, Object... params) throws Exception {
+        public Object invoke(final Object arithmetic, final Object... params) throws Exception {
             return operate((int) compare.invoke(arithmetic, params));
         }
 
@@ -602,12 +602,12 @@ public final class Operator implements JexlOperator.Uberspect {
         }
 
         @Override
-        public boolean tryFailed(Object rval) {
+        public boolean tryFailed(final Object rval) {
             return rval == JexlEngine.TRY_FAILED;
         }
 
         @Override
-        public Object tryInvoke(String name, Object arithmetic, Object... params) throws JexlException.TryFailed {
+        public Object tryInvoke(final String name, final Object arithmetic, final Object... params) throws JexlException.TryFailed {
             final Object cmp = compare.tryInvoke(JexlOperator.COMPARE.getMethodName(), arithmetic, params);
             return cmp instanceof Integer? operate((int) cmp) : JexlEngine.TRY_FAILED;
         }
@@ -640,12 +640,12 @@ public final class Operator implements JexlOperator.Uberspect {
         }
 
         @Override
-        public Object invoke(Object arithmetic, Object... params) throws Exception {
+        public Object invoke(final Object arithmetic, final Object... params) throws Exception {
             return operate(-(int) compare.invoke(arithmetic, params[1], params[0]));
         }
 
         @Override
-        public Object tryInvoke(String name, Object arithmetic, Object... params) throws JexlException.TryFailed {
+        public Object tryInvoke(final String name, final Object arithmetic, final Object... params) throws JexlException.TryFailed {
             final Object cmp = compare.tryInvoke(JexlOperator.COMPARE.getMethodName(), arithmetic, params[1], params[0]);
             return cmp instanceof Integer? operate(-Integer.signum((Integer) cmp)) : JexlEngine.TRY_FAILED;
         }
