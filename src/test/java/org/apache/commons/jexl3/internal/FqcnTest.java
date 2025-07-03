@@ -36,7 +36,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 
-
 public class FqcnTest extends JexlTestCase {
   public static final int FORTYTWO = 42;
   public FqcnTest() {
