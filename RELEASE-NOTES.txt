@@ -30,6 +30,29 @@ Have fun!
 -Apache Commons Team
 
 ========================================================================================================================
+Release 3.6.0
+========================================================================================================================
+
+Version 3.6.0 is a minor release.
+
+Compatibility with previous releases
+====================================
+Version 3.6.0 is source and binary compatible with 3.5.
+
+
+What's new in 3.6.0:
+====================
+Switch / case statements and expressions have been added to JEXL.
+
+New Features in 3.6.0:
+======================
+* JEXL-440:     Switch/case statement and expression
+Bugs Fixed in 3.6.0:
+====================
+* JEXL-437:     Semicolons not actually optional between function calls on separate lines
+
+
+========================================================================================================================
 Release 3.5.0
 ========================================================================================================================
 

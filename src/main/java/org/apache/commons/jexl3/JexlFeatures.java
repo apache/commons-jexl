@@ -725,9 +725,11 @@ public final class JexlFeatures {
      * may be missing an operator or that the intent is not clear.
      * </p>
      * @param flag true to enable, false to disable
+     * @return this features instance
      */
-    public void setAmbiguousStatement(final boolean flag) {
+    public JexlFeatures ambiguousStatement(final boolean flag) {
         setFeature(AMBIGUOUS_STATEMENT, flag);
+        return this;
     }
 
     /**
@@ -740,7 +742,8 @@ public final class JexlFeatures {
      * @return true if statements can be ambiguous, false otherwise
      */
     public boolean supportsAmbiguousStatement() {
-        return getFeature(AMBIGUOUS_STATEMENT);
+        boolean sas = getFeature(AMBIGUOUS_STATEMENT);
+        return sas;
     }
 
     /**

@@ -614,6 +614,45 @@ public class Issues400Test {
         }
     }
 
+    @Test
+    void test437a() {
+        JexlEngine jexl = new JexlBuilder().create();
+        final String src = "let values = [...]\n"
+                + "function append(const value) {\n"
+                + "  values.add(value)\n"
+                + "}\n"
+                + "\n"
+                + "append(1)\n"
+                + "append(2)\n"
+                + "return values ";
+        final JexlScript script = jexl.createScript(src);
+        assertNotNull(script);
+        final Object result = script.execute(null);
+        assertInstanceOf(List.class, result);
+        List<?> values = (List<?>) result;
+        assertEquals(2, values.size());
+    }
+
+    @Test
+    void test437b() {
+        JexlFeatures features = JexlFeatures.createDefault().ambiguousStatement(true);
+        assertTrue(features.supportsAmbiguousStatement());
+        JexlEngine jexl = new JexlBuilder().features(features).create();
+        final String src = "let values = [...]"
+                + "function append(const value) {"
+                + "  values.add(value)"
+                + "}"
+                + "append(1)"
+                + "append(2)"
+                + "return values ";
+        final JexlScript script = jexl.createScript(src);
+        assertNotNull(script);
+        final Object result = script.execute(null);
+        assertInstanceOf(List.class, result);
+        List<?> values = (List<?>) result;
+        assertEquals(2, values.size());
+    }
+
     /** The set of characters that may be followed by a '='.*/
     static final char[] EQ_FRIEND;
     static {
@@ -729,11 +768,10 @@ public class Issues400Test {
 
     @Test
     void test440a() {
-        JexlFeatures f = JexlFeatures.createDefault();
-        f.setAmbiguousStatement(true);
+        JexlFeatures f = JexlFeatures.createDefault().ambiguousStatement(true);
         JexlEngine jexl = new JexlBuilder().features(f).safe(false).strict(true).create();
-        String src =
-"let y = switch (x) { case 10,11 -> 3 case 20, 21 -> 4\ndefault -> { let z = 4; z + x } } y";
+        String src = "let y = switch (x) { case 10,11 -> 3 case 20, 21 -> 4\n" +
+                "default -> { let z = 4; z + x } } y";
         JexlScript script = jexl.createScript(src, "x");
         assertNotNull(script);
         String dbgStr = script.getParsedText();
@@ -749,8 +787,7 @@ public class Issues400Test {
         Assertions.assertEquals(4, result);
         result = script.execute(null, 38);
         Assertions.assertEquals(42, result);
-        src =
-                "let y = switch (x) { case 10,11 -> break; case 20, 21 -> 4 } y";
+        src = "let y = switch (x) { case 10,11 -> break; case 20, 21 -> 4; } y";
         try {
             script = jexl.createScript(src, "x");
             fail("should not be able to create script with break in switch");
@@ -779,5 +816,26 @@ public class Issues400Test {
         Assertions.assertEquals(169, result);
         result = script.execute(null, 38);
         Assertions.assertEquals(42, result);
+    }
+
+    public enum Scope440 {
+        UNDEFINED, UNDECLARED, GLOBAL, LOCAL, THIS, SUPER;
+    }
+
+    @Test
+    void test440c() {
+        JexlEngine jexl = new JexlBuilder().loader(getClass().getClassLoader()).imports(this.getClass().getName()).create();
+        final String src = "let s = switch (x) { case Scope440.UNDEFINED -> 'undefined'; case Scope440.THIS -> 'this'; default -> 'OTHER'; } s";
+        final JexlScript script = jexl.createScript(src, "x");
+        assertNotNull(script);
+        String dbgStr = script.getParsedText();
+        assertNotNull(dbgStr);
+
+        Object result = script.execute(null, Scope440.UNDEFINED);
+        Assertions.assertEquals("undefined", result);
+        result = script.execute(null, Scope440.THIS);
+        Assertions.assertEquals("this", result);
+        result = script.execute(null, 21);
+        Assertions.assertEquals("OTHER", result);
     }
 }

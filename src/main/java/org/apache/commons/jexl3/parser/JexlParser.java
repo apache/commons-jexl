@@ -20,6 +20,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Deque;
@@ -27,6 +28,7 @@ import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
@@ -37,6 +39,7 @@ import org.apache.commons.jexl3.JexlFeatures;
 import org.apache.commons.jexl3.JexlInfo;
 import org.apache.commons.jexl3.internal.LexicalScope;
 import org.apache.commons.jexl3.internal.Scope;
+import org.apache.commons.jexl3.introspection.JexlUberspect;
 
 /**
  * The base class for parsing, manages the parameter/local variable frame.
@@ -175,54 +178,83 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
      * The source being processed.
      */
     protected String source;
-
     /**
      * The map of named registers aka script parameters.
      * <p>Each parameter is associated to a register and is materialized
      * as an offset in the registers array used during evaluation.</p>
      */
     protected Scope scope;
-
     /**
      * When parsing inner functions/lambda, need to stack the scope (sic).
      */
     protected final Deque<Scope> scopes = new ArrayDeque<>();
-
     /**
      * The list of pragma declarations.
      */
     protected Map<String, Object> pragmas;
+    /**
+     * The optional class name and constant resolver.
+     */
+    protected JexlUberspect.ClassConstantResolver fqcnResolver = null;
+    /**
+     * The list of imports.
+     * <p>Imports are used to resolve simple class names into fully qualified class names.</p>
+     */
+    protected List<String> imports = new ArrayList<>();
 
+
+    void addImport(String importName) {
+        if (importName != null && !importName.isEmpty()) {
+            if (imports == null) {
+                imports = new ArrayList<>();
+            }
+            if (!imports.contains(importName)) {
+                imports.add(importName);
+            }
+        }
+    }
+
+    Object resolveConstant(String name) {
+        JexlUberspect.ClassConstantResolver resolver = fqcnResolver;
+        if (resolver == null) {
+            JexlEngine engine = JexlEngine.getThreadEngine();
+            if (engine instanceof JexlUberspect.ConstantResolverFactory) {
+                fqcnResolver = resolver = ((JexlUberspect.ConstantResolverFactory) engine).createConstantResolver(imports);
+            }
+        }
+        return resolver != null
+            ? resolver.resolveConstant(name)
+            : JexlEngine.TRY_FAILED;
+    }
+
+    /**
+     * Whether automatic semicolon insertion is enabled.
+     */
+    protected boolean autoSemicolon = true;
     /**
      * The known namespaces.
      */
     protected Set<String> namespaces;
-
     /**
      * The number of nested loops.
      */
     protected int loopCount;
-
     /**
      * Stack of parsing loop counts.
      */
     protected final Deque<Integer> loopCounts = new ArrayDeque<>();
-
     /**
      * The current lexical block.
      */
     protected LexicalUnit block;
-
     /**
      * Stack of lexical blocks.
      */
     protected final Deque<LexicalUnit> blocks = new ArrayDeque<>();
-
     /**
      * The map of lexical to functional blocks.
      */
     protected final Map<LexicalUnit, Scope> blockScopes = new IdentityHashMap<>();
-
     /**
      * The name of the null case constant.
      */
@@ -441,6 +473,8 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
         scopes.clear();
         pragmas = null;
         namespaces = null;
+        fqcnResolver = null;
+        imports.clear();
         loopCounts.clear();
         loopCount = 0;
         blocks.clear();
@@ -793,6 +827,27 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
      */
     protected boolean isVariable(final String name) {
         return scope != null && scope.getSymbol(name) != null;
+    }
+
+    /**
+     * Checks whether a statement is ambiguous.
+     * <p>
+     * This is used to detect statements that are not terminated by a semicolon,
+     * and that may be confused with an expression.
+     * </p>
+     * @param semicolon the semicolon token kind
+     * @return true if statement is ambiguous, false otherwise
+     */
+    protected boolean isAmbiguousStatement(int semicolon) {
+        if (autoSemicolon) {
+            Token current = getToken(0);
+            Token next = getToken(1);
+            if (current != null && next != null && current.endLine != next.beginLine) {
+                // if the next token is on a different line, no ambiguity reported
+                return false;
+            }
+        }
+        return !getFeatures().supportsAmbiguousStatement();
     }
 
     /**

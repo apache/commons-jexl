@@ -21,6 +21,9 @@ import java.lang.reflect.Field;
 
 import org.apache.commons.jexl3.introspection.JexlPropertyGet;
 
+import static java.lang.reflect.Modifier.isFinal;
+import static java.lang.reflect.Modifier.isStatic;
+
 /**
  * A JexlPropertyGet for public fields.
  */
@@ -63,6 +66,16 @@ public final class FieldGetExecutor implements JexlPropertyGet {
     @Override
     public boolean isCacheable() {
         return true;
+    }
+
+    @Override
+    public boolean isConstant() {
+        if (field.isEnumConstant()) {
+            return true;
+        }
+        final int modifiers = field.getModifiers();
+        // public static final fields are (considered) constants
+        return isFinal(modifiers) && isStatic(modifiers);
     }
 
     @Override

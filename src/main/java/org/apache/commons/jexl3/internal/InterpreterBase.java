@@ -16,7 +16,6 @@
  */
 package org.apache.commons.jexl3.internal;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -309,7 +308,7 @@ public abstract class InterpreterBase extends ParserVisitor {
     /** The namespace resolver. */
     protected final JexlContext.NamespaceResolver ns;
     /** The class name resolver. */
-    protected final JexlContext.ClassNameResolver fqcnSolver;
+    protected final JexlUberspect.ClassNameResolver fqcnSolver;
     /** The operators evaluation delegate. */
     protected final JexlOperator.Uberspect operators;
     /** The map of 'prefix:function' to object resolving as namespaces. */
@@ -355,10 +354,7 @@ public abstract class InterpreterBase extends ParserVisitor {
         }
         this.operators = ops;
         // the import package facility
-        final Collection<String> imports = options.getImports();
-        this.fqcnSolver = imports.isEmpty()
-                ? engine.classNameSolver
-                : new FqcnResolver(engine.classNameSolver).importPackages(imports);
+        this.fqcnSolver = engine.createConstantResolver(options.getImports());
     }
 
     /**

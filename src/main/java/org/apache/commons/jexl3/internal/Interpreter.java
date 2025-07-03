@@ -932,7 +932,7 @@ public class Interpreter extends InterpreterBase {
         if (fqcn != null) {
             return fqcn;
         }
-        // context may be solving class name ?
+        // context may be solving class name?
         if (context instanceof JexlContext.ClassNameResolver) {
             final JexlContext.ClassNameResolver resolver = (JexlContext.ClassNameResolver) context;
             fqcn = resolver.resolveClassName(name);

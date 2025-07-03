@@ -47,6 +47,14 @@ public interface JexlPropertyGet {
     boolean isCacheable();
 
     /**
+     * Checks whether this JexlPropertyGet returns a constant.
+     * @return true if invoking this getter will always return the same value, false otherwise
+     */
+    default boolean isConstant() {
+        return false;
+    }
+
+    /**
      * Checks whether a tryInvoke failed or not.
      *
      * @param rval the value returned by tryInvoke
