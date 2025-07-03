@@ -111,6 +111,7 @@ public interface JexlUberspect {
     interface ConstantResolverFactory {
         /**
          * Creates a constant resolver.
+         * @param imports the collection of imports (packages and classes) to use
          * @return a constant resolver
          */
         ClassConstantResolver createConstantResolver(Collection<String> imports);

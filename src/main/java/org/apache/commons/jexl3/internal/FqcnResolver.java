@@ -21,12 +21,12 @@ import org.apache.commons.jexl3.JexlException;
 import org.apache.commons.jexl3.introspection.JexlPropertyGet;
 import org.apache.commons.jexl3.introspection.JexlUberspect;
 
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Helper resolving a simple class name into a Fully Qualified Class Name (hence FqcnResolver) using

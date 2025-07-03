@@ -18,11 +18,10 @@
 package org.apache.commons.jexl3.internal.introspection;
 
 import java.lang.reflect.Field;
-
-import org.apache.commons.jexl3.introspection.JexlPropertyGet;
-
 import static java.lang.reflect.Modifier.isFinal;
 import static java.lang.reflect.Modifier.isStatic;
+import org.apache.commons.jexl3.introspection.JexlPropertyGet;
+
 
 /**
  * A JexlPropertyGet for public fields.
