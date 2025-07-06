@@ -17,10 +17,10 @@
 
 package org.apache.commons.jexl3;
 
-import org.apache.commons.jexl3.introspection.JexlUberspect;
-
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import org.apache.commons.jexl3.introspection.JexlUberspect;
 
 /**
  * Manages variables which can be referenced in a JEXL expression.
