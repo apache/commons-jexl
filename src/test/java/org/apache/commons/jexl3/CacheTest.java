@@ -37,7 +37,7 @@ import org.junit.jupiter.api.Test;
  * Verifies cache & tryExecute
  */
 @SuppressWarnings({"UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
-public class CacheTest extends JexlTestCase {
+class CacheTest extends JexlTestCase {
     /**
      * A task to check boolean assignment.
      */
@@ -635,42 +635,42 @@ public class CacheTest extends JexlTestCase {
     }
 
     @Test
-    public void testAssignBooleanCache() throws Exception {
+    void testAssignBooleanCache() throws Exception {
         runThreaded(AssignBooleanTask.class, LOOPS, true);
     }
 
     @Test
-    public void testAssignBooleanNoCache() throws Exception {
+    void testAssignBooleanNoCache() throws Exception {
         runThreaded(AssignBooleanTask.class, LOOPS, false);
     }
 
     @Test
-    public void testAssignCache() throws Exception {
+    void testAssignCache() throws Exception {
         runThreaded(AssignTask.class, LOOPS, true);
     }
 
     @Test
-    public void testAssignListCache() throws Exception {
+    void testAssignListCache() throws Exception {
         runThreaded(AssignListTask.class, LOOPS, true);
     }
 
     @Test
-    public void testAssignListNoCache() throws Exception {
+    void testAssignListNoCache() throws Exception {
         runThreaded(AssignListTask.class, LOOPS, false);
     }
 
     @Test
-    public void testAssignNoCache() throws Exception {
+    void testAssignNoCache() throws Exception {
         runThreaded(AssignTask.class, LOOPS, false);
     }
 
     @Test
-    public void testComputeCache() throws Exception {
+    void testComputeCache() throws Exception {
         runThreaded(ComputeTask.class, LOOPS, true);
     }
 
     @Test
-    public void testCOMPUTECache() throws Exception {
+    void testCOMPUTECache() throws Exception {
         final TestCacheArguments args = new TestCacheArguments();
         args.ca = new Object[]{
             Cached.class, Cached1.class, Cached2.class
@@ -680,12 +680,12 @@ public class CacheTest extends JexlTestCase {
     }
 
     @Test
-    public void testComputeNoCache() throws Exception {
+    void testComputeNoCache() throws Exception {
         runThreaded(ComputeTask.class, LOOPS, false);
     }
 
     @Test
-    public void testCOMPUTENoCache() throws Exception {
+    void testCOMPUTENoCache() throws Exception {
         final TestCacheArguments args = new TestCacheArguments();
         args.ca = new Object[]{
             Cached.class, Cached1.class, Cached2.class
@@ -695,12 +695,12 @@ public class CacheTest extends JexlTestCase {
     }
 
     @Test
-    public void testNullAssignCache() throws Exception {
+    void testNullAssignCache() throws Exception {
         runThreaded(AssignNullTask.class, LOOPS, true);
     }
 
     @Test
-    public void testNullAssignNoCache() throws Exception {
+    void testNullAssignNoCache() throws Exception {
         runThreaded(AssignNullTask.class, LOOPS, false);
     }
 }

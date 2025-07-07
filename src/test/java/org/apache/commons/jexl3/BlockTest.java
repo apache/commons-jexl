@@ -25,7 +25,7 @@ import org.junit.jupiter.api.Test;
  * Tests for blocks
  */
 @SuppressWarnings({"UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
-public class BlockTest extends JexlTestCase {
+class BlockTest extends JexlTestCase {
 
     /**
      * Create the test
@@ -35,7 +35,7 @@ public class BlockTest extends JexlTestCase {
     }
 
     @Test
-    public void testBlockExecutesAll() throws Exception {
+    void testBlockExecutesAll() throws Exception {
         final JexlScript e = JEXL.createScript("if (true) { x = 'Hello'; y = 'World';}");
         final JexlContext jc = new MapContext();
         final Object o = e.execute(jc);
@@ -45,7 +45,7 @@ public class BlockTest extends JexlTestCase {
     }
 
     @Test
-    public void testBlockLastExecuted01() throws Exception {
+    void testBlockLastExecuted01() throws Exception {
         final JexlScript e = JEXL.createScript("if (true) { x = 1; } else { x = 2; }");
         final JexlContext jc = new MapContext();
         final Object o = e.execute(jc);
@@ -53,7 +53,7 @@ public class BlockTest extends JexlTestCase {
     }
 
     @Test
-    public void testBlockLastExecuted02() throws Exception {
+    void testBlockLastExecuted02() throws Exception {
         final JexlScript e = JEXL.createScript("if (false) { x = 1; } else { x = 2; }");
         final JexlContext jc = new MapContext();
         final Object o = e.execute(jc);
@@ -61,7 +61,7 @@ public class BlockTest extends JexlTestCase {
     }
 
     @Test
-    public void testBlockSimple() throws Exception {
+    void testBlockSimple() throws Exception {
         final JexlScript e = JEXL.createScript("if (true) { 'hello'; }");
         final JexlContext jc = new MapContext();
         final Object o = e.execute(jc);
@@ -69,7 +69,7 @@ public class BlockTest extends JexlTestCase {
     }
 
     @Test
-    public void testEmptyBlock() throws Exception {
+    void testEmptyBlock() throws Exception {
         final JexlScript e = JEXL.createScript("if (true) { }");
         final JexlContext jc = new MapContext();
         final Object o = e.execute(jc);
@@ -77,7 +77,7 @@ public class BlockTest extends JexlTestCase {
     }
 
     @Test
-    public void testNestedBlock() throws Exception {
+    void testNestedBlock() throws Exception {
         final JexlScript e = JEXL.createScript("if (true) { x = 'hello'; y = 'world';" + " if (true) { x; } y; }");
         final JexlContext jc = new MapContext();
         final Object o = e.execute(jc);

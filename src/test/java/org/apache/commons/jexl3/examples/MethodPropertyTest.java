@@ -27,7 +27,7 @@ import org.junit.jupiter.api.Test;
 /**
  *  Simple example to show how to access method and properties.
  */
-public class MethodPropertyTest {
+class MethodPropertyTest {
     /**
      * Helper example class.
      */
@@ -127,7 +127,7 @@ public class MethodPropertyTest {
      * @throws Exception
      */
     @Test
-    public void testExample() throws Exception {
+    void testExample() throws Exception {
         example(AbstractOutput.JUNIT);
     }
 }

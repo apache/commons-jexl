@@ -39,7 +39,7 @@ import org.apache.commons.jexl3.MapContext;
 import org.apache.commons.jexl3.introspection.JexlUberspect;
 import org.junit.jupiter.api.Test;
 
-public class OptionalTest {
+class OptionalTest {
 
     public static class StreamContext extends MapContext {
         public Stream map(final Collection<Object> c, final JexlScript s) {
@@ -72,7 +72,7 @@ public class OptionalTest {
     }
 
     @Test
-    public void test342() {
+    void test342() {
         final JexlBuilder builder = new JexlBuilder();
         final JexlUberspect uber = builder.create().getUberspect();
         final JexlEngine jexl = builder.uberspect(new ReferenceUberspect(uber)).safe(false).create();
@@ -109,7 +109,7 @@ public class OptionalTest {
     }
 
     @Test
-    public void testOptionalArgs() {
+    void testOptionalArgs() {
         final JexlBuilder builder = new JexlBuilder();
         final JexlArithmetic jexla = new OptionalArithmetic(true);
         final JexlUberspect uber = builder.create().getUberspect();
@@ -124,7 +124,7 @@ public class OptionalTest {
     }
 
     @Test
-    public void testStream0() {
+    void testStream0() {
         final String src = "$0.map(x -> x * x).reduce((a, x) -> a + x)";
         final JexlBuilder builder = new JexlBuilder();
         final JexlUberspect uber = builder.create().getUberspect();
@@ -138,7 +138,7 @@ public class OptionalTest {
     }
 
     @Test
-    public void testStream1() {
+    void testStream1() {
         final String src = "$0.map(x -> x * x).reduce((a, x) -> a + x)";
         final JexlEngine jexl = new JexlBuilder().safe(false).create();
         final JexlInfo info = new JexlInfo("testStream", 1, 1);

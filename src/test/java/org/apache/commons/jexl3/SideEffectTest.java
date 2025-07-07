@@ -41,7 +41,7 @@ import org.junit.jupiter.api.Test;
  * Tests for array access operator []
  */
 @SuppressWarnings({"UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
-public class SideEffectTest extends JexlTestCase {
+class SideEffectTest extends JexlTestCase {
 
     /**
      * An arithmetic that implements 2 selfAdd methods.
@@ -462,17 +462,17 @@ public class SideEffectTest extends JexlTestCase {
     }
 
     @Test
-    public void test246() throws Exception {
+    void test246() throws Exception {
         run246(new Arithmetic246(true));
     }
 
     @Test
-    public void test246b() throws Exception {
+    void test246b() throws Exception {
         run246(new Arithmetic246b(true));
     }
 
     @Test
-    public void test248() throws Exception {
+    void test248() throws Exception {
         final MapContext ctx = new MapContext();
         final List<Object> foo = new ArrayList<>(Arrays.asList(10, 20, 30, 40));
         ctx.set("foo", foo);
@@ -489,7 +489,7 @@ public class SideEffectTest extends JexlTestCase {
     }
 
     @Test
-    public void testArithmeticSelf() throws Exception {
+    void testArithmeticSelf() throws Exception {
         final JexlEngine jexl = new JexlBuilder().cache(64).arithmetic(new SelfArithmetic(false)).create();
         final JexlContext jc = null;
         runSelfOverload(jexl, jc);
@@ -497,14 +497,14 @@ public class SideEffectTest extends JexlTestCase {
     }
 
     @Test
-    public void testArithmeticSelfNoCache() throws Exception {
+    void testArithmeticSelfNoCache() throws Exception {
         final JexlEngine jexl = new JexlBuilder().cache(0).arithmetic(new SelfArithmetic(false)).create();
         final JexlContext jc = null;
         runSelfOverload(jexl, jc);
     }
 
     @Test
-    public void testIncrementSelf() throws Exception {
+    void testIncrementSelf() throws Exception {
         final JexlEngine jexl = new JexlBuilder().cache(64).arithmetic(new SelfArithmetic(false)).create();
         final JexlContext jc = null;
         runSelfIncrement(jexl, jc);
@@ -512,14 +512,14 @@ public class SideEffectTest extends JexlTestCase {
     }
 
     @Test
-    public void testIncrementSelfNoCache() throws Exception {
+    void testIncrementSelfNoCache() throws Exception {
         final JexlEngine jexl = new JexlBuilder().cache(0).arithmetic(new SelfArithmetic(false)).create();
         final JexlContext jc = null;
         runSelfIncrement(jexl, jc);
     }
 
     @Test
-    public void testOverrideGetSet() throws Exception {
+    void testOverrideGetSet() throws Exception {
         final JexlEngine jexl = new JexlBuilder().cache(64).arithmetic(new SelfArithmetic(false)).create();
         final JexlContext jc = null;
 
@@ -541,7 +541,7 @@ public class SideEffectTest extends JexlTestCase {
     }
 
     @Test
-    public void testSideEffectAntishArray() throws Exception {
+    void testSideEffectAntishArray() throws Exception {
         final Integer i41 = Integer.valueOf(4141);
         final Integer i42 = Integer.valueOf(42);
         final Integer i43 = Integer.valueOf(43);
@@ -576,7 +576,7 @@ public class SideEffectTest extends JexlTestCase {
     }
 
     @Test
-    public void testSideEffectArray() throws Exception {
+    void testSideEffectArray() throws Exception {
         final Integer i41 = Integer.valueOf(4141);
         final Integer i42 = Integer.valueOf(42);
         final Integer i43 = Integer.valueOf(43);
@@ -613,7 +613,7 @@ public class SideEffectTest extends JexlTestCase {
     }
 
     @Test
-    public void testSideEffectBean() throws Exception {
+    void testSideEffectBean() throws Exception {
         final Integer i41 = Integer.valueOf(4141);
         final Foo foo = new Foo(0);
         asserter.setVariable("foo", foo);
@@ -644,7 +644,7 @@ public class SideEffectTest extends JexlTestCase {
     }
 
     @Test
-    public void testSideEffectBeanContainer() throws Exception {
+    void testSideEffectBeanContainer() throws Exception {
         final Integer i41 = Integer.valueOf(4141);
         final Foo foo = new Foo(0);
         asserter.setVariable("foo", foo);
@@ -678,7 +678,7 @@ public class SideEffectTest extends JexlTestCase {
     }
 
     @Test
-    public void testSideEffectDotArray() throws Exception {
+    void testSideEffectDotArray() throws Exception {
         final Integer i41 = Integer.valueOf(4141);
         final Integer i42 = Integer.valueOf(42);
         final Integer i43 = Integer.valueOf(43);
@@ -715,7 +715,7 @@ public class SideEffectTest extends JexlTestCase {
     }
 
     @Test
-    public void testSideEffectVar() throws Exception {
+    void testSideEffectVar() throws Exception {
         final Map<String,Object> context = asserter.getVariables();
         final Integer i41 = Integer.valueOf(4141);
         final Object foo = i41;
@@ -766,7 +766,7 @@ public class SideEffectTest extends JexlTestCase {
     }
 
     @Test
-    public void testSideEffectVarDots() throws Exception {
+    void testSideEffectVarDots() throws Exception {
         final Map<String,Object> context = asserter.getVariables();
         final Integer i41 = Integer.valueOf(4141);
         final Object foo = i41;

@@ -66,7 +66,7 @@ public abstract class JexlNode extends SimpleNode implements JexlCache.Reference
     }
 
     @Override
-    public void setCache(Object cache) {
+    public void setCache(final Object cache) {
         jjtSetValue(cache);
     }
 
@@ -324,7 +324,7 @@ public abstract class JexlNode extends SimpleNode implements JexlCache.Reference
      * @param name the source name
      * @return the info
      */
-    public JexlInfo jexlInfo(String name) {
+    public JexlInfo jexlInfo(final String name) {
         JexlInfo info = null;
         JexlNode node = this;
         while (node != null) {

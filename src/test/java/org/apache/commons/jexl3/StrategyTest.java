@@ -35,7 +35,7 @@ import org.junit.jupiter.api.Test;
  * Test cases for the if statement.
  */
 @SuppressWarnings({"UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
-public class StrategyTest extends JexlTestCase {
+class StrategyTest extends JexlTestCase {
     // JEXL-174
     public static class MapArithmetic extends JexlArithmetic {
         public MapArithmetic(final boolean flag) {
@@ -115,25 +115,25 @@ public class StrategyTest extends JexlTestCase {
     }
 
     @Test
-    public void testJexlStrategy() throws Exception {
+    void testJexlStrategy() throws Exception {
         final JexlEngine jexl = new Engine();
         run171(jexl, true);
     }
 
     @Test
-    public void testMapStrategy() throws Exception {
+    void testMapStrategy() throws Exception {
         final JexlEngine jexl = new JexlBuilder().strategy(JexlUberspect.MAP_STRATEGY).create();
         run171(jexl, false);
     }
 
     @Test
-    public void testMyMapStrategy() throws Exception {
+    void testMyMapStrategy() throws Exception {
         final JexlEngine jexl = new JexlBuilder().arithmetic(new MapArithmetic(true)).create();
         run171(jexl, false);
     }
 
     @Test
-    public void testRawResolvers() throws Exception {
+    void testRawResolvers() throws Exception {
         final Object map  = new HashMap<String, Object>();
         final JexlEngine jexl = new JexlBuilder().create();
         final JexlUberspect uberspect = jexl.getUberspect();

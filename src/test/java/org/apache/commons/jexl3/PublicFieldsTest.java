@@ -27,7 +27,7 @@ import org.junit.jupiter.api.Test;
  * Tests public field set/get.
  */
 @SuppressWarnings({"UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
-public class PublicFieldsTest extends JexlTestCase {
+class PublicFieldsTest extends JexlTestCase {
     public enum Gender { MALE, FEMALE }
     /**
      * An Inner class.
@@ -68,7 +68,7 @@ public class PublicFieldsTest extends JexlTestCase {
     }
 
     @Test
-    public void testGetEnum() throws Exception {
+    void testGetEnum() throws Exception {
         ctxt.set("com.jexl.gender", Gender.class);
         final String src = "x = com.jexl.gender.FEMALE";
         final JexlScript script = JEXL.createScript(src);
@@ -78,7 +78,7 @@ public class PublicFieldsTest extends JexlTestCase {
     }
 
     @Test
-    public void testGetInnerDouble() throws Exception {
+    void testGetInnerDouble() throws Exception {
         final JexlExpression get = JEXL.createExpression("pub.inner.aDouble");
         assertEquals(42.0, get.evaluate(ctxt));
         JEXL.setProperty(pub, "inner.aDouble", -42);
@@ -86,7 +86,7 @@ public class PublicFieldsTest extends JexlTestCase {
     }
 
     @Test
-    public void testGetInt() throws Exception {
+    void testGetInt() throws Exception {
         final JexlExpression get = JEXL.createExpression("pub.anInt");
         assertEquals(42, get.evaluate(ctxt));
         JEXL.setProperty(pub, "anInt", -42);
@@ -94,7 +94,7 @@ public class PublicFieldsTest extends JexlTestCase {
     }
 
     @Test
-    public void testGetStaticField() throws Exception {
+    void testGetStaticField() throws Exception {
         ctxt.set("com.jexl", Inner.class);
         final String src = "x = com.jexl.NOT42";
         final JexlScript script = JEXL.createScript(src);
@@ -104,7 +104,7 @@ public class PublicFieldsTest extends JexlTestCase {
     }
 
     @Test
-    public void testGetString() throws Exception {
+    void testGetString() throws Exception {
         final JexlExpression get = JEXL.createExpression("pub.aString");
         assertEquals(LOWER42, get.evaluate(ctxt));
         JEXL.setProperty(pub, "aString", UPPER42);
@@ -112,7 +112,7 @@ public class PublicFieldsTest extends JexlTestCase {
     }
 
     @Test
-    public void testSetInnerDouble() throws Exception {
+    void testSetInnerDouble() throws Exception {
         final JexlExpression set = JEXL.createExpression("pub.inner.aDouble = value");
         ctxt.set("value", -42.0);
         assertEquals(-42.0, set.evaluate(ctxt));
@@ -127,7 +127,7 @@ public class PublicFieldsTest extends JexlTestCase {
     }
 
     @Test
-    public void testSetInt() throws Exception {
+    void testSetInt() throws Exception {
         final JexlExpression set = JEXL.createExpression("pub.anInt = value");
         ctxt.set("value", -42);
         assertEquals(-42, set.evaluate(ctxt));
@@ -142,7 +142,7 @@ public class PublicFieldsTest extends JexlTestCase {
     }
 
     @Test
-    public void testSetString() throws Exception {
+    void testSetString() throws Exception {
         final JexlExpression set = JEXL.createExpression("pub.aString = value");
         ctxt.set("value", UPPER42);
         assertEquals(UPPER42, set.evaluate(ctxt));

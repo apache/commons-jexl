@@ -56,7 +56,7 @@ import org.junit.jupiter.params.provider.MethodSource;
  * Test cases for the UnifiedEL.
  */
 @SuppressWarnings({"UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
-public class JXLTTest extends JexlTestCase {
+class JXLTTest extends JexlTestCase {
     public static class Context311 extends MapContext
       implements JexlContext.OptionsHandle, JexlContext.ThreadLocal {
         private JexlOptions options;

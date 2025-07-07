@@ -52,7 +52,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-public class JexlScriptEngineTest {
+class JexlScriptEngineTest {
     public static class Errors {
         public int illegal() {
             throw new IllegalArgumentException("jexl");

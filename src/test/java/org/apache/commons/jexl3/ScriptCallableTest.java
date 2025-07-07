@@ -44,7 +44,7 @@ import org.junit.jupiter.api.Test;
  * Tests around asynchronous script execution and interrupts.
  */
 @SuppressWarnings({ "UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes" })
-public class ScriptCallableTest extends JexlTestCase {
+class ScriptCallableTest extends JexlTestCase {
     public static class AnnotationContext extends MapContext implements JexlContext.AnnotationProcessor {
         @Override
         public Object processAnnotation(final String name, final Object[] args, final Callable<Object> statement) throws Exception {
@@ -213,7 +213,7 @@ public class ScriptCallableTest extends JexlTestCase {
     }
 
     @Test
-    public void testCallableCancel() throws Exception {
+    void testCallableCancel() throws Exception {
         final Semaphore latch = new Semaphore(0);
         final JexlContext ctxt = new MapContext();
         ctxt.set("latch", latch);
@@ -243,7 +243,7 @@ public class ScriptCallableTest extends JexlTestCase {
      * Tests JEXL-317.
      */
     @Test
-    public void testCallableCancellation() throws Exception {
+    void testCallableCancellation() throws Exception {
         final Semaphore latch = new Semaphore(0);
         final AtomicBoolean cancel = new AtomicBoolean(false);
         final JexlContext ctxt = new CancellationContext(cancel);
@@ -271,7 +271,7 @@ public class ScriptCallableTest extends JexlTestCase {
     }
 
     @Test
-    public void testCallableClosure() throws Exception {
+    void testCallableClosure() throws Exception {
         final JexlScript e = JEXL.createScript("function(t) {while(t);}");
         final Callable<Object> c = e.callable(null, Boolean.TRUE);
         final List<Runnable> list;
@@ -289,7 +289,7 @@ public class ScriptCallableTest extends JexlTestCase {
     }
 
     @Test
-    public void testCallableTimeout() throws Exception {
+    void testCallableTimeout() throws Exception {
         final Semaphore latch = new Semaphore(0);
         final JexlContext ctxt = new MapContext();
         ctxt.set("latch", latch);
@@ -311,7 +311,7 @@ public class ScriptCallableTest extends JexlTestCase {
     }
 
     @Test
-    public void testCancelForever() throws Exception {
+    void testCancelForever() throws Exception {
         final Semaphore latch = new Semaphore(0);
         final JexlContext ctxt = new TestContext();
         ctxt.set("latch", latch);
@@ -334,7 +334,7 @@ public class ScriptCallableTest extends JexlTestCase {
     }
 
     @Test
-    public void testCancelLoopWait() throws Exception {
+    void testCancelLoopWait() throws Exception {
         final List<Runnable> list;
         final JexlScript e = JEXL.createScript("while (true) { wait(10) }");
         final Callable<Object> c = e.callable(new TestContext());
@@ -352,7 +352,7 @@ public class ScriptCallableTest extends JexlTestCase {
     }
 
     @Test
-    public void testCancelWait() throws Exception {
+    void testCancelWait() throws Exception {
         final List<Runnable> list;
         final JexlScript e = JEXL.createScript("wait(10)");
         final Callable<Object> c = e.callable(new TestContext());
@@ -369,7 +369,7 @@ public class ScriptCallableTest extends JexlTestCase {
     }
 
     @Test
-    public void testCancelWaitInterrupt() throws Exception {
+    void testCancelWaitInterrupt() throws Exception {
         final List<Runnable> list;
         final JexlScript e = JEXL.createScript("waitInterrupt(42)");
         final Callable<Object> c = e.callable(new TestContext());
@@ -387,7 +387,7 @@ public class ScriptCallableTest extends JexlTestCase {
     }
 
     @Test
-    public void testFuture() throws Exception {
+    void testFuture() throws Exception {
         final JexlScript e = JEXL.createScript("while(true);");
         final FutureTask<Object> future = new FutureTask<>(e.callable(null));
         final ExecutorService executor = Executors.newFixedThreadPool(1);
@@ -402,7 +402,7 @@ public class ScriptCallableTest extends JexlTestCase {
     }
 
     @Test
-    public void testHangs() throws Exception {
+    void testHangs() throws Exception {
         final JexlScript e = JEXL.createScript("hangs()");
         final Callable<Object> c = e.callable(new TestContext());
         final ExecutorService executor = Executors.newFixedThreadPool(1);
@@ -416,32 +416,32 @@ public class ScriptCallableTest extends JexlTestCase {
     }
 
     @Test
-    public void testInterruptCancellable() throws Exception {
+    void testInterruptCancellable() throws Exception {
         runInterrupt(new JexlBuilder().silent(true).strict(true).cancellable(true).create());
     }
 
     @Test
-    public void testInterruptSilentLenient() throws Exception {
+    void testInterruptSilentLenient() throws Exception {
         runInterrupt(new JexlBuilder().silent(true).strict(false).create());
     }
 
     @Test
-    public void testInterruptSilentStrict() throws Exception {
+    void testInterruptSilentStrict() throws Exception {
         runInterrupt(new JexlBuilder().silent(true).strict(true).create());
     }
 
     @Test
-    public void testInterruptVerboseLenient() throws Exception {
+    void testInterruptVerboseLenient() throws Exception {
         runInterrupt(new JexlBuilder().silent(false).strict(false).create());
     }
 
     @Test
-    public void testInterruptVerboseStrict() throws Exception {
+    void testInterruptVerboseStrict() throws Exception {
         runInterrupt(new JexlBuilder().silent(false).strict(true).create());
     }
 
     @Test
-    public void testNoWait() throws Exception {
+    void testNoWait() throws Exception {
         List<Runnable> lr = null;
         final JexlScript e = JEXL.createScript("wait(0)");
         final Callable<Object> c = e.callable(new TestContext());
@@ -459,7 +459,7 @@ public class ScriptCallableTest extends JexlTestCase {
     }
 
     @Test
-    public void testTimeout() throws Exception {
+    void testTimeout() throws Exception {
         JexlScript script = JEXL.createScript("(flag)->{ @timeout(100) { while(flag); return 42 }; 'cancelled' }");
         final JexlContext ctxt = new AnnotationContext();
         Object result = script.execute(ctxt, true);
@@ -486,7 +486,7 @@ public class ScriptCallableTest extends JexlTestCase {
     }
 
     @Test
-    public void testWait() throws Exception {
+    void testWait() throws Exception {
         List<Runnable> lr = null;
         final JexlScript e = JEXL.createScript("wait(1)");
         final Callable<Object> c = e.callable(new TestContext());

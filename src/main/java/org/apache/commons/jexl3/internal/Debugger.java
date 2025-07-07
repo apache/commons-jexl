@@ -668,7 +668,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
                 }
             }
         }
-        char lastChar = builder.charAt(builder.length() - 1);
+        final char lastChar = builder.charAt(builder.length() - 1);
         if (!Character.isSpaceChar(lastChar) && lastChar != '\n') {
             builder.append(' ');
         }

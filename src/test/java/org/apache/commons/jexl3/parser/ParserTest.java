@@ -27,7 +27,7 @@ import org.junit.jupiter.api.Test;
 
 /**
  */
-public class ParserTest {
+class ParserTest {
     static final JexlFeatures FEATURES = new JexlFeatures();
     public ParserTest() {}
 
@@ -35,7 +35,7 @@ public class ParserTest {
      * Test the escaped control characters.
      */
     @Test
-    public void testControlCharacters() {
+    void testControlCharacters() {
         // Both '' and "" are valid JEXL string
         // The array of tuples where the first element is an expected result and the second element is a test string.
         final String[][] strings = {
@@ -54,13 +54,13 @@ public class ParserTest {
     }
 
     @Test
-    public void testErrorAmbiguous() throws Exception {
+    void testErrorAmbiguous() throws Exception {
         final Parser parser = new Parser(";");
         assertThrows(JexlException.Ambiguous.class, () -> parser.parse(null, FEATURES, "x = 1 y = 5", null), "should have failed on ambiguous statement");
     }
 
     @Test
-    public void testErrorAssign() throws Exception {
+    void testErrorAssign() throws Exception {
         final String[] ops = { "=", "+=", "-=", "/=", "*=", "^=", "&=", "|=" };
         for (final String op : ops) {
             final Parser parser = new Parser(";");
@@ -72,7 +72,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testIdentifierEscape() {
+    void testIdentifierEscape() {
         final String[] ids = {"a\\ b", "a\\ b\\ c", "a\\'b\\\"c", "a\\ \\ c"};
         for(final String id : ids) {
             final String esc0 = StringParser.unescapeIdentifier(id);
@@ -86,7 +86,7 @@ public class ParserTest {
      * See if we can parse simple scripts
      */
     @Test
-    public void testParse() throws Exception {
+    void testParse() throws Exception {
         final Parser parser = new Parser(";");
         JexlNode sn;
         sn = parser.parse(null, FEATURES, "foo = 1;", null);

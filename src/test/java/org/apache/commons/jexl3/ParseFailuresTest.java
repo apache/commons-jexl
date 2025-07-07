@@ -26,7 +26,7 @@ import org.junit.jupiter.api.Test;
  * Tests for malformed expressions and scripts. ({@link org.apache.commons.jexl3.JexlEngine#createExpression(String)} and
  * {@link org.apache.commons.jexl3.JexlEngine#createScript(String)} should throw {@link org.apache.commons.jexl3.JexlException}s).
  */
-public class ParseFailuresTest extends JexlTestCase {
+class ParseFailuresTest extends JexlTestCase {
 
     static final Log LOGGER = LogFactory.getLog(ParseFailuresTest.class.getName());
 
@@ -38,7 +38,7 @@ public class ParseFailuresTest extends JexlTestCase {
     }
 
     @Test
-    public void testMalformedExpression1() throws Exception {
+    void testMalformedExpression1() throws Exception {
         // this will throw a JexlException
         final String badExpression = "eq";
         final JexlException pe = assertThrows(JexlException.class, () -> JEXL.createExpression(badExpression),
@@ -47,7 +47,7 @@ public class ParseFailuresTest extends JexlTestCase {
     }
 
     @Test
-    public void testMalformedExpression2() throws Exception {
+    void testMalformedExpression2() throws Exception {
         // this will throw a TokenMgrErr, which we rethrow as a JexlException
         final String badExpression = "?";
         final JexlException pe = assertThrows(JexlException.class, () -> JEXL.createExpression(badExpression),
@@ -56,7 +56,7 @@ public class ParseFailuresTest extends JexlTestCase {
     }
 
     @Test
-    public void testMalformedScript1() throws Exception {
+    void testMalformedScript1() throws Exception {
         // this will throw a TokenMgrErr, which we rethrow as a JexlException
         final String badScript = "eq";
         final JexlException pe = assertThrows(JexlException.class, () -> JEXL.createExpression(badScript),
@@ -65,7 +65,7 @@ public class ParseFailuresTest extends JexlTestCase {
     }
 
     @Test
-    public void testMalformedScript2() throws Exception {
+    void testMalformedScript2() throws Exception {
         // this will throw a TokenMgrErr, which we rethrow as a JexlException
         final String badScript = "?";
         final JexlException pe = assertThrows(JexlException.class, () -> JEXL.createExpression(badScript),
@@ -74,7 +74,7 @@ public class ParseFailuresTest extends JexlTestCase {
     }
 
     @Test
-    public void testMalformedScript3() throws Exception {
+    void testMalformedScript3() throws Exception {
         // this will throw a TokenMgrErr, which we rethrow as a JexlException
         final String badScript = "foo=1;bar=2;a?b:c:d;";
         final JexlException pe = assertThrows(JexlException.class, () -> JEXL.createExpression(badScript),

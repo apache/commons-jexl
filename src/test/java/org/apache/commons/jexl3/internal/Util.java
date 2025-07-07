@@ -79,12 +79,12 @@ public class Util {
             return;
         }
         final Engine jdbg = new Engine();
-        JexlScriptParser jexlp = jdbg.parser;;
+        final JexlScriptParser jexlp = jdbg.parser;
         if (!(jexlp instanceof Parser)) {
             // jexl-438 escape
             return;
         }
-        Parser parser = (Parser) jexlp;
+        final Parser parser = (Parser) jexlp;
         parser.allowRegisters(true);
         final Debugger dbg = new Debugger();
         // iterate over all expression in

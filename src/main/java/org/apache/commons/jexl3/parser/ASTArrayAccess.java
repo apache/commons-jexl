@@ -41,7 +41,7 @@ public class ASTArrayAccess extends JexlLexicalNode {
   }
 
   @Override
-  public boolean isSafeLhs(boolean safe) {
+  public boolean isSafeLhs(final boolean safe) {
     return isSafeChild(0) || super.isSafeLhs(safe);
   }
 

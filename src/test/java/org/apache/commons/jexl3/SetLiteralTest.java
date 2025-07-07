@@ -32,7 +32,7 @@ import org.junit.jupiter.api.Test;
  * Tests for set literals
  */
 @SuppressWarnings({"UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
-public class SetLiteralTest extends JexlTestCase {
+class SetLiteralTest extends JexlTestCase {
 
     private static Set<?> createSet(final Object... args) {
         return new HashSet<>(Arrays.asList(args));
@@ -43,7 +43,7 @@ public class SetLiteralTest extends JexlTestCase {
     }
 
     @Test
-    public void testLiteralWithOneEntry() throws Exception {
+    void testLiteralWithOneEntry() throws Exception {
         final List<String> sources = Arrays.asList("{ 'foo' }", "{ 'foo', }");
         for(final String src : sources) {
             final JexlExpression e = JEXL.createExpression(src);
@@ -56,7 +56,7 @@ public class SetLiteralTest extends JexlTestCase {
     }
 
     @Test
-    public void testNotEmptySimpleSetLiteral() throws Exception {
+    void testNotEmptySimpleSetLiteral() throws Exception {
         final JexlExpression e = JEXL.createExpression("empty({ 'foo' , 'bar' })");
         final JexlContext jc = new MapContext();
 
@@ -65,7 +65,7 @@ public class SetLiteralTest extends JexlTestCase {
     }
 
     @Test
-    public void testSetLiteralWithNulls() throws Exception {
+    void testSetLiteralWithNulls() throws Exception {
         final String[] exprs = {
             "{  }",
             "{ 10 }",
@@ -92,7 +92,7 @@ public class SetLiteralTest extends JexlTestCase {
     }
 
     @Test
-    public void testSetLiteralWithNumbers() throws Exception {
+    void testSetLiteralWithNumbers() throws Exception {
         final JexlExpression e = JEXL.createExpression("{ 5.0 , 10 }");
         final JexlContext jc = new MapContext();
 
@@ -102,7 +102,7 @@ public class SetLiteralTest extends JexlTestCase {
     }
 
     @Test
-    public void testSetLiteralWithOneEntryBlock() throws Exception {
+    void testSetLiteralWithOneEntryBlock() throws Exception {
         final JexlScript e = JEXL.createScript("{ { 'foo' }; }");
         final JexlContext jc = new MapContext();
 
@@ -112,7 +112,7 @@ public class SetLiteralTest extends JexlTestCase {
     }
 
     @Test
-    public void testSetLiteralWithOneEntryScript() throws Exception {
+    void testSetLiteralWithOneEntryScript() throws Exception {
         final JexlScript e = JEXL.createScript("{ 'foo' }");
         final JexlContext jc = new MapContext();
 
@@ -122,7 +122,7 @@ public class SetLiteralTest extends JexlTestCase {
     }
 
     @Test
-    public void testSetLiteralWithOneNestedSet() throws Exception {
+    void testSetLiteralWithOneNestedSet() throws Exception {
         final JexlScript e = JEXL.createScript("{ { 'foo' } }");
         final JexlContext jc = new MapContext();
 
@@ -132,7 +132,7 @@ public class SetLiteralTest extends JexlTestCase {
     }
 
     @Test
-    public void testSetLiteralWithStrings() throws Exception {
+    void testSetLiteralWithStrings() throws Exception {
         final List<String> sources = Arrays.asList("{ 'foo', 'bar' }", "{ 'foo', 'bar', ... }", "{ 'foo', 'bar', }");
         for (final String src : sources) {
             final JexlExpression e = JEXL.createExpression(src);
@@ -145,7 +145,7 @@ public class SetLiteralTest extends JexlTestCase {
     }
 
     @Test
-    public void testSetLiteralWithStringsScript() throws Exception {
+    void testSetLiteralWithStringsScript() throws Exception {
         final JexlScript e = JEXL.createScript("{ 'foo' , 'bar' }");
         final JexlContext jc = new MapContext();
 
@@ -155,7 +155,7 @@ public class SetLiteralTest extends JexlTestCase {
     }
 
     @Test
-    public void testSizeOfSimpleSetLiteral() throws Exception {
+    void testSizeOfSimpleSetLiteral() throws Exception {
         final JexlExpression e = JEXL.createExpression("size({ 'foo' , 'bar'})");
         final JexlContext jc = new MapContext();
 

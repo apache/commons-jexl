@@ -31,7 +31,7 @@ import org.junit.jupiter.api.Test;
 /**
  * Checking the builder basics.
  */
-public class BuilderTest {
+class BuilderTest {
     private static JexlBuilder builder() {
         return new JexlBuilder();
     }

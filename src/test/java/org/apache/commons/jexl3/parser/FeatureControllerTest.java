@@ -23,7 +23,7 @@ import org.apache.commons.jexl3.JexlTestCase;
 import org.apache.commons.jexl3.junit.Asserter;
 import org.junit.jupiter.api.Test;
 
-public class FeatureControllerTest extends JexlTestCase {
+class FeatureControllerTest extends JexlTestCase {
 
     public FeatureControllerTest() {
         super("FeatureControllerTest");
@@ -35,7 +35,7 @@ public class FeatureControllerTest extends JexlTestCase {
     }
 
     @Test
-    public void testAnnotationFeatureSwitch() throws Exception {
+    void testAnnotationFeatureSwitch() throws Exception {
         final Asserter onAsserter = new Asserter(createEngine(new JexlFeatures().methodCall(true).annotation(true)));
         final Asserter offAsserter = new Asserter(createEngine(new JexlFeatures().methodCall(true).annotation(false)));
         final String expr = "@silent ''.toString()";
@@ -44,7 +44,7 @@ public class FeatureControllerTest extends JexlTestCase {
     }
 
     @Test
-    public void testLoopFeatureSwitch() throws Exception {
+    void testLoopFeatureSwitch() throws Exception {
         final Asserter onAsserter = new Asserter(createEngine(new JexlFeatures().loops(true)));
         onAsserter.setVariable("cond", true);
         onAsserter.setVariable("i", 0);
@@ -82,7 +82,7 @@ public class FeatureControllerTest extends JexlTestCase {
     }
 
     @Test
-    public void testMethodCallFeatureSwitch() throws Exception {
+    void testMethodCallFeatureSwitch() throws Exception {
         final Asserter onAsserter = new Asserter(createEngine(new JexlFeatures().methodCall(true)));
         final Asserter offAsserter = new Asserter(createEngine(new JexlFeatures().methodCall(false)));
         final String expr = "'jexl'.toUpperCase()";
@@ -91,7 +91,7 @@ public class FeatureControllerTest extends JexlTestCase {
     }
 
     @Test
-    public void testNewInstanceFeatureSwitch() throws Exception {
+    void testNewInstanceFeatureSwitch() throws Exception {
         final Asserter onAsserter = new Asserter(createEngine(new JexlFeatures().newInstance(true)));
         final Asserter offAsserter = new Asserter(createEngine(new JexlFeatures().newInstance(false)));
         String expr = "new('java.lang.String', 'JEXL')";
@@ -103,7 +103,7 @@ public class FeatureControllerTest extends JexlTestCase {
     }
 
     @Test
-    public void testSideEffectDisabled() throws Exception {
+    void testSideEffectDisabled() throws Exception {
         final Asserter asserter = new Asserter(createEngine(new JexlFeatures().sideEffect(false)));
         asserter.setVariable("i", 1);
         String matchException = "@1:1 assign/modify error in 'i'";
@@ -136,7 +136,7 @@ public class FeatureControllerTest extends JexlTestCase {
     }
 
     @Test
-    public void testSideEffectEnabled() throws Exception {
+    void testSideEffectEnabled() throws Exception {
         final Asserter asserter = new Asserter(createEngine(new JexlFeatures().sideEffect(true)));
         asserter.assertExpression("i = 1", 1); // 1
         asserter.assertExpression("i = i + 1", 2); // 1 + 1 = 2
@@ -170,7 +170,7 @@ public class FeatureControllerTest extends JexlTestCase {
     }
 
     @Test
-    public void testStructuredLiteralFeatureSwitch() throws Exception {
+    void testStructuredLiteralFeatureSwitch() throws Exception {
         final Asserter onAsserter = new Asserter(createEngine(new JexlFeatures().structuredLiteral(true)));
         final Asserter offAsserter = new Asserter(createEngine(new JexlFeatures().structuredLiteral(false)));
         final String arrayLitExpr = "[1, 2, 3, 4][3]";

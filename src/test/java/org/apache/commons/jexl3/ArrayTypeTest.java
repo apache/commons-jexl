@@ -40,7 +40,7 @@ import org.junit.jupiter.api.Test;
  * Ensure ArrayBuilder types its output by finding some common ancestor class or interface (besides Object.class)
  * from its entries when possible.
  */
-public class ArrayTypeTest {
+class ArrayTypeTest {
   public abstract static class Class0 implements Inter0 {
     private final int value;
     public Class0(final int v) {
@@ -75,7 +75,7 @@ public class ArrayTypeTest {
   public interface InterX extends InterB {}
 
   @Test
-  public void testArrayTypes() {
+  void testArrayTypes() {
     final ArrayBuilder ab = new ArrayBuilder(1);
     // An engine for expressions with args
     final JexlFeatures features = JexlFeatures.createScript().script(false);

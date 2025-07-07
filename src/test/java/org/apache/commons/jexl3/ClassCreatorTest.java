@@ -43,7 +43,7 @@ import org.junit.jupiter.api.Test;
  * Basic check on automated class creation
  */
 @SuppressWarnings({"UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
-public class ClassCreatorTest extends JexlTestCase {
+class ClassCreatorTest extends JexlTestCase {
     public static class BigObject {
         @SuppressWarnings("unused")
         private final byte[] space = new byte[MEGA];

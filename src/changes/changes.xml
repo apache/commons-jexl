@@ -39,7 +39,7 @@
                 Switch statement &amp; expressions
             </action>
           <!-- UPDATE -->
-          <action type="update" dev="ggregory" due-to="Gary Gregory, Dependabot">Bump org.apache.commons:commons-parent from 81 to 84 #344.</action>
+          <action type="update" dev="ggregory" due-to="Gary Gregory, Dependabot">Bump org.apache.commons:commons-parent from 81 to 85 #344.</action>
         </release>
         <release version="3.5.0" date="2025-04-11" description="This is a feature and maintenance release. Java 8 or later is required.">
           <!-- FIX -->

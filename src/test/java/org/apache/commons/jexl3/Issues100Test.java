@@ -44,7 +44,7 @@ import org.junit.jupiter.api.Test;
  * Test cases for reported issue between JEXL-100 and JEXL-199.
  */
 @SuppressWarnings({"boxing", "UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
-public class Issues100Test extends JexlTestCase {
+class Issues100Test extends JexlTestCase {
     // A's class definition
     public static class A105 {
         String nameA;
@@ -214,7 +214,7 @@ public static class Foo125 {
     }
 
     @Test
-    public void test100() throws Exception {
+    void test100() throws Exception {
         final JexlEngine jexl = new JexlBuilder().cache(4).create();
         final JexlContext ctxt = new MapContext();
         final int[] foo = {42};
@@ -233,7 +233,7 @@ public static class Foo125 {
     }
 
     @Test
-    public void test105() throws Exception {
+    void test105() throws Exception {
         final JexlContext context = new MapContext();
         final JexlExpression selectExp = new Engine().createExpression("[a.propA]");
         context.set("a", new A105("a1", "p1"));
@@ -247,7 +247,7 @@ public static class Foo125 {
     }
 
     @Test
-    public void test106() throws Exception {
+    void test106() throws Exception {
         final JexlEvalContext context = new JexlEvalContext();
         final JexlOptions options = context.getEngineOptions();
         options.setStrict(true);
@@ -263,7 +263,7 @@ public static class Foo125 {
     }
 
     @Test
-    public void test107() throws Exception {
+    void test107() throws Exception {
         // @formatter:off
         final String[] exprs = {
             "'Q4'.toLowerCase()", "q4",
@@ -291,7 +291,7 @@ public static class Foo125 {
     }
 
     @Test
-    public void test108() throws Exception {
+    void test108() throws Exception {
         JexlScript expr;
         Object value;
         final JexlEngine jexl = new Engine();
@@ -325,7 +325,7 @@ public static class Foo125 {
     }
 
     @Test
-    public void test109() throws Exception {
+    void test109() throws Exception {
         final JexlEngine jexl = new Engine();
         Object value;
         final JexlContext context = new MapContext();
@@ -335,7 +335,7 @@ public static class Foo125 {
     }
 
     @Test
-    public void test110() throws Exception {
+    void test110() throws Exception {
         final JexlEngine jexl = new Engine();
         final String[] names = {"foo"};
         Object value;
@@ -348,7 +348,7 @@ public static class Foo125 {
     }
 
     @Test
-    public void test111() throws Exception {
+    void test111() throws Exception {
         final JexlEngine jexl = new Engine();
         Object value;
         final JexlContext context = new MapContext();
@@ -397,7 +397,7 @@ public static class Foo125 {
     }
 
     @Test
-    public void test112() throws Exception {
+    void test112() throws Exception {
         Object result;
         final JexlEngine jexl = new Engine();
         result = jexl.createScript(Integer.toString(Integer.MAX_VALUE)).execute(null);
@@ -409,7 +409,7 @@ public static class Foo125 {
     }
 
     @Test
-    public void test117() throws Exception {
+    void test117() throws Exception {
         final JexlEngine jexl = new Engine();
         final JexlExpression e = jexl.createExpression("TIMESTAMP > 20100102000000");
         final JexlContext ctx = new MapContext();
@@ -419,7 +419,7 @@ public static class Foo125 {
     }
 
     @Test
-    public void test125() throws Exception {
+    void test125() throws Exception {
         final JexlEngine jexl = new Engine();
         final JexlExpression e = jexl.createExpression("method()");
         final JexlContext jc = new Foo125Context(jexl, new Foo125());
@@ -427,7 +427,7 @@ public static class Foo125 {
     }
 
 @Test
-    public void test130a() throws Exception {
+    void test130a() throws Exception {
         final String myName = "Test.Name";
         final Object myValue = "Test.Value";
 
@@ -440,7 +440,7 @@ public static class Foo125 {
     }
 
     @Test
-    public void test130b() throws Exception {
+    void test130b() throws Exception {
         final String myName = "Test.Name";
         final Object myValue = new Object() {
             @Override
@@ -458,7 +458,7 @@ public static class Foo125 {
     }
 
     @Test
-    public void test135() throws Exception {
+    void test135() throws Exception {
         final JexlEngine jexl = new Engine();
         final JexlContext jc = new MapContext();
         JexlScript script;
@@ -505,7 +505,7 @@ public static class Foo125 {
     }
 
     @Test
-    public void test136() throws Exception {
+    void test136() throws Exception {
         final JexlEngine jexl = new Engine();
         final JexlContext jc = new MapContext();
         JexlScript script;
@@ -524,7 +524,7 @@ public static class Foo125 {
     }
 
     //    @Test
-//    public void test138() throws Exception {
+//    void test138() throws Exception {
 //        MapContext ctxt = new MapContext();
 //        ctxt.set("tz", java.util.TimeZone.class);
 //        String source = ""
@@ -542,7 +542,7 @@ public static class Foo125 {
 //        assertNotNull(result);
 //    }
     @Test
-    public void test143() throws Exception {
+    void test143() throws Exception {
         final JexlEngine jexl = new Engine();
         final JexlContext jc = new MapContext();
         JexlScript script;
@@ -557,7 +557,7 @@ public static class Foo125 {
     }
 
     @Test
-    public void test144() throws Exception {
+    void test144() throws Exception {
         final JexlEngine jexl = new Engine();
         final JexlContext jc = new MapContext();
         final JexlScript script = jexl.createScript("var total = 10; total('tt')");
@@ -566,7 +566,7 @@ public static class Foo125 {
     }
 
     @Test
-    public void test144a() throws Exception {
+    void test144a() throws Exception {
         final JexlEngine jexl = new Engine();
         final JexlContext jc = new MapContext();
         jc.set("quuxClass", Quux144.class);
@@ -608,7 +608,7 @@ public static class Foo125 {
     }
 
     @Test
-    public void test147b() throws Exception {
+    void test147b() throws Exception {
         final String[] scripts = {"var x = new ('java.util.HashMap'); x.one = 1; x.two = 2; x.one", // results to 1
             "x = new ('java.util.HashMap'); x.one = 1; x.two = 2; x.one",// results to 1
             "x = new ('java.util.HashMap'); x.one = 1; x.two = 2; x['one']",//results to 1
@@ -624,7 +624,7 @@ public static class Foo125 {
     }
 
     @Test
-    public void test147c() throws Exception {
+    void test147c() throws Exception {
         final String[] scripts = {
             "var x = new ('java.util.HashMap'); x.one = 1; x.two = 2; x.one",
             "x = new ('java.util.HashMap'); x.one = 1; x.two = 2; x.one",
@@ -640,7 +640,7 @@ public static class Foo125 {
     }
 
     @Test
-    public void test148a() throws Exception {
+    void test148a() throws Exception {
         final JexlEngine jexl = new Engine();
         final JexlContext jc = new MapContext();
         jc.set("u", new Utils());
@@ -659,7 +659,7 @@ public static class Foo125 {
     }
 
     @Test
-    public void test155() throws Exception {
+    void test155() throws Exception {
         final JexlEngine jexlEngine = new Engine();
         final JexlExpression jexlExpresssion = jexlEngine.createExpression("first.second.name");
         final JexlContext jc = new MapContext();
@@ -670,7 +670,7 @@ public static class Foo125 {
     }
 
     @Test
-    public void test179() throws Exception {
+    void test179() throws Exception {
         final JexlContext jc = new MapContext();
         final JexlEngine jexl = new JexlBuilder().create();
         final String src = "x = new ('java.util.HashSet'); x.add(1); x";
@@ -681,7 +681,7 @@ public static class Foo125 {
     }
 
     @Test
-    public void test192() throws Exception {
+    void test192() throws Exception {
         final JexlContext jc = new MapContext();
         jc.set("x.y.z", C192.class);
         final JexlEngine jexl = new JexlBuilder().create();
@@ -706,7 +706,7 @@ public static class Foo125 {
     }
 
     @Test
-    public void test199() throws Exception {
+    void test199() throws Exception {
         final JexlContext jc = new MapContext();
         final JexlEngine jexl = new JexlBuilder().arithmetic(new JexlArithmetic(false)).create();
 
@@ -718,7 +718,7 @@ public static class Foo125 {
     }
 
     @Test
-    public void test5115a() throws Exception {
+    void test5115a() throws Exception {
         final String str = "{\n"
                 + "  var x = \"A comment\";\n"
                 + "  var y = \"A comment\";\n"
@@ -728,7 +728,7 @@ public static class Foo125 {
     }
 
     @Test
-    public void test5115b() throws Exception {
+    void test5115b() throws Exception {
         final String str = "{\n"
                 + "  var x = \"A comment\";\n"
                 + "}";
@@ -737,14 +737,14 @@ public static class Foo125 {
     }
 
     @Test
-    public void test5115c() throws Exception {
+    void test5115c() throws Exception {
         final URL testUrl = new File(TESTA).toURI().toURL();
         final JexlEngine jexl = new Engine();
         final JexlScript s = jexl.createScript(testUrl);
     }
 
     @Test
-    public void testQuestion42() throws Exception {
+    void testQuestion42() throws Exception {
         final JexlEngine jexl = new JexlBuilder().arithmetic(new Arithmetic42()).create();
         final JexlContext jc = new Question42();
 
@@ -760,7 +760,7 @@ public static class Foo125 {
     }
 
     @Test
-    public void testRichContext() throws Exception {
+    void testRichContext() throws Exception {
         final A105 a105 = new A105("foo", "bar");
         final JexlEngine jexl = new Engine();
         Object value;
@@ -770,7 +770,7 @@ public static class Foo125 {
     }
 
     @Test
-    public void testScaleIssue() throws Exception {
+    void testScaleIssue() throws Exception {
         final JexlEngine jexlX = new Engine();
         final String expStr1 = "result == salary/month * work.percent/100.00";
         final JexlExpression exp1 = jexlX.createExpression(expStr1);

@@ -31,9 +31,9 @@ import org.junit.jupiter.api.Test;
  * Checks the CacheMap.MethodKey implementation
  */
 
-public class MiscIntrospectionTest {
+class MiscIntrospectionTest {
     @Test
-    public void testArrayIterator() {
+    void testArrayIterator() {
         // not on lists
         assertThrows(IllegalArgumentException.class, () -> new ArrayIterator(new ArrayList<>()));
         // wih null ?
@@ -51,7 +51,7 @@ public class MiscIntrospectionTest {
     }
 
     @Test
-    public void testArrayListWrapper() {
+    void testArrayListWrapper() {
         ArrayListWrapper alw;
         assertThrows(IllegalArgumentException.class, () -> new ArrayListWrapper(1));
         final Integer[] ai = { 1, 2 };
@@ -61,7 +61,7 @@ public class MiscIntrospectionTest {
     }
 
     @Test
-    public void testEmptyContext() {
+    void testEmptyContext() {
         assertThrows(UnsupportedOperationException.class, () -> JexlEngine.EMPTY_CONTEXT.set("nope", 42));
     }
 

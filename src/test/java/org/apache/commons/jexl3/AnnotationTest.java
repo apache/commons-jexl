@@ -38,7 +38,7 @@ import org.junit.jupiter.api.Test;
  */
 @SuppressWarnings({"UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
 
-public class AnnotationTest extends JexlTestCase {
+class AnnotationTest extends JexlTestCase {
 
     public static class AnnotationContext extends MapContext implements JexlContext.AnnotationProcessor {
         private int count;
@@ -191,7 +191,7 @@ public class AnnotationTest extends JexlTestCase {
     }
 
     @Test
-    public void test197a() throws Exception {
+    void test197a() throws Exception {
         final JexlContext jc = new MapContext();
         final JexlScript e = JEXL.createScript("@synchronized { return 42; }");
         final Object r = e.execute(jc);
@@ -199,7 +199,7 @@ public class AnnotationTest extends JexlTestCase {
     }
 
     @Test
-    public void testError() throws Exception {
+    void testError() throws Exception {
         testError(true);
         testError(false);
     }
@@ -228,7 +228,7 @@ public class AnnotationTest extends JexlTestCase {
     }
 
     @Test
-    public void testHoistingStatement() throws Exception {
+    void testHoistingStatement() throws Exception {
         final AnnotationContext jc = new AnnotationContext();
         final JexlScript e = JEXL.createScript("var t = 1; @synchronized for(var x : [2,3,7]) t *= x; t");
         final Object r = e.execute(jc);
@@ -238,7 +238,7 @@ public class AnnotationTest extends JexlTestCase {
     }
 
     @Test
-    public void testJexlSynchronized0() throws InterruptedException {
+    void testJexlSynchronized0() throws InterruptedException {
         final TestRunner tr = new TestRunner();
         final AnnotationContext ctxt = new AnnotationContext();
         final JexlScript script = JEXL.createScript(
@@ -256,7 +256,7 @@ public class AnnotationTest extends JexlTestCase {
     }
 
     @Test
-    public void testMultiple() throws Exception {
+    void testMultiple() throws Exception {
         final AnnotationContext jc = new AnnotationContext();
         final JexlScript e = JEXL.createScript("@one(1) @synchronized { return 42; }");
         final Object r = e.execute(jc);
@@ -268,7 +268,7 @@ public class AnnotationTest extends JexlTestCase {
     }
 
     @Test
-    public void testNoArg() throws Exception {
+    void testNoArg() throws Exception {
         final AnnotationContext jc = new AnnotationContext();
         final JexlScript e = JEXL.createScript("@synchronized { return 42; }");
         final Object r = e.execute(jc);
@@ -278,7 +278,7 @@ public class AnnotationTest extends JexlTestCase {
     }
 
     @Test
-    public void testNoArgExpression() throws Exception {
+    void testNoArgExpression() throws Exception {
         final AnnotationContext jc = new AnnotationContext();
         final JexlScript e = JEXL.createScript("@synchronized 42");
         final Object r = e.execute(jc);
@@ -288,7 +288,7 @@ public class AnnotationTest extends JexlTestCase {
     }
 
     @Test
-    public void testNoArgStatement() throws Exception {
+    void testNoArgStatement() throws Exception {
         final AnnotationContext jc = new AnnotationContext();
         final JexlScript e = JEXL.createScript("@synchronized if (true) 2 * 3 * 7; else -42;");
         final Object r = e.execute(jc);
@@ -298,7 +298,7 @@ public class AnnotationTest extends JexlTestCase {
     }
 
     @Test
-    public void testOneArg() throws Exception {
+    void testOneArg() throws Exception {
         final AnnotationContext jc = new AnnotationContext();
         final JexlScript e = JEXL.createScript("@one(1) { return 42; }");
         final Object r = e.execute(jc);
@@ -312,7 +312,7 @@ public class AnnotationTest extends JexlTestCase {
     /**
      * A base test to ensure synchronized makes a difference.
      */
-    public void testSynchronized() throws InterruptedException {
+    void testSynchronized() throws InterruptedException {
         final TestRunner tr = new TestRunner();
         final Counter syncCounter = tr.syncCounter;
         final Counter concCounter = tr.concCounter;
@@ -327,7 +327,7 @@ public class AnnotationTest extends JexlTestCase {
     }
 
     @Test
-    public void testUnknown() throws Exception {
+    void testUnknown() throws Exception {
         testUnknown(true);
         testUnknown(false);
     }
@@ -356,7 +356,7 @@ public class AnnotationTest extends JexlTestCase {
     }
 
     @Test
-    public void testVarStmt() throws Exception {
+    void testVarStmt() throws Exception {
         final OptAnnotationContext jc = new OptAnnotationContext();
         final JexlOptions options = jc.getEngineOptions();
         jc.getEngineOptions().set(JEXL);

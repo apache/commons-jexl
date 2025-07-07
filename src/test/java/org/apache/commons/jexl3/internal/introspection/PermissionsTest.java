@@ -52,7 +52,7 @@ import org.junit.jupiter.api.Test;
  * Checks the CacheMap.MethodKey implementation
  */
 
-public class PermissionsTest {
+class PermissionsTest {
 
     public static class A {
         public int i;
@@ -216,7 +216,7 @@ public class PermissionsTest {
     }
 
     @Test
-    public void testGetPackageName() {
+    void testGetPackageName() {
         final String PKG = "org.apache.commons.jexl3.internal.introspection";
         String pkg = ClassTool.getPackageName(Outer.class);
         assertEquals(PKG, pkg);
@@ -235,7 +235,7 @@ public class PermissionsTest {
     }
 
     @Test
-    public void testParsePermissions0a() throws Exception {
+    void testParsePermissions0a() throws Exception {
         final String src = "java.lang { Runtime { exit(); exec(); } }\njava.net { URL {} }";
         final Permissions p = (Permissions) JexlPermissions.parse(src);
         final Map<String, Permissions.NoJexlPackage> nojexlmap = p.getPackages();
@@ -256,7 +256,7 @@ public class PermissionsTest {
     }
 
     @Test
-    public void testParsePermissions0b() throws Exception {
+    void testParsePermissions0b() throws Exception {
         final String src = "java.lang { -Runtime { exit(); } }";
         final Permissions p = (Permissions) JexlPermissions.parse(src);
         final Method exit = getMethod(java.lang.Runtime.class,"exit");
@@ -265,7 +265,7 @@ public class PermissionsTest {
     }
 
     @Test
-    public void testParsePermissions0c() throws Exception {
+    void testParsePermissions0c() throws Exception {
         final String src = "java.lang { +Runtime { availableProcessorCount(); } }";
         final Permissions p = (Permissions) JexlPermissions.parse(src);
         final Method exit = getMethod(java.lang.Runtime.class,"exit");
@@ -274,7 +274,7 @@ public class PermissionsTest {
     }
 
     @Test
-    public void testParsePermissions0d() throws Exception {
+    void testParsePermissions0d() throws Exception {
         final String src = "java.lang { +System { currentTimeMillis(); } }";
         final JexlPermissions p = RESTRICTED.compose(src);
         final Field in = System.class.getField("in");
@@ -286,7 +286,7 @@ public class PermissionsTest {
     }
 
     @Test
-    public void testParsePermissions0e() throws Exception {
+    void testParsePermissions0e() throws Exception {
         final String src = "java.lang { +System { in; } }";
         final JexlPermissions p = RESTRICTED.compose(src);
         final Field in = System.class.getField("in");
@@ -298,7 +298,7 @@ public class PermissionsTest {
     }
 
     @Test
-    public void testParsePermissions0f() throws Exception {
+    void testParsePermissions0f() throws Exception {
         final String src = "java.lang { +Class { getName(); getSimpleName(); } }";
         final JexlPermissions p = RESTRICTED.compose(src);
         final Method getName = getMethod(java.lang.Class.class,"getName");
@@ -320,7 +320,7 @@ public class PermissionsTest {
     }
 
     @Test
-    public void testParsePermissions0g() throws Exception {
+    void testParsePermissions0g() throws Exception {
         final String src = "java.lang { +Class {  } }";
         final JexlPermissions p = RESTRICTED.compose(src);
         final Method getName = getMethod(java.lang.Class.class,"getName");
@@ -336,7 +336,7 @@ public class PermissionsTest {
     }
 
     @Test
-    public void testParsePermissions1() {
+    void testParsePermissions1() {
         final String[] src = {
                 "java.lang.*",
                 "java.math.*",
@@ -383,7 +383,7 @@ public class PermissionsTest {
     }
 
     @Test
-    public void testParsePermissionsFailures() {
+    void testParsePermissionsFailures() {
         // @formatter:off
         final String[] srcs = {
                 "java.lang.*.*",
@@ -401,12 +401,12 @@ public class PermissionsTest {
     }
 
     @Test
-    public void testPermissions0() throws Exception {
+    void testPermissions0() throws Exception {
         runTestPermissions(permissions0());
     }
 
     @Test
-    public void testPermissions1() throws Exception {
+    void testPermissions1() throws Exception {
         runTestPermissions(new JexlPermissions.Delegate(permissions0()) {
             @Override public String toString() {
                 return "delegate:" + base.toString();
@@ -415,11 +415,11 @@ public class PermissionsTest {
     }
 
     @Test
-    public void testPermissions2() throws Exception {
+    void testPermissions2() throws Exception {
         runTestPermissions(new JexlPermissions.ClassPermissions(permissions0(), Collections.emptySet()));
     }
 
-    @Test public void testPrivateOverload1() throws Exception {
+    @Test void testPrivateOverload1() throws Exception {
         final String src = "parseDouble(\"PHM1\".substring(3)).intValue()";
         final JexlArithmetic jexla = new I33Arithmetic(true);
         final JexlEngine jexl = new JexlBuilder().safe(false).arithmetic(jexla).create();
@@ -429,7 +429,7 @@ public class PermissionsTest {
         assertEquals(1, result);
     }
 
-    @Test public void testProtectedOverride0() {
+    @Test void testProtectedOverride0() {
         JexlScript script;
         Object r;
         final Foo2 foo3 = new Foo3();
@@ -443,7 +443,7 @@ public class PermissionsTest {
         assertEquals("foo3",r);
     }
 
-    @Test public void testProtectedOverride1() {
+    @Test void testProtectedOverride1() {
         final List<String> a = new LinkedList<>();
         a.add("aaa");
         a.add("bbb");
@@ -458,7 +458,7 @@ public class PermissionsTest {
     }
 
     @Test
-    public void testSecurePermissions() {
+    void testSecurePermissions() {
         assertNotNull(JexlTestCase.SECURE);
         final List<Class<?>> acs = Arrays.asList(
             java.lang.Runtime.class,
@@ -485,7 +485,7 @@ public class PermissionsTest {
     }
 
     @Test
-    public void testWildCardPackages() {
+    void testWildCardPackages() {
         Set<String> wildcards;
         boolean found;
         wildcards = new HashSet<>(Arrays.asList("com.apache.*"));

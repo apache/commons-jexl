@@ -43,7 +43,7 @@ import org.junit.jupiter.api.Test;
 /**
  * A test around scripting streams.
  */
-public class StreamTest {
+class StreamTest {
 
     /**
      * A MapContext that can operate on streams and collections.
@@ -120,7 +120,7 @@ public class StreamTest {
     }
 
     @Test
-    public void testURICollection() {
+    void testURICollection() {
         // A collection map/filter aware context
         final JexlContext sctxt = new CollectionContext();
         // Some uris
@@ -156,7 +156,7 @@ public class StreamTest {
     }
 
     @Test
-    public void testURIStream() {
+    void testURIStream() {
         // let's assume a collection of uris need to be processed and transformed to be simplified ;
         // we want only http/https ones, only the host part and using a https scheme
         final List<URI> uris = Arrays.asList(

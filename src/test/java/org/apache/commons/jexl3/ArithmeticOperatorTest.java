@@ -55,7 +55,7 @@ import org.junit.jupiter.api.Test;
  * Tests for the startsWith, endsWith, match and range operators.
  */
 @SuppressWarnings({"UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
-public class ArithmeticOperatorTest extends JexlTestCase {
+class ArithmeticOperatorTest extends JexlTestCase {
     public static class Aggregate {
         public static int sum(final Iterable<Integer> ii) {
             int sum = 0;
@@ -659,16 +659,16 @@ public class ArithmeticOperatorTest extends JexlTestCase {
         private final JexlScript expr;
         private Object cache;
 
-        PropertyComparator(JexlArithmetic jexla, JexlScript expr) {
+        PropertyComparator(final JexlArithmetic jexla, final JexlScript expr) {
             this.arithmetic = jexla;
             this.operator = JexlEngine.getThreadEngine().getUberspect().getOperator(arithmetic);
             this.expr = expr;
         }
         @Override
-        public int compare(Object o1, Object o2) {
+        public int compare(final Object o1, final Object o2) {
             final Object left = expr.execute(context, o1);
             final Object right = expr.execute(context, o2);
-            Object result = operator.tryOverload(this, JexlOperator.COMPARE, left, right);
+            final Object result = operator.tryOverload(this, JexlOperator.COMPARE, left, right);
             if (result instanceof Integer) {
                 return (int) result;
             }
@@ -681,25 +681,25 @@ public class ArithmeticOperatorTest extends JexlTestCase {
         }
 
         @Override
-        public void setCache(Object cache) {
+        public void setCache(final Object cache) {
             this.cache = cache;
         }
     }
 
     public static class SortingArithmetic extends JexlArithmetic {
-        public SortingArithmetic(boolean strict) {
+        public SortingArithmetic(final boolean strict) {
             this(strict, null, Integer.MIN_VALUE);
         }
 
-        private SortingArithmetic(boolean strict, MathContext context, int scale) {
+        private SortingArithmetic(final boolean strict, final MathContext context, final int scale) {
             super(strict, context, scale);
         }
 
-        public int compare(Integer left, Integer right) {
+        public int compare(final Integer left, final Integer right) {
             return left.compareTo(right);
         }
 
-        public int compare(String left, String right) {
+        public int compare(final String left, final String right) {
             return left.compareTo(right);
         }
 
@@ -760,16 +760,16 @@ public class ArithmeticOperatorTest extends JexlTestCase {
     }
 
     public static class Arithmetic428 extends JexlArithmetic {
-        public Arithmetic428(boolean strict) {
+        public Arithmetic428(final boolean strict) {
             this(strict, null, Integer.MIN_VALUE);
         }
 
-        private Arithmetic428(boolean strict, MathContext context, int scale) {
+        private Arithmetic428(final boolean strict, final MathContext context, final int scale) {
             super(strict, context, scale);
         }
 
-        public int compare(Instant lhs, String str) {
-            Instant rhs = Instant.parse(str);
+        public int compare(final Instant lhs, final String str) {
+            final Instant rhs = Instant.parse(str);
             return lhs.compareTo(rhs);
         }
     }
@@ -787,12 +787,12 @@ public class ArithmeticOperatorTest extends JexlTestCase {
         script = jexl.createScript("x < y", "x", "y");
         final JexlScript s0 = script;
         assertThrows(JexlException.class, () -> s0.execute(null, 42, rhs));
-        for(int i : LOOPS) { assertTrue((boolean) script.execute(null, lhs, rhs)); }
-        for(int i : LOOPS) { assertTrue((boolean) script.execute(null, lhs, rhs)); }
-        for(int i : LOOPS) { assertFalse((boolean) script.execute(null, rhs, lhs)); }
-        for(int i : LOOPS) { assertFalse((boolean) script.execute(null, rhs, lhs)); }
-        for(int i : LOOPS) { assertTrue((boolean) script.execute(null, lhs, rhs)); }
-        for(int i : LOOPS) { assertFalse((boolean) script.execute(null, rhs, lhs)); }
+        for(final int i : LOOPS) { assertTrue((boolean) script.execute(null, lhs, rhs)); }
+        for(final int i : LOOPS) { assertTrue((boolean) script.execute(null, lhs, rhs)); }
+        for(final int i : LOOPS) { assertFalse((boolean) script.execute(null, rhs, lhs)); }
+        for(final int i : LOOPS) { assertFalse((boolean) script.execute(null, rhs, lhs)); }
+        for(final int i : LOOPS) { assertTrue((boolean) script.execute(null, lhs, rhs)); }
+        for(final int i : LOOPS) { assertFalse((boolean) script.execute(null, rhs, lhs)); }
 
         script = jexl.createScript("x <= y", "x", "y");
         final JexlScript s1 = script;
@@ -831,11 +831,11 @@ public class ArithmeticOperatorTest extends JexlTestCase {
     }
 
     public static class Arithmetic429 extends JexlArithmetic {
-        public Arithmetic429(boolean astrict) {
+        public Arithmetic429(final boolean astrict) {
             super(astrict);
         }
 
-        public int compare(String lhs, Number rhs) {
+        public int compare(final String lhs, final Number rhs) {
             return lhs.compareTo(rhs.toString());
         }
     }

@@ -285,7 +285,7 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
      * The {@link Parser}; when parsing expressions, this engine uses the parser if it
      * is not already in use otherwise it will create a new temporary one.
      */
-    protected final JexlScriptParser parser; //$NON-NLS-1$
+    protected final JexlScriptParser parser;
     /**
      * The expression max length to hit the cache.
      */

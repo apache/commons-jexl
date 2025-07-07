@@ -32,14 +32,14 @@ import org.junit.jupiter.api.Test;
  * Tests do while statement.
  */
 @SuppressWarnings({ "UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes" })
-public class DoWhileTest extends JexlTestCase {
+class DoWhileTest extends JexlTestCase {
 
     public DoWhileTest() {
         super("DoWhileTest");
     }
 
     @Test
-    public void testEmptyBody() throws Exception {
+    void testEmptyBody() throws Exception {
         final JexlScript e = JEXL.createScript("var i = 0; do ; while((i+=1) < 10); i");
         final JexlContext jc = new MapContext();
         final Object o = e.execute(jc);
@@ -47,7 +47,7 @@ public class DoWhileTest extends JexlTestCase {
     }
 
     @Test
-    public void testEmptyStmtBody() throws Exception {
+    void testEmptyStmtBody() throws Exception {
         final JexlScript e = JEXL.createScript("var i = 0; do {} while((i+=1) < 10); i");
         final JexlContext jc = new MapContext();
         final Object o = e.execute(jc);
@@ -55,7 +55,7 @@ public class DoWhileTest extends JexlTestCase {
     }
 
     @Test
-    public void testForEachBreakInsideFunction() throws Exception {
+    void testForEachBreakInsideFunction() throws Exception {
         final JexlException.Parsing xparse = assertThrows(JexlException.Parsing.class, () -> JEXL.createScript("for (i : 1..2) {  y = function() { break; } }"),
                 "break is out of loop!");
         final String str = xparse.detailedMessage();
@@ -63,7 +63,7 @@ public class DoWhileTest extends JexlTestCase {
     }
 
     @Test
-    public void testForEachContinueInsideFunction() throws Exception {
+    void testForEachContinueInsideFunction() throws Exception {
         final JexlException.Parsing xparse = assertThrows(JexlException.Parsing.class,
                 () -> JEXL.createScript("for (i : 1..2) {  y = function() { continue; } }"), "break is out of loop!");
         final String str = xparse.detailedMessage();
@@ -71,13 +71,13 @@ public class DoWhileTest extends JexlTestCase {
     }
 
     @Test
-    public void testForEachLambda() throws Exception {
+    void testForEachLambda() throws Exception {
         final JexlScript e = JEXL.createScript("(x)->{ for (i : 1..2) {  continue; var y = function() { 42; } break; } }");
         assertNotNull(e);
     }
 
     @Test
-    public void testForLoop0() {
+    void testForLoop0() {
         final String src = "(l)->{ for(let x = 0; x < 4; ++x) { l.add(x); } }";
         final JexlEngine jexl = new JexlBuilder().safe(true).create();
         final JexlScript script = jexl.createScript(src);
@@ -88,7 +88,7 @@ public class DoWhileTest extends JexlTestCase {
     }
 
     @Test
-    public void testForLoop1() {
+    void testForLoop1() {
         final String src = "(l)->{ for(var x = 0; x < 4; ++x) { l.add(x); } }";
         final JexlEngine jexl = new JexlBuilder().safe(true).create();
         final JexlScript script = jexl.createScript(src);
@@ -99,7 +99,7 @@ public class DoWhileTest extends JexlTestCase {
     }
 
     @Test
-    public void testForLoop2() {
+    void testForLoop2() {
         final String src = "(l)->{ for(x = 0; x < 4; ++x) { l.add(x); } }";
         final JexlEngine jexl = new JexlBuilder().safe(true).create();
         final JexlScript script = jexl.createScript(src);
@@ -111,7 +111,7 @@ public class DoWhileTest extends JexlTestCase {
     }
 
     @Test
-    public void testSimpleWhileFalse() throws Exception {
+    void testSimpleWhileFalse() throws Exception {
         JexlScript e = JEXL.createScript("do {} while (false)");
         final JexlContext jc = new MapContext();
 
@@ -124,7 +124,7 @@ public class DoWhileTest extends JexlTestCase {
     }
 
     @Test
-    public void testWhileEmptyBody() throws Exception {
+    void testWhileEmptyBody() throws Exception {
         final JexlScript e = JEXL.createScript("var i = 0; while((i+=1) < 10); i");
         final JexlContext jc = new MapContext();
         final Object o = e.execute(jc);
@@ -132,7 +132,7 @@ public class DoWhileTest extends JexlTestCase {
     }
 
     @Test
-    public void testWhileEmptyStmtBody() throws Exception {
+    void testWhileEmptyStmtBody() throws Exception {
         final JexlScript e = JEXL.createScript("var i = 0; while((i+=1) < 10) {}; i");
         final JexlContext jc = new MapContext();
         final Object o = e.execute(jc);
@@ -140,7 +140,7 @@ public class DoWhileTest extends JexlTestCase {
     }
 
     @Test
-    public void testWhileExecutesExpressionWhenLooping() throws Exception {
+    void testWhileExecutesExpressionWhenLooping() throws Exception {
         JexlScript e = JEXL.createScript("do x = x + 1 while (x < 10)");
         final JexlContext jc = new MapContext();
         jc.set("x", 1);
@@ -161,7 +161,7 @@ public class DoWhileTest extends JexlTestCase {
     }
 
     @Test
-    public void testWhileWithBlock() throws Exception {
+    void testWhileWithBlock() throws Exception {
         final JexlScript e = JEXL.createScript("do { x = x + 1; y = y * 2; } while (x < 10)");
         final JexlContext jc = new MapContext();
         jc.set("x", Integer.valueOf(1));

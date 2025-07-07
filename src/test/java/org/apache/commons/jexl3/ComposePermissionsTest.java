@@ -32,7 +32,7 @@ import com.google.gson.Gson;
 /**
  * Tests for pragmas
  */
-public class ComposePermissionsTest extends JexlTestCase {
+class ComposePermissionsTest extends JexlTestCase {
     static final String SAMPLE_JSON = "src/test/scripts/sample.json";
 
     /**
@@ -78,12 +78,12 @@ public class ComposePermissionsTest extends JexlTestCase {
     }
 
     @Test
-    public void testComposePermissions() throws Exception {
+    void testComposePermissions() throws Exception {
         runComposePermissions(JexlPermissions.UNRESTRICTED);
     }
 
     @Test
-    public void testComposePermissions1() throws Exception {
+    void testComposePermissions1() throws Exception {
         runComposePermissions(new JexlPermissions.Delegate(JexlPermissions.UNRESTRICTED) {
             @Override
             public String toString() {
@@ -93,7 +93,7 @@ public class ComposePermissionsTest extends JexlTestCase {
     }
 
     @Test
-    public void testComposePermissions2() throws Exception {
+    void testComposePermissions2() throws Exception {
         runComposePermissions(new JexlPermissions.ClassPermissions(JexlPermissions.UNRESTRICTED, Collections.emptySet()));
     }
 }

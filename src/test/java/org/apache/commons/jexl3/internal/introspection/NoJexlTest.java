@@ -31,7 +31,7 @@ import org.junit.jupiter.api.Test;
  * Checks the CacheMap.MethodKey implementation
  */
 
-public class NoJexlTest {
+class NoJexlTest {
 
     public static class A {
         public int i;
@@ -84,7 +84,7 @@ public class NoJexlTest {
     }
 
     @Test
-    public void testNoJexlPermissions() throws Exception {
+    void testNoJexlPermissions() throws Exception {
         final Permissions p = Permissions.UNRESTRICTED;
         assertFalse(p.allow((Field) null));
         assertFalse(p.allow((Package) null));

@@ -30,7 +30,7 @@ import org.junit.jupiter.api.Test;
  * Tests JexlContext (advanced) features.
  */
 @SuppressWarnings({"AssertEqualsBetweenInconvertibleTypes"})
-public class ContextNamespaceTest extends JexlTestCase {
+class ContextNamespaceTest extends JexlTestCase {
 
     public static class Context346 extends MapContext {
         public int func(final int y) { return 42 * y;}
@@ -236,7 +236,7 @@ public class ContextNamespaceTest extends JexlTestCase {
     }
 
     @Test
-    public void testNamespace346a() {
+    void testNamespace346a() {
         final JexlContext ctxt = new Context346();
         final JexlEngine jexl = new JexlBuilder().safe(false).create();
         final String src = "x != null ? x : func(y)";
@@ -247,7 +247,7 @@ public class ContextNamespaceTest extends JexlTestCase {
         assertEquals(169, result);
     }
     @Test
-    public void testNamespace346b() {
+    void testNamespace346b() {
         final JexlContext ctxt = new MapContext();
         final Map<String, Object> ns = new HashMap<>();
         ns.put("x", Math.class);
@@ -262,7 +262,7 @@ public class ContextNamespaceTest extends JexlTestCase {
     }
 
     @Test
-    public void testNamespace348a() {
+    void testNamespace348a() {
         final JexlContext ctxt = new MapContext();
         final Map<String, Object> ns = new HashMap<>();
         ns.put("ns", Ns348.class);
@@ -274,7 +274,7 @@ public class ContextNamespaceTest extends JexlTestCase {
     }
 
     @Test
-    public void testNamespace348b() {
+    void testNamespace348b() {
         final JexlContext ctxt = new ContextNs348();
         final JexlEngine jexl = new JexlBuilder().safe(false).create();
         // no space for ns name as syntactic hint
@@ -285,7 +285,7 @@ public class ContextNamespaceTest extends JexlTestCase {
     }
 
     @Test
-    public void testNamespace348c() {
+    void testNamespace348c() {
         final JexlContext ctxt = new ContextNs348();
         final Map<String, Object> ns = new HashMap<>();
         ns.put("ns", Ns348.class);
@@ -299,7 +299,7 @@ public class ContextNamespaceTest extends JexlTestCase {
     }
 
     @Test
-    public void testNamespace348d() {
+    void testNamespace348d() {
         final JexlContext ctxt = new ContextNs348();
         final JexlFeatures f = new JexlFeatures();
         f.namespaceTest(n -> true);
@@ -311,7 +311,7 @@ public class ContextNamespaceTest extends JexlTestCase {
     }
 
     @Test
-    public void testNamespacePragma() {
+    void testNamespacePragma() {
         final JexlEngine jexl = new JexlBuilder().create();
         final JexlContext context = new TaxesContext(18.6);
         // local namespace tax declared
@@ -324,7 +324,7 @@ public class ContextNamespaceTest extends JexlTestCase {
     }
 
     @Test
-    public void testNamespacePragmaString() {
+    void testNamespacePragmaString() {
         final JexlEngine jexl = new JexlBuilder().create();
         final JexlContext context = new MapContext();
         // local namespace str declared
@@ -337,20 +337,20 @@ public class ContextNamespaceTest extends JexlTestCase {
     }
 
     @Test
-    public void testNsNsContext0() {
+    void testNsNsContext0() {
         nsnsCtor.set(0);
         final String clsName = NsNs.class.getName();
         runNsNsContext(Collections.singletonMap("nsns", clsName));
     }
 
     @Test
-    public void testNsNsContext1() {
+    void testNsNsContext1() {
         nsnsCtor.set(0);
         runNsNsContext(Collections.singletonMap("nsns", NsNs.class));
     }
 
     @Test
-    public void testObjectContext() {
+    void testObjectContext() {
         final JexlEngine jexl = new JexlBuilder().strict(true).silent(false).create();
         final Vat vat = new Vat(18.6);
         final ObjectContext<Vat> ctxt = new ObjectContext<>(jexl, vat);
@@ -362,17 +362,17 @@ public class ContextNamespaceTest extends JexlTestCase {
     }
 
     @Test
-    public void testStaticNs0() {
+    void testStaticNs0() {
         runStaticNsContext(Collections.singletonMap("sns", StaticNs.class));
     }
 
     @Test
-    public void testStaticNs1() {
+    void testStaticNs1() {
         runStaticNsContext(Collections.singletonMap("sns", StaticNs.class.getName()));
     }
 
     @Test
-    public void testThreadedContext() {
+    void testThreadedContext() {
         final JexlEngine jexl = new JexlBuilder().create();
         final JexlContext context = new TaxesContext(18.6);
         final String strs = "taxes:vat(1000)";

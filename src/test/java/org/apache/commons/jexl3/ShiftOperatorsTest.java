@@ -27,7 +27,7 @@ import org.junit.jupiter.api.Test;
  * Tests shift operators.
  */
 @SuppressWarnings({"UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
-public class ShiftOperatorsTest extends JexlTestCase {
+class ShiftOperatorsTest extends JexlTestCase {
     public static class ShiftArithmetic extends JexlArithmetic {
         ShiftArithmetic(final boolean flag) {
             super(flag);
@@ -72,7 +72,7 @@ public class ShiftOperatorsTest extends JexlTestCase {
     }
 
     @Test
-    public void testLeftShiftIntValue() throws Exception {
+    void testLeftShiftIntValue() throws Exception {
         final String expr = "(x, y)-> x << y";
         asserter.assertExpression(expr, 1L << 2, 1L, 2);
         asserter.assertExpression(expr, 1L << -2, 1L, -2);
@@ -91,7 +91,7 @@ public class ShiftOperatorsTest extends JexlTestCase {
     }
 
     @Test
-    public void testLeftShiftLongValue() throws Exception {
+    void testLeftShiftLongValue() throws Exception {
         a360.assertExpression("2147483648 << 2", 2147483648L << 2);
         a360.assertExpression("2147483648 << -2", 2147483648L << -2);
         a360.assertExpression("-2147483649 << 2", -2147483649L << 2);
@@ -99,7 +99,7 @@ public class ShiftOperatorsTest extends JexlTestCase {
     }
 
     @Test
-    public void testOverloadedShift() throws Exception {
+    void testOverloadedShift() throws Exception {
         final JexlEngine jexl = new JexlBuilder().arithmetic(new ShiftArithmetic(true)).create();
         StringBuilder x;
         JexlScript e;
@@ -122,7 +122,7 @@ public class ShiftOperatorsTest extends JexlTestCase {
     }
 
     @Test
-    public void testPrecedence() throws Exception {
+    void testPrecedence() throws Exception {
         a360.assertExpression("40 + 2 << 1 + 1", 40 + 2 << 1 + 1);
         a360.assertExpression("40 + (2 << 1) + 1", 40 + (2 << 1) + 1);
         a360.assertExpression("(40 + 2) << (1 + 1)", 40 + 2 << 1 + 1);
@@ -137,7 +137,7 @@ public class ShiftOperatorsTest extends JexlTestCase {
     }
 
     @Test
-    public void testRightShiftBigValue() throws Exception {
+    void testRightShiftBigValue() throws Exception {
         a360.assertExpression("9223372036854775808 >> 2", new BigInteger("9223372036854775808").shiftRight(2));
         a360.assertExpression("9223372036854775808 >> -2", new BigInteger("9223372036854775808").shiftRight(-2));
         a360.assertExpression("-9223372036854775809 >> 2", new BigInteger("-9223372036854775809").shiftRight(2));
@@ -145,7 +145,7 @@ public class ShiftOperatorsTest extends JexlTestCase {
     }
 
     @Test
-    public void testRightShiftIntValue() throws Exception {
+    void testRightShiftIntValue() throws Exception {
         final String expr = "(x, y)-> x >> y";
         asserter.assertExpression(expr, 42L >> 2, 42L, 2);
         asserter.assertExpression(expr, 42L >> -2, 42L, -2);
@@ -164,7 +164,7 @@ public class ShiftOperatorsTest extends JexlTestCase {
     }
 
     @Test
-    public void testRightShiftLongValue() throws Exception {
+    void testRightShiftLongValue() throws Exception {
         a360.assertExpression("8589934592 >> 2", 8589934592L >> 2);
         a360.assertExpression("8589934592 >> -2", 8589934592L >> -2);
         a360.assertExpression("-8589934592 >> 2", -8589934592L >> 2);
@@ -172,7 +172,7 @@ public class ShiftOperatorsTest extends JexlTestCase {
     }
 
     @Test
-    public void testRightShiftUnsignedBigValue() throws Exception {
+    void testRightShiftUnsignedBigValue() throws Exception {
         a360.assertExpression("9223372036854775808 >>> 2", shiftRightUnsigned("9223372036854775808", 2));
         a360.assertExpression("9223372036854775808 >>> -2", shiftRightUnsigned("9223372036854775808", -2));
         a360.assertExpression("-9223372036854775809 >>> 2", shiftRightUnsigned("-9223372036854775809", 2));
@@ -180,7 +180,7 @@ public class ShiftOperatorsTest extends JexlTestCase {
     }
 
     @Test
-    public void testRightShiftUnsignedIntValue() throws Exception {
+    void testRightShiftUnsignedIntValue() throws Exception {
         final String expr = "(x, y)-> x >>> y";
         asserter.assertExpression(expr, 42L >>> 2, 42L, 2);
         asserter.assertExpression(expr, 42L >>> -2, 42L, -2);

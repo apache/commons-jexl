@@ -37,7 +37,7 @@ import org.junit.jupiter.api.Test;
 /**
  * Tests for checking introspection discovery.
  */
-public class DiscoveryTest extends JexlTestCase {
+class DiscoveryTest extends JexlTestCase {
     public static class Bean {
         private String value;
         private String eulav;
@@ -143,7 +143,7 @@ public class DiscoveryTest extends JexlTestCase {
     }
 
     @Test
-    public void testBeanIntrospection() throws Exception {
+    void testBeanIntrospection() throws Exception {
         final Uberspect uber = Engine.getUberspect(null, null);
         final Bean bean = new Bean("JEXL", "LXEJ");
 
@@ -172,7 +172,7 @@ public class DiscoveryTest extends JexlTestCase {
     }
 
     @Test
-    public void testDuckIntrospection() throws Exception {
+    void testDuckIntrospection() throws Exception {
         final Uberspect uber = Engine.getUberspect(null, null);
         final Duck duck = new Duck("JEXL", "LXEJ");
 
@@ -200,7 +200,7 @@ public class DiscoveryTest extends JexlTestCase {
     }
 
     @Test
-    public void testListIntrospection() throws Exception {
+    void testListIntrospection() throws Exception {
         final Uberspect uber = Engine.getUberspect(null, null);
         final List<Object> list = new ArrayList<>();
         list.add("LIST");
@@ -231,7 +231,7 @@ public class DiscoveryTest extends JexlTestCase {
     }
 
     @Test
-    public void testMapIntrospection() throws Exception {
+    void testMapIntrospection() throws Exception {
         final Uberspect uber = Engine.getUberspect(null, null);
         final Map<String, Object> map = new HashMap<>();
         map.put("value", "MAP");
@@ -262,7 +262,7 @@ public class DiscoveryTest extends JexlTestCase {
     }
 
     @Test
-    public void testMethodIntrospection() throws Exception {
+    void testMethodIntrospection() throws Exception {
         final Uberspect uber = new Uberspect(null, null);
         final Bulgroz bulgroz = new Bulgroz();
         JexlMethod jmethod;

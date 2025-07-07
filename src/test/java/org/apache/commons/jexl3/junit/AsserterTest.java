@@ -27,13 +27,13 @@ import org.junit.jupiter.api.Test;
  *  Simple tests
  */
 @SuppressWarnings({"UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
-public class AsserterTest extends JexlTestCase {
+class AsserterTest extends JexlTestCase {
     public AsserterTest() {
         super("AsserterTest");
     }
 
     @Test
-    public void testThis() throws Exception {
+    void testThis() throws Exception {
         final Asserter asserter = new Asserter(JEXL);
         asserter.setVariable("this", new Foo());
         asserter.assertExpression("this.repeat('abc')", "Repeat : abc");
@@ -41,7 +41,7 @@ public class AsserterTest extends JexlTestCase {
     }
 
     @Test
-    public void testVariable() throws Exception {
+    void testVariable() throws Exception {
         final Asserter asserter = new Asserter(JEXL);
         asserter.setSilent(true);
         asserter.setVariable("foo", new Foo());

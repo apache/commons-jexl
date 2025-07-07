@@ -30,7 +30,7 @@ import org.junit.jupiter.api.Test;
  * Checks various exception handling cases.
  */
 @SuppressWarnings({"UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
-public class ExceptionTest extends JexlTestCase {
+class ExceptionTest extends JexlTestCase {
     public static class ThrowNPE {
         boolean doThrow;
         public boolean getFail() {
@@ -87,7 +87,7 @@ public class ExceptionTest extends JexlTestCase {
     }
 
     @Test
-    public void test206() throws Exception {
+    void test206() throws Exception {
         String src = "null.1 = 2; return 42";
         doTest206(src, false, false);
         doTest206(src, false, true);
@@ -108,7 +108,7 @@ public class ExceptionTest extends JexlTestCase {
     // Unknown vars and properties versus null operands
     // JEXL-73
     @Test
-    public void testEx() throws Exception {
+    void testEx() throws Exception {
         final JexlEngine jexl = createEngine(false);
         final JexlExpression e = jexl.createExpression("c.e * 6");
         final JexlEvalContext ctxt = new JexlEvalContext();
@@ -143,7 +143,7 @@ public class ExceptionTest extends JexlTestCase {
 
     // Unknown vars and properties versus null operands
     @Test
-    public void testExMethod() throws Exception {
+    void testExMethod() throws Exception {
         final JexlEngine jexl = createEngine(false);
         final JexlExpression e = jexl.createExpression("c.e.foo()");
         final JexlEvalContext ctxt = new JexlEvalContext();
@@ -167,7 +167,7 @@ public class ExceptionTest extends JexlTestCase {
 
     // null local vars and strict arithmetic effects
     @Test
-    public void testExVar() throws Exception {
+    void testExVar() throws Exception {
         final JexlEngine jexl = createEngine(false);
         final JexlScript e = jexl.createScript("(x)->{ x * 6 }");
         final JexlEvalContext ctxt = new JexlEvalContext();
@@ -188,7 +188,7 @@ public class ExceptionTest extends JexlTestCase {
     }
 
     @Test
-    public void testWrappedEx() throws Exception {
+    void testWrappedEx() throws Exception {
         final JexlEngine jexl = new Engine();
         final JexlExpression e = jexl.createExpression("npe()");
         final JexlContext jc = new ObjectContext<>(jexl, new ThrowNPE());
@@ -198,7 +198,7 @@ public class ExceptionTest extends JexlTestCase {
     }
 
     @Test
-    public void testWrappedExmore() throws Exception {
+    void testWrappedExmore() throws Exception {
         final JexlEngine jexl = new Engine();
         final ThrowNPE npe = new ThrowNPE();
         assertNull(assertThrows(JexlException.Property.class, () -> jexl.getProperty(npe, "foo")).getCause());

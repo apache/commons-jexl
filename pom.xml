@@ -20,7 +20,7 @@
     <parent>
         <groupId>org.apache.commons</groupId>
         <artifactId>commons-parent</artifactId>
-        <version>84</version>
+        <version>85</version>
     </parent>
     <artifactId>commons-jexl3</artifactId>
     <version>3.5.1-SNAPSHOT</version>
@@ -100,6 +100,10 @@
             <url>scm:svn:https://svn.apache.org/repos/infra/websites/production/commons/content/proper/commons-jexl/</url>
         </site>
     </distributionManagement>
+    <ciManagement>
+      <system>GitHub</system>
+      <url>https://github.com/apache/commons-jexl/actions</url>
+    </ciManagement>
     <dependencies>
         <dependency>
             <groupId>commons-logging</groupId>

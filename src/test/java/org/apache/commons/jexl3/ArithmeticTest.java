@@ -52,7 +52,7 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
 @SuppressWarnings({"UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
-public class ArithmeticTest extends JexlTestCase {
+class ArithmeticTest extends JexlTestCase {
     public static class Arithmetic132 extends JexlArithmetic {
         public Arithmetic132() {
             super(false);

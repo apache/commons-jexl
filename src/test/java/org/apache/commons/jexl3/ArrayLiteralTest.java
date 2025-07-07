@@ -32,14 +32,14 @@ import org.junit.jupiter.api.Test;
  * Tests for array literals.
  */
 @SuppressWarnings({"UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
-public class ArrayLiteralTest extends JexlTestCase {
+class ArrayLiteralTest extends JexlTestCase {
 
     public ArrayLiteralTest() {
         super("ArrayLiteralTest");
     }
 
     @Test
-    public void testChangeThroughVariables() throws Exception {
+    void testChangeThroughVariables() throws Exception {
         final JexlContext jc = new MapContext();
         final JexlExpression e147 = JEXL.createExpression("quux = [one, two]");
 
@@ -57,7 +57,7 @@ public class ArrayLiteralTest extends JexlTestCase {
     }
 
     @Test
-    public void testEmptyArrayLiteral() throws Exception {
+    void testEmptyArrayLiteral() throws Exception {
         final JexlContext jc = new MapContext();
         Object o;
         o = JEXL.createExpression("[]").evaluate(jc);
@@ -71,7 +71,7 @@ public class ArrayLiteralTest extends JexlTestCase {
     }
 
     @Test
-    public void testLiteralWithElipsis() throws Exception {
+    void testLiteralWithElipsis() throws Exception {
         final JexlExpression e = JEXL.createExpression("[ 'foo' , 'bar', ... ]");
         final JexlContext jc = new MapContext();
 
@@ -83,7 +83,7 @@ public class ArrayLiteralTest extends JexlTestCase {
     }
 
     @Test
-    public void testLiteralWithIntegers() throws Exception {
+    void testLiteralWithIntegers() throws Exception {
         final JexlExpression e = JEXL.createExpression("[ 5 , 10 ]");
         final JexlContext jc = new MapContext();
 
@@ -93,7 +93,7 @@ public class ArrayLiteralTest extends JexlTestCase {
     }
 
     @Test
-    public void testLiteralWithNulls() throws Exception {
+    void testLiteralWithNulls() throws Exception {
         final String[] exprs = {
             "[ null , 10 ]",
             "[ 10 , null ]",
@@ -118,7 +118,7 @@ public class ArrayLiteralTest extends JexlTestCase {
     }
 
     @Test
-    public void testLiteralWithNumbers() throws Exception {
+    void testLiteralWithNumbers() throws Exception {
         final JexlExpression e = JEXL.createExpression("[ 5.0 , 10 ]");
         final JexlContext jc = new MapContext();
 
@@ -129,7 +129,7 @@ public class ArrayLiteralTest extends JexlTestCase {
     }
 
     @Test
-    public void testLiteralWithOneEntry() throws Exception {
+    void testLiteralWithOneEntry() throws Exception {
         final Object[] check = {"foo"};
         final List<String> sources = Arrays.asList("[ 'foo']", "[ 'foo' , ]");
         for(final String src : sources) {
@@ -140,7 +140,7 @@ public class ArrayLiteralTest extends JexlTestCase {
     }
 
     @Test
-    public void testLiteralWithStrings() throws Exception {
+    void testLiteralWithStrings() throws Exception {
         final Object[] check = {"foo", "bar"};
         final List<String> sources = Arrays.asList("[ 'foo' , 'bar' ]", "[ 'foo' , 'bar', ]");
         for(final String src : sources) {
@@ -151,7 +151,7 @@ public class ArrayLiteralTest extends JexlTestCase {
     }
 
     @Test
-    public void testNotEmptySimpleArrayLiteral() throws Exception {
+    void testNotEmptySimpleArrayLiteral() throws Exception {
         final JexlExpression e = JEXL.createExpression("empty([ 'foo' , 'bar' ])");
         final JexlContext jc = new MapContext();
 
@@ -160,7 +160,7 @@ public class ArrayLiteralTest extends JexlTestCase {
     }
 
     @Test
-    public void testNotestCallingMethodsOnNewMapLiteral() throws Exception {
+    void testNotestCallingMethodsOnNewMapLiteral() throws Exception {
         final JexlExpression e = JEXL.createExpression("size({ 'foo' : 'bar' }.values())");
         final JexlContext jc = new MapContext();
 
@@ -169,7 +169,7 @@ public class ArrayLiteralTest extends JexlTestCase {
     }
 
     @Test
-    public void testSizeOfSimpleArrayLiteral() throws Exception {
+    void testSizeOfSimpleArrayLiteral() throws Exception {
         final JexlExpression e = JEXL.createExpression("size([ 'foo' , 'bar' ])");
         final JexlContext jc = new MapContext();
 

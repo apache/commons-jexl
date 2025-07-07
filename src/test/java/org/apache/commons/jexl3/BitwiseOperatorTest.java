@@ -24,7 +24,7 @@ import org.junit.jupiter.api.Test;
  * Tests for the bitwise operators.
  */
 @SuppressWarnings({"UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
-public class BitwiseOperatorTest extends JexlTestCase {
+class BitwiseOperatorTest extends JexlTestCase {
     private Asserter asserter;
 
     /**
@@ -42,133 +42,133 @@ public class BitwiseOperatorTest extends JexlTestCase {
     }
 
     @Test
-    public void testAndSimple() throws Exception {
+    void testAndSimple() throws Exception {
         asserter.assertExpression("15 & 3", Long.valueOf(15 & 3));
     }
 
     @Test
-    public void testAndVariableNumberCoercion() throws Exception {
+    void testAndVariableNumberCoercion() throws Exception {
         asserter.setVariable("x", Integer.valueOf(15));
         asserter.setVariable("y", Short.valueOf((short) 7));
         asserter.assertExpression("x & y", Long.valueOf(15 & 7));
     }
 
     @Test
-    public void testAndVariableStringCoercion() throws Exception {
+    void testAndVariableStringCoercion() throws Exception {
         asserter.setVariable("x", Integer.valueOf(15));
         asserter.setVariable("y", "7");
         asserter.assertExpression("x & y", Long.valueOf(15 & 7));
     }
 
     @Test
-    public void testAndWithLeftNull() throws Exception {
+    void testAndWithLeftNull() throws Exception {
         asserter.assertExpression("null & 1", Long.valueOf(0));
     }
 
     @Test
-    public void testAndWithRightNull() throws Exception {
+    void testAndWithRightNull() throws Exception {
         asserter.assertExpression("1 & null", Long.valueOf(0));
     }
 
     @Test
-    public void testAndWithTwoNulls() throws Exception {
+    void testAndWithTwoNulls() throws Exception {
         asserter.assertExpression("null & null", Long.valueOf(0));
     }
 
     @Test
-    public void testComplementSimple() throws Exception {
+    void testComplementSimple() throws Exception {
         asserter.assertExpression("~128", Long.valueOf(-129));
     }
 
     @Test
-    public void testComplementVariableNumberCoercion() throws Exception {
+    void testComplementVariableNumberCoercion() throws Exception {
         asserter.setVariable("x", Integer.valueOf(15));
         asserter.assertExpression("~x", Long.valueOf(~15));
     }
 
     @Test
-    public void testComplementVariableStringCoercion() throws Exception {
+    void testComplementVariableStringCoercion() throws Exception {
         asserter.setVariable("x", "15");
         asserter.assertExpression("~x", Long.valueOf(~15));
     }
 
     @Test
-    public void testComplementWithNull() throws Exception {
+    void testComplementWithNull() throws Exception {
         asserter.assertExpression("~null", Long.valueOf(-1));
     }
 
     @Test
-    public void testOrSimple() throws Exception {
+    void testOrSimple() throws Exception {
         asserter.assertExpression("12 | 3", Long.valueOf(15));
     }
 
     @Test
-    public void testOrVariableNumberCoercion() throws Exception {
+    void testOrVariableNumberCoercion() throws Exception {
         asserter.setVariable("x", Integer.valueOf(12));
         asserter.setVariable("y", Short.valueOf((short) 3));
         asserter.assertExpression("x | y", Long.valueOf(15));
     }
 
     @Test
-    public void testOrVariableStringCoercion() throws Exception {
+    void testOrVariableStringCoercion() throws Exception {
         asserter.setVariable("x", Integer.valueOf(12));
         asserter.setVariable("y", "3");
         asserter.assertExpression("x | y", Long.valueOf(15));
     }
 
     @Test
-    public void testOrWithLeftNull() throws Exception {
+    void testOrWithLeftNull() throws Exception {
         asserter.assertExpression("null | 1", Long.valueOf(1));
     }
 
     @Test
-    public void testOrWithRightNull() throws Exception {
+    void testOrWithRightNull() throws Exception {
         asserter.assertExpression("1 | null", Long.valueOf(1));
     }
 
     @Test
-    public void testOrWithTwoNulls() throws Exception {
+    void testOrWithTwoNulls() throws Exception {
         asserter.assertExpression("null | null", Long.valueOf(0));
     }
 
     @Test
-    public void testParenthesized() throws Exception {
+    void testParenthesized() throws Exception {
         asserter.assertExpression("(2 | 1) & 3", Long.valueOf(3L));
         asserter.assertExpression("(2 & 1) | 3", Long.valueOf(3L));
         asserter.assertExpression("~(120 | 42)", Long.valueOf(~(120 | 42)));
     }
 
     @Test
-    public void testXorSimple() throws Exception {
+    void testXorSimple() throws Exception {
         asserter.assertExpression("1 ^ 3", Long.valueOf(1 ^ 3));
     }
 
     @Test
-    public void testXorVariableNumberCoercion() throws Exception {
+    void testXorVariableNumberCoercion() throws Exception {
         asserter.setVariable("x", Integer.valueOf(1));
         asserter.setVariable("y", Short.valueOf((short) 3));
         asserter.assertExpression("x ^ y", Long.valueOf(1 ^ 3));
     }
 
     @Test
-    public void testXorVariableStringCoercion() throws Exception {
+    void testXorVariableStringCoercion() throws Exception {
         asserter.setVariable("x", Integer.valueOf(1));
         asserter.setVariable("y", "3");
         asserter.assertExpression("x ^ y", Long.valueOf(1 ^ 3));
     }
 
     @Test
-    public void testXorWithLeftNull() throws Exception {
+    void testXorWithLeftNull() throws Exception {
         asserter.assertExpression("null ^ 1", Long.valueOf(1));
     }
 
     @Test
-    public void testXorWithRightNull() throws Exception {
+    void testXorWithRightNull() throws Exception {
         asserter.assertExpression("1 ^ null", Long.valueOf(1));
     }
 
     @Test
-    public void testXorWithTwoNulls() throws Exception {
+    void testXorWithTwoNulls() throws Exception {
         asserter.assertExpression("null ^ null", Long.valueOf(0));
     }
 

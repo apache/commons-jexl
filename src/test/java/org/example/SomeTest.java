@@ -34,7 +34,7 @@ import org.apache.commons.jexl3.introspection.JexlPermissions;
 import org.apache.commons.jexl3.parser.JexlNode;
 import org.junit.jupiter.api.Test;
 
-public class SomeTest {
+class SomeTest {
 
   /**
    * Engine creating dedicated template interpreter.
@@ -69,7 +69,7 @@ public class SomeTest {
   static AtomicInteger CALL406 = new AtomicInteger();
 
   @Test
-  public void test406b() {
+  void test406b() {
     final JexlEngine jexl = new JexlBuilder() {
       @Override
       public JexlEngine create() {
@@ -90,7 +90,7 @@ public class SomeTest {
    * User namespace needs to be allowed through permissions.
    */
   @Test
-  public void testCustomFunctionPermissions() {
+  void testCustomFunctionPermissions() {
       final Map<String, Object> funcs = new HashMap<>();
       funcs.put("math", new MyMath());
       final JexlPermissions permissions = JexlPermissions.parse("org.example.*");

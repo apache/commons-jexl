@@ -50,7 +50,7 @@ import org.junit.jupiter.api.Test;
  * Test cases for reported issue between JEXL-200 and JEXL-299.
  */
 @SuppressWarnings({"boxing", "UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
-public class Issues200Test extends JexlTestCase {
+class Issues200Test extends JexlTestCase {
     public static class Arithmetic266 extends JexlArithmetic {
         static final ThreadLocal<Deque<Iterator266>> TLS_FOREACH = new ThreadLocal<Deque<Iterator266>>() {
             @Override
@@ -449,6 +449,7 @@ public class Issues200Test extends JexlTestCase {
         final JexlScript script = jexl.createScript("while(true);");
         assertThrows(JexlException.class, () -> jexl.createExpression("while(true);"), "expr do not allow 'while' statement");
     }
+  
     @Test
     void test245() {
         final MapContext ctx = new MapContext();

@@ -39,7 +39,7 @@ import org.junit.jupiter.api.Test;
  * Tests for calling methods on objects
  */
 @SuppressWarnings({"UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
-public class MethodTest extends JexlTestCase {
+class MethodTest extends JexlTestCase {
     public static class ContextualFunctor {
         private final EnhancedContext context;
 
@@ -333,7 +333,7 @@ public class MethodTest extends JexlTestCase {
     }
 
     @Test
-    public void testAmbiguousInvoke() throws Exception {
+    void testAmbiguousInvoke() throws Exception {
         // JEXL-299
         final Functor func = new Functor();
         final JexlContext ctxt = new MapContext();
@@ -353,7 +353,7 @@ public class MethodTest extends JexlTestCase {
     }
 
     @Test
-    public void testCallJexlVarArgMethod() throws Exception {
+    void testCallJexlVarArgMethod() throws Exception {
         final VarArgs test = new VarArgs();
         asserter.setVariable("test", test);
         assertEquals("jexl:0", test.callMixed("jexl"));
@@ -368,7 +368,7 @@ public class MethodTest extends JexlTestCase {
     }
 
     @Test
-    public void testCallMixedVarArgMethod() throws Exception {
+    void testCallMixedVarArgMethod() throws Exception {
         final VarArgs test = new VarArgs();
         asserter.setVariable("test", test);
         assertEquals("Mixed:1", test.callMixed(Integer.valueOf(1)));
@@ -383,7 +383,7 @@ public class MethodTest extends JexlTestCase {
     }
 
     @Test
-    public void testCallVarArgMethod() throws Exception {
+    void testCallVarArgMethod() throws Exception {
         final VarArgs test = new VarArgs();
         asserter.setVariable("test", test);
         asserter.assertExpression("test.callInts()", test.callInts());
@@ -395,7 +395,7 @@ public class MethodTest extends JexlTestCase {
     }
 
     @Test
-    public void testFizzCall() throws Exception {
+    void testFizzCall() throws Exception {
         final ScriptContext context = new ScriptContext(new HashMap<>());
 
         JexlScript bar = JEXL.createScript("functor:get('drink')");
@@ -414,7 +414,7 @@ public class MethodTest extends JexlTestCase {
     }
 
     @Test
-    public void testInvoke() throws Exception {
+    void testInvoke() throws Exception {
         final Functor func = new Functor();
         assertEquals(Integer.valueOf(10), JEXL.invokeMethod(func, "ten"));
         assertEquals(Integer.valueOf(42), JEXL.invokeMethod(func, "PLUS20", Integer.valueOf(22)));
@@ -432,20 +432,20 @@ public class MethodTest extends JexlTestCase {
      * test a simple method expression
      */
     @Test
-    public void testMethod() throws Exception {
+    void testMethod() throws Exception {
         // tests a simple method expression
         asserter.setVariable("foo", new Foo());
         asserter.assertExpression("foo.bar()", METHOD_STRING);
     }
 
     @Test
-    public void testMulti() throws Exception {
+    void testMulti() throws Exception {
         asserter.setVariable("foo", new Foo());
         asserter.assertExpression("foo.innerFoo.bar()", METHOD_STRING);
     }
 
     @Test
-    public void testNamespaceCall() throws Exception {
+    void testNamespaceCall() throws Exception {
         final java.util.Map<String, Object> funcs = new java.util.HashMap<>();
         funcs.put("func", new Functor());
         funcs.put("FUNC", Functor.class);
@@ -474,7 +474,7 @@ public class MethodTest extends JexlTestCase {
     }
 
     @Test
-    public void testNamespaceCallEdge() throws Exception {
+    void testNamespaceCallEdge() throws Exception {
         final java.util.Map<String, Object> funcs = new java.util.HashMap<>();
         final Edge func = new Edge();
         funcs.put("func", func);
@@ -538,7 +538,7 @@ public class MethodTest extends JexlTestCase {
     }
 
     @Test
-    public void testScriptCall() throws Exception {
+    void testScriptCall() throws Exception {
         JexlContext context = new MapContext();
         final JexlScript plus = JEXL.createScript("a + b", new String[]{"a", "b"});
         context.set("plus", plus);
@@ -612,13 +612,13 @@ public class MethodTest extends JexlTestCase {
      * Ensures static methods on objects can be called.
      */
     @Test
-    public void testStaticMethodInvocation() throws Exception {
+    void testStaticMethodInvocation() throws Exception {
         asserter.setVariable("aBool", Boolean.FALSE);
         asserter.assertExpression("aBool.valueOf('true')", Boolean.TRUE);
     }
 
     @Test
-    public void testStaticMethodInvocationOnClasses() throws Exception {
+    void testStaticMethodInvocationOnClasses() throws Exception {
         asserter.setVariable("Boolean", Boolean.class);
         asserter.assertExpression("Boolean.valueOf('true')", Boolean.TRUE);
     }
@@ -627,7 +627,7 @@ public class MethodTest extends JexlTestCase {
      * test some String method calls
      */
     @Test
-    public void testStringMethods() throws Exception {
+    void testStringMethods() throws Exception {
         asserter.setVariable("foo", "abcdef");
         asserter.assertExpression("foo.substring(3)", "def");
         asserter.assertExpression("foo.substring(0,(size(foo)-3))", "abc");
@@ -637,7 +637,7 @@ public class MethodTest extends JexlTestCase {
     }
 
     @Test
-    public void testTopLevelCall() throws Exception {
+    void testTopLevelCall() throws Exception {
         final java.util.Map<String, Object> funcs = new java.util.HashMap<>();
         funcs.put(null, new Functor());
         funcs.put("math", new MyMath());
@@ -668,7 +668,7 @@ public class MethodTest extends JexlTestCase {
     }
 
     @Test
-    public void testTryFailed() throws Exception {
+    void testTryFailed() throws Exception {
         // JEXL-257
         final Functor func = new Functor();
         final JexlContext ctxt = new MapContext();
@@ -716,7 +716,7 @@ public class MethodTest extends JexlTestCase {
     }
 
     @Test
-    public void testTryFailedScript() throws Exception {
+    void testTryFailedScript() throws Exception {
         // JEXL-257
         final Functor func = new Functor();
         final JexlContext ctxt = new MapContext();
@@ -762,7 +762,7 @@ public class MethodTest extends JexlTestCase {
     }
 
     @Test
-    public void testVariousFunctionLocation() throws Exception {
+    void testVariousFunctionLocation() throws Exception {
         // see JEXL-190
         final Map<String, Object> vars = new HashMap<>();
         final Map<String,Object> funcs = new HashMap<>();
