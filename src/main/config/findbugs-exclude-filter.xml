@@ -71,4 +71,10 @@
         <Package name="org.apache.commons.jexl3.parser"/>
         <Bug code="EI2,EI"></Bug>
     </Match>
+    <Match>
+        <Class name="org.apache.commons.jexl3.parser.ASTCaseStatement"/>
+    </Match>
+    <Match>
+        <Class name="org.apache.commons.jexl3.parser.ASTSwitchStatement"/>
+    </Match>
 </FindBugsFilter>

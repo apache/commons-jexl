@@ -334,9 +334,9 @@ public final class JexlOptions {
      */
     public JexlOptions set(final JexlEngine jexl) {
         if (jexl instanceof Engine) {
-            ((Engine) jexl).optionsSet(this);
+            return ((Engine) jexl).optionsSet(this);
         }
-        return this;
+        throw new UnsupportedOperationException("JexlEngine is not an Engine instance: " + jexl.getClass().getName());
     }
 
     /**

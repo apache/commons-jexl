@@ -859,7 +859,7 @@ class ArithmeticTest extends JexlTestCase {
     }
 
     @Test
-    void testArithmeticPlus() throws Exception {
+    void testArithmeticPlus() {
         final JexlEngine jexl = new JexlBuilder().cache(64).arithmetic(new ArithmeticPlus(false)).create();
         final JexlContext jc = new EmptyTestContext();
         runOverload(jexl, jc);
@@ -1527,7 +1527,7 @@ class ArithmeticTest extends JexlTestCase {
     }
 
     @Test
-    void testInfiniteArithmetic() throws Exception {
+    void testInfiniteArithmetic() {
         final Map<String, Object> ns = new HashMap<>();
         ns.put("math", Math.class);
         final JexlEngine jexl = new JexlBuilder().arithmetic(new Arithmetic132()).namespaces(ns).create();
@@ -1555,14 +1555,14 @@ class ArithmeticTest extends JexlTestCase {
     }
 
     @Test
-    void testInstanceOf0() throws Exception {
+    void testInstanceOf0() {
         final JexlEngine jexl = new JexlBuilder().strict(true).safe(false).create();
         final JexlContext ctxt = new InstanceofContext();
         runInstanceof(jexl, ctxt);
     }
 
     @Test
-    void testInstanceOf1() throws Exception {
+    void testInstanceOf1() {
         final JexlEngine jexl = new JexlBuilder().strict(true).safe(false).imports("java.lang").create();
         runInstanceof(jexl, null);
     }
@@ -1703,8 +1703,8 @@ class ArithmeticTest extends JexlTestCase {
         assertEquals(63.5d, ctxt.get("g"));
         assertEquals(0x10, ctxt.get("h"));
         assertEquals(010, ctxt.get("i")); // octal 010
-        assertEquals(0x10L, ctxt.get("j")); // octal 010L
-        assertEquals(010L, ctxt.get("k"));
+        assertEquals(0x10L, ctxt.get("j")); // hexa 010L
+        assertEquals(010L, ctxt.get("k")); // octal 010L
     }
 
     @Test
@@ -1864,7 +1864,7 @@ class ArithmeticTest extends JexlTestCase {
     void testNullArgs() {
         final JexlEngine jexl =  new JexlBuilder().arithmetic(new JexlArithmetic(true) {
             @Override public boolean isStrict(final JexlOperator op) {
-                return JexlOperator.ADD == op? false: super.isStrict(op);
+                return JexlOperator.ADD != op && super.isStrict(op);
             }
         }).create();
         final JexlScript script = jexl.createScript("'1.2' + x ", "x");

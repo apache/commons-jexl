@@ -16,26 +16,15 @@
  */
 package org.apache.commons.jexl3.parser;
 
-import org.apache.commons.jexl3.JexlException;
-import org.apache.commons.jexl3.JexlFeatures;
-import org.apache.commons.jexl3.JexlInfo;
-import org.apache.commons.jexl3.internal.Scope;
 
-/**
- * The interface that produces a JEXL script AST from a source.
- * @since 3.5.0
- */
-public interface JexlScriptParser {
-  /**
-   * Parses a script or expression.
-   *
-   * @param info      information structure
-   * @param features  the set of parsing features
-   * @param src      the expression to parse
-   * @param scope     the script frame
-   * @return the parsed tree
-   * @throws JexlException if any error occurred during parsing
-   */
-  ASTJexlScript parse(final JexlInfo info, final JexlFeatures features, final String src, final Scope scope);
+public class ASTCaseExpression extends ASTCaseStatement {
 
+  public ASTCaseExpression(int id) {
+    super(id);
+  }
+
+  @Override
+  public Object jjtAccept(ParserVisitor visitor, Object data) {
+    return visitor.visit(this, data);
+  }
 }

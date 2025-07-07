@@ -73,7 +73,7 @@ public final class JexlFeatures {
         "global assign/modify", "array reference", "create instance", "loop", "function",
         "method call", "set/map/array literal", "pragma", "annotation", "script", "lexical", "lexicalShade",
         "thin-arrow", "fat-arrow", "namespace pragma", "namespace identifier", "import pragma", "comparator names", "pragma anywhere",
-        "const capture", "ref capture"
+        "const capture", "ref capture", "ambiguous statement"
     };
     /** Registers feature ordinal. */
     private static final int REGISTER = 0;
@@ -125,13 +125,13 @@ public final class JexlFeatures {
     public static final int CONST_CAPTURE = 23;
     /** Captured variables are reference. */
     public static final int REF_CAPTURE = 24;
-    /** Captured variables are reference. */
-    public static final int STRICT_STATEMENT = 25;
+    /** Ambiguous or strict statement allowed. */
+    public static final int AMBIGUOUS_STATEMENT = 25;
     /**
      * All features.
      * Ensure this is updated if additional features are added.
      */
-    private static final long ALL_FEATURES = (1L << REF_CAPTURE + 1) - 1L; // MUST REMAIN PRIVATE
+    private static final long ALL_FEATURES = (1L << AMBIGUOUS_STATEMENT + 1) - 1L; // MUST REMAIN PRIVATE
     /**
      * The default features flag mask.
      * <p>Meant for compatibility with scripts written before 3.3.1</p>
@@ -168,13 +168,11 @@ public final class JexlFeatures {
 
     /**
      * Protected future syntactic elements.
-     * <p><em>throw, switch, case, default, class, instanceof, jexl, $jexl</em></p>
+     * <p><em>class, jexl, $jexl</em></p>
      * @since 3.3.1
      */
     private static final Set<String> RESERVED_WORDS =
-        Collections.unmodifiableSet(
-            new HashSet<>(Arrays.asList(
-                "switch", "case", "default", "class", "jexl", "$jexl")));
+        Collections.unmodifiableSet(new HashSet<>(Arrays.asList("class", "jexl", "$jexl")));
 
     /*
      * *WARNING*
@@ -717,6 +715,35 @@ public final class JexlFeatures {
         } else {
             flags &= ~(1L << feature);
         }
+    }
+
+    /**
+     * Sets whether statements can be ambiguous.
+     * <p>
+     * When enabled, the semicolumn is not required between expressions that otherwise are considered
+     * ambiguous. The default will report ambiguity in cases like <code>if (true) { x 5 }</code> considering this
+     * may be missing an operator or that the intent is not clear.
+     * </p>
+     * @param flag true to enable, false to disable
+     * @return this features instance
+     */
+    public JexlFeatures ambiguousStatement(final boolean flag) {
+        setFeature(AMBIGUOUS_STATEMENT, flag);
+        return this;
+    }
+
+    /**
+     * Checks whether statements can be ambiguous.
+     * <p>
+     * When enabled, the semicolumn is not required between expressions that otherwise are considered
+     * ambiguous. The default will report ambiguity in cases like <code>if (true) { x 5 }</code> considering this
+     * may be missing an operator or that the intent is not clear.
+     * </p>
+     * @return true if statements can be ambiguous, false otherwise
+     */
+    public boolean supportsAmbiguousStatement() {
+        boolean sas = getFeature(AMBIGUOUS_STATEMENT);
+        return sas;
     }
 
     /**

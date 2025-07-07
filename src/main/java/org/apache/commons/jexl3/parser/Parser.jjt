@@ -39,6 +39,7 @@ package org.apache.commons.jexl3.parser;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.LinkedList;
 
 import org.apache.commons.jexl3.JexlInfo;
@@ -48,6 +49,17 @@ import org.apache.commons.jexl3.internal.Scope;
 
 public final class Parser extends JexlParser
 {
+
+    /**
+     * Parses a JEXL source string and returns the corresponding AST.
+     * @param jexlInfo the JEXL info to use, may be null
+     * @param jexlFeatures the JEXL features to use
+     * @param jexlSrc the JEXL source string to parse
+     * @param jexlScope the scope to use for parsing
+     * @return the AST for the JEXL source string
+     * @throws JexlException.Tokenization if there is a tokenization error
+     * @throws JexlException.Parsing if there is a parsing error
+     */
     public ASTJexlScript parse(JexlInfo jexlInfo, JexlFeatures jexlFeatures, String jexlSrc, Scope jexlScope) {
         JexlFeatures previous = getFeatures();
         try {
@@ -71,7 +83,11 @@ public final class Parser extends JexlParser
             throw new JexlException.Tokenization(info, xtme).clean();
         } catch (ParseException xparse) {
             Token errortok = errorToken(jj_lastpos, jj_scanpos, token.next, token);
-            throw new JexlException.Parsing(info.at(errortok.beginLine, errortok.beginColumn), errortok.image).clean();
+            String msg = xparse.getMessage();
+            if (msg.endsWith(";")) {
+              msg = errortok.image;
+            }
+            throw new JexlException.Parsing(info.at(errortok.beginLine, errortok.beginColumn), msg).clean();
         } finally {
             token_source.defaultLexState = DEFAULT;
             cleanup(previous);
@@ -103,7 +119,7 @@ TOKEN_MGR_DECLS : {
     | <"//" (~["\n","\r"])* ("\n" | "\r" | "\r\n")? >
 }
 
-<NEVER> TOKEN : /* Exception handling. */
+<DEFAULT> TOKEN : /* Exception handling. */
 {
       < THROW : "throw" >
     | < TRY : "try" >
@@ -111,7 +127,7 @@ TOKEN_MGR_DECLS : {
     | < FINALLY : "finally" >
 }
 
-<NEVER> TOKEN : /* Type check. */
+<DEFAULT> TOKEN : /* Type check. */
 {
       < ISA : "instanceof" >
 }
@@ -238,6 +254,10 @@ TOKEN_MGR_DECLS : {
     | < NULL : "null" >
     | < TRUE : "true" >
     | < FALSE : "false" >
+    | < SWITCH : "switch" >
+    | < CASE : "case" >
+    | < CASE_DEFAULT : "default" >
+    | < IMPORT : "import" >
 }
 
 
@@ -356,7 +376,7 @@ ASTJexlScript JexlScript(Scope frame, JexlFeatures features) : {
    {
         pushUnit(jjtThis);
    }
-        ( LOOKAHEAD(<PRAGMA>) Pragma() | { controlPragmaAnywhere(); } Statement() )* <EOF>
+        (LOOKAHEAD(<IMPORT>) Import())* ( LOOKAHEAD(<PRAGMA>) Pragma() | { controlPragmaAnywhere(); } Statement() )* <EOF>
    {
         popUnit(jjtThis);
         return jjtThis.script();
@@ -413,10 +433,11 @@ void StatementNoVar() #void : {}
     | LOOKAHEAD(<BREAK>) Break()
     | LOOKAHEAD(<THROW>) ThrowStatement()
     | LOOKAHEAD(<TRY>) TryStatement()
+    | LOOKAHEAD(<SWITCH>) SwitchStatement()
     | LOOKAHEAD(LambdaLookahead()) Lambda()
     | LOOKAHEAD(Expression()) ExpressionStatement()
     | Block()
-    | LOOKAHEAD(<VAR>, {!getFeatures().isLexical()} ) Var()
+    | LOOKAHEAD(<VAR>, { !getFeatures().isLexical()} ) Var()
 }
 
 void Block() #Block : {}
@@ -431,7 +452,7 @@ void FunctionStatement() #JexlLambda : {}
 
 void ExpressionStatement() #void : {}
 {
-    Expression() (LOOKAHEAD(Expression()) Expression() #Ambiguous(1))* (LOOKAHEAD(1) <SEMICOL>)?
+    Expression() (LOOKAHEAD(Expression(), { isAmbiguousStatement(SEMICOL) } ) Expression() #Ambiguous(1))* (LOOKAHEAD(1) <SEMICOL>)*
 }
 
 
@@ -478,14 +499,18 @@ void DoWhileStatement() : {}
     <DO> { loopCount += 1; } (LOOKAHEAD(1) Block() | StatementNoVar()) <WHILE> <LPAREN> Expression() <RPAREN> { loopCount -= 1; }
 }
 
-void ReturnStatement() : {}
+void ReturnStatement() : {
+    this.autoSemicolon = false;
+ }
 {
-    <RETURN> (LOOKAHEAD(2) ExpressionStatement() )?
+    <RETURN> (LOOKAHEAD(2) ExpressionStatement() )? { this.autoSemicolon = true; }
 }
 
-void ThrowStatement() : {}
+void ThrowStatement() : {
+    this.autoSemicolon = false;
+ }
 {
-    <THROW> (LOOKAHEAD(2) ExpressionStatement() )?
+    <THROW> (LOOKAHEAD(2) ExpressionStatement() )? { this.autoSemicolon = true; }
 }
 
 void Continue() #Continue : {
@@ -571,6 +596,7 @@ void DeclareVar(boolean lexical, boolean constant) #Var :
 {
     t=<IDENTIFIER> { declareVariable(jjtThis, t, lexical, constant); }
 }
+
 void DeclareFunction() #Var :
 {
     Token t;
@@ -579,21 +605,125 @@ void DeclareFunction() #Var :
     t=<IDENTIFIER> { declareFunction(jjtThis, t); }
 }
 
+void SwitchStatement() #SwitchStatement :
+{
+    ASTSwitchStatement.Helper helper = new ASTSwitchStatement.Helper();
+    SwitchSet cases = switchSet();
+}
+{
+    <SWITCH> <LPAREN> Expression() <RPAREN> <LCURLY>
+      ( SwitchStatementCase(cases) { helper.defineCase(cases); } )*
+    <RCURLY>
+{
+    helper.defineSwitch(jjtThis);
+}
+}
+
+
+void SwitchStatementCase(SwitchSet cases) #CaseStatement :
+{
+    Object constant;
+    List<Object> constants;
+    loopCount += 1;
+}
+{
+    ( ( LOOKAHEAD(2) <CASE> constant=constLiteral() <COLON>
+        { constants = Collections.singletonList(constant); jjtThis.setValues(constants); cases.addAll(constants); } )+
+        |
+        <CASE_DEFAULT> <COLON> )
+    ( LOOKAHEAD(<LCURLY>) Block() | (StatementNoVar())+ )?
+{
+    loopCount -= 1;
+}
+}
+
+void SwitchExpression() #SwitchExpression :
+{
+    ASTSwitchStatement.Helper helper = new ASTSwitchStatement.Helper();
+    SwitchSet cases = switchSet();
+    pushLoop();
+}
+{
+    <SWITCH> <LPAREN> Expression() <RPAREN> <LCURLY>
+      ( SwitchExpressionCase(cases) { helper.defineCase(cases); } )*
+    <RCURLY>
+{
+    helper.defineSwitch(jjtThis);
+    popLoop();
+}
+}
+
+void SwitchExpressionCase(SwitchSet cases) #CaseExpression :
+{
+    List<Object> constants = new ArrayList<Object>(1);
+}
+{
+    ( LOOKAHEAD(2)
+        <CASE> ConstLiterals(constants) <LAMBDA> { cases.addAll(constants); jjtThis.setValues(constants); }
+        |
+        <CASE_DEFAULT> <LAMBDA>
+    )
+    ( LOOKAHEAD(3) Block() | Expression() (<SEMICOL>)?)
+}
+
+void ConstLiterals(List<Object> constants) #void :
+{
+    Object constant;
+}
+{
+    constant=constLiteral() { constants.add(constant); } (LOOKAHEAD(2) <COMMA> constant=constLiteral() { constants.add(constant); })*
+}
+
+
+Object constLiteral() #void :
+{
+    Token s = null;
+    Token v;
+    Object result;
+    LinkedList<String> lstr = new LinkedList<String>();
+}
+{
+  (
+      LOOKAHEAD(2) (s=<plus>|s=<minus>)? v=<INTEGER_LITERAL> { result = NumberParser.parseInteger(s, v); }
+    | LOOKAHEAD(2) (s=<plus>|s=<minus>)? v=<FLOAT_LITERAL> { result = NumberParser.parseDouble(s, v); }
+    | LOOKAHEAD(1) v=<STRING_LITERAL> { result = Parser.buildString(v.image, true); }
+    | LOOKAHEAD(1) <TRUE> { result = true; }
+    | LOOKAHEAD(1) <FALSE> { result = false; }
+    | LOOKAHEAD(1) <NULL> { result = null; }
+    | LOOKAHEAD(1) <NAN_LITERAL> { result = Double.NaN; }
+    | LOOKAHEAD(1) propertyKey(lstr) { result = resolveConstant(stringify(lstr)); }
+  )
+  {
+    return result;
+  }
+}
+
+void Import() #void :
+{
+    List<String> imports = new ArrayList<String>();
+}
+{
+    <IMPORT> propertyKey(imports) (LOOKAHEAD(1) <SEMICOL>)?
+    {
+       addImport(stringify(imports));
+    }
+}
+
 void Pragma() #void :
 {
     LinkedList<String> lstr = new LinkedList<String>();
     Object value;
 }
 {
-<PRAGMA> pragmaKey(lstr)  value=pragmaValue() { declarePragma(stringify(lstr), value); }
+<PRAGMA> propertyKey(lstr)  value=pragmaValue() { declarePragma(stringify(lstr), value); }
 }
 
-void pragmaKey(List<String> lstr) #void :
+void propertyKey(List<String> lstr) #void :
 {
     Token t;
 }
 {
-    t=<IDENTIFIER>  { lstr.add(t.image); } ( LOOKAHEAD(<DOT>) pragmaKey(lstr) )*
+    t=<IDENTIFIER>  { lstr.add(t.image); } ( LOOKAHEAD(<DOT>) propertyKey(lstr) )*
    |
     <DOT> t=<DOT_IDENTIFIER> { lstr.add(t.image); }
 }
@@ -610,7 +740,7 @@ Object result;
       LOOKAHEAD(2) (s=<plus>|s=<minus>)? v=<INTEGER_LITERAL> { result = NumberParser.parseInteger(s, v); }
     | LOOKAHEAD(2) (s=<plus>|s=<minus>)? v=<FLOAT_LITERAL> { result = NumberParser.parseDouble(s, v); }
     | LOOKAHEAD(1) v=<STRING_LITERAL> { result = Parser.buildString(v.image, true); }
-    | LOOKAHEAD(1)  pragmaKey(lstr) { result = stringify(lstr); }
+    | LOOKAHEAD(1)  propertyKey(lstr) { result = stringify(lstr); }
     | LOOKAHEAD(1) <TRUE> { result = true; }
     | LOOKAHEAD(1) <FALSE> { result = false; }
     | LOOKAHEAD(1) <NULL> { result = null; }
@@ -1010,7 +1140,7 @@ void QualifiedIdentifier() #QualifiedIdentifier : {
     LinkedList<String> lstr = new LinkedList<String>();
 }
 {
-    pragmaKey(lstr) { jjtThis.setName(stringify(lstr));}
+    propertyKey(lstr) { jjtThis.setName(stringify(lstr));}
 }
 
 void Constructor() #ConstructorNode : {}
@@ -1054,7 +1184,6 @@ void LambdaLookahead() #void : {}
 void Lambda() #JexlLambda :
 {
    Token arrow;
-   Token name;
 }
 {
   <FUNCTION> (LOOKAHEAD(<IDENTIFIER>) DeclareFunction())? {
@@ -1132,6 +1261,8 @@ void PrimaryExpression() #void : {}
        LOOKAHEAD( <LBRACKET> ) ArrayLiteral()
     |
        LOOKAHEAD( <NEW> ) Constructor()
+    |
+       LOOKAHEAD( <SWITCH> ) SwitchExpression()
     |
        LOOKAHEAD( FunctionCallLookahead() ) FunctionCall()
     |

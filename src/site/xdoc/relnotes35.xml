@@ -24,7 +24,7 @@
   <body>
     <section name="Compatibility with previous release">
       <p>
-        Version 3.5 is source and binary compatible with 3.4.
+        Version 3.6 is source and binary compatible with 3.5.
       </p>
     </section>
     <section name="Compatibility with older releases (&lt; 3.3, 2.x)">
@@ -49,7 +49,35 @@
         or whether loops or side effects are accessible are part of your choice to make.
       </p>
     </section>
-    <section name="What's new in 3.5:">
+
+    <section name="What is new in 3.6:">
+      <p>
+        JEXL 3.6 is a minor release that adds a few features and fixes some bugs.
+        It does not introduce any breaking change.
+      </p>
+    </section>
+    <section name="New Features in 3.6:">
+    <p>
+    <table>
+    <tr>
+      <td><a href="https://issues.apache.org/jira/browse/JEXL-440">JEXL-440:</a></td>
+      <td>Switch statement &amp; expressions.</td>
+    </tr>
+    </table>
+    </p>
+    </section>
+    <section name="Bugs fixed in 3.6:">
+      <p>
+        <table>
+          <tr>
+            <td><a href="https://issues.apache.org/jira/browse/JEXL-437">JEXL-437:</a></td>
+            <td>Semicolons not actually optional between function calls on separate lines</td>
+          </tr>
+        </table>
+      </p>
+    </section>
+
+    <section name="What was new in 3.5:">
       <p>
         A feature that captures variables as references allowing side effect from a lambda to its
         outer scope; this is mimicking JavaScript scoping rule (JEXL-426).

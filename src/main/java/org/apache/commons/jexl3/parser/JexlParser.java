@@ -20,11 +20,15 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Deque;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
@@ -35,6 +39,7 @@ import org.apache.commons.jexl3.JexlFeatures;
 import org.apache.commons.jexl3.JexlInfo;
 import org.apache.commons.jexl3.internal.LexicalScope;
 import org.apache.commons.jexl3.internal.Scope;
+import org.apache.commons.jexl3.introspection.JexlUberspect;
 
 /**
  * The base class for parsing, manages the parameter/local variable frame.
@@ -173,57 +178,202 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
      * The source being processed.
      */
     protected String source;
-
     /**
      * The map of named registers aka script parameters.
      * <p>Each parameter is associated to a register and is materialized
      * as an offset in the registers array used during evaluation.</p>
      */
     protected Scope scope;
-
     /**
      * When parsing inner functions/lambda, need to stack the scope (sic).
      */
     protected final Deque<Scope> scopes = new ArrayDeque<>();
-
     /**
      * The list of pragma declarations.
      */
     protected Map<String, Object> pragmas;
+    /**
+     * The optional class name and constant resolver.
+     */
+    protected JexlUberspect.ClassConstantResolver fqcnResolver = null;
+    /**
+     * The list of imports.
+     * <p>Imports are used to resolve simple class names into fully qualified class names.</p>
+     */
+    protected List<String> imports = new ArrayList<>();
 
+
+    void addImport(String importName) {
+        if (importName != null && !importName.isEmpty()) {
+            if (imports == null) {
+                imports = new ArrayList<>();
+            }
+            if (!imports.contains(importName)) {
+                imports.add(importName);
+            }
+        }
+    }
+
+    Object resolveConstant(String name) {
+        JexlUberspect.ClassConstantResolver resolver = fqcnResolver;
+        if (resolver == null) {
+            JexlEngine engine = JexlEngine.getThreadEngine();
+            if (engine instanceof JexlUberspect.ConstantResolverFactory) {
+                fqcnResolver = resolver = ((JexlUberspect.ConstantResolverFactory) engine).createConstantResolver(imports);
+            }
+        }
+        return resolver != null
+            ? resolver.resolveConstant(name)
+            : JexlEngine.TRY_FAILED;
+    }
+
+    /**
+     * Whether automatic semicolon insertion is enabled.
+     */
+    protected boolean autoSemicolon = true;
     /**
      * The known namespaces.
      */
     protected Set<String> namespaces;
-
     /**
      * The number of nested loops.
      */
     protected int loopCount;
-
     /**
      * Stack of parsing loop counts.
      */
     protected final Deque<Integer> loopCounts = new ArrayDeque<>();
-
     /**
      * The current lexical block.
      */
     protected LexicalUnit block;
-
     /**
      * Stack of lexical blocks.
      */
     protected final Deque<LexicalUnit> blocks = new ArrayDeque<>();
-
     /**
      * The map of lexical to functional blocks.
      */
     protected final Map<LexicalUnit, Scope> blockScopes = new IdentityHashMap<>();
+    /**
+     * The name of the null case constant.
+     */
+    public static final Object NIL = new Object() {
+        @Override public String toString() {
+        return "null";
+    }};
+    /**
+     * The name of the default case constant.
+     */
+    public static final Object DFLT = new Object() {
+    @Override public String toString() {
+        return "default";
+    }};
+    /**
+     * The name of the default NaN constant.
+     */
+    public static final Object NAN = new Object() {
+    @Override public String toString() {
+        return "NaN";
+    }};
+
+    /**
+     * Encode a value to a switch predicate.
+     * @param value the value
+     * @return the encoded value, which is either the value itself, or NAN (for NaN) or NIL (for null)
+     */
+    static Object switchCode(Object value) {
+        if (value == null) {
+            return NIL;
+        }
+        if (value instanceof Double && ((Double) value).isNaN()) {
+            return NAN;
+        }
+        return value;
+    }
+
+    /**
+     * Decodes a value of a switch predicate.
+     * @param value an encoded value, which is either a value or NAN (for NaN) or NIL (for null)
+     * @return the decoded value
+     */
+    static Object switchDecode(Object value) {
+        if (value == NIL) {
+            return null;
+        }
+        if (value == NAN) {
+            return Double.NaN;
+        }
+        return value;
+    }
+
+    /**
+     * Constructs a set of constants amenable to switch expression.
+     */
+    protected SwitchSet switchSet() {
+        return new SwitchSet();
+    }
+    protected class SwitchSet implements Iterable<Object> {
+        private final Set<Object> values = new LinkedHashSet<>();
+        /**
+         * Adds a collection of values to the set.
+         * @param values the values to add
+         */
+        void addAll(Collection<Object> values) {
+            for (Object value : values) {
+                add(value);
+            }
+        }
+
+        /**
+         * Adds a value to the set.
+         * @param value the value to add
+         */
+        void add(Object value) {
+            Object code = switchCode(value);
+            if (!values.add(code)) {
+                throw new JexlException.Parsing(info, "duplicate constant value: " + value);
+            }
+        }
+
+        void clear() {
+            values.clear();
+        }
+
+        boolean isEmpty() {
+            return values.isEmpty();
+        }
+
+        int size() {
+            return values.size();
+        }
+
+        @Override
+        public Iterator<Object> iterator() {
+            return new Iterator<Object>() {
+                private final Iterator<Object> iter = values.iterator();
+
+                @Override
+                public boolean hasNext() {
+                    return iter.hasNext();
+                }
+
+                @Override
+                public Object next() {
+                    return switchDecode(iter.next());
+                }
+
+                @Override
+                public void remove() {
+                    iter.remove();
+                }
+            };
+        }
+    }
 
     /**
      * Internal, for debug purpose only.
-     * @param registers whether register syntax is recognized by this parser
+     * @param registers sets whether this parser recognizes the register syntax
      */
     public void allowRegisters(final boolean registers) {
         featureController.setFeatures(new JexlFeatures(featureController.getFeatures()).register(registers));
@@ -323,6 +473,8 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
         scopes.clear();
         pragmas = null;
         namespaces = null;
+        fqcnResolver = null;
+        imports.clear();
         loopCounts.clear();
         loopCount = 0;
         blocks.clear();
@@ -678,6 +830,27 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
     }
 
     /**
+     * Checks whether a statement is ambiguous.
+     * <p>
+     * This is used to detect statements that are not terminated by a semicolon,
+     * and that may be confused with an expression.
+     * </p>
+     * @param semicolon the semicolon token kind
+     * @return true if statement is ambiguous, false otherwise
+     */
+    protected boolean isAmbiguousStatement(int semicolon) {
+        if (autoSemicolon) {
+            Token current = getToken(0);
+            Token next = getToken(1);
+            if (current != null && next != null && current.endLine != next.beginLine) {
+                // if the next token is on a different line, no ambiguity reported
+                return false;
+            }
+        }
+        return !getFeatures().supportsAmbiguousStatement();
+    }
+
+    /**
      * Called by parser at end of node construction.
      * <p>
      * Detects "Ambiguous statement" and 'non-left value assignment'.</p>
@@ -796,6 +969,17 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
             blocks.push(block);
         }
         block = unit;
+    }
+
+    protected void pushLoop() {
+        loopCounts.push(loopCount);
+        loopCount = 0;
+    }
+
+    protected void popLoop() {
+        if (!loopCounts.isEmpty()) {
+            loopCount = loopCounts.pop();
+        }
     }
 
     /**

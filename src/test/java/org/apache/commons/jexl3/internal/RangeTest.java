@@ -40,10 +40,10 @@ import org.junit.jupiter.api.Test;
 class RangeTest extends JexlTestCase {
 
     public RangeTest() {
-        super("InternalTest");
+        super("RangeTest");
     }
 
-    private void checkIteration(final IntegerRange ir, final int first, final int last) throws Exception {
+    private void checkIteration(final IntegerRange ir, final int first, final int last) {
         final Iterator<Integer> ii = ir.iterator();
         if (ii.hasNext()) {
             int l = ii.next();
@@ -57,7 +57,7 @@ class RangeTest extends JexlTestCase {
         }
     }
 
-    private void checkIteration(final LongRange lr, final long first, final long last) throws Exception {
+    private void checkIteration(final LongRange lr, final long first, final long last) {
         final Iterator<Long> ii = lr.iterator();
         if (ii.hasNext()) {
             long l = ii.next();

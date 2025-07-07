@@ -92,14 +92,14 @@ public final class JexlTest extends JexlTestCase {
      * Asserts that the given expression returns the given value when applied to the
      * given context
      */
-    protected void assertExpression(final JexlContext jc, final String expression, final Object expected) throws Exception {
+    protected void assertExpression(final JexlContext jc, final String expression, final Object expected) {
         final JexlExpression e = JEXL.createExpression(expression);
         final Object actual = e.evaluate(jc);
         assertEquals(expected, actual, expression);
     }
 
     @Test
-    void testAntPropertiesWithMethods() throws Exception {
+    void testAntPropertiesWithMethods() {
         final JexlContext jc = new MapContext();
         final String value = "Stinky Cheese";
         jc.set("maven.bob.food", value);
@@ -116,7 +116,7 @@ public final class JexlTest extends JexlTestCase {
 
     @SuppressWarnings("boxing")
     @Test
-    void testArray() throws Exception {
+    void testArray() {
         final int[] array = {100, 101, 102};
         final JexlEngine jexl = JEXL;
         final JexlContext jc = new MapContext();
@@ -139,7 +139,7 @@ public final class JexlTest extends JexlTestCase {
      * @throws Exception
      */
     @Test
-    void testAssignment() throws Exception {
+    void testAssignment() {
         final JexlContext jc = new MapContext();
         jc.set("aString", "Hello");
         final Foo foo = new Foo();
@@ -161,7 +161,7 @@ public final class JexlTest extends JexlTestCase {
      * @throws Exception on errors
      */
     @Test
-    void testBadParse() throws Exception {
+    void testBadParse() {
         assertThrows(JexlException.class, () -> assertExpression(new MapContext(), "empty()", null));
     }
 
@@ -169,7 +169,7 @@ public final class JexlTest extends JexlTestCase {
      * test some blank strings
      */
     @Test
-    void testBlankStrings() throws Exception {
+    void testBlankStrings() {
         final JexlContext jc = new MapContext();
         jc.set("bar", "");
 
@@ -180,7 +180,7 @@ public final class JexlTest extends JexlTestCase {
     }
 
     @Test
-    void testBoolean() throws Exception {
+    void testBoolean() {
         final JexlContext jc = new MapContext();
         jc.set("foo", new Foo());
         jc.set("a", Boolean.TRUE);
@@ -199,7 +199,7 @@ public final class JexlTest extends JexlTestCase {
      * @throws Exception if there are errors
      */
     @Test
-    void testBooleanShortCircuitAnd() throws Exception {
+    void testBooleanShortCircuitAnd() {
         // handle false for the left arg of 'and'
         Foo tester = new Foo();
         final JexlContext jc = new MapContext();
@@ -221,7 +221,7 @@ public final class JexlTest extends JexlTestCase {
      * @throws Exception if there are errors
      */
     @Test
-    void testBooleanShortCircuitOr() throws Exception {
+    void testBooleanShortCircuitOr() {
         // handle false for the left arg of 'or'
         Foo tester = new Foo();
         final JexlContext jc = new MapContext();
@@ -242,7 +242,7 @@ public final class JexlTest extends JexlTestCase {
      * test some simple mathematical calculations
      */
     @Test
-    void testCalculations() throws Exception {
+    void testCalculations() {
         final JexlEvalContext jc = new JexlEvalContext();
         final JexlOptions options = jc.getEngineOptions();
         options.setStrict(false);
@@ -270,7 +270,7 @@ public final class JexlTest extends JexlTestCase {
      * Attempts to recreate bug https://jira.werken.com/ViewIssue.jspa?key=JELLY-8
      */
     @Test
-    void testCharAtBug() throws Exception {
+    void testCharAtBug() {
         final JexlEvalContext jc = new JexlEvalContext();
         final JexlOptions options = jc.getEngineOptions();
         options.setSilent(true);
@@ -284,7 +284,7 @@ public final class JexlTest extends JexlTestCase {
     }
 
     @Test
-    void testCoercionWithComparisionOperators() throws Exception {
+    void testCoercionWithComparisionOperators() {
         final JexlContext jc = new MapContext();
 
         assertExpression(jc, "'2' > 1", Boolean.TRUE);
@@ -307,7 +307,7 @@ public final class JexlTest extends JexlTestCase {
      * @throws Exception
      */
     @Test
-    void testComment() throws Exception {
+    void testComment() {
         assertExpression(new MapContext(), "## double or nothing\n 1 + 1", Integer.valueOf("2"));
     }
 
@@ -315,7 +315,7 @@ public final class JexlTest extends JexlTestCase {
      * test some simple conditions
      */
     @Test
-    void testComparisons() throws Exception {
+    void testComparisons() {
         final JexlContext jc = new MapContext();
         jc.set("foo", "the quick and lazy fox");
 
@@ -328,7 +328,7 @@ public final class JexlTest extends JexlTestCase {
      * test some simple conditions
      */
     @Test
-    void testConditions() throws Exception {
+    void testConditions() {
         final JexlEvalContext jc = new JexlEvalContext();
         final JexlOptions options = jc.getEngineOptions();
         jc.set("foo", Integer.valueOf(2));
@@ -375,7 +375,7 @@ public final class JexlTest extends JexlTestCase {
 
     @SuppressWarnings("boxing")
     @Test
-    void testDuck() throws Exception {
+    void testDuck() {
         final JexlEngine jexl = JEXL;
         final JexlContext jc = new MapContext();
         jc.set("duck", new Duck());
@@ -402,7 +402,7 @@ public final class JexlTest extends JexlTestCase {
     }
 
     @Test
-    void testEmpty() throws Exception {
+    void testEmpty() {
         final JexlEvalContext jc = new JexlEvalContext();
         final JexlOptions options = jc.getEngineOptions();
         options.setStrict(false);
@@ -427,7 +427,7 @@ public final class JexlTest extends JexlTestCase {
     }
 
     @Test
-    void testEmptyDottedVariableName() throws Exception {
+    void testEmptyDottedVariableName() {
         final JexlContext jc = new MapContext();
 
         jc.set("this.is.a.test", "");
@@ -436,7 +436,7 @@ public final class JexlTest extends JexlTestCase {
     }
 
     @Test
-    void testEmptySubListOfMap() throws Exception {
+    void testEmptySubListOfMap() {
         final JexlContext jc = new MapContext();
         final Map<String, ArrayList<?>> m = new HashMap<>();
         m.put("aList", new ArrayList<>());
@@ -447,7 +447,7 @@ public final class JexlTest extends JexlTestCase {
     }
 
     @Test
-    void testExpression() throws Exception {
+    void testExpression() {
         final JexlContext jc = new MapContext();
         jc.set("foo", new Foo());
         jc.set("a", Boolean.TRUE);
@@ -510,7 +510,7 @@ public final class JexlTest extends JexlTestCase {
      * test the use of an int based property
      */
     @Test
-    void testIntProperty() throws Exception {
+    void testIntProperty() {
         final Foo foo = new Foo();
 
         // lets check the square function first.
@@ -529,7 +529,7 @@ public final class JexlTest extends JexlTestCase {
      * test some blank strings
      */
     @Test
-    void testLogicExpressions() throws Exception {
+    void testLogicExpressions() {
         final JexlContext jc = new MapContext();
         jc.set("foo", "abc");
         jc.set("bar", "def");
@@ -549,7 +549,7 @@ public final class JexlTest extends JexlTestCase {
      * test the use of dot notation to lookup map entries
      */
     @Test
-    void testMapDot() throws Exception {
+    void testMapDot() {
         final Map<String, String> foo = new HashMap<>();
         foo.put("bar", "123");
 
@@ -563,7 +563,7 @@ public final class JexlTest extends JexlTestCase {
      * test the -1 comparison bug
      */
     @Test
-    void testNegativeIntComparison() throws Exception {
+    void testNegativeIntComparison() {
         final JexlContext jc = new MapContext();
         final Foo foo = new Foo();
         jc.set("foo", foo);
@@ -577,7 +577,7 @@ public final class JexlTest extends JexlTestCase {
      * test the new function e.g constructor invocation
      */
     @Test
-    void testNew() throws Exception {
+    void testNew() {
         final JexlContext jc = new MapContext();
         jc.set("double", Double.class);
         jc.set("foo", "org.apache.commons.jexl3.Foo");
@@ -595,8 +595,8 @@ public final class JexlTest extends JexlTestCase {
     }
 
     @Test
-    void testNewImports() throws Exception {
-        final JexlEngine jexl = new JexlBuilder().imports("not a package", "java.lang", "java.util").create();
+    void testNewImports() {
+        final JexlEngine jexl = new JexlBuilder().imports("java.lang", "java.util").create();
         JexlExpression expr;
         Object result;
         expr = jexl.createExpression("new LinkedList([1,2,3,...])");
@@ -608,7 +608,7 @@ public final class JexlTest extends JexlTestCase {
      * test some simple conditions
      */
     @Test
-    void testNotConditions() throws Exception {
+    void testNotConditions() {
         final JexlContext jc = new MapContext();
 
         final Foo foo = new Foo();
@@ -640,7 +640,7 @@ public final class JexlTest extends JexlTestCase {
      * test some simple conditions
      */
     @Test
-    void testNotConditionsWithDots() throws Exception {
+    void testNotConditionsWithDots() {
         final JexlContext jc = new MapContext();
 
         jc.set("x.a", Boolean.TRUE);
@@ -655,7 +655,7 @@ public final class JexlTest extends JexlTestCase {
      * test some null conditions
      */
     @Test
-    void testNull() throws Exception {
+    void testNull() {
         final JexlEvalContext jc = new JexlEvalContext();
         final JexlOptions options = jc.getEngineOptions();
         options.setStrict(false);
@@ -674,7 +674,7 @@ public final class JexlTest extends JexlTestCase {
      * test a simple property expression
      */
     @Test
-    void testProperty() throws Exception {
+    void testProperty() {
         /*
          *  tests a simple property expression
          */
@@ -690,7 +690,7 @@ public final class JexlTest extends JexlTestCase {
     }
 
     @Test
-    void testSize() throws Exception {
+    void testSize() {
         final JexlEvalContext jc = new JexlEvalContext();
         final JexlOptions options = jc.getEngineOptions();
         options.setStrict(false);
@@ -744,7 +744,7 @@ public final class JexlTest extends JexlTestCase {
     }
 
     @Test
-    void testSizeAsProperty() throws Exception {
+    void testSizeAsProperty() {
         final JexlContext jc = new MapContext();
         final Map<String, Object> map = new HashMap<>();
         map.put("size", "cheese");
@@ -766,7 +766,7 @@ public final class JexlTest extends JexlTestCase {
      * @throws Exception
      */
     @Test
-    void testStringConcatenation() throws Exception {
+    void testStringConcatenation() {
         final JexlContext jc = new MapContext();
         jc.set("first", "Hello");
         jc.set("second", "World");
@@ -774,7 +774,7 @@ public final class JexlTest extends JexlTestCase {
     }
 
     @Test
-    void testStringLit() throws Exception {
+    void testStringLit() {
         /*
          *  tests a simple property expression
          */
@@ -787,7 +787,7 @@ public final class JexlTest extends JexlTestCase {
      * Tests string literals
      */
     @Test
-    void testStringLiterals() throws Exception {
+    void testStringLiterals() {
         final JexlContext jc = new MapContext();
         jc.set("foo", "bar");
 
@@ -799,21 +799,21 @@ public final class JexlTest extends JexlTestCase {
      * test quoting in strings
      */
     @Test
-    void testStringQuoting() throws Exception {
+    void testStringQuoting() {
         final JexlContext jc = new MapContext();
         assertExpression(jc, "'\"Hello\"'", "\"Hello\"");
         assertExpression(jc, "\"I'm testing\"", "I'm testing");
     }
 
     @Test
-    void testToString() throws Exception {
+    void testToString() {
         final String code = "abcd";
         final JexlExpression expr = JEXL.createExpression(code);
         assertEquals(code, expr.toString(), "Bad expression value");
     }
 
     @Test
-    void testUnicodeSupport() throws Exception {
+    void testUnicodeSupport() {
         final JexlContext jc = new MapContext();
         assertExpression(jc, "'x' == '\\u0032?ytkownik'", Boolean.FALSE);
         assertExpression(jc, "'c:\\some\\windows\\path'", "c:\\some\\windows\\path");
@@ -826,7 +826,7 @@ public final class JexlTest extends JexlTestCase {
      * test variables with underscore names
      */
     @Test
-    void testVariableNames() throws Exception {
+    void testVariableNames() {
         final JexlContext jc = new MapContext();
         jc.set("foo_bar", "123");
 

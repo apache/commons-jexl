@@ -23,6 +23,7 @@ import static org.apache.commons.jexl3.parser.JexlParser.PRAGMA_OPTIONS;
 
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -71,7 +72,7 @@ import org.apache.commons.logging.LogFactory;
  * A JexlEngine implementation.
  * @since 2.0
  */
-public class Engine extends JexlEngine {
+public class Engine extends JexlEngine implements JexlUberspect.ConstantResolverFactory {
     /**
      * Gets the default instance of Uberspect.
      * <p>This is lazily initialized to avoid building a default instance if there
@@ -177,12 +178,15 @@ public class Engine extends JexlEngine {
     public static Uberspect getUberspect(final Log logger, final JexlUberspect.ResolverStrategy strategy) {
         return getUberspect(logger, strategy, null);
     }
+
     /**
      * Gets the default instance of Uberspect.
      * <p>This is lazily initialized to avoid building a default instance if there
-     * is no use for it. The main reason for not using the default Uberspect instance is to
-     * be able to use a (low level) introspector created with a given logger
-     * instead of the default one and even more so for with a different (restricted) set of permissions.</p>
+     * is no use for it.</p>
+     * <lu>The main reason for not using the default Uberspect instance are:
+     * <li>Using a (low level) introspector created with a given logger instead of the default one</li>
+     * <li>Using a (restricted) set of permissions</li>
+     * </lu>
      * @param logger the logger to use for the underlying Uberspect
      * @param strategy the property resolver strategy
      * @param permissions the introspection permissions
@@ -762,6 +766,13 @@ public class Engine extends JexlEngine {
         return doCreateInstance(clazz, args);
     }
 
+    @Override
+    public JexlUberspect.ClassConstantResolver createConstantResolver(Collection<String> imports) {
+        return imports == null || imports.isEmpty()
+                ? classNameSolver
+                : new FqcnResolver(classNameSolver).importPackages(imports);
+    }
+
     /**
      * Sets options from this engine options.
      * @param opts the options to set
@@ -810,21 +821,27 @@ public class Engine extends JexlEngine {
             }
         }
         final JexlInfo ninfo = info == null && debug ? createInfo() : info;
-        // if parser not in use...
-        if (parsing.compareAndSet(false, true)) {
-            try {
-                // lets parse
-                script = parser.parse(ninfo, features, src, scope);
-            } finally {
-                // no longer in use
-                parsing.set(false);
+        JexlEngine se = putThreadEngine(this);
+        try {
+            // if parser not in use...
+            if (parsing.compareAndSet(false, true)) {
+                try {
+                    // lets parse
+                    script = parser.parse(ninfo, features, src, scope);
+                } finally {
+                    // no longer in use
+                    parsing.set(false);
+                }
+            } else {
+                // ...otherwise parser was in use, create a new temporary one
+                script = parserFactory.get().parse(ninfo, features, src, scope);
             }
-        } else {
-            // ...otherwise parser was in use, create a new temporary one
-            script = parserFactory.get().parse(ninfo, features, src, scope);
-        }
-        if (source != null) {
-            cache.put(source, script);
+            if (source != null) {
+                cache.put(source, script);
+            }
+        } finally {
+            // restore thread local engine
+            putThreadEngine(se);
         }
         return script;
     }

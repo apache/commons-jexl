@@ -16,40 +16,37 @@
  */
 package org.apache.commons.jexl3.internal;
 
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.commons.jexl3.JexlContext;
+import org.apache.commons.jexl3.JexlEngine;
+import org.apache.commons.jexl3.JexlException;
+import org.apache.commons.jexl3.introspection.JexlPropertyGet;
 import org.apache.commons.jexl3.introspection.JexlUberspect;
 
 /**
- * Helper resolving a simple class name into a fully-qualified class name (hence FqcnResolver) using
- * package names as roots of import.
- * <p>This only keeps names of classes to avoid any class loading/reloading/permissions issue.</p>
+ * Helper resolving a simple class name into a Fully Qualified Class Name (hence FqcnResolver) using
+ * package names and classes as roots of import.
+ * <p>This only keeps the names of the classes to avoid any class loading/reloading/permissions issue.</p>
  */
- final class FqcnResolver implements JexlContext.ClassNameResolver {
+public class FqcnResolver implements JexlUberspect.ClassConstantResolver {
     /**
-     * The class loader.
+     * The uberspect.
      */
     private final JexlUberspect uberspect;
     /**
-     * A lock for RW concurrent ops.
-     */
-    private final ReadWriteLock lock = new ReentrantReadWriteLock();
-    /**
      * The set of packages to be used as import roots.
      */
-    private final Set<String> imports = new LinkedHashSet<>();
+    private final Set<String> imports = Collections.synchronizedSet(new LinkedHashSet<>());
     /**
      * The map of solved fqcns based on imports keyed on (simple) name,
-     * valued as fully-qualified class name.
+     * valued as fully qualified class name.
      */
-    private final Map<String, String> fqcns = new HashMap<>();
+    private final Map<String, String> fqcns = new ConcurrentHashMap<>();
     /**
      * Optional parent solver.
      */
@@ -62,19 +59,18 @@ import org.apache.commons.jexl3.introspection.JexlUberspect;
      * @throws NullPointerException if parent solver is null
      */
     FqcnResolver(final FqcnResolver solver) {
-        Objects.requireNonNull(solver, "solver");
-        this.parent = solver;
+        this.parent = Objects.requireNonNull(solver, "solver");
         this.uberspect = solver.uberspect;
     }
 
     /**
      * Creates a class name solver.
      *
-     * @param uber   the optional class loader
+     * @param uber     the optional class loader
      * @param packages the optional package names
      */
     FqcnResolver(final JexlUberspect uber, final Iterable<String> packages) {
-        this.uberspect = uber;
+        this.uberspect = Objects.requireNonNull(uber, "uberspect");
         this.parent = null;
         importCheck(packages);
     }
@@ -88,42 +84,35 @@ import org.apache.commons.jexl3.introspection.JexlUberspect;
     String getQualifiedName(final String name) {
         String fqcn;
         if (parent != null && (fqcn = parent.getQualifiedName(name)) != null) {
-            return  fqcn;
+            return fqcn;
         }
-        lock.readLock().lock();
-        try {
-            fqcn = fqcns.get(name);
-        } finally {
-            lock.readLock().unlock();
-        }
-        if (fqcn == null) {
-            final ClassLoader loader = uberspect.getClassLoader();
-            for (final String pkg : imports) {
-                Class<?> clazz;
-                try {
-                    clazz = loader.loadClass(pkg + "." + name);
-                } catch (final ClassNotFoundException e) {
-                    // not in this package
-                    continue;
-                }
-                // solved it, insert in map and return
-                if (clazz != null) {
-                    fqcn = clazz.getName();
-                    lock.writeLock().lock();
-                    try {
-                        fqcns.put(name, fqcn);
-                    } finally {
-                        lock.writeLock().unlock();
-                    }
-                    break;
-                }
-            }
-        }
-        return fqcn;
+        return fqcns.computeIfAbsent(name, this::solveClassName);
     }
 
     /**
-     * Adds a collection of packages as import root, checks the names are one of a package.
+     * Attempts to solve a fully qualified class name from a simple class name.
+     * <p>It tries to solve the class name as package.classname or package$classname (inner class).</p>
+     *
+     * @param name the simple class name
+     * @return the fully qualified class name or null if not found
+     */
+    private String solveClassName(String name) {
+        for (final String pkg : imports) {
+            // try package.classname or fqcn$classname (inner class)
+            for (char dot : new char[]{'.', '$'}) {
+                Class<?> clazz = uberspect.getClassByName(pkg + dot + name);
+                // solved it
+                if (clazz != null) {
+                    return clazz.getName();
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Adds a collection of packages/classes as import root, check each name point to one or the other.
+     *
      * @param names the package names
      */
     private void importCheck(final Iterable<String> names) {
@@ -133,14 +122,25 @@ import org.apache.commons.jexl3.introspection.JexlUberspect;
     }
 
     /**
-     * Adds a package as import root, checks the name if one of a package.
+     * Adds a package as import root, checks the name points to a package or a class.
+     *
      * @param name the package name
      */
     private void importCheck(final String name) {
-        // check the package name actually points to a package to avoid clutter
-        if (name != null && Package.getPackage(name) != null) {
-            imports.add(name);
+        if (name == null || name.isEmpty()) {
+            return;
         }
+        // check the package name actually points to a package to avoid clutter
+        Package pkg = Package.getPackage(name);
+        if (pkg == null) {
+            // if it is a class, solve it now
+            Class<?> clazz = uberspect.getClassByName(name);
+            if (clazz == null) {
+                throw new JexlException(null, "Cannot import '" + name + "' as it is neither a package nor a class");
+            }
+            fqcns.put(name, clazz.getName());
+        }
+        imports.add(name);
     }
 
     /**
@@ -151,15 +151,14 @@ import org.apache.commons.jexl3.introspection.JexlUberspect;
      */
     FqcnResolver importPackages(final Iterable<String> packages) {
         if (packages != null) {
-            lock.writeLock().lock();
-            try {
-                if (parent == null) {
-                    importCheck(packages);
-                } else {
-                    packages.forEach(pkg ->{ if (!parent.isImporting(pkg)) { importCheck(pkg); }});
-                }
-            } finally {
-                lock.writeLock().unlock();
+            if (parent == null) {
+                importCheck(packages);
+            } else {
+                packages.forEach(pkg -> {
+                    if (!parent.isImporting(pkg)) {
+                        importCheck(pkg);
+                    }
+                });
             }
         }
         return this;
@@ -175,16 +174,46 @@ import org.apache.commons.jexl3.introspection.JexlUberspect;
         if (parent != null && parent.isImporting(pkg)) {
             return true;
         }
-        lock.readLock().lock();
-        try {
-            return imports.contains(pkg);
-        } finally {
-            lock.readLock().unlock();
-        }
+        return imports.contains(pkg);
     }
 
     @Override
     public String resolveClassName(final String name) {
         return getQualifiedName(name);
+    }
+
+    @Override
+    public Object resolveConstant(final String cname) {
+        return getConstant(cname.split("\\."));
+    }
+
+    private Object getConstant(final String... ids) {
+        if (ids.length == 1) {
+            final String pname = ids[0];
+            for (String cname : fqcns.keySet()) {
+                Object constant = getConstant(cname, pname);
+                if (constant != JexlEngine.TRY_FAILED) {
+                    return constant;
+                }
+            }
+        } else if (ids.length == 2) {
+            String cname = ids[0];
+            String id = ids[1];
+            String fqcn = resolveClassName(cname);
+            if (fqcn != null) {
+                Class<?> clazz = uberspect.getClassByName(fqcn);
+                if (clazz != null) {
+                    JexlPropertyGet getter = uberspect.getPropertyGet(clazz, id);
+                    if (getter != null && getter.isConstant()) {
+                        try {
+                            return getter.invoke(clazz);
+                        } catch (Exception xany) {
+                            // ignore
+                        }
+                    }
+                }
+            }
+        }
+        return JexlEngine.TRY_FAILED;
     }
 }

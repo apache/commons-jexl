@@ -20,6 +20,8 @@ package org.apache.commons.jexl3;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.apache.commons.jexl3.introspection.JexlUberspect;
+
 /**
  * Manages variables which can be referenced in a JEXL expression.
  *
@@ -83,14 +85,7 @@ public interface JexlContext {
      * A marker interface that solves a simple class name into a fully-qualified one.
      * @since 3.3
      */
-    interface ClassNameResolver {
-        /**
-         * Resolves a class name.
-         * @param name the simple class name
-         * @return the fully qualified class name
-         */
-        String resolveClassName(String name);
-    }
+    interface ClassNameResolver extends JexlUberspect.ClassNameResolver {}
 
     /**
      * A marker interface of the JexlContext that processes module definitions.

@@ -43,6 +43,20 @@ public final class NumberParser implements Serializable {
         return new NumberParser().assignNatural(isNegative(negative), s.image).getLiteralValue();
     }
 
+    public NumberParser() {
+        this(null);
+    }
+
+    public NumberParser(Number number) {
+        if (number != null) {
+            this.literal = number;
+            this.clazz = number.getClass();
+        } else {
+            this.literal = null;
+            this.clazz = null;
+        }
+    }
+
     /** The type literal value. */
     private Number literal;
 

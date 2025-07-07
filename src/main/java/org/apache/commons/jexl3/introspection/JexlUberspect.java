@@ -18,6 +18,7 @@
 package org.apache.commons.jexl3.introspection;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -48,7 +49,7 @@ public interface JexlUberspect {
         /** Seeks map methods get/put. */
         MAP,
 
-        /** Seeks list methods get/set. */
+        /** Seeks list methods to get/set. */
         LIST,
 
         /** Seeks any get/{set,put} method (quacking like a list or a map). */
@@ -74,6 +75,46 @@ public interface JexlUberspect {
                                                     final Object arg) {
             return uber.getPropertySet(Collections.singletonList(this), obj, identifier, arg);
         }
+    }
+
+    /**
+     * A marker interface that solves a simple class name into a fully qualified one.
+     * <p>The base implementation uses imports.</p>
+     * @since 3.3
+     */
+    interface ClassNameResolver {
+        /**
+         * Resolves a class name.
+         * @param name the simple class name
+         * @return the fully qualified class name
+         */
+        String resolveClassName(String name);
+    }
+
+    /**
+     * A marker interface that solves a class constant by name.
+     * <p>The base implementation uses imports to solve enums and public static final fields.</p>
+     * @since 3.6
+     */
+    interface ClassConstantResolver extends ClassNameResolver {
+        /**
+         * Resolves a constant by its name.
+         * @param name the constant name, a qualified name
+         * @return the constant value or TRY_FAILED if not found
+         */
+        Object resolveConstant(String name);
+    }
+
+    /**
+     * The factory type for creating constant resolvers.
+     */
+    interface ConstantResolverFactory {
+        /**
+         * Creates a constant resolver.
+         * @param imports the collection of imports (packages and classes) to use
+         * @return a constant resolver
+         */
+        ClassConstantResolver createConstantResolver(Collection<String> imports);
     }
 
     /**
@@ -115,7 +156,7 @@ public interface JexlUberspect {
     /**
      * Determines property resolution strategy.
      *
-     * <p>To use a strategy instance, you have to set it at engine creation using
+     * <p>To use a strategy, you have to set it at engine creation using
      * {@link org.apache.commons.jexl3.JexlBuilder#strategy(JexlUberspect.ResolverStrategy)}
      * as in:</p>
      *
@@ -127,9 +168,9 @@ public interface JexlUberspect {
         /**
          * Applies this strategy to a list of resolver types.
          *
-         * @param operator the property access operator, may be null
+         * @param operator the property access operator, can be null
          * @param obj      the instance we seek to obtain a property setter/getter from, cannot be null
-         * @return the ordered list of resolvers types, must not be null
+         * @return the ordered list of resolver types, cannot be null
          */
         List<PropertyResolver> apply(JexlOperator operator, Object obj);
     }
@@ -226,7 +267,7 @@ public interface JexlUberspect {
     default Class<?> getClassByName(final String className) {
         try {
             return Class.forName(className, false, getClassLoader());
-        } catch (final ClassNotFoundException xignore) {
+        } catch (final ClassNotFoundException ignore) {
             return null;
         }
     }

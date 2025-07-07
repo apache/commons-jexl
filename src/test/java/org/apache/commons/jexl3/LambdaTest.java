@@ -32,6 +32,8 @@ import org.apache.commons.jexl3.internal.Closure;
 import org.apache.commons.jexl3.internal.Script;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 /**
  * Tests function/lambda/closure features.
@@ -213,18 +215,16 @@ class LambdaTest extends JexlTestCase {
         assertEquals(42, result);
     }
 
-    @Test void testFailParseFunc0() {
-        final String src = "if (false) function foo(x) { x + x }; var foo = 1";
+    @ParameterizedTest
+    @CsvSource({
+            "'if (false) function foo(x) { x + x }; var foo = 1', 'function'",
+            "'if (false) let foo = (x) -> { x + x }; var foo = 1', 'let'",
+            "'function foo(x) { x + x }; var foo = 42', 'foo'"
+    })
+    void testFailParseFunc(String src, String expectedKeyword) {
         final JexlEngine jexl = createEngine();
         final JexlException.Parsing xparse = assertThrows(JexlException.Parsing.class, () -> jexl.createScript(src));
-        assertTrue(xparse.getMessage().contains("function"));
-    }
-
-    @Test void testFailParseFunc1() {
-        final String src = "if (false) let foo = (x) { x + x }; var foo = 1";
-        final JexlEngine jexl = createEngine();
-        final JexlException.Parsing xparse = assertThrows(JexlException.Parsing.class, () -> jexl.createScript(src));
-        assertTrue(xparse.getMessage().contains("let"));
+        assertTrue(xparse.getMessage().contains(expectedKeyword));
     }
 
     @Test void testFatFact0() {
@@ -408,12 +408,6 @@ class LambdaTest extends JexlTestCase {
         assertEquals(simpleWhitespace(src), parsed);
     }
 
-    @Test void testNamedFuncIsConst() {
-        final String src = "function foo(x) { x + x }; var foo ='nonononon'";
-        final JexlEngine jexl = createEngine();
-        final JexlException.Parsing xparse = assertThrows(JexlException.Parsing.class, () -> jexl.createScript(src));
-        assertTrue(xparse.getMessage().contains("foo"));
-    }
 
     @Test void testNestLambada() throws Exception {
         final JexlEngine jexl = createEngine();
