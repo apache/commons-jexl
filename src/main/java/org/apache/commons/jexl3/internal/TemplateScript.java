@@ -88,16 +88,15 @@ public final class TemplateScript implements JxltEngine.Template {
         }
         return null;
     }
+
     /** The prefix marker. */
     private final String prefix;
     /** The array of source blocks. */
     private final Block[] source;
     /** The resulting script. */
     private final ASTJexlScript script;
-
     /** The TemplateEngine expressions called by the script. */
     private final TemplateExpression[] exprs;
-
     /** The engine. */
     private final TemplateEngine jxlt;
 

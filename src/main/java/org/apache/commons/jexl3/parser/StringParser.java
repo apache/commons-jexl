@@ -131,17 +131,19 @@ public class StringParser {
 
     /**
      * Escapes a String representation, expand non-ASCII characters as Unicode escape sequence.
-     * @param delim the delimiter character
+     * @param delim the delimiter character (if 0, no delimiter is added)
      * @param str the string to escape
      * @return the escaped representation
      */
-    public static String escapeString(final String str, final char delim) {
+    public static String escapeString(final CharSequence str, final char delim) {
         if (str == null) {
             return null;
         }
         final int length = str.length();
         final StringBuilder strb = new StringBuilder(length + 2);
-        strb.append(delim);
+        if (delim > 0) {
+            strb.append(delim);
+        }
         for (int i = 0; i < length; ++i) {
             final char c = str.charAt(i);
             switch (c) {
@@ -168,7 +170,10 @@ public class StringParser {
                     strb.append('r');
                     break;
                 case '\\':
-                    strb.append('\\');
+                    // we escape the backslash only if there is a delimiter
+                    if (delim > 0) {
+                        strb.append('\\');
+                    }
                     strb.append('\\');
                     break;
                 default:
@@ -189,9 +194,12 @@ public class StringParser {
                     }
             }
         }
-        strb.append(delim);
+        if (delim > 0) {
+            strb.append(delim);
+        }
         return strb.toString();
     }
+
     /**
      * Reads the remainder of a string till a given separator,
      * handles escaping through '\' syntax.

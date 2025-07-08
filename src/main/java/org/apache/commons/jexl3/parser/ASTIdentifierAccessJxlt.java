@@ -22,7 +22,7 @@ import org.apache.commons.jexl3.JxltEngine;
 /**
  * x.`expr`.
  */
-public class ASTIdentifierAccessJxlt extends ASTIdentifierAccess implements JexlNode.JxltHandle{
+public class ASTIdentifierAccessJxlt extends ASTIdentifierAccess implements JexlNode.JxltHandle {
     protected transient JxltEngine.Expression jxltExpression;
 
     ASTIdentifierAccessJxlt(final int id) {

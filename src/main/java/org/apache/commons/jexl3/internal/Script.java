@@ -87,12 +87,13 @@ public class Script implements JexlScript, JexlExpression {
         }
 
         /**
-         * @return true if evaluation was cancelled, false otherwise
+         * @return true if evaluation was canceled, false otherwise
          */
         public boolean isCancelled() {
             return interpreter.isCancelled();
         }
     }
+
     /**
      * The engine for this expression.
      */
@@ -105,7 +106,6 @@ public class Script implements JexlScript, JexlExpression {
      * The resulting AST we can interpret.
      */
     protected final ASTJexlScript script;
-
     /**
      * The engine version (as class loader change count) that last evaluated this script.
      */
@@ -127,7 +127,7 @@ public class Script implements JexlScript, JexlExpression {
 
     /**
      * Creates a Callable from this script.
-     * <p>This allows to submit it to an executor pool and provides support for asynchronous calls.</p>
+     * <p>This allows submitting it to an executor pool and provides support for asynchronous calls.</p>
      * <p>The interpreter will handle interruption/cancellation gracefully if needed.</p>
      * @param context the context
      * @return the callable
@@ -139,7 +139,7 @@ public class Script implements JexlScript, JexlExpression {
 
     /**
      * Creates a Callable from this script.
-     * <p>This allows to submit it to an executor pool and provides support for asynchronous calls.</p>
+     * <p>This allows submitting it to an executor pool and provides support for asynchronous calls.</p>
      * <p>The interpreter will handle interruption/cancellation gracefully if needed.</p>
      * @param context the context
      * @param args    the script arguments

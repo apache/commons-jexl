@@ -92,7 +92,7 @@ public final class TemplateEngine extends JxltEngine {
          * @param strb   the string builder to append to
          * @param prefix the line prefix (immediate or deferred)
          */
-        protected void toString(final StringBuilder strb, final String prefix) {
+        void toString(final StringBuilder strb, final String prefix) {
             if (BlockType.VERBATIM.equals(type)) {
                 strb.append(body);
             } else {
@@ -112,12 +112,13 @@ public final class TemplateEngine extends JxltEngine {
         /** Block is a directive, ie a fragment of JEXL code. */
         DIRECTIVE
     }
+
     /** A composite unified expression: "... ${...} ... #{...} ...". */
     final class CompositeExpression extends TemplateExpression {
         /** Bit encoded (deferred count > 0) bit 1, (immediate count > 0) bit 0. */
         private final int meta;
         /** The list of sub-expression resulting from parsing. */
-        protected final TemplateExpression[] exprs;
+        final TemplateExpression[] exprs;
 
         /**
          * Creates a composite expression.
@@ -766,7 +767,7 @@ public final class TemplateEngine extends JxltEngine {
      * @param reader the reader
      * @return the line iterator
      */
-    protected static Iterator<CharSequence> readLines(final Reader reader) {
+    private static Iterator<CharSequence> readLines(final Reader reader) {
         if (!reader.markSupported()) {
             throw new IllegalArgumentException("mark support in reader required");
         }
@@ -920,7 +921,7 @@ public final class TemplateEngine extends JxltEngine {
      * @param expr  the string expression
      * @param scope the template scope
      * @return the unified expression instance
-     * @throws JexlException if an error occur during parsing
+     * @throws JexlException if an error occurs during parsing
      */
     TemplateExpression parseExpression(final JexlInfo info, final String expr, final Scope scope) {  // CSOFF: MethodLength
         final int size = expr.length();
@@ -990,8 +991,9 @@ public final class TemplateEngine extends JxltEngine {
                         strb.append(c);
                     } else {
                         // materialize the immediate expr
-                        final String src = strb.toString();
-                        final TemplateExpression iexpr = new ImmediateExpression(src, jexl.parse(info.at(lineno, column), noscript, src, scope), null);
+                        final String src = escapeString(strb);
+                        final JexlInfo srcInfo = info.at(lineno, column);
+                        final TemplateExpression iexpr = new ImmediateExpression(src, jexl.jxltParse(srcInfo, noscript, src, scope), null);
                         builder.add(iexpr);
                         strb.delete(0, Integer.MAX_VALUE);
                         state = ParseState.CONST;
@@ -1033,12 +1035,19 @@ public final class TemplateEngine extends JxltEngine {
                         inner1 -= 1;
                     } else {
                         // materialize the nested/deferred expr
-                        final String src = strb.toString();
+                        final String src = escapeString(strb);
+                        final JexlInfo srcInfo = info.at(lineno, column);
                         TemplateExpression dexpr;
                         if (nested) {
-                            dexpr = new NestedExpression(expr.substring(inested, column + 1), jexl.parse(info.at(lineno, column), noscript, src, scope), null);
+                            dexpr = new NestedExpression(
+                                        escapeString(expr.substring(inested, column + 1)),
+                                        jexl.jxltParse(srcInfo, noscript, src, scope),
+                                 null);
                         } else {
-                            dexpr = new DeferredExpression(strb.toString(), jexl.parse(info.at(lineno, column), noscript, src, scope), null);
+                            dexpr = new DeferredExpression(
+                                    src,
+                                    jexl.jxltParse(srcInfo, noscript, src, scope),
+                             null);
                         }
                         builder.add(dexpr);
                         strb.delete(0, Integer.MAX_VALUE);
@@ -1094,6 +1103,10 @@ public final class TemplateEngine extends JxltEngine {
             builder.add(cexpr);
         }
         return builder.build(this, null);
+    }
+
+    private String escapeString(final CharSequence str) {
+        return StringParser.escapeString(str, (char) 0);
     }
 
     /**

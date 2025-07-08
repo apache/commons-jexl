@@ -29,7 +29,7 @@ import java.util.Map;
  */
 public final class Scope {
     /**
-     * The value of an as-yet  undeclared but variable, for instance: x; before var x;.
+     * The value of an as-yet undeclared but variable, for instance: x; before var x;.
      */
     static final Object UNDECLARED = new Object() {
         @Override public String toString() {

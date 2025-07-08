@@ -23,7 +23,7 @@ import org.apache.commons.jexl3.internal.Frame;
 import org.apache.commons.jexl3.internal.Scope;
 
 /**
- * Enhanced script to allow parameters declaration.
+ * Enhanced script to allow parameter declaration.
  */
 public class ASTJexlScript extends JexlLexicalNode  {
     /** Serial uid.*/

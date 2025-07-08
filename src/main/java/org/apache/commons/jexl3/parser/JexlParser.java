@@ -169,7 +169,7 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
     /**
      * The associated controller.
      */
-    protected final FeatureController featureController = new FeatureController(JexlEngine.DEFAULT_FEATURES);
+    protected final FeatureController featureController;
     /**
      * The basic source info.
      */
@@ -180,14 +180,14 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
     protected String source;
     /**
      * The map of named registers aka script parameters.
-     * <p>Each parameter is associated to a register and is materialized
+     * <p>Each parameter is associated with a register and is materialized
      * as an offset in the registers array used during evaluation.</p>
      */
     protected Scope scope;
     /**
      * When parsing inner functions/lambda, need to stack the scope (sic).
      */
-    protected final Deque<Scope> scopes = new ArrayDeque<>();
+    protected final Deque<Scope> scopes;
     /**
      * The list of pragma declarations.
      */
@@ -242,7 +242,7 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
     /**
      * Stack of parsing loop counts.
      */
-    protected final Deque<Integer> loopCounts = new ArrayDeque<>();
+    protected final Deque<Integer> loopCounts;
     /**
      * The current lexical block.
      */
@@ -250,11 +250,50 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
     /**
      * Stack of lexical blocks.
      */
-    protected final Deque<LexicalUnit> blocks = new ArrayDeque<>();
+    protected final Deque<LexicalUnit> blocks;
     /**
      * The map of lexical to functional blocks.
      */
-    protected final Map<LexicalUnit, Scope> blockScopes = new IdentityHashMap<>();
+    protected final Map<LexicalUnit, Scope> blockScopes;
+
+    /**
+     * Creates a new parser.
+     * <p>
+     * This constructor is protected so that it can only be used by subclasses.
+     * </p>
+     */
+    protected JexlParser() {
+        featureController = new FeatureController(JexlEngine.DEFAULT_FEATURES);
+        scopes = new ArrayDeque<>();
+        loopCounts = new ArrayDeque<>();
+        blocks = new ArrayDeque<>();
+        blockScopes = new IdentityHashMap<>();
+    }
+
+    /**
+     * Creates a new inner-parser.
+     * <p>
+     * This is the constructor used to create a parser for template expressions.
+     * </p>
+     */
+    protected JexlParser(JexlParser parser) {
+        this.info = null;
+        this.source = null;
+        featureController = parser.featureController;
+        scope = parser.scope;
+        scopes = parser.scopes;
+        pragmas = parser.pragmas;
+        namespaces = parser.namespaces;
+        loopCount = parser.loopCount;
+        loopCounts = parser.loopCounts;
+        block = parser.block;
+        blocks = parser.blocks;
+        blockScopes = parser.blockScopes;
+        fqcnResolver = parser.fqcnResolver;
+        imports = parser.imports;
+        autoSemicolon = parser.autoSemicolon;
+    }
+
     /**
      * The name of the null case constant.
      */
@@ -525,7 +564,7 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
     /**
      * Declares a local parameter.
      * <p>
-     * This method creates an new entry in the symbol map.
+     * This method creates a new entry in the symbol map.
      * </p>
      *
      * @param token the parameter name token
@@ -890,6 +929,20 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
         // heavy check
         featureController.controlNode(node);
     }
+//
+//    JxltEngine.Expression parseJxlt(final String src) {
+//        if (src != null && !src.isEmpty()) {
+//            JexlEngine jexl = JexlEngine.getThreadEngine();
+//            if (jexl != null) {
+//                JxltEngine jxlt = jexl.createJxltEngine();
+//                if (jxlt instanceof TemplateEngine) {
+//                    JxltEngine.Expression jxltExpression = ((TemplateEngine) jxlt).createExpression(null, src);
+//                    return jxltExpression;
+//                }
+//            }
+//        }
+//        return null;
+//    }
 
     /**
      * Called by parser at beginning of node construction.

@@ -49,6 +49,13 @@ import org.apache.commons.jexl3.internal.Scope;
 
 public final class Parser extends JexlParser
 {
+        public Parser(JexlParser parser) {
+            super(parser);
+            jj_input_stream = new SimpleCharStream(new StringProvider(""), 1, 1);
+            token_source = new ParserTokenManager(jj_input_stream);
+            token = new Token();
+            token.next = jj_nt = token_source.getNextToken();
+        }
 
     /**
      * Parses a JEXL source string and returns the corresponding AST.
@@ -65,9 +72,9 @@ public final class Parser extends JexlParser
         try {
             setFeatures(jexlFeatures);
             // lets do the 'Unique Init' in here to be safe - it's a pain to remember
-            info = jexlInfo != null? jexlInfo : new JexlInfo();
-            source = jexlSrc;
-            pragmas = null;
+            this.info = jexlInfo != null? jexlInfo : new JexlInfo();
+            this.source = jexlSrc;
+            this.pragmas = null;
             this.scope = jexlScope;
             token_source.comparatorNames = jexlFeatures.supportsComparatorNames();
             ReInit(jexlSrc);
@@ -353,7 +360,7 @@ TOKEN_MGR_DECLS : {
 <*> TOKEN :
 {
   < JXLT_LITERAL:
-    "`" (~["`","\\"] | "\\" ~["\u0000"])* "`"
+    "`"("\n" | "\r" | "\r\n")* ("\\" "`" | ~["\u2028"-"\u202E","\u2066"-"\u2069"])*"`"
   > : DEFAULT
 }
 
@@ -1050,10 +1057,11 @@ void StringLiteral() :
 void JxltLiteral() #JxltLiteral :
 {
    Token t;
+   String src;
 }
 {
    t=<JXLT_LITERAL>
-   { jjtThis.setLiteral(Parser.buildString(t.image, true)); }
+   { jjtThis.setLiteral(src = Parser.buildString(t.image, true)); }
 }
 
 void RegexLiteral() :

@@ -847,6 +847,20 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
     }
 
     /**
+     * Parses a Jexl expression or script.
+     * <p>This is a convenience method that uses the default parser and the script features.
+     * @param info the JexlInfo
+     * @param expr whether to parse an expression or a script
+     * @param src the source to parse
+     * @param scope the scope, may be null
+     * @return the parsed tree
+     */
+    protected ASTJexlScript jxltParse(final JexlInfo info, final boolean expr, final String src, final Scope scope) {
+        return parse(info, expr, src, scope);
+    }
+
+
+    /**
      * Processes jexl.module.ns pragma.
      *
      * <p>If the value is empty, the namespace will be cleared which may be useful to debug and force unload

@@ -52,7 +52,7 @@ import org.junit.jupiter.api.Test;
 /**
  * Test cases for reported issue between JEXL-300 and JEXL-399.
  */
-class Issues400Test {
+public class Issues400Test {
 
     public static class VinzCaller {
         private final JexlContext context;
@@ -519,7 +519,7 @@ class Issues400Test {
 
     @Test
     void test431b() {
-        final JexlEngine jexl = new JexlBuilder().create();
+        JexlEngine jexl = new JexlBuilder().create();
         final String src = "let x = 0; try(let error) { x += 19 } catch (let error) { return 169 } try { x += 23 } catch (let error) { return 169 }";
         final JexlScript script = jexl.createScript(src);
         assertNotNull(script);
@@ -837,4 +837,37 @@ class Issues400Test {
         result = script.execute(null, 21);
         Assertions.assertEquals("OTHER", result);
     }
+
+    @Test
+    public void testIssue441() throws Exception {
+        JexlEngine jexl = new JexlBuilder().create();
+        String ctl = "\nab\nc`d\n";
+        JexlExpression e = jexl.createExpression("`\nab\nc\\`d\n`");
+        Object o = e.evaluate(null);
+        Assertions.assertEquals(ctl, o);
+
+        JexlContext context = new MapContext();
+        context.set("name", "Hello");
+        String code = "return `${name + '\\n' + name}`;";
+        JexlScript script = jexl.createScript(code);
+        o = script.execute(context);
+        ctl = "Hello\nHello";
+        Assertions.assertEquals(ctl, o);
+    }
+
+    @Test
+    void testIssue442() {
+        JexlEngine jexl = new JexlBuilder().create();
+        JexlContext context = new MapContext();
+        String code = "var x = 'hello';\n" +
+                "function test(z) {\n" +
+                "let y = x;\n"+
+                "  return `${x} ${z}`;\n" +
+                "}\n" +
+                "test('world');";
+        JexlScript script = jexl.createScript(code);
+        Object result = script.execute(context);
+        Assertions.assertEquals("hello world", result);
+    }
 }
+
