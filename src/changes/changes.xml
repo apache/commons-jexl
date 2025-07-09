@@ -40,6 +40,7 @@
             </action>
           <!-- UPDATE -->
           <action type="update" dev="ggregory" due-to="Gary Gregory, Dependabot">Bump org.apache.commons:commons-parent from 81 to 85 #344.</action>
+          <action type="update" dev="ggregory" due-to="Gary Gregory, Dependabot">Bump org.apache.commons:commons-lang3 from 3.17.0 to 3.18.0 #355.</action>
         </release>
         <release version="3.5.0" date="2025-04-11" description="This is a feature and maintenance release. Java 8 or later is required.">
           <!-- FIX -->
