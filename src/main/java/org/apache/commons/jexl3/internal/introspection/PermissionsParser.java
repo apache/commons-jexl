@@ -374,6 +374,6 @@ public class PermissionsParser {
      * @return the error message
      */
     private String unexpected(final char c, final int i) {
-        return "unexpected '" + c + "'" + "@" + i;
+        return "unexpected '" + c + "'@" + i;
     }
 }

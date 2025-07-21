@@ -1043,7 +1043,7 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
     public void setProperty(final JexlContext context, final Object bean, final String expr, final Object value) {
         // synthesize expr using register
         String src = trimSource(expr);
-        src = "#0" + (src.charAt(0) == '[' ? "" : ".") + src + "=" + "#1";
+        src = "#0" + (src.charAt(0) == '[' ? "" : ".") + src + "=#1";
         try {
             final Scope scope = new Scope(null, "#0", "#1");
             final ASTJexlScript script = parse(null, PROPERTY_FEATURES, src, scope);
