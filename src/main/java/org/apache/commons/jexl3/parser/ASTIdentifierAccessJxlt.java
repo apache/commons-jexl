@@ -18,12 +18,14 @@
 package org.apache.commons.jexl3.parser;
 
 import org.apache.commons.jexl3.JxltEngine;
+import org.apache.commons.jexl3.internal.Scope;
 
 /**
  * x.`expr`.
  */
 public class ASTIdentifierAccessJxlt extends ASTIdentifierAccess implements JexlNode.JxltHandle {
     protected transient JxltEngine.Expression jxltExpression;
+    private Scope scope;
 
     ASTIdentifierAccessJxlt(final int id) {
         super(id);
@@ -49,4 +51,9 @@ public class ASTIdentifierAccessJxlt extends ASTIdentifierAccess implements Jexl
         jxltExpression = tp;
     }
 
+    @Override
+    public Scope getScope() { return scope; }
+
+    @Override
+    public void setScope(final Scope scope) {  this.scope = scope; }
 }

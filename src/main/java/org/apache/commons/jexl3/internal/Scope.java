@@ -131,8 +131,8 @@ public final class Scope {
             newFrame = frame.newFrame(this, arguments, 0);
         } else {
             newFrame = ref
-            ? new ReferenceFrame(this, arguments, 0)
-            : new Frame(this, arguments, 0);
+            ? new ReferenceFrame(frame, this, arguments, 0)
+            : new Frame(frame, this, arguments, 0);
         }
         return newFrame.assign(args);
     }

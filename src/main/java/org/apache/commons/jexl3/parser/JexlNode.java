@@ -21,6 +21,7 @@ import org.apache.commons.jexl3.JexlCache;
 import org.apache.commons.jexl3.JexlContext.NamespaceFunctor;
 import org.apache.commons.jexl3.JexlInfo;
 import org.apache.commons.jexl3.JxltEngine;
+import org.apache.commons.jexl3.internal.Scope;
 import org.apache.commons.jexl3.introspection.JexlMethod;
 import org.apache.commons.jexl3.introspection.JexlPropertyGet;
 import org.apache.commons.jexl3.introspection.JexlPropertySet;
@@ -58,6 +59,18 @@ public abstract class JexlNode extends SimpleNode implements JexlCache.Reference
          * @param expr a TemplateEngine.TemplateExpression instance
          */
         void setExpression(JxltEngine.Expression expr);
+
+        /**
+         * Sets the scope of the expression.
+         * @param scope the scope
+         */
+        void setScope(Scope scope);
+
+        /**
+         * Gets the scope of the expression.
+         * @return the scope
+         */
+        Scope getScope();
     }
 
     @Override

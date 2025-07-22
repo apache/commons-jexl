@@ -24,6 +24,8 @@ import java.util.concurrent.atomic.AtomicReference;
  * @since 3.0
  */
 public class Frame {
+    /** The parent frame. */
+    private final Frame parent;
     /** The scope. */
     private final Scope scope;
     /** The actual stack frame. */
@@ -37,10 +39,16 @@ public class Frame {
      * @param r the stack frame
      * @param c the number of curried parameters
      */
-    protected Frame(final Scope s, final Object[] r, final int c) {
+    protected Frame(final Frame f, Scope s, final Object[] r, final int c) {
+        parent = f;
         scope = s;
         stack = r;
         curried = c;
+        String[] symbols = scope.getSymbols();
+        if (symbols.length != r.length) {
+            throw new IllegalArgumentException("Scope and stack frame size mismatch: "
+                    + symbols.length + " != " + r.length);
+        }
     }
 
     /**
@@ -72,7 +80,7 @@ public class Frame {
      * @return a new instance of frame
      */
     Frame newFrame(final Scope s, final Object[] r, final int c) {
-        return new Frame(s, r, c);
+        return new Frame(this, s, r, c);
     }
 
     /**
@@ -109,6 +117,14 @@ public class Frame {
      */
     public Scope getScope() {
         return scope;
+    }
+
+    /**
+     * Gets the parent frame.
+     * @return the parent frame or null if this is the root frame
+     */
+    public Frame getParent() {
+        return parent;
     }
 
     /**
@@ -154,13 +170,13 @@ public class Frame {
  * Pass-by-reference frame.
  */
 class ReferenceFrame extends Frame {
-    ReferenceFrame(final Scope s, final Object[] r, final int c) {
-        super(s, r, c);
+    ReferenceFrame(final Frame f, final Scope s, final Object[] r, final int c) {
+        super(f, s, r, c);
     }
 
     @Override
     Frame newFrame(final Scope s, final Object[] r, final int c) {
-        return new ReferenceFrame(s, r, c);
+        return new ReferenceFrame(this, s, r, c);
     }
 
     @Override

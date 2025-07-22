@@ -380,6 +380,27 @@ public class Interpreter extends InterpreterBase {
      * @return the JXLT template evaluation.
      * @param <NODE> the node type
      */
+    public  <NODE extends JexlNode & JexlNode.JxltHandle> void parseJxltHandle(final NODE node) {
+        if (node.getExpression() == null) {
+            final TemplateEngine jxlt = jexl.jxlt();
+            JexlInfo info = node.jexlInfo();
+            if (this.block != null) {
+                info = new JexlNode.Info(node, info);
+            }
+            Scope newScope = new Scope(frame != null ? frame.getScope() : null);
+            final JxltEngine.Expression expr = jxlt.parseExpression(info, node.getExpressionSource(), newScope);
+            node.setExpression(expr);
+            node.setScope(newScope);
+        }
+    }
+
+    /**
+     * Evaluates a JxltHandle node.
+     * <p>This parses and stores the JXLT template if necessary (upon first execution)</p>
+     * @param node the node
+     * @return the JXLT template evaluation.
+     * @param <NODE> the node type
+     */
     private <NODE extends JexlNode & JexlNode.JxltHandle> Object evalJxltHandle(final NODE node) {
         JxltEngine.Expression expr = node.getExpression();
         if (expr == null) {
@@ -388,12 +409,21 @@ public class Interpreter extends InterpreterBase {
             if (this.block != null) {
                 info = new JexlNode.Info(node, info);
             }
-            expr = jxlt.parseExpression(info, node.getExpressionSource(), frame != null ? frame.getScope() : null);
+            Scope newScope = new Scope(frame != null ? frame.getScope() : null);
+            expr = jxlt.parseExpression(info, node.getExpressionSource(), newScope);
             node.setExpression(expr);
+            node.setScope(newScope);
         }
         // internal classes to evaluate in context
         if (expr instanceof TemplateEngine.TemplateExpression) {
-            final Object eval = ((TemplateEngine.TemplateExpression) expr).evaluate(context, frame, options);
+            Scope exprScope = node.getScope();
+            String[] symbols = exprScope.getSymbols();
+            Object[] values = new Object[symbols.length];
+            for (int v = 0; v < values.length; ++v) {
+                values[v] = evalSymbol(symbols[v]);
+            }
+            Frame exprFrame = new Frame(frame, exprScope, values, 0);
+            final Object eval = ((TemplateEngine.TemplateExpression) expr).evaluate(context, exprFrame, options);
             if (eval != null) {
                 final String inter = eval.toString();
                 if (options.isStrictInterpolation()) {
@@ -402,6 +432,20 @@ public class Interpreter extends InterpreterBase {
                 final Integer id = JexlArithmetic.parseIdentifier(inter);
                 return id != null ? id : eval;
             }
+        }
+        return null;
+    }
+
+    Object evalSymbol(String symbol) {
+        Frame f = frame;
+        while (f != null) {
+            Scope scope = f.getScope();
+            Integer index = scope.getSymbol(symbol);
+            if (index != null && f.has(index)) {
+                Object value = f.get(index);
+                return value;
+            }
+            f = f.getParent();
         }
         return null;
     }

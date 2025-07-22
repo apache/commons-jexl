@@ -17,6 +17,7 @@
 package org.apache.commons.jexl3.parser;
 
 import org.apache.commons.jexl3.JxltEngine;
+import org.apache.commons.jexl3.internal.Scope;
 
 public final class ASTJxltLiteral extends JexlNode implements JexlNode.JxltHandle{
     /** Serial uid.*/
@@ -25,7 +26,13 @@ public final class ASTJxltLiteral extends JexlNode implements JexlNode.JxltHandl
     private String literal;
     /** The expression (parsed). */
     private transient JxltEngine.Expression jxltExpression;
+    /** The scope of the expression. */
+    private Scope scope;
 
+    /**
+     * Creates a Jxlt literal node.
+     * @param id the node id
+     */
     ASTJxltLiteral(final int id) {
         super(id);
     }
@@ -33,6 +40,16 @@ public final class ASTJxltLiteral extends JexlNode implements JexlNode.JxltHandl
     @Override
     public String getExpressionSource() {
         return literal;
+    }
+
+    @Override
+    public Scope getScope() {
+        return scope;
+    }
+
+    @Override
+    public void setScope(final Scope scope) {
+        this.scope = scope;
     }
 
     @Override
