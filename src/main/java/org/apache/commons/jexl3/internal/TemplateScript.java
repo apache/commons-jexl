@@ -180,7 +180,13 @@ public final class TemplateScript implements JxltEngine.Template {
                 // no node info means this verbatim is surrounded by comments markers;
                 // expr at this index is never called
                 if (ji != null) {
-                    te = jxlt.parseExpression(ji, block.getBody(), scopeOf(ji));
+                    Scope es = scopeOf(ji);
+                    if (es == null) {
+                        // if the scope is null, it means the verbatim is at the top level
+                        // of the script, so we use the script scope
+                        es = scope;
+                    }
+                    te = jxlt.parseExpression(ji, block.getBody(), es);
                 } else {
                     te = jxlt.new ConstantExpression(block.getBody(), null);
                 }

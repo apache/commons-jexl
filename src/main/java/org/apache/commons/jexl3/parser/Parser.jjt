@@ -70,12 +70,14 @@ public final class Parser extends JexlParser
     public ASTJexlScript parse(JexlInfo jexlInfo, JexlFeatures jexlFeatures, String jexlSrc, Scope jexlScope) {
         JexlFeatures previous = getFeatures();
         try {
-            setFeatures(jexlFeatures);
             // lets do the 'Unique Init' in here to be safe - it's a pain to remember
             this.info = jexlInfo != null? jexlInfo : new JexlInfo();
             this.source = jexlSrc;
-            this.pragmas = null;
-            this.scope = jexlScope;
+            if (this.parent == null) {
+                setFeatures(jexlFeatures);
+                this.pragmas = null;
+            }
+            this.scopeReference.set(jexlScope);
             token_source.comparatorNames = jexlFeatures.supportsComparatorNames();
             ReInit(jexlSrc);
             ASTJexlScript script = jexlFeatures.supportsScript()
@@ -1061,7 +1063,7 @@ void JxltLiteral() #JxltLiteral :
 }
 {
    t=<JXLT_LITERAL>
-   { jjtThis.setLiteral(src = Parser.buildString(t.image, true)); }
+   { jjtThis.setLiteral(src = Parser.buildString(t.image, true), getScope()); }
 }
 
 void RegexLiteral() :
@@ -1218,7 +1220,7 @@ void IdentifierAccess() #void :
     |
         t=<STRING_LITERAL> { jjtThis.setIdentifier(Parser.buildString(t.image, true)); } #IdentifierAccess
     |
-        t=<JXLT_LITERAL> { jjtThis.setIdentifier(Parser.buildString(t.image, true)); } #IdentifierAccessJxlt
+        t=<JXLT_LITERAL> { jjtThis.setIdentifier(Parser.buildString(t.image, true), getScope()); } #IdentifierAccessJxlt
     )
     |
     <QDOT> (
@@ -1226,7 +1228,7 @@ void IdentifierAccess() #void :
     |
         t=<STRING_LITERAL> { jjtThis.setIdentifier(Parser.buildString(t.image, true)); } #IdentifierAccessSafe
     |
-        t=<JXLT_LITERAL> { jjtThis.setIdentifier(Parser.buildString(t.image, true)); } #IdentifierAccessSafeJxlt
+        t=<JXLT_LITERAL> { jjtThis.setIdentifier(Parser.buildString(t.image, true), getScope()); } #IdentifierAccessSafeJxlt
     )
 }
 

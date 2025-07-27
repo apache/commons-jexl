@@ -796,7 +796,7 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
      * @throws JexlException if any error occurred during parsing
      */
     protected ASTJexlScript parse(final JexlInfo info, final boolean expr, final String src, final Scope scope) {
-        return parse(info, expr? this.expressionFeatures : this.scriptFeatures, src, scope);
+        return parser.jxltParse(info, expr? this.expressionFeatures : this.scriptFeatures, src, scope);
     }
 
     /**
@@ -852,13 +852,12 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
      * @param info the JexlInfo
      * @param expr whether to parse an expression or a script
      * @param src the source to parse
-     * @param scope the scope, may be null
+     * @param scope the scope, maybe null
      * @return the parsed tree
      */
     protected ASTJexlScript jxltParse(final JexlInfo info, final boolean expr, final String src, final Scope scope) {
         return parse(info, expr, src, scope);
     }
-
 
     /**
      * Processes jexl.module.ns pragma.

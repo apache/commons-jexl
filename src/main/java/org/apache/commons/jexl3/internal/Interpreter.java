@@ -28,7 +28,6 @@ import org.apache.commons.jexl3.JexlArithmetic;
 import org.apache.commons.jexl3.JexlContext;
 import org.apache.commons.jexl3.JexlEngine;
 import org.apache.commons.jexl3.JexlException;
-import org.apache.commons.jexl3.JexlInfo;
 import org.apache.commons.jexl3.JexlOperator;
 import org.apache.commons.jexl3.JexlOptions;
 import org.apache.commons.jexl3.JexlScript;
@@ -161,7 +160,7 @@ public class Interpreter extends InterpreterBase {
             final int symbol = methodIdentifier.getSymbol();
             methodName = methodIdentifier.getName();
             functor = null;
-            // is it a global or local variable ?
+            // is it a global or local variable?
             if (target == context) {
                 if (frame != null && frame.has(symbol)) {
                     functor = frame.get(symbol);
@@ -192,7 +191,7 @@ public class Interpreter extends InterpreterBase {
         // solving the call site
         final CallDispatcher call = new CallDispatcher(node, cacheable);
         try {
-            // do we have a  cached version method/function name ?
+            // do we have a cached version method/function name?
             final Object eval = call.tryEval(target, methodName, argv);
             if (JexlEngine.TRY_FAILED != eval) {
                 return eval;
@@ -254,11 +253,11 @@ public class Interpreter extends InterpreterBase {
                         return ((JexlMethod) functor).invoke(target, argv);
                     }
                     final String mCALL = "call";
-                    // may be a generic callable, try a 'call' method
+                    // maybe a generic callable, try a 'call' method
                     if (call.isTargetMethod(functor, mCALL, argv)) {
                         return call.eval(mCALL);
                     }
-                    // functor is a var, may be method is a global one ?
+                    // functor is a var, may be method is a global one?
                     if (isavar) {
                         if (call.isContextMethod(methodName, argv)) {
                             return call.eval(methodName);
@@ -380,50 +379,11 @@ public class Interpreter extends InterpreterBase {
      * @return the JXLT template evaluation.
      * @param <NODE> the node type
      */
-    public  <NODE extends JexlNode & JexlNode.JxltHandle> void parseJxltHandle(final NODE node) {
-        if (node.getExpression() == null) {
-            final TemplateEngine jxlt = jexl.jxlt();
-            JexlInfo info = node.jexlInfo();
-            if (this.block != null) {
-                info = new JexlNode.Info(node, info);
-            }
-            Scope newScope = new Scope(frame != null ? frame.getScope() : null);
-            final JxltEngine.Expression expr = jxlt.parseExpression(info, node.getExpressionSource(), newScope);
-            node.setExpression(expr);
-            node.setScope(newScope);
-        }
-    }
-
-    /**
-     * Evaluates a JxltHandle node.
-     * <p>This parses and stores the JXLT template if necessary (upon first execution)</p>
-     * @param node the node
-     * @return the JXLT template evaluation.
-     * @param <NODE> the node type
-     */
     private <NODE extends JexlNode & JexlNode.JxltHandle> Object evalJxltHandle(final NODE node) {
         JxltEngine.Expression expr = node.getExpression();
-        if (expr == null) {
-            final TemplateEngine jxlt = jexl.jxlt();
-            JexlInfo info = node.jexlInfo();
-            if (this.block != null) {
-                info = new JexlNode.Info(node, info);
-            }
-            Scope newScope = new Scope(frame != null ? frame.getScope() : null);
-            expr = jxlt.parseExpression(info, node.getExpressionSource(), newScope);
-            node.setExpression(expr);
-            node.setScope(newScope);
-        }
         // internal classes to evaluate in context
         if (expr instanceof TemplateEngine.TemplateExpression) {
-            Scope exprScope = node.getScope();
-            String[] symbols = exprScope.getSymbols();
-            Object[] values = new Object[symbols.length];
-            for (int v = 0; v < values.length; ++v) {
-                values[v] = evalSymbol(symbols[v]);
-            }
-            Frame exprFrame = new Frame(frame, exprScope, values, 0);
-            final Object eval = ((TemplateEngine.TemplateExpression) expr).evaluate(context, exprFrame, options);
+            final Object eval = ((TemplateEngine.TemplateExpression) expr).evaluate(context, frame, options);
             if (eval != null) {
                 final String inter = eval.toString();
                 if (options.isStrictInterpolation()) {
@@ -432,20 +392,6 @@ public class Interpreter extends InterpreterBase {
                 final Integer id = JexlArithmetic.parseIdentifier(inter);
                 return id != null ? id : eval;
             }
-        }
-        return null;
-    }
-
-    Object evalSymbol(String symbol) {
-        Frame f = frame;
-        while (f != null) {
-            Scope scope = f.getScope();
-            Integer index = scope.getSymbol(symbol);
-            if (index != null && f.has(index)) {
-                Object value = f.get(index);
-                return value;
-            }
-            f = f.getParent();
         }
         return null;
     }

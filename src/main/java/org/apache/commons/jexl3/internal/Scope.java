@@ -67,7 +67,7 @@ public final class Scope {
      */
     private Map<String, Integer> namedVariables;
     /**
-     * The map of local captured variables to parent scope variables, ie closure.
+     * The map of local captured variables to parent scope variables, i.e., closure.
      */
     private Map<Integer, Integer> capturedVariables;
     /**
@@ -131,8 +131,8 @@ public final class Scope {
             newFrame = frame.newFrame(this, arguments, 0);
         } else {
             newFrame = ref
-            ? new ReferenceFrame(frame, this, arguments, 0)
-            : new Frame(frame, this, arguments, 0);
+            ? new ReferenceFrame(this, arguments, 0)
+            : new Frame(this, arguments, 0);
         }
         return newFrame.assign(args);
     }
@@ -140,7 +140,7 @@ public final class Scope {
     /**
      * Declares a parameter.
      * <p>
-     * This method creates an new entry in the symbol map.
+     * This method creates a new entry in the symbol map.
      * </p>
      * @param param the parameter name
      * @return the register index storing this variable
@@ -161,7 +161,7 @@ public final class Scope {
     /**
      * Declares a local variable.
      * <p>
-     * This method creates an new entry in the symbol map.
+     * This method creates a new entry in the symbol map.
      * </p>
      * @param varName the variable name
      * @return the register index storing this variable
@@ -196,7 +196,7 @@ public final class Scope {
     }
 
     /**
-     * Gets the captured index of a given symbol, ie the target index of a symbol in a child scope.
+     * Gets the captured index of a given symbol, i.e., the target index of a symbol in a child scope.
      * @param symbol the symbol index
      * @return the target symbol index or null if the symbol is not captured
      */
@@ -213,7 +213,7 @@ public final class Scope {
     }
 
     /**
-     * Gets the index of a captured symbol, ie the source index of a symbol in a parent scope.
+     * Gets the index of a captured symbol, i.e., the source index of a symbol in a parent scope.
      * @param symbol the symbol index
      * @return the source symbol index or -1 if the symbol is not captured
      */
@@ -223,7 +223,7 @@ public final class Scope {
     }
 
     /**
-     * Gets this script captured symbols names, i.e. local variables defined in outer scopes and used
+     * Gets this script captured symbols names, i.e., local variables defined in outer scopes and used
      * by this scope.
      * @return the captured names
      */
@@ -262,7 +262,7 @@ public final class Scope {
     }
 
     /**
-     * Gets this script parameters, i.e. symbols assigned before creating local variables.
+     * Gets this script parameters, i.e., symbols assigned before creating local variables.
      * @return the parameter names
      */
     public String[] getParameters() {
@@ -295,8 +295,8 @@ public final class Scope {
     }
 
     /**
-     * Checks whether an identifier is a local variable or argument, ie a symbol.
-     * If this fails, look in parents for symbol that can be captured.
+     * Checks whether an identifier is a local variable or argument, i.e., a symbol.
+     * If this fails, look within parents for a symbol that can be captured.
      * @param name the symbol name
      * @return the symbol index
      */
@@ -305,7 +305,7 @@ public final class Scope {
     }
 
     /**
-     * Checks whether an identifier is a local variable or argument, ie a symbol.
+     * Checks whether an identifier is a local variable or argument, i.e., a symbol.
      * @param name the symbol name
      * @param capture whether solving by capturing a parent symbol is allowed
      * @return the symbol index
@@ -330,7 +330,7 @@ public final class Scope {
     }
 
     /**
-     * Gets this script symbols names, i.e. parameters and local variables.
+     * Gets this script symbols names, i.e., parameters and local variables.
      * @return the symbol names
      */
     public String[] getSymbols() {
