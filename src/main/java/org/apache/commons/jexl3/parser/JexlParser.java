@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.commons.jexl3.JexlEngine;
@@ -156,11 +157,8 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
      */
     protected static String stringify(final Iterable<String> lstr) {
         final StringBuilder strb = new StringBuilder();
-        boolean dot = false;
         for(final String str : lstr) {
-            if (!dot) {
-               dot = true;
-            } else {
+            if (strb.length() > 0) {
                strb.append('.');
             }
             strb.append(str);
@@ -196,19 +194,16 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
     /**
      * The optional class name and constant resolver.
      */
-    protected JexlUberspect.ClassConstantResolver fqcnResolver = null;
+    protected final AtomicReference<JexlUberspect.ClassConstantResolver> fqcnResolver;
     /**
      * The list of imports.
      * <p>Imports are used to resolve simple class names into fully qualified class names.</p>
      */
-    protected List<String> imports = new ArrayList<>();
+    protected final List<String> imports;
 
 
     void addImport(String importName) {
         if (importName != null && !importName.isEmpty()) {
-            if (imports == null) {
-                imports = new ArrayList<>();
-            }
             if (!imports.contains(importName)) {
                 imports.add(importName);
             }
@@ -216,11 +211,12 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
     }
 
     Object resolveConstant(String name) {
-        JexlUberspect.ClassConstantResolver resolver = fqcnResolver;
+        JexlUberspect.ClassConstantResolver resolver = fqcnResolver.get();
         if (resolver == null) {
             JexlEngine engine = JexlEngine.getThreadEngine();
             if (engine instanceof JexlUberspect.ConstantResolverFactory) {
-                fqcnResolver = resolver = ((JexlUberspect.ConstantResolverFactory) engine).createConstantResolver(imports);
+                resolver = ((JexlUberspect.ConstantResolverFactory) engine).createConstantResolver(imports);
+                fqcnResolver.set(resolver);
             }
         }
         return resolver != null
@@ -239,7 +235,7 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
     /**
      * The number of nested loops.
      */
-    protected int loopCount;
+    protected AtomicInteger loopCount;
     /**
      * Stack of parsing loop counts.
      */
@@ -247,7 +243,7 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
     /**
      * The current lexical block.
      */
-    protected AtomicReference<LexicalUnit> blockReference;
+    protected final AtomicReference<LexicalUnit> blockReference;
     /**
      * Stack of lexical blocks.
      */
@@ -300,10 +296,13 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
             featureController = new FeatureController(JexlEngine.DEFAULT_FEATURES);
             scopeReference = new AtomicReference<>();
             blockReference = new AtomicReference<>();
+            fqcnResolver = new AtomicReference<>();
+            loopCount = new AtomicInteger(0);
             scopes = new ArrayDeque<>();
             loopCounts = new ArrayDeque<>();
             blocks = new ArrayDeque<>();
             blockScopes = new IdentityHashMap<>();
+            imports = new ArrayList<>();
         }
     }
 
@@ -481,7 +480,7 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
                     // captured are declared in all cases
                     identifier.setCaptured(true);
                 } else {
-                    LexicalUnit unit = blockReference.get();
+                    LexicalUnit unit = getUnit();
                     declared = unit.hasSymbol(symbol);
                     // one of the lexical blocks above should declare it
                     if (!declared) {
@@ -527,10 +526,10 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
             scopes.clear();
             pragmas = null;
             namespaces = null;
-            fqcnResolver = null;
+            fqcnResolver.set(null);
             imports.clear();
             loopCounts.clear();
-            loopCount = 0;
+            loopCount.set(0);
             blocks.clear();
             blockReference.set(null);
             blockScopes.clear();
@@ -570,7 +569,7 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
         // function is const fun...
         if (declareSymbol(symbol)) {
             scope.addLexical(symbol);
-            LexicalUnit block = blockReference.get();
+            LexicalUnit block = getUnit();
             block.setConstant(symbol);
         } else {
             if (getFeatures().isLexical()) {
@@ -603,7 +602,7 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
         final int symbol = scope.declareParameter(identifier);
         // not sure how declaring a parameter could fail...
         // lexical feature error
-        LexicalUnit block = blockReference.get();
+        LexicalUnit block = getUnit();
         if (!block.declareSymbol(symbol)) {
             if (lexical || getFeatures().isLexical()) {
                 final JexlInfo xinfo = info.at(token.beginLine, token.beginColumn);
@@ -683,7 +682,7 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
                 break;
             }
         }
-        LexicalUnit block = blockReference.get();
+        LexicalUnit block = getUnit();
         return block == null || block.declareSymbol(symbol);
     }
 
@@ -726,7 +725,7 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
         } else if (lexical) {
             scope.addLexical(symbol);
             if (constant) {
-                LexicalUnit block = blockReference.get();
+                LexicalUnit block = getUnit();
                 block.setConstant(symbol);
             }
         }
@@ -764,6 +763,7 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
     protected LexicalUnit getUnit() {
         return blockReference.get();
     }
+
     /**
      * Default implementation does nothing but is overridden by generated code.
      * @param top whether the identifier is beginning an l/r value
@@ -781,11 +781,11 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
      */
     private boolean isConstant(final int symbol) {
         if (symbol >= 0) {
-            LexicalUnit block = blockReference.get();
+            LexicalUnit block = getUnit();
             if (block != null && block.hasSymbol(symbol)) {
                 return block.isConstant(symbol);
             }
-            Scope blockScope = blockScopes.get(blockReference.get());
+            Scope blockScope = blockScopes.get(block);
             int lexical = symbol;
             for (final LexicalUnit unit : blocks) {
                 final Scope unitScope = blockScopes.get(unit);
@@ -961,7 +961,7 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
 
     /**
      * Parses an embedded Jexl expression within an interpolation node.
-     * <p>This creates a sub-parser that shares the scopes and of the parent parser.</p>
+     * <p>This creates a sub-parser that shares the scopes of the parent parser.</p>
      * @param info the JexlInfo
      * @param src the source to parse
      * @return the parsed tree
@@ -1005,7 +1005,7 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
         Scope scope = scopes.isEmpty() ? null : scopes.pop();
         scopeReference.set(scope);
         if (!loopCounts.isEmpty()) {
-            loopCount = loopCounts.pop();
+            loopCount.set(loopCounts.pop());
         }
     }
 
@@ -1024,16 +1024,14 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
     /**
      * Create a new local variable scope and push it as current.
      */
-    protected Scope pushScope() {
+    protected void pushScope() {
         Scope scope = scopeReference.get();
         if (scope != null) {
             scopes.push(scope);
         }
         scope = new Scope(scope, (String[]) null);
         scopeReference.set(scope);
-        loopCounts.push(loopCount);
-        loopCount = 0;
-        return scope;
+        loopCounts.push(loopCount.getAndSet(0));
     }
 
     /**
@@ -1051,13 +1049,12 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
     }
 
     protected void pushLoop() {
-        loopCounts.push(loopCount);
-        loopCount = 0;
+        loopCounts.push(loopCount.getAndSet(0));
     }
 
     protected void popLoop() {
         if (!loopCounts.isEmpty()) {
-            loopCount = loopCounts.pop();
+            loopCount.set(loopCounts.pop());
         }
     }
 

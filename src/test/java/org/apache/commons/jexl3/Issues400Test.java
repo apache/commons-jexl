@@ -724,6 +724,11 @@ public class Issues400Test {
         public ASTJexlScript parse(final JexlInfo info, final JexlFeatures features, final String src, final Scope scope) {
             return parser.parse(info, features, transcodeSQLExpr(src), scope);
         }
+
+        @Override
+        public ASTJexlScript jxltParse(final JexlInfo info, final JexlFeatures features, final String src, final Scope scope) {
+            return new Parser(parser).parse(info, features, transcodeSQLExpr(src), scope);
+        }
     }
 
 

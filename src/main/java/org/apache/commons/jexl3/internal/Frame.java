@@ -37,7 +37,7 @@ public class Frame {
      * @param r the stack frame
      * @param c the number of curried parameters
      */
-    protected Frame(Scope s, final Object[] r, final int c) {
+    protected Frame(final Scope s, final Object[] r, final int c) {
         scope = s;
         stack = r;
         curried = c;

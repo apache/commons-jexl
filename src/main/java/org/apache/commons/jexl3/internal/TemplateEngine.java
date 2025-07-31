@@ -515,7 +515,7 @@ public final class TemplateEngine extends JxltEngine {
         @Override
         protected TemplateExpression prepare(final Interpreter interpreter) {
             final String value = interpreter.interpret(node).toString();
-            final JexlNode dnode = jexl.parse(node.jexlInfo(), noscript, value, null);
+            final JexlNode dnode = jexl.jxltParse(node.jexlInfo(), noscript, value, null);
             return new ImmediateExpression(value, dnode, this);
         }
     }
