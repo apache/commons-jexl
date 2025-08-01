@@ -191,9 +191,9 @@ class JexlScriptEngineTest {
     void testScriptEngineFactory() {
         final JexlScriptEngineFactory factory = new JexlScriptEngineFactory();
         assertEquals("JEXL Engine", factory.getParameter(ScriptEngine.ENGINE));
-        assertEquals("3.5", factory.getParameter(ScriptEngine.ENGINE_VERSION));
+        assertEquals("3.6", factory.getParameter(ScriptEngine.ENGINE_VERSION));
         assertEquals("JEXL", factory.getParameter(ScriptEngine.LANGUAGE));
-        assertEquals("3.5", factory.getParameter(ScriptEngine.LANGUAGE_VERSION));
+        assertEquals("3.6", factory.getParameter(ScriptEngine.LANGUAGE_VERSION));
         assertNull(factory.getParameter("THREADING"));
         assertEquals(NAMES, factory.getParameter(ScriptEngine.NAME));
         assertEquals(EXTENSIONS, factory.getExtensions());
