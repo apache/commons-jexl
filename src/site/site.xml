@@ -26,7 +26,7 @@
         <menu name="JEXL">
             <item name="Overview"                href="index.html" />
             <item name="Release Notes"           href="relnotes35.html"/>
-            <item name="Javadoc 3.5"             href="apidocs/index.html"/>
+            <item name="Javadoc 3.6"             href="apidocs/index.html"/>
             <item name="Javadoc 2.1.1"           href="javadocs/apidocs-2.1.1/index.html"/>
             <item name="Javadoc 1.1"             href="javadocs/apidocs-1.1/index.html"/>
             <item name="Download"                href="download_jexl.cgi"/>

@@ -47,7 +47,7 @@ public final class TemplateEngine extends JxltEngine {
      * Abstract the source fragments, verbatim or immediate typed text blocks.
      */
     static final class Block {
-        /** The type of block, verbatim or directive. */
+        /** The type of block: verbatim or directive. */
         private final BlockType type;
         /** The block start line info. */
         private final int line;
@@ -109,7 +109,7 @@ public final class TemplateEngine extends JxltEngine {
     enum BlockType {
         /** Block is to be output "as is" but may be a unified expression. */
         VERBATIM,
-        /** Block is a directive, ie a fragment of JEXL code. */
+        /** Block is a directive, i.e., a fragment of JEXL code. */
         DIRECTIVE
     }
 
@@ -149,7 +149,7 @@ public final class TemplateEngine extends JxltEngine {
             for (final TemplateExpression expr : exprs) {
                 value = expr.evaluate(interpreter);
                 if (value != null) {
-                    strb.append(value.toString());
+                    strb.append(value);
                 }
             }
             return strb.toString();
@@ -234,7 +234,7 @@ public final class TemplateEngine extends JxltEngine {
         @Override
         public StringBuilder asString(final StringBuilder strb) {
             if (value != null) {
-                strb.append(value.toString());
+                strb.append(value);
             }
             return strb;
         }
@@ -310,7 +310,7 @@ public final class TemplateEngine extends JxltEngine {
         }
 
         /**
-         * Builds an TemplateExpression from a source, performs checks.
+         * Builds a TemplateExpression from a source, performs checks.
          * @param el     the unified el instance
          * @param source the source TemplateExpression
          * @return an TemplateExpression
@@ -515,7 +515,7 @@ public final class TemplateEngine extends JxltEngine {
         @Override
         protected TemplateExpression prepare(final Interpreter interpreter) {
             final String value = interpreter.interpret(node).toString();
-            final JexlNode dnode = jexl.parse(node.jexlInfo(), noscript, value, null);
+            final JexlNode dnode = jexl.jxltParse(node.jexlInfo(), noscript, value, null);
             return new ImmediateExpression(value, dnode, this);
         }
     }
@@ -524,15 +524,15 @@ public final class TemplateEngine extends JxltEngine {
     private enum ParseState {
         /** Parsing a constant. */
         CONST,
-        /** Parsing after $ . */
+        /** Parsing after <code>$</code> . */
         IMMEDIATE0,
-        /** Parsing after # . */
+        /** Parsing after <code>#</code> . */
         DEFERRED0,
-        /** Parsing after ${ . */
+        /** Parsing after <code>${</code> . */
         IMMEDIATE1,
-        /** Parsing after #{ . */
+        /** Parsing after <code>#{</code> . */
         DEFERRED1,
-        /** Parsing after \ . */
+        /** Parsing after <code>\</code> . */
         ESCAPE
     }
 
@@ -578,7 +578,7 @@ public final class TemplateEngine extends JxltEngine {
          * @param context the context storing global variables
          * @param options flags and properties that can alter the evaluation behavior.
          * @return the expression value
-         * @throws JexlException
+         * @throws JexlException if expression evaluation fails
          */
         protected final Object evaluate(final JexlContext context, final Frame frame, final JexlOptions options) {
             try {
@@ -668,7 +668,7 @@ public final class TemplateEngine extends JxltEngine {
          * @param context the context storing global variables
          * @param opts flags and properties that can alter the evaluation behavior.
          * @return the expression value
-         * @throws JexlException
+         * @throws JexlException if expression preparation fails
          */
         protected final TemplateExpression prepare(final JexlContext context, final Frame frame, final JexlOptions opts) {
             try {
@@ -693,7 +693,7 @@ public final class TemplateEngine extends JxltEngine {
             asString(strb);
             if (source != this) {
                 strb.append(" /*= ");
-                strb.append(source.toString());
+                strb.append(source);
                 strb.append(" */");
             }
             return strb.toString();
@@ -748,7 +748,7 @@ public final class TemplateEngine extends JxltEngine {
         strb.append(action);
         if (expr != null) {
             strb.append(" '");
-            strb.append(expr.toString());
+            strb.append(expr);
             strb.append("'");
         }
         final Throwable cause = xany.getCause();
@@ -827,7 +827,7 @@ public final class TemplateEngine extends JxltEngine {
     /** The first character for deferred expressions. */
     final char deferredChar;
 
-    /** Whether expressions can use JEXL script or only expressions (ie, no for, var, etc). */
+    /** Whether expressions can use JEXL script or only expressions (i.e., no for, var, etc). */
     final boolean noscript;
 
     /**
@@ -863,13 +863,17 @@ public final class TemplateEngine extends JxltEngine {
 
     @Override
     public JxltEngine.Expression createExpression(final JexlInfo jexlInfo, final String expression) {
+        return createExpression(jexlInfo, expression, null);
+    }
+
+    public JxltEngine.Expression createExpression(final JexlInfo jexlInfo, final String expression, final Scope scope) {
         final JexlInfo info = jexlInfo == null ?  jexl.createInfo() : jexlInfo;
         Exception xuel = null;
         TemplateExpression stmt = null;
         try {
             stmt = cache.get(expression);
             if (stmt == null) {
-                stmt = parseExpression(info, expression, null);
+                stmt = parseExpression(info, expression, scope);
                 cache.put(expression, stmt);
             }
         } catch (final JexlException xjexl) {
@@ -1115,7 +1119,7 @@ public final class TemplateEngine extends JxltEngine {
      * @param source the source reader
      * @return the list of blocks
      */
-    protected List<Block> readTemplate(final String prefix, final Reader source) {
+     List<Block> readTemplate(final String prefix, final Reader source) {
         final ArrayList<Block> blocks = new ArrayList<>();
         final BufferedReader reader;
         if (source instanceof BufferedReader) {
@@ -1159,7 +1163,7 @@ public final class TemplateEngine extends JxltEngine {
                     // still a directive
                     strb.append(line.subSequence(prefixLen, line.length()));
                 }
-            } else if (type == BlockType.VERBATIM) {
+            } else { //if (type == BlockType.VERBATIM) {
                 // switch to directive if necessary
                 prefixLen = startsWith(line, prefix);
                 if (prefixLen >= 0) {
@@ -1191,7 +1195,7 @@ public final class TemplateEngine extends JxltEngine {
      * @param pattern  the pattern to match at start of sequence
      * @return the first position after end of pattern if it matches, -1 otherwise
      */
-    protected int startsWith(final CharSequence sequence, final CharSequence pattern) {
+    int startsWith(final CharSequence sequence, final CharSequence pattern) {
         final int length = sequence.length();
         int s = 0;
         while (s < length && Character.isSpaceChar(sequence.charAt(s))) {

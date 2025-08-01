@@ -17,7 +17,10 @@
 
 package org.apache.commons.jexl3.parser;
 
+import org.apache.commons.jexl3.JexlEngine;
 import org.apache.commons.jexl3.JxltEngine;
+import org.apache.commons.jexl3.internal.Scope;
+import org.apache.commons.jexl3.internal.TemplateEngine;
 
 /**
  * x.`expr`.
@@ -49,4 +52,16 @@ public class ASTIdentifierAccessJxlt extends ASTIdentifierAccess implements Jexl
         jxltExpression = tp;
     }
 
+    public void setIdentifier(final String src, final Scope scope) {
+        super.setIdentifier(src);
+        if (src != null && !src.isEmpty()) {
+            JexlEngine jexl = JexlEngine.getThreadEngine();
+            if (jexl != null) {
+                JxltEngine jxlt = jexl.createJxltEngine();
+                if (jxlt instanceof TemplateEngine) {
+                  this.jxltExpression = ((TemplateEngine) jxlt).createExpression(jexlInfo(), src, scope);
+                }
+            }
+        }
+    }
 }

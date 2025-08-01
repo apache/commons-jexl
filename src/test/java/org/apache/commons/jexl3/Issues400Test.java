@@ -140,7 +140,7 @@ public class Issues400Test {
             final String src = "var a = {'a': 1};\n" +
                 "var list = [a, a];\n" +
                 "let map1 = {:};\n" +
-                "for (var item : list) {\n" +
+                "for (let item : list) {\n" +
                 setmap +
                 "}\n " +
                 "map1";
@@ -463,7 +463,6 @@ public class Issues400Test {
     @Test
     void test429a() {
         final MapContext ctxt = new MapContext();
-        //ctxt.set("b", 1);
         final JexlFeatures features = JexlFeatures.createDefault();
         final JexlEngine jexl = new JexlBuilder()
                 .features(features)
@@ -725,6 +724,11 @@ public class Issues400Test {
         public ASTJexlScript parse(final JexlInfo info, final JexlFeatures features, final String src, final Scope scope) {
             return parser.parse(info, features, transcodeSQLExpr(src), scope);
         }
+
+        @Override
+        public ASTJexlScript jxltParse(final JexlInfo info, final JexlFeatures features, final String src, final Scope scope) {
+            return new Parser(parser).parse(info, features, transcodeSQLExpr(src), scope);
+        }
     }
 
 
@@ -839,7 +843,7 @@ public class Issues400Test {
     }
 
     @Test
-    public void testIssue441() throws Exception {
+    void testIssue441() {
         JexlEngine jexl = new JexlBuilder().create();
         String ctl = "\nab\nc`d\n";
         JexlExpression e = jexl.createExpression("`\nab\nc\\`d\n`");
@@ -861,8 +865,8 @@ public class Issues400Test {
         JexlContext context = new MapContext();
         String code = "var x = 'hello';\n" +
                 "function test(z) {\n" +
-                "let y = x;\n"+
-                "  return `${x} ${z}`;\n" +
+                //"x + ' ' + z\n"+
+                "`${x} ${z}`;\n" +
                 "}\n" +
                 "test('world');";
         JexlScript script = jexl.createScript(code);

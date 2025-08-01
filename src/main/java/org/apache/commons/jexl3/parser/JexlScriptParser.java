@@ -38,4 +38,18 @@ public interface JexlScriptParser {
    */
   ASTJexlScript parse(final JexlInfo info, final JexlFeatures features, final String src, final Scope scope);
 
+  /**
+   * Parses an embedded JXLT script or expression, an interpolation expression.
+   *
+   * @param info      information structure
+   * @param features  the set of parsing features
+   * @param src      the expression to parse
+   * @param scope     the script frame
+   * @return the parsed tree
+   * @throws JexlException if any error occurred during parsing
+   */
+  default ASTJexlScript jxltParse(JexlInfo info, JexlFeatures features, String src, Scope scope) {
+    return parse(info, features, src, scope);
+  }
+
 }

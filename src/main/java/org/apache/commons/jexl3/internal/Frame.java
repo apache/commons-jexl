@@ -41,6 +41,11 @@ public class Frame {
         scope = s;
         stack = r;
         curried = c;
+        String[] symbols = scope.getSymbols();
+        if (symbols.length != r.length) {
+            throw new IllegalArgumentException("Scope and stack frame size mismatch: "
+                    + symbols.length + " != " + r.length);
+        }
     }
 
     /**

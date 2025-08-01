@@ -129,7 +129,7 @@ public abstract class JexlNode extends SimpleNode implements JexlCache.Reference
      */
     private static final long serialVersionUID = 1L;
 
-    // line + column encoded: up to 4096 columns (ie 20 bits for line + 12 bits for column)
+    // line + column encoded: up to 4096 columns (i.e., 20 bits for line + 12 bits for column)
     private int lc = -1;
 
     public JexlNode(final int id) {
@@ -275,7 +275,7 @@ public abstract class JexlNode extends SimpleNode implements JexlCache.Reference
         for(int s = 0; s < nsiblings; ++s) {
             final JexlNode sibling = parent.jjtGetChild(s);
             if (sibling == this) {
-                // the next chid offset of this nodes parent
+                // the next child offset of this node_s parent
                 rhs = s + 1;
                 break;
             }
@@ -337,7 +337,7 @@ public abstract class JexlNode extends SimpleNode implements JexlCache.Reference
         if (lc >= 0) {
             final int c = lc & 0xfff;
             final int l = lc >> 0xc;
-            // at least an info with line/column number
+            // at least an info instance with line/column number
             return info != null ? info.at(info.getLine() + l - 1, c) : new JexlInfo(name, l, c);
         }
         // weird though; no jjSetFirstToken(...) ever called?

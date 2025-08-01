@@ -789,20 +789,6 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
      * Parses an expression.
      *
      * @param info      information structure
-     * @param expr     whether we parse an expression or a feature
-     * @param src      the expression to parse
-     * @param scope     the script frame
-     * @return the parsed tree
-     * @throws JexlException if any error occurred during parsing
-     */
-    protected ASTJexlScript parse(final JexlInfo info, final boolean expr, final String src, final Scope scope) {
-        return parse(info, expr? this.expressionFeatures : this.scriptFeatures, src, scope);
-    }
-
-    /**
-     * Parses an expression.
-     *
-     * @param info      information structure
      * @param parsingf  the set of parsing features
      * @param src      the expression to parse
      * @param scope     the script frame
@@ -825,12 +811,14 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
         try {
             // if parser not in use...
             if (parsing.compareAndSet(false, true)) {
-                try {
-                    // lets parse
-                    script = parser.parse(ninfo, features, src, scope);
-                } finally {
-                    // no longer in use
-                    parsing.set(false);
+                synchronized (parsing) {
+                    try {
+                        // lets parse
+                        script = parser.parse(ninfo, features, src, scope);
+                    } finally {
+                        // no longer in use
+                        parsing.set(false);
+                    }
                 }
             } else {
                 // ...otherwise parser was in use, create a new temporary one
@@ -848,17 +836,17 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
 
     /**
      * Parses a Jexl expression or script.
-     * <p>This is a convenience method that uses the default parser and the script features.
      * @param info the JexlInfo
      * @param expr whether to parse an expression or a script
      * @param src the source to parse
-     * @param scope the scope, may be null
+     * @param scope the scope, maybe null
      * @return the parsed tree
      */
     protected ASTJexlScript jxltParse(final JexlInfo info, final boolean expr, final String src, final Scope scope) {
-        return parse(info, expr, src, scope);
+        synchronized(parsing) {
+            return parser.jxltParse(info, expr ? this.expressionFeatures : this.scriptFeatures, src, scope);
+        }
     }
-
 
     /**
      * Processes jexl.module.ns pragma.

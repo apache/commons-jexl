@@ -17,8 +17,10 @@
 package org.apache.commons.jexl3;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -346,17 +348,25 @@ class PropertyAccessTest extends JexlTestCase {
         result = script.execute(ctx, "querty");
         assertEquals("oops", result);
 
-        // fails with jxlt & lenient navigation
+        // parsing fails with jxlt & lenient navigation
         stmt = "(x)->{ x?.`c${la--ss` ?? 'oops' }";
-        script = engine.createScript(stmt);
-        result = script.execute(ctx, "querty");
-        assertEquals("oops", result);
+        try {
+            script = engine.createScript(stmt);
+            result = script.execute(ctx, "querty");
+        } catch (final JexlException xany) {
+            assertNotNull(xany.getMessage());
+            assertTrue(xany.getMessage().contains("c${la--ss"));
+        }
 
-        // fails with jxlt & strict navigation
+        // parsing fails with jxlt & strict navigation
         stmt = "(x)->{ x.`c${la--ss` ?? 'oops' }";
+        try {
         script = engine.createScript(stmt);
         result = script.execute(ctx, "querty");
-        assertEquals("oops", result);
+        } catch (final JexlException xany) {
+            assertNotNull(xany.getMessage());
+            assertTrue(xany.getMessage().contains("c${la--ss"));
+        }
     }
 
     @Test

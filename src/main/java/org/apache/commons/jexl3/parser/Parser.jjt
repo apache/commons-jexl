@@ -70,12 +70,14 @@ public final class Parser extends JexlParser
     public ASTJexlScript parse(JexlInfo jexlInfo, JexlFeatures jexlFeatures, String jexlSrc, Scope jexlScope) {
         JexlFeatures previous = getFeatures();
         try {
-            setFeatures(jexlFeatures);
             // lets do the 'Unique Init' in here to be safe - it's a pain to remember
             this.info = jexlInfo != null? jexlInfo : new JexlInfo();
             this.source = jexlSrc;
-            this.pragmas = null;
-            this.scope = jexlScope;
+            if (this.parent == null) {
+                setFeatures(jexlFeatures);
+                this.pragmas = null;
+            }
+            this.scopeReference.set(jexlScope);
             token_source.comparatorNames = jexlFeatures.supportsComparatorNames();
             ReInit(jexlSrc);
             ASTJexlScript script = jexlFeatures.supportsScript()
@@ -498,12 +500,12 @@ LOOKAHEAD(2) Var() | Identifier(true)
 
 void WhileStatement() : {}
 {
-    <WHILE> <LPAREN> Expression() <RPAREN>  { loopCount += 1; }  (LOOKAHEAD(1) Block() | StatementNoVar()) { loopCount -= 1; }
+    <WHILE> <LPAREN> Expression() <RPAREN>  { loopCount.incrementAndGet(); }  (LOOKAHEAD(1) Block() | StatementNoVar()) { loopCount.decrementAndGet(); }
 }
 
 void DoWhileStatement() : {}
 {
-    <DO> { loopCount += 1; } (LOOKAHEAD(1) Block() | StatementNoVar()) <WHILE> <LPAREN> Expression() <RPAREN> { loopCount -= 1; }
+    <DO> { loopCount.incrementAndGet(); } (LOOKAHEAD(1) Block() | StatementNoVar()) <WHILE> <LPAREN> Expression() <RPAREN> { loopCount.decrementAndGet(); }
 }
 
 void ReturnStatement() : {
@@ -524,14 +526,14 @@ void Continue() #Continue : {
     Token t;
 }
 {
-    t=<CONTINUE> { if (loopCount == 0) { throwParsingException(t); } }
+    t=<CONTINUE> { if (loopCount.get() == 0) { throwParsingException(t); } }
 }
 
 void Break() #Break : {
     Token t;
 }
 {
-    t=<BREAK> { if (loopCount == 0) { throwParsingException(t); } }
+    t=<BREAK> { if (loopCount.get() == 0) { throwParsingException(t); } }
 }
 
 void ForeachStatement() : {
@@ -551,11 +553,11 @@ void ForeachStatement() : {
     )
     <RPAREN>
     {
-        loopCount += 1;
+        loopCount.incrementAndGet();
     }
         (LOOKAHEAD(1) Block() | StatementNoVar() )
     {
-        loopCount -= 1;
+        loopCount.decrementAndGet();
         jjtThis.setLoopForm(loopForm);
         popUnit(jjtThis);
     }
@@ -631,7 +633,7 @@ void SwitchStatementCase(SwitchSet cases) #CaseStatement :
 {
     Object constant;
     List<Object> constants;
-    loopCount += 1;
+    loopCount.incrementAndGet();
 }
 {
     ( ( LOOKAHEAD(2) <CASE> constant=constLiteral() <COLON>
@@ -640,7 +642,7 @@ void SwitchStatementCase(SwitchSet cases) #CaseStatement :
         <CASE_DEFAULT> <COLON> )
     ( LOOKAHEAD(<LCURLY>) Block() | (StatementNoVar())+ )?
 {
-    loopCount -= 1;
+    loopCount.decrementAndGet();
 }
 }
 
@@ -1061,7 +1063,7 @@ void JxltLiteral() #JxltLiteral :
 }
 {
    t=<JXLT_LITERAL>
-   { jjtThis.setLiteral(src = Parser.buildString(t.image, true)); }
+   { jjtThis.setLiteral(src = Parser.buildString(t.image, true), getScope()); }
 }
 
 void RegexLiteral() :
@@ -1218,7 +1220,7 @@ void IdentifierAccess() #void :
     |
         t=<STRING_LITERAL> { jjtThis.setIdentifier(Parser.buildString(t.image, true)); } #IdentifierAccess
     |
-        t=<JXLT_LITERAL> { jjtThis.setIdentifier(Parser.buildString(t.image, true)); } #IdentifierAccessJxlt
+        t=<JXLT_LITERAL> { jjtThis.setIdentifier(Parser.buildString(t.image, true), getScope()); } #IdentifierAccessJxlt
     )
     |
     <QDOT> (
@@ -1226,7 +1228,7 @@ void IdentifierAccess() #void :
     |
         t=<STRING_LITERAL> { jjtThis.setIdentifier(Parser.buildString(t.image, true)); } #IdentifierAccessSafe
     |
-        t=<JXLT_LITERAL> { jjtThis.setIdentifier(Parser.buildString(t.image, true)); } #IdentifierAccessSafeJxlt
+        t=<JXLT_LITERAL> { jjtThis.setIdentifier(Parser.buildString(t.image, true), getScope()); } #IdentifierAccessSafeJxlt
     )
 }
 
