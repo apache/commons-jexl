@@ -167,14 +167,14 @@ public abstract class JexlEngine {
     /**
      * The thread local context.
      */
-    protected static final java.lang.ThreadLocal<JexlContext.ThreadLocal> CONTEXT =
-                       new java.lang.ThreadLocal<>();
+    protected static final ThreadLocal<JexlContext.ThreadLocal> CONTEXT =
+                       new ThreadLocal<>();
 
     /**
      * The thread local engine.
      */
-    protected static final java.lang.ThreadLocal<JexlEngine> ENGINE =
-                       new java.lang.ThreadLocal<>();
+    protected static final ThreadLocal<JexlEngine> ENGINE =
+                       new ThreadLocal<>();
 
     /** Default features. */
     public static final JexlFeatures DEFAULT_FEATURES = new JexlFeatures();

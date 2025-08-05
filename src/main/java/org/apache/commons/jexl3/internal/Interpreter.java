@@ -94,8 +94,8 @@ public class Interpreter extends InterpreterBase {
     /**
      * The thread local interpreter.
      */
-    protected static final java.lang.ThreadLocal<Interpreter> INTER =
-                       new java.lang.ThreadLocal<>();
+    protected static final ThreadLocal<Interpreter> INTER =
+                       new ThreadLocal<>();
     /** Frame height. */
     protected int fp;
 
