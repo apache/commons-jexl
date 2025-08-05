@@ -653,8 +653,8 @@ public final class MethodKey {
      * algorithm described in the JLS section 15.12.2 (with the exception that it can't
      * distinguish a primitive type argument from an object type argument, since in reflection
      * primitive type arguments are represented by their object counterparts, so for an argument of
-     * type (say) java.lang.Integer, it will not be able to decide between a method that takes int and a
-     * method that takes java.lang.Integer as a parameter.
+     * type (say) {@link Integer}, it will not be able to decide between a method that takes int and a
+     * method that takes {@link Integer} as a parameter.
      * </p>
      * <p>
      * This turns out to be a relatively rare case where this is needed - however, functionality
