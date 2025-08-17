@@ -245,7 +245,7 @@ class ScriptCallableTest extends JexlTestCase {
     @Test
     void testCallableCancellation() throws Exception {
         final Semaphore latch = new Semaphore(0);
-        final AtomicBoolean cancel = new AtomicBoolean(false);
+        final AtomicBoolean cancel = new AtomicBoolean();
         final JexlContext ctxt = new CancellationContext(cancel);
         ctxt.set("latch", latch);
 

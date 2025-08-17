@@ -175,7 +175,7 @@ public class JexlBuilder {
      * In the urgent case of a strict 3.2 compatibility, the simplest and fastest mitigation is to use the 'unrestricted'
      * set of permissions. The builder must be explicit about it either by setting the default permissions with a
      * statement like {@code JexlBuilder.setDefaultPermissions(JexlPermissions.UNRESTRICTED);} or with a more precise
-     * one like <code>new JexlBuilder().permissions({@link JexlPermissions#UNRESTRICTED})</code>.
+     * one like {@code new JexlBuilder().permissions({@link JexlPermissions#UNRESTRICTED})}.
      * </p><p>
      * Note that an explicit call to {@link #uberspect(JexlUberspect)} will supersede any permissions related behavior
      * by using the {@link JexlUberspect} provided as argument used as-is in the created {@link JexlEngine}.
