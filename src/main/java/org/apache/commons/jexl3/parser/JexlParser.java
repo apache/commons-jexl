@@ -297,7 +297,7 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
             scopeReference = new AtomicReference<>();
             blockReference = new AtomicReference<>();
             fqcnResolver = new AtomicReference<>();
-            loopCount = new AtomicInteger(0);
+            loopCount = new AtomicInteger();
             scopes = new ArrayDeque<>();
             loopCounts = new ArrayDeque<>();
             blocks = new ArrayDeque<>();
