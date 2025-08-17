@@ -879,7 +879,7 @@ class ArithmeticTest extends JexlTestCase {
         JexlScript e = JEXL.createScript("if (x) 1 else 2;", "x");
         final JexlArithmetic jexla = JEXL.getArithmetic();
         final JexlContext jc = new MapContext();
-        final AtomicBoolean ab = new AtomicBoolean(false);
+        final AtomicBoolean ab = new AtomicBoolean();
         Object o;
         o = e.execute(jc, ab);
         assertEquals(Integer.valueOf(2), o);
@@ -1579,7 +1579,7 @@ class ArithmeticTest extends JexlTestCase {
         assertEquals(0, jexla.toInteger(""));
         assertEquals('b', jexla.toInteger('b'));
         assertEquals(1, jexla.toInteger(new AtomicBoolean(true)));
-        assertEquals(0, jexla.toInteger(new AtomicBoolean(false)));
+        assertEquals(0, jexla.toInteger(new AtomicBoolean()));
 
         // long coercions
         assertNullOperand(() -> jexla.toLong(null));
@@ -1589,7 +1589,7 @@ class ArithmeticTest extends JexlTestCase {
         assertEquals(0L, jexla.toLong(""));
         assertEquals('b', jexla.toLong('b'));
         assertEquals(1L, jexla.toLong(new AtomicBoolean(true)));
-        assertEquals(0L, jexla.toLong(new AtomicBoolean(false)));
+        assertEquals(0L, jexla.toLong(new AtomicBoolean()));
     }
 
     @Test
@@ -2118,7 +2118,7 @@ class ArithmeticTest extends JexlTestCase {
         assertEquals(Boolean.TRUE, jexla.positivize(Boolean.TRUE));
         assertEquals(Boolean.FALSE, jexla.positivize(Boolean.FALSE));
         assertEquals(Boolean.TRUE, jexla.positivize(new AtomicBoolean(true)));
-        assertEquals(Boolean.FALSE, jexla.positivize(new AtomicBoolean(false)));
+        assertEquals(Boolean.FALSE, jexla.positivize(new AtomicBoolean()));
 
         assertNullOperand(() -> jexla.negate(null));
         assertNull(jexlb.negate(null));
