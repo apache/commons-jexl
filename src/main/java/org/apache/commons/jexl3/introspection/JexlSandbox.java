@@ -603,7 +603,7 @@ public final class JexlSandbox {
          * <p>The constructor is denoted as the empty-string, all other methods by their names.</p>
          *
          * @param methodNames the method names
-         * @return this instance of permissions
+         * @return {@code this} instance of permissions
          */
         public Permissions execute(final String... methodNames) {
             for (final String methodName : methodNames) {
@@ -633,7 +633,7 @@ public final class JexlSandbox {
          * Adds a list of readable property names to these permissions.
          *
          * @param propertyNames the property names
-         * @return this instance of permissions
+         * @return {@code this} instance of permissions
          */
         public Permissions read(final String... propertyNames) {
             for (final String propertyName : propertyNames) {
@@ -655,7 +655,7 @@ public final class JexlSandbox {
          * Adds a list of writable property names to these permissions.
          *
          * @param propertyNames the property names
-         * @return this instance of permissions
+         * @return {@code this} instance of permissions
          */
         public Permissions write(final String... propertyNames) {
             for (final String propertyName : propertyNames) {

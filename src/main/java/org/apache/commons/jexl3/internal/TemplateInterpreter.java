@@ -67,7 +67,7 @@ public class TemplateInterpreter extends Interpreter {
         /**
          * Sets the context.
          * @param j the context
-         * @return this instance
+         * @return {@code this} instance
          */
         Arguments context(final JexlContext j) {
             this.jcontext = j;
@@ -76,7 +76,7 @@ public class TemplateInterpreter extends Interpreter {
         /**
          * Sets the expressions.
          * @param e the expressions
-         * @return this instance
+         * @return {@code this} instance
          */
         Arguments expressions(final TemplateExpression[] e) {
             this.expressions = e;
@@ -85,7 +85,7 @@ public class TemplateInterpreter extends Interpreter {
         /**
          * Sets the frame.
          * @param f the frame
-         * @return this instance
+         * @return {@code this} instance
          */
         Arguments frame(final Frame f) {
             this.jframe = f;
@@ -94,7 +94,7 @@ public class TemplateInterpreter extends Interpreter {
         /**
          * Sets the options.
          * @param o the options
-         * @return this instance
+         * @return {@code this} instance
          */
         Arguments options(final JexlOptions o) {
             this.options = o;
@@ -103,7 +103,7 @@ public class TemplateInterpreter extends Interpreter {
         /**
          * Sets the writer.
          * @param o the writer
-         * @return this instance
+         * @return {@code this} instance
          */
         Arguments writer(final Writer o) {
             this.out = o;

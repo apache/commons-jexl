@@ -129,7 +129,7 @@ public class JexlInfo {
 
     /**
      * Gets this instance or a copy without any decorations
-     * @return this instance or a copy without any decorations
+     * @return {@code this} instance or a copy without any decorations
      */
     public JexlInfo detach() {
         return this;

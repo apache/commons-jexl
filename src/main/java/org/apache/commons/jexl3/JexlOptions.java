@@ -330,7 +330,7 @@ public final class JexlOptions {
     /**
      * Sets options from engine.
      * @param jexl the engine
-     * @return this instance
+     * @return {@code this} instance
      */
     public JexlOptions set(final JexlEngine jexl) {
         if (jexl instanceof Engine) {
@@ -342,7 +342,7 @@ public final class JexlOptions {
     /**
      * Sets options from options.
      * @param src the options
-     * @return this instance
+     * @return {@code this} instance
      */
     public JexlOptions set(final JexlOptions src) {
         mathContext = src.mathContext;
