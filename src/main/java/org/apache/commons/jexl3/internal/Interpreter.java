@@ -977,7 +977,7 @@ public class Interpreter extends InterpreterBase {
      * Short-circuit evaluation of logical expression.
      * @param check the fuse value that will stop evaluation, true for OR, false for AND
      * @param node a ASTAndNode or a ASTOrNode
-     * @param data
+     * @param data the data, usually null and unused
      * @return true or false if boolean logical option is true, the last evaluated argument otherwise
      */
     private Object shortCircuit(final boolean check, final JexlNode node, final Object data) {
@@ -2016,7 +2016,13 @@ public class Interpreter extends InterpreterBase {
     protected Object visit(final ASTSwitchExpression node, final Object data) {
         final Object value = node.jjtGetChild(0).jjtAccept(this, data);
         final int index = node.switchIndex(value);
-        return index >= 0 ? node.jjtGetChild(index).jjtAccept(this, data) : null;
+        if (index >= 0) {
+          return node.jjtGetChild(index).jjtAccept(this, data);
+        }
+        if (isStrictEngine()) {
+          throw new JexlException(node, "no case in switch expression for: " + value);
+        }
+        return null;
     }
 
     @Override
@@ -2036,6 +2042,9 @@ public class Interpreter extends InterpreterBase {
                 }
             }
             return value;
+        }
+        if (isStrictEngine()) {
+            throw new JexlException(node, "no case in switch statement for: " + value);
         }
         return null;
     }
@@ -2288,7 +2297,7 @@ public class Interpreter extends InterpreterBase {
     /**
      * Runs a node.
      * @param node the node
-     * @param data the usual data
+     * @param data the usual data, always null
      * @return the return value
      */
     protected Object visitLexicalNode(final JexlNode node, final Object data) {
