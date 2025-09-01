@@ -167,14 +167,56 @@
                     <finalName>commons-jexl-${project.version}</finalName>
                 </configuration>
             </plugin>
+
             <plugin>
-                <groupId>com.helger.maven</groupId>
-                <artifactId>ph-javacc-maven-plugin</artifactId>
-                <version>4.1.5</version>
+                <groupId>org.javacc.plugin</groupId>
+                <artifactId>javacc-maven-plugin</artifactId>
+                <version>3.0.3</version>
                 <executions>
                     <execution>
                         <id>jexl-jjtree</id>
                         <configuration>
+                            <jdkVersion>1.8</jdkVersion>
+                            <codeGenerator>java</codeGenerator>
+                            <sourceDirectory>${basedir}/src/main/java/org/apache/commons/jexl3/parser</sourceDirectory>
+                            <outputDirectory>${project.build.directory}/generated-sources/java</outputDirectory>
+                        </configuration>
+                        <goals>
+                            <goal>jjtree-javacc</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <dependencies>
+                    <!--
+                    <dependency>
+                        <groupId>net.java.dev.javacc</groupId>
+                        <artifactId>javacc</artifactId>
+                        <version>7.0.13</version>
+                    </dependency>
+                    -->
+                    <dependency>
+                        <groupId>org.javacc</groupId>
+                        <artifactId>core</artifactId>
+                        <version>8.0.1</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.javacc.generator</groupId>
+                        <artifactId>java</artifactId>
+                        <version>8.0.1</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+
+            <!--
+            <plugin>
+                <groupId>io.github.tulipcc</groupId>
+                <artifactId>tulipcc-maven-plugin</artifactId>
+                <version>5.0.0</version>
+                <executions>
+                    <execution>
+                        <id>jexl-jjtree</id>
+                        <configuration>
+                            <jdkVersion>1.8</jdkVersion>
                             <sourceDirectory>${basedir}/src/main/java/org/apache/commons/jexl3/parser</sourceDirectory>
                             <outputDirectory>${project.build.directory}/generated-sources/java</outputDirectory>
                         </configuration>
@@ -184,6 +226,7 @@
                     </execution>
                 </executions>
             </plugin>
+            -->
             <plugin>
                 <artifactId>maven-antrun-plugin</artifactId>
                 <executions>
@@ -195,8 +238,8 @@
                                 <replaceregexp
                                         file="target/generated-sources/java/org/apache/commons/jexl3/parser/Parser.java"
                                         byline="true"
-                                        match="private final LookaheadSuccess jj_ls ="
-                                        replace="private static final LookaheadSuccess jj_ls ="/>
+                                        match="^(\s+)private final LookaheadSuccess jj_ls ="
+                                        replace="\1private static final LookaheadSuccess jj_ls ="/>
                             </target>
                         </configuration>
                         <goals>
