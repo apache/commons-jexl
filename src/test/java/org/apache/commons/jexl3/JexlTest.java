@@ -92,7 +92,7 @@ public final class JexlTest extends JexlTestCase {
      * Asserts that the given expression returns the given value when applied to the
      * given context
      */
-    protected void assertExpression(final JexlContext jc, final String expression, final Object expected) {
+    private void assertExpression(final JexlContext jc, final String expression, final Object expected) {
         final JexlExpression e = JEXL.createExpression(expression);
         final Object actual = e.evaluate(jc);
         assertEquals(expected, actual, expression);
@@ -136,7 +136,6 @@ public final class JexlTest extends JexlTestCase {
 
     /**
      * Test assignment.
-     * @throws Exception
      */
     @Test
     void testAssignment() {
@@ -151,14 +150,12 @@ public final class JexlTest extends JexlTestCase {
         assertEquals("world", jc.get("hello"), "hello variable not changed");
         assertExpression(jc, "result = 1 + 1", Integer.valueOf(2));
         assertEquals(Integer.valueOf(2), jc.get("result"), "result variable not changed");
-        // todo: make sure properties can be assigned to, fall back to flat var if no property
-        // assertExpression(jc, "foo.property1 = '99'", "99");
-        // assertEquals("property not set", "99", foo.getProperty1());
+        assertExpression(jc, "foo.property1 = '99'", "99");
+        assertEquals("99", foo.getProperty1(), "property not set");
     }
 
     /**
      * Make sure bad syntax throws ParseException
-     * @throws Exception on errors
      */
     @Test
     void testBadParse() {
@@ -196,7 +193,6 @@ public final class JexlTest extends JexlTestCase {
 
     /**
      * Test that 'and' only evaluates the second item if needed
-     * @throws Exception if there are errors
      */
     @Test
     void testBooleanShortCircuitAnd() {
@@ -218,7 +214,6 @@ public final class JexlTest extends JexlTestCase {
 
     /**
      * Test that 'or' only evaluates the second item if needed
-     * @throws Exception if there are errors
      */
     @Test
     void testBooleanShortCircuitOr() {
@@ -255,7 +250,7 @@ public final class JexlTest extends JexlTestCase {
         assertExpression(jc, "stringy + 2", "thingy2");
 
         /*
-         * test new null coersion
+         * test new null coercion
          */
         jc.set("imanull", null);
         assertExpression(jc, "imanull + 2", Integer.valueOf(2));
@@ -267,7 +262,7 @@ public final class JexlTest extends JexlTestCase {
     }
 
     /**
-     * Attempts to recreate bug https://jira.werken.com/ViewIssue.jspa?key=JELLY-8
+     * Attempts to recreate bug <a href="https://jira.werken.com/ViewIssue.jspa?key=JELLY-8">...</a>
      */
     @Test
     void testCharAtBug() {
@@ -284,7 +279,7 @@ public final class JexlTest extends JexlTestCase {
     }
 
     @Test
-    void testCoercionWithComparisionOperators() {
+    void testCoercionWithComparisonOperators() {
         final JexlContext jc = new MapContext();
 
         assertExpression(jc, "'2' > 1", Boolean.TRUE);
@@ -304,7 +299,6 @@ public final class JexlTest extends JexlTestCase {
 
     /**
      * Test the ## comment in a string
-     * @throws Exception
      */
     @Test
     void testComment() {
@@ -414,7 +408,7 @@ public final class JexlTest extends JexlTestCase {
         jc.set("longstring", "thingthing");
 
         /*
-         *  I can't believe anyone thinks this is a syntax.. :)
+         *  I can't believe anyone thinks this is a syntax... :)
          */
         assertExpression(jc, "empty nullthing", Boolean.TRUE);
         assertExpression(jc, "empty string", Boolean.TRUE);
@@ -454,7 +448,7 @@ public final class JexlTest extends JexlTestCase {
         jc.set("b", Boolean.FALSE);
         jc.set("num", Integer.valueOf(5));
         jc.set("now", Calendar.getInstance().getTime());
-        final GregorianCalendar gc = new GregorianCalendar(5000, 11, 20);
+        final GregorianCalendar gc = new GregorianCalendar(5000, Calendar.DECEMBER, 20);
         jc.set("now2", gc.getTime());
         jc.set("bdec", new BigDecimal("7"));
         jc.set("bint", new BigInteger("7"));
@@ -513,7 +507,7 @@ public final class JexlTest extends JexlTestCase {
     void testIntProperty() {
         final Foo foo = new Foo();
 
-        // lets check the square function first.
+        // let's check the square function first.
         assertEquals(4, foo.square(2));
         assertEquals(4, foo.square(-2));
 
@@ -574,7 +568,7 @@ public final class JexlTest extends JexlTestCase {
     }
 
     /**
-     * test the new function e.g constructor invocation
+     * Test the new function e.g. constructor invocation.
      */
     @Test
     void testNew() {
@@ -762,8 +756,7 @@ public final class JexlTest extends JexlTestCase {
     }
 
     /**
-     * Simple test of '+' as a string concatenation operator
-     * @throws Exception
+     * Simple test of '+' as a string concatenation operator.
      */
     @Test
     void testStringConcatenation() {

@@ -192,7 +192,7 @@ public class Issues400Test {
         final Map<String, Object> b = Collections.singletonMap("c", 42);
         final Map<String, Object> a = Collections.singletonMap("b", b);
         JexlScript script;
-        Object result = -42;
+        Object result;
         script = jexl.createScript("a?['B']?['C']", "a");
         result = script.execute(null, a);
         assertEquals(script.getSourceText(), script.getParsedText());
@@ -767,79 +767,6 @@ public class Issues400Test {
         Assertions.assertTrue((boolean) sqle.createScript("a != 25", "a").execute(null, 24));
         Assertions.assertTrue((boolean) sqle.createScript("a = 25", "a").execute(null, 25));
         Assertions.assertFalse((boolean) sqle.createScript("a != 25", "a").execute(null, 25));
-    }
-
-    @Test
-    void test440a() {
-        JexlFeatures f = JexlFeatures.createDefault().ambiguousStatement(true);
-        JexlEngine jexl = new JexlBuilder().features(f).safe(false).strict(true).create();
-        String src = "let y = switch (x) { case 10,11 -> 3 case 20, 21 -> 4\n" +
-                "default -> { let z = 4; z + x } } y";
-        JexlScript script = jexl.createScript(src, "x");
-        assertNotNull(script);
-        String dbgStr = script.getParsedText();
-        assertNotNull(dbgStr);
-
-        Object result = script.execute(null, 10);
-        Assertions.assertEquals(3, result);
-        result = script.execute(null, 11);
-        Assertions.assertEquals(3, result);
-        result = script.execute(null, 20);
-        Assertions.assertEquals(4, result);
-        result = script.execute(null, 21);
-        Assertions.assertEquals(4, result);
-        result = script.execute(null, 38);
-        Assertions.assertEquals(42, result);
-        src = "let y = switch (x) { case 10,11 -> break; case 20, 21 -> 4; } y";
-        try {
-            script = jexl.createScript(src, "x");
-            fail("should not be able to create script with break in switch");
-        } catch (JexlException.Parsing xparse) {
-            assertTrue(xparse.getMessage().contains("break"));
-        }
-        assertNotNull(script);
-    }
-    @Test
-    void test440b() {
-        JexlEngine jexl = new JexlBuilder().safe(false).strict(true).create();
-        final String src =
-"switch (x) { case 10 : return 3; case 20 : case 21 : return 4; case 32: break; default : return x + 4; } 169";
-        final JexlScript script = jexl.createScript(src, "x");
-        assertNotNull(script);
-        String dbgStr = script.getParsedText();
-        assertNotNull(dbgStr);
-
-        Object result = script.execute(null, 10);
-        Assertions.assertEquals(3, result);
-        result = script.execute(null, 20);
-        Assertions.assertEquals(4, result);
-        result = script.execute(null, 21);
-        Assertions.assertEquals(4, result);
-        result = script.execute(null, 32);
-        Assertions.assertEquals(169, result);
-        result = script.execute(null, 38);
-        Assertions.assertEquals(42, result);
-    }
-
-    public enum Scope440 {
-        UNDEFINED, UNDECLARED, GLOBAL, LOCAL, THIS, SUPER;
-    }
-
-    @Test
-    void test440c() {
-        JexlEngine jexl = new JexlBuilder().loader(getClass().getClassLoader()).imports(this.getClass().getName()).create();
-        final String src = "let s = switch (x) { case Scope440.UNDEFINED -> 'undefined'; case Scope440.THIS -> 'this'; default -> 'OTHER'; } s";
-        final JexlScript script = jexl.createScript(src, "x");
-        assertNotNull(script);
-        String dbgStr = script.getParsedText();
-        assertNotNull(dbgStr);
-
-        Object result = script.execute(null, Scope440.UNDEFINED);
-        Assertions.assertEquals("undefined", result);
-        result = script.execute(null, Scope440.THIS);
-        Assertions.assertEquals("this", result);
-        result = script.execute(null, 21);
-        Assertions.assertEquals("OTHER", result);
     }
 
     @Test

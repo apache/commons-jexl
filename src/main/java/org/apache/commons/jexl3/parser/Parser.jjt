@@ -92,11 +92,7 @@ public final class Parser extends JexlParser
             throw new JexlException.Tokenization(info, xtme).clean();
         } catch (ParseException xparse) {
             Token errortok = errorToken(jj_lastpos, jj_scanpos, token.next, token);
-            String msg = xparse.getMessage();
-            if (msg.endsWith(";")) {
-              msg = errortok.image;
-            }
-            throw new JexlException.Parsing(info.at(errortok.beginLine, errortok.beginColumn), msg).clean();
+            throw new JexlException.Parsing(info.at(errortok.beginLine, errortok.beginColumn), errortok.image).clean();
         } finally {
             token_source.defaultLexState = DEFAULT;
             cleanup(previous);
