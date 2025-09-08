@@ -99,7 +99,7 @@ public final class Parser extends JexlParser
             }
             throw new JexlException.Parsing(info.at(errortok.beginLine, errortok.beginColumn), msg).clean();
         } finally {
-            token_source.defaultLexState = DEFAULT;
+            //token_source.defaultLexState = DEFAULT;
             cleanup(previous);
             jjtree.reset();
         }

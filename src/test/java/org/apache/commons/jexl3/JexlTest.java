@@ -36,6 +36,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import jdk.nashorn.internal.runtime.ParserException;
+import org.apache.commons.jexl3.parser.ParseException;
 import org.apache.commons.jexl3.parser.Parser;
 import org.junit.jupiter.api.Test;
 
@@ -139,7 +141,7 @@ public final class JexlTest extends JexlTestCase {
      * @throws Exception
      */
     @Test
-    void testAssignment() {
+    void testAssignment() throws ParseException {
         final JexlContext jc = new MapContext();
         jc.set("aString", "Hello");
         final Foo foo = new Foo();

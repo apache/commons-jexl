@@ -31,7 +31,7 @@ package org.apache.commons.jexl3.parser;
  * The functional goal is to a allow a <em>volatile</em> value in the node
  * so it can serve as a last evaluation cache even in multi-threaded executions.
  */
-public class SimpleNode implements Node {
+public class SimpleNode extends Node {
     /**
      */
     private static final long serialVersionUID = 1L;
@@ -39,8 +39,6 @@ public class SimpleNode implements Node {
     private JexlNode parent;
     /** The array of children nodes. */
     private JexlNode[] children;
-    /** The node type id. */
-    protected final int id;
     /** Volatile value so it can be used as a last evaluation cache. */
     private transient volatile Object value;
 
@@ -49,8 +47,9 @@ public class SimpleNode implements Node {
      * @param i the node type identifier
      */
     public SimpleNode(final int i) {
-        id = i;
+        super(i);
     }
+
 
     /**
      * Constructs a SimpleNode instance.

@@ -109,6 +109,32 @@
       <system>GitHub</system>
       <url>https://github.com/apache/commons-jexl/actions</url>
     </ciManagement>
+    <repositories>
+        <repository>
+            <name>Central Portal Snapshots</name>
+            <id>central-portal-snapshots</id>
+            <url>https://central.sonatype.com/repository/maven-snapshots/</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+    <pluginRepositories>
+        <pluginRepository>
+            <name>Plugin Portal Snapshots</name>
+            <id>plugin-portal-snapshots</id>
+            <url>https://central.sonatype.com/repository/maven-snapshots/</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </pluginRepository>
+    </pluginRepositories>
     <dependencies>
         <dependency>
             <groupId>commons-logging</groupId>
@@ -144,36 +170,12 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-    <repositories>
-        <repository>
-            <name>Central Portal Snapshots</name>
-            <id>central-portal-snapshots</id>
-            <url>https://central.sonatype.com/repository/maven-snapshots/</url>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
-    <!-- Added to get the Atmosphere 1.1.0-SNAPSHOT, can be removed when 1.1.0 is released -->
-    <repository>
-        <id>oss.sonatype.org-snapshot</id>
-        <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-        <releases>
-            <enabled>false</enabled>
-        </releases>
-        <snapshots>
-            <enabled>true</enabled>
-        </snapshots>
-    </repository>
-</repositories>
     <build>
         <defaultGoal>clean verify apache-rat:check spotbugs:check japicmp:cmp checkstyle:check javadoc:javadoc</defaultGoal>
     <pluginManagement>
       <plugins>
         <plugin>
-          <groupId>org.javacc.plugin</groupId>
+          <groupId>org.javacc</groupId>
           <artifactId>javacc-maven-plugin</artifactId>
           <version>${javacc-maven-plugin.version}</version>
           <dependencies>
@@ -190,6 +192,17 @@
             </dependency>
           </dependencies>
         </plugin>
+          <!-- all used processors artifacts -->
+          <plugin>
+              <groupId>org.javacc</groupId>
+              <artifactId>core</artifactId>
+              <version>${javacc.core.version}</version>
+          </plugin>
+          <plugin>
+              <groupId>org.javacc.generator</groupId>
+              <artifactId>java</artifactId>
+              <version>${javacc.java.version}</version>
+          </plugin>
       </plugins>
     </pluginManagement>
         <plugins>
@@ -221,7 +234,7 @@
 
             <!-- changed for JavaCC 8 -->
             <plugin>
-              <groupId>org.javacc.plugin</groupId>
+              <groupId>org.javacc</groupId>
               <artifactId>javacc-maven-plugin</artifactId>
               <executions>
                 <execution>
