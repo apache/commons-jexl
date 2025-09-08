@@ -30,6 +30,11 @@
     <url>https://commons.apache.org/proper/commons-jexl/</url>
     <inceptionYear>2001</inceptionYear>
     <properties>
+        <!-- added for JavaCC 8, to be changed later to published releases -->
+        <javacc-maven-plugin.version>3.8.0-SNAPSHOT</javacc-maven-plugin.version>
+        <javacc.core.version>8.1.0-SNAPSHOT</javacc.core.version>
+        <javacc.java.version>8.1.0-SNAPSHOT</javacc.java.version>
+    
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <commons.componentid>jexl</commons.componentid>
@@ -139,8 +144,54 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+    <repositories>
+        <repository>
+            <name>Central Portal Snapshots</name>
+            <id>central-portal-snapshots</id>
+            <url>https://central.sonatype.com/repository/maven-snapshots/</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+    <!-- Added to get the Atmosphere 1.1.0-SNAPSHOT, can be removed when 1.1.0 is released -->
+    <repository>
+        <id>oss.sonatype.org-snapshot</id>
+        <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        <releases>
+            <enabled>false</enabled>
+        </releases>
+        <snapshots>
+            <enabled>true</enabled>
+        </snapshots>
+    </repository>
+</repositories>
     <build>
         <defaultGoal>clean verify apache-rat:check spotbugs:check japicmp:cmp checkstyle:check javadoc:javadoc</defaultGoal>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.javacc.plugin</groupId>
+          <artifactId>javacc-maven-plugin</artifactId>
+          <version>${javacc-maven-plugin.version}</version>
+          <dependencies>
+            <!-- all used processors artifacts -->
+            <dependency>
+              <groupId>org.javacc</groupId>
+              <artifactId>core</artifactId>
+              <version>${javacc.core.version}</version>
+            </dependency>
+            <dependency>
+              <groupId>org.javacc.generator</groupId>
+              <artifactId>java</artifactId>
+              <version>${javacc.java.version}</version>
+            </dependency>
+          </dependencies>
+        </plugin>
+      </plugins>
+    </pluginManagement>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -168,6 +219,38 @@
                 </configuration>
             </plugin>
 
+            <!-- changed for JavaCC 8 -->
+            <plugin>
+              <groupId>org.javacc.plugin</groupId>
+              <artifactId>javacc-maven-plugin</artifactId>
+              <executions>
+                <execution>
+                  <id>jexl-jjtree</id>
+                  <phase>generate-sources</phase>
+                  <goals>
+                    <goal>jjtree-javacc</goal>
+                  </goals>
+                  <configuration>
+                    <keepIntermediateDirectory>false</keepIntermediateDirectory> <!-- default -->
+                    <sourceDirectory>${basedir}/src/main/java/org/apache/commons/jexl3/parser</sourceDirectory>
+                    <jjtreeCmdLineArgs>
+                      <arg>-CODE_GENERATOR="Java"</arg>
+                      <arg>-GRAMMAR_ENCODING="UTF-8"</arg>
+                      <arg>-NODE_DIRECTORY="${project.basedir}/src/main/java"</arg>
+                      <arg>-NODE_PACKAGE="org.apache.commons.jexl3.parser"</arg>
+                      <arg>-JJTREE_OUTPUT_DIRECTORY="${project.build.directory}/generated-sources/jjtree"</arg>
+                    </jjtreeCmdLineArgs>
+                    <javaccCmdLineArgs>
+                      <arg>-CODE_GENERATOR="Java"</arg>
+                      <arg>-GRAMMAR_ENCODING="UTF-8"</arg>
+                      <!-- java and not the usual javacc dir... -->
+                      <arg>-OUTPUT_DIRECTORY="${project.build.directory}/generated-sources/java"</arg>
+                    </javaccCmdLineArgs>
+                  </configuration>
+                </execution>
+            </executions>
+            </plugin>
+            <!--
             <plugin>
                 <groupId>org.javacc.plugin</groupId>
                 <artifactId>javacc-maven-plugin</artifactId>
@@ -187,25 +270,26 @@
                     </execution>
                 </executions>
                 <dependencies>
-                    <!--
                     <dependency>
                         <groupId>net.java.dev.javacc</groupId>
                         <artifactId>javacc</artifactId>
                         <version>7.0.13</version>
                     </dependency>
-                    -->
                     <dependency>
                         <groupId>org.javacc</groupId>
                         <artifactId>core</artifactId>
                         <version>8.0.1</version>
+                        <version>8.0.6</version>
                     </dependency>
                     <dependency>
                         <groupId>org.javacc.generator</groupId>
                         <artifactId>java</artifactId>
                         <version>8.0.1</version>
+                        <version>8.0.6</version>
                     </dependency>
                 </dependencies>
             </plugin>
+            -->
 
             <!--
             <plugin>

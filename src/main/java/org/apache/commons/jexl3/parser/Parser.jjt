@@ -19,6 +19,7 @@
 options
 {
    MULTI=true;
+   SINGLE_TREE_FILE=false;
    STATIC=false;
    JAVA_TEMPLATE_TYPE="modern";
    VISITOR=true;
