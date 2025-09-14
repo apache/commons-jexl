@@ -53,7 +53,7 @@ public final class Parser extends JexlParser
         public Parser(JexlParser parser) {
             super(parser);
             jj_input_stream = new SimpleCharStream(new StringProvider(""), 1, 1);
-            token_source = new ParserTokenManager(jj_input_stream);
+            token_source = new ParserTokenManager(jj_input_stream, DEFAULT);
             token = new Token();
             token.next = jj_nt = token_source.getNextToken();
         }
@@ -100,6 +100,7 @@ public final class Parser extends JexlParser
             throw new JexlException.Parsing(info.at(errortok.beginLine, errortok.beginColumn), msg).clean();
         } finally {
             //token_source.defaultLexState = DEFAULT;
+            token_source.SwitchTo(DEFAULT);
             cleanup(previous);
             jjtree.reset();
         }
