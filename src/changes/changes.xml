@@ -55,7 +55,7 @@
             </action>
           <!-- UPDATE -->
           <action type="update" dev="ggregory" due-to="Gary Gregory, Dependabot">Bump org.apache.commons:commons-parent from 81 to 88 #344, #368, #372.</action>
-          <action type="update" dev="ggregory" due-to="Gary Gregory, Dependabot">Bump org.apache.commons:commons-lang3 from 3.17.0 to 3.18.0 #355.</action>
+          <action type="update" dev="ggregory" due-to="Gary Gregory, Dependabot">Bump org.apache.commons:commons-lang3 from 3.17.0 to 3.19.0 #355.</action>
           <action type="update" dev="ggregory" due-to="Gary Gregory, Dependabot">Bump com.google.code.gson:gson from 2.13.1 to 2.13.2 #371.</action>
         </release>
         <release version="3.5.0" date="2025-04-11"
