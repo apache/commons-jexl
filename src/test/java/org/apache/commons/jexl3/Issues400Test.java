@@ -28,6 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.Closeable;
+import java.io.File;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -799,6 +800,27 @@ public class Issues400Test {
         JexlScript script = jexl.createScript(code);
         Object result = script.execute(context);
         Assertions.assertEquals("hello world", result);
+    }
+
+
+    @Test
+    void testIssue447() {
+        JexlEngine jexl = new JexlBuilder().create();
+        String src = "const c = `${a}\n?= ${b}`; function foo(const left, const right) { `${left}\n?== ${right}` } c+foo(a, b)";
+        JexlScript script = jexl.createScript(src, "a", "b");
+        Object result = script.execute(null, "a", "b");
+        Assertions.assertEquals("a\n?= ba\n?== b", result);
+
+        final String TEST447 =  "src/test/scripts/test447.jexl";
+        final File src447 = new File(TEST447);
+        JexlScript script447 = jexl.createScript(src447);
+        Object result447 = script447.execute(null);
+        Assertions.assertInstanceOf(List.class, result447);
+        @SuppressWarnings("unchecked")
+        final List<Boolean> list = (List<Boolean>) result447;
+        for (Boolean item : list) {
+            Assertions.assertTrue(item);
+        }
     }
 }
 
