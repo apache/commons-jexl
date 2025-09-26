@@ -28,10 +28,10 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest]
-        java: [ 8, 11, 17, 21, 24 ]
+        java: [ 8, 11, 17, 21, 25 ]
         experimental: [false]
         include:
-          - java: 25-ea
+          - java: 26-ea
             os: windows-latest
             experimental: true
       fail-fast: false
