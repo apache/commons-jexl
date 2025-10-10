@@ -74,7 +74,7 @@
         <!-- project.build.outputTimestamp is managed by Maven plugins, see https://maven.apache.org/guides/mini/guide-reproducible-builds.html -->
         <project.build.outputTimestamp>2025-04-16T12:37:37Z</project.build.outputTimestamp>
         <!-- Attempt at Java 25 -->
-        <commons.asm.version>9.8</commons.asm.version>
+        <commons.asm.version>9.9</commons.asm.version>
         <!-- Commons release plugin -->
         <commons.bc.version>3.5.0</commons.bc.version>
         <commons.release.version>3.6.0</commons.release.version>
