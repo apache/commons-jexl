@@ -519,7 +519,7 @@ public class Issues400Test {
 
     @Test
     void test431b() {
-        JexlEngine jexl = new JexlBuilder().create();
+        final JexlEngine jexl = new JexlBuilder().create();
         final String src = "let x = 0; try(let error) { x += 19 } catch (let error) { return 169 } try { x += 23 } catch (let error) { return 169 }";
         final JexlScript script = jexl.createScript(src);
         assertNotNull(script);
@@ -616,7 +616,7 @@ public class Issues400Test {
 
     @Test
     void test437a() {
-        JexlEngine jexl = new JexlBuilder().create();
+        final JexlEngine jexl = new JexlBuilder().create();
         final String src = "let values = [...]\n"
                 + "function append(const value) {\n"
                 + "  values.add(value)\n"
@@ -629,15 +629,15 @@ public class Issues400Test {
         assertNotNull(script);
         final Object result = script.execute(null);
         assertInstanceOf(List.class, result);
-        List<?> values = (List<?>) result;
+        final List<?> values = (List<?>) result;
         assertEquals(2, values.size());
     }
 
     @Test
     void test437b() {
-        JexlFeatures features = JexlFeatures.createDefault().ambiguousStatement(true);
+        final JexlFeatures features = JexlFeatures.createDefault().ambiguousStatement(true);
         assertTrue(features.supportsAmbiguousStatement());
-        JexlEngine jexl = new JexlBuilder().features(features).create();
+        final JexlEngine jexl = new JexlBuilder().features(features).create();
         final String src = "let values = [...]"
                 + "function append(const value) {"
                 + "  values.add(value)"
@@ -649,7 +649,7 @@ public class Issues400Test {
         assertNotNull(script);
         final Object result = script.execute(null);
         assertInstanceOf(List.class, result);
-        List<?> values = (List<?>) result;
+        final List<?> values = (List<?>) result;
         assertEquals(2, values.size());
     }
 
@@ -772,16 +772,16 @@ public class Issues400Test {
 
     @Test
     void testIssue441() {
-        JexlEngine jexl = new JexlBuilder().create();
+        final JexlEngine jexl = new JexlBuilder().create();
         String ctl = "\nab\nc`d\n";
-        JexlExpression e = jexl.createExpression("`\nab\nc\\`d\n`");
+        final JexlExpression e = jexl.createExpression("`\nab\nc\\`d\n`");
         Object o = e.evaluate(null);
         Assertions.assertEquals(ctl, o);
 
-        JexlContext context = new MapContext();
+        final JexlContext context = new MapContext();
         context.set("name", "Hello");
-        String code = "return `${name + '\\n' + name}`;";
-        JexlScript script = jexl.createScript(code);
+        final String code = "return `${name + '\\n' + name}`;";
+        final JexlScript script = jexl.createScript(code);
         o = script.execute(context);
         ctl = "Hello\nHello";
         Assertions.assertEquals(ctl, o);
@@ -789,36 +789,36 @@ public class Issues400Test {
 
     @Test
     void testIssue442() {
-        JexlEngine jexl = new JexlBuilder().create();
-        JexlContext context = new MapContext();
-        String code = "var x = 'hello';\n" +
+        final JexlEngine jexl = new JexlBuilder().create();
+        final JexlContext context = new MapContext();
+        final String code = "var x = 'hello';\n" +
                 "function test(z) {\n" +
                 //"x + ' ' + z\n"+
                 "`${x} ${z}`;\n" +
                 "}\n" +
                 "test('world');";
-        JexlScript script = jexl.createScript(code);
-        Object result = script.execute(context);
+        final JexlScript script = jexl.createScript(code);
+        final Object result = script.execute(context);
         Assertions.assertEquals("hello world", result);
     }
 
 
     @Test
     void testIssue447() {
-        JexlEngine jexl = new JexlBuilder().create();
-        String src = "const c = `${a}\n?= ${b}`; function foo(const left, const right) { `${left}\n?== ${right}` } c+foo(a, b)";
-        JexlScript script = jexl.createScript(src, "a", "b");
-        Object result = script.execute(null, "a", "b");
+        final JexlEngine jexl = new JexlBuilder().create();
+        final String src = "const c = `${a}\n?= ${b}`; function foo(const left, const right) { `${left}\n?== ${right}` } c+foo(a, b)";
+        final JexlScript script = jexl.createScript(src, "a", "b");
+        final Object result = script.execute(null, "a", "b");
         Assertions.assertEquals("a\n?= ba\n?== b", result);
 
         final String TEST447 =  "src/test/scripts/test447.jexl";
         final File src447 = new File(TEST447);
-        JexlScript script447 = jexl.createScript(src447);
-        Object result447 = script447.execute(null);
+        final JexlScript script447 = jexl.createScript(src447);
+        final Object result447 = script447.execute(null);
         Assertions.assertInstanceOf(List.class, result447);
         @SuppressWarnings("unchecked")
         final List<Boolean> list = (List<Boolean>) result447;
-        for (Boolean item : list) {
+        for (final Boolean item : list) {
             Assertions.assertTrue(item);
         }
     }

@@ -221,7 +221,7 @@ class LambdaTest extends JexlTestCase {
             "'if (false) let foo = (x) -> { x + x }; var foo = 1', 'let'",
             "'function foo(x) { x + x }; var foo = 42', 'foo'"
     })
-    void testFailParseFunc(String src, String expectedKeyword) {
+    void testFailParseFunc(final String src, final String expectedKeyword) {
         final JexlEngine jexl = createEngine();
         final JexlException.Parsing xparse = assertThrows(JexlException.Parsing.class, () -> jexl.createScript(src));
         assertTrue(xparse.getMessage().contains(expectedKeyword));

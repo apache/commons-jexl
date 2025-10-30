@@ -36,7 +36,7 @@ public class SwitchTest extends JexlTestCase {
 
   @Test
   void testSwitchExpression() {
-    JexlEngine jexl = new JexlBuilder().safe(false).strict(true).create();
+    final JexlEngine jexl = new JexlBuilder().safe(false).strict(true).create();
     final JexlScript e = jexl.createScript("var j = switch(i) { case 1 -> 2; case 2 -> 3; default -> 4; }; j", "i");
     final JexlContext jc = new MapContext();
     final Object o = e.execute(jc, 1);
@@ -45,24 +45,24 @@ public class SwitchTest extends JexlTestCase {
 
   @Test
   void testBrokenSwitchExpression0() {
-    JexlEngine jexl = new JexlBuilder().safe(false).strict(true).create();
+    final JexlEngine jexl = new JexlBuilder().safe(false).strict(true).create();
     try {
       final JexlScript e = jexl.createScript("var j = switch(i) { case 1 -> return 2;  }; j", "i");
       fail("should not be able to create script with return in switch expression");
-    } catch (JexlException.Parsing xparse) {
+    } catch (final JexlException.Parsing xparse) {
       assertTrue(xparse.getMessage().contains("return"));
     }
     try {
       final JexlScript e = jexl.createScript("var j = switch(i) { case 1 -> break; }; j", "i");
       fail("should not be able to create script with break in switch expression");
-    } catch (JexlException.Parsing xparse) {
+    } catch (final JexlException.Parsing xparse) {
       assertTrue(xparse.getMessage().contains("break"));
     }
   }
 
   @Test
   void testSwitchStatement() {
-    JexlEngine jexl = new JexlBuilder().safe(false).strict(true).create();
+    final JexlEngine jexl = new JexlBuilder().safe(false).strict(true).create();
     final JexlScript e = jexl.createScript("switch(i) { case 1: i += 2; case 2: i += 3; default: i += 4; }; i + 33", "i");
     final JexlContext jc = new MapContext();
     final Object o = e.execute(jc, 2);
@@ -71,13 +71,13 @@ public class SwitchTest extends JexlTestCase {
 
   @Test
   void test440a() {
-    JexlFeatures f = JexlFeatures.createDefault().ambiguousStatement(true);
-    JexlEngine jexl = new JexlBuilder().features(f).safe(false).strict(true).create();
+    final JexlFeatures f = JexlFeatures.createDefault().ambiguousStatement(true);
+    final JexlEngine jexl = new JexlBuilder().features(f).safe(false).strict(true).create();
     String src =
             "let y = switch (x) { case 10,11 -> 3 case 20, 21 -> 4\n" + "default -> { let z = 4; z + x } } y";
     JexlScript script = jexl.createScript(src, "x");
     assertNotNull(script);
-    String dbgStr = script.getParsedText();
+    final String dbgStr = script.getParsedText();
     assertNotNull(dbgStr);
 
     Object result = script.execute(null, 10);
@@ -94,7 +94,7 @@ public class SwitchTest extends JexlTestCase {
     try {
       script = jexl.createScript(src, "x");
       fail("should not be able to create script with break in switch");
-    } catch (JexlException.Parsing xparse) {
+    } catch (final JexlException.Parsing xparse) {
       assertTrue(xparse.getMessage().contains("break"));
     }
     assertNotNull(script);
@@ -102,12 +102,12 @@ public class SwitchTest extends JexlTestCase {
 
   @Test
   void test440b() {
-    JexlEngine jexl = new JexlBuilder().safe(false).strict(true).create();
+    final JexlEngine jexl = new JexlBuilder().safe(false).strict(true).create();
     final String src =
             "switch (x) { case 10 : return 3; case 20 : case 21 : return 4; case 32: break; default : return x + 4; } 169";
     final JexlScript script = jexl.createScript(src, "x");
     assertNotNull(script);
-    String dbgStr = script.getParsedText();
+    final String dbgStr = script.getParsedText();
     assertNotNull(dbgStr);
 
     Object result = script.execute(null, 10);
@@ -128,12 +128,12 @@ public class SwitchTest extends JexlTestCase {
 
   @Test
   void test440c() {
-    JexlEngine jexl = new JexlBuilder().loader(getClass().getClassLoader()).imports(this.getClass().getName()).create();
+    final JexlEngine jexl = new JexlBuilder().loader(getClass().getClassLoader()).imports(this.getClass().getName()).create();
     final String src =
             "let s = switch (x) { case Scope440.UNDEFINED -> 'undefined'; case Scope440.THIS -> 'this'; default -> 'OTHER'; } s";
     final JexlScript script = jexl.createScript(src, "x");
     assertNotNull(script);
-    String dbgStr = script.getParsedText();
+    final String dbgStr = script.getParsedText();
     assertNotNull(dbgStr);
 
     Object result = script.execute(null, Scope440.UNDEFINED);
@@ -146,28 +146,28 @@ public class SwitchTest extends JexlTestCase {
 
   @Test
   void test440d() {
-    JexlEngine jexl = new JexlBuilder().loader(getClass().getClassLoader()).imports(this.getClass().getName()).create();
+    final JexlEngine jexl = new JexlBuilder().loader(getClass().getClassLoader()).imports(this.getClass().getName()).create();
     final String src = "let s = switch (x) { case Scope440.UNDEFINED -> 'undefined'; } s";
     final JexlScript script = jexl.createScript(src, "x");
     try {
       script.execute(null, Scope440.THIS);
       fail("should not be able to execute script with switch expression with no default");
-    } catch (JexlException xjexl) {
+    } catch (final JexlException xjexl) {
       assertTrue(xjexl.getMessage().contains("switch"));
     }
   }
 
   @Test
   void test440e() {
-    JexlEngine jexl = new JexlBuilder().loader(getClass().getClassLoader()).imports(this.getClass().getName()).create();
+    final JexlEngine jexl = new JexlBuilder().loader(getClass().getClassLoader()).imports(this.getClass().getName()).create();
     final String src = "function f(x) { switch (x) { case Scope440.UNDEFINED : return 'undefined'; } } f(x)";
     final JexlScript script = jexl.createScript(src, "x");
-    Object result = script.execute(null, Scope440.UNDEFINED);
+    final Object result = script.execute(null, Scope440.UNDEFINED);
     Assertions.assertEquals("undefined", result);
     try {
       script.execute(null, Scope440.THIS);
       fail("should not be able to execute script with switch expression with no default");
-    } catch (JexlException xjexl) {
+    } catch (final JexlException xjexl) {
       assertTrue(xjexl.getMessage().contains("switch"));
     }
   }
