@@ -60,7 +60,7 @@
                 Switch statement &amp; expressions
             </action>
           <!-- UPDATE -->
-          <action type="update" dev="ggregory" due-to="Gary Gregory, Dependabot">Bump org.apache.commons:commons-parent from 81 to 90 #344, #368, #372.</action>
+          <action type="update" dev="ggregory" due-to="Gary Gregory, Dependabot">Bump org.apache.commons:commons-parent from 81 to 91 #344, #368, #372.</action>
           <action type="update" dev="ggregory" due-to="Gary Gregory, Dependabot">Bump org.apache.commons:commons-lang3 from 3.17.0 to 3.19.0 #355.</action>
           <action type="update" dev="ggregory" due-to="Gary Gregory, Dependabot">Bump com.google.code.gson:gson from 2.13.1 to 2.13.2 #371.</action>
         </release>
