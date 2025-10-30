@@ -18,7 +18,7 @@
 <project name="JEXL">
     <bannerRight>
         <name>Apache Commons JEXL</name>
-        <src>images/jexl-logo-white.png</src>
+        <src>images/logo.png</src>
         <href>index.html</href>
     </bannerRight>
 
