@@ -48,7 +48,7 @@ public interface JexlScriptParser {
    * @return the parsed tree
    * @throws JexlException if any error occurred during parsing
    */
-  default ASTJexlScript jxltParse(JexlInfo info, JexlFeatures features, String src, Scope scope) {
+  default ASTJexlScript jxltParse(final JexlInfo info, final JexlFeatures features, final String src, final Scope scope) {
     return parse(info, features, src, scope);
   }
 

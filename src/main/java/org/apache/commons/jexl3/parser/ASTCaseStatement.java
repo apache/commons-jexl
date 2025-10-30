@@ -28,16 +28,16 @@ public class ASTCaseStatement extends JexlNode {
   /** The values of the case statement. */
   protected List<Object> values = Collections.emptyList();
 
-  public ASTCaseStatement(int id) {
+  public ASTCaseStatement(final int id) {
     super(id);
   }
 
   @Override
-  public Object jjtAccept(ParserVisitor visitor, Object data) {
+  public Object jjtAccept(final ParserVisitor visitor, final Object data) {
     return visitor.visit(this, data);
   }
 
-  public void setValue(Object value) {
+  public void setValue(final Object value) {
     if (value == null) {
       this.values = Collections.emptyList();
     } else {
@@ -45,7 +45,7 @@ public class ASTCaseStatement extends JexlNode {
     }
   }
 
-  public void setValues(List<Object> values) {
+  public void setValues(final List<Object> values) {
     if (values == null) {
       this.values = Collections.emptyList();
     } else if (values.size() == 1) {

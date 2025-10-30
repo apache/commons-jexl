@@ -47,7 +47,7 @@ public final class NumberParser implements Serializable {
         this(null);
     }
 
-    public NumberParser(Number number) {
+    public NumberParser(final Number number) {
         if (number != null) {
             this.literal = number;
             this.clazz = number.getClass();

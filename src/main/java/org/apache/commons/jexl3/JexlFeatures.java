@@ -742,8 +742,7 @@ public final class JexlFeatures {
      * @return true if statements can be ambiguous, false otherwise
      */
     public boolean supportsAmbiguousStatement() {
-        boolean sas = getFeature(AMBIGUOUS_STATEMENT);
-        return sas;
+        return getFeature(AMBIGUOUS_STATEMENT);
     }
 
     /**

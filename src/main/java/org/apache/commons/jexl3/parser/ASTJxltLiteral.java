@@ -68,9 +68,9 @@ public final class ASTJxltLiteral extends JexlNode implements JexlNode.JxltHandl
     void setLiteral(final String src, final Scope scope) {
         this.literal = src;
         if (src != null && !src.isEmpty()) {
-            JexlEngine jexl = JexlEngine.getThreadEngine();
+            final JexlEngine jexl = JexlEngine.getThreadEngine();
             if (jexl != null) {
-                JxltEngine jxlt = jexl.createJxltEngine();
+                final JxltEngine jxlt = jexl.createJxltEngine();
                 if (jxlt instanceof TemplateEngine) {
                   this.jxltExpression = ((TemplateEngine) jxlt).createExpression(jexlInfo(), src, scope);
                 }

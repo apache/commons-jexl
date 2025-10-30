@@ -124,7 +124,7 @@ public final class TemplateScript implements JxltEngine.Template {
      * @param blocks the list of blocks
      * @return the script source
      */
-    private static String callerScript(Block[] blocks) {
+    private static String callerScript(final Block[] blocks) {
         final StringBuilder strb = new StringBuilder();
         int nuexpr = 0;
         int line = 1;
@@ -197,7 +197,7 @@ public final class TemplateScript implements JxltEngine.Template {
         // create the caller script
         final Block[] blocks = jxlt.readTemplate(prefix, reader).toArray(new Block[0]);
         int verbatims = 0;
-        for(Block b : blocks) {
+        for(final Block b : blocks) {
             if (BlockType.VERBATIM == b.getType()) {
                 verbatims += 1;
             }
@@ -206,7 +206,7 @@ public final class TemplateScript implements JxltEngine.Template {
         // allow lambda defining params
         final JexlInfo info = jexlInfo == null ? jexl.createInfo() : jexlInfo;
         final Scope scope = parms == null ? null : new Scope(null, parms);
-        ASTJexlScript callerScript = jexl.jxltParse(info.at(1, 1), false, scriptSource, scope).script();
+        final ASTJexlScript callerScript = jexl.jxltParse(info.at(1, 1), false, scriptSource, scope).script();
         // seek the map of expression number to scope so we can parse Unified
         // expression blocks with the appropriate symbols
         final JexlNode.Info[] callSites = new JexlNode.Info[verbatims];

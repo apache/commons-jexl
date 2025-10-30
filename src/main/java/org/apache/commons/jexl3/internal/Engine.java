@@ -767,7 +767,7 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
     }
 
     @Override
-    public JexlUberspect.ClassConstantResolver createConstantResolver(Collection<String> imports) {
+    public JexlUberspect.ClassConstantResolver createConstantResolver(final Collection<String> imports) {
         return imports == null || imports.isEmpty()
                 ? classNameSolver
                 : new FqcnResolver(classNameSolver).importPackages(imports);
@@ -807,7 +807,7 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
             }
         }
         final JexlInfo ninfo = info == null && debug ? createInfo() : info;
-        JexlEngine se = putThreadEngine(this);
+        final JexlEngine se = putThreadEngine(this);
         try {
             // if parser not in use...
             if (parsing.compareAndSet(false, true)) {

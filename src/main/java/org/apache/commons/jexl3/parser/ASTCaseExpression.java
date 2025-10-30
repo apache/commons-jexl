@@ -19,12 +19,12 @@ package org.apache.commons.jexl3.parser;
 
 public class ASTCaseExpression extends ASTCaseStatement {
 
-  public ASTCaseExpression(int id) {
+  public ASTCaseExpression(final int id) {
     super(id);
   }
 
   @Override
-  public Object jjtAccept(ParserVisitor visitor, Object data) {
+  public Object jjtAccept(final ParserVisitor visitor, final Object data) {
     return visitor.visit(this, data);
   }
 }

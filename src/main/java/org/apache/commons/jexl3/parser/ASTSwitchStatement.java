@@ -31,12 +31,12 @@ public class ASTSwitchStatement extends JexlNode {
    */
   protected Map<Object, Integer> cases = Collections.emptyMap();
 
-  public ASTSwitchStatement(int id) {
+  public ASTSwitchStatement(final int id) {
     super(id);
   }
 
   @Override
-  public Object jjtAccept(ParserVisitor visitor, Object data) {
+  public Object jjtAccept(final ParserVisitor visitor, final Object data) {
     return visitor.visit(this, data);
   }
 
@@ -50,9 +50,10 @@ public class ASTSwitchStatement extends JexlNode {
    */
   public List<Object>[] getCasesList() {
     @SuppressWarnings("unchecked")
+    final
     List<Object>[] list = (List<Object>[]) new List[jjtGetNumChildren() -1];
-    for (Map.Entry<Object, Integer> entry : cases.entrySet()) {
-      int index = entry.getValue();
+    for (final Map.Entry<Object, Integer> entry : cases.entrySet()) {
+      final int index = entry.getValue();
       if (index < 0 || index >= list.length) {
         throw new IndexOutOfBoundsException("switch index out of bounds: " + index);
       }
@@ -66,7 +67,7 @@ public class ASTSwitchStatement extends JexlNode {
   }
 
   @SuppressWarnings("unchecked")
-  public void setCases(Map cases) {
+  public void setCases(final Map cases) {
     this.cases = cases == null ? Collections.emptyMap() : (Map<Object, Integer>) cases;
   }
 
@@ -74,8 +75,8 @@ public class ASTSwitchStatement extends JexlNode {
     return cases;
   }
 
-  public int switchIndex(Object value) {
-    Object code = JexlParser.switchCode(value);
+  public int switchIndex(final Object value) {
+    final Object code = JexlParser.switchCode(value);
     Integer index = cases.get(code);
     if (index == null) {
       index = cases.get(JexlParser.DFLT);
@@ -95,16 +96,15 @@ public class ASTSwitchStatement extends JexlNode {
     private boolean defaultDefined = false;
     private final Map<Object, Integer> dispatch = new LinkedHashMap<>();
 
-    void defineCase(JexlParser.SwitchSet constants) throws ParseException {
+    void defineCase(final JexlParser.SwitchSet constants) throws ParseException {
       if (constants.isEmpty()) {
         if (defaultDefined) {
           throw new ParseException("default clause is already defined");
-        } else {
-          defaultDefined = true;
-          dispatch.put(JexlParser.DFLT, nswitch);
         }
+        defaultDefined = true;
+          dispatch.put(JexlParser.DFLT, nswitch);
       } else {
-        for (Object constant : constants) {
+        for (final Object constant : constants) {
           if (dispatch.put(constant == null ? JexlParser.NIL : constant, nswitch) != null) {
             throw new ParseException("duplicate case in switch statement for value: " + constant);
           }
@@ -114,7 +114,7 @@ public class ASTSwitchStatement extends JexlNode {
       nswitch += 1;
     }
 
-    void defineSwitch(ASTSwitchStatement statement) {
+    void defineSwitch(final ASTSwitchStatement statement) {
       statement.cases = dispatch;
     }
   }

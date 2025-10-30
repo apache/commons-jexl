@@ -202,18 +202,16 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
     protected final List<String> imports;
 
 
-    void addImport(String importName) {
-        if (importName != null && !importName.isEmpty()) {
-            if (!imports.contains(importName)) {
-                imports.add(importName);
-            }
+    void addImport(final String importName) {
+        if (importName != null && !importName.isEmpty() && !imports.contains(importName)) {
+            imports.add(importName);
         }
     }
 
-    Object resolveConstant(String name) {
+    Object resolveConstant(final String name) {
         JexlUberspect.ClassConstantResolver resolver = fqcnResolver.get();
         if (resolver == null) {
-            JexlEngine engine = JexlEngine.getThreadEngine();
+            final JexlEngine engine = JexlEngine.getThreadEngine();
             if (engine instanceof JexlUberspect.ConstantResolverFactory) {
                 resolver = ((JexlUberspect.ConstantResolverFactory) engine).createConstantResolver(imports);
                 fqcnResolver.set(resolver);
@@ -273,7 +271,7 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
      * This is the constructor used to create a parser for template expressions.
      * </p>
      */
-    protected JexlParser(JexlParser parser) {
+    protected JexlParser(final JexlParser parser) {
         this.info = null;
         this.source = null;
         if (parser != null) {
@@ -333,7 +331,7 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
      * @param value the value
      * @return the encoded value, which is either the value itself, or NAN (for NaN) or NIL (for null)
      */
-    static Object switchCode(Object value) {
+    static Object switchCode(final Object value) {
         if (value == null) {
             return NIL;
         }
@@ -348,7 +346,7 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
      * @param value an encoded value, which is either a value or NAN (for NaN) or NIL (for null)
      * @return the decoded value
      */
-    static Object switchDecode(Object value) {
+    static Object switchDecode(final Object value) {
         if (value == NIL) {
             return null;
         }
@@ -370,8 +368,8 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
          * Adds a collection of values to the set.
          * @param values the values to add
          */
-        void addAll(Collection<Object> values) {
-            for (Object value : values) {
+        void addAll(final Collection<Object> values) {
+            for (final Object value : values) {
                 add(value);
             }
         }
@@ -380,8 +378,8 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
          * Adds a value to the set.
          * @param value the value to add
          */
-        void add(Object value) {
-            Object code = switchCode(value);
+        void add(final Object value) {
+            final Object code = switchCode(value);
             if (!values.add(code)) {
                 throw new JexlException.Parsing(info, "duplicate constant value: " + value);
             }
@@ -569,7 +567,7 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
         // function is const fun...
         if (declareSymbol(symbol)) {
             scope.addLexical(symbol);
-            LexicalUnit block = getUnit();
+            final LexicalUnit block = getUnit();
             block.setConstant(symbol);
         } else {
             if (getFeatures().isLexical()) {
@@ -602,7 +600,7 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
         final int symbol = scope.declareParameter(identifier);
         // not sure how declaring a parameter could fail...
         // lexical feature error
-        LexicalUnit block = getUnit();
+        final LexicalUnit block = getUnit();
         if (!block.declareSymbol(symbol)) {
             if (lexical || getFeatures().isLexical()) {
                 final JexlInfo xinfo = info.at(token.beginLine, token.beginColumn);
@@ -682,7 +680,7 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
                 break;
             }
         }
-        LexicalUnit block = getUnit();
+        final LexicalUnit block = getUnit();
         return block == null || block.declareSymbol(symbol);
     }
 
@@ -725,8 +723,7 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
         } else if (lexical) {
             scope.addLexical(symbol);
             if (constant) {
-                LexicalUnit block = getUnit();
-                block.setConstant(symbol);
+                getUnit().setConstant(symbol);
             }
         }
     }
@@ -781,7 +778,7 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
      */
     private boolean isConstant(final int symbol) {
         if (symbol >= 0) {
-            LexicalUnit block = getUnit();
+            final LexicalUnit block = getUnit();
             if (block != null && block.hasSymbol(symbol)) {
                 return block.isConstant(symbol);
             }
@@ -892,7 +889,7 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
      * @return true if a variable with that name was declared
      */
     protected boolean isVariable(final String name) {
-        Scope scope = scopeReference.get();
+        final Scope scope = scopeReference.get();
         return scope != null && scope.getSymbol(name) != null;
     }
 
@@ -905,10 +902,10 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
      * @param semicolon the semicolon token kind
      * @return true if statement is ambiguous, false otherwise
      */
-    protected boolean isAmbiguousStatement(int semicolon) {
+    protected boolean isAmbiguousStatement(final int semicolon) {
         if (autoSemicolon) {
-            Token current = getToken(0);
-            Token next = getToken(1);
+            final Token current = getToken(0);
+            final Token next = getToken(1);
             if (current != null && next != null && current.endLine != next.beginLine) {
                 // if the next token is on a different line, no ambiguity reported
                 return false;
@@ -934,7 +931,7 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
             }
             final ASTJexlScript script = (ASTJexlScript) node;
             // reaccess in case local variables have been declared
-            Scope scope = scopeReference.get();
+            final Scope scope = scopeReference.get();
             if (script.getScope() != scope) {
                 script.setScope(scope);
             }
@@ -967,7 +964,7 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
      * @return the parsed tree
      */
     @Override
-    public ASTJexlScript jxltParse(JexlInfo info, JexlFeatures features, String src, Scope scope) {
+    public ASTJexlScript jxltParse(final JexlInfo info, final JexlFeatures features, final String src, final Scope scope) {
         return new Parser(this).parse(info, features, src, scope);
     }
 
@@ -1002,7 +999,7 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
      * Pops back to previous local variable scope.
      */
     protected void popScope() {
-        Scope scope = scopes.isEmpty() ? null : scopes.pop();
+        final Scope scope = scopes.isEmpty() ? null : scopes.pop();
         scopeReference.set(scope);
         if (!loopCounts.isEmpty()) {
             loopCount.set(loopCounts.pop());
@@ -1014,7 +1011,7 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
      * @param unit restores the previous lexical scope
      */
     protected void popUnit(final LexicalUnit unit) {
-        LexicalUnit block = blockReference.get();
+        final LexicalUnit block = blockReference.get();
         if (block == unit){
             blockScopes.remove(unit);
             blockReference.set(blocks.isEmpty()? null : blocks.pop());
@@ -1039,9 +1036,9 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
      * @param unit the new lexical unit
      */
     protected void pushUnit(final LexicalUnit unit) {
-        Scope scope = scopeReference.get();
+        final Scope scope = scopeReference.get();
         blockScopes.put(unit, scope);
-        LexicalUnit block = blockReference.get();
+        final LexicalUnit block = blockReference.get();
         if (block != null) {
             blocks.push(block);
         }

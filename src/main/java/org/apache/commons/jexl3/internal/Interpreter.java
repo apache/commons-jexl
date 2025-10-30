@@ -380,7 +380,7 @@ public class Interpreter extends InterpreterBase {
      * @param <NODE> the node type
      */
     private <NODE extends JexlNode & JexlNode.JxltHandle> Object evalJxltHandle(final NODE node) {
-        JxltEngine.Expression expr = node.getExpression();
+        final JxltEngine.Expression expr = node.getExpression();
         // internal classes to evaluate in context
         if (expr instanceof TemplateEngine.TemplateExpression) {
             final Object eval = ((TemplateEngine.TemplateExpression) expr).evaluate(context, frame, options);
@@ -1221,7 +1221,7 @@ public class Interpreter extends InterpreterBase {
     }
 
     @Override
-    protected Object visit(ASTCaseStatement node, Object data) {
+    protected Object visit(final ASTCaseStatement node, final Object data) {
         final int argc = node.jjtGetNumChildren();
         Object result = null;
         for (int i = 0; i < argc; i++) {
@@ -1231,7 +1231,7 @@ public class Interpreter extends InterpreterBase {
     }
 
     @Override
-    protected Object visit(ASTCaseExpression node, Object data) {
+    protected Object visit(final ASTCaseExpression node, final Object data) {
         return node.jjtGetChild(0).jjtAccept(this, data);
     }
 
@@ -2029,7 +2029,7 @@ public class Interpreter extends InterpreterBase {
     protected Object visit(final ASTSwitchStatement node, final Object data) {
         final int count = node.jjtGetNumChildren();
         Object value = node.jjtGetChild(0).jjtAccept(this, data);
-        int index = node.switchIndex(value);
+        final int index = node.switchIndex(value);
         if (index > 0) {
             for (int i = index; i < count; ++i) {
                 try {
