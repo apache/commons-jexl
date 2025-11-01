@@ -15,32 +15,35 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 -->
-<project name="JEXL">
-    <bannerRight>
-        <name>Apache Commons JEXL</name>
-        <src>images/logo.png</src>
-        <href>index.html</href>
-    </bannerRight>
-
-    <body>
-        <menu name="JEXL">
-            <item name="Overview"                href="index.html" />
-            <item name="Release Notes"           href="relnotes35.html"/>
-            <item name="Javadoc 3.6"             href="apidocs/index.html"/>
-            <item name="Javadoc 2.1.1"           href="javadocs/apidocs-2.1.1/index.html"/>
-            <item name="Javadoc 1.1"             href="javadocs/apidocs-1.1/index.html"/>
-            <item name="Download"                href="download_jexl.cgi"/>
-            <item name="Reference"               href="reference/index.html"/>
-        </menu>
-
-        <menu name="Development">
-            <item name="Mailing Lists"           href="mail-lists.html"/>
-            <item name="Issue Tracking"          href="issue-tracking.html"/>
-            <item name="Source Repository"       href="scm.html"/>
-            <item name="Building"                href="building.html"/>
-            <item name="Javadoc (SVN latest)"    href="apidocs/index.html"/>
-        </menu>
-
-    </body>
-
-</project>
+<site xmlns="http://maven.apache.org/SITE/2.0.0" 
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/SITE/2.0.0 http://maven.apache.org/xsd/site-2.0.0.xsd"
+  name="Apache Commons JEXL">
+  <bannerRight name="Commons JEXL" href="/index.html">
+    <image src="/images/logo.png"/>
+  </bannerRight>
+  <body>
+    <menu name="Commons JEXL">
+      <!-- Start: For all components. -->
+      <item name="About" href="/index.html" />
+      <item name="Asking Questions" href="/mail-lists.html" />
+      <item name="Release History" href="/changes.html" />
+      <item name="Issue Tracking" href="/issue-management.html" />
+      <item name="Dependency Management" href="/dependency-info.html" />
+      <item name="Sources" href="/scm.html" />
+      <item name="Security" href="/security.html" />
+      <item name="License" href="https://www.apache.org/licenses/LICENSE-2.0" />
+      <item name="Code of Conduct" href="https://www.apache.org/foundation/policies/conduct.html" />
+      <item name="Download" href="/download_io.cgi" />
+      <item name="Javadoc">
+        <item name="Javadoc Current"          href="/apidocs/index.html" />
+        <item name="Javadoc Archive"          href="https://javadoc.io/doc/commons-io/commons-io" />
+        <item name="Javadoc Last 2.x (2.1.1)" href="javadocs/apidocs-2.1.1/index.html"/>
+        <item name="Javadoc Last 1.x (1.1)"   href="javadocs/apidocs-1.1/index.html"/>
+      </item>
+      <!-- End: For all components. -->
+      <item name="Release Notes"           href="relnotes35.html"/>
+      <item name="Reference"               href="reference/index.html"/>
+    </menu>
+  </body>
+</site>
