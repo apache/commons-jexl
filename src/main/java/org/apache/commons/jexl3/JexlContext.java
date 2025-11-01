@@ -46,6 +46,7 @@ public interface JexlContext {
      * It is used by the interpreter during evaluation to execute annotation evaluations.
      * <p>If the JexlContext is not an instance of an AnnotationProcessor, encountering an annotation will generate
      * an error or a warning depending on the engine strictness.
+     *
      * @since 3.1
      */
     interface AnnotationProcessor {
@@ -71,6 +72,7 @@ public interface JexlContext {
      * of its cancellation through the context. It uses the same interpreter logic
      * that reacts to cancellation and is an alternative to using callable() and/or
      * interrupting script interpreter threads.
+     *
      * @since 3.2
      */
     interface CancellationHandle {
@@ -83,6 +85,7 @@ public interface JexlContext {
 
     /**
      * A marker interface that solves a simple class name into a fully-qualified one.
+     *
      * @since 3.3
      */
     interface ClassNameResolver extends JexlUberspect.ClassNameResolver {}
@@ -90,6 +93,7 @@ public interface JexlContext {
     /**
      * A marker interface of the JexlContext that processes module definitions.
      * It is used by the interpreter during evaluation of the pragma module definitions.
+     *
      * @since 3.3
      */
     interface ModuleProcessor {
@@ -97,6 +101,7 @@ public interface JexlContext {
          * Defines a module.
          * The module name will be the namespace mapped to the object returned by the evaluation
          * of its body.
+         *
          * @param engine the engine evaluating this module pragma
          * @param info the info at the pragma location
          * @param name the module name
@@ -115,6 +120,7 @@ public interface JexlContext {
     interface NamespaceFunctor {
         /**
          * Creates the functor object that will be used instead of the namespace.
+         *
          * @param context the context
          * @return the namespace functor instance
          */
@@ -157,6 +163,7 @@ public interface JexlContext {
          * of the context handled JexlOptions instance used for the duration of the execution;
          * the context handled JexlOptions instance being only used as the source of that copy,
          * it can safely alter its boolean flags during execution with no effect, avoiding any behavior ambiguity.
+         *
          * @return the engine options
          */
         JexlOptions getEngineOptions();
@@ -170,8 +177,10 @@ public interface JexlContext {
      * @since 3.2
      */
     interface PragmaProcessor {
+
         /**
          * Process one pragma.
+         *
          * @param opts the current evaluator options
          * @param key the key
          * @param value the value
@@ -183,6 +192,7 @@ public interface JexlContext {
 
         /**
          * Process one pragma.
+         *
          * <p>Never called in 3.3, must be implemented for 3.2 binary compatibility reasons.</p>
          * <p>Typical implementation in 3.3:</p>
          * <code>
@@ -191,6 +201,7 @@ public interface JexlContext {
          *             processPragma(null, key, value);
          *         }
          * </code>
+         *
          * @param key the key
          * @param value the value
          * @deprecated 3.3
@@ -200,13 +211,15 @@ public interface JexlContext {
     }
 
     /**
-     * A marker interface  of the JexlContext that indicates the interpreter to put this context
-     * in the JexlEngine thread local context instance during evaluation.
+     * A marker interface of the {@link JexlContext} that indicates the interpreter to put this context
+     * in the {@link JexlEngine} thread local context instance during evaluation.
+     * <p>
      * This allows user functions or methods to access the context during a call.
-     * Note that the usual caveats wrt using thread local apply (caching/leaking references, etc.); in particular,
+     * Note that the usual caveats regarding using thread local apply (caching, leaking references, and so on); in particular,
      * keeping a reference to such a context is to be considered with great care and caution.
      * It should also be noted that sharing such a context between threads should implicate synchronizing variable
      * accessing the implementation class.
+     * </p>
      *
      * @see JexlEngine#setThreadContext(JexlContext.ThreadLocal)
      * @see JexlEngine#getThreadContext()
