@@ -754,7 +754,7 @@ class Issues300Test {
         JexlEngine jexl = new JexlBuilder().safe(true).create();
         final JexlScript script = jexl.createScript(src);
         Object result = script.execute(null);
-        // safe navigation is lenient wrt null
+        // Safe navigation is lenient regarding null.
         assertFalse((Boolean) result);
 
         jexl = new JexlBuilder().strict(true).safe(false).create();
