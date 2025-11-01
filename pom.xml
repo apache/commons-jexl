@@ -33,6 +33,7 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <commons.componentid>jexl</commons.componentid>
+        <commons.packageId>jexl3</commons.packageId>
         <commons.module.name>org.apache.commons.jexl3</commons.module.name>
         <commons.site.path>jexl</commons.site.path>
         <commons.scmPubUrl>https://svn.apache.org/repos/infra/websites/production/commons/content/proper/commons-jexl</commons.scmPubUrl>
