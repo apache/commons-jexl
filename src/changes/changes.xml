@@ -31,10 +31,10 @@
                  description="This is a feature and maintenance release. Java 8 or later is required.">
             <!-- FIX -->
             <action dev="henrib" type="fix" issue="JEXL-447" due-to="William Price">
-                Regression in script-defined functions
+                Regression in script-defined functions.
             </action>
             <action dev="William Price" type="fix" issue="JEXL-446" due-to="William Price">
-                ClassTool module inspection is too strict
+                ClassTool module inspection is too strict.
             </action>
             <action dev="henrib" type="fix" issue="JEXL-442" due-to="Xu Pengcheng">
                 Local variables are not resolved in interpolation string expression.
@@ -43,21 +43,20 @@
                 Tokenization error if "\n" in template expression.
             </action>
             <action dev="henrib" type="fix" issue="JEXL-439" due-to="Xu Pengcheng">
-                When using reference capture, incorrect scoping when local variable redefines a captured symbol
+                When using reference capture, incorrect scoping when local variable redefines a captured symbol.
             </action>
             <action dev="henrib" type="fix" issue="JEXL-437" due-to="William Price">
-                Semicolons not actually optional between function calls on separate lines
+                Semicolons not actually optional between function calls on separate lines.
             </action>
             <action type="fix" dev="ggregory" due-to="Gary Gregory">
-                oac....AbstractExecutor.initMarker(Class, String, Class...) throws IllegalArgumentException instead of Error.
+                org.apache.commons.jexl3.internal.introspection.AbstractExecutor.initMarker(Class, String, Class...) throws IllegalArgumentException instead of Exception.
             </action>
             <action type="fix" dev="ggregory" due-to="Gary Gregory">
-                Reuse BigInteger constants instead of creating new
-                instances in org.apache.commons.jexl3.JexlArithmetic.toBigInteger(Object).
+                Reuse BigInteger constants instead of creating new instances in JexlArithmetic.toBigInteger(Object).
             </action>
             <!-- ADD -->
             <action dev="henrib" type="add" issue="JEXL-440">
-                Switch statement &amp; expressions
+                Switch statement &amp; expressions.
             </action>
           <!-- UPDATE -->
           <action type="update" dev="ggregory" due-to="Gary Gregory, Dependabot">Bump org.apache.commons:commons-parent from 81 to 91 #344, #368, #372.</action>
