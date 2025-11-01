@@ -767,7 +767,7 @@ public final class TemplateEngine extends JxltEngine {
      * @param reader the reader
      * @return the line iterator
      */
-    private static Iterator<CharSequence> readLines(final Reader reader) {
+    static Iterator<CharSequence> readLines(final Reader reader) {
         if (!reader.markSupported()) {
             throw new IllegalArgumentException("mark support in reader required");
         }
