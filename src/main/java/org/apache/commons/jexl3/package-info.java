@@ -391,7 +391,7 @@
  * and internal package classes imply you might have to re-adapt your code when new JEXL versions are released.
  * <p>
  * {@link org.apache.commons.jexl3.internal.Engine} can be
- * extended to let you capture your own configuration defaults wrt cache sizes and various flags.
+ * extended to let you capture your own configuration defaults regarding cache sizes and various flags.
  * Implementing your own cache - instead of the basic LinkedHashMap based one - would be
  * another possible extension.
  * </p>
