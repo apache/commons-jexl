@@ -156,14 +156,7 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
      * @return the dotted version
      */
     protected static String stringify(final Iterable<String> lstr) {
-        final StringBuilder strb = new StringBuilder();
-        for(final String str : lstr) {
-            if (strb.length() > 0) {
-               strb.append('.');
-            }
-            strb.append(str);
-        }
-        return strb.toString();
+        return String.join(".", lstr);
     }
     /**
      * The associated controller.
