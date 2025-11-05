@@ -127,6 +127,11 @@ public final class JexlFeatures {
     public static final int REF_CAPTURE = 24;
     /** Ambiguous or strict statement allowed. */
     public static final int AMBIGUOUS_STATEMENT = 25;
+    /** Bad naming, use AMBIGUOUS_STATEMENT.
+     * @deprecated 3.6
+     */
+    @Deprecated
+    public static final int STRICT_STATEMENT = 25;
     /**
      * All features.
      * Ensure this is updated if additional features are added.

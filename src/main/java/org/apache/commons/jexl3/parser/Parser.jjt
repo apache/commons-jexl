@@ -362,7 +362,7 @@ TOKEN_MGR_DECLS : {
   > : DEFAULT
 }
 
-<DEFAULT> TOKEN :
+<*> TOKEN :
 {
   < REGEX_LITERAL:
     "~" "/" (~["/","\n","\r","\t","\f","\b","\u2028","\u2029"] | "\\" "/" )* "/"
@@ -381,7 +381,7 @@ ASTJexlScript JexlScript(Scope frame, JexlFeatures features) : {
    {
         pushUnit(jjtThis);
    }
-        (LOOKAHEAD(<IMPORT>) Import())* ( LOOKAHEAD(<PRAGMA>) Pragma() | { controlPragmaAnywhere(); } Statement() )* <EOF>
+        ( Import())* ( Pragma() | { controlPragmaAnywhere(); } Statement() )* <EOF>
    {
         popUnit(jjtThis);
         return jjtThis.script();
@@ -408,37 +408,37 @@ void Annotation() #Annotation :
     Token t;
 }
 {
-    t=<ANNOTATION> { jjtThis.setName(t.image); } (LOOKAHEAD(<LPAREN>) Arguments() )?
+    t=<ANNOTATION> { jjtThis.setName(t.image); } (LOOKAHEAD(2) Arguments() )?
 }
 
 void AnnotatedStatement() #AnnotatedStatement : {}
  {
-    (LOOKAHEAD(<ANNOTATION>) Annotation())+ (LOOKAHEAD(1) Block() | Statement())
+    (LOOKAHEAD(2) Annotation())+ Statement()
  }
 
 void Statement() #void : {}
 {
-    LOOKAHEAD(<LET>|<CONST>|<VAR>) Var()
+    LOOKAHEAD(3) Var()
     |
-    LOOKAHEAD(<FUNCTION> <IDENTIFIER>) FunctionStatement()
+    LOOKAHEAD(3) FunctionStatement()
     |
-    StatementNoVar()
+    StatementSink()
 }
 
-void StatementNoVar() #void : {}
+void StatementSink() #void : {}
 {
     <SEMICOL>
-    | LOOKAHEAD(<ANNOTATION>) AnnotatedStatement()
-    | LOOKAHEAD(<IF>) IfStatement()
-    | LOOKAHEAD(<FOR>) ForeachStatement()
-    | LOOKAHEAD(<WHILE>) WhileStatement()
-    | LOOKAHEAD(<DO>) DoWhileStatement()
-    | LOOKAHEAD(<RETURN>) ReturnStatement()
-    | LOOKAHEAD(<CONTINUE>) Continue()
-    | LOOKAHEAD(<BREAK>) Break()
-    | LOOKAHEAD(<THROW>) ThrowStatement()
-    | LOOKAHEAD(<TRY>) TryStatement()
-    | LOOKAHEAD(<SWITCH>) SwitchStatement()
+    | AnnotatedStatement()
+    | IfStatement()
+    | ForeachStatement()
+    | WhileStatement()
+    | DoWhileStatement()
+    | ReturnStatement()
+    | Continue()
+    | Break()
+    | ThrowStatement()
+    | TryStatement()
+    | LOOKAHEAD(3) SwitchStatement()
     | LOOKAHEAD(LambdaLookahead()) Lambda()
     | LOOKAHEAD(Expression()) ExpressionStatement()
     | Block()
@@ -447,7 +447,7 @@ void StatementNoVar() #void : {}
 
 void Block() #Block : {}
 {
-    <LCURLY> { pushUnit(jjtThis); } ( LOOKAHEAD(<PRAGMA>)  Pragma() | Statement() )* { popUnit(jjtThis); } <RCURLY>
+    <LCURLY> { pushUnit(jjtThis); } ( Pragma() | Statement() )* { popUnit(jjtThis); } <RCURLY>
 }
 
 void FunctionStatement() #JexlLambda : {}
@@ -457,22 +457,22 @@ void FunctionStatement() #JexlLambda : {}
 
 void ExpressionStatement() #void : {}
 {
-    Expression() (LOOKAHEAD(Expression(), { isAmbiguousStatement(SEMICOL) } ) Expression() #Ambiguous(1))* (LOOKAHEAD(1) <SEMICOL>)*
+    Expression() (LOOKAHEAD(2, { isAmbiguousStatement(SEMICOL) } ) Expression() #Ambiguous(1))* (LOOKAHEAD(1) <SEMICOL>)?
 }
 
 
 void IfStatement() : {}
 {
-    <IF> <LPAREN> Expression() <RPAREN> (LOOKAHEAD(1) Block() | StatementNoVar())
-    ( LOOKAHEAD(2) <ELSE> <IF> <LPAREN> Expression() <RPAREN> (LOOKAHEAD(1) Block() | StatementNoVar()) )*
-    ( LOOKAHEAD(1) <ELSE>  (LOOKAHEAD(1) Block() | StatementNoVar()) )?
+    <IF> <LPAREN> Expression() <RPAREN> (LOOKAHEAD(1) Block() | StatementSink())
+    ( LOOKAHEAD(2) <ELSE> <IF> <LPAREN> Expression() <RPAREN> (LOOKAHEAD(1) Block() | StatementSink()) )*
+    ( LOOKAHEAD(1) <ELSE>  (LOOKAHEAD(1) Block() | StatementSink()) )?
 }
 
 void TryStatement() : {}
 {
-     <TRY> (LOOKAHEAD(1) TryResources() | Block())
-     (LOOKAHEAD(1) <CATCH> { pushUnit(jjtThis); } <LPAREN> InlineVar() <RPAREN> Block() { jjtThis.catchClause(); popUnit(jjtThis);})?
-     (LOOKAHEAD(1) <FINALLY>  Block() { jjtThis.finallyClause(); })?
+     <TRY> ( TryResources() | Block())
+     ( <CATCH> { pushUnit(jjtThis); } <LPAREN> InlineVar() <RPAREN> Block() { jjtThis.catchClause(); popUnit(jjtThis);})?
+     ( <FINALLY>  Block() { jjtThis.finallyClause(); } )?
 }
 
 void TryResources() : {}
@@ -496,12 +496,12 @@ LOOKAHEAD(2) Var() | Identifier(true)
 
 void WhileStatement() : {}
 {
-    <WHILE> <LPAREN> Expression() <RPAREN>  { loopCount.incrementAndGet(); }  (LOOKAHEAD(1) Block() | StatementNoVar()) { loopCount.decrementAndGet(); }
+    <WHILE> <LPAREN> Expression() <RPAREN>  { loopCount.incrementAndGet(); }  (LOOKAHEAD(1) Block() | StatementSink()) { loopCount.decrementAndGet(); }
 }
 
 void DoWhileStatement() : {}
 {
-    <DO> { loopCount.incrementAndGet(); } (LOOKAHEAD(1) Block() | StatementNoVar()) <WHILE> <LPAREN> Expression() <RPAREN> { loopCount.decrementAndGet(); }
+    <DO> { loopCount.incrementAndGet(); } (LOOKAHEAD(1) Block() | StatementSink()) <WHILE> <LPAREN> Expression() <RPAREN> { loopCount.decrementAndGet(); }
 }
 
 void ReturnStatement() : {
@@ -551,7 +551,7 @@ void ForeachStatement() : {
     {
         loopCount.incrementAndGet();
     }
-        (LOOKAHEAD(1) Block() | StatementNoVar() )
+        (LOOKAHEAD(1) Block() | StatementSink() )
     {
         loopCount.decrementAndGet();
         jjtThis.setLoopForm(loopForm);
@@ -617,13 +617,19 @@ void SwitchStatement() #SwitchStatement :
 }
 {
     <SWITCH> <LPAREN> Expression() <RPAREN> <LCURLY>
-      ( SwitchStatementCase(cases) { helper.defineCase(cases); } )*
+      ( LOOKAHEAD(SwitchStatementLookahead()) ( SwitchStatementCase(cases) { helper.defineCase(cases); } )*
+        |
+        { jjtThis.isStatement = false; pushLoop(); } ( SwitchExpressionCase(cases) { helper.defineCase(cases); } )*) { popLoop(); }
     <RCURLY>
 {
     helper.defineSwitch(jjtThis);
 }
 }
 
+void SwitchStatementLookahead() #void : {}
+{
+    <CASE> constLiteral() <COLON> | <CASE_DEFAULT> <COLON>
+}
 
 void SwitchStatementCase(SwitchSet cases) #CaseStatement :
 {
@@ -636,7 +642,7 @@ void SwitchStatementCase(SwitchSet cases) #CaseStatement :
         { constants = Collections.singletonList(constant); jjtThis.setValues(constants); cases.addAll(constants); } )+
         |
         <CASE_DEFAULT> <COLON> )
-    ( LOOKAHEAD(<LCURLY>) Block() | (StatementNoVar())+ )?
+    ( LOOKAHEAD(<LCURLY>) Block() | (StatementSink() )+ )?
 {
     loopCount.decrementAndGet();
 }
@@ -663,12 +669,10 @@ void SwitchExpressionCase(SwitchSet cases) #CaseExpression :
     List<Object> constants = new ArrayList<Object>(1);
 }
 {
-    ( LOOKAHEAD(2)
-        <CASE> ConstLiterals(constants) <LAMBDA> { cases.addAll(constants); jjtThis.setValues(constants); }
-        |
-        <CASE_DEFAULT> <LAMBDA>
-    )
-    ( LOOKAHEAD(3) Block() | Expression() (<SEMICOL>)?)
+   ( LOOKAHEAD(2) <CASE> ConstLiterals(constants) <LAMBDA> { cases.addAll(constants); jjtThis.setValues(constants); }
+    |
+    <CASE_DEFAULT> <LAMBDA> )
+    ( LOOKAHEAD(3) Block() | Expression() (<SEMICOL>)? )
 }
 
 void ConstLiterals(List<Object> constants) #void :

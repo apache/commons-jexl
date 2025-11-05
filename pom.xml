@@ -296,8 +296,6 @@
                         <onlyModified>true</onlyModified>
                         <accessModifier>protected</accessModifier>
                         <ignoreMissingClasses>true</ignoreMissingClasses>
-                        <breakBuildOnBinaryIncompatibleModifications>false</breakBuildOnBinaryIncompatibleModifications>
-                        <breakBuildIfCausedByExclusion>false</breakBuildIfCausedByExclusion>
                     </parameter>
                 </configuration>
             </plugin>

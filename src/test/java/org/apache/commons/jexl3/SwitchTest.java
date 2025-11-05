@@ -21,8 +21,12 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
+import org.apache.commons.jexl3.internal.Debugger;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Tests switch/case statement and expression.
@@ -47,13 +51,13 @@ public class SwitchTest extends JexlTestCase {
   void testBrokenSwitchExpression0() {
     final JexlEngine jexl = new JexlBuilder().safe(false).strict(true).create();
     try {
-      final JexlScript e = jexl.createScript("var j = switch(i) { case 1 -> return 2;  }; j", "i");
+      jexl.createScript("var j = switch(i) { case 1 -> return 2;  }; j", "i");
       fail("should not be able to create script with return in switch expression");
     } catch (final JexlException.Parsing xparse) {
       assertTrue(xparse.getMessage().contains("return"));
     }
     try {
-      final JexlScript e = jexl.createScript("var j = switch(i) { case 1 -> break; }; j", "i");
+      jexl.createScript("var j = switch(i) { case 1 -> break; }; j", "i");
       fail("should not be able to create script with break in switch expression");
     } catch (final JexlException.Parsing xparse) {
       assertTrue(xparse.getMessage().contains("break"));
@@ -104,7 +108,13 @@ public class SwitchTest extends JexlTestCase {
   void test440b() {
     final JexlEngine jexl = new JexlBuilder().safe(false).strict(true).create();
     final String src =
-            "switch (x) { case 10 : return 3; case 20 : case 21 : return 4; case 32: break; default : return x + 4; } 169";
+      "switch (x) {\n" +
+        " case 10 : return 3\n;" +
+        " case 20 : case 21 : return 4;\n" +
+        " case 32: break; \n" +
+        " default : return x + 4;\n" +
+      " }\n" +
+      " 169";
     final JexlScript script = jexl.createScript(src, "x");
     assertNotNull(script);
     final String dbgStr = script.getParsedText();
@@ -169,6 +179,77 @@ public class SwitchTest extends JexlTestCase {
       fail("should not be able to execute script with switch expression with no default");
     } catch (final JexlException xjexl) {
       assertTrue(xjexl.getMessage().contains("switch"));
+    }
+  }
+
+  @Test
+  void testSwitchStatement1() {
+    // a one statement script
+    String src = "switch (x) {\n"
+            + "  case 1: return 'one';\n"
+            + "  case 2: return 'two';\n"
+            + "  case 3: return 'three';\n"
+            + "  default: return 'many';\n"
+            + "}";
+    runSwitch(src);
+    String src2 = "if (true) { " + src + " }";
+    runSwitch(src2);
+  }
+
+  @Test
+  void testSwitchExpression1() {
+    // a one statement script that uses the expression syntax
+    String src = "switch (x) {\n"
+            + "  case 1 -> 'one';\n"
+            + "  case 2 -> 'two';\n"
+            + "  case 3 -> 'three';\n"
+            + "  default -> 'many';\n"
+            + "}";
+    runSwitch(src);
+    String src2 = "if (true) { " + src + " }";
+    runSwitch(src2);
+  }
+
+  void runSwitch(final String src) {
+    JexlEngine jexl = new JexlBuilder().create();
+    JexlScript script = jexl.createScript(src, "x");
+    Object result;
+    result = script.execute(null, 1);
+    Assertions.assertEquals("one", result);
+    result = script.execute(null, 2);
+    Assertions.assertEquals("two", result);
+    result = script.execute(null, 3);
+    Assertions.assertEquals("three", result);
+    result = script.execute(null, 4);
+    Assertions.assertEquals("many", result);
+    result = script.execute(null, 42);
+    Assertions.assertEquals("many", result);
+    final Debugger debugger = new Debugger();
+    assertTrue(debugger.debug(script));
+    final String dbgStr = debugger.toString();
+    assertTrue(JexlTestCase.equalsIgnoreWhiteSpace(src, dbgStr));
+  }
+
+  @Test
+  void testSwitchExpressionFail() {
+    List<String> err = Arrays.asList("break", "continue");
+    for (String keyword : err) {
+      switchExpressionFailKeyword(keyword);
+    }
+  }
+  private void switchExpressionFailKeyword(String keyword) {
+    // a one statement script that uses the expression syntax
+    String src = "switch (x) {\n"
+            + "  case 1 -> 'one';\n"
+            + "  case 2 -> " + keyword + ";\n"
+            + "  default -> 'many';\n"
+            + "}";
+    JexlEngine jexl = new JexlBuilder().create();
+    try {
+      jexl.createScript(src, "x");
+      fail("should not be able to create script with " + keyword + " in switch expression");
+    } catch (final JexlException.Parsing xparse) {
+      assertTrue(xparse.getMessage().contains(keyword));
     }
   }
 }

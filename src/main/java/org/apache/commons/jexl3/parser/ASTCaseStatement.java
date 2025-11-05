@@ -22,8 +22,6 @@ import java.util.Collections;
 import java.util.List;
 
 public class ASTCaseStatement extends JexlNode {
-  /** Pointless serial UID */
-  private static final long serialVersionUID = 1L;
 
   /** The values of the case statement. */
   protected List<Object> values = Collections.emptyList();
@@ -37,15 +35,7 @@ public class ASTCaseStatement extends JexlNode {
     return visitor.visit(this, data);
   }
 
-  public void setValue(final Object value) {
-    if (value == null) {
-      this.values = Collections.emptyList();
-    } else {
-      this.values = Collections.singletonList(value);
-    }
-  }
-
-  public void setValues(final List<Object> values) {
+  void setValues(final List<Object> values) {
     if (values == null) {
       this.values = Collections.emptyList();
     } else if (values.size() == 1) {

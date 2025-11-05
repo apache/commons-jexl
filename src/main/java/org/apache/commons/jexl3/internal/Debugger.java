@@ -52,7 +52,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
      */
     private static boolean isStatement(final JexlNode child) {
         if (child instanceof ASTCaseStatement) {
-            return isStatement(child.jjtGetChild(0));
+            return child.jjtGetNumChildren() > 0 && isStatement(child.jjtGetChild(0));
         }
         return child instanceof ASTJexlScript
                 || child instanceof ASTBlock
@@ -718,8 +718,23 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     }
 
     @Override
-    protected Object visit(final ASTCaseStatement node, final Object data) {
-        final List<Object> values = node.getValues();
+    protected Object visit(final ASTSwitchExpression node, Object data) {
+        return visit((ASTSwitchStatement) node, data);
+    }
+
+    @Override
+    protected Object visit(final ASTCaseStatement node, Object data) {
+        JexlNode parent = node.jjtGetParent();
+        boolean isStatement = parent instanceof ASTSwitchStatement && ((ASTSwitchStatement) parent).isStatement();
+        if (isStatement) {
+            return visitCaseStatement(node, data);
+        } else {
+            return visitCaseExpression(node, data);
+        }
+    }
+
+    private Object visitCaseStatement(ASTCaseStatement node, Object data) {
+        List<Object> values = node.getValues();
         if (values.isEmpty()) {
             // default case
             builder.append("default : ");
@@ -731,23 +746,24 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
                 builder.append(" : ");
             }
         }
-        accept(node.jjtGetChild(0), data);
+        if (node.jjtGetNumChildren() > 0) {
+            accept(node.jjtGetChild(0), data);
+        }
         return data;
     }
 
     @Override
-    protected Object visit(final ASTSwitchExpression node, final Object data) {
-        return visit((ASTSwitchStatement) node, data);
+    protected Object visit(ASTCaseExpression node, Object data) {
+        return visitCaseExpression(node, data);
     }
 
-    @Override
-    protected Object visit(final ASTCaseExpression node, final Object data) {
-        final List<Object> values = node.getValues();
+    private Object visitCaseExpression(final ASTCaseStatement node, Object data) {
+        List<Object> values = node.getValues();
         if (values.isEmpty()) {
             // default case
             builder.append("default -> ");
         } else {
-            builder.append("case -> ");
+            builder.append("case ");
             // regular case
             boolean first = true;
             for (final Object value : values) {
@@ -758,7 +774,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
                 }
                 acceptValue(builder, value, true);
             }
-            builder.append(" : ");
+            builder.append(" -> ");
         }
         accept(node.jjtGetChild(0), data);
         return data;

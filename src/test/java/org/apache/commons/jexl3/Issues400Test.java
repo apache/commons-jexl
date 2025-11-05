@@ -112,7 +112,7 @@ public class Issues400Test {
     @Test
     void test402() {
         final JexlContext jc = new MapContext();
-      // @formatter:off
+        // @formatter:off
       final String[] sources = {
         "if (true) { return }",
         "if (true) { 3; return }",
@@ -164,26 +164,26 @@ public class Issues400Test {
         final JexlEngine jexl = new JexlBuilder().cache(64).strict(true).safe(false).create();
         Map<String, Object> a = Collections.singletonMap("b", 42);
         // access is constant
-        for (final String src : new String[] { "a.b", "a?.b", "a['b']", "a?['b']", "a?.`b`" }) {
+        for (final String src : new String[]{"a.b", "a?.b", "a['b']", "a?['b']", "a?.`b`"}) {
             run404(jexl, src, a);
             run404(jexl, src + ";", a);
         }
         // access is variable
-        for (final String src : new String[] { "a[b]", "a?[b]", "a?.`${b}`" }) {
+        for (final String src : new String[]{"a[b]", "a?[b]", "a?.`${b}`"}) {
             run404(jexl, src, a, "b");
             run404(jexl, src + ";", a, "b");
         }
         // add a 3rd access
         final Map<String, Object> b = Collections.singletonMap("c", 42);
         a = Collections.singletonMap("b", b);
-        for (final String src : new String[] { "a[b].c", "a?[b]?['c']", "a?.`${b}`.c" }) {
+        for (final String src : new String[]{"a[b].c", "a?[b]?['c']", "a?.`${b}`.c"}) {
             run404(jexl, src, a, "b");
         }
     }
 
     @Test
     void test404b() {
-      // @formatter:off
+        // @formatter:off
       final JexlEngine jexl = new JexlBuilder()
           .cache(64)
           .strict(true)
@@ -213,13 +213,13 @@ public class Issues400Test {
         // can still do ternary, note the space between ? and [
         script = jexl.createScript("a? ['B']:['C']", "a");
         result = script.execute(null, a);
-        assertArrayEquals(new String[] { "B" }, (String[]) result);
+        assertArrayEquals(new String[]{"B"}, (String[]) result);
         script = jexl.createScript("a?['b'] ?: ['C']", "a");
         result = script.execute(null, a);
         assertEquals(b, result);
         script = jexl.createScript("a?['B'] ?: ['C']", "a");
         result = script.execute(null, a);
-        assertArrayEquals(new String[] { "C" }, (String[]) result);
+        assertArrayEquals(new String[]{"C"}, (String[]) result);
     }
 
     @Test
@@ -252,7 +252,7 @@ public class Issues400Test {
         final JexlScript script0 = jexl.createScript(src0, "x");
         final String src1 = "join(x, '*')";
         final JexlScript script1 = jexl.createScript(src1, "x");
-        for (final Object x : Arrays.asList(Arrays.asList(1, 2, 3, 4), new int[] { 1, 2, 3, 4 })) {
+        for (final Object x : Arrays.asList(Arrays.asList(1, 2, 3, 4), new int[]{1, 2, 3, 4})) {
             Object result = script0.execute(context, x);
             assertEquals("1*2*3*4", result, src0);
             result = script1.execute(context, x);
@@ -335,8 +335,7 @@ public class Issues400Test {
     void test413d() {
         final JexlBuilder builder = new JexlBuilder().features(new JexlFeatures().constCapture(true));
         final JexlEngine jexl = builder.create();
-        final JexlException.Parsing xparse = assertThrows(JexlException.Parsing.class, () -> jexl.createScript("var c = 42; var f = y -> c += y; f(z)", "z"),
-                "c should be const");
+        final JexlException.Parsing xparse = assertThrows(JexlException.Parsing.class, () -> jexl.createScript("var c = 42; var f = y -> c += y; f(z)", "z"), "c should be const");
         assertTrue(xparse.getMessage().contains("const"));
     }
 
@@ -465,18 +464,14 @@ public class Issues400Test {
     void test429a() {
         final MapContext ctxt = new MapContext();
         final JexlFeatures features = JexlFeatures.createDefault();
-        final JexlEngine jexl = new JexlBuilder()
-                .features(features)
-                .safe(false).strict(true).silent(false).create();
+        final JexlEngine jexl = new JexlBuilder().features(features).safe(false).strict(true).silent(false).create();
         final JexlScript f = jexl.createScript("x -> x");
         ctxt.set("f", f);
-        String src = "#pragma jexl.namespace.b "+Ns429.class.getName()  +"\n"
-                +"b ? b : f(2);";
+        String src = "#pragma jexl.namespace.b " + Ns429.class.getName() + "\n" + "b ? b : f(2);";
         JexlScript script = jexl.createScript(src, "b");
         assertEquals(1, (int) script.execute(ctxt, 1));
 
-        src = "#pragma jexl.namespace.b "+Ns429.class.getName()  +"\n"
-                +"b ? b:f(2) : 1;";
+        src = "#pragma jexl.namespace.b " + Ns429.class.getName() + "\n" + "b ? b:f(2) : 1;";
         script = jexl.createScript(src, "b");
         assertEquals(20042, (int) script.execute(ctxt, 1));
     }
@@ -487,18 +482,14 @@ public class Issues400Test {
         ctxt.set("b", 1);
         final JexlFeatures features = JexlFeatures.createDefault();
         features.namespaceIdentifier(true);
-        final JexlEngine jexl = new JexlBuilder()
-                .features(features)
-                .safe(false).strict(true).silent(false).create();
+        final JexlEngine jexl = new JexlBuilder().features(features).safe(false).strict(true).silent(false).create();
         final JexlScript f = jexl.createScript("x -> x");
         ctxt.set("f", f);
-        String src = "#pragma jexl.namespace.b "+Ns429.class.getName()  +"\n"
-                +"b ? b : f(2);";
+        String src = "#pragma jexl.namespace.b " + Ns429.class.getName() + "\n" + "b ? b : f(2);";
         JexlScript script = jexl.createScript(src);
         assertEquals(1, (int) script.execute(ctxt));
 
-        src = "#pragma jexl.namespace.b "+Ns429.class.getName()  +"\n"
-                +"b ? b:f(2) : 1;";
+        src = "#pragma jexl.namespace.b " + Ns429.class.getName() + "\n" + "b ? b:f(2) : 1;";
         script = jexl.createScript(src);
         assertEquals(20042, (int) script.execute(ctxt));
     }
@@ -534,7 +525,7 @@ public class Issues400Test {
         try {
             final JexlScript script = jexl.createScript(src);
             fail("xx is already defined in scope");
-        } catch(final JexlException.Parsing parsing) {
+        } catch (final JexlException.Parsing parsing) {
             assertTrue(parsing.getDetail().contains("xx"));
         }
     }
@@ -567,6 +558,7 @@ public class Issues400Test {
         public Arithmetic435(final boolean strict) {
             super(strict);
         }
+
         public Object empty(final String type) {
             if ("list".equals(type)) {
                 return Collections.emptyList();
@@ -588,13 +580,13 @@ public class Issues400Test {
 
     @Test
     void test436a() {
-        final String[] srcs = {"let i = null; ++i", "let i; ++i;", "let i; i--;",  "let i; i++;"};
+        final String[] srcs = {"let i = null; ++i", "let i; ++i;", "let i; i--;", "let i; i++;"};
         run436(null, srcs);
     }
 
     @Test
     void test436b() {
-        final String[] srcs = {"var i = null; ++i", "var i; ++i;", "var i; i--;",  "var i; i++;"};
+        final String[] srcs = {"var i = null; ++i", "var i; ++i;", "var i; i--;", "var i; i++;"};
         run436(null, srcs);
     }
 
@@ -602,13 +594,13 @@ public class Issues400Test {
     void test436c() {
         final JexlContext ctxt = new MapContext();
         ctxt.set("i", null);
-        final String[] srcs = {"++i", "++i;", "i--;",  "i++;"};
+        final String[] srcs = {"++i", "++i;", "i--;", "i++;"};
         run436(null, srcs);
     }
 
     void run436(final JexlContext ctxt, final String[] srcs) {
         final JexlEngine jexl = new JexlBuilder().create();
-        for(final String src : srcs) {
+        for (final String src : srcs) {
             final JexlScript script = jexl.createScript(src);
             assertThrows(JexlException.Operator.class, () -> script.execute(ctxt));
         }
@@ -653,8 +645,11 @@ public class Issues400Test {
         assertEquals(2, values.size());
     }
 
-    /** The set of characters that may be followed by a '='.*/
+    /**
+     * The set of characters that may be followed by a '='.
+     */
     static final char[] EQ_FRIEND;
+
     static {
         final char[] eq = {'!', ':', '<', '>', '^', '|', '&', '+', '-', '/', '*', '~', '='};
         Arrays.sort(eq);
@@ -663,6 +658,7 @@ public class Issues400Test {
 
     /**
      * Transcodes a SQL-inspired expression to a JEXL expression.
+     *
      * @param expr the expression to transcode
      * @return the resulting expression
      */
@@ -735,9 +731,9 @@ public class Issues400Test {
 
     @Test
     void testSQLTranspose() {
-        final String[] e = { "a<>b", "a = 2", "a.b.c <> '1<>0'" };
-        final String[] j = { "a!=b", "a == 2", "a.b.c != '1<>0'" };
-        for(int i = 0; i < e.length; ++i) {
+        final String[] e = {"a<>b", "a = 2", "a.b.c <> '1<>0'"};
+        final String[] j = {"a!=b", "a == 2", "a.b.c != '1<>0'"};
+        for (int i = 0; i < e.length; ++i) {
             final String je = transcodeSQLExpr(e[i]);
             Assertions.assertEquals(j[i], je);
         }
@@ -745,7 +741,7 @@ public class Issues400Test {
 
     @Test
     void testSQLNoChange() {
-        final String[] e = { "a <= 2", "a >= 2", "a := 2", "a + 3 << 4 > 5",  };
+        final String[] e = {"a <= 2", "a >= 2", "a := 2", "a + 3 << 4 > 5",};
         for (final String element : e) {
             final String je = transcodeSQLExpr(element);
             Assertions.assertEquals(element, je);
@@ -754,12 +750,7 @@ public class Issues400Test {
 
     @Test
     void test438() {// no local, no lambda, no loops, no-side effects
-        final JexlFeatures f = new JexlFeatures()
-                .localVar(false)
-                .lambda(false)
-                .loops(false)
-                .sideEffect(false)
-                .sideEffectGlobal(false);
+        final JexlFeatures f = new JexlFeatures().localVar(false).lambda(false).loops(false).sideEffect(false).sideEffectGlobal(false);
         final JexlBuilder builder = new JexlBuilder().parserFactory(SQLParser::new).cache(32).features(f);
         final JexlEngine sqle = builder.create();
         Assertions.assertTrue((boolean) sqle.createScript("a <> 25", "a").execute(null, 24));
@@ -811,7 +802,7 @@ public class Issues400Test {
         final Object result = script.execute(null, "a", "b");
         Assertions.assertEquals("a\n?= ba\n?== b", result);
 
-        final String TEST447 =  "src/test/scripts/test447.jexl";
+        final String TEST447 = "src/test/scripts/test447.jexl";
         final File src447 = new File(TEST447);
         final JexlScript script447 = jexl.createScript(src447);
         final Object result447 = script447.execute(null);
@@ -822,5 +813,6 @@ public class Issues400Test {
             Assertions.assertTrue(item);
         }
     }
+
 }
 

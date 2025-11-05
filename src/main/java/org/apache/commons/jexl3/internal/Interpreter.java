@@ -1865,6 +1865,12 @@ public class Interpreter extends InterpreterBase {
             ? node.jjtGetChild(0).jjtAccept(this, data)
             : null;
         cancelCheck(node);
+        JexlNode parent = node.jjtGetParent();
+        // if return is last child of script, no need to throw
+        if (parent instanceof ASTJexlScript &&
+            parent.jjtGetChild(parent.jjtGetNumChildren() - 1) == node) {
+            return val;
+        }
         throw new JexlException.Return(node, null, val);
     }
 
@@ -2031,6 +2037,9 @@ public class Interpreter extends InterpreterBase {
         Object value = node.jjtGetChild(0).jjtAccept(this, data);
         final int index = node.switchIndex(value);
         if (index > 0) {
+            if (!node.isStatement()) {
+                return node.jjtGetChild(index).jjtAccept(this, data);
+            }
             for (int i = index; i < count; ++i) {
                 try {
                     // evaluate the switch body

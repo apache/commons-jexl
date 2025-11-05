@@ -367,16 +367,14 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
     }
 
     protected class SwitchSet implements Iterable<Object> {
-
         private final Set<Object> values = new LinkedHashSet<>();
 
         /**
          * Adds a collection of values to the set.
-         *
-         * @param values the values to add.
+         * @param values the values to add
          */
         void addAll(final Collection<Object> values) {
-            for (final Object value : values) {
+            for (Object value : values) {
                 add(value);
             }
         }
@@ -1079,10 +1077,18 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
         blockReference.set(unit);
     }
 
+    /**
+     * Escape any outer (parent) loops.
+     * <p>A lambda definition embedded in a for-block escapes that block;
+     * break/continue are not valid within that lambda.</p>
+     */
     protected void pushLoop() {
         loopCounts.push(loopCount.getAndSet(0));
     }
 
+    /**
+     * Restores the previous loop count.
+     */
     protected void popLoop() {
         if (!loopCounts.isEmpty()) {
             loopCount.set(loopCounts.pop());

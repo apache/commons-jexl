@@ -20,6 +20,7 @@ package org.apache.commons.jexl3.parser;
 public class ASTSwitchExpression extends ASTSwitchStatement {
   public ASTSwitchExpression(final int id) {
     super(id);
+    isStatement = false;
   }
 
   @Override
