@@ -206,7 +206,7 @@ public abstract class ParserVisitor {
 
     protected abstract Object visit(ASTTernaryNode node, Object data);
 
-    protected abstract Object visit( ASTThrowStatement node, Object data);
+    protected abstract Object visit(ASTThrowStatement node, Object data);
 
     protected abstract Object visit(ASTTrueNode node, Object data);
 

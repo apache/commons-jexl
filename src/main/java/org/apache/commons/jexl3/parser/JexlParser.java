@@ -530,7 +530,7 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
     protected void cleanup(final JexlFeatures features) {
         info = null;
         source = null;
-        if (parent == null ) {
+        if (parent == null) {
             scopeReference.set(null);
             scopes.clear();
             pragmas = null;

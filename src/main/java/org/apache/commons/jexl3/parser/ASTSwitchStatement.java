@@ -88,7 +88,7 @@ public class ASTSwitchStatement extends JexlNode {
    */
   public static class Helper {
     private int switchIndex = 1; // switch index, starts at 1 since the first child is the switch expression
-    private boolean defaultDefined = false;
+    private boolean defaultDefined;
     private final Map<Object, Integer> dispatch = new LinkedHashMap<>();
 
     void defineCase(final JexlParser.SwitchSet switchSet) throws ParseException {
