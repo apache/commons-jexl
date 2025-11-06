@@ -335,7 +335,10 @@ public class Issues400Test {
     void test413d() {
         final JexlBuilder builder = new JexlBuilder().features(new JexlFeatures().constCapture(true));
         final JexlEngine jexl = builder.create();
-        final JexlException.Parsing xparse = assertThrows(JexlException.Parsing.class, () -> jexl.createScript("var c = 42; var f = y -> c += y; f(z)", "z"), "c should be const");
+        final JexlException.Parsing xparse = assertThrows(
+                JexlException.Parsing.class,
+                () -> jexl.createScript("var c = 42; var f = y -> c += y; f(z)", "z"),
+                "c should be const");
         assertTrue(xparse.getMessage().contains("const"));
     }
 
