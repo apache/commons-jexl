@@ -16,13 +16,13 @@
  */
 package org.apache.commons.jexl3;
 
-import java.util.Arrays;
-import java.util.List;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
+
+import java.util.Arrays;
+import java.util.List;
 
 import org.apache.commons.jexl3.internal.Debugger;
 import org.junit.jupiter.api.Assertions;
