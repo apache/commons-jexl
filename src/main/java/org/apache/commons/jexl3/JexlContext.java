@@ -97,6 +97,8 @@ public interface JexlContext {
      * A marker interface that solves a simple class name into a fully-qualified one.
      *
      * @since 3.3
+     * @since 3.6.0 Removes {@code String resolveClassName(String name)} and extends {@link JexlUberspect.ClassNameResolver} which implements
+     *        {@code String resolveClassName(String name)}.
      */
     interface ClassNameResolver extends JexlUberspect.ClassNameResolver {}
 
