@@ -718,23 +718,22 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     }
 
     @Override
-    protected Object visit(final ASTSwitchExpression node, Object data) {
+    protected Object visit(final ASTSwitchExpression node, final Object data) {
         return visit((ASTSwitchStatement) node, data);
     }
 
     @Override
-    protected Object visit(final ASTCaseStatement node, Object data) {
-        JexlNode parent = node.jjtGetParent();
-        boolean isStatement = parent instanceof ASTSwitchStatement && ((ASTSwitchStatement) parent).isStatement();
+    protected Object visit(final ASTCaseStatement node, final Object data) {
+        final JexlNode parent = node.jjtGetParent();
+        final boolean isStatement = parent instanceof ASTSwitchStatement && ((ASTSwitchStatement) parent).isStatement();
         if (isStatement) {
             return visitCaseStatement(node, data);
-        } else {
-            return visitCaseExpression(node, data);
         }
+        return visitCaseExpression(node, data);
     }
 
-    private Object visitCaseStatement(ASTCaseStatement node, Object data) {
-        List<Object> values = node.getValues();
+    private Object visitCaseStatement(final ASTCaseStatement node, final Object data) {
+        final List<Object> values = node.getValues();
         if (values.isEmpty()) {
             // default case
             builder.append("default : ");
@@ -753,12 +752,12 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     }
 
     @Override
-    protected Object visit(ASTCaseExpression node, Object data) {
+    protected Object visit(final ASTCaseExpression node, final Object data) {
         return visitCaseExpression(node, data);
     }
 
-    private Object visitCaseExpression(final ASTCaseStatement node, Object data) {
-        List<Object> values = node.getValues();
+    private Object visitCaseExpression(final ASTCaseStatement node, final Object data) {
+        final List<Object> values = node.getValues();
         if (values.isEmpty()) {
             // default case
             builder.append("default -> ");

@@ -95,10 +95,9 @@ public class ASTSwitchStatement extends JexlNode {
       if (switchSet.isEmpty()) {
         if (defaultDefined) {
           throw new ParseException("default clause is already defined");
-        } else {
-          defaultDefined = true;
-          dispatch.put(JexlParser.DFLT, switchIndex);
         }
+        defaultDefined = true;
+        dispatch.put(JexlParser.DFLT, switchIndex);
       } else {
         for (final Object constant : switchSet) {
           if (dispatch.put(constant == null ? JexlParser.NIL : constant, switchIndex) != null) {
@@ -110,7 +109,7 @@ public class ASTSwitchStatement extends JexlNode {
       switchIndex += 1;
     }
 
-    void defineSwitch(ASTSwitchStatement statement) {
+    void defineSwitch(final ASTSwitchStatement statement) {
       statement.cases = dispatch;
     }
   }

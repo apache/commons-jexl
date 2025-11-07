@@ -1865,7 +1865,7 @@ public class Interpreter extends InterpreterBase {
             ? node.jjtGetChild(0).jjtAccept(this, data)
             : null;
         cancelCheck(node);
-        JexlNode parent = node.jjtGetParent();
+        final JexlNode parent = node.jjtGetParent();
         // if return is last child of script, no need to throw
         if (parent instanceof ASTJexlScript &&
             parent.jjtGetChild(parent.jjtGetNumChildren() - 1) == node) {
