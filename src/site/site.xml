@@ -37,7 +37,7 @@
       <item name="Download" href="/download_io.cgi" />
       <item name="Javadoc">
         <item name="Javadoc Current"          href="/apidocs/index.html" />
-        <item name="Javadoc Archive"          href="https://javadoc.io/doc/commons-io/commons-io" />
+        <item name="Javadoc Archive"          href="https://javadoc.io/doc/org.apache.commons/commons-jexl3" />
         <item name="Javadoc Last 2.x (2.1.1)" href="javadocs/apidocs-2.1.1/index.html"/>
         <item name="Javadoc Last 1.x (1.1)"   href="javadocs/apidocs-1.1/index.html"/>
       </item>
