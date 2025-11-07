@@ -80,7 +80,7 @@ public interface JexlUberspect {
     /**
      * A marker interface that solves a simple class name into a fully qualified one.
      * <p>The base implementation uses imports.</p>
-     * @since 3.6
+     * @since 3.6.0
      */
     interface ClassNameResolver {
         /**
@@ -94,7 +94,7 @@ public interface JexlUberspect {
     /**
      * A marker interface that solves a class constant by name.
      * <p>The base implementation uses imports to solve enums and public static final fields.</p>
-     * @since 3.6
+     * @since 3.6.0
      */
     interface ClassConstantResolver extends ClassNameResolver {
         /**
@@ -107,7 +107,7 @@ public interface JexlUberspect {
 
     /**
      * The factory type for creating constant resolvers.
-     * @since 3.6
+     * @since 3.6.0
      */
     interface ConstantResolverFactory {
         /**
