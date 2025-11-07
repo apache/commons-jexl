@@ -83,10 +83,10 @@
         <commons.distSvnStagingUrl>scm:svn:https://dist.apache.org/repos/dist/dev/commons/${commons.componentid}</commons.distSvnStagingUrl>
     </properties>
     <scm>
-        <connection>scm:git:https://gitbox.apache.org/repos/asf/commons-jexl.git</connection>
-        <developerConnection>scm:git:https://gitbox.apache.org/repos/asf/commons-jexl.git</developerConnection>
-        <url>https://gitbox.apache.org/repos/asf/commons-jexl.git</url>
-      <tag>HEAD</tag>
+      <connection>scm:git:https://gitbox.apache.org/repos/asf/commons-cli.git</connection>
+      <developerConnection>scm:git:https://gitbox.apache.org/repos/asf/commons-cli.git</developerConnection>
+      <url>https://gitbox.apache.org/repos/asf?p=commons-cli.git</url>
+      <tag>rel/common-${commons.componentid}-${commons.release.version}</tag>
     </scm>
     <issueManagement>
         <system>jira</system>
