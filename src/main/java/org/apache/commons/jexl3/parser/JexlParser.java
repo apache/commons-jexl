@@ -374,9 +374,7 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
          * @param values the values to add
          */
         void addAll(final Collection<Object> values) {
-            for (Object value : values) {
-                add(value);
-            }
+            values.forEach(this::add);
         }
 
         /**
