@@ -283,18 +283,12 @@
                 <artifactId>japicmp-maven-plugin</artifactId>
                 <configuration>
                     <parameter>
-                        <includes>
-                            <include>org.apache.commons.jexl3</include>
-                            <include>org.apache.commons.jexl3.introspection</include>
-                            <include>org.apache.commons.jexl3.scripting</include>
-                        </includes>
                         <excludes>
                             <exclude>org.apache.commons.jexl3.internal</exclude>
                             <exclude>org.apache.commons.jexl3.internal.introspection</exclude>
                             <exclude>org.apache.commons.jexl3.parser</exclude>
                         </excludes>
                         <onlyModified>true</onlyModified>
-                        <accessModifier>protected</accessModifier>
                         <ignoreMissingClasses>true</ignoreMissingClasses>
                     </parameter>
                 </configuration>
@@ -317,7 +311,6 @@
                     <show>protected</show>
                 </configuration>
             </plugin>
-
         </plugins>
     </build>
     <reporting>
@@ -379,27 +372,18 @@
                     </reportSet>
                 </reportSets>
             </plugin>
-
             <plugin>
                 <groupId>com.github.siom79.japicmp</groupId>
                 <artifactId>japicmp-maven-plugin</artifactId>
                 <configuration>
                     <parameter>
-                        <includes>
-                            <include>org.apache.commons.jexl3</include>
-                            <include>org.apache.commons.jexl3.introspection</include>
-                            <include>org.apache.commons.jexl3.scripting</include>
-                        </includes>
                         <excludes>
                             <exclude>org.apache.commons.jexl3.internal</exclude>
                             <exclude>org.apache.commons.jexl3.internal.introspection</exclude>
                             <exclude>org.apache.commons.jexl3.parser</exclude>
                         </excludes>
                         <onlyModified>true</onlyModified>
-                        <accessModifier>protected</accessModifier>
                         <ignoreMissingClasses>true</ignoreMissingClasses>
-                        <breakBuildOnBinaryIncompatibleModifications>false</breakBuildOnBinaryIncompatibleModifications>
-                        <breakBuildIfCausedByExclusion>false</breakBuildIfCausedByExclusion>
                     </parameter>
                 </configuration>
             </plugin>
@@ -415,7 +399,6 @@
                     </excludes>
                 </configuration>
             </plugin>
-
         </plugins>
     </reporting>
     <developers>
