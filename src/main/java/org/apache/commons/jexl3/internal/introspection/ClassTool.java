@@ -117,8 +117,8 @@ final class ClassTool {
      * return module.isExported(declarator.getPackageName(), jexlModule);
      * }
      * This is required since some classes and methods may not be exported thus not callable through
-     * reflection.  A package can be non-exported, <i>unconditionally</i> exported (to all reading
-     * modules), or use <i>qualified</i> exports to only export the package to specifically named
+     * reflection.  A package can be non-exported, <em>unconditionally</em> exported (to all reading
+     * modules), or use <em>qualified</em> exports to only export the package to specifically named
      * modules.  This method is only concerned with whether JEXL may reflectively access the
      * package, so a qualified export naming the JEXL module is the least-privilege access required.
      * The declarator's module may also use: unqualified exports, qualified {@code opens}, or
