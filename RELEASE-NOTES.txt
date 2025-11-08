@@ -50,6 +50,58 @@ Have fun!
 
 ------------------------------------------------------------------------------
 
+Apache Commons JEXL 3.6.0 Release Notes
+---------------------------------------
+
+The Apache Commons JEXL team is pleased to announce the release of Apache Commons JEXL 3.6.0.
+
+Introduction
+------------
+
+Apache Commons JEXL is a library that facilitates the implementation of scripting features in
+        applications and frameworks written in Java.
+
+This is a feature and maintenance release. Java 8 or later is required.
+
+New features
+------------
+
+o JEXL-440:  Switch statement & expressions. 
+
+Fixed Bugs
+----------
+
+o JEXL-447:  Regression in script-defined functions. Thanks to William Price. 
+o JEXL-446:  ClassTool module inspection is too strict. Thanks to William Price. 
+o JEXL-442:  Local variables are not resolved in interpolation string expression. Thanks to Xu Pengcheng. 
+o JEXL-441:  Tokenization error if "\n" in template expression. Thanks to Xu Pengcheng. 
+o JEXL-439:  When using reference capture, incorrect scoping when local variable redefines a captured symbol. Thanks to Xu Pengcheng. 
+o JEXL-437:  Semicolons not actually optional between function calls on separate lines. Thanks to William Price. 
+o          org.apache.commons.jexl3.internal.introspection.AbstractExecutor.initMarker(Class, String, Class...) throws IllegalArgumentException instead of Exception. Thanks to Gary Gregory. 
+o          Reuse BigInteger constants instead of creating new instances in JexlArithmetic.toBigInteger(Object). Thanks to Gary Gregory. 
+
+Changes
+-------
+
+o          Bump org.apache.commons:commons-parent from 81 to 91 #344, #368, #372. Thanks to Gary Gregory, Dependabot. 
+o          Bump org.apache.commons:commons-lang3 from 3.17.0 to 3.19.0 #355. Thanks to Gary Gregory, Dependabot. 
+o          Bump com.google.code.gson:gson from 2.13.1 to 2.13.2 #371. Thanks to Gary Gregory, Dependabot. 
+
+
+Historical list of changes: https://commons.apache.org/proper/commons-jexl/changes.html
+
+For complete information on Apache Commons JEXL, including instructions on how to submit bug reports,
+patches, or suggestions for improvement, see the Apache Commons JEXL website:
+
+https://commons.apache.org/proper/commons-jexl/
+
+Download page: https://commons.apache.org/proper/commons-jexl/download_jexl.cgi
+
+Have fun!
+-Apache Commons Team
+
+------------------------------------------------------------------------------
+
 
                             Apache Commons JEXL
                                 Version 3.5.0
