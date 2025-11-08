@@ -19,6 +19,7 @@ package org.apache.commons.jexl3;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.Serializable;
@@ -97,6 +98,9 @@ class ArrayTypeTest {
     // intersect ClassC, ClassX -> Class0
     Class<?> inter = ClassMisc.getCommonSuperClass(ClassC.class, ClassX.class);
     assertEquals(Class0.class, inter);
+    assertEquals(Object.class, ClassMisc.getCommonSuperClass(ClassC.class, Object.class));
+    assertNull(ClassMisc.getCommonSuperClass(ClassC.class, null));
+    assertNull(ClassMisc.getCommonSuperClass(null, ClassC.class));
 
     // intersect ClassC, ClassB -> ClassB
     inter = ClassMisc.getCommonSuperClass(ClassC.class, ClassB.class);
