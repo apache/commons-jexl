@@ -30,6 +30,9 @@
         <release version="3.6.0" date="2025-11-08"
                  description="This is a feature and maintenance release. Java 8 or later is required.">
             <!-- FIX -->
+            <action dev="henrib" type="fix" issue="JEXL-448">
+                Cache handling is perfectible.
+            </action>
             <action dev="henrib" type="fix" issue="JEXL-447" due-to="William Price">
                 Regression in script-defined functions.
             </action>
