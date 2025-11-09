@@ -24,14 +24,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.HashMap;
 import java.util.Map;
-
 import org.apache.commons.jexl3.ConcurrentCache;
 import org.apache.commons.jexl3.JexlBuilder;
 import org.apache.commons.jexl3.JexlCache;
 import org.apache.commons.jexl3.JexlEngine;
 import org.apache.commons.jexl3.JexlFeatures;
 import org.apache.commons.jexl3.JexlScript;
-
 import org.junit.jupiter.api.Test;
 
 public class SourceCacheTest {
