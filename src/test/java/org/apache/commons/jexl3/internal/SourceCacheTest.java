@@ -16,24 +16,23 @@
  */
 package org.apache.commons.jexl3.internal;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.commons.jexl3.ConcurrentCache;
 import org.apache.commons.jexl3.JexlBuilder;
 import org.apache.commons.jexl3.JexlCache;
 import org.apache.commons.jexl3.JexlEngine;
 import org.apache.commons.jexl3.JexlFeatures;
 import org.apache.commons.jexl3.JexlScript;
+
 import org.junit.jupiter.api.Test;
-
-import java.lang.ref.Reference;
-import java.lang.ref.WeakReference;
-import java.util.HashMap;
-import java.util.Map;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class SourceCacheTest {
 

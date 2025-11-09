@@ -19,7 +19,6 @@ package org.apache.commons.jexl3.internal;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -28,10 +27,8 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-import org.apache.commons.jexl3.ConcurrentCache;
-import org.apache.commons.jexl3.JexlCache;
-import org.apache.commons.jexl3.JexlFeatures;
 import org.apache.commons.jexl3.JexlTestCase;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
