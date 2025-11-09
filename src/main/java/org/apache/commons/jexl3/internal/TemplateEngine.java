@@ -30,6 +30,7 @@ import java.util.Set;
 import org.apache.commons.jexl3.JexlCache;
 import org.apache.commons.jexl3.JexlContext;
 import org.apache.commons.jexl3.JexlException;
+import org.apache.commons.jexl3.JexlFeatures;
 import org.apache.commons.jexl3.JexlInfo;
 import org.apache.commons.jexl3.JexlOptions;
 import org.apache.commons.jexl3.JxltEngine;
@@ -461,6 +462,10 @@ public final class TemplateEngine extends JxltEngine {
             return collector.collected();
         }
 
+        public Scope getScope() {
+           return node instanceof ASTJexlScript? ((ASTJexlScript) node).getScope() : null;
+        }
+
         @Override
         protected void getVariables(final Engine.VarCollector collector) {
             jexl.getVariables(node instanceof ASTJexlScript? (ASTJexlScript) node : null, node, collector);
@@ -556,6 +561,10 @@ public final class TemplateEngine extends JxltEngine {
             final StringBuilder strb = new StringBuilder();
             asString(strb);
             return strb.toString();
+        }
+
+        public Scope getScope() {
+            return null;
         }
 
         /**
@@ -698,7 +707,6 @@ public final class TemplateEngine extends JxltEngine {
             }
             return strb.toString();
         }
-
     }
 
     /**
@@ -813,7 +821,7 @@ public final class TemplateEngine extends JxltEngine {
     }
 
     /** The TemplateExpression cache. */
-    final JexlCache<String, TemplateExpression> cache;
+    final JexlCache<Source, Object> cache;
 
     /** The JEXL engine instance. */
     final Engine jexl;
@@ -845,7 +853,7 @@ public final class TemplateEngine extends JxltEngine {
                           final char deferred) {
         this.jexl = jexl;
         this.logger = jexl.logger;
-        this.cache = (JexlCache<String, TemplateExpression>) jexl.cacheFactory.apply(cacheSize);
+        this.cache = jexl.createCache(cacheSize);
         immediateChar = immediate;
         deferredChar = deferred;
         noscript = noScript;
@@ -870,11 +878,21 @@ public final class TemplateEngine extends JxltEngine {
         final JexlInfo info = jexlInfo == null ?  jexl.createInfo() : jexlInfo;
         Exception xuel = null;
         TemplateExpression stmt = null;
+        final JexlFeatures features = noscript ? jexl.expressionFeatures : jexl.scriptFeatures;
+        // do not cache interpolation expression, they are stored in AST node
+        final boolean cached = cache != null && expression.length() < jexl.cacheThreshold;
         try {
-            stmt = cache.get(expression);
-            if (stmt == null) {
+            if (!cached) {
                 stmt = parseExpression(info, expression, scope);
-                cache.put(expression, stmt);
+            } else {
+                final Source source = new Source(features, Scope.getSymbolsMap(scope), expression);
+                Object c = cache.get(source);
+                stmt = c instanceof TemplateExpression ? (TemplateExpression) c : null;
+                if (stmt != null) {
+                    return stmt;
+                }
+                stmt = parseExpression(info, expression, scope);
+                cache.put(source, stmt);
             }
         } catch (final JexlException xjexl) {
             xuel = new Exception(xjexl.getInfo(), "failed to parse '" + expression + "'", xjexl);

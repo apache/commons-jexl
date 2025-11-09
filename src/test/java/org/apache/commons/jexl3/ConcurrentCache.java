@@ -28,7 +28,7 @@ import com.googlecode.concurrentlinkedhashmap.ConcurrentLinkedHashMap;
  * @param <K> the cache key entry type
  * @param <V> the cache key value type
  */
-public class ConcurrentCache<K, V>  extends SoftCache<K, V> {
+public class ConcurrentCache<K, V> extends SoftCache<K, V> {
   /**
    * Creates a new instance of a concurrent cache.
    *

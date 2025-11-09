@@ -88,8 +88,12 @@ public class Util {
         parser.allowRegisters(true);
         final Debugger dbg = new Debugger();
         // iterate over all expression in
-        for (final Map.Entry<Source, ASTJexlScript> entry : jexl.cache.entries()) {
-            final JexlNode node = entry.getValue();
+        for (final Map.Entry<Source, Object> entry : jexl.cache.entries()) {
+            Object c = entry.getValue();
+            if (!(c instanceof JexlNode)) {
+                continue;
+            }
+            final JexlNode node = (ASTJexlScript) c;
             // recreate expr string from AST
             dbg.debug(node);
             final String expressiondbg = dbg.toString();

@@ -57,7 +57,7 @@ public class ASTIdentifierAccessJxlt extends ASTIdentifierAccess implements Jexl
         if (src != null && !src.isEmpty()) {
             final JexlEngine jexl = JexlEngine.getThreadEngine();
             if (jexl != null) {
-                final JxltEngine jxlt = jexl.createJxltEngine();
+                final JxltEngine jxlt = jexl.createJxltEngine(true, -1, '$','#');
                 if (jxlt instanceof TemplateEngine) {
                   this.jxltExpression = ((TemplateEngine) jxlt).createExpression(jexlInfo(), src, scope);
                 }

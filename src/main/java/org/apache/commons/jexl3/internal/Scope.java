@@ -18,6 +18,7 @@ package org.apache.commons.jexl3.internal;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -92,6 +93,17 @@ public final class Scope {
         }
         vars = 0;
         parent = scope;
+    }
+    /**
+     * Gets an unmodifiable view of a scope&quote;s symbols map.
+     * @param scope the scope
+     * @return the symbols map
+     */
+    public static Map<String, Integer> getSymbolsMap(final Scope scope) {
+        if (scope != null && scope.namedVariables != null) {
+            return Collections.unmodifiableMap(scope.namedVariables);
+        }
+        return Collections.emptyMap();
     }
 
     /**

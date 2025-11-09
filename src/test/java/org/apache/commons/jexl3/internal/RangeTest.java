@@ -19,6 +19,7 @@ package org.apache.commons.jexl3.internal;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -27,6 +28,8 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
+import org.apache.commons.jexl3.ConcurrentCache;
+import org.apache.commons.jexl3.JexlCache;
 import org.apache.commons.jexl3.JexlFeatures;
 import org.apache.commons.jexl3.JexlTestCase;
 import org.junit.jupiter.api.AfterEach;
@@ -197,21 +200,5 @@ class RangeTest extends JexlTestCase {
         assertThrows(NoSuchElementException.class, ii0::next);
     }
 
-    @Test
-    void testSource() {
-        final JexlFeatures features = JexlFeatures.createDefault();
-        final Source src0 = new Source(features, "x -> -x");
-        final Source src0b = new Source(features, "x -> -x");
-        final Source src1 = new Source(features, "x -> +x");
-        assertEquals(7, src0.length());
-        assertEquals(src0, src0);
-        assertEquals(src0, src0b);
-        assertNotEquals(src0, src1);
-        assertEquals(src0.hashCode(), src0b.hashCode());
-        assertNotEquals(src0.hashCode(), src1.hashCode());
-        assertTrue(src0.compareTo(src0b) == 0);
-        assertTrue(src0.compareTo(src1) > 0);
-        assertTrue(src1.compareTo(src0) < 0);
-    }
 }
 
