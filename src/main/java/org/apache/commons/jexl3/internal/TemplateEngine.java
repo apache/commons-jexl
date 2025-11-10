@@ -462,6 +462,7 @@ public final class TemplateEngine extends JxltEngine {
             return collector.collected();
         }
 
+        @Override
         public Scope getScope() {
            return node instanceof ASTJexlScript? ((ASTJexlScript) node).getScope() : null;
         }
@@ -886,7 +887,7 @@ public final class TemplateEngine extends JxltEngine {
                 stmt = parseExpression(info, expression, scope);
             } else {
                 final Source source = new Source(features, Scope.getSymbolsMap(scope), expression);
-                Object c = cache.get(source);
+                final Object c = cache.get(source);
                 stmt = c instanceof TemplateExpression ? (TemplateExpression) c : null;
                 if (stmt != null) {
                     return stmt;
