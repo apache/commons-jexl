@@ -413,7 +413,7 @@ void Annotation() #Annotation :
 
 void AnnotatedStatement() #AnnotatedStatement : {}
  {
-    (LOOKAHEAD(2) Annotation())+ Statement()
+    (LOOKAHEAD(2) Annotation())+ (LOOKAHEAD(1) Block() | Statement())
  }
 
 void Statement() #void : {}
@@ -441,7 +441,7 @@ void StatementSink() #void : {}
     | LOOKAHEAD(3) SwitchStatement()
     | LOOKAHEAD(LambdaLookahead()) Lambda()
     | LOOKAHEAD(Expression()) ExpressionStatement()
-    | Block()
+    | LOOKAHEAD(3) Block()
     | LOOKAHEAD(<VAR>, { !getFeatures().isLexical()} ) Var()
 }
 
