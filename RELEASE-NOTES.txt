@@ -20,7 +20,7 @@ o JEXL-440:  Switch statement & expressions.
 Fixed Bugs
 ----------
 
-o JEXL-448:  Cache handling is perfectible.
+o JEXL-448:  Engines caching misses local variables handling and global eviction capability.
 o JEXL-447:  Regression in script-defined functions. Thanks to William Price. 
 o JEXL-446:  ClassTool module inspection is too strict. Thanks to William Price. 
 o JEXL-442:  Local variables are not resolved in interpolation string expression. Thanks to Xu Pengcheng. 
