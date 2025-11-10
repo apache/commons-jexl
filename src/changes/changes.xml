@@ -27,7 +27,7 @@
         <author email="dev@commons.apache.org">Commons Developers</author>
     </properties>
     <body>
-        <release version="3.6.0" date="2025-11-08"
+        <release version="3.6.0" date="2025-11-10"
                  description="This is a feature and maintenance release. Java 8 or later is required.">
             <!-- FIX -->
             <action dev="henrib" type="fix" issue="JEXL-448">
