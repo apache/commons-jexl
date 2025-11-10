@@ -58,7 +58,7 @@ final class MetaCache {
     @SuppressWarnings("unchecked")
     <K, V> JexlCache<K, V> createCache(final int capacity) {
         if (capacity > 0) {
-            JexlCache<K, V> cache = (JexlCache<K, V>) factory.apply(capacity);
+            final JexlCache<K, V> cache = (JexlCache<K, V>) factory.apply(capacity);
             if (cache != null) {
                 synchronized (references) {
                     // The reference is created with the queue for automatic cleanup
@@ -77,8 +77,8 @@ final class MetaCache {
      */
     void clearCaches() {
         synchronized (references) {
-            for (Reference<JexlCache<?, ?>> ref : references) {
-                JexlCache<?, ?> cache = ref.get();
+            for (final Reference<JexlCache<?, ?>> ref : references) {
+                final JexlCache<?, ?> cache = ref.get();
                 if (cache != null) {
                     cache.clear();
                 }
