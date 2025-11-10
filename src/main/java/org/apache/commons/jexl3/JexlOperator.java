@@ -378,10 +378,14 @@ public enum JexlOperator {
 
     /**
      * Marker for side effect.
-     * <br>Returns this from 'self*' overload method to let the engine know the side effect has been performed and
+     * <p>
+     * Returns this from 'self*' overload method to let the engine know the side effect has been performed and
      * there is no need to assign the result.
+     * </p>
+     *
      * @deprecated 3.5.0
      */
+    @Deprecated
     ASSIGN("=", null, null),
 
     /**
