@@ -463,11 +463,6 @@ public final class TemplateEngine extends JxltEngine {
         }
 
         @Override
-        public Scope getScope() {
-           return node instanceof ASTJexlScript? ((ASTJexlScript) node).getScope() : null;
-        }
-
-        @Override
         protected void getVariables(final Engine.VarCollector collector) {
             jexl.getVariables(node instanceof ASTJexlScript? (ASTJexlScript) node : null, node, collector);
         }
@@ -562,10 +557,6 @@ public final class TemplateEngine extends JxltEngine {
             final StringBuilder strb = new StringBuilder();
             asString(strb);
             return strb.toString();
-        }
-
-        public Scope getScope() {
-            return null;
         }
 
         /**

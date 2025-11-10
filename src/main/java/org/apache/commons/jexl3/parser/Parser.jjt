@@ -413,7 +413,11 @@ void Annotation() #Annotation :
 
 void AnnotatedStatement() #AnnotatedStatement : {}
  {
-    (LOOKAHEAD(2) Annotation())+ Statement()
+    ( LOOKAHEAD(2) Annotation() )+
+        // curly brackets expressions (set, map) have priority over statements
+        ( LOOKAHEAD(<LCURLY> ( <RCURLY>  | <COLON> | ( Expression() ( <RCURLY> | <COLON> | <COMMA>) ) ))
+          Expression()
+        | Statement() )
  }
 
 void Statement() #void : {}
