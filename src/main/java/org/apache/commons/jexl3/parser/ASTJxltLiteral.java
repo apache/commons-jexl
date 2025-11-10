@@ -16,10 +16,8 @@
  */
 package org.apache.commons.jexl3.parser;
 
-import org.apache.commons.jexl3.JexlEngine;
 import org.apache.commons.jexl3.JxltEngine;
 import org.apache.commons.jexl3.internal.Scope;
-import org.apache.commons.jexl3.internal.TemplateEngine;
 
 public final class ASTJxltLiteral extends JexlNode implements JexlNode.JxltHandle {
     /** Serial uid.*/
