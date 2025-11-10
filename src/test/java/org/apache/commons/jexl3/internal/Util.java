@@ -90,10 +90,11 @@ public class Util {
         // iterate over all expression in
         for (final Map.Entry<Source, Object> entry : jexl.cache.entries()) {
             Object c = entry.getValue();
-            if (!(c instanceof JexlNode)) {
+            // we may have cached Jxlt expressions due to interpolation strings, skip them
+            if (!(c instanceof ASTJexlScript)) {
                 continue;
             }
-            final JexlNode node = (ASTJexlScript) c;
+            final ASTJexlScript node = (ASTJexlScript) c;
             // recreate expr string from AST
             dbg.debug(node);
             final String expressiondbg = dbg.toString();

@@ -94,12 +94,13 @@ public final class Scope {
         vars = 0;
         parent = scope;
     }
+
     /**
      * Gets an unmodifiable view of a scope&quote;s symbols map.
      * @param scope the scope
      * @return the symbols map
      */
-    public static Map<String, Integer> getSymbolsMap(final Scope scope) {
+     static Map<String, Integer> getSymbolsMap(final Scope scope) {
         if (scope != null && scope.namedVariables != null) {
             return Collections.unmodifiableMap(scope.namedVariables);
         }

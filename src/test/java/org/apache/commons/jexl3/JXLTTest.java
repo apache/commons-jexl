@@ -526,17 +526,18 @@ class JXLTTest extends JexlTestCase {
         final JexlEngine jexl = builder.create();
         JexlScript script;
         Object result;
+
         script = jexl.createScript("let x = 42; let y = `${x}`; y");
         result = script.execute(null);
         assertInstanceOf(String.class, result);
         assertEquals("42", result);
-        final Map<Object,Object> map = Collections.singletonMap("42", S42);
 
+        final Map<Object,Object> map = Collections.singletonMap("42", S42);
         script = jexl.createScript("let x = 42; map.`${x}`", "map");
         result = script.execute(null, map);
         assertEquals(S42, result);
-        final List<String> list = Collections.singletonList(S42);
 
+        final List<String> list = Collections.singletonList(S42);
         final JexlScript finalScript = script;
         assertThrows(JexlException.Property.class, () -> finalScript.execute(null, list));
         script = jexl.createScript("let x = 0; list[x]", "list");

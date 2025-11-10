@@ -44,14 +44,19 @@ final class MetaCache {
     // Queue to receive references whose referent has been garbage collected
     private final ReferenceQueue<JexlCache<?, ?>> queue;
 
-    public MetaCache(final IntFunction<JexlCache<?, ?>> factory) {
+    /**
+     * Constructs a MetaCache with the given cache factory.
+     *
+     * @param factory The factory function to create JexlCache instances given a capacity.
+     */
+    MetaCache(final IntFunction<JexlCache<?, ?>> factory) {
         this.factory = factory;
         this.references = new HashSet<>();
         this.queue = new ReferenceQueue<>();
     }
 
     @SuppressWarnings("unchecked")
-    public <K, V> JexlCache<K, V> createCache(final int capacity) {
+    <K, V> JexlCache<K, V> createCache(final int capacity) {
         if (capacity > 0) {
             JexlCache<K, V> cache = (JexlCache<K, V>) factory.apply(capacity);
             if (cache != null) {
@@ -67,7 +72,10 @@ final class MetaCache {
         return null;
     }
 
-    public void clearCaches() {
+    /**
+     * Clears all caches tracked by this MetaCache.
+     */
+    void clearCaches() {
         synchronized (references) {
             for (Reference<JexlCache<?, ?>> ref : references) {
                 JexlCache<?, ?> cache = ref.get();
@@ -96,7 +104,14 @@ final class MetaCache {
         return references.size();
     }
 
-    public int size() {
+    /**
+     * Gets the number of live caches currently tracked by this MetaCache.
+     *
+     * <p>Any cache that is no longer strongly reference will get removed from the
+     * tracked set.</p>
+     * @return The number of caches.
+     */
+    int size() {
         synchronized (references) {
             return cleanUp();
         }
