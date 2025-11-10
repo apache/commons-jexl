@@ -40,7 +40,6 @@ import org.apache.commons.jexl3.JexlException;
 import org.apache.commons.jexl3.JexlFeatures;
 import org.apache.commons.jexl3.JexlInfo;
 import org.apache.commons.jexl3.JxltEngine;
-import org.apache.commons.jexl3.internal.Engine;
 import org.apache.commons.jexl3.internal.LexicalScope;
 import org.apache.commons.jexl3.internal.Scope;
 import org.apache.commons.jexl3.internal.TemplateEngine;
