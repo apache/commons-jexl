@@ -89,7 +89,7 @@ public class Util {
         final Debugger dbg = new Debugger();
         // iterate over all expression in
         for (final Map.Entry<Source, Object> entry : jexl.cache.entries()) {
-            Object c = entry.getValue();
+            final Object c = entry.getValue();
             // we may have cached Jxlt expressions due to interpolation strings, skip them
             if (!(c instanceof ASTJexlScript)) {
                 continue;

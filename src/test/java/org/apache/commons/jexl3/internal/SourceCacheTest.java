@@ -56,27 +56,27 @@ public class SourceCacheTest {
     void testSourceCache() {
         final JexlFeatures features = JexlFeatures.createDefault();
         // source objects differ when symbol maps differ
-        Map<String, Integer> symbols0 = new HashMap<>();
+        final Map<String, Integer> symbols0 = new HashMap<>();
         symbols0.put("x", 0);
         symbols0.put("y", 1);
-        Source src0 = new Source(features, symbols0,"x + y");
+        final Source src0 = new Source(features, symbols0,"x + y");
         assertFalse(src0.equals(null));
         assertFalse(src0.equals("x + y"));
-        Map<String, Integer> symbols1 = new HashMap<>();
+        final Map<String, Integer> symbols1 = new HashMap<>();
         symbols0.put("x", 0);
         symbols0.put("y", 2);
-        Source src1 = new Source(features, symbols1,"x + y");
+        final Source src1 = new Source(features, symbols1,"x + y");
         assertNotEquals(src0, src1);
         assertNotEquals(0, src0.compareTo(src1));
-        Source src2 = new Source(features, null,"x + y");
+        final Source src2 = new Source(features, null,"x + y");
         assertNotEquals(src0, src2);
         assertNotEquals(0, src0.compareTo(src2));
-        Source src3 = new Source(JexlFeatures.createNone(), symbols1,"x + y");
+        final Source src3 = new Source(JexlFeatures.createNone(), symbols1,"x + y");
         assertNotEquals(src0, src3);
         assertNotEquals(0, src0.compareTo(src3));
 
-        JexlEngine jexl = new JexlBuilder().cache(4).create();
-        JexlCache<Source, Object> cache = ((Engine) jexl).getCache();
+        final JexlEngine jexl = new JexlBuilder().cache(4).create();
+        final JexlCache<Source, Object> cache = ((Engine) jexl).getCache();
         // order of declaration of variables matters
         JexlScript script0 = jexl.createScript("x + y", "x", "y");
         assertNotNull(script0);
@@ -93,14 +93,14 @@ public class SourceCacheTest {
 
     @Test
     void testInterpolationCache() {
-        JexlEngine jexl = new JexlBuilder().strictInterpolation(true).cache(4).create();
-        JexlCache<Source, Object> cache = ((Engine) jexl).getCache();
+        final JexlEngine jexl = new JexlBuilder().strictInterpolation(true).cache(4).create();
+        final JexlCache<Source, Object> cache = ((Engine) jexl).getCache();
         // order of declaration of variables matters
         JexlScript script0;
         for (int i = 0; i < 2; ++i) {
             script0 = jexl.createScript("`${x}` + `${x}`", "x");
             assertNotNull(script0);
-            Object result = script0.execute(null, 42);
+            final Object result = script0.execute(null, 42);
             assertEquals("4242", result);
             // the '+' and the two '`${x}`' should lead to only 2 cached sources
             assertEquals(2, cache.size());
