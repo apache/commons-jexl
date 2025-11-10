@@ -91,6 +91,7 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
         /** Non-instantiable. */
         private UberspectHolder() {}
     }
+
     /**
      * Utility class to collect variables.
      */
@@ -156,6 +157,7 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
             return root instanceof ASTIdentifier;
         }
     }
+
     /**
      * The features allowed for property set/get methods.
      */
@@ -167,6 +169,7 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
             .arrayReferenceExpr(false)
             .methodCall(false)
             .register(true);
+
     /**
      * Use {@link Engine#getUberspect(Log, JexlUberspect.ResolverStrategy, JexlPermissions)}.
      * @deprecated 3.3
@@ -204,6 +207,7 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
         }
         return new Uberspect(logger, strategy, permissions);
     }
+
     /**
      * Solves an optional option.
      * @param conf the option as configured, may be null
@@ -290,32 +294,23 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
      * The expression max length to hit the cache.
      */
     protected final int cacheThreshold;
-
     /**
      * The expression cache.
      */
-    protected final JexlCache<Source, ASTJexlScript> cache;
-
-    /**
-     * The default jxlt engine.
-     */
-    protected volatile TemplateEngine jxlt;
-
+    protected final JexlCache<Source, Object> cache;
     /**
      * Collect all or only dot references.
      */
     protected final int collectMode;
-
     /**
      * A cached version of the options.
      */
     protected final JexlOptions options;
-
     /**
-     * The cache factory method.
+     * The set of caches created by this engine.
+     * <p>Caches are soft-referenced by the engine so they can be cleaned on class loader change.</p>
      */
-    protected final IntFunction<JexlCache<?, ?>> cacheFactory;
-
+    protected final MetaCache metaCache;
     /**
      * Creates an engine with default arguments.
      */
@@ -372,8 +367,8 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
         this.charset = conf.charset();
         // caching:
         final IntFunction<JexlCache<?, ?>> factory = conf.cacheFactory();
-        this.cacheFactory = factory == null ? SoftCache::new : factory;
-        this.cache = (JexlCache<Source, ASTJexlScript>) (conf.cache() > 0 ? cacheFactory.apply(conf.cache()) : null);
+        this.metaCache = new MetaCache(factory == null ? SoftCache::new : factory);
+        this.cache = metaCache.createCache(conf.cache());
         this.cacheThreshold = conf.cacheThreshold();
         if (uberspect == null) {
             throw new IllegalArgumentException("uberspect cannot be null");
@@ -389,6 +384,10 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
         if (cache != null) {
             cache.clear();
         }
+    }
+
+    JexlCache<Source, Object> getCache() {
+        return cache;
     }
 
     @Override
@@ -738,24 +737,6 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
         return this.strict;
     }
 
-    /**
-     * Gets and/or creates a default template engine.
-     * @return a template engine
-     */
-    protected TemplateEngine jxlt() {
-        TemplateEngine e = jxlt;
-        if (e == null) {
-            synchronized(this) {
-                e = jxlt;
-                if (e == null) {
-                    e = new TemplateEngine(this, true, 0, '$', '#');
-                    jxlt = e;
-                }
-            }
-        }
-        return e;
-    }
-
     @Override
     public <T> T newInstance(final Class<? extends T> clazz, final Object... args) {
         return clazz.cast(doCreateInstance(clazz, args));
@@ -798,16 +779,16 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
     protected ASTJexlScript parse(final JexlInfo info, final JexlFeatures parsingf, final String src, final Scope scope) {
         final boolean cached = src.length() < cacheThreshold && cache != null;
         final JexlFeatures features = parsingf != null ? parsingf : DEFAULT_FEATURES;
-        final Source source = cached? new Source(features, src) : null;
-        ASTJexlScript script;
+        final Source source = cached ? new Source(features, Scope.getSymbolsMap(scope), src) : null;
         if (source != null) {
-            script = cache.get(source);
-            if (script != null && (scope == null || scope.equals(script.getScope()))) {
-                return script;
+            final Object c = cache.get(source);
+            if (c instanceof ASTJexlScript) {
+                return (ASTJexlScript) c;
             }
         }
         final JexlInfo ninfo = info == null && debug ? createInfo() : info;
         final JexlEngine se = putThreadEngine(this);
+        ASTJexlScript script;
         try {
             // if parser not in use...
             if (parsing.compareAndSet(false, true)) {
@@ -1003,7 +984,6 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
 
     @Override
     public void setClassLoader(final ClassLoader loader) {
-        jxlt = null;
         uberspect.setClassLoader(loader);
         if (functions != null) {
             final Iterable<String> names = new ArrayList<>(functions.keySet());
@@ -1022,9 +1002,7 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
                 }
             }
         }
-        if (cache != null) {
-            cache.clear();
-        }
+        metaCache.clearCaches();
     }
 
     @Override
@@ -1101,4 +1079,15 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
             consumer.accept(o);
         }
     }
+
+    /**
+     * Creates a new cache instance.
+     * <p>This uses the metacache instance as factory.</p>
+     * @param capacity the cache capacity
+     * @return a cache instance, null if capacity == 0, the JEXL cache if capacity &lt; 0
+     */
+    protected JexlCache<Source, Object> createCache(final int capacity) {
+        return capacity < 0 ? cache : capacity > 0 ? metaCache.createCache(capacity) : null;
+    }
+
 }

@@ -39,8 +39,11 @@ import org.apache.commons.jexl3.JexlEngine;
 import org.apache.commons.jexl3.JexlException;
 import org.apache.commons.jexl3.JexlFeatures;
 import org.apache.commons.jexl3.JexlInfo;
+import org.apache.commons.jexl3.JxltEngine;
+import org.apache.commons.jexl3.internal.Engine;
 import org.apache.commons.jexl3.internal.LexicalScope;
 import org.apache.commons.jexl3.internal.Scope;
+import org.apache.commons.jexl3.internal.TemplateEngine;
 import org.apache.commons.jexl3.introspection.JexlUberspect;
 
 /**
@@ -991,6 +994,27 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
     @Override
     public ASTJexlScript jxltParse(final JexlInfo info, final JexlFeatures features, final String src, final Scope scope) {
         return new Parser(this).parse(info, features, src, scope);
+    }
+
+    /**
+     * Parses an interpolation expression.
+     * <p>Requires the JEXL engine to be accessible through its thread-local.</p>
+     * @param info the JexlInfo
+     * @param src the source to parse
+     * @param scope the scope
+     * @return the expression
+     */
+    static JxltEngine.Expression parseInterpolation(final JexlInfo info, final String src, final Scope scope) {
+        final JexlEngine jexl = JexlEngine.getThreadEngine();
+        if (jexl != null) {
+            // interpolation uses default $ and # as expression markers;
+            // the cache size is negative to reuse the engine cache
+            final JxltEngine jxlt = jexl.createJxltEngine(true, -1, '$', '#');
+            if (jxlt instanceof TemplateEngine) {
+                return ((TemplateEngine) jxlt).createExpression(info, src, scope);
+            }
+        }
+        throw new IllegalStateException("engine is not a accessible");
     }
 
     /**
