@@ -64,7 +64,6 @@ import org.apache.commons.jexl3.internal.introspection.PermissionsParser;
  * @since 3.3
  */
 public interface JexlPermissions {
-
     /**
      * A permission delegation that augments the RESTRICTED permission with an explicit
      * set of classes.
@@ -226,7 +225,9 @@ public interface JexlPermissions {
             "org.w3c.dom.*",
             "org.apache.commons.jexl3.*",
             "org.apache.commons.jexl3 { JexlBuilder {} }",
-            "org.apache.commons.jexl3.internal { Engine {} }",
+            "org.apache.commons.jexl3.introspection { JexlPermissions {} JexlPermissions$ClassPermissions {} }",
+            "org.apache.commons.jexl3.internal { Engine {} Engine32 {} TemplateEngine {} }",
+            "org.apache.commons.jexl3.internal.introspection { Uberspect {} Introspector {} }",
             "java.lang { Runtime{} System{} ProcessBuilder{} Process{}" +
                     " RuntimePermission{} SecurityManager{}" +
                     " Thread{} ThreadGroup{} Class{} }",
