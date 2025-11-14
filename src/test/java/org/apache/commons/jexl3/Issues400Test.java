@@ -6,7 +6,7 @@
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
  *
- *      https://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,6 +17,7 @@
 package org.apache.commons.jexl3;
 
 import static org.apache.commons.jexl3.introspection.JexlPermissions.RESTRICTED;
+import static org.apache.commons.jexl3.introspection.JexlPermissions.UNRESTRICTED;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -42,6 +43,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.commons.jexl3.internal.Debugger;
 import org.apache.commons.jexl3.internal.Scope;
+import org.apache.commons.jexl3.internal.introspection.Uberspect;
 import org.apache.commons.jexl3.introspection.JexlPermissions;
 import org.apache.commons.jexl3.parser.ASTJexlScript;
 import org.apache.commons.jexl3.parser.JexlScriptParser;
@@ -815,6 +817,45 @@ public class Issues400Test {
         for (final Boolean item : list) {
             Assertions.assertTrue(item);
         }
+    }
+
+    public static class BrkContext extends MapContext {
+        public BrkContext() {
+            super();
+            set("SYSTEM", System.class);
+            set("UNRESTRICTED", UNRESTRICTED);
+        }
+
+        public static Object brk(Object debug) {
+            return debug;
+        }
+
+    }
+
+    @Test
+    void test450() {
+        for (JexlPermissions perm : new JexlPermissions[]{JexlPermissions.RESTRICTED, JexlPermissions.UNRESTRICTED}) {
+            JexlEngine jexl = new JexlBuilder().permissions(perm).create();
+            JexlScript e = getExpression450(jexl);
+            try {
+                e.execute(null);
+                fail("should not be able to access System class with " + perm);
+            } catch (JexlException xjexl) {
+                assertNotNull(xjexl);
+            }
+        }
+    }
+
+    private static JexlScript getExpression450(JexlEngine jexl) {
+        return jexl.createScript("new('org.apache.commons.jexl3.internal.TemplateEngine'," +
+            "new('org.apache.commons.jexl3.internal.Engine32'),false,256,'{'.charAt(0),'#'.charAt(0))" +
+                ".createExpression(" +
+                    "\"#{x = new ('org.apache.commons.jexl3.internal.introspection.Uberspect', null, null, UNRESTRICTED);" +
+                    "sys = x.getClassLoader().loadClass('java.lang.System') ?: SYSTEM;" + // fail to load System
+                    "p = new('org.apache.commons.jexl3.introspection.JexlPermissions$ClassPermissions', [sys]);" +
+                    "c = new('org.apache.commons.jexl3.internal.introspection.Uberspect', null, null, p);" +
+                    "z = c.getMethod(sys,'currentTimeMillis').invoke(x,null);}\")" +
+                    ".evaluate(new('org.apache.commons.jexl3.Issues400Test$BrkContext'))");
     }
 
 }
