@@ -32,7 +32,7 @@
            <action dev="henrib" type="fix" issue="JEXL-449" due-to="William Price">Inconsistency on nature of curly-bracket syntactic elements regarding annotations.</action>
            <!-- ADD -->
            <!-- UPDATE -->
-          <action type="update" dev="ggregory" due-to="Gary Gregory, Dependabot">Bump org.apache.commons:commons-parent from 91 to 92 #391.</action>
+          <action type="update" dev="ggregory" due-to="Gary Gregory, Dependabot">Bump org.apache.commons:commons-parent from 91 to 93 #391, #396.</action>
           <action type="update" dev="ggregory" due-to="Gary Gregory">Bump org.apache.commons:commons-lang3 from 3.17.0 to 3.20.0.</action>
         </release>
         <release version="3.6.0" date="2025-11-10"
