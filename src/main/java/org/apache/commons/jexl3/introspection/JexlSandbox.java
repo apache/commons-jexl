@@ -302,7 +302,7 @@ public final class JexlSandbox {
                 if (permissions == null) {
                     // let's recurse on super classes
                     final Class<?> superClazz = clazz.getSuperclass();
-                    if (Object.class != superClazz) {
+                    if (null != superClazz) {
                         permissions = inheritable(compute(superClazz, false));
                     }
                 }
