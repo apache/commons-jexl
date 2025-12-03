@@ -31,7 +31,9 @@ import org.apache.commons.jexl3.parser.JexlNode;
 
 /**
  * An Engine that behaves like JEXL 3.2, bugs included.
+ * @deprecated 3.6.1, use Engine with JexlOptions instead.
  */
+@Deprecated
 public class Engine32 extends Engine {
     /**
      * Static delegation of getVariable.

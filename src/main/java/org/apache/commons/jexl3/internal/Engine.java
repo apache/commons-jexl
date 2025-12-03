@@ -337,6 +337,9 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
         final JexlUberspect uber = conf.uberspect() == null
                 ? getUberspect(conf.logger(), conf.strategy(), conf.permissions())
                 : conf.uberspect();
+        if (uber == null) {
+            throw new IllegalArgumentException("uberspect cannot be null");
+        }
         final ClassLoader loader = conf.loader();
         if (loader != null) {
             uber.setClassLoader(loader);
@@ -370,9 +373,6 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
         this.metaCache = new MetaCache(factory == null ? SoftCache::new : factory);
         this.cache = metaCache.createCache(conf.cache());
         this.cacheThreshold = conf.cacheThreshold();
-        if (uberspect == null) {
-            throw new IllegalArgumentException("uberspect cannot be null");
-        }
         this.parserFactory = conf.parserFactory() == null ?
                () -> new Parser(new StringProvider(";"))
                 : conf.parserFactory();
@@ -550,7 +550,9 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
      * @param script the script
      * @return the local variables array which may be empty (but not null) if no local variables were defined
      * @since 3.0
+     * @deprecated 3.6.1
      */
+    @Deprecated()
     protected String[] getLocalVariables(final JexlScript script) {
         return script.getLocalVariables();
     }
@@ -569,7 +571,9 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
      * @param script the script
      * @return the parameters which may be empty (but not null) if no parameters were defined
      * @since 3.0
+     * @deprecated 3.6.1
      */
+    @Deprecated
     protected String[] getParameters(final JexlScript script) {
         return script.getParameters();
     }
