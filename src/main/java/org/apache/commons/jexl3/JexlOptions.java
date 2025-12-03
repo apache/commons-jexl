@@ -265,7 +265,7 @@ public final class JexlOptions {
      * <p>After a symbol is defined as local, dereferencing it outside its
      * scope will trigger an error instead of seeking a global variable of the
      * same name. To further reduce potential naming ambiguity errors,
-     * global variables (ie non-local) must be declared to be assigned (@link JexlContext#has(String) )
+     * global variables (ie non-local) must be declared to be assigned {@link JexlContext#has(String)}
      * when this flag is on; attempting to set an undeclared global variables will
      * raise an error.
      * @return true if lexical shading is applied, false otherwise
