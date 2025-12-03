@@ -1069,11 +1069,15 @@ public class JexlException extends RuntimeException {
 
     /**
      * Detailed info message about this error.
+     * <p>
      * Format is "debug![begin,end]: string \n msg" where:
-     * - debug is the debugging information if it exists (@link JexlEngine.setDebug)
-     * - begin, end are character offsets in the string for the precise location of the error
-     * - string is the string representation of the offending expression
-     * - msg is the actual explanation message for this error
+     * </p>
+     * <ul>
+     * <li>debug is the debugging information if it exists (@link JexlEngine.setDebug)</li>
+     * <li>begin, end are character offsets in the string for the precise location of the error</li>
+     * <li>string is the string representation of the offending expression</li>
+     * <li>msg is the actual explanation message for this error</li>
+     * </ul>
      *
      * @return this error as a string
      */
