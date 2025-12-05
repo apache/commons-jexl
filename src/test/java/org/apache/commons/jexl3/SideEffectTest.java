@@ -143,12 +143,12 @@ class SideEffectTest extends JexlTestCase {
             return new Var(lhs.value & rhs.value);
         }
 
-        public Object arrayGet(final Var var, final String property) {
-            return "VALUE".equals(property)? var.value : JexlEngine.TRY_FAILED;
+        public Object arrayGet(final Var variable, final String property) {
+            return "VALUE".equals(property)? variable.value : JexlEngine.TRY_FAILED;
         }
 
-        public Object arraySet(final Var var, final String property, final int v) {
-            return "VALUE".equals(property)? var.value = v : JexlEngine.TRY_FAILED;
+        public Object arraySet(final Var variable, final String property, final int v) {
+            return "VALUE".equals(property)? variable.value = v : JexlEngine.TRY_FAILED;
         }
 
         public int decrement(final Var lhs) {
@@ -179,12 +179,12 @@ class SideEffectTest extends JexlTestCase {
             return n.value;
         }
 
-        public Object propertyGet(final Var var, final String property) {
-            return "value".equals(property)? var.value : JexlEngine.TRY_FAILED;
+        public Object propertyGet(final Var variable, final String property) {
+            return "value".equals(property)? variable.value : JexlEngine.TRY_FAILED;
         }
 
-        public Object propertySet(final Var var, final String property, final int v) {
-            return "value".equals(property)? var.value = v : JexlEngine.TRY_FAILED;
+        public Object propertySet(final Var variable, final String property, final int v) {
+            return "value".equals(property)? variable.value = v : JexlEngine.TRY_FAILED;
         }
 
         public Var selfAdd(final Var lhs, final Var rhs) {
@@ -277,12 +277,12 @@ class SideEffectTest extends JexlTestCase {
         super("SideEffectTest");
     }
 
-    private void run246(final JexlArithmetic j246) throws Exception {
+    private void run246(final JexlArithmetic j246) {
         final Log log246 = LogFactory.getLog(SideEffectTest.class);
         // quiesce the logger
         final java.util.logging.Logger ll246 = java.util.logging.LogManager.getLogManager().getLogger(SideEffectTest.class.getName());
        // ll246.setLevel(Level.WARNING);
-        final JexlEngine jexl = new JexlBuilder().arithmetic(j246).cache(32).debug(true).logger(log246).create();
+        final JexlEngine jexl = new JexlBuilder().arithmetic(j246).cache(32).logger(log246).create();
         final JexlScript script = jexl.createScript("z += x", "x");
         final MapContext ctx = new MapContext();
         List<String> z = new ArrayList<>(1);
@@ -462,17 +462,17 @@ class SideEffectTest extends JexlTestCase {
     }
 
     @Test
-    void test246() throws Exception {
+    void test246() {
         run246(new Arithmetic246(true));
     }
 
     @Test
-    void test246b() throws Exception {
+    void test246b() {
         run246(new Arithmetic246b(true));
     }
 
     @Test
-    void test248() throws Exception {
+    void test248() {
         final MapContext ctx = new MapContext();
         final List<Object> foo = new ArrayList<>(Arrays.asList(10, 20, 30, 40));
         ctx.set("foo", foo);
@@ -489,7 +489,7 @@ class SideEffectTest extends JexlTestCase {
     }
 
     @Test
-    void testArithmeticSelf() throws Exception {
+    void testArithmeticSelf() {
         final JexlEngine jexl = new JexlBuilder().cache(64).arithmetic(new SelfArithmetic(false)).create();
         final JexlContext jc = null;
         runSelfOverload(jexl, jc);
@@ -497,14 +497,14 @@ class SideEffectTest extends JexlTestCase {
     }
 
     @Test
-    void testArithmeticSelfNoCache() throws Exception {
+    void testArithmeticSelfNoCache() {
         final JexlEngine jexl = new JexlBuilder().cache(0).arithmetic(new SelfArithmetic(false)).create();
         final JexlContext jc = null;
         runSelfOverload(jexl, jc);
     }
 
     @Test
-    void testIncrementSelf() throws Exception {
+    void testIncrementSelf() {
         final JexlEngine jexl = new JexlBuilder().cache(64).arithmetic(new SelfArithmetic(false)).create();
         final JexlContext jc = null;
         runSelfIncrement(jexl, jc);
@@ -512,14 +512,14 @@ class SideEffectTest extends JexlTestCase {
     }
 
     @Test
-    void testIncrementSelfNoCache() throws Exception {
+    void testIncrementSelfNoCache() {
         final JexlEngine jexl = new JexlBuilder().cache(0).arithmetic(new SelfArithmetic(false)).create();
         final JexlContext jc = null;
         runSelfIncrement(jexl, jc);
     }
 
     @Test
-    void testOverrideGetSet() throws Exception {
+    void testOverrideGetSet() {
         final JexlEngine jexl = new JexlBuilder().cache(64).arithmetic(new SelfArithmetic(false)).create();
         final JexlContext jc = null;
 

@@ -18,13 +18,13 @@
 
 <document>
   <properties>
-    <title>Apache Commons JEXL 3.5 Release Notes</title>
+    <title>Apache Commons JEXL 3.6.1 Release Notes</title>
   </properties>
 
   <body>
     <section name="Compatibility with previous release">
       <p>
-        Version 3.6 is source and binary compatible with 3.5.
+        Version 3.6.1 is source and binary compatible with 3.6.0.
       </p>
     </section>
     <section name="Compatibility with older releases (&lt; 3.3, 2.x)">
@@ -50,28 +50,99 @@
       </p>
     </section>
 
-    <section name="What is new in 3.6:">
+    <section name="What is new in 3.6.1:">
       <p>
-        JEXL 3.6 is a minor release that adds a few features and fixes some bugs.
+        JEXL 3.6.1 is a minor release that fixes some bugs.
         It does not introduce any breaking change.
       </p>
     </section>
-    <section name="New Features in 3.6:">
-    <p>
-    <table>
-    <tr>
-      <td><a href="https://issues.apache.org/jira/browse/JEXL-440">JEXL-440:</a></td>
-      <td>Switch statement &amp; expressions.</td>
-    </tr>
-    </table>
-    </p>
-    </section>
-    <section name="Bugs fixed in 3.6:">
+    <section name="Bugs fixed in 3.6.1:">
       <p>
         <table>
           <tr>
-            <td><a href="https://issues.apache.org/jira/browse/JEXL-437">JEXL-437:</a></td>
-            <td>Semicolons not actually optional between function calls on separate lines</td>
+            <td>
+              <a href="https://issues.apache.org/jira/browse/JEXL-452">JEXL-452:</a>
+            </td>
+            <td>Debug setting in Engine shows class/method/line even when set to false.</td>
+          </tr>
+          <tr>
+            <td>
+              <a href="https://issues.apache.org/jira/browse/JEXL-451">JEXL-451:</a>
+            </td>
+            <td>Restore JexlSandbox permission capabilities on Object.class.</td>
+          </tr>
+          <tr>
+            <td>
+              <a href="https://issues.apache.org/jira/browse/JEXL-450">JEXL-450:</a>
+            </td>
+            <td>Disable instantiation of internal classes in RESTRICTED mode.</td>
+          </tr>
+          <tr>
+            <td>
+              <a href="https://issues.apache.org/jira/browse/JEXL-449">JEXL-449:</a>
+            </td>
+            <td>Inconsistency on nature of curly-bracket syntactic elements regarding annotations.</td>
+          </tr>
+        </table>
+      </p>
+    </section>
+
+    <section name="What was new in 3.6.0:">
+      <p>
+        JEXL 3.6.0 introduces a switch statement and expressions (JEXL-440).
+        It is a minor release that does not introduce any breaking change.
+      </p>
+    </section>
+    <section name="New Features in 3.6.0:">
+      <p>
+        <table>
+          <tr>
+            <td>
+              <a href="https://issues.apache.org/jira/browse/JEXL-440">JEXL-440:</a>
+            </td>
+            <td>Switch statement &amp; expressions.</td>
+          </tr>
+        </table>
+      </p>
+    </section>
+    <section name="Bugs fixed in 3.6.0:">
+      <p>
+        <table>
+          <tr>
+            <td>
+              <a href="https://issues.apache.org/jira/browse/JEXL-437">JEXL-447:</a>
+            </td>
+            <td>Regression in script-defined functions</td>
+          </tr>
+          <tr>
+            <td>
+              <a href="https://issues.apache.org/jira/browse/JEXL-446">JEXL-446:</a>
+            </td>
+            <td>ClassTool module inspection is too strict</td>
+          </tr>
+          <tr>
+            <td>
+              <a href="https://issues.apache.org/jira/browse/JEXL-442">JEXL-442:</a>
+            </td>
+            <td>Local variables are not resolved in interpolation string expression</td>
+          </tr>
+          <tr>
+            <td>
+              <a href="https://issues.apache.org/jira/browse/JEXL-441">JEXL-441:</a>
+            </td>
+            <td>Tokenization error if "\n" in template expression.</td>
+          </tr>
+          <tr>
+            <td>
+              <a href="https://issues.apache.org/jira/browse/JEXL-439">JEXL-439:</a>
+            </td>
+            <td>When using reference capture, incorrect scoping when local variable redefines a captured symbol</td>
+          </tr>
+          <tr>
+            <td>
+              <a href="https://issues.apache.org/jira/browse/JEXL-437">JEXL-437:</a>
+            </td>
+            <td>Semicolons actually not optional between function calls on separate lines</td>
           </tr>
         </table>
       </p>

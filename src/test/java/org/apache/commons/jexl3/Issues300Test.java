@@ -1058,7 +1058,6 @@ class Issues300Test {
         final JexlEngine jexl = new JexlBuilder()
                 .safe(false)
                 .strict(true)
-                .debug(true)
                 .create();
         // @formatter:on
         JexlScript script = null;
@@ -1090,7 +1089,7 @@ class Issues300Test {
     }
 
     @Test
-    void testBackslashes() throws Exception {
+    void testBackslashes() {
         final JexlEngine jexl = new JexlBuilder().safe(false).create();
         final String src = "\"\b\t\f\"";
         JexlScript s = jexl.createScript(src);
@@ -1306,7 +1305,7 @@ class Issues300Test {
     }
 
     @Test
-    void testUnsolvableMethod() throws Exception {
+    void testUnsolvableMethod() {
         final JexlEngine jexl = new JexlBuilder().create();
         // @formatter:off
         final JexlScript script = jexl.createScript(

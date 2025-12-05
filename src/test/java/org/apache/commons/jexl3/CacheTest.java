@@ -521,13 +521,11 @@ class CacheTest extends JexlTestCase {
 
     private static final JexlEngine jexlCache = new JexlBuilder()
         .cache(1024)
-        .debug(true)
         .strict(true)
         .create();
 
     private static final JexlEngine jexlNoCache = new JexlBuilder()
         .cache(0)
-        .debug(true)
         .strict(true)
         .create();
 

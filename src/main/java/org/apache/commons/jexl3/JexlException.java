@@ -1073,12 +1073,12 @@ public class JexlException extends RuntimeException {
      * Format is "debug![begin,end]: string \n msg" where:
      * </p>
      * <ul>
-     * <li>debug is the debugging information if it exists (@link JexlEngine.setDebug)</li>
+     * <li>debug is the debugging information if it exists {@link JexlBuilder#debug(boolean)}</li>
      * <li>begin, end are character offsets in the string for the precise location of the error</li>
      * <li>string is the string representation of the offending expression</li>
      * <li>msg is the actual explanation message for this error</li>
      * </ul>
-     *
+     * @see JexlEngine#isDebug()
      * @return this error as a string
      */
     @Override

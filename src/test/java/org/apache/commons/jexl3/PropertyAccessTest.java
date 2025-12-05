@@ -189,7 +189,7 @@ class PropertyAccessTest extends JexlTestCase {
     }
 
     @Test
-    void test250() throws Exception {
+    void test250() {
         final MapContext ctx = new MapContext();
         final HashMap<Object, Object> x = new HashMap<>();
         x.put(2, "123456789");
@@ -235,7 +235,7 @@ class PropertyAccessTest extends JexlTestCase {
     }
 
     @Test
-    void test275a() throws Exception {
+    void test275a() {
         final JexlEngine jexl = new JexlBuilder().strict(true).safe(false).create();
         final JexlContext ctxt = new MapContext();
         Object result = null;
@@ -275,7 +275,7 @@ class PropertyAccessTest extends JexlTestCase {
     }
 
     @Test
-    void test275b() throws Exception {
+    void test275b() {
         final JexlEngine jexl = new JexlBuilder().strict(true).safe(true).create();
         final JexlContext ctxt = new MapContext();
         JexlScript script;
@@ -307,7 +307,7 @@ class PropertyAccessTest extends JexlTestCase {
     }
 
     @Test
-    void testErroneousIdentifier() throws Exception {
+    void testErroneousIdentifier() {
         final MapContext ctx = new MapContext();
         final JexlEngine engine = new JexlBuilder().strict(true).silent(false).create();
 
@@ -370,9 +370,9 @@ class PropertyAccessTest extends JexlTestCase {
     }
 
     @Test
-    void testInnerProperty() throws Exception {
+    void testInnerProperty() {
         final PropertyArithmetic pa = new PropertyArithmetic(true);
-        final JexlEngine jexl = new JexlBuilder().arithmetic(pa).debug(true).strict(true).cache(32).create();
+        final JexlEngine jexl = new JexlBuilder().arithmetic(pa).strict(true).cache(32).create();
         final Container quux = new Container("quux", 42);
         final JexlScript get;
         Object result;
@@ -426,9 +426,9 @@ class PropertyAccessTest extends JexlTestCase {
     }
 
     @Test
-    void testInnerViaArithmetic() throws Exception {
+    void testInnerViaArithmetic() {
         final PropertyArithmetic pa = new PropertyArithmetic(true);
-        final JexlEngine jexl = new JexlBuilder().arithmetic(pa).debug(true).strict(true).cache(32).create();
+        final JexlEngine jexl = new JexlBuilder().arithmetic(pa).strict(true).cache(32).create();
         final PropertyContainer quux = new PropertyContainer("bar", 169);
         Object result;
 
@@ -520,7 +520,7 @@ class PropertyAccessTest extends JexlTestCase {
         }
     }
      @Test
-    void testStringIdentifier() throws Exception {
+    void testStringIdentifier() {
         final Map<String, String> foo = new HashMap<>();
 
         final JexlContext jc = new MapContext();

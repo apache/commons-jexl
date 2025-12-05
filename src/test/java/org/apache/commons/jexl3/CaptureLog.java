@@ -17,6 +17,7 @@ package org.apache.commons.jexl3;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.apache.commons.logging.Log;
 
@@ -47,6 +48,17 @@ public class CaptureLog implements Log {
             }
         }
         return count;
+    }
+
+    public List<String> getCapturedMessages() {
+        return captured.stream()
+                .map(a -> a[2])
+                .filter(o -> o instanceof String)
+                .map(o -> (String) o).collect(Collectors.toList());
+    }
+
+    public void clear() {
+        captured.clear();
     }
 
     @Override
