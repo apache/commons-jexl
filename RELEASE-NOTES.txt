@@ -1,7 +1,7 @@
 
 
                             Apache Commons JEXL
-                               Version 3.6.0
+                               Version 3.6.1
                                Release Notes
 
 
@@ -29,6 +29,25 @@ Download page: https://commons.apache.org/proper/commons-jexl/download_jexl.cgi
 
 Have fun!
 -Apache Commons Team
+
+========================================================================================================================
+Release 3.6.1
+========================================================================================================================
+
+Version 3.6.1 is a minor release.
+
+Compatibility with previous releases
+====================================
+Version 3.6.1 is source and binary compatible with 3.6.
+
+
+Bugs Fixed in 3.6.1:
+====================
+* JEXL-452:     Debug setting in Engine shows class/method/line even when set to false.
+* JEXL-451:     Restore JexlSandbox permission capabilities on Object.class.
+* JEXL-450:     Disable instantiation of internal classes in RESTRICTED mode.
+* JEXL-449:     Inconsistency on nature of curly-bracket syntactic elements regarding annotations.
+
 
 ========================================================================================================================
 Release 3.6.0

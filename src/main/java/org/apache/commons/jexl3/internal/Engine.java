@@ -439,7 +439,7 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
     protected Object doCreateInstance(final Object clazz, final Object... args) {
         JexlException xjexl = null;
         Object result = null;
-        final JexlInfo info = debug ? createInfo() : null;
+        final JexlInfo info = createInfo();
         try {
             JexlMethod ctor = uberspect.getConstructor(clazz, args);
             if (ctor == null && arithmetic.narrowArguments(args)) {
@@ -585,7 +585,7 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
         src = "#0" + (src.charAt(0) == '[' ? "" : ".") + src;
         try {
             final Scope scope = new Scope(null, "#0");
-            final ASTJexlScript script = parse(null, PROPERTY_FEATURES, src, scope);
+            final ASTJexlScript script = parse(createInfo(), PROPERTY_FEATURES, src, scope);
             final JexlNode node = script.jjtGetChild(0);
             final Frame frame = script.createFrame(bean);
             final Interpreter interpreter = createInterpreter(context == null ? EMPTY_CONTEXT : context, frame, options);
@@ -694,7 +694,7 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
     public Object invokeMethod(final Object obj, final String meth, final Object... args) {
         JexlException xjexl = null;
         Object result = null;
-        final JexlInfo info = debug ? createInfo() : null;
+        final JexlInfo info = createInfo();
         try {
             JexlMethod method = uberspect.getMethod(obj, meth, args);
             if (method == null && arithmetic.narrowArguments(args)) {
@@ -790,7 +790,7 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
                 return (ASTJexlScript) c;
             }
         }
-        final JexlInfo ninfo = info == null && debug ? createInfo() : info;
+        final JexlInfo ninfo = info != null ? info : createInfo();
         final JexlEngine se = putThreadEngine(this);
         ASTJexlScript script;
         try {
@@ -1016,7 +1016,7 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
         src = "#0" + (src.charAt(0) == '[' ? "" : ".") + src + "=#1";
         try {
             final Scope scope = new Scope(null, "#0", "#1");
-            final ASTJexlScript script = parse(null, PROPERTY_FEATURES, src, scope);
+            final ASTJexlScript script = parse(createInfo(), PROPERTY_FEATURES, src, scope);
             final JexlNode node = script.jjtGetChild(0);
             final Frame frame = script.createFrame(bean, value);
             final Interpreter interpreter = createInterpreter(context != null ? context : EMPTY_CONTEXT, frame, options);

@@ -414,16 +414,16 @@ public class JexlBuilder {
     }
 
     /**
-     * Gets the debug flag
+     * Gets the debug flag.
      * @return the debugging information flag
      */
     public Boolean debug() {
         return this.debug;
     }
 
-   /**
+    /**
      * Sets whether the engine will report debugging information when error occurs.
-     *
+     * @see JexlEngine#isDebug()
      * @param flag true implies debug is on, false implies debug is off.
      * @return this builder
      */

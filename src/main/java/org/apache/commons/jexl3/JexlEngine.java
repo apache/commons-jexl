@@ -274,7 +274,7 @@ public abstract class JexlEngine {
      * @return a JexlInfo instance
      */
     public JexlInfo createInfo() {
-        return new JexlInfo();
+        return isDebug()? new JexlInfo() : new JexlInfo("jexl", 1, 1);
     }
 
     /**
@@ -528,6 +528,13 @@ public abstract class JexlEngine {
 
     /**
      * Checks whether this engine is in debug mode.
+     *
+     * <p>If set to true which is the default, when calling {@link JexlEngine#newInstance}, {@link JexlEngine#invokeMethod},
+     * {@link JexlEngine#setProperty}, {@link JexlEngine#getProperty} or if no {@link JexlInfo} instance is provided when
+     * creating a script and an error occurs during execution, the error message will contain the stack-trace (class/method/line)
+     * location of the caller for the methods, of the creator for the script; this may not be desirable in rare environments where
+     * vulnerability assessments are strict.</p>
+     * @see JexlBuilder#debug(boolean)
      *
      * @return true if debug is on, false otherwise
      */
