@@ -80,7 +80,6 @@
         <commons.rc.version>RC1</commons.rc.version>
         <commons.release.isDistModule>true</commons.release.isDistModule>
         <commons.distSvnStagingUrl>scm:svn:https://dist.apache.org/repos/dist/dev/commons/${commons.componentid}</commons.distSvnStagingUrl>
-        <commons.repo.name>commons-${commons.componentid}</commons.repo.name>
     </properties>
     <scm>
       <connection>scm:git:https://gitbox.apache.org/repos/asf/${commons.repo.name}.git</connection>
