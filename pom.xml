@@ -88,10 +88,6 @@
       <url>https://gitbox.apache.org/repos/asf?p=${commons.repo.name}.git</url>
       <tag>rel/${commons.repo.name}-${commons.release.version}</tag>
     </scm>
-    <issueManagement>
-        <system>jira</system>
-        <url>https://issues.apache.org/jira/browse/JEXL</url>
-    </issueManagement>
     <distributionManagement>
         <site>
             <id>apache.website</id>
