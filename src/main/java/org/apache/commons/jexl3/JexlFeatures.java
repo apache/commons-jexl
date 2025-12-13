@@ -35,22 +35,22 @@ import java.util.function.Predicate;
  * constructor: the 2 convenience methods {@link JexlFeatures#createNone()} and {@link JexlFeatures#createAll()}
  * are the recommended starting points to selectively enable or disable chosen features.</p>
  * <ul>
- * <li>Registers: register syntax (#number), used internally for {g,s}etProperty
- * <li>Reserved Names: a set of reserved variable names that cannot be used as local variable (or parameter) names
- * <li>Global Side Effect : assigning/modifying values on global variables (=, += , -=, ...)
- * <li>Lexical: lexical scope, prevents redefining local variables
- * <li>Lexical Shade: local variables shade globals, prevents confusing a global variable with a local one
- * <li>Side Effect : assigning/modifying values on any variables or left-value
- * <li>Constant Array Reference: ensures array references only use constants;they should be statically solvable.
- * <li>New Instance: creating an instance using new(...)
- * <li>Loops: loop constructs (while(true), for(...))
- * <li>Lambda: function definitions (()-&gt;{...}, function(...) ).
+ * <li>Registers: register syntax (#number), used internally for {g,s}etProperty</li>
+ * <li>Reserved Names: a set of reserved variable names that cannot be used as local variable (or parameter) names</li>
+ * <li>Global Side Effect : assigning/modifying values on global variables (=, += , -=, ...)</li>
+ * <li>Lexical: lexical scope, prevents redefining local variables</li>
+ * <li>Lexical Shade: local variables shade globals, prevents confusing a global variable with a local one</li>
+ * <li>Side Effect : assigning/modifying values on any variables or left-value</li>
+ * <li>Constant Array Reference: ensures array references only use constants;they should be statically solvable.</li>
+ * <li>New Instance: creating an instance using new(...)</li>
+ * <li>Loops: loop constructs (while(true), for(...))</li>
+ * <li>Lambda: function definitions (()-&gt;{...}, function(...) ).</li>
  * <li>Method calls: calling methods (obj.method(...) or obj['method'](...)); when disabled, leaves function calls
- * - including namespace prefixes - available
- * <li>Structured literals: arrays, lists, maps, sets, ranges
- * <li>Pragma: pragma construct as in {@code #pragma x y}
- * <li>Annotation: @annotation statement;
- * <li>Thin-arrow: use the thin-arrow, ie {@code ->} for lambdas as in {@code x -> x + x}
+ * - including namespace prefixes - available</li>
+ * <li>Structured literals: arrays, lists, maps, sets, ranges</li>
+ * <li>Pragma: pragma construct as in {@code #pragma x y}</li>
+ * <li>Annotation: @annotation statement;</li>
+ * <li>Thin-arrow: use the thin-arrow, ie {@code ->} for lambdas as in {@code x -> x + x}</li>
  * <li>Fat-arrow: use the  fat-arrow, ie {@code =>} for lambdas as in {@code x => x + x}
  * <li>Namespace pragma: whether the {@code #pragma jexl.namespace.ns namespace} syntax is allowed</li>
  * <li>Namespace identifier: whether the {@code ns:fun(...)} parser treats the ns:fun as one identifier, no spaces allowed</li>
