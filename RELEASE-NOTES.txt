@@ -6,7 +6,7 @@ The Apache Commons JEXL team is pleased to announce the release of Apache Common
 Introduction
 ------------
 
-Apache Commons JEXL is a library that enables the implementation of scripting features in Java applications and frameworks.
+Apache Commons JEXL is a library that enables scripting features in Java applications and frameworks.
 
 This is a feature and maintenance release. Java 8 or later is required.
 

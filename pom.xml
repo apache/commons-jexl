@@ -25,7 +25,7 @@
     <artifactId>commons-jexl3</artifactId>
     <version>3.6.2-SNAPSHOT</version>
     <name>Apache Commons JEXL</name>
-    <description>Apache Commons JEXL is a library that enables the implementation of scripting features in Java applications and frameworks.</description>
+    <description>Apache Commons JEXL is a library that enables scripting features in Java applications and frameworks..</description>
     <url>https://commons.apache.org/proper/commons-jexl/</url>
     <inceptionYear>2001</inceptionYear>
     <properties>
