@@ -548,7 +548,7 @@ public final class JexlFeatures {
     /**
      * Sets whether looping constructs are enabled.
      * <p>
-     * When disabled, parsing a script/expression using syntactic looping constructs (for,while)
+     * When disabled, parsing a script/expression using syntactic looping constructs (for, while)
      * will throw a parsing exception.
      * </p>
      * @param flag true to enable, false to disable

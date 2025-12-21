@@ -189,7 +189,7 @@ final class ClassMap {
      * </p>
      * <p>
      * Since the invocation of the associated method is dynamic, there is no need (nor way) to differentiate between
-     * foo(int,int) and foo(Integer,Integer) since in practice only the latter form will be used through a call.
+     * foo(int, int) and foo(Integer, Integer) since in practice only the latter form will be used through a call.
      * This of course, applies to all 8 primitive types.
      * </p>
      * Uses ConcurrentMap since 3.0, marginally faster than 2.1 under contention.
