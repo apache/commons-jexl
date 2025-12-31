@@ -24,6 +24,7 @@ import org.apache.commons.jexl3.JexlException;
 
 /**
  * Specialized executor to invoke a method on an object.
+ *
  * @since 2.0
  */
 public final class MethodExecutor extends AbstractExecutor.Method {
@@ -37,6 +38,7 @@ public final class MethodExecutor extends AbstractExecutor.Method {
      * If the object is a class, an attempt will be made to find the
      * method as a static method of that class.
      * </p>
+     *
      * @param is the introspector used to discover the method
      * @param obj the object to introspect
      * @param method the name of the method to find
@@ -64,6 +66,7 @@ public final class MethodExecutor extends AbstractExecutor.Method {
 
     /**
      * Creates a new instance.
+     *
      * @param c the class this executor applies to
      * @param m the method
      * @param k the MethodKey
@@ -84,6 +87,7 @@ public final class MethodExecutor extends AbstractExecutor.Method {
 
     /**
      * Reassembles arguments if the method is a vararg method.
+     *
      * @param args The actual arguments being passed to this method
      * @return The actual parameters adjusted for the varargs in order
      * to fit the method declaration.

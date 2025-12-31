@@ -35,6 +35,7 @@ public class ArrayListWrapper extends AbstractList<Object> implements RandomAcce
 
     /**
      * Create the wrapper.
+     *
      * @param anArray {@link #array}
      */
     public ArrayListWrapper(final Object anArray) {

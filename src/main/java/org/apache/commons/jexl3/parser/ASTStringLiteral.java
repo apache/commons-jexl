@@ -29,6 +29,7 @@ public final class ASTStringLiteral extends JexlNode implements JexlNode.Constan
 
     /**
      * Gets the literal value.
+     *
      * @return the string literal
      */
     @Override

@@ -62,6 +62,7 @@ import java.util.function.Predicate;
  * <li>Const Capture: whether variables captured by lambdas are read-only (aka const, same as Java) or read-write.</li>
  * <li>Reference Capture: whether variables captured by lambdas are pass-by-reference or pass-by-value.</li>
  * </ul>
+ *
  * @since 3.2
  */
 public final class JexlFeatures {
@@ -174,6 +175,7 @@ public final class JexlFeatures {
     /**
      * Protected future syntactic elements.
      * <p><em>class, jexl, $jexl</em></p>
+     *
      * @since 3.3.1
      */
     private static final Set<String> RESERVED_WORDS =
@@ -189,6 +191,7 @@ public final class JexlFeatures {
 
      /**
      * Creates an all features enabled set.
+     *
      * @return a new instance of all features set
      * @since 3.3.1
      */
@@ -219,6 +222,7 @@ public final class JexlFeatures {
      *   <li>import pragma, {@link JexlFeatures#supportsImportPragma()}</li>
      *   <li>pragma anywhere, {@link JexlFeatures#supportsPragmaAnywhere()}</li>
      * </ul>
+     *
      * @return a new instance of a default scripting features set
      * @since 3.3.1
      */
@@ -230,6 +234,7 @@ public final class JexlFeatures {
      * Creates an empty feature set.
      * <p>This is the strictest base-set since no feature is allowed, suitable as-is only
      * for the simplest expressions.</p>
+     *
      * @return a new instance of an empty features set
      * @since 3.3.1
      */
@@ -251,6 +256,7 @@ public final class JexlFeatures {
      * <p>It also adds a set of reserved words to enable future unencumbered syntax evolution:
      * <em>try, catch, throw, finally, switch, case, default, class, instanceof</em>
      * </p>
+     *
      * @return a new instance of a modern scripting features set
      * @since 3.3.1
      */
@@ -260,6 +266,7 @@ public final class JexlFeatures {
 
     /**
      * The text corresponding to a feature code.
+     *
      * @param feature the feature number
      * @return the feature name
      */
@@ -286,6 +293,7 @@ public final class JexlFeatures {
 
     /**
      * Copy constructor.
+     *
      * @param features the feature to copy from
      */
     public JexlFeatures(final JexlFeatures features) {
@@ -296,6 +304,7 @@ public final class JexlFeatures {
      * An all member constructor for derivation.
      * <p>Not respecting immutability or thread-safety constraints for this class constructor arguments will
      * likely result in unexpected behavior.</p>
+     *
      * @param f flag
      * @param r reserved variable names; must be an immutable Set or thread-safe (concurrent or synchronized set)
      * @param n namespace predicate; must be stateless or thread-safe
@@ -312,6 +321,7 @@ public final class JexlFeatures {
      * When disabled, parsing a script/expression using syntactic annotation constructs (@annotation)
      * will throw a parsing exception.
      * </p>
+     *
      * @param flag true to enable, false to disable
      * @return this features instance
      */
@@ -326,6 +336,7 @@ public final class JexlFeatures {
      * When disabled, parsing a script/expression using 'obj[ ref ]' where ref is not a string or integer literal
      * will throw a parsing exception;
      * </p>
+     *
      * @param flag true to enable, false to disable
      * @return this features instance
      */
@@ -340,6 +351,7 @@ public final class JexlFeatures {
      * When disabled, comparison operators names (eq;ne;le;lt;ge;gt)
      * will be treated as plain identifiers.
      * </p>
+     *
      * @param flag true to enable, false to disable
      * @return this features instance
      * @since 3.3
@@ -355,6 +367,7 @@ public final class JexlFeatures {
      * When disabled, lambda-captured variables are implicitly converted to read-write local variable (let),
      * when enabled, those are implicitly converted to read-only local variables (const).
      * </p>
+     *
      * @param flag true to enable, false to disable
      * @return this features instance
      */
@@ -371,6 +384,7 @@ public final class JexlFeatures {
      * When disabled, lambda-captured variables use pass-by-value semantic,
      * when enabled, those use pass-by-reference semantic.
      * </p>
+     *
      * @param flag true to enable, false to disable
      * @return this features instance
      */
@@ -409,6 +423,7 @@ public final class JexlFeatures {
      * When disabled, parsing a script/expression using syntactic fat-arrow (=&lt;)
      * will throw a parsing exception.
      * </p>
+     *
      * @param flag true to enable, false to disable
      * @return this features instance
      * @since 3.3
@@ -420,6 +435,7 @@ public final class JexlFeatures {
 
     /**
      * Gets a feature flag value.
+     *
      * @param feature feature ordinal
      * @return true if on, false if off
      */
@@ -429,6 +445,7 @@ public final class JexlFeatures {
 
     /**
      * Gets the feature flags
+     *
      * @return these features&quot;s flags
      */
     public long getFlags() {
@@ -437,6 +454,7 @@ public final class JexlFeatures {
 
     /**
      * Gets the immutable set of reserved names.
+     *
      * @return the (unmodifiable) set of reserved names.
      */
     public Set<String> getReservedNames() {
@@ -457,6 +475,7 @@ public final class JexlFeatures {
      * When disabled, parsing a script/expression using syntactic import pragma constructs
      * (#pragma jexl.import....) will throw a parsing exception.
      * </p>
+     *
      * @param flag true to enable, false to disable
      * @return this features instance
      * @since 3.3
@@ -468,6 +487,7 @@ public final class JexlFeatures {
 
     /**
      * Is the lexical scope feature enabled?
+     *
      * @return whether lexical scope feature is enabled */
     public boolean isLexical() {
         return getFeature(LEXICAL);
@@ -475,6 +495,7 @@ public final class JexlFeatures {
 
     /**
      * Is the lexical shade feature enabled?
+     *
      * @return whether lexical shade feature is enabled */
     public boolean isLexicalShade() {
         return getFeature(LEXICAL_SHADE);
@@ -482,6 +503,7 @@ public final class JexlFeatures {
 
     /**
      * Checks whether a name is reserved.
+     *
      * @param name the name to check
      * @return true if reserved, false otherwise
      */
@@ -495,6 +517,7 @@ public final class JexlFeatures {
      * When disabled, parsing a script/expression using syntactic lambda constructs (-&gt;,function)
      * will throw a parsing exception.
      * </p>
+     *
      * @param flag true to enable, false to disable
      * @return this features instance
      */
@@ -537,6 +560,7 @@ public final class JexlFeatures {
      * When disabled, parsing a script/expression using a local variable or parameter syntax
      * will throw a parsing exception.
      * </p>
+     *
      * @param flag true to enable, false to disable
      * @return this features instance
      */
@@ -551,6 +575,7 @@ public final class JexlFeatures {
      * When disabled, parsing a script/expression using syntactic looping constructs (for, while)
      * will throw a parsing exception.
      * </p>
+     *
      * @param flag true to enable, false to disable
      * @return this features instance
      */
@@ -565,6 +590,7 @@ public final class JexlFeatures {
      * When disabled, parsing a script/expression using 'obj.method()'
      * will throw a parsing exception;
      * </p>
+     *
      * @param flag true to enable, false to disable
      * @return this features instance
      */
@@ -579,6 +605,7 @@ public final class JexlFeatures {
      * When disabled, parsing a script/expression using syntactic namespace pragma constructs
      * (#pragma jexl.namespace....) will throw a parsing exception.
      * </p>
+     *
      * @param flag true to enable, false to disable
      * @return this features instance
      * @since 3.3
@@ -594,6 +621,7 @@ public final class JexlFeatures {
      * When enabled, a namespace call must be of the form <code>ns:fun(...)</code> with no
      * spaces between the namespace name and the function.
      * </p>
+     *
      * @param flag true to enable, false to disable
      * @return this features instance
      * @since 3.5.0
@@ -605,6 +633,7 @@ public final class JexlFeatures {
 
     /**
      * Gets the declared namespaces test.
+     *
      * @return the declared namespaces test.
      */
     public Predicate<String> namespaceTest() {
@@ -613,6 +642,7 @@ public final class JexlFeatures {
 
     /**
      * Sets a test to determine namespace declaration.
+     *
      * @param names the name predicate
      * @return this features instance
      */
@@ -627,6 +657,7 @@ public final class JexlFeatures {
      * When disabled, parsing a script/expression using 'new(...)' will throw a parsing exception;
      * using a class as functor will fail at runtime.
      * </p>
+     *
      * @param flag true to enable, false to disable
      * @return this features instance
      */
@@ -641,6 +672,7 @@ public final class JexlFeatures {
      * When disabled, parsing a script/expression using syntactic pragma constructs (#pragma)
      * will throw a parsing exception.
      * </p>
+     *
      * @param flag true to enable, false to disable
      * @return this features instance
      */
@@ -673,6 +705,7 @@ public final class JexlFeatures {
      * <p>
      * When disabled, parsing a script/expression using the register syntax will throw a parsing exception.
      * </p>
+     *
      * @param flag true to enable, false to disable
      * @return this features instance
      */
@@ -683,6 +716,7 @@ public final class JexlFeatures {
 
     /**
      * Sets a collection of reserved r precluding those to be used as local variables or parameter r.
+     *
      * @param names the r to reserve
      * @return this features instance
      */
@@ -701,6 +735,7 @@ public final class JexlFeatures {
      * When disabled, parsing a script using syntactic script constructs (statements, ...)
      * will throw a parsing exception.
      * </p>
+     *
      * @param flag true to enable, false to disable
      * @return this features instance
      */
@@ -711,6 +746,7 @@ public final class JexlFeatures {
 
     /**
      * Sets a feature flag.
+     *
      * @param feature the feature ordinal
      * @param flag    turn-on, turn off
      */
@@ -729,6 +765,7 @@ public final class JexlFeatures {
      * ambiguous. The default will report ambiguity in cases like <code>if (true) { x 5 }</code> considering this
      * may be missing an operator or that the intent is not clear.
      * </p>
+     *
      * @param flag true to enable, false to disable
      * @return this features instance
      */
@@ -744,6 +781,7 @@ public final class JexlFeatures {
      * ambiguous. The default will report ambiguity in cases like <code>if (true) { x 5 }</code> considering this
      * may be missing an operator or that the intent is not clear.
      * </p>
+     *
      * @return true if statements can be ambiguous, false otherwise
      */
     public boolean supportsAmbiguousStatement() {
@@ -756,6 +794,7 @@ public final class JexlFeatures {
      * When disabled, parsing a script/expression using syntactical constructs modifying variables
      * or members will throw a parsing exception.
      * </p>
+     *
      * @param flag true to enable, false to disable
      * @return this features instance
      */
@@ -770,6 +809,7 @@ public final class JexlFeatures {
      * When disabled, parsing a script/expression using syntactical constructs modifying variables
      * <em>including all potentially ant-ish variables</em> will throw a parsing exception.
      * </p>
+     *
      * @param flag true to enable, false to disable
      * @return this features instance
      */
@@ -784,6 +824,7 @@ public final class JexlFeatures {
      * When disabled, parsing a script/expression creating one of these literals
      * will throw a parsing exception;
      * </p>
+     *
      * @param flag true to enable, false to disable
      * @return this features instance
      */
@@ -794,6 +835,7 @@ public final class JexlFeatures {
 
     /**
      * Does the engine support annotations?
+     *
      * @return true if annotation are enabled, false otherwise
      */
     public boolean supportsAnnotation() {
@@ -802,6 +844,7 @@ public final class JexlFeatures {
 
     /**
      * Does the engine support array references which contain method call expressions?
+     *
      * @return true if array references can contain method call expressions, false otherwise
      */
     public boolean supportsArrayReferenceExpr() {
@@ -810,6 +853,7 @@ public final class JexlFeatures {
 
     /**
      * Does the engine support legacy comparison operator names syntax?
+     *
      * @return true if legacy comparison operator names syntax is enabled, false otherwise
      * @since 3.3
      */
@@ -819,6 +863,7 @@ public final class JexlFeatures {
 
     /**
      * Does the engine support lambda captured-variables as const?
+     *
      * @return true if lambda captured-variables are const, false otherwise
      */
     public boolean supportsConstCapture() {
@@ -827,6 +872,7 @@ public final class JexlFeatures {
 
     /**
      * Does the engine support lambda captured-variables as references?
+     *
      * @return true if lambda captured-variables are references, false otherwise
      */
     public boolean supportsReferenceCapture() {
@@ -835,6 +881,7 @@ public final class JexlFeatures {
 
     /**
      * Does the engine support expressions (aka not scripts)
+     *
      * @return true if expressions (aka not scripts) are enabled, false otherwise
      */
     public boolean supportsExpression() {
@@ -843,6 +890,7 @@ public final class JexlFeatures {
 
     /**
      * Does the engine support fat-arrow lambda syntax?
+     *
      * @return true if fat-arrow lambda syntax is enabled, false otherwise
      * @since 3.3
      */
@@ -852,6 +900,7 @@ public final class JexlFeatures {
 
     /**
      * Does the engine support import pragma?
+     *
      * @return true if import pragma are enabled, false otherwise
      * @since 3.3
      */
@@ -861,6 +910,7 @@ public final class JexlFeatures {
 
     /**
      * Does the engine support lambdas?
+     *
      * @return true if lambda are enabled, false otherwise
      */
     public boolean supportsLambda() {
@@ -869,6 +919,7 @@ public final class JexlFeatures {
 
     /**
      * Is local variables syntax enabled?
+     *
      * @return true if local variables syntax is enabled
      */
     public boolean supportsLocalVar() {
@@ -877,6 +928,7 @@ public final class JexlFeatures {
 
     /**
      * Are loops enabled?
+     *
      * @return true if loops are enabled, false otherwise
      */
     public boolean supportsLoops() {
@@ -885,6 +937,7 @@ public final class JexlFeatures {
 
     /**
      * Can array references contain expressions?
+     *
      * @return true if array references can contain expressions, false otherwise
      */
     public boolean supportsMethodCall() {
@@ -893,6 +946,7 @@ public final class JexlFeatures {
 
     /**
      * Is namespace pragma enabled?
+     *
      * @return true if namespace pragma are enabled, false otherwise
      * @since 3.3
      */
@@ -902,6 +956,7 @@ public final class JexlFeatures {
 
     /**
      * Is namespace identifier syntax enabled?
+     *
      * @return true if namespace identifier syntax is enabled, false otherwise
      * @since 3.5.0
      */
@@ -911,6 +966,7 @@ public final class JexlFeatures {
 
     /**
      * Is creating new instances enabled?
+     *
      * @return true if creating new instances is enabled, false otherwise
      */
     public boolean supportsNewInstance() {
@@ -919,6 +975,7 @@ public final class JexlFeatures {
 
     /**
      * Is the namespace pragma enabled?
+     *
      * @return true if namespace pragma are enabled, false otherwise
      */
     public boolean supportsPragma() {
@@ -927,6 +984,7 @@ public final class JexlFeatures {
 
     /**
      * Can pragma constructs appear anywhere in the code?
+     *
      * @return true if pragma constructs can appear anywhere in the code, false otherwise
      * @since 3.3
      */
@@ -936,6 +994,7 @@ public final class JexlFeatures {
 
     /**
      * Is register syntax enabled?
+     *
      * @return true if register syntax is enabled
      */
     public boolean supportsRegister() {
@@ -944,6 +1003,7 @@ public final class JexlFeatures {
 
     /**
      * Are scripts enabled?
+     *
      * @return true if scripts are enabled, false otherwise
      */
     public boolean supportsScript() {
@@ -952,6 +1012,7 @@ public final class JexlFeatures {
 
     /**
      * Are side effects enabled?
+     *
      * @return true if side effects are enabled, false otherwise
      */
     public boolean supportsSideEffect() {
@@ -960,6 +1021,7 @@ public final class JexlFeatures {
 
     /**
      * Can global variables be assigned?
+     *
      * @return true if global variables can be assigned
      */
     public boolean supportsSideEffectGlobal() {
@@ -968,6 +1030,7 @@ public final class JexlFeatures {
 
     /**
      * Are array/map/set literal expressions supported?
+     *
      * @return true if array/map/set literal expressions are supported, false otherwise
      */
     public boolean supportsStructuredLiteral() {
@@ -976,6 +1039,7 @@ public final class JexlFeatures {
 
     /**
      * Is thin-arrow lambda syntax enabled?
+     *
      * @return true if thin-arrow lambda syntax is enabled, false otherwise
      * @since 3.3
      */
@@ -989,6 +1053,7 @@ public final class JexlFeatures {
      * When disabled, parsing a script/expression using syntactic thin-arrow (-&lt;)
      * will throw a parsing exception.
      * </p>
+     *
      * @param flag true to enable, false to disable
      * @return this features instance
      * @since 3.3

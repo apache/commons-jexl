@@ -21,6 +21,7 @@ import java.util.List;
 
 /**
  * Specialized executor to get a property from a List or array.
+ *
  * @since 2.0
  */
 public final class ListGetExecutor extends AbstractExecutor.Get {
@@ -56,6 +57,7 @@ public final class ListGetExecutor extends AbstractExecutor.Get {
 
     /**
      * Creates an instance.
+     *
      * @param clazz he class the get method applies to
      * @param method the method held by this executor
      * @param index the index to use as an argument to the get method

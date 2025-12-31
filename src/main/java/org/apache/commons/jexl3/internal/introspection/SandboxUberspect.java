@@ -30,12 +30,14 @@ import org.apache.commons.jexl3.introspection.JexlUberspect;
 
 /**
  * An uberspect that controls usage of properties, methods and constructors through a sandbox.
+ *
  * @since 3.0
  */
 public final class SandboxUberspect implements JexlUberspect {
     /**
      * Identity equality.
      * <p>Spotbugs just <em>hates</em> string identity...</p>
+     *
      * @param lhs left hand side
      * @param rhs right hand side
      * @return true if left is identical to right
@@ -51,6 +53,7 @@ public final class SandboxUberspect implements JexlUberspect {
 
     /**
      * A constructor for JexlSandbox uberspect.
+     *
      * @param theUberspect the JexlUberspect to sandbox
      * @param theSandbox the sandbox which is copied to avoid changes at runtime
      */

@@ -214,6 +214,7 @@ public class JexlArithmetic {
     /**
      * Attempts transformation of potential array in an abstract list or leave as is.
      * <p>An array (as in int[]) is not convenient to call methods so when encountered we turn them into lists</p>
+     *
      * @param container an array or on object
      * @return an abstract list wrapping the array instance or the initial argument
      * @see org.apache.commons.jexl3.internal.introspection.ArrayListWrapper
@@ -242,6 +243,7 @@ public class JexlArithmetic {
     /**
      * Checks if the product of the arguments overflows a {@code long}.
      * <p>see java8 Math.multiplyExact
+     *
      * @param x the first value
      * @param y the second value
      * @param r the product
@@ -382,6 +384,7 @@ public class JexlArithmetic {
 
     /**
      * Creates an array builder.
+     *
      * @param size the number of elements in the array
      * @return an array builder instance
      * @deprecated since 3.3.1
@@ -443,6 +446,7 @@ public class JexlArithmetic {
 
     /**
      * Use or overload and() instead.
+     *
      * @param lhs left hand side
      * @param rhs right hand side
      * @return lhs &amp; rhs
@@ -485,6 +489,7 @@ public class JexlArithmetic {
     /**
      * Checks whether a potential collection contains another.
      * <p>Made protected to make it easier to override if needed.</p>
+     *
      * @param collection the container which can be a collection or an array (even of primitive)
      * @param value the value which can be a collection or an array (even of primitive) or a singleton
      * @return test result or null if there is no arithmetic solution
@@ -521,6 +526,7 @@ public class JexlArithmetic {
 
     /**
      * Any override of this method (pre 3.3) should be modified to match the new signature.
+     *
      * @param left left operand
      * @param right right operand
      * @param symbol the operator symbol
@@ -559,6 +565,7 @@ public class JexlArithmetic {
      * {@code x =~ y} means {@code y contains x} thus {@code contains(x, y)}.</p>
      * <p>When this method returns null during evaluation, the operator code continues trying to find
      * one through the uberspect.</p>
+     *
      * @param container the container
      * @param value the value
      * @return test result or null if there is no arithmetic solution
@@ -607,6 +614,7 @@ public class JexlArithmetic {
 
     /**
      * The result of +,/,-,*,% when both operands are null.
+     *
      * @param operator the actual operator
      * @return Integer(0) if lenient
      * @throws  JexlArithmetic.NullOperand if strict-cast
@@ -655,6 +663,7 @@ public class JexlArithmetic {
 
     /**
      * The last method called before returning a result from a script execution.
+     *
      * @param returned the returned value
      * @return the controlled returned value
      */
@@ -684,6 +693,7 @@ public class JexlArithmetic {
     /**
      * Creates a JexlArithmetic instance.
      * Called by options(...) method when another instance of the same class of arithmetic is required.
+     *
      * @see #options(org.apache.commons.jexl3.JexlEngine.Options)
      * @param astrict     whether this arithmetic is lenient or strict
      * @param bigdContext the math context instance to use for +,-,/,*,% operations on big decimals.
@@ -705,6 +715,7 @@ public class JexlArithmetic {
 
     /**
      * Decrements argument by 1.
+     *
      * @param val the argument
      * @return val - 1
      */
@@ -835,6 +846,7 @@ public class JexlArithmetic {
     /**
      * Check for emptiness of various types: Number, Collection, Array, Map, String.
      * <p>Override or overload this method to add new signatures to the size operators.
+     *
      * @param object the object to check the emptiness of
      * @return the boolean or false if object is not null
      * @since 3.2
@@ -937,6 +949,7 @@ public class JexlArithmetic {
 
     /**
      * Increments argument by 1.
+     *
      * @param val the argument
      * @return val + 1
      */
@@ -946,6 +959,7 @@ public class JexlArithmetic {
 
     /**
      * Add value to number argument.
+     *
      * @param val the number
      * @param incr the value to add
      * @return val + incr
@@ -1058,6 +1072,7 @@ public class JexlArithmetic {
      * <p>This is used to determine whether negate results on number literals can be cached.
      * If the result on calling negate with the same constant argument may change between calls,
      * which means the function is not deterministic, this method must return false.
+     *
      * @return true if negate is idempotent, false otherwise
      */
     public boolean isNegateStable() {
@@ -1066,6 +1081,7 @@ public class JexlArithmetic {
 
     /**
      * Checks if an operand is considered null.
+     *
      * @param value the operand
      * @return true if operand is considered null
      */
@@ -1092,6 +1108,7 @@ public class JexlArithmetic {
      * <p>This is used to determine whether positivize results on number literals can be cached.
      * If the result on calling positivize with the same constant argument may change between calls,
      * which means the function is not deterministic, this method must return false.
+     *
      * @return true if positivize is idempotent, false otherwise
      */
     public boolean isPositivizeStable() {
@@ -1117,6 +1134,7 @@ public class JexlArithmetic {
      * list of operators that are not strict are (==, [], []=, ., .=, empty, size, contains).</p>
      * <p>An arithmetic refining its strict behavior handling for more operators must declare which by overriding
      * this method.</p>
+     *
      * @param operator the operator to check for null-argument(s) handling
      * @return true if operator considers null arguments as errors, false if operator has appropriate semantics
      * for null argument(s)
@@ -1188,6 +1206,7 @@ public class JexlArithmetic {
 
     /**
      * Creates a map-builder.
+     *
      * @param size the number of elements in the map
      * @return a map-builder instance
      * @deprecated 3.3
@@ -1321,6 +1340,7 @@ public class JexlArithmetic {
 
     /**
      * Narrows a double to a float if there is no information loss.
+     *
      * @param value the double value
      * @param narrow the target narrow class
      * @return the narrowed or initial number
@@ -1440,6 +1460,7 @@ public class JexlArithmetic {
     /**
      * Given a long, attempt to narrow it to an int.
      * <p>Narrowing will only occur if no operand is a Long.
+     *
      * @param lhs  the left hand side operand that lead to the long result
      * @param rhs  the right hand side operand that lead to the long result
      * @param r the long to narrow
@@ -1568,6 +1589,7 @@ public class JexlArithmetic {
 
     /**
      * Apply options to this arithmetic which eventually may create another instance.
+     *
      * @see #createWithOptions(boolean, java.math.MathContext, int)
      * @param context the context that may extend {@link JexlContext.OptionsHandle} to use
      * @return a new arithmetic instance or this
@@ -1585,6 +1607,7 @@ public class JexlArithmetic {
 
     /**
      * Apply options to this arithmetic which eventually may create another instance.
+     *
      * @see #createWithOptions(boolean, java.math.MathContext, int)
      * @param options the {@link JexlEngine.Options} to use
      * @return an arithmetic with those options set
@@ -1613,6 +1636,7 @@ public class JexlArithmetic {
 
     /**
      * Apply options to this arithmetic which eventually may create another instance.
+     *
      * @see #createWithOptions(boolean, java.math.MathContext, int)
      * @param options the {@link JexlEngine.Options} to use
      * @return an arithmetic with those options set
@@ -1653,6 +1677,7 @@ public class JexlArithmetic {
     /**
      * Convert a string to a BigDecimal.
      * <>Empty string is considered as 0.</>
+     *
      * @param arg the arg
      * @return a BigDecimal
      * @throws CoercionException if the string cannot be coerced into a BigDecimal
@@ -1668,6 +1693,7 @@ public class JexlArithmetic {
     /**
      * Converts a string to a big integer.
      * <>Empty string is considered as 0.</>
+     *
      * @param arg the arg
      * @return a big integer
      * @throws ArithmeticException if the string cannot be coerced into a big integer
@@ -1683,6 +1709,7 @@ public class JexlArithmetic {
     /**
      * Convert a string to a double.
      * <>Empty string is considered as NaN.</>
+     *
      * @param arg the arg
      * @return a double
      * @throws ArithmeticException if the string cannot be coerced into a double
@@ -1698,6 +1725,7 @@ public class JexlArithmetic {
     /**
      * Converts a string to an int.
      * <p>This ensure the represented number is a natural (not a real).</p>
+     *
      * @param arg the arg
      * @return an int
      * @throws ArithmeticException if the string cannot be coerced into a long
@@ -1714,6 +1742,7 @@ public class JexlArithmetic {
     /**
      * Converts a string to a long.
      * <p>This ensure the represented number is a natural (not a real).</p>
+     *
      * @param arg the arg
      * @return a long
      * @throws ArithmeticException if the string cannot be coerced into a long
@@ -1733,6 +1762,7 @@ public class JexlArithmetic {
     /**
      * Parse an identifier which must be of the form:
      * 0|([1-9][0-9]*)
+     *
      * @param id the identifier
      * @return an integer or null
      */
@@ -1766,6 +1796,7 @@ public class JexlArithmetic {
      * Positivize value (unary plus for numbers).
      * <p>C/C++/C#/Java perform integral promotion of the operand, ie
      * cast to int if type can be represented as int without loss of precision.
+     *
      * @see #isPositivizeStable()
      * @param val the value to positivize
      * @return the positive value
@@ -1811,6 +1842,7 @@ public class JexlArithmetic {
 
     /**
      * Creates a set-builder.
+     *
      * @param size the number of elements in the set
      * @return a set-builder instance
      * @deprecated since 3.3.1
@@ -1991,6 +2023,7 @@ public class JexlArithmetic {
 
     /**
      * Test if a condition is true or false.
+     *
      * @param object the object to use as condition
      * @return true or false
      * @since 3.3

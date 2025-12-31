@@ -66,6 +66,7 @@ public class TemplateDebugger extends Debugger {
 
     /**
      * Position the debugger on the root of a template expression.
+     *
      * @param je the expression
      * @return true if the expression was a {@link TemplateExpression} instance, false otherwise
      */
@@ -79,6 +80,7 @@ public class TemplateDebugger extends Debugger {
 
     /**
      * Position the debugger on the root of a template script.
+     *
      * @param jt the template
      * @return true if the template was a {@link TemplateScript} instance, false otherwise
      */
@@ -110,6 +112,7 @@ public class TemplateDebugger extends Debugger {
 
     /**
      * In a template, any statement that is not 'jexl:print(n)' must be prefixed by "$$".
+     *
      * @param child the node to check
      * @return the expression number or -1 if the node is not a jexl:print
      */
@@ -221,6 +224,7 @@ public class TemplateDebugger extends Debugger {
 
     /**
      * Visit a composite expression.
+     *
      * @param expr the composite expression
      * @param data the visitor argument
      * @return the visitor argument
@@ -234,6 +238,7 @@ public class TemplateDebugger extends Debugger {
 
     /**
      * Visit a constant expression.
+     *
      * @param expr the constant expression
      * @param data the visitor argument
      * @return the visitor argument
@@ -245,6 +250,7 @@ public class TemplateDebugger extends Debugger {
 
     /**
      * Visit a deferred expression.
+     *
      * @param expr the deferred expression
      * @param data the visitor argument
      * @return the visitor argument
@@ -259,6 +265,7 @@ public class TemplateDebugger extends Debugger {
 
     /**
      * Visit an immediate expression.
+     *
      * @param expr the immediate expression
      * @param data the visitor argument
      * @return the visitor argument
@@ -273,6 +280,7 @@ public class TemplateDebugger extends Debugger {
 
     /**
      * Visit a nested expression.
+     *
      * @param expr the nested expression
      * @param data the visitor argument
      * @return the visitor argument
@@ -283,6 +291,7 @@ public class TemplateDebugger extends Debugger {
     }
     /**
      * Visit a template expression.
+     *
      * @param expr the constant expression
      * @param data the visitor argument
      * @return the visitor argument

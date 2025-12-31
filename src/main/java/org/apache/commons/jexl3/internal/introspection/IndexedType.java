@@ -42,6 +42,7 @@ public final class IndexedType implements JexlPropertyGet {
 
         /**
          * Creates a new duck container.
+         *
          * @param theType the container type
          * @param theContainer the container instance
          */
@@ -52,6 +53,7 @@ public final class IndexedType implements JexlPropertyGet {
 
         /**
          * Gets a property from this indexed container.
+         *
          * @param key the property key
          * @return the property value
          * @throws Exception if inner invocation fails
@@ -62,6 +64,7 @@ public final class IndexedType implements JexlPropertyGet {
 
         /**
          * Gets the property container class.
+         *
          * @return the container class
          */
         public Class<?> getContainerClass() {
@@ -70,6 +73,7 @@ public final class IndexedType implements JexlPropertyGet {
 
         /**
          * Gets the property container name.
+         *
          * @return the container name
          */
         public String getContainerName() {
@@ -78,6 +82,7 @@ public final class IndexedType implements JexlPropertyGet {
 
         /**
          * Sets a property in this indexed container.
+         *
          * @param key the property key
          * @param value the property value
          * @return the invocation result (frequently null)
@@ -128,6 +133,7 @@ public final class IndexedType implements JexlPropertyGet {
 
     /**
      * Creates a new indexed property container type.
+     *
      * @param name the container name
      * @param c the owning class
      * @param gets the array of getter methods
@@ -150,6 +156,7 @@ public final class IndexedType implements JexlPropertyGet {
 
     /**
      * Gets the value of a property from a container.
+     *
      * @param object the container instance (not null)
      * @param key the property key (not null)
      * @return the property value
@@ -182,6 +189,7 @@ public final class IndexedType implements JexlPropertyGet {
 
     /**
      * Sets the value of a property in a container.
+     *
      * @param object the container instance (not null)
      * @param key the property key (not null)
      * @param value the property value (not null)

@@ -88,6 +88,7 @@ public interface JexlContext {
 
         /**
          * Gets a cancelable boolean used by the interpreter.
+         *
          * @return a cancelable boolean used by the interpreter.
          */
         AtomicBoolean getCancellation();
@@ -157,6 +158,7 @@ public interface JexlContext {
 
         /**
          * Resolves a namespace by its name.
+         *
          * @param name the name.
          * @return the namespace object.
          */
@@ -165,6 +167,7 @@ public interface JexlContext {
 
     /**
      * A marker interface of the JexlContext that exposes runtime evaluation options.
+     *
      * @since 3.2
      */
     interface OptionsHandle {

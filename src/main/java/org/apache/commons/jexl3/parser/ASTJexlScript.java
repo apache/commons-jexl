@@ -45,6 +45,7 @@ public class ASTJexlScript extends JexlLexicalNode  {
 
     /**
      * Creates an array of arguments by copying values up to the number of parameters.
+     *
      * @param caller the calling frame
      * @param values the argument values
      * @return the arguments array
@@ -55,6 +56,7 @@ public class ASTJexlScript extends JexlLexicalNode  {
 
     /**
      * Creates an array of arguments by copying values up to the number of parameters.
+     *
      * @param values the argument values
      * @return the arguments array
      */
@@ -64,6 +66,7 @@ public class ASTJexlScript extends JexlLexicalNode  {
 
     /**
      * Gets the (maximum) number of arguments this script expects.
+     *
      * @return the number of parameters
      */
     public int getArgCount() {
@@ -72,6 +75,7 @@ public class ASTJexlScript extends JexlLexicalNode  {
 
     /**
      * Gets this script captured variable, i.e. symbols captured from outer scopes.
+     *
      * @return the captured variable names
      */
     public String[] getCapturedVariables() {
@@ -87,6 +91,7 @@ public class ASTJexlScript extends JexlLexicalNode  {
 
     /**
      * Gets this script local variable, i.e. symbols assigned to local variables.
+     *
      * @return the local variable names
      */
     public String[] getLocalVariables() {
@@ -95,6 +100,7 @@ public class ASTJexlScript extends JexlLexicalNode  {
 
     /**
      * Gets this script parameters, i.e. symbols assigned before creating local variables.
+     *
      * @return the parameter names
      */
     public String[] getParameters() {
@@ -117,6 +123,7 @@ public class ASTJexlScript extends JexlLexicalNode  {
 
     /**
      * Gets this script symbols, i.e. parameters and local variables.
+     *
      * @return the symbol names
      */
     public String[] getSymbols() {
@@ -125,6 +132,7 @@ public class ASTJexlScript extends JexlLexicalNode  {
 
     /**
      * Checks whether a given symbol is captured.
+     *
      * @param symbol the symbol number
      * @return true if captured, false otherwise
      */
@@ -139,6 +147,7 @@ public class ASTJexlScript extends JexlLexicalNode  {
 
     /**
      * Consider script with no parameters that return lambda as parametric-scripts.
+     *
      * @return the script
      */
     public ASTJexlScript script() {
@@ -153,6 +162,7 @@ public class ASTJexlScript extends JexlLexicalNode  {
 
     /**
      * Sets this script features.
+     *
      * @param theFeatures the features
      */
     public void setFeatures(final JexlFeatures theFeatures) {
@@ -161,6 +171,7 @@ public class ASTJexlScript extends JexlLexicalNode  {
 
     /**
      * Sets this script pragmas.
+     *
      * @param thePragmas the pragmas
      */
     public void setPragmas(final Map<String, Object> thePragmas) {
@@ -169,6 +180,7 @@ public class ASTJexlScript extends JexlLexicalNode  {
 
     /**
      * Sets this script scope.
+     *
      * @param theScope the scope
      */
     public void setScope(final Scope theScope) {

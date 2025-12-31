@@ -23,6 +23,7 @@ import org.apache.commons.jexl3.internal.Scope;
 
 /**
  * The interface that produces a JEXL script AST from a source.
+ *
  * @since 3.5.0
  */
 public interface JexlScriptParser {

@@ -23,18 +23,21 @@ public interface JavaccError {
 
     /**
      * Gets the last correct input.
+     *
      * @return the string after which the error occurred
      */
     String getAfter();
 
     /**
      * Gets the column number.
+     *
      * @return the column.
      */
     int getColumn();
 
     /**
      * Gets the line number.
+     *
      * @return line number.
      */
     int getLine();

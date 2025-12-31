@@ -20,6 +20,7 @@ import org.apache.commons.jexl3.internal.LexicalScope;
 
 /**
  * Base class for AST nodes behaving as lexical units.
+ *
  * @since 3.2
  */
 public abstract class JexlLexicalNode extends JexlNode implements JexlParser.LexicalUnit {

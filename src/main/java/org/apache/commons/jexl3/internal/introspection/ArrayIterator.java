@@ -47,6 +47,7 @@ public class ArrayIterator implements Iterator<Object> {
 
     /**
      * Creates a new iterator instance for the specified array.
+     *
      * @param arr The array for which an iterator is desired.
      */
     public ArrayIterator(final Object arr) {

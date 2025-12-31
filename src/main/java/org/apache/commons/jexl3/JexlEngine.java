@@ -106,6 +106,7 @@ public abstract class JexlEngine {
     /**
      * Script evaluation options.
      * <p>The JexlContext used for evaluation can implement this interface to alter behavior.</p>
+     *
      * @deprecated 3.2
      */
     @Deprecated
@@ -133,6 +134,7 @@ public abstract class JexlEngine {
 
         /**
          * Tests whether evaluation will throw JexlException.Cancel (true) or return null (false) when interrupted.
+         *
          * @return true when cancellable, false otherwise
          * @since 3.1
          */
@@ -205,6 +207,7 @@ public abstract class JexlEngine {
      * Accesses the current thread local engine.
      * <p>Advanced: you should only use this to retrieve the engine within a method/ctor called through the evaluation
      * of a script/expression.</p>
+     *
      * @return the engine or null
      */
     public static JexlEngine getThreadEngine() {
@@ -534,6 +537,7 @@ public abstract class JexlEngine {
      * creating a script and an error occurs during execution, the error message will contain the stack-trace (class/method/line)
      * location of the caller for the methods, of the creator for the script; this may not be desirable in rare environments where
      * vulnerability assessments are strict.</p>
+     *
      * @see JexlBuilder#debug(boolean)
      *
      * @return true if debug is on, false otherwise

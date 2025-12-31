@@ -75,6 +75,7 @@ public class Uberspect implements JexlUberspect {
 
     /**
      * Creates a new Uberspect.
+     *
      * @param runtimeLogger the logger used for all logging needs
      * @param sty the resolver strategy
      */
@@ -84,6 +85,7 @@ public class Uberspect implements JexlUberspect {
 
     /**
      * Creates a new Uberspect.
+     *
      * @param runtimeLogger the logger used for all logging needs
      * @param sty the resolver strategy
      * @param perms the introspector permissions
@@ -102,6 +104,7 @@ public class Uberspect implements JexlUberspect {
      * Gets the current introspector base.
      * <p>
      * If the reference has been collected, this method will recreate the underlying introspector.</p>
+     *
      * @return the introspector
      */
     protected final Introspector base() {
@@ -124,6 +127,7 @@ public class Uberspect implements JexlUberspect {
     /**
      * Computes which operators have an overload implemented in the arithmetic.
      * <p>This is used to speed up resolution and avoid introspection when possible.</p>
+     *
      * @param arithmetic the arithmetic instance
      * @return the set of overloaded operators
      */
@@ -174,6 +178,7 @@ public class Uberspect implements JexlUberspect {
 
     /**
      * Gets a class by name through this introspector class loader.
+     *
      * @param className the class name
      * @return the class instance or null if it could not be found
      */
@@ -209,6 +214,7 @@ public class Uberspect implements JexlUberspect {
 
     /**
      * Gets the accessible field names known for a given class.
+     *
      * @param c the class
      * @return the class field names
      */
@@ -290,6 +296,7 @@ public class Uberspect implements JexlUberspect {
 
     /**
      * Gets the accessible methods names known for a given class.
+     *
      * @param c the class
      * @return the class method names
      */
@@ -299,6 +306,7 @@ public class Uberspect implements JexlUberspect {
 
     /**
      * Gets all the methods with a given name from this map.
+     *
      * @param c          the class
      * @param methodName the seeked methods name
      * @return the array of methods

@@ -589,6 +589,7 @@ public class ScriptVisitor extends ParserVisitor {
 
     /**
      * Visits all AST constituents of a JEXL expression.
+     *
      * @param jscript the expression
      * @param data some data context
      * @return the visit result or null if jscript was not a Script implementation
@@ -603,6 +604,7 @@ public class ScriptVisitor extends ParserVisitor {
     /**
      * Visits a node.
      * Default implementation visits all its children.
+     *
      * @param node the node to visit
      * @param data visitor pattern argument
      * @return visitor pattern value
@@ -613,6 +615,7 @@ public class ScriptVisitor extends ParserVisitor {
 
     /**
      * Visits all AST constituents of a JEXL script.
+     *
      * @param jscript the expression
      * @param data some data context
      * @return the visit result or null if jscript was not a Script implementation

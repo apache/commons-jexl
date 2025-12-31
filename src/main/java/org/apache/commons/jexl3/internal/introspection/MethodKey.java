@@ -59,6 +59,7 @@ public final class MethodKey {
 
         /**
          * A severe or not ambiguous exception.
+         *
          * @param flag logging flag
          */
         AmbiguousException(final boolean flag) {
@@ -192,6 +193,7 @@ public final class MethodKey {
 
     /**
      * Helper to build class arrays.
+     *
      * @param args the classes
      * @return the array
      */
@@ -440,6 +442,7 @@ public final class MethodKey {
      * class introspection order, the isVarargs flag on the method itself will be false.
      * To circumvent the potential problem, fetch the method with the same signature from the super-classes,
      * - which will be different if override  -and get the varargs flag from it.
+     *
      * @param method the method or constructor to check for varargs
      * @return true if declared varargs, false otherwise
      */
@@ -539,6 +542,7 @@ public final class MethodKey {
      * introspection for methods with primitive types will work
      * correctly.
      * </p>
+     *
      * @param parm a may-be primitive type class
      * @return the equivalent object class
      */
@@ -559,6 +563,7 @@ public final class MethodKey {
 
     /**
      * Creates a key from a method.
+     *
      * @param aMethod the method to generate the key from.
      */
     MethodKey(final Executable aMethod) {
@@ -566,6 +571,7 @@ public final class MethodKey {
     }
     /**
      * Creates a key from a method name and a set of parameters.
+     *
      * @param aMethod the method to generate the key from, class name for constructors
      * @param args    the intended method parameters
      */
@@ -589,6 +595,7 @@ public final class MethodKey {
     }
     /**
      * Creates a key from a method name and a set of arguments.
+     *
      * @param aMethod the method to generate the key from
      * @param args    the intended method arguments
      */
@@ -615,6 +622,7 @@ public final class MethodKey {
 
     /**
      * Outputs a human-readable debug representation of this key.
+     *
      * @return method(p0, p1, ...)
      */
     public String debugString() {
@@ -641,6 +649,7 @@ public final class MethodKey {
 
     /**
      * Gets this key's method name.
+     *
      * @return the method name
      */
     String getMethod() {
@@ -720,6 +729,7 @@ public final class MethodKey {
 
     /**
      * Gets the most specific constructor that is applicable to the parameters of this key.
+     *
      * @param methods a list of constructors.
      * @return the most specific constructor.
      * @throws MethodKey.AmbiguousException if there is more than one.
@@ -730,6 +740,7 @@ public final class MethodKey {
 
     /**
      * Gets the most specific method that is applicable to the parameters of this key.
+     *
      * @param methods a list of methods.
      * @return the most specific method.
      * @throws MethodKey.AmbiguousException if there is more than one.
@@ -740,6 +751,7 @@ public final class MethodKey {
 
     /**
      * Gets this key's method parameter classes.
+     *
      * @return the parameters
      */
     Class<?>[] getParameters() {

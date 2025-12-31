@@ -49,6 +49,7 @@ public class JexlException extends RuntimeException {
         private final transient JexlInfo recover;
         /**
          * Creates a new Ambiguous statement exception instance.
+         *
          * @param begin  the start location information
          * @param end the end location information
          * @param expr  the source expression line
@@ -60,6 +61,7 @@ public class JexlException extends RuntimeException {
 
         /**
          * Creates a new Ambiguous statement exception instance.
+         *
          * @param info  the location information
          * @param expr  the source expression line
          */
@@ -74,6 +76,7 @@ public class JexlException extends RuntimeException {
 
         /**
          * Tries to remove this ambiguity in the source.
+         *
          * @param src the source that triggered this exception
          * @return the source with the ambiguous statement removed
          *         or null if no recovery was possible
@@ -111,6 +114,7 @@ public class JexlException extends RuntimeException {
 
         /**
          * Gets the annotation name
+         *
          * @return the annotation name
          */
         public String getAnnotation() {
@@ -203,6 +207,7 @@ public class JexlException extends RuntimeException {
         private final int code;
         /**
          * Creates a new Ambiguous statement exception instance.
+         *
          * @param info  the location information
          * @param feature the feature code
          * @param expr  the source expression line
@@ -294,6 +299,7 @@ public class JexlException extends RuntimeException {
 
         /**
          * Gets the method name
+         *
          * @return the method name
          */
         public String getMethod() {
@@ -304,6 +310,7 @@ public class JexlException extends RuntimeException {
 
         /**
          * Gets  the method signature
+         *
          * @return the method signature
          * @since 3.2
          */
@@ -337,6 +344,7 @@ public class JexlException extends RuntimeException {
 
         /**
          * Gets the method name
+         *
          * @return the method name
          */
         public String getSymbol() {
@@ -434,6 +442,7 @@ public class JexlException extends RuntimeException {
 
         /**
          * Gets the property name
+         *
          * @return the property name
          */
         public String getProperty() {
@@ -475,6 +484,7 @@ public class JexlException extends RuntimeException {
 
         /**
          * Gets the returned value
+         *
          * @return the returned value
          */
         public Object getValue() {
@@ -530,6 +540,7 @@ public class JexlException extends RuntimeException {
 
         /**
          * Gets the thrown value
+         *
          * @return the thrown value
          */
         public Object getValue() {
@@ -546,6 +557,7 @@ public class JexlException extends RuntimeException {
         private static final long serialVersionUID = 20210606123901L;
         /**
          * Creates a new Tokenization exception instance.
+         *
          * @param info  the location info
          * @param cause the javacc cause
          */
@@ -563,12 +575,14 @@ public class JexlException extends RuntimeException {
      * Thrown when method/ctor invocation fails.
      * <p>These wrap InvocationTargetException as runtime exception
      * allowing to go through without signature modifications.
+     *
      * @since 3.2
      */
     public static class TryFailed extends JexlException {
         private static final long serialVersionUID = 20210606124105L;
         /**
          * Creates a new instance.
+         *
          * @param xany the original invocation target exception
          */
         TryFailed(final InvocationTargetException xany) {
@@ -618,6 +632,7 @@ public class JexlException extends RuntimeException {
 
         /**
          * Gets the variable name
+         *
          * @return the variable name
          */
         public String getVariable() {
@@ -649,6 +664,7 @@ public class JexlException extends RuntimeException {
 
         /**
          * Stringifies the variable issue.
+         *
          * @param var the variable name
          * @return the issue message
          */
@@ -810,6 +826,7 @@ public class JexlException extends RuntimeException {
 
     /**
      * Creates a signed-name for a given method name and arguments.
+     *
      * @param name the method name
      * @param args the method arguments
      * @return a suitable signed name
@@ -882,6 +899,7 @@ public class JexlException extends RuntimeException {
 
     /**
      * Removes a slice from a source.
+     *
      * @param src the source
      * @param froml the beginning line
      * @param fromc the beginning column
@@ -917,6 +935,7 @@ public class JexlException extends RuntimeException {
     /**
      * Wrap an invocation exception.
      * <p>Return the cause if it is already a JexlException.
+     *
      * @param xinvoke the invocation exception
      * @return a JexlException
      */
@@ -1051,6 +1070,7 @@ public class JexlException extends RuntimeException {
 
     /**
      * Gets the exception specific detail
+     *
      * @return this exception specific detail
      * @since 3.2
      */
@@ -1078,6 +1098,7 @@ public class JexlException extends RuntimeException {
      * <li>string is the string representation of the offending expression</li>
      * <li>msg is the actual explanation message for this error</li>
      * </ul>
+     *
      * @see JexlEngine#isDebug()
      * @return this error as a string
      */
@@ -1100,6 +1121,7 @@ public class JexlException extends RuntimeException {
 
     /**
      * Pleasing checkstyle.
+     *
      * @return the info
      */
     protected JexlInfo info() {

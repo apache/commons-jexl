@@ -354,6 +354,7 @@ public class JexlScriptEngine extends AbstractScriptEngine implements Compilable
      *                 .permissions(JexlPermissions.UNRESTRICTED)
      *                 .create());
      * }
+     *
      * @param engine the JexlEngine instance to use
      * @since 3.3
      */
@@ -368,6 +369,7 @@ public class JexlScriptEngine extends AbstractScriptEngine implements Compilable
      * {@code
      *         JexlScriptEngine.setPermissions(JexlPermissions.UNRESTRICTED);
      * }
+     *
      * @param permissions the permissions instance to use or null to use the {@link JexlBuilder} default
      * @since 3.3
      */

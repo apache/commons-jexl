@@ -34,6 +34,7 @@ import org.apache.commons.jexl3.parser.JexlNode;
 
 /**
  * Helper class to deal with operator overloading and specifics.
+ *
  * @since 3.0
  */
 public final class Operator implements JexlOperator.Uberspect {
@@ -84,6 +85,7 @@ public final class Operator implements JexlOperator.Uberspect {
 
     /**
      * Creates an instance.
+     *
      * @param theUberspect the uberspect instance
      * @param theArithmetic the arithmetic instance
      * @param theOverloads  the overloaded operators
@@ -96,6 +98,7 @@ public final class Operator implements JexlOperator.Uberspect {
 
     /**
      * Creates an instance.
+     *
      * @param theUberspect the uberspect instance
      * @param theArithmetic the arithmetic instance
      * @param theOverloads  the overloaded operators
@@ -150,6 +153,7 @@ public final class Operator implements JexlOperator.Uberspect {
     /**
      * Tidy arguments based on operator arity.
      * <p>The interpreter may add a null to the arguments of operator expecting only one parameter.</p>
+     *
      * @param operator the operator
      * @param args the arguments (as seen by the interpreter)
      * @return the tidied arguments
@@ -160,6 +164,7 @@ public final class Operator implements JexlOperator.Uberspect {
 
     /**
      * Attempts finding a method in left and eventually narrowing right.
+     *
      * @param methodName the method name
      * @param right the left argument in the operator
      * @param left the right argument in the operator
@@ -183,6 +188,7 @@ public final class Operator implements JexlOperator.Uberspect {
 
     /**
      * Throw a NPE if operator is strict and one of the arguments is null.
+     *
      * @param arithmetic the JEXL arithmetic instance
      * @param operator the operator to check
      * @param args the operands
@@ -203,6 +209,7 @@ public final class Operator implements JexlOperator.Uberspect {
 
     /**
      * Triggered when an operator fails.
+     *
      * @param ref     the node where the error originated from
      * @param operator the operator symbol
      * @param cause    the cause of error (if any)
@@ -225,6 +232,7 @@ public final class Operator implements JexlOperator.Uberspect {
     /**
      * Seeks an implementation of an operator method in an arithmetic instance.
      * <p>Method must <em><>not/em belong to JexlArithmetic</p>
+     *
      * @param arithmetic the arithmetic instance
      * @param operator the operator
      * @param args the arguments
@@ -243,6 +251,7 @@ public final class Operator implements JexlOperator.Uberspect {
 
     /**
      * Checks whether a method returns a boolean or a Boolean.
+     *
      * @param vm the JexlMethod (can be null)
      * @return true of false
      */
@@ -256,6 +265,7 @@ public final class Operator implements JexlOperator.Uberspect {
 
     /**
      * Checks whether a method returns an int or an Integer.
+     *
      * @param vm the JexlMethod (can be null)
      * @return true of false
      */
@@ -463,6 +473,7 @@ public final class Operator implements JexlOperator.Uberspect {
 
     /**
      * Performs the base operation of an assignment.
+     *
      * @param operator the operator
      * @param args the arguments
      * @return the result
@@ -504,6 +515,7 @@ public final class Operator implements JexlOperator.Uberspect {
 
     /**
      * Tries operator evaluation, handles method resolution caching.
+     *
      * @param node the node
      * @param operator the operator
      * @param args the operator arguments
@@ -553,6 +565,7 @@ public final class Operator implements JexlOperator.Uberspect {
     /**
      * Special handling of overloads where another attempt at finding a method may be attempted.
      * <p>As of 3.5.0, only the comparison operators attempting to use compare() are handled.</p>
+     *
      * @param operator the operator
      * @param args the arguments
      * @return an instance or null
@@ -614,6 +627,7 @@ public final class Operator implements JexlOperator.Uberspect {
 
         /**
          * From compare() int result to operator boolean result.
+         *
          * @param cmp the compare result
          * @return the operator applied
          */

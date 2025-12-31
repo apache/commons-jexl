@@ -213,6 +213,7 @@ public final class JexlSandbox {
 
     /**
      * Gets a copy of this sandbox
+     *
      * @return a copy of this sandbox
      */
     public JexlSandbox copy() {
@@ -514,6 +515,7 @@ public final class JexlSandbox {
 
         /**
          * Gets a copy of these Names
+         *
          * @return a copy of these Names
          */
         protected Names copy() {
@@ -614,6 +616,7 @@ public final class JexlSandbox {
 
         /**
          * Do these permissions apply to derived classes?
+         *
          * @return whether these permissions apply to derived classes.
          */
         public boolean isInheritable() {

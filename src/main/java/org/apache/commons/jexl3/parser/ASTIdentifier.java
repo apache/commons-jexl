@@ -35,6 +35,7 @@ public class ASTIdentifier extends JexlNode {
     private static final int CONST = 4;
     /**
      * Checks the value of a flag in the mask.
+     *
      * @param ordinal the flag ordinal
      * @param mask the flags mask
      * @return the mask value with this flag or-ed in
@@ -44,6 +45,7 @@ public class ASTIdentifier extends JexlNode {
     }
     /**
      * Sets the value of a flag in a mask.
+     *
      * @param ordinal the flag ordinal
      * @param mask the flags mask
      * @param value true or false

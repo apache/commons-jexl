@@ -52,6 +52,7 @@ public final class FieldGetExecutor implements JexlPropertyGet {
     private final Field field;
     /**
      * Creates a new instance of FieldPropertyGet.
+     *
      * @param theField the class public field
      */
     private FieldGetExecutor(final Field theField) {

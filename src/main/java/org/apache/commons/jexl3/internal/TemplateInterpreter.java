@@ -59,6 +59,7 @@ public class TemplateInterpreter extends Interpreter {
 
         /**
          * Sole ctor.
+         *
          * @param e the JEXL engine
          */
         Arguments(final Engine e) {
@@ -66,6 +67,7 @@ public class TemplateInterpreter extends Interpreter {
         }
         /**
          * Sets the context.
+         *
          * @param j the context
          * @return {@code this} instance
          */
@@ -75,6 +77,7 @@ public class TemplateInterpreter extends Interpreter {
         }
         /**
          * Sets the expressions.
+         *
          * @param e the expressions
          * @return {@code this} instance
          */
@@ -84,6 +87,7 @@ public class TemplateInterpreter extends Interpreter {
         }
         /**
          * Sets the frame.
+         *
          * @param f the frame
          * @return {@code this} instance
          */
@@ -93,6 +97,7 @@ public class TemplateInterpreter extends Interpreter {
         }
         /**
          * Sets the options.
+         *
          * @param o the options
          * @return {@code this} instance
          */
@@ -102,6 +107,7 @@ public class TemplateInterpreter extends Interpreter {
         }
         /**
          * Sets the writer.
+         *
          * @param o the writer
          * @return {@code this} instance
          */
@@ -118,6 +124,7 @@ public class TemplateInterpreter extends Interpreter {
 
     /**
      * Creates a template interpreter instance.
+     *
      * @param args the template interpreter arguments
      */
     protected TemplateInterpreter(final Arguments args) {
@@ -133,6 +140,7 @@ public class TemplateInterpreter extends Interpreter {
      * This will dynamically try to find the best suitable method in the writer through uberspection.
      * Subclassing Writer by adding 'print' methods should be the preferred way to specialize output.
      * </p>
+     *
      * @param info the source info
      * @param arg  the argument to print out
      */
@@ -163,6 +171,7 @@ public class TemplateInterpreter extends Interpreter {
      * Includes a call to another template.
      * <p>
      * Includes another template using this template initial context and writer.</p>
+     *
      * @param script the TemplateScript to evaluate
      * @param args   the arguments
      */
@@ -172,6 +181,7 @@ public class TemplateInterpreter extends Interpreter {
 
     /**
      * Prints a unified expression evaluation result.
+     *
      * @param e the expression number
      */
     public void print(final int e) {
@@ -191,6 +201,7 @@ public class TemplateInterpreter extends Interpreter {
 
     /**
      * Prints a composite expression.
+     *
      * @param composite the composite expression
      */
     private void printComposite(final TemplateEngine.CompositeExpression composite) {
@@ -211,6 +222,7 @@ public class TemplateInterpreter extends Interpreter {
      * Interprets a function node.
      * print() and include() must be decoded by this interpreter since delegating to the Uberspect
      * may be sandboxing the interpreter itself making it unable to call the function.
+     *
      * @param node the function node
      * @param data the data
      * @return the function evaluation result.

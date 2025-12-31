@@ -83,12 +83,14 @@ public interface JexlCache<K, V> {
     interface Reference {
         /**
          * Gets the referenced object.
+         *
          * @return the referenced object
          */
         Object getCache();
 
         /**
          * Sets the referenced object.
+         *
          * @param cache the referenced object
          */
         void setCache(Object cache);

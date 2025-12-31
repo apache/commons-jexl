@@ -23,6 +23,7 @@ import org.apache.commons.jexl3.JexlException;
 
 /**
  * Specialized executor to set a property in an object.
+ *
  * @since 2.0
  */
 public class PropertySetExecutor extends AbstractExecutor.Set {
@@ -91,6 +92,7 @@ public class PropertySetExecutor extends AbstractExecutor.Set {
 
     /**
      * Checks whether an argument is an empty array.
+     *
      * @param arg the argument
      * @return true if {@code arg} is an empty array
      */
@@ -101,6 +103,7 @@ public class PropertySetExecutor extends AbstractExecutor.Set {
     /**
      * Finds an empty array property setter method by {@code methodName}.
      * <p>This checks only one method with that name accepts an array as sole parameter.
+     *
      * @param is       the introspector
      * @param clazz    the class to find the get method from
      * @param methodName    the method name to find
@@ -133,6 +136,7 @@ public class PropertySetExecutor extends AbstractExecutor.Set {
 
     /**
      * Creates an instance.
+     *
      * @param clazz  the class the set method applies to
      * @param method the method called through this executor
      * @param key    the key to use as 1st argument to the set method

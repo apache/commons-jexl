@@ -109,6 +109,7 @@ final class MetaCache {
      *
      * <p>Any cache that is no longer strongly reference will get removed from the
      * tracked set.</p>
+     *
      * @return The number of caches.
      */
     int size() {

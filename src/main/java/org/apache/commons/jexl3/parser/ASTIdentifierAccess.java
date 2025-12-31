@@ -43,6 +43,7 @@ public class ASTIdentifierAccess extends JexlNode {
 
     /**
      * Tests whether this is a Jxlt based identifier.
+     *
      * @return true if `..${...}...`, false otherwise
      */
     public boolean isExpression() {
@@ -56,6 +57,7 @@ public class ASTIdentifierAccess extends JexlNode {
 
     /**
      * Tests whether this is a dot or a question-mark-dot aka safe-navigation access.
+     *
      * @return true is ?., false if.
      */
     public boolean isSafe() {

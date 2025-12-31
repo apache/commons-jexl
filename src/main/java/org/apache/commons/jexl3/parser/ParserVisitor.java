@@ -24,6 +24,7 @@ public abstract class ParserVisitor {
 
     /**
      * Unused, should throw in Parser.
+     *
      * @param node a node
      * @param data the data
      * @return does not return
@@ -224,6 +225,7 @@ public abstract class ParserVisitor {
 
     /**
      * Unused, satisfy ParserVisitor interface.
+     *
      * @param node a node
      * @param data the data
      * @return does not return

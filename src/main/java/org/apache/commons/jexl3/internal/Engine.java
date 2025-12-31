@@ -70,6 +70,7 @@ import org.apache.commons.logging.LogFactory;
 
 /**
  * A JexlEngine implementation.
+ *
  * @since 2.0
  */
 public class Engine extends JexlEngine implements JexlUberspect.ConstantResolverFactory {
@@ -117,6 +118,7 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
 
         /**
          * Constructs a new instance.
+         *
          * @param constaa whether constant array-access is considered equivalent to dot-access
          */
         protected VarCollector(final int constaa) {
@@ -125,6 +127,7 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
 
         /**
          * Adds a 'segment' to the variable being collected.
+         *
          * @param name the name
          */
         public void add(final String name) {
@@ -133,6 +136,7 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
 
         /**
          * Starts/stops a variable collect.
+         *
          * @param node starts if not null, stop if null
          */
         public void collect(final JexlNode node) {
@@ -172,6 +176,7 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
 
     /**
      * Use {@link Engine#getUberspect(Log, JexlUberspect.ResolverStrategy, JexlPermissions)}.
+     *
      * @deprecated 3.3
      * @param logger the logger
      * @param strategy the strategy
@@ -190,6 +195,7 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
      * <li>Using a (low level) introspector created with a given logger instead of the default one</li>
      * <li>Using a (restricted) set of permissions</li>
      * </lu>
+     *
      * @param logger the logger to use for the underlying Uberspect
      * @param strategy the property resolver strategy
      * @param permissions the introspection permissions
@@ -210,6 +216,7 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
 
     /**
      * Solves an optional option.
+     *
      * @param conf the option as configured, may be null
      * @param def the default value if null, shall not be null
      * @param <T> the option type
@@ -320,6 +327,7 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
 
     /**
      * Creates a JEXL engine using the provided {@link JexlBuilder}.
+     *
      * @param conf the builder
      */
     public Engine(final JexlBuilder conf) {
@@ -397,6 +405,7 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
 
     /**
      * Creates an interpreter.
+     *
      * @param context a JexlContext; if null, the empty context is used instead.
      * @param frame   the interpreter frame
      * @param opts    the evaluation options
@@ -423,6 +432,7 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
 
     /**
      * Creates a template interpreter.
+     *
      * @param args the template interpreter arguments
      */
     protected Interpreter createTemplateInterpreter(final TemplateInterpreter.Arguments args) {
@@ -432,6 +442,7 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
     /**
      * Creates a new instance of an object using the most appropriate constructor
      * based on the arguments.
+     *
      * @param clazz the class to instantiate
      * @param args  the constructor arguments
      * @return the created object instance or null on failure when silent
@@ -470,6 +481,7 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
     /**
      * Compute a script options for evaluation.
      * <p>This calls processPragma(...).
+     *
      * @param script the script
      * @param context the context
      * @return the options
@@ -500,6 +512,7 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
      * options otherwise.
      * <p>If the context is an options handle and the handled options shared instance flag
      * is false, this method creates a copy of the options making them immutable during execution.
+     *
      * @param context the context
      * @return the options if any
      */
@@ -518,6 +531,7 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
 
     /**
      * Obsolete version of options evaluation.
+     *
      * @param opts the obsolete instance of options
      * @return the newer class of options
      */
@@ -547,6 +561,7 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
 
     /**
      * Gets the array of local variable from a script.
+     *
      * @param script the script
      * @return the local variables array which may be empty (but not null) if no local variables were defined
      * @since 3.0
@@ -559,6 +574,7 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
 
     /**
      * Solves a namespace using this engine map of functions.
+     *
      * @param name the namespoce name
      * @return the object associated
      */
@@ -568,6 +584,7 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
 
     /**
      * Gets the array of parameters from a script.
+     *
      * @param script the script
      * @return the parameters which may be empty (but not null) if no parameters were defined
      * @since 3.0
@@ -615,6 +632,7 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
      * Gets the list of variables accessed by a script.
      * <p>This method will visit all nodes of a script and extract all variables whether they
      * are written in 'dot' or 'bracketed' notation. (a.b is equivalent to a['b']).</p>
+     *
      * @param script the script
      * @return the set of variables, each as a list of strings (ant-ish variables use more than 1 string)
      *         or the empty set if no variables are used
@@ -627,6 +645,7 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
 
     /**
      * Fills up the list of variables accessed by a node.
+     *
      * @param script the owning script
      * @param node the node
      * @param collector the variable collector
@@ -760,6 +779,7 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
 
     /**
      * Sets options from this engine options.
+     *
      * @param opts the options to set
      * @return the options
      */
@@ -821,6 +841,7 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
 
     /**
      * Parses a Jexl expression or script.
+     *
      * @param info the JexlInfo
      * @param expr whether to parse an expression or a script
      * @param src the source to parse
@@ -838,6 +859,7 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
      *
      * <p>If the value is empty, the namespace will be cleared which may be useful to debug and force unload
      * the object bound to the namespace.</p>
+     *
      * @param ns the namespace map
      * @param key the key the namespace
      * @param value the value, ie the expression to evaluate and its result bound to the namespace
@@ -880,6 +902,7 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
 
     /**
      * Processes jexl.namespace.ns pragma.
+     *
      * @param ns the namespace map
      * @param key the key
      * @param value the value, ie the class
@@ -907,6 +930,7 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
     /**
      * Processes a script pragmas.
      * <p>Only called from options(...)
+     *
      * @param script the script
      * @param context the context
      * @param opts the options
@@ -966,6 +990,7 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
 
     /**
      * Swaps the current thread local engine.
+     *
      * @param jexl the engine or null
      * @return the previous thread local engine
      */
@@ -977,6 +1002,7 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
 
     /**
      * Swaps the current thread local context.
+     *
      * @param tls the context or null
      * @return the previous thread local context
      */
@@ -1039,6 +1065,7 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
 
     /**
      * Trims the source from front and ending spaces.
+     *
      * @param str expression to clean
      * @return trimmed expression ending in a semicolon
      */
@@ -1064,6 +1091,7 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
 
     /**
      * Creates a collector instance.
+     *
      * @return a collector instance
      */
     protected VarCollector varCollector() {
@@ -1072,6 +1100,7 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
 
     /**
      * Utility to deal with single value or set of values.
+     *
      * @param value the value or the set
      * @param consumer the consumer of values
      */
@@ -1087,6 +1116,7 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
     /**
      * Creates a new cache instance.
      * <p>This uses the metacache instance as factory.</p>
+     *
      * @param capacity the cache capacity
      * @return a cache instance, null if capacity == 0, the JEXL cache if capacity &lt; 0
      */

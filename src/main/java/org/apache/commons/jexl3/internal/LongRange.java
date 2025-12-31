@@ -34,6 +34,7 @@ final class AscLongIterator implements Iterator<Long> {
 
     /**
      * Creates a iterator on the range.
+     *
      * @param l low boundary
      * @param h high boundary
      */
@@ -70,6 +71,7 @@ final class DescLongIterator implements Iterator<Long> {
 
     /**
      * Creates a iterator on the range.
+     *
      * @param l low boundary
      * @param h high boundary
      */
@@ -105,6 +107,7 @@ public abstract class LongRange implements Collection<Long> {
     public static class Ascending extends LongRange {
         /**
          * Constructs a new instance.
+         *
          * @param from lower boundary
          * @param to upper boundary
          */
@@ -123,6 +126,7 @@ public abstract class LongRange implements Collection<Long> {
     public static class Descending extends LongRange {
         /**
          * Constructs a new instance.
+         *
          * @param from upper boundary
          * @param to lower boundary
          */
@@ -138,6 +142,7 @@ public abstract class LongRange implements Collection<Long> {
 
     /**
      * Creates a range, ascending or descending depending on boundaries order.
+     *
      * @param from the lower inclusive boundary
      * @param to   the higher inclusive boundary
      * @return a range
@@ -157,6 +162,7 @@ public abstract class LongRange implements Collection<Long> {
 
     /**
      * Creates a new range.
+     *
      * @param from the lower inclusive boundary
      * @param to   the higher inclusive boundary
      */
@@ -219,6 +225,7 @@ public abstract class LongRange implements Collection<Long> {
 
     /**
      * Gets the interval maximum value.
+     *
      * @return the high boundary
      */
     public long getMax() {
@@ -227,6 +234,7 @@ public abstract class LongRange implements Collection<Long> {
 
     /**
      * Gets the interval minimum value.
+     *
      * @return the low boundary
      */
     public long getMin() {

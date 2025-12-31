@@ -158,6 +158,7 @@ public class TokenMgrException extends RuntimeException implements JavaccError {
 
     /**
      * Gets the reason why the exception is thrown.
+     *
      * @return one of the 4 lexical error codes
      */
     public int getErrorCode() {
@@ -172,6 +173,7 @@ public class TokenMgrException extends RuntimeException implements JavaccError {
      /**
      * Returns a detailed message for the Error when it is thrown by the
      * token manager to indicate a lexical error.
+     *
      * @return the message
      */
     @Override

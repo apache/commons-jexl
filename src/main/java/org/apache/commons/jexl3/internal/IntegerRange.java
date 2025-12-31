@@ -33,6 +33,7 @@ final class AscIntegerIterator implements Iterator<Integer> {
     private int cursor;
     /**
      * Creates a iterator on the range.
+     *
      * @param l low boundary
      * @param h high boundary
      */
@@ -68,6 +69,7 @@ final class DescIntegerIterator implements Iterator<Integer> {
     private int cursor;
     /**
      * Creates a iterator on the range.
+     *
      * @param l low boundary
      * @param h high boundary
      */
@@ -101,6 +103,7 @@ public abstract class IntegerRange implements Collection<Integer> {
     public static class Ascending extends IntegerRange {
         /**
          * Constructs a new instance.
+         *
          * @param from lower boundary
          * @param to upper boundary
          */
@@ -119,6 +122,7 @@ public abstract class IntegerRange implements Collection<Integer> {
     public static class Descending extends IntegerRange {
         /**
          * Constructs a new instance.
+         *
          * @param from upper boundary
          * @param to lower boundary
          */
@@ -134,6 +138,7 @@ public abstract class IntegerRange implements Collection<Integer> {
 
     /**
      * Creates a range, ascending or descending depending on boundaries order.
+     *
      * @param from the lower inclusive boundary
      * @param to   the higher inclusive boundary
      * @return a range
@@ -152,6 +157,7 @@ public abstract class IntegerRange implements Collection<Integer> {
 
     /**
      * Creates a new range.
+     *
      * @param from the lower inclusive boundary
      * @param to  the higher inclusive boundary
      */
@@ -214,6 +220,7 @@ public abstract class IntegerRange implements Collection<Integer> {
 
     /**
      * Gets the interval maximum value.
+     *
      * @return the high boundary
      */
     public int getMax() {
@@ -222,6 +229,7 @@ public abstract class IntegerRange implements Collection<Integer> {
 
     /**
      * Gets the interval minimum value.
+     *
      * @return the low boundary
      */
     public int getMin() {

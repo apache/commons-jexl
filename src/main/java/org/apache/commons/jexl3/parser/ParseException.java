@@ -60,6 +60,7 @@ public class ParseException extends Exception implements JavaccError {
      * in the generated parser.  Calling this constructor generates
      * a new object of this type with the fields "currentToken",
      * "expectedTokenSequences", and "tokenImage" set.
+     *
      * @param currentToken This is the last token that has been consumed successfully.  If
      * this object has been created due to a parse error, the token
      * following this token will (therefore) be the first error token.

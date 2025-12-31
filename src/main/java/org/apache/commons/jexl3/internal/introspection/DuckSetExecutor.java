@@ -35,6 +35,7 @@ import org.apache.commons.jexl3.JexlException;
  * }
  * </code>
  * </p>
+ *
  * @since 2.0
  */
 public final class DuckSetExecutor extends AbstractExecutor.Set {
@@ -62,6 +63,7 @@ public final class DuckSetExecutor extends AbstractExecutor.Set {
 
     /**
      * Creates an instance.
+     *
      * @param clazz the class the set method applies to
      * @param method the method called through this executor
      * @param key the key to use as 1st argument to the set method

@@ -20,6 +20,7 @@ import java.util.Map;
 
 /**
  * Specialized executor to set a property in a Map.
+ *
  * @since 2.0
  */
 public final class MapSetExecutor extends AbstractExecutor.Set {
@@ -52,6 +53,7 @@ public final class MapSetExecutor extends AbstractExecutor.Set {
 
     /**
      * Creates an instance.
+     *
      * @param clazz the class the set method applies to
      * @param method the method called through this executor
      * @param key the key to use as 1st argument to the set method

@@ -31,18 +31,21 @@ public class JexlInfo {
     public interface Detail {
         /**
          * Gets the end column on the line that triggered the error
+         *
          * @return the end column on the line that triggered the error
          */
         int end();
 
         /**
          * Gets the start column on the line that triggered the error
+         *
          * @return the start column on the line that triggered the error
          */
         int start();
 
         /**
          * Gets the code that triggered the error
+         *
          * @return the actual part of code that triggered the error
          */
         @Override
@@ -51,6 +54,7 @@ public class JexlInfo {
 
     /**
      * Gets the info from a script.
+     *
      * @param script the script
      * @return the info
      */
@@ -129,6 +133,7 @@ public class JexlInfo {
 
     /**
      * Gets this instance or a copy without any decorations
+     *
      * @return {@code this} instance or a copy without any decorations
      */
     public JexlInfo detach() {
@@ -146,6 +151,7 @@ public class JexlInfo {
 
     /**
      * Gets error detail
+     *
      * @return the detailed information in case of an error
      */
     public Detail getDetail() {

@@ -46,6 +46,7 @@ public class SimpleNode implements Node {
 
     /**
      * Creates a SimpleNode instance.
+     *
      * @param i the node type identifier
      */
     public SimpleNode(final int i) {
@@ -95,6 +96,7 @@ public class SimpleNode implements Node {
 
     /**
      * Override to dump output somewhere.
+     *
      * @param str the string to output
      */
     protected void dumpOut(final String str) {
@@ -191,6 +193,7 @@ public class SimpleNode implements Node {
 
     /**
      * Sets this node's parent.
+     *
      * @param n the parent
      */
     @Override

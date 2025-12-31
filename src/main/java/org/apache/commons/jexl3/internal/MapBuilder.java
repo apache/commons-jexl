@@ -31,6 +31,7 @@ public class MapBuilder implements JexlArithmetic.MapBuilder {
 
     /**
      * Creates a new builder.
+     *
      * @param size the expected map size
      */
     public MapBuilder(final int size) {
@@ -39,6 +40,7 @@ public class MapBuilder implements JexlArithmetic.MapBuilder {
 
     /**
      * Creates a new builder.
+     *
      * @param size the expected map size
      * @param extended whether the map is extended
      */

@@ -21,6 +21,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * A call frame, created from a scope, stores the arguments and local variables in a "stack frame" (sic).
+ *
  * @since 3.0
  */
 public class Frame {
@@ -33,6 +34,7 @@ public class Frame {
 
     /**
      * Creates a new frame.
+     *
      * @param s the scope
      * @param r the stack frame
      * @param c the number of curried parameters
@@ -50,6 +52,7 @@ public class Frame {
 
     /**
      * Assign values to this frame.
+     *
      * @param values the values
      * @return this frame
      */
@@ -71,6 +74,7 @@ public class Frame {
 
     /**
      * Creates a new from of this frame&quot;s class.
+     *
      * @param s the scope
      * @param r the arguments
      * @param c the number of curried parameters
@@ -82,6 +86,7 @@ public class Frame {
 
     /**
      * Captures a value.
+     *
      * @param s the offset in this frame
      * @param lexical true if this captured symbol is redefined locally
      * @return the stacked value
@@ -92,6 +97,7 @@ public class Frame {
 
     /**
      * Gets a value.
+     *
      * @param s the offset in this frame
      * @return the stacked value
      */
@@ -101,6 +107,7 @@ public class Frame {
 
     /**
      * Sets a value.
+     *
      * @param r the offset in this frame
      * @param value the value to set in this frame
      */
@@ -110,6 +117,7 @@ public class Frame {
 
     /**
      * Gets the scope.
+     *
      * @return this frame scope
      */
     public Scope getScope() {
@@ -118,6 +126,7 @@ public class Frame {
 
     /**
      * Gets this script unbound parameters, i.e. parameters not bound through curry().
+     *
      * @return the parameter names
      */
     public String[] getUnboundParameters() {
@@ -126,6 +135,7 @@ public class Frame {
 
     /**
      * Tests whether this frame defines a symbol, ie declared it and assigned it a value.
+     *
      * @param s the offset in this frame
      * @return true if this symbol has been assigned a value, false otherwise
      */
@@ -137,6 +147,7 @@ public class Frame {
      * Replace any instance of a closure in this stack by its (fuzzy encoded) offset in it.
      * <p>This is to avoid the cyclic dependency between the closure and its frame stack that
      * may point back to it that occur with recursive function definitions.</p>
+     *
      * @param closure the owning closure
      * @return the cleaned-up stack or the stack itself (most of the time)
      */

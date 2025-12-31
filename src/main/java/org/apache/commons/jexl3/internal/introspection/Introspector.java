@@ -59,6 +59,7 @@ public final class Introspector {
     private static final Constructor<?> CTOR_MISS = CacheMiss.class.getConstructors()[0];
     /**
      * Checks whether a class is loaded through a given class loader or one of its ascendants.
+     *
      * @param loader the class loader
      * @param clazz  the class to check
      * @return true if clazz was loaded through the loader, false otherwise
@@ -107,6 +108,7 @@ public final class Introspector {
 
     /**
      * Create the introspector.
+     *
      * @param log     the logger to use
      * @param cloader the class loader
      */
@@ -116,6 +118,7 @@ public final class Introspector {
 
     /**
      * Create the introspector.
+     *
      * @param log     the logger to use
      * @param cloader the class loader
      * @param perms the permissions
@@ -128,6 +131,7 @@ public final class Introspector {
 
     /**
      * Gets a class by name through this introspector class loader.
+     *
      * @param className the class name
      * @return the class instance or null if it could not be found
      */
@@ -142,6 +146,7 @@ public final class Introspector {
 
     /**
      * Gets the constructor defined by the {@code MethodKey}.
+     *
      * @param c   the class we want to instantiate
      * @param key Key of the constructor being searched for
      * @return The desired constructor object
@@ -239,6 +244,7 @@ public final class Introspector {
 
     /**
      * Gets the array of accessible field names known for a given class.
+     *
      * @param c the class
      * @return the class field names
      */
@@ -252,6 +258,7 @@ public final class Introspector {
 
     /**
      * Gets the class loader used by this introspector.
+     *
      * @return the class loader
      */
     public ClassLoader getLoader() {
@@ -260,6 +267,7 @@ public final class Introspector {
 
     /**
      * Gets the ClassMap for a given class.
+     *
      * @param c the class
      * @return the class map
      */
@@ -314,6 +322,7 @@ public final class Introspector {
 
     /**
      * Gets a method defined by a class, a name and a set of parameters.
+     *
      * @param c      the class
      * @param name   the method name
      * @param params the method parameters
@@ -326,6 +335,7 @@ public final class Introspector {
 
     /**
      * Gets the array of accessible methods names known for a given class.
+     *
      * @param c the class
      * @return the class method names
      */
@@ -339,6 +349,7 @@ public final class Introspector {
 
     /**
      * Gets the array of accessible method known for a given class.
+     *
      * @param c          the class
      * @param methodName the method name
      * @return the array of methods (null or not empty)
@@ -354,6 +365,7 @@ public final class Introspector {
     /**
      * Sets the class loader used to solve constructors.
      * <p>Also cleans the constructors and methods caches.</p>
+     *
      * @param classLoader the class loader; if null, use this instance class loader
      */
     public void setLoader(final ClassLoader classLoader) {

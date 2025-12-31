@@ -57,6 +57,7 @@ public class Interpreter extends InterpreterBase {
 
         /**
          * Simple ctor.
+         *
          * @param astmt the statement
          * @param aindex the index
          * @param adata the data
@@ -107,6 +108,7 @@ public class Interpreter extends InterpreterBase {
 
     /**
      * Creates an interpreter.
+     *
      * @param engine   the engine creating this interpreter
      * @param aContext the evaluation context, global variables, methods and functions
      * @param opts     the evaluation options, flags modifying evaluation behavior
@@ -119,6 +121,7 @@ public class Interpreter extends InterpreterBase {
 
     /**
      * Copy constructor.
+     *
      * @param ii  the interpreter to copy
      * @param jexla the arithmetic instance to use (or null)
      */
@@ -352,6 +355,7 @@ public class Interpreter extends InterpreterBase {
     /**
      * Evaluates an access identifier based on the 2 main implementations;
      * static (name or numbered identifier) or dynamic (jxlt).
+     *
      * @param node the identifier access node
      * @return the evaluated identifier
      */
@@ -375,6 +379,7 @@ public class Interpreter extends InterpreterBase {
     /**
      * Evaluates a JxltHandle node.
      * <p>This parses and stores the JXLT template if necessary (upon first execution)</p>
+     *
      * @param node the node
      * @return the JXLT template evaluation.
      * @param <NODE> the node type
@@ -398,6 +403,7 @@ public class Interpreter extends InterpreterBase {
 
     /**
      * Executes an assignment with an optional side effect operator.
+     *
      * @param node     the node
      * @param assignop the assignment operator or null if simply assignment
      * @param data     the data
@@ -743,6 +749,7 @@ public class Interpreter extends InterpreterBase {
      * <p>
      * If the underlying JEXL engine is silent, errors will be logged through
      * its logger as warning.
+     *
      * @param node the script or expression to interpret.
      * @return the result of the interpretation.
      * @throws JexlException if any error occurs during interpretation.
@@ -815,6 +822,7 @@ public class Interpreter extends InterpreterBase {
 
     /**
      * Determines if the specified Object is assignment-compatible with the object represented by the Class.
+     *
      * @param object the Object
      * @param clazz the Class
      * @return the result of isInstance call
@@ -831,6 +839,7 @@ public class Interpreter extends InterpreterBase {
 
     /**
      * Processes an annotated statement.
+     *
      * @param stmt the statement
      * @param index the index of the current annotation being processed
      * @param data the contextual data
@@ -888,6 +897,7 @@ public class Interpreter extends InterpreterBase {
 
     /**
      * Delegates the annotation processing to the JexlContext if it is an AnnotationProcessor.
+     *
      * @param annotation    the annotation name
      * @param args          the annotation arguments
      * @param stmt          the statement / block that was annotated
@@ -902,6 +912,7 @@ public class Interpreter extends InterpreterBase {
 
     /**
      * Swaps the current thread local interpreter.
+     *
      * @param inter the interpreter or null
      * @return the previous thread local interpreter
      */
@@ -913,6 +924,7 @@ public class Interpreter extends InterpreterBase {
 
     /**
      * Resolves a class name.
+     *
      * @param name the simple class name
      * @return the fully qualified class name or the name
      */
@@ -935,6 +947,7 @@ public class Interpreter extends InterpreterBase {
 
     /**
      * Runs a closure.
+     *
      * @param closure the closure
      * @return the closure return value
      */
@@ -975,6 +988,7 @@ public class Interpreter extends InterpreterBase {
 
     /**
      * Short-circuit evaluation of logical expression.
+     *
      * @param check the fuse value that will stop evaluation, true for OR, false for AND
      * @param node a ASTAndNode or a ASTOrNode
      * @param data the data, usually null and unused
@@ -1547,6 +1561,7 @@ public class Interpreter extends InterpreterBase {
 
     /**
      * Execute a method call, ie syntactically written as name.call(...).
+     *
      * @param node the actual method call node
      * @param antish non-null when name.call is an antish variable
      * @param data the context
@@ -2289,6 +2304,7 @@ public class Interpreter extends InterpreterBase {
 
     /**
      * Base visitation for blocks.
+     *
      * @param node the block
      * @param data the usual data
      * @return the result of the last expression evaluation
@@ -2305,6 +2321,7 @@ public class Interpreter extends InterpreterBase {
 
     /**
      * Runs a node.
+     *
      * @param node the node
      * @param data the usual data, always null
      * @return the return value

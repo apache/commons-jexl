@@ -21,6 +21,7 @@ import java.util.Map;
 
 /**
  * Specialized executor to get a property from a Map.
+ *
  * @since 2.0
  */
 public final class MapGetExecutor extends AbstractExecutor.Get {
@@ -48,6 +49,7 @@ public final class MapGetExecutor extends AbstractExecutor.Get {
 
     /**
      * Creates an instance.
+     *
      * @param clazz he class the get method applies to
      * @param method the method held by this executor
      * @param key the property to get

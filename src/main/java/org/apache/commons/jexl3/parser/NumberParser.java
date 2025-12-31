@@ -66,6 +66,7 @@ public final class NumberParser implements Serializable {
     /**
      * Sets this node as a natural literal.
      * Originally from OGNL.
+     *
      * @param negative whether the natural should be negative
      * @param natural the natural as string
      * @return this parser instance
@@ -128,6 +129,7 @@ public final class NumberParser implements Serializable {
     /**
      * Sets this node as an (optionally) signed natural literal.
      * Originally from OGNL.
+     *
      * @param str the natural as string
      * @return this parser instance
      */
@@ -154,6 +156,7 @@ public final class NumberParser implements Serializable {
     /**
      * Sets this node as a real literal.
      * Originally from OGNL.
+     *
      * @param negative whether the real should be negative
      * @param s the real as string
      * @return this parser instance
@@ -209,6 +212,7 @@ public final class NumberParser implements Serializable {
     /**
      * Sets this node as an (optionally) signed real literal.
      * Originally from OGNL.
+     *
      * @param str the real as string
      * @return this parser instance
      */

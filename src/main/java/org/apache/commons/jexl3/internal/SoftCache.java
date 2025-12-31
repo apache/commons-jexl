@@ -50,6 +50,7 @@ public class SoftCache<K, V> implements JexlCache<K, V> {
     protected static final float LOAD_FACTOR = 0.75f;
     /**
      * Creates a synchronized LinkedHashMap.
+     *
      * @param capacity the map capacity
      * @return the map instance
      * @param <K> key type

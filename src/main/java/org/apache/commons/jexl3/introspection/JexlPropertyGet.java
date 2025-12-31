@@ -48,6 +48,7 @@ public interface JexlPropertyGet {
 
     /**
      * Checks whether this JexlPropertyGet returns a constant.
+     *
      * @return true if invoking this getter will always return the same value, false otherwise
      */
     default boolean isConstant() {

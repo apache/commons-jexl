@@ -21,6 +21,7 @@ import java.lang.reflect.InvocationTargetException;
 import org.apache.commons.jexl3.JexlException;
 /**
  * Specialized executor to get a boolean property from an object.
+ *
  * @since 2.0
  */
 public final class BooleanGetExecutor extends AbstractExecutor.Get {
@@ -48,6 +49,7 @@ public final class BooleanGetExecutor extends AbstractExecutor.Get {
 
     /**
      * Creates an instance by attempting discovery of the get method.
+     *
      * @param clazz the class to introspect
      * @param method the method held by this executor
      * @param key the property to get

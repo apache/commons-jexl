@@ -56,6 +56,7 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
     public interface LexicalUnit {
         /**
          * Declares a local symbol.
+         *
          * @param symbol the symbol index in the scope
          * @return true if declaration was successful, false if symbol was already declared
          */
@@ -71,6 +72,7 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
         int getSymbolCount();
         /**
          * Checks whether a symbol is declared in this lexical unit.
+         *
          * @param symbol the symbol
          * @return true if declared, false otherwise
          */
@@ -121,6 +123,7 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
     );
     /**
      * Pick the most significant token for error reporting.
+     *
      * @param tokens the tokens to choose from
      * @return the token
      */
@@ -134,6 +137,7 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
     }
     /**
      * Reads a given source line.
+     *
      * @param src the source
      * @param lineno the line number
      * @return the line
@@ -154,6 +158,7 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
     }
     /**
      * Utility function to create '.' separated string from a list of string.
+     *
      * @param lstr the list of strings
      * @return the dotted version
      */
@@ -373,6 +378,7 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
 
         /**
          * Adds a collection of values to the set.
+         *
          * @param values the values to add
          */
         void addAll(final Collection<Object> values) {
@@ -757,6 +763,7 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
      * Since local variables create new symbols, it is important to
      * regain access after parsing to known which / how-many registers are needed.
      * </p>
+     *
      * @return the named register map
      */
     protected Scope getScope() {
@@ -773,6 +780,7 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
 
     /**
      * Gets the lexical unit used by this parser.
+     *
      * @return the named register map.
      */
     protected LexicalUnit getUnit() {
@@ -998,6 +1006,7 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
     /**
      * Parses an interpolation expression.
      * <p>Requires the JEXL engine to be accessible through its thread-local.</p>
+     *
      * @param info the JexlInfo
      * @param src the source to parse
      * @param scope the scope
