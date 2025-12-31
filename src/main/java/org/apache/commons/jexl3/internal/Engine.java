@@ -177,10 +177,10 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
     /**
      * Use {@link Engine#getUberspect(Log, JexlUberspect.ResolverStrategy, JexlPermissions)}.
      *
-     * @deprecated 3.3
      * @param logger the logger
      * @param strategy the strategy
      * @return an Uberspect instance
+     * @deprecated 3.3
      */
     @Deprecated
     public static Uberspect getUberspect(final Log logger, final JexlUberspect.ResolverStrategy strategy) {
