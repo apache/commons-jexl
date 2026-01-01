@@ -104,7 +104,7 @@ public final class Introspector {
     private final Map<String, Class<?>> constructibleClasses = new HashMap<>();
     /**
      * The class loader used to solve constructors if needed.
-     * <p>Field is read/written under lock.</p>
+     * <p>Cheap read-write lock pattern: exclusive lock for write, read visibility through volatile.</p>
      */
     @SuppressWarnings("java:S3077")
     private volatile ClassLoader loader;
@@ -140,7 +140,7 @@ public final class Introspector {
      */
     public Class<?> getClassByName(final String className) {
         try {
-            final Class<?> clazz = Class.forName(className, false, getLoader());
+            final Class<?> clazz = Class.forName(className, false, loader);
             return permissions.allow(clazz)? clazz : null;
         } catch (final ClassNotFoundException xignore) {
             return null;
@@ -266,12 +266,7 @@ public final class Introspector {
      * @return the class loader
      */
     public ClassLoader getLoader() {
-        lock.readLock().lock();
-        try {
-            return loader;
-        } finally {
-            lock.readLock().unlock();
-        }
+        return loader;
     }
 
     /**
@@ -384,12 +379,12 @@ public final class Introspector {
             final ClassLoader previous = loader;
             if (!current.equals(previous)) {
                 // clean up constructor and class maps
-                final Iterator<Map.Entry<MethodKey, Constructor<?>>> constructorEntries = constructorsMap.entrySet().iterator();
-                while (constructorEntries.hasNext()) {
-                    final Map.Entry<MethodKey, Constructor<?>> entry = constructorEntries.next();
+                final Iterator<Map.Entry<MethodKey, Constructor<?>>> constructors = constructorsMap.entrySet().iterator();
+                while (constructors.hasNext()) {
+                    final Map.Entry<MethodKey, Constructor<?>> entry = constructors.next();
                     final Class<?> clazz = entry.getValue().getDeclaringClass();
                     if (isLoadedBy(previous, clazz)) {
-                        constructorEntries.remove();
+                        constructors.remove();
                         if (!CTOR_MISS.equals(entry.getValue())) {
                             // the method name is the name of the class
                             constructibleClasses.remove(entry.getKey().getMethod());
@@ -397,12 +392,12 @@ public final class Introspector {
                     }
                 }
                 // clean up method maps
-                final Iterator<Map.Entry<Class<?>, ClassMap>> classMapEntries = classMethodMaps.entrySet().iterator();
-                while (classMapEntries.hasNext()) {
-                    final Map.Entry<Class<?>, ClassMap> entry = classMapEntries.next();
+                final Iterator<Map.Entry<Class<?>, ClassMap>> methods = classMethodMaps.entrySet().iterator();
+                while (methods.hasNext()) {
+                    final Map.Entry<Class<?>, ClassMap> entry = methods.next();
                     final Class<?> clazz = entry.getKey();
                     if (isLoadedBy(previous, clazz)) {
-                        classMapEntries.remove();
+                        methods.remove();
                     }
                 }
                 loader = current;
