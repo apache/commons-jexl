@@ -51,6 +51,7 @@ public final class Introspector {
         /** The constructor used as cache-miss. */
         @SuppressWarnings("unused")
         public CacheMiss() {
+            // empty
         }
     }
     /**
@@ -81,10 +82,6 @@ public final class Introspector {
      */
     private final Log logger;
     /**
-     * The class loader used to solve constructors if needed.
-     */
-    private ClassLoader loader;
-    /**
      * The permissions.
      */
     private final JexlPermissions permissions;
@@ -105,6 +102,12 @@ public final class Introspector {
      * Holds the set of classes we have introspected.
      */
     private final Map<String, Class<?>> constructibleClasses = new HashMap<>();
+    /**
+     * The class loader used to solve constructors if needed.
+     * <p>Field is read/written under lock.</p>
+     */
+    @SuppressWarnings("java:S3077")
+    private volatile ClassLoader loader;
 
     /**
      * Create the introspector.
@@ -137,7 +140,7 @@ public final class Introspector {
      */
     public Class<?> getClassByName(final String className) {
         try {
-            final Class<?> clazz = Class.forName(className, false, loader);
+            final Class<?> clazz = Class.forName(className, false, getLoader());
             return permissions.allow(clazz)? clazz : null;
         } catch (final ClassNotFoundException xignore) {
             return null;
@@ -182,19 +185,20 @@ public final class Introspector {
                     if (c != null && c.getName().equals(key.getMethod())) {
                         clazz = c;
                     } else {
+                        // read under lock
                         clazz = loader.loadClass(constructorName);
                     }
                     // add it to list of known loaded classes
                     constructibleClasses.put(constructorName, clazz);
                 }
-                final List<Constructor<?>> l = new ArrayList<>();
+                final List<Constructor<?>> constructors = new ArrayList<>();
                 for (final Constructor<?> ictor : clazz.getConstructors()) {
                     if (permissions.allow(ictor)) {
-                        l.add(ictor);
+                        constructors.add(ictor);
                     }
                 }
                 // try to find one
-                ctor = key.getMostSpecificConstructor(l.toArray(new Constructor<?>[0]));
+                ctor = key.getMostSpecificConstructor(constructors.toArray(new Constructor<?>[0]));
                 if (ctor != null) {
                     constructorsMap.put(key, ctor);
                 } else {
@@ -262,7 +266,12 @@ public final class Introspector {
      * @return the class loader
      */
     public ClassLoader getLoader() {
-        return loader;
+        lock.readLock().lock();
+        try {
+            return loader;
+        } finally {
+            lock.readLock().unlock();
+        }
     }
 
     /**
@@ -369,35 +378,37 @@ public final class Introspector {
      * @param classLoader the class loader; if null, use this instance class loader
      */
     public void setLoader(final ClassLoader classLoader) {
-        final ClassLoader previous = loader;
         final ClassLoader current = classLoader == null ? getClass().getClassLoader() : classLoader;
-        if (!current.equals(loader)) {
-            lock.writeLock().lock();
-            try {
+        lock.writeLock().lock();
+        try {
+            final ClassLoader previous = loader;
+            if (!current.equals(previous)) {
                 // clean up constructor and class maps
-                final Iterator<Map.Entry<MethodKey, Constructor<?>>> mentries = constructorsMap.entrySet().iterator();
-                while (mentries.hasNext()) {
-                    final Map.Entry<MethodKey, Constructor<?>> entry = mentries.next();
+                final Iterator<Map.Entry<MethodKey, Constructor<?>>> constructorEntries = constructorsMap.entrySet().iterator();
+                while (constructorEntries.hasNext()) {
+                    final Map.Entry<MethodKey, Constructor<?>> entry = constructorEntries.next();
                     final Class<?> clazz = entry.getValue().getDeclaringClass();
                     if (isLoadedBy(previous, clazz)) {
-                        mentries.remove();
-                        // the method name is the name of the class
-                        constructibleClasses.remove(entry.getKey().getMethod());
+                        constructorEntries.remove();
+                        if (!CTOR_MISS.equals(entry.getValue())) {
+                            // the method name is the name of the class
+                            constructibleClasses.remove(entry.getKey().getMethod());
+                        }
                     }
                 }
                 // clean up method maps
-                final Iterator<Map.Entry<Class<?>, ClassMap>> centries = classMethodMaps.entrySet().iterator();
-                while (centries.hasNext()) {
-                    final Map.Entry<Class<?>, ClassMap> entry = centries.next();
+                final Iterator<Map.Entry<Class<?>, ClassMap>> classMapEntries = classMethodMaps.entrySet().iterator();
+                while (classMapEntries.hasNext()) {
+                    final Map.Entry<Class<?>, ClassMap> entry = classMapEntries.next();
                     final Class<?> clazz = entry.getKey();
                     if (isLoadedBy(previous, clazz)) {
-                        centries.remove();
+                        classMapEntries.remove();
                     }
                 }
                 loader = current;
-            } finally {
-                lock.writeLock().unlock();
             }
+        } finally {
+            lock.writeLock().unlock();
         }
     }
 }

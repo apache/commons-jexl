@@ -114,8 +114,8 @@ Bugs Fixed in 3.6.0:
 * JEXL-447:     Regression in script-defined functions
 * JEXL-446:     ClassTool module inspection is too strict
 * JEXL-442:     Local variables are not resolved in interpolation string expression
-* JEXL-441:     Tokenization error if "\n" in template expression.
-* JEXL-439:     When using reference capture, incorrect scoping when local variable redefines a captured symbo
+* JEXL-441:     Tokenization error if "\n" in template expression
+* JEXL-439:     When using reference capture, incorrect scoping when local variable redefines a captured symbol
 * JEXL-437:     Semicolons actually not optional between function calls on separate lines
 
 
