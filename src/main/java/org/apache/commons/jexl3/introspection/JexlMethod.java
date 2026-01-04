@@ -28,6 +28,7 @@ import org.apache.commons.jexl3.JexlException;
  * @since 1.0
  */
 public interface JexlMethod {
+
     /**
      * returns the return type of the method invoked.
      *

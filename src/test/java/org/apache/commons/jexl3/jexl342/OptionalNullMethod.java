@@ -27,10 +27,13 @@ import org.apache.commons.jexl3.introspection.JexlUberspect;
  * <p>Performs a late discovery of the actual method.</p>
  */
 public class OptionalNullMethod implements JexlMethod {
+
     /** The Uberspect to discover the method. */
     private final JexlUberspect uberspect;
+
     /** The method we are trying to discover. */
     private final String methodName;
+
     /** The result when we solve it. */
     private JexlMethod delegate;
 

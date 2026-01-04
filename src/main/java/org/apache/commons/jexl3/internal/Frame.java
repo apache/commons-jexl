@@ -25,10 +25,13 @@ import java.util.concurrent.atomic.AtomicReference;
  * @since 3.0
  */
 public class Frame {
+
     /** The scope. */
     private final Scope scope;
+
     /** The actual stack frame. */
     protected final Object[] stack;
+
     /** Number of curried parameters. */
     private final int curried;
 

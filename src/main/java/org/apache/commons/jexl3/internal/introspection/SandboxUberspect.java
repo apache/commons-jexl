@@ -34,6 +34,7 @@ import org.apache.commons.jexl3.introspection.JexlUberspect;
  * @since 3.0
  */
 public final class SandboxUberspect implements JexlUberspect {
+
     /**
      * Identity equality.
      * <p>Spotbugs just <em>hates</em> string identity...</p>
@@ -45,6 +46,7 @@ public final class SandboxUberspect implements JexlUberspect {
     private static boolean eq(final Object lhs, final Object rhs) {
         return lhs == rhs;
     }
+
     /** The base uberspect. */
     private final JexlUberspect uberspect;
 

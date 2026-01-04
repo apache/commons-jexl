@@ -66,8 +66,10 @@ import java.util.function.Predicate;
  * @since 3.2
  */
 public final class JexlFeatures {
+
     /** The false predicate. */
     public static final Predicate<String> TEST_STR_FALSE = s -> false;
+
     /** Te feature names (for toString()). */
     private static final String[] F_NAMES = {
         "register", "reserved variable", "local variable", "assign/modify",
@@ -76,68 +78,97 @@ public final class JexlFeatures {
         "thin-arrow", "fat-arrow", "namespace pragma", "namespace identifier", "import pragma", "comparator names", "pragma anywhere",
         "const capture", "ref capture", "ambiguous statement"
     };
+
     /** Registers feature ordinal. */
     private static final int REGISTER = 0;
+
     /** Reserved future feature ordinal (unused as of 3.3.1). */
     public static final int RESERVED = 1;
+
     /** Locals feature ordinal. */
     public static final int LOCAL_VAR = 2;
+
     /** Side effects feature ordinal. */
     public static final int SIDE_EFFECT = 3;
+
     /** Global side effects feature ordinal. */
     public static final int SIDE_EFFECT_GLOBAL = 4;
+
     /** Expressions allowed in array reference ordinal. */
     public static final int ARRAY_REF_EXPR = 5;
+
     /** New-instance feature ordinal. */
     public static final int NEW_INSTANCE = 6;
+
     /** Loops feature ordinal. */
     public static final int LOOP = 7;
+
     /** Lambda feature ordinal. */
     public static final int LAMBDA = 8;
+
     /** Lambda feature ordinal. */
     public static final int METHOD_CALL = 9;
+
     /** Structured literal feature ordinal. */
     public static final int STRUCTURED_LITERAL = 10;
+
     /** Pragma feature ordinal. */
     public static final int PRAGMA = 11;
+
     /** Annotation feature ordinal. */
     public static final int ANNOTATION = 12;
+
     /** Script feature ordinal. */
     public static final int SCRIPT = 13;
+
     /** Lexical feature ordinal. */
     public static final int LEXICAL = 14;
+
     /** Lexical shade feature ordinal. */
     public static final int LEXICAL_SHADE = 15;
+
     /** Thin-arrow lambda syntax. */
     public static final int THIN_ARROW = 16;
+
     /** Fat-arrow lambda syntax. */
     public static final int FAT_ARROW = 17;
+
     /** Namespace pragma feature ordinal. */
     public static final int NS_PRAGMA = 18;
+
     /** Namespace syntax as an identifier (no space). */
     public static final int NS_IDENTIFIER = 19;
+
     /** Import pragma feature ordinal. */
     public static final int IMPORT_PRAGMA = 20;
+
     /** Comparator names (legacy) syntax. */
     public static final int COMPARATOR_NAMES = 21;
+
     /** The pragma anywhere feature ordinal. */
     public static final int PRAGMA_ANYWHERE = 22;
+
     /** Captured variables are const. */
     public static final int CONST_CAPTURE = 23;
+
     /** Captured variables are reference. */
     public static final int REF_CAPTURE = 24;
+
     /** Ambiguous or strict statement allowed. */
     public static final int AMBIGUOUS_STATEMENT = 25;
+
     /** Bad naming, use AMBIGUOUS_STATEMENT.
      * @deprecated 3.6
      */
     @Deprecated
     public static final int STRICT_STATEMENT = 25;
+
     /**
      * All features.
      * Ensure this is updated if additional features are added.
      */
     private static final long ALL_FEATURES = (1L << AMBIGUOUS_STATEMENT + 1) - 1L; // MUST REMAIN PRIVATE
+
     /**
      * The default features flag mask.
      * <p>Meant for compatibility with scripts written before 3.3.1</p>
@@ -160,6 +191,7 @@ public final class JexlFeatures {
         | 1L << IMPORT_PRAGMA
         | 1L << COMPARATOR_NAMES
         | 1L << PRAGMA_ANYWHERE;
+
     /**
      * The canonical scripting (since 3.3.1) features flag mask based on the original default.
      * <p>Adds lexical, lexical-shade and const-capture but removes comparator-names and pragma-anywhere</p>

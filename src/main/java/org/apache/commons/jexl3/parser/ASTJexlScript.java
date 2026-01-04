@@ -26,12 +26,16 @@ import org.apache.commons.jexl3.internal.Scope;
  * Enhanced script to allow parameter declaration.
  */
 public class ASTJexlScript extends JexlLexicalNode  {
+
     /** Serial uid.*/
     private static final long serialVersionUID = 202112111533L;
+
     /** The pragmas. */
     private Map<String, Object> pragmas;
+
     /** Features. */
     private transient JexlFeatures features;
+
     /** The script scope. */
     private transient Scope scope;
 

@@ -34,6 +34,7 @@ import org.apache.commons.jexl3.JexlOperator;
  * @since 1.0
  */
 public interface JexlUberspect {
+
     /**
      * The various builtin property resolvers.
      * <p>
@@ -43,6 +44,7 @@ public interface JexlUberspect {
      * @since 3.0
      */
     enum JexlResolver implements PropertyResolver {
+
         /** Seeks methods named get{P,p}property and is{P,p}property. */
         PROPERTY,
 
@@ -84,6 +86,7 @@ public interface JexlUberspect {
      * @since 3.6.0
      */
     interface ClassNameResolver {
+
         /**
          * Resolves a class name.
          *
@@ -100,6 +103,7 @@ public interface JexlUberspect {
      * @since 3.6.0
      */
     interface ClassConstantResolver extends ClassNameResolver {
+
         /**
          * Resolves a constant by its name.
          *
@@ -115,6 +119,7 @@ public interface JexlUberspect {
      * @since 3.6.0
      */
     interface ConstantResolverFactory {
+
         /**
          * Creates a constant resolver.
          *
@@ -172,6 +177,7 @@ public interface JexlUberspect {
      * @since 3.0
      */
     interface ResolverStrategy {
+
         /**
          * Applies this strategy to a list of resolver types.
          *

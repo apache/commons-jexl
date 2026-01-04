@@ -28,6 +28,7 @@ import org.apache.commons.jexl3.JexlException;
  * @since 2.0
  */
 public final class MethodExecutor extends AbstractExecutor.Method {
+
     /**
      * Discovers a {@link MethodExecutor}.
      * <p>
@@ -58,6 +59,7 @@ public final class MethodExecutor extends AbstractExecutor.Method {
         }
         return m == null ? null : new MethodExecutor(clazz, m, key);
     }
+
     /** If this method is a vararg method, vaStart is the last argument index. */
     private final int vaStart;
 

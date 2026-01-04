@@ -25,31 +25,38 @@ import java.util.BitSet;
  * There are actually only 2 used states: 1 and 3</p>
  */
 public class LexicalScope {
+
     /**
      * Number of bits in a long.
      */
     protected static final int BITS_PER_LONG = 64;
+
     /**
      * Bits per symbol.
      * let (b + 0) + const (b + 1).
      */
     protected static final int BITS_PER_SYMBOL = 2;
+
     /**
      * From a symbol number to a starting symbol bit number.
      */
     protected static final int SYMBOL_SHIFT = BITS_PER_SYMBOL - 1;
+
     /**
      * Bitmask for symbols.
      */
     protected static final long SYMBOL_MASK = (1L << BITS_PER_SYMBOL - 1) - 1; // 3, as 1+2, 2 bits
+
     /**
      * Number of symbols.
      */
     protected int count;
+
     /**
      * The mask of symbols in the scope.
      */
     protected long symbols;
+
     /**
      * Symbols after bit 64 (aka symbol 32 when 2 bits per symbol).
      */

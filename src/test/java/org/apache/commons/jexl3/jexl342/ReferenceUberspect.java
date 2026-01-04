@@ -41,11 +41,13 @@ import org.apache.commons.jexl3.introspection.JexlUberspect;
  * see JEXL-342.
  */
 public class ReferenceUberspect implements JexlUberspect {
+
     /**
      * Duck-reference handler, calls get().
      */
     @FunctionalInterface
     interface ReferenceHandler {
+
         /**
          * Performs a call to get().
          * @param ref the reference
@@ -53,8 +55,10 @@ public class ReferenceUberspect implements JexlUberspect {
          */
         Object callGet(Object ref);
     }
+
     /** A static signature for method(). */
     private static final Object[] EMPTY_PARAMS = {};
+
     /**
      * Discovers an optional getter.
      * <p>The method to be found should be named "{find}{P,p}property and return an Optional&lt;?&gt;.</p>
@@ -110,6 +114,7 @@ public class ReferenceUberspect implements JexlUberspect {
         }
         return null;
     }
+
     /**
      * Find a reference handler for a given instance.
      * @param ref the reference

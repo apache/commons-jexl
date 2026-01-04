@@ -35,8 +35,10 @@ import org.apache.commons.jexl3.parser.JexlNode;
  * <p>A friend (ala C++) of template engine.
  */
 public class TemplateDebugger extends Debugger {
+
     /** The outer script. */
     private ASTJexlScript script;
+
     /** The expressions called by the script through jexl:print. */
     private TemplateExpression[] exprs;
 
@@ -289,6 +291,7 @@ public class TemplateDebugger extends Debugger {
         super.accept(expr.node, data);
         return data;
     }
+
     /**
      * Visit a template expression.
      *

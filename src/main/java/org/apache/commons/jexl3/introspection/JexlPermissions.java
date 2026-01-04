@@ -65,6 +65,7 @@ import org.apache.commons.jexl3.internal.introspection.PermissionsParser;
  * @since 3.3
  */
 public interface JexlPermissions {
+
     /**
      * A permission delegation that augments the RESTRICTED permission with an explicit
      * set of classes.
@@ -74,6 +75,7 @@ public interface JexlPermissions {
      * <code>RESTRICTED.compose("java.lang { +Class {} }")</code>.</p>
      */
      final class ClassPermissions extends JexlPermissions.Delegate {
+
         /** The set of explicitly allowed classes, overriding the delegate permissions. */
         private final Set<String> allowedClasses;
 
@@ -130,6 +132,7 @@ public interface JexlPermissions {
      * Overloads should call the appropriate validate() method early in their body.
      */
      class Delegate implements JexlPermissions {
+
          /** The permissions we delegate to. */
         protected final JexlPermissions base;
 
@@ -358,6 +361,7 @@ public interface JexlPermissions {
      * @since 3.3
      */
     boolean allow(final Field field);
+
     /**
      * Checks whether a method allows JEXL introspection.
      * <p>If a method is not allowed, it cannot resolved and called in scripts or expressions.</p>

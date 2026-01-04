@@ -38,6 +38,7 @@ import org.apache.commons.jexl3.parser.*;
  * @since 2.0
  */
 public class Debugger extends ParserVisitor implements JexlInfo.Detail {
+
     /** Checks identifiers that contain spaces or punctuation
      * (but underscore, at-sign, sharp-sign and dollar).
      */
@@ -46,6 +47,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     private static  boolean isLambdaExpr(final ASTJexlLambda lambda) {
         return lambda.jjtGetNumChildren() == 1 && !isStatement(lambda.jjtGetChild(0));
     }
+
     /**
      * Tests whether a node is a statement (vs an expression).
      *
@@ -67,6 +69,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
                 || child instanceof ASTThrowStatement
                 || child instanceof ASTSwitchStatement;
     }
+
     /**
      * Tests whether a script or expression ends with a semicolumn.
      *
@@ -85,6 +88,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
         }
         return false;
     }
+
     /**
      * Stringifies the pragmas.
      *
@@ -110,14 +114,19 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
         }
 
     }
+
     /** The builder to compose messages. */
     protected final StringBuilder builder = new StringBuilder();
+
     /** The cause of the issue to debug. */
     protected JexlNode cause;
+
     /** The starting character location offset of the cause in the builder. */
     protected int start;
+
     /** The ending character location offset of the cause in the builder. */
     protected int end;
+
     /** The indentation level. */
     protected int indentLevel;
 
@@ -486,6 +495,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
         }
         return data;
     }
+
     /**
      * Accepts a (simple) value and appends its representation to the builder.
      *

@@ -23,6 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * Abstracts using a test within Junit or through a main method.
  */
 public abstract class AbstractOutput {
+
     /**
      * The output instance for Junit TestCase calling assertEquals.
      */

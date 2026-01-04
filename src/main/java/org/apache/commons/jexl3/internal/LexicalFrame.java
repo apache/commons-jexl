@@ -26,14 +26,17 @@ import java.util.Deque;
  * definition.
  */
 public class LexicalFrame extends LexicalScope {
+
     /**
      * The script frame.
      */
     private final Frame frame;
+
     /**
      * Previous frame.
      */
     protected final LexicalFrame previous;
+
     /**
      * The stack of values in the lexical frame.
      * <p>[symbol identifier, value] are stacked in pairs</p>

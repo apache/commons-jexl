@@ -23,8 +23,10 @@ import org.apache.commons.jexl3.annotations.NoJexl;
  * @since 3.0
  */
 public final class ReadonlyContext implements JexlContext, JexlContext.OptionsHandle {
+
     /** The wrapped context. */
     private final JexlContext wrapped;
+
     /** The wrapped engine options. */
     private final JexlOptions options;
 

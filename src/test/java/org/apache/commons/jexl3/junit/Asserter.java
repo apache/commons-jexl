@@ -42,10 +42,13 @@ import org.apache.commons.jexl3.JexlScript;
  * @since 1.0
  */
 public class Asserter {
+
     /** Variables used during asserts. */
     private final Map<String, Object> variables = new HashMap<>();
+
     /** Context to use during asserts. */
     private final JexlEvalContext context = new JexlEvalContext(variables);
+
     /** JEXL engine to use during Asserts. */
     private final JexlEngine engine;
 
@@ -145,6 +148,7 @@ public class Asserter {
     public Map<String, Object> getVariables() {
         return variables;
     }
+
     /**
      * Removes a variable of a certain name from the context.
      * @param name variable name

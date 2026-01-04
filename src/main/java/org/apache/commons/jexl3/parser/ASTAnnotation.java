@@ -20,6 +20,7 @@ package org.apache.commons.jexl3.parser;
  * Annotation.
  */
 public class ASTAnnotation extends JexlNode {
+
     /**
      */
     private static final long serialVersionUID = 1L;

@@ -45,14 +45,18 @@ import org.apache.commons.logging.Log;
  * @since 3.0
  */
 public final class TemplateEngine extends JxltEngine {
+
     /**
      * Abstract the source fragments, verbatim or immediate typed text blocks.
      */
     static final class Block {
+
         /** The type of block: verbatim or directive. */
         private final BlockType type;
+
         /** The block start line info. */
         private final int line;
+
         /** The actual content. */
         private final String body;
 
@@ -107,20 +111,25 @@ public final class TemplateEngine extends JxltEngine {
             }
         }
     }
+
     /**
      * The enum capturing the difference between verbatim and code source fragments.
      */
     enum BlockType {
+
         /** Block is to be output "as is" but may be a unified expression. */
         VERBATIM,
+
         /** Block is a directive, i.e., a fragment of JEXL code. */
         DIRECTIVE
     }
 
     /** A composite unified expression: "... ${...} ... #{...} ...". */
     final class CompositeExpression extends TemplateExpression {
+
         /** Bit encoded (deferred count > 0) bit 1, (immediate count > 0) bit 0. */
         private final int meta;
+
         /** The list of sub-expression resulting from parsing. */
         final TemplateExpression[] exprs;
 
@@ -215,8 +224,10 @@ public final class TemplateEngine extends JxltEngine {
             return eq ? this : builder.build(TemplateEngine.this, this);
         }
     }
+
     /** A constant unified expression. */
     final class ConstantExpression extends TemplateExpression {
+
         /** The constant held by this unified expression. */
         private final Object value;
 
@@ -256,8 +267,10 @@ public final class TemplateEngine extends JxltEngine {
             return ExpressionType.CONSTANT;
         }
     }
+
     /** A deferred unified expression: #{jexl}. */
     final class DeferredExpression extends JexlBasedExpression {
+
         /**
          * Creates a deferred unified expression.
          *
@@ -289,13 +302,16 @@ public final class TemplateEngine extends JxltEngine {
             return new ImmediateExpression(expr, node, source);
         }
     }
+
     /**
      * A helper class to build expressions.
      * Keeps count of sub-expressions by type.
      */
     static final class ExpressionBuilder {
+
         /** Per TemplateExpression type counters. */
         private final int[] counts;
+
         /** The list of expressions. */
         private final List<TemplateExpression> expressions;
 
@@ -374,17 +390,23 @@ public final class TemplateEngine extends JxltEngine {
      * @see ExpressionBuilder
      */
     enum ExpressionType {
+
         /** Constant TemplateExpression, count index 0. */
         CONSTANT(0),
+
         /** Immediate TemplateExpression, count index 1. */
         IMMEDIATE(1),
+
         /** Deferred TemplateExpression, count index 2. */
         DEFERRED(2),
+
         /** Nested (which are deferred) expressions, count
          * index 2. */
         NESTED(2),
+
         /** Composite expressions are not counted, index -1. */
         COMPOSITE(-1);
+
         /** The index in arrays of TemplateExpression counters for composite expressions. */
         private final int index;
 
@@ -407,6 +429,7 @@ public final class TemplateEngine extends JxltEngine {
 
     /** An immediate unified expression: ${jexl}. */
     final class ImmediateExpression extends JexlBasedExpression {
+
         /**
          * Creates an immediate unified expression.
          *
@@ -433,8 +456,10 @@ public final class TemplateEngine extends JxltEngine {
 
     /** The base for JEXL based unified expressions. */
     abstract class JexlBasedExpression extends TemplateExpression {
+
         /** The JEXL string for this unified expression. */
         protected final CharSequence expr;
+
         /** The JEXL node for this unified expression. */
         protected final JexlNode node;
 
@@ -494,6 +519,7 @@ public final class TemplateEngine extends JxltEngine {
      * Note that the deferred syntax is JEXL's.
      */
     final class NestedExpression extends JexlBasedExpression {
+
         /**
          * Creates a nested unified expression.
          *
@@ -539,16 +565,22 @@ public final class TemplateEngine extends JxltEngine {
 
     /** The different parsing states. */
     private enum ParseState {
+
         /** Parsing a constant. */
         CONST,
+
         /** Parsing after <code>$</code> . */
         IMMEDIATE0,
+
         /** Parsing after <code>#</code> . */
         DEFERRED0,
+
         /** Parsing after <code>${</code> . */
         IMMEDIATE1,
+
         /** Parsing after <code>#{</code> . */
         DEFERRED1,
+
         /** Parsing after <code>\</code> . */
         ESCAPE
     }
@@ -557,6 +589,7 @@ public final class TemplateEngine extends JxltEngine {
      * The abstract base class for all unified expressions, immediate '${...}' and deferred '#{...}'.
      */
     abstract class TemplateExpression implements Expression {
+
         /** The source of this template expression(see {@link TemplateEngine.TemplateExpression#prepare}). */
         protected final TemplateExpression source;
 

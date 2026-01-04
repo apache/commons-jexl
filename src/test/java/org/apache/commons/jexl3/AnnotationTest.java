@@ -92,6 +92,7 @@ class AnnotationTest extends JexlTestCase {
             return statement.call();
         }
     }
+
     /**
      * A counter whose inc method will misbehave if not mutex-ed.
      */

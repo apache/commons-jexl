@@ -23,10 +23,12 @@ import java.util.List;
 import java.util.Map;
 
 public class ASTSwitchStatement extends JexlNode {
+
   /**
    * Whether this switch is a statement (true) or an expression (false).
    */
   protected boolean isStatement = true;
+
   /**
    * The map of cases, where the key is the case value and the value is the switch index.
    */

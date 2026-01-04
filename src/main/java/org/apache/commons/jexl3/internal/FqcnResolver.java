@@ -34,19 +34,23 @@ import org.apache.commons.jexl3.introspection.JexlUberspect;
  * <p>This only keeps the names of the classes to avoid any class loading/reloading/permissions issue.</p>
  */
 public class FqcnResolver implements JexlUberspect.ClassConstantResolver {
+
     /**
      * The uberspect.
      */
     private final JexlUberspect uberspect;
+
     /**
      * The set of packages to be used as import roots.
      */
     private final Set<String> imports = Collections.synchronizedSet(new LinkedHashSet<>());
+
     /**
      * The map of solved fqcns based on imports keyed on (simple) name,
      * valued as fully qualified class name.
      */
     private final Map<String, String> fqcns = new ConcurrentHashMap<>();
+
     /**
      * Optional parent solver.
      */

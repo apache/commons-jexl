@@ -26,6 +26,7 @@ import org.apache.commons.jexl3.JexlArithmetic;
  * Helper class to create map literals.
  */
 public class MapBuilder implements JexlArithmetic.MapBuilder {
+
     /** The map being created. */
     protected final Map<Object, Object> map;
 

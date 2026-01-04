@@ -30,6 +30,7 @@ import java.util.RandomAccess;
  * </p>
  */
 public class ArrayListWrapper extends AbstractList<Object> implements RandomAccess {
+
     /** The array to wrap. */
     private final Object array;
 

@@ -29,18 +29,22 @@ import org.apache.commons.jexl3.JexlInfo;
 import org.apache.commons.jexl3.JexlOptions;
 import org.apache.commons.jexl3.JexlScript;
 import org.apache.commons.jexl3.parser.ASTJexlScript;
+
 /**
  * <p>A JexlScript implementation.</p>
  *
  * @since 1.1
  */
 public class Script implements JexlScript, JexlExpression {
+
     /**
      * Implements the Future and Callable interfaces to help delegation.
      */
     public class Callable implements java.util.concurrent.Callable<Object> {
+
         /** The actual interpreter. */
         protected final Interpreter interpreter;
+
         /** Use interpreter as marker for not having run. */
         protected volatile Object result;
 
@@ -102,14 +106,17 @@ public class Script implements JexlScript, JexlExpression {
      * The engine for this expression.
      */
     protected final Engine jexl;
+
     /**
      * Original expression stripped from leading and trailing spaces.
      */
     protected final String source;
+
     /**
      * The resulting AST we can interpret.
      */
     protected final ASTJexlScript script;
+
     /**
      * The engine version (as class loader change count) that last evaluated this script.
      */

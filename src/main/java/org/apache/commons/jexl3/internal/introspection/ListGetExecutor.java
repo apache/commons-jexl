@@ -25,12 +25,15 @@ import java.util.List;
  * @since 2.0
  */
 public final class ListGetExecutor extends AbstractExecutor.Get {
+
     /** The java.lang.reflect.Array.get method used as an active marker in ListGet. */
     private static final java.lang.reflect.Method ARRAY_GET =
             initMarker(Array.class, "get", Object.class, Integer.TYPE);
+
     /** The java.util.obj.get method used as an active marker in ListGet. */
     private static final java.lang.reflect.Method LIST_GET =
             initMarker(List.class, "get", Integer.TYPE);
+
     /**
      * Attempts to discover a ListGetExecutor.
      *

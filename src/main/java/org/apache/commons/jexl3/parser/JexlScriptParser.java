@@ -27,6 +27,7 @@ import org.apache.commons.jexl3.internal.Scope;
  * @since 3.5.0
  */
 public interface JexlScriptParser {
+
   /**
    * Parses a script or expression.
    *

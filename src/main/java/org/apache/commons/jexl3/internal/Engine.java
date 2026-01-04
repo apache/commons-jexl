@@ -74,6 +74,7 @@ import org.apache.commons.logging.LogFactory;
  * @since 2.0
  */
 public class Engine extends JexlEngine implements JexlUberspect.ConstantResolverFactory {
+
     /**
      * Gets the default instance of Uberspect.
      * <p>This is lazily initialized to avoid building a default instance if there
@@ -83,6 +84,7 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
      * <p>Implemented as on demand holder idiom.</p>
      */
     private static final class UberspectHolder {
+
         /** The default uberspector that handles all introspection patterns. */
         static final Uberspect UBERSPECT =
                 new Uberspect(LogFactory.getLog(JexlEngine.class),
@@ -97,18 +99,22 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
      * Utility class to collect variables.
      */
     protected static class VarCollector {
+
         /**
          * The collected variables represented as a set of list of strings.
          */
         private final Set<List<String>> refs = new LinkedHashSet<>();
+
         /**
          * The current variable being collected.
          */
         private List<String> ref = new ArrayList<>();
+
         /**
          * The node that started the collect.
          */
         private JexlNode root;
+
         /**
          * Whether constant array-access is considered equivalent to dot-access;
          * if so, > 1 means collect any constant (set,map,...) instead of just
@@ -225,99 +231,122 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
     private static <T> T option(final T conf, final T def) {
         return conf == null ? def : conf;
     }
+
     /**
      * The Log to which all JexlEngine messages will be logged.
      */
     protected final Log logger;
+
     /**
      * The JexlUberspect instance.
      */
     protected final JexlUberspect uberspect;
+
     /**
      * The {@link JexlArithmetic} instance.
      */
     protected final JexlArithmetic arithmetic;
+
     /**
      * The map of 'prefix:function' to object implementing the namespaces.
      */
     protected final Map<String, Object> functions;
+
     /**
      * The default class name resolver.
      */
     protected final FqcnResolver classNameSolver;
+
     /**
      * The maximum stack height.
      */
     protected final int stackOverflow;
+
     /**
      * Whether this engine considers unknown variables, methods and constructors as errors.
      */
     protected final boolean strict;
+
     /**
      * Whether this engine considers null in navigation expression as errors.
      */
     protected final boolean safe;
+
     /**
      * Whether expressions evaluated by this engine will throw exceptions (false) or return null (true) on errors.
      * Default is false.
      */
     protected final boolean silent;
+
     /**
      * Whether expressions evaluated by this engine will throw JexlException.Cancel (true) or return null (false) when
      * interrupted.
      * Default is true when not silent and strict.
      */
     protected final boolean cancellable;
+
     /**
      * Whether error messages will carry debugging information.
      */
     protected final boolean debug;
+
     /**
      * The set of default script parsing features.
      */
     protected final JexlFeatures scriptFeatures;
+
     /**
      * The set of default expression parsing features.
      */
     protected final JexlFeatures expressionFeatures;
+
     /**
      * The default charset.
      */
     protected final Charset charset;
+
     /**
      * The Jexl script parser factory.
      */
     protected final Supplier<JexlScriptParser> parserFactory;
+
     /**
      * The atomic parsing flag; true whilst parsing.
      */
     protected final AtomicBoolean parsing = new AtomicBoolean();
+
     /**
      * The {@link Parser}; when parsing expressions, this engine uses the parser if it
      * is not already in use otherwise it will create a new temporary one.
      */
     protected final JexlScriptParser parser;
+
     /**
      * The expression max length to hit the cache.
      */
     protected final int cacheThreshold;
+
     /**
      * The expression cache.
      */
     protected final JexlCache<Source, Object> cache;
+
     /**
      * Collect all or only dot references.
      */
     protected final int collectMode;
+
     /**
      * A cached version of the options.
      */
     protected final JexlOptions options;
+
     /**
      * The set of caches created by this engine.
      * <p>Caches are soft-referenced by the engine so they can be cleaned on class loader change.</p>
      */
     protected final MetaCache metaCache;
+
     /**
      * Creates an engine with default arguments.
      */

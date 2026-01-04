@@ -81,6 +81,7 @@ public interface JexlCache<K, V> {
      * A cached reference.
      */
     interface Reference {
+
         /**
          * Gets the referenced object.
          *

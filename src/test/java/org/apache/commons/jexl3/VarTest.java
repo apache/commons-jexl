@@ -75,6 +75,7 @@ class VarTest extends JexlTestCase {
             this.x = x;
         }
     }
+
     /**
      * Dates that can return multiple properties in one call.
      */

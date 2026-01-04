@@ -31,6 +31,7 @@ import org.apache.commons.jexl3.introspection.JexlPropertySet;
  * @since 2.0
  */
 public abstract class JexlNode extends SimpleNode implements JexlCache.Reference {
+
     /**
      * A marker interface for constants.
      *
@@ -39,6 +40,7 @@ public abstract class JexlNode extends SimpleNode implements JexlCache.Reference
     public interface Constant<T> {
         T getLiteral();
     }
+
     /**
      * Marker interface for cachable function calls.
      */
@@ -48,6 +50,7 @@ public abstract class JexlNode extends SimpleNode implements JexlCache.Reference
      * Marker interface for nodes hosting a JxltExpression.
      */
     public interface JxltHandle {
+
         /** @return the expression source. */
         String getExpressionSource();
 

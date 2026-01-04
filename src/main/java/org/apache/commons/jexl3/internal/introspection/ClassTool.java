@@ -24,12 +24,16 @@ import java.lang.invoke.MethodType;
  * Utility for Java9+ backport in Java8 of class and module related methods.
  */
 final class ClassTool {
+
     /** The Class.getModule() method. */
     private static final MethodHandle GET_MODULE;
+
     /** The Class.getPackageName() method. */
     private static final MethodHandle GET_PKGNAME;
+
     /** The Module.isExported(String packageName) method. */
     private static final MethodHandle IS_EXPORTED;
+
     /** The Module of JEXL itself. */
     private static final Object JEXL_MODULE;
 

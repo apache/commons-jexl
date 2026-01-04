@@ -29,14 +29,17 @@ import org.apache.commons.jexl3.introspection.JexlPropertyGet;
  * It implements JexlPropertyGet since such a container can only be accessed from its owning instance (not set).
  */
 public final class IndexedType implements JexlPropertyGet {
+
     /**
      * A generic indexed property container, exposes get(key) and set(key, value)
      * and solves method call dynamically based on arguments.
      * <p>Must remain public for introspection purpose.</p>
      */
     public static final class IndexedContainer {
+
         /** The container instance. */
         final Object container;
+
         /** The container type instance. */
         final IndexedType type;
 
@@ -92,6 +95,7 @@ public final class IndexedType implements JexlPropertyGet {
             return type.invokeSet(container, key, value);
         }
     }
+
     /**
      * Attempts to find an indexed-property getter in an object.
      * The code attempts to find the list of methods getXXX() and setXXX().
@@ -116,12 +120,16 @@ public final class IndexedType implements JexlPropertyGet {
         }
         return null;
     }
+
     /** The container name. */
     final String container;
+
     /** The container class. */
     final Class<?> clazz;
+
     /** The array of getter methods. */
     private final Method[] getters;
+
     /** Last get method used. */
     private volatile Method get;
 

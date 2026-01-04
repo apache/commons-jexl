@@ -125,6 +125,7 @@ abstract class AbstractExecutor {
     static Class<?> classOf(final Object instance) {
         return instance == null ? Object.class : instance.getClass();
     }
+
     /**
      * A helper to initialize the marker methods (array.get, list.get, etc...).
      *

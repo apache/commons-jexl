@@ -27,8 +27,10 @@ import org.apache.commons.jexl3.JexlException;
  * @since 2.0
  */
 public class PropertySetExecutor extends AbstractExecutor.Set {
+
     /** Index of the first character of the set{p,P}roperty. */
     private static final int SET_START_INDEX = 3;
+
     /**
      * Discovers a PropertySetExecutor.
      * <p>The method to be found should be named "set{P,p}property.</p>
@@ -49,6 +51,7 @@ public class PropertySetExecutor extends AbstractExecutor.Set {
         final java.lang.reflect.Method method = discoverSet(is, clazz, property, value);
         return method != null ? new PropertySetExecutor(clazz, method, property, value) : null;
     }
+
     /**
      * Discovers the method for a {@link org.apache.commons.jexl3.introspection.JexlPropertySet}.
      * <p>The method to be found should be named "set{P,p}property.

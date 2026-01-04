@@ -29,6 +29,7 @@ import org.apache.commons.jexl3.JexlException;
  * @since 1.0
  */
 public interface JexlPropertyGet {
+
     /**
      * Method used to get the property value of an object.
      *

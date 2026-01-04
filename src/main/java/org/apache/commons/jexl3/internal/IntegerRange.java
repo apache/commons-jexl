@@ -25,12 +25,16 @@ import java.util.NoSuchElementException;
  * An ascending iterator on an integer range.
  */
 final class AscIntegerIterator implements Iterator<Integer> {
+
     /** The lower boundary. */
     private final int min;
+
     /** The upper boundary. */
     private final int max;
+
     /** The current value. */
     private int cursor;
+
     /**
      * Creates a iterator on the range.
      *
@@ -61,12 +65,16 @@ final class AscIntegerIterator implements Iterator<Integer> {
  * A descending iterator on an integer range.
  */
 final class DescIntegerIterator implements Iterator<Integer> {
+
     /** The lower boundary. */
     private final int min;
+
     /** The upper boundary. */
     private final int max;
+
     /** The current value. */
     private int cursor;
+
     /**
      * Creates a iterator on the range.
      *
@@ -97,10 +105,12 @@ final class DescIntegerIterator implements Iterator<Integer> {
  * A range of integers.
  */
 public abstract class IntegerRange implements Collection<Integer> {
+
     /**
      * Ascending integer range.
      */
     public static class Ascending extends IntegerRange {
+
         /**
          * Constructs a new instance.
          *
@@ -116,10 +126,12 @@ public abstract class IntegerRange implements Collection<Integer> {
             return new AscIntegerIterator(min, max);
         }
     }
+
     /**
      * Descending integer range.
      */
     public static class Descending extends IntegerRange {
+
         /**
          * Constructs a new instance.
          *
@@ -149,6 +161,7 @@ public abstract class IntegerRange implements Collection<Integer> {
         }
         return new IntegerRange.Descending(to, from);
     }
+
     /** The lower boundary. */
     protected final int min;
 

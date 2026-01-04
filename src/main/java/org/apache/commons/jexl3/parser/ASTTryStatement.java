@@ -21,6 +21,7 @@ package org.apache.commons.jexl3.parser;
  */
 public class ASTTryStatement extends JexlLexicalNode {
     private static final long serialVersionUID = 1L;
+
     /** catch() &= 1, finally &= 2. */
     private int tryForm;
 

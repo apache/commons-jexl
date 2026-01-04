@@ -49,6 +49,7 @@ import org.junit.jupiter.api.Test;
  * </p>
  */
 class CachePerformanceTest {
+
     /**
      * A task randomly chooses to run scripts (CACHED * HIT times). Tasks will be run
      */
@@ -108,10 +109,13 @@ class CachePerformanceTest {
 
     /** Number of test loops. */
     private static final int LOOPS = 10; // 0;
+
     /** Number of different scripts. */
     private static final int SCRIPTS = 800; // 0;
+
     /** Cache capacity. */
     private static final int CACHED = 500; // 0;
+
     /** Number of times each script is evaluated. */
     private static final int HIT = 5;
 

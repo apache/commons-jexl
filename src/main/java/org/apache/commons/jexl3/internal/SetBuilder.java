@@ -26,6 +26,7 @@ import org.apache.commons.jexl3.JexlArithmetic;
  * Helper class to create set literals.
  */
 public class SetBuilder implements JexlArithmetic.SetBuilder {
+
     /** The set being created. */
     protected final Set<Object> set;
 

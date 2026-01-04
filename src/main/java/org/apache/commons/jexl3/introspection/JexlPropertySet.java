@@ -29,6 +29,7 @@ import org.apache.commons.jexl3.JexlException;
  * @since 1.0
  */
 public interface JexlPropertySet {
+
     /**
      * Method used to set the property value of an object.
      *

@@ -49,11 +49,13 @@ import org.apache.commons.jexl3.introspection.JexlUberspect;
  * The base class for parsing, manages the parameter/local variable frame.
  */
 public abstract class JexlParser extends StringParser implements JexlScriptParser {
+
     /**
      * A lexical unit is the container defining local symbols and their
      * visibility boundaries.
      */
     public interface LexicalUnit {
+
         /**
          * Declares a local symbol.
          *
@@ -61,6 +63,7 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
          * @return true if declaration was successful, false if symbol was already declared
          */
         boolean declareSymbol(int symbol);
+
         /**
          * @return the set of symbols identifiers declared in this unit
          */
@@ -70,6 +73,7 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
          * @return the number of local variables declared in this unit
          */
         int getSymbolCount();
+
         /**
          * Checks whether a symbol is declared in this lexical unit.
          *
@@ -82,22 +86,27 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
 
         void setConstant(int symbol);
     }
+
     /**
      * The name of the options pragma.
      */
     public static final String PRAGMA_OPTIONS = "jexl.options";
+
     /**
      * The prefix of a namespace pragma.
      */
     public static final String PRAGMA_JEXLNS = "jexl.namespace.";
+
     /**
      * The prefix of a module pragma.
      */
     public static final String PRAGMA_MODULE = "jexl.module.";
+
     /**
      * The import pragma.
      */
     public static final String PRAGMA_IMPORT = "jexl.import";
+
     /**
      * The set of assignment operators as classes.
      */
@@ -121,6 +130,7 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
             ASTGetIncrementNode.class
         )
     );
+
     /**
      * Pick the most significant token for error reporting.
      *
@@ -135,6 +145,7 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
         }
         return null;
     }
+
     /**
      * Reads a given source line.
      *
@@ -156,6 +167,7 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
         }
         return msg;
     }
+
     /**
      * Utility function to create '.' separated string from a list of string.
      *
@@ -165,36 +177,44 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
     protected static String stringify(final Iterable<String> lstr) {
         return String.join(".", lstr);
     }
+
     /**
      * The associated controller.
      */
     protected final FeatureController featureController;
+
     /**
      * The basic source info.
      */
     protected JexlInfo info;
+
     /**
      * The source being processed.
      */
     protected String source;
+
     /**
      * The map of named registers aka script parameters.
      * <p>Each parameter is associated with a register and is materialized
      * as an offset in the registers array used during evaluation.</p>
      */
     protected final AtomicReference<Scope> scopeReference;
+
     /**
      * When parsing inner functions/lambda, need to stack the scope (sic).
      */
     protected final Deque<Scope> scopes;
+
     /**
      * The list of pragma declarations.
      */
     protected Map<String, Object> pragmas;
+
     /**
      * The optional class name and constant resolver.
      */
     protected final AtomicReference<JexlUberspect.ClassConstantResolver> fqcnResolver;
+
     /**
      * The list of imports.
      * <p>Imports are used to resolve simple class names into fully qualified class names.</p>
@@ -226,30 +246,37 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
      * Whether automatic semicolon insertion is enabled.
      */
     protected boolean autoSemicolon = true;
+
     /**
      * The known namespaces.
      */
     protected Set<String> namespaces;
+
     /**
      * The number of nested loops.
      */
     protected AtomicInteger loopCount;
+
     /**
      * Stack of parsing loop counts.
      */
     protected final Deque<Integer> loopCounts;
+
     /**
      * The current lexical block.
      */
     protected final AtomicReference<LexicalUnit> blockReference;
+
     /**
      * Stack of lexical blocks.
      */
     protected final Deque<LexicalUnit> blocks;
+
     /**
      * The map of lexical to functional blocks.
      */
     protected final Map<LexicalUnit, Scope> blockScopes;
+
     /**
      * The parent parser if any.
      */

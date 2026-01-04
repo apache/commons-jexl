@@ -60,12 +60,16 @@ public final class Operator implements JexlOperator.Uberspect {
 
     /** The uberspect. */
     private final JexlUberspect uberspect;
+
     /** The arithmetic instance being analyzed. */
     private final JexlArithmetic arithmetic;
+
     /** The set of overloaded operators. */
     private final Set<JexlOperator> overloads;
+
     /** The delegate if built as a 3.4 legacy. */
     private final JexlArithmetic.Uberspect delegate;
+
     /** Caching state: -1 unknown, 0 false, 1 true. */
     private volatile int caching = -1;
 

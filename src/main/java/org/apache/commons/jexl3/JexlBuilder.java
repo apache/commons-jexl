@@ -84,6 +84,7 @@ import org.apache.commons.logging.Log;
  * </ul>
  */
 public class JexlBuilder {
+
     /**
      * The set of default permissions used when creating a new builder.
      * <p>Static but modifiable so these default permissions can be changed to a purposeful set.</p>

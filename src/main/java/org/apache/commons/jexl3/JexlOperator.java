@@ -49,6 +49,7 @@ import java.util.function.Consumer;
  * @since 3.0
  */
 public enum JexlOperator {
+
     /**
      * Add operator.
      * <br><strong>Syntax:</strong> {@code x + y}
@@ -592,6 +593,7 @@ public enum JexlOperator {
      * @since 3.5.0
      */
     public interface Uberspect extends JexlArithmetic.Uberspect {
+
         /**
          * Try to find the most specific method and evaluate an operator.
          * <p>This method does not call {@link #overloads(JexlOperator)} and shall not be called with an

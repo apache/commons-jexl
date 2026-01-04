@@ -76,10 +76,13 @@ class MethodKeyTest {
         "applyIt",
         "invokeIt"
     };
+
     /** From key to string */
     private static final java.util.Map< MethodKey, String> BY_KEY;
+
     /** Form string to key */
     private static final java.util.Map<String, MethodKey> BY_STRING;
+
     /** The list of keys we generated & test against */
     private static final MethodKey[] KEY_LIST;
 

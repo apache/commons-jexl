@@ -46,34 +46,47 @@ import org.apache.commons.jexl3.internal.Engine;
  * @since 3.2
  */
 public final class JexlOptions {
+
     /** The boolean logical flag. */
     private static final int BOOLEAN_LOGICAL = 10;
+
     /** The interpolation string bit. */
     private static final int STRICT_INTERPOLATION= 9;
+
     /** The const capture bit. */
     private static final int CONST_CAPTURE = 8;
+
     /** The shared instance bit. */
     private static final int SHARED = 7;
+
     /** The local shade bit. */
     private static final int SHADE = 6;
+
     /** The antish var bit. */
     private static final int ANTISH = 5;
+
     /** The lexical scope bit. */
     private static final int LEXICAL = 4;
+
     /** The safe bit. */
     private static final int SAFE = 3;
+
     /** The silent bit. */
     private static final int SILENT = 2;
+
     /** The strict bit. */
     private static final int STRICT = 1;
+
     /** The cancellable bit. */
     private static final int CANCELLABLE = 0;
+
     /** The flag names ordered. */
     private static final String[] NAMES = {
         "cancellable", "strict", "silent", "safe", "lexical", "antish",
         "lexicalShade", "sharedInstance", "constCapture", "strictInterpolation",
         "booleanShortCircuit"
     };
+
     /** Default mask .*/
     private static int DEFAULT = 1 /*<< CANCELLABLE*/ | 1 << STRICT | 1 << ANTISH | 1 << SAFE;
 

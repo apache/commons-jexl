@@ -27,8 +27,10 @@ import org.apache.commons.jexl3.parser.ASTJexlLambda;
  * A Script closure.
  */
 public class Closure extends Script {
+
     /** The frame. */
     protected final Frame frame;
+
     /** The options. */
     protected final JexlOptions options;
 

@@ -35,6 +35,7 @@ import org.junit.jupiter.api.Test;
 @SuppressWarnings({"AssertEqualsBetweenInconvertibleTypes"})
 class FeaturesTest extends JexlTestCase {
     private final JexlEngine jexl = new JexlBuilder().create();
+
     /**
      * Create the test
      */

@@ -33,6 +33,7 @@ import org.apache.commons.jexl3.JexlException;
  * @since 2.0
  */
 public final class DuckGetExecutor extends AbstractExecutor.Get {
+
     /**
      * Attempts to discover a DuckGetExecutor.
      *

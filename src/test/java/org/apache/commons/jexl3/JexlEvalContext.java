@@ -28,12 +28,16 @@ public class JexlEvalContext implements
        JexlContext,
        JexlContext.NamespaceResolver,
        JexlContext.OptionsHandle {
+
     /** The marker for the empty vars. */
     private static final Map<String,Object> EMPTY_MAP = Collections.<String,Object>emptyMap();
+
     /** The variables.*/
     private final JexlContext vars;
+
     /** The namespace. */
     private final JexlContext.NamespaceResolver ns;
+
     /** The options. */
     private final JexlOptions options = new JexlOptions();
 

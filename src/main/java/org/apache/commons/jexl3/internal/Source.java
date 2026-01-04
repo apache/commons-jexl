@@ -28,12 +28,16 @@ import org.apache.commons.jexl3.JexlFeatures;
  * scripts with different features and prevent false sharing.
  */
 public final class Source implements Comparable<Source> {
+
     /** The hash code, pre-computed for fast op. */
     private final int hashCode;
+
     /** The set of features. */
     private final JexlFeatures features;
+
     /** The local symbols, if any. */
     private final Map<String, Integer> symbols;
+
     /** The actual source script/expression. */
     private final String str;
 

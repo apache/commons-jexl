@@ -39,21 +39,28 @@ import org.apache.commons.jexl3.parser.JexlNode;
  * <p>public for introspection purpose.</p>
  */
 public class TemplateInterpreter extends Interpreter {
+
     /**
      * Helper ctor.
      * <p>Stores the different properties required to create a Template interpreter.
      */
     public static class Arguments {
+
         /** The engine. */
         Engine jexl;
+
         /** The options. */
         JexlOptions options;
+
         /** The context. */
         JexlContext jcontext;
+
         /** The frame. */
         Frame jframe;
+
         /** The expressions. */
         TemplateExpression[] expressions;
+
         /** The writer. */
         Writer out;
 
@@ -65,6 +72,7 @@ public class TemplateInterpreter extends Interpreter {
         Arguments(final Engine e) {
             this.jexl = e;
         }
+
         /**
          * Sets the context.
          *
@@ -75,6 +83,7 @@ public class TemplateInterpreter extends Interpreter {
             this.jcontext = j;
             return this;
         }
+
         /**
          * Sets the expressions.
          *
@@ -85,6 +94,7 @@ public class TemplateInterpreter extends Interpreter {
             this.expressions = e;
             return this;
         }
+
         /**
          * Sets the frame.
          *
@@ -95,6 +105,7 @@ public class TemplateInterpreter extends Interpreter {
             this.jframe = f;
             return this;
         }
+
         /**
          * Sets the options.
          *
@@ -105,6 +116,7 @@ public class TemplateInterpreter extends Interpreter {
             this.options = o;
             return this;
         }
+
         /**
          * Sets the writer.
          *
@@ -116,6 +128,7 @@ public class TemplateInterpreter extends Interpreter {
             return this;
         }
     }
+
     /** The array of template expressions. */
     final TemplateExpression[] exprs;
 

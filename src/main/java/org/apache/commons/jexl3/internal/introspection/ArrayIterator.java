@@ -38,10 +38,13 @@ import java.util.NoSuchElementException;
  * @since 1.0
  */
 public class ArrayIterator implements Iterator<Object> {
+
     /** The objects to iterate over. */
     private final Object array;
+
     /** The size of the array. */
     private final int size;
+
     /** The current position and size in the array. */
     private int pos;
 

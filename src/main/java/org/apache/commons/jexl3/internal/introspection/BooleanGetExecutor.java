@@ -19,12 +19,14 @@ package org.apache.commons.jexl3.internal.introspection;
 import java.lang.reflect.InvocationTargetException;
 
 import org.apache.commons.jexl3.JexlException;
+
 /**
  * Specialized executor to get a boolean property from an object.
  *
  * @since 2.0
  */
 public final class BooleanGetExecutor extends AbstractExecutor.Get {
+
     /**
      * Discovers a BooleanGetExecutor.
      * <p>The method to be found should be named "is{P,p}property and return a boolean.</p>

@@ -44,6 +44,7 @@ import org.apache.commons.logging.Log;
  * @since 1.0
  */
 final class ClassMap {
+
     /**
      * The cache miss marker method.
      */
@@ -53,6 +54,7 @@ final class ClassMap {
      * Singleton for permissions non-allowed classes.
      */
     private static final ClassMap EMPTY = new ClassMap();
+
     /**
      * A method that returns itself used as a marker for cache miss,
      * allows the underlying cache map to be strongly typed.
@@ -67,6 +69,7 @@ final class ClassMap {
             return null;
         }
     }
+
     /**
      * Populate the Map of direct hits. These are taken from all the public methods
      * that our class, its parents and their implemented interfaces provide.
@@ -117,6 +120,7 @@ final class ClassMap {
             }
         }
     }
+
     /**
      * @return the empty classmap instance
      */

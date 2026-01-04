@@ -42,6 +42,7 @@ import org.apache.commons.jexl3.parser.JexlNode;
  * A Template instance.
  */
 public final class TemplateScript implements JxltEngine.Template {
+
     /**
      * Collects the call-site surrounding a call to jexl:print(i).
      * <p>This allows parsing the blocks with the known symbols
@@ -159,12 +160,16 @@ public final class TemplateScript implements JxltEngine.Template {
 
     /** The prefix marker. */
     private final String prefix;
+
     /** The array of source blocks. */
     private final Block[] source;
+
     /** The resulting script. */
     private final ASTJexlScript script;
+
     /** The TemplateEngine expressions called by the script. */
     private final TemplateExpression[] exprs;
+
     /** The engine. */
     private final TemplateEngine jxlt;
 

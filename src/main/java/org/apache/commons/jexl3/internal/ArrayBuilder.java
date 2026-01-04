@@ -30,8 +30,10 @@ import org.apache.commons.jexl3.internal.introspection.ClassMisc;
  * Helper class to create typed arrays.
  */
 public class ArrayBuilder implements JexlArithmetic.ArrayBuilder {
+
     /** The number of primitive types. */
     private static final int PRIMITIVE_SIZE = 8;
+
     /** The boxing types to primitive conversion map. */
     private static final Map<Class<?>, Class<?>> BOXING_CLASSES;
     static {
@@ -58,14 +60,19 @@ public class ArrayBuilder implements JexlArithmetic.ArrayBuilder {
 
     /** The intended class array. */
     protected Class<?> commonClass;
+
     /** Whether the array stores numbers. */
     protected boolean isNumber = true;
+
     /** Whether we can try unboxing. */
     protected boolean unboxing = true;
+
     /** The untyped list of items being added. */
     protected final Object[] untyped;
+
     /** Number of added items. */
     protected int added;
+
     /** Extended? */
     protected final boolean extended;
 

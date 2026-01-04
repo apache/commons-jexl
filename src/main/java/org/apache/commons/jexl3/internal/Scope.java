@@ -30,6 +30,7 @@ import java.util.Map;
  * @since 3.0
  */
 public final class Scope {
+
     /**
      * The value of an as-yet undeclared but variable, for instance: x; before var x;.
      */
@@ -38,6 +39,7 @@ public final class Scope {
             return "??";
         }
     };
+
     /**
      * The value of a declared but undefined variable, for instance: var x;.
      */
@@ -46,32 +48,39 @@ public final class Scope {
             return "?";
         }
     };
+
     /**
      * The empty string array.
      */
     private static final String[] EMPTY_STRS = {};
+
     /**
      * The parent scope.
      */
     private final Scope parent;
+
     /**
      * The number of parameters.
      */
     private int parms;
+
     /**
      * The number of local variables.
      */
     private int vars;
+
     /**
      * The map of named variables aka script parameters and local variables.
      * Each parameter is associated with a symbol and is materialized as an offset in the stacked array used
      * during evaluation.
      */
     private Map<String, Integer> namedVariables;
+
     /**
      * The map of local captured variables to parent scope variables, i.e., closure.
      */
     private Map<Integer, Integer> capturedVariables;
+
     /**
      * Let symbols.
      */

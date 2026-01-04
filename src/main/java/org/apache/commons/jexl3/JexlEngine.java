@@ -54,6 +54,7 @@ public abstract class JexlEngine {
      * The empty context class, public for instrospection.
      */
     public static final class EmptyContext implements JexlContext {
+
         /**
          * Default ctor.
          */
@@ -79,6 +80,7 @@ public abstract class JexlEngine {
      * The  empty/static/non-mutable JexlNamespace class, public for instrospection.
      */
     public static final class EmptyNamespaceResolver implements JexlContext.NamespaceResolver {
+
         /**
          * Default ctor.
          */
@@ -92,6 +94,7 @@ public abstract class JexlEngine {
 
     /** The failure marker class. */
     private static final class FailObject {
+
         /**
          * Default ctor.
          */
@@ -118,6 +121,7 @@ public abstract class JexlEngine {
          * @return the math context
          */
         MathContext getArithmeticMathContext();
+
         /**
          * The BigDecimal scale used for comparison and coercion operations.
          *
@@ -391,6 +395,7 @@ public abstract class JexlEngine {
     public final JexlScript createScript(final JexlInfo info, final String source, final String... names) {
         return createScript(null, info, source, names);
     }
+
     /**
      * Creates a Script from a {@link URL} containing valid JEXL syntax.
      * This method parses the script and validates the syntax.

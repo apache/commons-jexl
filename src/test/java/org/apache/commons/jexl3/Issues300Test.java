@@ -124,6 +124,7 @@ class Issues300Test {
     }
 
     public static class Context0930 extends MapContext {
+
         /**
          * This allows using a JEXL lambda as a filter.
          *

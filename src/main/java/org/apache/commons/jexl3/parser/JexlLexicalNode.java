@@ -25,6 +25,7 @@ import org.apache.commons.jexl3.internal.LexicalScope;
  */
 public abstract class JexlLexicalNode extends JexlNode implements JexlParser.LexicalUnit {
     private static final long serialVersionUID = 1L;
+
     /** The local lexical scope, local information about let/const. */
     private LexicalScope lexicalScope;
 

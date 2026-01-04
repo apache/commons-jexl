@@ -67,6 +67,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @since 3.0
  */
 public final class JexlSandbox {
+
     /**
      * The marker string for explicitly disallowed null properties.
      */
@@ -111,18 +112,22 @@ public final class JexlSandbox {
      * The block-all permissions.
      */
     private static final Permissions BLOCK_ALL = new Permissions(false, BLOCK_NAMES, BLOCK_NAMES, BLOCK_NAMES);
+
     /**
      * The pass-thru permissions.
      */
     private static final Permissions ALLOW_ALL = new Permissions(false, ALLOW_NAMES, ALLOW_NAMES, ALLOW_NAMES);
+
     /**
      * The map from class names to permissions.
      */
     private final Map<String, Permissions> sandbox;
+
     /**
      * Whether permissions can be inherited (through implementation or extension).
      */
     private final boolean inherit;
+
     /**
      * Default behavior, block or allow.
      */
@@ -396,6 +401,7 @@ public final class JexlSandbox {
      * An allow set of names.
      */
     static class AllowSet extends Names {
+
         /**
          * The map of controlled names and aliases.
          */
@@ -447,6 +453,7 @@ public final class JexlSandbox {
      * A block set of names.
      */
     static class BlockSet extends Names {
+
         /**
          * The set of controlled names.
          */
@@ -537,18 +544,22 @@ public final class JexlSandbox {
      * Contains the allow or block lists for properties and methods for a given class.
      */
     public static final class Permissions {
+
         /**
          * Whether these permissions are inheritable, ie can be used by derived classes.
          */
         private final boolean inheritable;
+
         /**
          * The controlled readable properties.
          */
         private final Names read;
+
         /**
          * The controlled  writable properties.
          */
         private final Names write;
+
         /**
          * The controlled methods.
          */
@@ -673,6 +684,7 @@ public final class JexlSandbox {
      */
     @Deprecated
     public static final class BlackSet extends BlockSet {
+
         /** Default constructor */
         public BlackSet() { } // Keep Javadoc happy
     }
@@ -682,6 +694,7 @@ public final class JexlSandbox {
      */
     @Deprecated
     public static final class WhiteSet extends AllowSet {
+
         /** Default constructor */
         public WhiteSet() { } // Keep Javadoc happy
     }
@@ -697,6 +710,7 @@ public final class JexlSandbox {
     public Permissions black(final String clazz) {
         return block(clazz);
     }
+
     /**
      * Gets the read permission value for a given property of a class.
      *

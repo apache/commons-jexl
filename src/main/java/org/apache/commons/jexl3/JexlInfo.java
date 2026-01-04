@@ -29,6 +29,7 @@ public class JexlInfo {
      * Describes errors more precisely.
      */
     public interface Detail {
+
         /**
          * Gets the end column on the line that triggered the error
          *

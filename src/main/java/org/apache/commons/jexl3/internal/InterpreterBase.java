@@ -55,22 +55,30 @@ import org.apache.commons.logging.Log;
  * @since 3.0
  */
 public abstract class InterpreterBase extends ParserVisitor {
+
     /**
      * Helping dispatch function calls.
      */
     protected class CallDispatcher {
+
         /** The syntactic node. */
         final JexlNode node;
+
         /** Whether solution is cacheable. */
         final boolean cacheable;
+
         /** Whether arguments have been narrowed.  */
         boolean narrow;
+
         /** The method to call. */
         JexlMethod vm;
+
         /** The method invocation target. */
         Object target;
+
         /** The actual arguments. */
         Object[] argv;
+
         /** The cacheable funcall if any. */
         Funcall funcall;
 
@@ -195,6 +203,7 @@ public abstract class InterpreterBase extends ParserVisitor {
      * Cached arithmetic function call.
      */
     protected static class ArithmeticFuncall extends Funcall {
+
         /**
          * Constructs a new instance.
          *
@@ -215,6 +224,7 @@ public abstract class InterpreterBase extends ParserVisitor {
      * Cached context function call.
      */
     protected static class ContextFuncall extends Funcall {
+
         /**
          * Constructs a new instance.
          *
@@ -230,10 +240,12 @@ public abstract class InterpreterBase extends ParserVisitor {
             return me.tryInvoke(name, ii.context, ii.functionArguments(target, narrow, args));
         }
     }
+
     /**
      * A ctor that needs a context as 1st argument.
      */
     protected static class ContextualCtor extends Funcall {
+
         /**
          * Constructs a new instance.
          *
@@ -249,14 +261,18 @@ public abstract class InterpreterBase extends ParserVisitor {
             return me.tryInvoke(name, target, ii.callArguments(ii.context, narrow, args));
         }
     }
+
     /**
      * Cached function call.
      */
     protected static class Funcall implements JexlNode.Funcall {
+
         /** Whether narrow should be applied to arguments. */
         protected final boolean narrow;
+
         /** The JexlMethod to delegate the call to. */
         protected final JexlMethod me;
+
         /**
          * Constructs a new instance.
          *
@@ -298,28 +314,40 @@ public abstract class InterpreterBase extends ParserVisitor {
 
     /** The JEXL engine. */
     protected final Engine jexl;
+
     /** The logger. */
     protected final Log logger;
+
     /** The uberspect. */
     protected final JexlUberspect uberspect;
+
     /** The arithmetic handler. */
     protected final JexlArithmetic arithmetic;
+
     /** The context to store/retrieve variables. */
     protected final JexlContext context;
+
     /** The options. */
     protected final JexlOptions options;
+
     /** Cache executors. */
     protected final boolean cache;
+
     /** Cancellation support. */
     protected final AtomicBoolean cancelled;
+
     /** The namespace resolver. */
     protected final JexlContext.NamespaceResolver ns;
+
     /** The class name resolver. */
     protected final JexlUberspect.ClassNameResolver fqcnSolver;
+
     /** The operators evaluation delegate. */
     protected final JexlOperator.Uberspect operators;
+
     /** The map of 'prefix:function' to object resolving as namespaces. */
     protected final Map<String, Object> functions;
+
     /** The map of dynamically created namespaces, NamespaceFunctor or duck-types of those. */
     protected Map<String, Object> functors;
 
@@ -683,6 +711,7 @@ public abstract class InterpreterBase extends ParserVisitor {
         }
         return value;
     }
+
     /**
      * Triggered when method, function or constructor invocation fails with an exception.
      *

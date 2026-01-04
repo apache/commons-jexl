@@ -26,8 +26,10 @@ import org.apache.commons.jexl3.JexlException;
  * @since 2.0
  */
 public final class PropertyGetExecutor extends AbstractExecutor.Get {
+
     /** A static signature for method(). */
     private static final Object[] EMPTY_PARAMS = {};
+
     /**
      * Discovers a PropertyGetExecutor.
      * <p>The method to be found should be named "get{P,p}property.</p>

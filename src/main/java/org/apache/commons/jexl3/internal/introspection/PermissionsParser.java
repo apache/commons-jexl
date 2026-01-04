@@ -55,12 +55,16 @@ import java.util.concurrent.ConcurrentHashMap;
  * </pre>
  */
 public class PermissionsParser {
+
     /** The source. */
     private String src;
+
     /** The source size. */
     private int size;
+
     /** The @NoJexl execution-time map. */
     private Map<String, Permissions.NoJexlPackage> packages;
+
     /** The set of wildcard imports. */
     private Set<String> wildcards;
 

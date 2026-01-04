@@ -42,16 +42,21 @@ import org.apache.commons.jexl3.parser.*;
  * @since 2.0
  */
 public class Interpreter extends InterpreterBase {
+
     /**
      * An annotated call.
      */
     public class AnnotatedCall implements Callable<Object> {
+
         /** The statement. */
         private final ASTAnnotatedStatement stmt;
+
         /** The child index. */
         private final int index;
+
         /** The data. */
         private final Object data;
+
         /** Tracking whether we processed the annotation. */
         private boolean processed;
 
@@ -92,11 +97,13 @@ public class Interpreter extends InterpreterBase {
             return processed;
         }
     }
+
     /**
      * The thread local interpreter.
      */
     protected static final ThreadLocal<Interpreter> INTER =
                        new ThreadLocal<>();
+
     /** Frame height. */
     protected int fp;
 

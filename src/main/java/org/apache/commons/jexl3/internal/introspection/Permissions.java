@@ -51,6 +51,7 @@ import org.apache.commons.jexl3.introspection.JexlPermissions;
  * not be altered using an instance of permissions using {@link JexlPermissions#parse(String...)}.</p>
  */
 public class Permissions implements JexlPermissions {
+
     /**
      * A positive NoJexl construct that defines what is denied by absence in the set.
      * <p>Field or method that are named are the only one allowed access.</p>
@@ -217,6 +218,7 @@ public class Permissions implements JexlPermissions {
         }
         return clazz.getSimpleName();
     }
+
     /**
      * Whether the wilcard set of packages allows a given package to be introspected.
      *

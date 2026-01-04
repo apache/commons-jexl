@@ -51,20 +51,28 @@ import org.apache.commons.logging.LogFactory;
  * @since 1.0
  */
 public class Uberspect implements JexlUberspect {
+
     /** Publicly exposed special failure object returned by tryInvoke. */
     public static final Object TRY_FAILED = JexlEngine.TRY_FAILED;
+
     /** The logger to use for all warnings and errors. */
     protected final Log logger;
+
     /** The resolver strategy. */
     private final JexlUberspect.ResolverStrategy strategy;
+
     /** The permissions. */
     private final JexlPermissions permissions;
+
     /** The introspector version. */
     private final AtomicInteger version;
+
     /** The soft reference to the introspector currently in use. */
     private volatile Reference<Introspector> ref;
+
     /** The class loader reference; used to recreate the introspector when necessary. */
     private volatile Reference<ClassLoader> loader;
+
     /**
      * The map from arithmetic classes to overloaded operator sets.
      * <p>

@@ -27,6 +27,7 @@ import java.util.Iterator;
  * @since 1.0
  */
 public class EnumerationIterator<T> implements Iterator<T> {
+
     /**
      * The enumeration to iterate over.
      */

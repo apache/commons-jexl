@@ -20,10 +20,13 @@ import org.apache.commons.jexl3.JxltEngine;
 import org.apache.commons.jexl3.internal.Scope;
 
 public final class ASTJxltLiteral extends JexlNode implements JexlNode.JxltHandle {
+
     /** Serial uid.*/
     private static final long serialVersionUID = 1L;
+
     /** The actual literal value. */
     private String literal;
+
     /** The expression (parsed). */
     private transient JxltEngine.Expression jxltExpression;
 

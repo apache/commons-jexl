@@ -17,9 +17,11 @@
 package org.apache.commons.jexl3.parser;
 
 public final class ASTNumberLiteral extends JexlNode implements JexlNode.Constant<Number> {
+
     /**
      */
     private static final long serialVersionUID = 1L;
+
     /** The number parser. */
     private final NumberParser nlp;
 

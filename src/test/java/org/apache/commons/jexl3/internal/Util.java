@@ -32,6 +32,7 @@ import org.apache.commons.jexl3.parser.Parser;
  * Helper methods for validate sessions.
  */
 public class Util {
+
     /**
      * Checks the equality of 2 nodes by comparing all their descendants.
      * Descendants must have the same class and same image if non null.

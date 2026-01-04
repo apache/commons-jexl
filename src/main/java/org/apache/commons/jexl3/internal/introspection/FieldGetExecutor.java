@@ -28,6 +28,7 @@ import org.apache.commons.jexl3.introspection.JexlPropertyGet;
  * A JexlPropertyGet for public fields.
  */
 public final class FieldGetExecutor implements JexlPropertyGet {
+
     /**
      * Attempts to discover a FieldGetExecutor.
      *
@@ -50,6 +51,7 @@ public final class FieldGetExecutor implements JexlPropertyGet {
      * The public field.
      */
     private final Field field;
+
     /**
      * Creates a new instance of FieldPropertyGet.
      *

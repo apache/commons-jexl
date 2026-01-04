@@ -27,9 +27,11 @@ import java.util.Locale;
  * Parses number literals.
  */
 public final class NumberParser implements Serializable {
+
     /**
      */
     private static final long serialVersionUID = 1L;
+
     /** JEXL locale-neutral big decimal format. */
     static final DecimalFormat BIGDF = new DecimalFormat("0.0b", new DecimalFormatSymbols(Locale.ROOT));
     private static boolean isNegative(final Token token) {

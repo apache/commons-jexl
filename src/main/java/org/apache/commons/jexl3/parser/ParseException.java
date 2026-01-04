@@ -21,18 +21,22 @@ package org.apache.commons.jexl3.parser;
  * This exception is thrown when parse errors are encountered.
  */
 public class ParseException extends Exception implements JavaccError {
+
     /**
      * The version identifier.
      */
     private static final long serialVersionUID = 1L;
+
     /**
      * Last correct input before error occurs.
      */
     private String after = "";
+
     /**
      * Error line.
      */
     private int line = -1;
+
     /**
      * Error column.
      */

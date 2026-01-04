@@ -36,6 +36,7 @@ import java.util.Objects;
  * </p>
  */
 public class StringParser {
+
     /** The length of an escaped unicode sequence. */
     private static final int UCHAR_LEN = 4;
 
@@ -60,6 +61,7 @@ public class StringParser {
     public static String buildRegex(final CharSequence str) {
         return buildString(str.subSequence(1, str.length()), true);
     }
+
     /**
      * Builds a string, handles escaping through '\' syntax.
      *
@@ -87,6 +89,7 @@ public class StringParser {
         read(strb, str, begin, end, sep, esc);
         return strb.toString();
     }
+
     /**
      * Builds a template, does not escape characters.
      *
@@ -97,6 +100,7 @@ public class StringParser {
     public static String buildTemplate(final CharSequence str, final boolean eatsep) {
         return buildString(str, eatsep, false);
     }
+
     /**
      * Adds a escape char ('\') where needed in a string form of an ide
      *
@@ -273,6 +277,7 @@ public class StringParser {
         }
         return index;
     }
+
     /**
      * Reads the remainder of a string till a given separator,
      * handles escaping through '\' syntax.

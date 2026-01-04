@@ -28,10 +28,13 @@ import org.apache.commons.jexl3.introspection.JexlUberspect;
  * <p>Performs a late discovery of the actual getter.</p>
  */
 public class OptionalNullGetter implements JexlPropertyGet {
+
     /** The Uberspect to discover the getter. */
     private final JexlUberspect uberspect;
+
     /** The property we are trying to discover. */
     private final Object property;
+
     /** The result when we solve it. */
     private JexlPropertyGet delegate;
 

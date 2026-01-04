@@ -23,8 +23,10 @@ import org.apache.commons.jexl3.introspection.JexlPropertyGet;
  * Wraps a reference or optional property get executor.
  */
 public class ReferenceGetExecutor implements JexlPropertyGet {
+
     /** The reference handler. */
     private final ReferenceUberspect.ReferenceHandler handler;
+
     /** The previous getter we did delegate to. */
     private final JexlPropertyGet getter;
 

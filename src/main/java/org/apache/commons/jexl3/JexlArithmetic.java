@@ -59,6 +59,7 @@ import org.apache.commons.jexl3.introspection.JexlMethod;
  * @since 2.0
  */
 public class JexlArithmetic {
+
     /**
      * Helper interface used when creating an array literal.
      *
@@ -120,6 +121,7 @@ public class JexlArithmetic {
      * <p>The default implementation creates a java.util.HashMap.</p>
      */
     public interface MapBuilder {
+
         /**
          * Creates the actual "map" instance.
          *
@@ -150,6 +152,7 @@ public class JexlArithmetic {
      * <p>The default implementation creates a java.util.HashSet.</p>
      */
     public interface SetBuilder {
+
         /**
          * Adds a literal to the set.
          *
@@ -170,6 +173,7 @@ public class JexlArithmetic {
      * <p>This allows overloaded operator methods discovery.</p>
      */
     public interface Uberspect {
+
         /**
          * Gets the most specific method for an operator.
          *
@@ -1934,6 +1938,7 @@ public class JexlArithmetic {
         }
         return def;
     }
+
     /**
      * Test if left starts with right.
      *

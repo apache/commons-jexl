@@ -44,20 +44,24 @@ import org.apache.commons.logging.Log;
  * @since 1.0
  */
 public final class Introspector {
+
     /**
      * A Constructor get cache-miss.
      */
     private static final class CacheMiss {
+
         /** The constructor used as cache-miss. */
         @SuppressWarnings("unused")
         public CacheMiss() {
             // empty
         }
     }
+
     /**
      * The cache-miss marker for the constructors map.
      */
     private static final Constructor<?> CTOR_MISS = CacheMiss.class.getConstructors()[0];
+
     /**
      * Checks whether a class is loaded through a given class loader or one of its ascendants.
      *
@@ -77,22 +81,27 @@ public final class Introspector {
         }
         return false;
     }
+
     /**
      * the logger.
      */
     private final Log logger;
+
     /**
      * The permissions.
      */
     private final JexlPermissions permissions;
+
     /**
      * The read/write lock.
      */
     private final ReadWriteLock lock = new ReentrantReadWriteLock();
+
     /**
      * Holds the method maps for the classes we know about, keyed by Class.
      */
     private final Map<Class<?>, ClassMap> classMethodMaps = new HashMap<>();
+
     /**
      * Holds the map of classes ctors we know about as well as unknown ones.
      */
@@ -102,6 +111,7 @@ public final class Introspector {
      * Holds the set of classes we have introspected.
      */
     private final Map<String, Class<?>> constructibleClasses = new HashMap<>();
+
     /**
      * The class loader used to solve constructors if needed.
      * <p>Cheap read-write lock pattern: exclusive lock for write, read visibility through volatile.</p>

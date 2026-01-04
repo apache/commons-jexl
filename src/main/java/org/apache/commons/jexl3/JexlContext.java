@@ -110,6 +110,7 @@ public interface JexlContext {
      * @since 3.3
      */
     interface ModuleProcessor {
+
         /**
          * Defines a module.
          * The module name will be the namespace mapped to the object returned by the evaluation
@@ -131,6 +132,7 @@ public interface JexlContext {
      * <p>The functor is created once during the lifetime of a script evaluation.</p>
      */
     interface NamespaceFunctor {
+
         /**
          * Creates the functor object that will be used instead of the namespace.
          *
@@ -171,6 +173,7 @@ public interface JexlContext {
      * @since 3.2
      */
     interface OptionsHandle {
+
         /**
          * Gets the current set of options though the context.
          * <p>

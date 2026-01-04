@@ -25,10 +25,13 @@ import java.util.NoSuchElementException;
  * An iterator on a long range.
  */
 final class AscLongIterator implements Iterator<Long> {
+
     /** The lower boundary. */
     private final long min;
+
     /** The upper boundary. */
     private final long max;
+
     /** The current value. */
     private long cursor;
 
@@ -62,10 +65,13 @@ final class AscLongIterator implements Iterator<Long> {
  * An iterator on a long range.
  */
 final class DescLongIterator implements Iterator<Long> {
+
     /** The lower boundary. */
     private final long min;
+
     /** The upper boundary. */
     private final long max;
+
     /** The current value. */
     private long cursor;
 
@@ -101,10 +107,12 @@ final class DescLongIterator implements Iterator<Long> {
  * Behaves as a readonly collection of longs.
  */
 public abstract class LongRange implements Collection<Long> {
+
     /**
      * Ascending long range.
      */
     public static class Ascending extends LongRange {
+
         /**
          * Constructs a new instance.
          *
@@ -120,10 +128,12 @@ public abstract class LongRange implements Collection<Long> {
             return new AscLongIterator(min, max);
         }
     }
+
     /**
      * Descending long range.
      */
     public static class Descending extends LongRange {
+
         /**
          * Constructs a new instance.
          *

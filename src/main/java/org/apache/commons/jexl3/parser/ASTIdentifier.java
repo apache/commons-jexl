@@ -20,19 +20,26 @@ package org.apache.commons.jexl3.parser;
  * Identifiers, variables, ie symbols.
  */
 public class ASTIdentifier extends JexlNode {
+
     /**
      */
     private static final long serialVersionUID = 1L;
+
     /** The redefined variable flag. */
     private static final int REDEFINED = 0;
+
     /** The shaded variable flag. */
     private static final int SHADED = 1;
+
     /** The captured variable flag. */
     private static final int CAPTURED = 2;
+
     /** The lexical variable flag. */
     private static final int LEXICAL = 3;
+
     /** The const variable flag. */
     private static final int CONST = 4;
+
     /**
      * Checks the value of a flag in the mask.
      *
@@ -43,6 +50,7 @@ public class ASTIdentifier extends JexlNode {
     private static boolean isSet(final int ordinal, final int mask) {
         return (mask & 1 << ordinal) != 0;
     }
+
     /**
      * Sets the value of a flag in a mask.
      *
