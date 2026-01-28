@@ -83,6 +83,7 @@ class CachePerformanceTest {
                 }
                 return count;
             } catch (final InterruptedException e) {
+                Thread.currentThread().interrupt();
                 throw new RuntimeException(e);
             }
         }

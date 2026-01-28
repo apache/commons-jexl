@@ -100,7 +100,7 @@ public class SynchronizedArithmetic extends JexlArithmetic {
                     }
                 }
             } catch (final InterruptedException xint) {
-                // oops
+                Thread.currentThread().interrupt();
             }
         }
 
