@@ -1,48 +1,8 @@
-Apache Commons JEXL 3.6.1 Release Notes
----------------------------------------
 
-The Apache Commons JEXL team is pleased to announce the release of Apache Commons JEXL 3.6.1.
-
-Introduction
-------------
-
-Apache Commons JEXL is a library that enables scripting features in Java applications and frameworks.
-
-This is a feature and maintenance release. Java 8 or later is required.
-
-
-Fixed Bugs
-----------
-
-o JEXL-452:  Debug setting in Engine shows class/method/line even when set to false. Thanks to Gary Gregory. 
-o JEXL-451:  Restore JexlSandbox permission capabilities on Object.class. Thanks to Xu Pengcheng. 
-o JEXL-450:  Disable instantiation of internal classes in RESTRICTED mode. 
-o JEXL-449:  Inconsistency on nature of curly-bracket syntactic elements regarding annotations. Thanks to William Price. 
-
-Changes
--------
-
-o          Bump org.apache.commons:commons-parent from 91 to 93 #391, #396. Thanks to Gary Gregory, Dependabot. 
-o          Bump org.apache.commons:commons-lang3 from 3.17.0 to 3.20.0. Thanks to Gary Gregory. 
-
-
-Historical list of changes: https://commons.apache.org/proper/commons-jexl/changes.html
-
-For complete information on Apache Commons JEXL, including instructions on how to submit bug reports,
-patches, or suggestions for improvement, see the Apache Commons JEXL website:
-
-https://commons.apache.org/proper/commons-jexl/
-
-Download page: https://commons.apache.org/proper/commons-jexl/download_jexl.cgi
-
-Have fun!
--Apache Commons Team
-
-------------------------------------------------------------------------------
 
 
                             Apache Commons JEXL
-                               Version 3.6.1
+                               Version 3.6.2
                                Release Notes
 
 
@@ -72,6 +32,22 @@ Have fun!
 -Apache Commons Team
 
 ========================================================================================================================
+Release 3.6.2
+========================================================================================================================
+
+Version 3.6.2 is a minor release.
+
+Compatibility with previous releases
+====================================
+Version 3.6.2 is source and binary compatible with 3.6.
+
+
+Bugs Fixed in 3.6.2:
+====================
+* JEXL-454:     Switch NaN case not found.
+* JEXL-453:     Finally clause is not evaluated.
+
+========================================================================================================================
 Release 3.6.1
 ========================================================================================================================
 
@@ -89,6 +65,12 @@ Bugs Fixed in 3.6.1:
 * JEXL-450:     Disable instantiation of internal classes in RESTRICTED mode.
 * JEXL-449:     Inconsistency on nature of curly-bracket syntactic elements regarding annotations.
 
+
+Changes in 3.6.1:
+=================
+
+o               Bump org.apache.commons:commons-parent from 91 to 93 #391, #396. Thanks to Gary Gregory, Dependabot.
+o               Bump org.apache.commons:commons-lang3 from 3.17.0 to 3.20.0. Thanks to Gary Gregory.
 
 ========================================================================================================================
 Release 3.6.0
