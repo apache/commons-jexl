@@ -110,12 +110,11 @@ public final class IndexedType implements JexlPropertyGet {
     public static JexlPropertyGet discover(final Introspector is, final Object object, final String name) {
         if (object != null && name != null && !name.isEmpty()) {
             final String base = name.substring(0, 1).toUpperCase() + name.substring(1);
-            final String container = name;
             final Class<?> clazz = object.getClass();
             final Method[] getters = is.getMethods(object.getClass(), "get" + base);
             final Method[] setters = is.getMethods(object.getClass(), "set" + base);
             if (getters != null) {
-                return new IndexedType(container, clazz, getters, setters);
+                return new IndexedType(name, clazz, getters, setters);
             }
         }
         return null;
@@ -175,8 +174,8 @@ public final class IndexedType implements JexlPropertyGet {
         if (getters != null && getters.length > 0) {
             Method jm = get;
             if (jm != null) {
-                final Class<?>[] ptypes = jm.getParameterTypes();
-                if (ptypes[0].isAssignableFrom(key.getClass())) {
+                final Class<?>[] types = jm.getParameterTypes();
+                if (types[0].isAssignableFrom(key.getClass())) {
                     return jm.invoke(object, key);
                 }
             }
@@ -191,8 +190,7 @@ public final class IndexedType implements JexlPropertyGet {
             }
         }
         throw new IntrospectionException("property get error: "
-                + object.getClass().toString()
-                + "@" + key.toString());
+                + object.getClass() + "@" + key.toString());
     }
 
     /**
@@ -209,10 +207,10 @@ public final class IndexedType implements JexlPropertyGet {
         if (setters != null && setters.length > 0) {
             Method jm = set;
             if (jm != null) {
-                final Class<?>[] ptypes = jm.getParameterTypes();
-                if (ptypes[0].isAssignableFrom(key.getClass())
+                final Class<?>[] types = jm.getParameterTypes();
+                if (types[0].isAssignableFrom(key.getClass())
                     && (value == null
-                        || ptypes[1].isAssignableFrom(value.getClass()))) {
+                        || types[1].isAssignableFrom(value.getClass()))) {
                     return jm.invoke(object, key, value);
                 }
             }
@@ -227,8 +225,7 @@ public final class IndexedType implements JexlPropertyGet {
             }
         }
         throw new IntrospectionException("property set error: "
-                + object.getClass().toString()
-                + "@" + key.toString());
+                + object.getClass() + "@" + key.toString());
     }
 
     @Override
@@ -237,8 +234,8 @@ public final class IndexedType implements JexlPropertyGet {
     }
 
     @Override
-    public boolean tryFailed(final Object rval) {
-        return rval == Uberspect.TRY_FAILED;
+    public boolean tryFailed(final Object val) {
+        return val == Uberspect.TRY_FAILED;
     }
 
     @Override

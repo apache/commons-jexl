@@ -30,6 +30,7 @@ import java.math.MathContext;
 import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.ToLongFunction;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -1416,19 +1417,7 @@ public class JexlArithmetic {
      * @return an Integer or Long if narrowing is possible, the original BigDecimal otherwise
      */
     protected Number narrowBigDecimal(final Object lhs, final Object rhs, final BigDecimal big) {
-        if (isNumberable(lhs) || isNumberable(rhs)) {
-            try {
-                final long l = big.longValueExact();
-                // coerce to int when possible (int being so often used in method parms)
-                if ((int) l == l) {
-                    return (int) l;
-                }
-                return l;
-            } catch (final ArithmeticException xa) {
-                // ignore, no exact value possible
-            }
-        }
-        return big;
+       return narrowToLong(lhs, rhs, big, BigDecimal::longValueExact);
     }
 
     /**
@@ -1446,9 +1435,24 @@ public class JexlArithmetic {
      * @return an Integer or Long if narrowing is possible, the original BigInteger otherwise
      */
     protected Number narrowBigInteger(final Object lhs, final Object rhs, final BigInteger big) {
+        return narrowToLong(lhs, rhs, big, BigInteger::longValueExact);
+    }
+
+    /**
+     * Given a generic number, attempt to narrow it to an Integer or Long if it fits and
+     * one of the arguments is numberable.
+     *
+     * @param lhs  the left-hand side operand that lead to the big result
+     * @param rhs  the right-hand side operand that lead to the big result
+     * @param big the number to narrow
+     * @param toLongFunction the function to convert the number to a long
+     * @param <X> the number type
+     * @return an Integer or Long if narrowing is possible, the original number otherwise
+     */
+    protected <X extends Number> Number narrowToLong(final Object lhs, final Object rhs, final X big, final ToLongFunction<X> toLongFunction) {
         if (isNumberable(lhs) || isNumberable(rhs)) {
             try {
-                final long l = big.longValueExact();
+                final long l = toLongFunction.applyAsLong(big);
                 // coerce to int when possible (int being so often used in method parms)
                 if ((int) l == l) {
                     return (int) l;
@@ -1728,7 +1732,7 @@ public class JexlArithmetic {
 
     /**
      * Converts a string to an int.
-     * <p>This ensure the represented number is a natural (not a real).</p>
+     * <p>This ensures the represented number is a natural (not a real).</p>
      *
      * @param arg the arg
      * @return an int
@@ -1745,7 +1749,7 @@ public class JexlArithmetic {
 
     /**
      * Converts a string to a long.
-     * <p>This ensure the represented number is a natural (not a real).</p>
+     * <p>This ensures the represented number is a natural (not a real).</p>
      *
      * @param arg the arg
      * @return a long

@@ -133,12 +133,12 @@ public final class Introspector {
      * Create the introspector.
      *
      * @param log     the logger to use
-     * @param cloader the class loader
+     * @param loader the class loader
      * @param perms the permissions
      */
-    public Introspector(final Log log, final ClassLoader cloader, final JexlPermissions perms) {
+    public Introspector(final Log log, final ClassLoader loader, final JexlPermissions perms) {
         this.logger = log;
-        this.loader = cloader;
+        this.loader = loader;
         this.permissions = perms == null ? JexlPermissions.RESTRICTED : perms;
     }
 
