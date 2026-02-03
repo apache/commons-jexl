@@ -322,7 +322,8 @@ public class Issues400Test {
         options.setLexical(true);
         final JexlEngine jexl = builder.create();
         final JexlScript script = jexl.createScript("var c = 42; var f = y -> c += y; f(z)", "z");
-        final JexlException.Variable xvar = assertThrows(JexlException.Variable.class, () -> script.execute(null, 12), "c should be const");
+        final JexlException.Variable xvar = assertThrows(JexlException.Variable.class,
+            () -> script.execute(null, 12), "c should be const");
         assertEquals("c", xvar.getVariable());
     }
 
@@ -330,8 +331,11 @@ public class Issues400Test {
     void test413c() {
         final JexlBuilder builder = new JexlBuilder();
         final JexlEngine jexl = builder.create();
-        final JexlScript script = jexl.createScript("#pragma jexl.options '+constCapture'\nvar c = 42; var f = y -> c += y; f(z)", "z");
-        final JexlException.Variable xvar = assertThrows(JexlException.Variable.class, () -> script.execute(null, 12), "c should be const");
+        final String pragma = "#pragma jexl.options '+constCapture'\n"
+            + "var c = 42; var f = y -> c += y; f(z)";
+        final JexlScript script = jexl.createScript(pragma, "z");
+        final JexlException.Variable xvar = assertThrows(
+            JexlException.Variable.class, () -> script.execute(null, 12), "c should be const");
         assertEquals("c", xvar.getVariable());
     }
 
@@ -339,7 +343,9 @@ public class Issues400Test {
     void test413d() {
         final JexlBuilder builder = new JexlBuilder().features(new JexlFeatures().constCapture(true));
         final JexlEngine jexl = builder.create();
-        final JexlException.Parsing xparse = assertThrows(JexlException.Parsing.class, () -> jexl.createScript("var c = 42; var f = y -> c += y; f(z)", "z"), "c should be const");
+        final JexlException.Parsing xparse = assertThrows(JexlException.Parsing.class,
+            () -> jexl.createScript("var c = 42; var f = y -> c += y; f(z)", "z"),
+            "c should be const");
         assertTrue(xparse.getMessage().contains("const"));
     }
 
@@ -378,7 +384,10 @@ public class Issues400Test {
         assertFalse(RESTRICTED.allow(currentTimeMillis));
 
         // An engine with the System class as namespace and the positive permissions
-        final JexlEngine jexl = new JexlBuilder().namespaces(Collections.singletonMap("sns", System.class)).permissions(permissions).create();
+        final JexlEngine jexl = new JexlBuilder()
+            .namespaces(Collections.singletonMap("sns", System.class))
+            .permissions(permissions)
+            .create();
 
         final AtomicLong result = new AtomicLong();
         assertEquals(0, result.get());
@@ -501,7 +510,8 @@ public class Issues400Test {
     @Test
     void test431a() {
         final JexlEngine jexl = new JexlBuilder().create();
-        final String src = "let x = 0; try { x += 19 } catch (let error) { return 169 } try { x += 23 } catch (let error) { return 169 }";
+        final String src = "let x = 0; try { x += 19 } catch (let error) { return 169 } "
+            + "try { x += 23 } catch (let error) { return 169 }";
         final JexlScript script = jexl.createScript(src);
         assertNotNull(script);
         final Object result = script.execute(null);
@@ -515,7 +525,8 @@ public class Issues400Test {
     @Test
     void test431b() {
         final JexlEngine jexl = new JexlBuilder().create();
-        final String src = "let x = 0; try(let error) { x += 19 } catch (let error) { return 169 } try { x += 23 } catch (let error) { return 169 }";
+        final String src = "let x = 0; try(let error) { x += 19 } catch (let error) { return 169 } "
+            + "try { x += 23 } catch (let error) { return 169 }";
         final JexlScript script = jexl.createScript(src);
         assertNotNull(script);
         final Object result = script.execute(null);
@@ -613,7 +624,14 @@ public class Issues400Test {
     @Test
     void test437a() {
         final JexlEngine jexl = new JexlBuilder().create();
-        final String src = "let values = [...]\n" + "function append(const value) {\n" + "  values.add(value)\n" + "}\n" + "\n" + "append(1)\n" + "append(2)\n" + "return values ";
+        final String src = "let values = [...]\n"
+            + "function append(const value) {\n"
+            + "  values.add(value)\n"
+            + "}\n"
+            + "\n"
+            + "append(1)\n"
+            + "append(2)\n"
+            + "return values ";
         final JexlScript script = jexl.createScript(src);
         assertNotNull(script);
         final Object result = script.execute(null);
@@ -627,7 +645,13 @@ public class Issues400Test {
         final JexlFeatures features = JexlFeatures.createDefault().ambiguousStatement(true);
         assertTrue(features.supportsAmbiguousStatement());
         final JexlEngine jexl = new JexlBuilder().features(features).create();
-        final String src = "let values = [...]" + "function append(const value) {" + "  values.add(value)" + "}" + "append(1)" + "append(2)" + "return values ";
+        final String src = "let values = [...]"
+            + "function append(const value) {"
+            + "  values.add(value)"
+            + "}"
+            + "append(1)"
+            + "append(2)"
+            + "return values ";
         final JexlScript script = jexl.createScript(src);
         assertNotNull(script);
         final Object result = script.execute(null);
@@ -741,7 +765,12 @@ public class Issues400Test {
 
     @Test
     void test438() {// no local, no lambda, no loops, no-side effects
-        final JexlFeatures f = new JexlFeatures().localVar(false).lambda(false).loops(false).sideEffect(false).sideEffectGlobal(false);
+        final JexlFeatures f = new JexlFeatures()
+            .localVar(false)
+            .lambda(false)
+            .loops(false)
+            .sideEffect(false)
+            .sideEffectGlobal(false);
         final JexlBuilder builder = new JexlBuilder().parserFactory(SQLParser::new).cache(32).features(f);
         final JexlEngine sqle = builder.create();
         Assertions.assertTrue((boolean) sqle.createScript("a <> 25", "a").execute(null, 24));
@@ -785,7 +814,9 @@ public class Issues400Test {
     @Test
     void testIssue447() {
         final JexlEngine jexl = new JexlBuilder().create();
-        final String src = "const c = `${a}\n?= ${b}`; function foo(const left, const right) { `${left}\n?== ${right}` } c+foo(a, b)";
+        final String src = "const c = `${a}\n?= ${b}`; "
+            + "function foo(const left, const right) { `${left}\n?== ${right}` } "
+            + "c+foo(a, b)";
         final JexlScript script = jexl.createScript(src, "a", "b");
         final Object result = script.execute(null, "a", "b");
         Assertions.assertEquals("a\n?= ba\n?== b", result);
@@ -818,27 +849,36 @@ public class Issues400Test {
     @Test
     void test450a() {
         JexlEngine jexl0 = new JexlBuilder().silent(false).permissions(JexlPermissions.RESTRICTED).create();
-        assertThrows(JexlException.Method.class, () -> jexl0.newInstance("org.apache.commons.jexl3.internal.introspection.Uberspect", null, null), "should not be able to create Uberspect with RESTRICTED");
-        JexlPermissions perm = new JexlPermissions.ClassPermissions(org.apache.commons.jexl3.internal.introspection.Uberspect.class);
+        assertThrows(JexlException.Method.class,
+            () -> jexl0.newInstance("org.apache.commons.jexl3.internal.introspection.Uberspect", null, null),
+            "should not be able to create Uberspect with RESTRICTED");
+        JexlPermissions perm = new JexlPermissions.ClassPermissions(
+            org.apache.commons.jexl3.internal.introspection.Uberspect.class);
         JexlEngine jexl1 = new JexlBuilder().silent(false).permissions(perm).create();
-        assertNotNull(jexl1.newInstance("org.apache.commons.jexl3.internal.introspection.Uberspect", null, null), "should able to create Uberspect with Uberspect permission");
+        assertNotNull(jexl1.newInstance(
+            "org.apache.commons.jexl3.internal.introspection.Uberspect", null, null),
+            "should able to create Uberspect with Uberspect permission");
 
     }
 
     @Test
     void test450b() {
         // cannot load System with RESTRICTED
-        assertThrows(JexlException.Method.class, () -> run450b(JexlPermissions.RESTRICTED), "should not be able to load System with RESTRICTED");
+        assertThrows(JexlException.Method.class, () -> run450b(JexlPermissions.RESTRICTED),
+            "should not be able to load System with RESTRICTED");
         // can load System with UNRESTRICTED
         assertEquals(java.lang.System.class, run450b(UNRESTRICTED));
         // need to explicitly allow Uberspect and the current class loader to load System
-        JexlPermissions perm = new JexlPermissions.ClassPermissions(getClass().getClassLoader().getClass(), org.apache.commons.jexl3.internal.introspection.Uberspect.class);
+        JexlPermissions perm = new JexlPermissions.ClassPermissions(
+            getClass().getClassLoader().getClass(),
+            org.apache.commons.jexl3.internal.introspection.Uberspect.class);
         assertEquals(java.lang.System.class, run450b(perm));
     }
 
     private static Object run450b(JexlPermissions perm) {
         JexlEngine jexl = new JexlBuilder().silent(false).permissions(perm).create();
-        String uscript = "new('org.apache.commons.jexl3.internal.introspection.Uberspect', null, null, perm).getClassLoader().loadClass('java.lang.System')";
+        String uscript = "new('org.apache.commons.jexl3.internal.introspection.Uberspect', "
+            + "null, null, perm).getClassLoader().loadClass('java.lang.System')";
         JexlScript u0 = jexl.createScript(uscript, "perm");
         return u0.execute(null, perm);
     }
@@ -847,25 +887,41 @@ public class Issues400Test {
     void test450c() {
         // can reach and invoke System::currentTimeMillis with UNRESTRICTED
         assertNotNull(run450c(UNRESTRICTED));
-        // need explicit permissions to ClassPermissions and Uberspect to reach and invoke System::currentTimeMillis
-        JexlPermissions perm = new JexlPermissions.ClassPermissions(JexlPermissions.ClassPermissions.class, org.apache.commons.jexl3.internal.introspection.Uberspect.class);
+        // need explicit permissions to ClassPermissions and Uberspect to reach and invoke
+        // System::currentTimeMillis
+        JexlPermissions perm = new JexlPermissions.ClassPermissions(
+            JexlPermissions.ClassPermissions.class,
+            org.apache.commons.jexl3.internal.introspection.Uberspect.class);
         assertNotNull(run450c(perm));
         // cannot reach and invoke System::currentTimeMillis with RESTRICTED
-        assertThrows(JxltEngine.Exception.class, () -> run450c(JexlPermissions.RESTRICTED), "should not be able to load System with RESTRICTED");
+        assertThrows(JxltEngine.Exception.class, () -> run450c(JexlPermissions.RESTRICTED),
+            "should not be able to load System with RESTRICTED");
     }
 
     private static Object run450c(JexlPermissions perm) {
         JexlBuilder builder = new JexlBuilder().silent(false).permissions(perm);
-        Object result = new TemplateEngine(new Engine32(builder), false, 2, '$', '#').createExpression("${x = new ('org.apache.commons.jexl3.internal.introspection.Uberspect', null, null, UNRESTRICTED);" + "sys = x?.getClassLoader()?.loadClass('java.lang.System') ?: SYSTEM;" + // fail to create uberspect with java 8
-            "p = new('org.apache.commons.jexl3.introspection.JexlPermissions$ClassPermissions', [sys]);" + "c = new('org.apache.commons.jexl3.internal.introspection.Uberspect', null, null, p);" + "z = c.getMethod(sys,'currentTimeMillis').invoke(x,null);}").evaluate(new BrkContext());
+        Object result = new TemplateEngine(new Engine32(builder), false, 2, '$', '#')
+            .createExpression(
+                "${x = new ('org.apache.commons.jexl3.internal.introspection.Uberspect', "
+                + "null, null, UNRESTRICTED);"
+                + "sys = x?.getClassLoader()?.loadClass('java.lang.System') ?: SYSTEM;"
+                + "p = new('org.apache.commons.jexl3.introspection.JexlPermissions$ClassPermissions', [sys]);"
+                + "c = new('org.apache.commons.jexl3.internal.introspection.Uberspect', null, null, p);"
+                + "z = c.getMethod(sys,'currentTimeMillis').invoke(x,null);}")
+            .evaluate(new BrkContext());
         return result;
     }
 
     @Test
     void test450() {
-        assertNotNull(run450(JexlPermissions.UNRESTRICTED), "should be able to reach and invoke System::currentTimeMillis with UNRESTRICTED");
-        assertNotNull(run450(new JexlPermissions.ClassPermissions(org.apache.commons.jexl3.internal.TemplateEngine.class)), "should be able to reach and invoke System::currentTimeMillis with TemplateEngine permission");
-        assertThrows(JexlException.Method.class, () -> run450(RESTRICTED), "should not be able to reach and invoke System::currentTimeMillis with RESTRICTED");
+        assertNotNull(run450(JexlPermissions.UNRESTRICTED),
+            "should be able to reach and invoke System::currentTimeMillis with UNRESTRICTED");
+        assertNotNull(
+            run450(new JexlPermissions.ClassPermissions(
+                org.apache.commons.jexl3.internal.TemplateEngine.class)),
+            "should be able to reach and invoke System::currentTimeMillis with TemplateEngine permission");
+        assertThrows(JexlException.Method.class, () -> run450(RESTRICTED),
+            "should not be able to reach and invoke System::currentTimeMillis with RESTRICTED");
     }
 
     public static class Engine33 extends Engine32 {
@@ -878,15 +934,29 @@ public class Issues400Test {
         }
 
         static JexlBuilder createBuilder() {
-            JexlPermissions perm = new JexlPermissions.ClassPermissions(Issues400Test.class.getClassLoader().getClass(), JexlPermissions.ClassPermissions.class, org.apache.commons.jexl3.internal.TemplateEngine.class, org.apache.commons.jexl3.internal.introspection.Uberspect.class);
+            JexlPermissions perm = new JexlPermissions.ClassPermissions(
+                Issues400Test.class.getClassLoader().getClass(),
+                JexlPermissions.ClassPermissions.class,
+                org.apache.commons.jexl3.internal.TemplateEngine.class,
+                org.apache.commons.jexl3.internal.introspection.Uberspect.class);
             return new JexlBuilder().safe(false).silent(false).permissions(perm);
         }
     }
 
     private static Object run450(JexlPermissions perm) {
-        JexlEngine jexl = new JexlBuilder().silent(false).strict(true).safe(false).permissions(perm).create();
-        return jexl.createScript("new('org.apache.commons.jexl3.internal.TemplateEngine'," + "new('org.apache.commons.jexl3.Issues400Test$Engine33'),false,256,'$'.charAt(0),'#'.charAt(0))" + ".createExpression(" + "\"#{x = new ('org.apache.commons.jexl3.internal.introspection.Uberspect', null, null);" + "sys = x?.getClassLoader().loadClass('java.lang.System') ?: SYSTEM;" + // fail to load System on Java 8
-            "p = new('org.apache.commons.jexl3.introspection.JexlPermissions$ClassPermissions', [sys]);" + "c = new('org.apache.commons.jexl3.internal.introspection.Uberspect', null, null, p);" + "z = c.getMethod(sys,'currentTimeMillis').invoke(x,null);}\")" + ".evaluate(new('org.apache.commons.jexl3.Issues400Test$BrkContext'))").execute(null);
+        JexlEngine jexl = new JexlBuilder().silent(false).strict(true).safe(false)
+            .permissions(perm).create();
+        String script = "new('org.apache.commons.jexl3.internal.TemplateEngine',"
+            + "new('org.apache.commons.jexl3.Issues400Test$Engine33'),false,256,"
+            + "'$'.charAt(0),'#'.charAt(0))"
+            + ".createExpression("
+            + "\"#{x = new ('org.apache.commons.jexl3.internal.introspection.Uberspect', null, null);"
+            + "sys = x?.getClassLoader().loadClass('java.lang.System') ?: SYSTEM;"
+            + "p = new('org.apache.commons.jexl3.introspection.JexlPermissions$ClassPermissions', [sys]);"
+            + "c = new('org.apache.commons.jexl3.internal.introspection.Uberspect', null, null, p);"
+            + "z = c.getMethod(sys,'currentTimeMillis').invoke(x,null);}\")"
+            + ".evaluate(new('org.apache.commons.jexl3.Issues400Test$BrkContext'))";
+        return jexl.createScript(script).execute(null);
     }
 
     @Test
@@ -907,7 +977,8 @@ public class Issues400Test {
         // sandbox allows reading properties, permissions allow getSimpleName
         assertEquals("Object", jexl451.createScript("o.class.simpleName", "o").execute(null, new Object()));
         // sandbox allows reading properties, permissions forbids getClassLoader
-        assertThrows(JexlException.Property.class, () -> jexl451.createScript("o.class.classLoader", "o").execute(null, new Object()));
+        assertThrows(JexlException.Property.class,
+            () -> jexl451.createScript("o.class.classLoader", "o").execute(null, new Object()));
     }
 }
 
