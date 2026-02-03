@@ -2186,7 +2186,7 @@ public class Interpreter extends InterpreterBase {
         // if we have a 'finally' block, no matter what, evaluate it: its control flow will
         // take precedence over what the 'catch' block might have thrown.
         if (node.hasFinallyClause()) {
-            final JexlNode finallyBody = node.jjtGetChild(nc);
+            final JexlNode finallyBody = node.jjtGetChild(node.jjtGetNumChildren() - 1);
             try {
                 finallyBody.jjtAccept(this, data);
             } catch (JexlException.Break | JexlException.Continue | JexlException.Return flowException) {

@@ -22,11 +22,9 @@ import java.io.StringReader;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Deque;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
-import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -378,84 +376,20 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
     }
 
     /**
-     * Decodes a value of a switch predicate.
-     *
-     * @param value an encoded value, which is either a value or NAN (for NaN) or NIL (for null).
-     * @return the decoded value.
-     */
-    static Object switchDecode(final Object value) {
-        if (value == NIL) {
-            return null;
-        }
-        if (value == NAN) {
-            return Double.NaN;
-        }
-        return value;
-    }
-
-    /**
      * Constructs a set of constants amenable to switch expression.
      */
     protected SwitchSet switchSet() {
         return new SwitchSet();
     }
 
-    protected class SwitchSet implements Iterable<Object> {
-        private final Set<Object> values = new LinkedHashSet<>();
-
-        /**
-         * Adds a collection of values to the set.
-         *
-         * @param values the values to add
-         */
-        void addAll(final Collection<Object> values) {
-            values.forEach(this::add);
-        }
-
-        /**
-         * Adds a value to the set.
-         *
-         * @param value the value to add.
-         */
-        void add(final Object value) {
+    protected class SwitchSet extends LinkedHashSet<Object> {
+        @Override
+        public boolean add(final Object value) {
             final Object code = switchCode(value);
-            if (!values.add(code)) {
+            if (!super.add(code)) {
                 throw new JexlException.Parsing(info, "duplicate constant value: " + value);
             }
-        }
-
-        void clear() {
-            values.clear();
-        }
-
-        boolean isEmpty() {
-            return values.isEmpty();
-        }
-
-        int size() {
-            return values.size();
-        }
-
-        @Override
-        public Iterator<Object> iterator() {
-            return new Iterator<Object>() {
-                private final Iterator<Object> iter = values.iterator();
-
-                @Override
-                public boolean hasNext() {
-                    return iter.hasNext();
-                }
-
-                @Override
-                public Object next() {
-                    return switchDecode(iter.next());
-                }
-
-                @Override
-                public void remove() {
-                    iter.remove();
-                }
-            };
+            return true;
         }
     }
 

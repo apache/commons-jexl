@@ -102,7 +102,7 @@ public class ASTSwitchStatement extends JexlNode {
         dispatch.put(JexlParser.DFLT, switchIndex);
       } else {
         for (final Object constant : switchSet) {
-          if (dispatch.put(constant == null ? JexlParser.NIL : constant, switchIndex) != null) {
+          if (dispatch.put(constant, switchIndex) != null) {
             throw new ParseException("duplicate case in switch statement for value: " + constant);
           }
         }
