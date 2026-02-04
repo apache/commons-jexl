@@ -802,7 +802,7 @@ public class Issues400Test {
     @Test
     void testIssue455a() {
         final JexlEngine jexl = new JexlBuilder().create();
-        String code = "name -> `${name +\n name}`";
+        String code = "name -> `${name +\n\t\b\f\r name}`";
         JexlScript script = jexl.createScript(code);
         Object o = script.execute(null, "Hello");
         String ctl = "HelloHello";

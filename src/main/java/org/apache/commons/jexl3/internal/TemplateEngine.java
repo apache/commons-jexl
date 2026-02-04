@@ -1108,7 +1108,7 @@ public final class TemplateEngine extends JxltEngine {
                             strb.append(c);
                         } else if (inner1 > 0) {
                             inner1 -= 1;
-                        } else if (!isIgnorable(c)) {
+                        } else {
                             // materialize the nested/deferred expr
                             final String src = escapeString(strb);
                             final JexlInfo srcInfo = info.at(lineno, column);
@@ -1131,8 +1131,10 @@ public final class TemplateEngine extends JxltEngine {
                         }
                         break;
                     default:
-                        // do buildup expr
-                        column = append(strb, expr, column, c);
+                        if (!isIgnorable(c)) {
+                            // do buildup expr
+                            column = append(strb, expr, column, c);
+                        }
                         break;
                 }
                 break;
@@ -1187,7 +1189,6 @@ public final class TemplateEngine extends JxltEngine {
     private static boolean isIgnorable(char c) {
         return c == '\n' || c == '\r' || c == '\t' || c == '\f' || c == '\b';
     }
-
 
     /**
      * Reads lines of a template grouping them by typed blocks.
