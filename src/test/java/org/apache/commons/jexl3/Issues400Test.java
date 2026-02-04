@@ -30,6 +30,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.Closeable;
 import java.io.File;
+import java.io.StringWriter;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -796,6 +797,38 @@ public class Issues400Test {
         o = script.execute(context);
         ctl = "Hello\nHello";
         Assertions.assertEquals(ctl, o);
+    }
+
+    @Test
+    void testIssue455a() {
+        final JexlEngine jexl = new JexlBuilder().create();
+        String code = "name -> `${name +\n name}`";
+        JexlScript script = jexl.createScript(code);
+        Object o = script.execute(null, "Hello");
+        String ctl = "HelloHello";
+        Assertions.assertEquals(ctl, o);
+    }
+
+    @Test
+    void testIssue455b() {
+        final JexlEngine jexl = new JexlBuilder().create();
+        String code = "name -> `${name}\n${name}`;";
+        JexlScript script = jexl.createScript(code);
+        Object o = script.execute(null, "Hello");
+        String ctl = "Hello\nHello";
+        Assertions.assertEquals(ctl, o);
+    }
+
+    @Test
+    void testIssue455() {
+        final JexlEngine jexl = new JexlBuilder().create();
+        final JexlContext context = new MapContext();
+        context.set("name", "Hello");
+        final JxltEngine jxlt = jexl.createJxltEngine();
+        final JxltEngine.Template template = jxlt.createTemplate("<b>\n\t${name\n\t+ name}\n</b>");
+        final StringWriter writer = new StringWriter();
+        template.evaluate(context, writer);
+        assertEquals("<b>\n\tHelloHello\n</b>", writer.toString());
     }
 
     @Test

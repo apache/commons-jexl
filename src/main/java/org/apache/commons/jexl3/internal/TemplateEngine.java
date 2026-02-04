@@ -1073,7 +1073,7 @@ public final class TemplateEngine extends JxltEngine {
                         strb.delete(0, Integer.MAX_VALUE);
                         state = ParseState.CONST;
                     }
-                } else {
+                } else if (!isIgnorable(c)) {
                     if (c == '{') {
                         immediate1 += 1;
                     }
@@ -1086,54 +1086,54 @@ public final class TemplateEngine extends JxltEngine {
                 // nested immediate in deferred; need to balance count of '{' & '}'
                 // closing '}'
                 switch (c) {
-                case '"':
-                case '\'':
-                    strb.append(c);
-                    column = StringParser.readString(strb, expr, column + 1, c);
-                    continue;
-                case '{':
-                    if (expr.charAt(column - 1) == immediateChar) {
-                        inner1 += 1;
-                        strb.deleteCharAt(strb.length() - 1);
-                        nested = true;
-                    } else {
-                        deferred1 += 1;
+                    case '"':
+                    case '\'':
                         strb.append(c);
-                    }
-                    continue;
-                case '}':
-                    // balance nested immediate
-                    if (deferred1 > 0) {
-                        deferred1 -= 1;
-                        strb.append(c);
-                    } else if (inner1 > 0) {
-                        inner1 -= 1;
-                    } else {
-                        // materialize the nested/deferred expr
-                        final String src = escapeString(strb);
-                        final JexlInfo srcInfo = info.at(lineno, column);
-                        TemplateExpression dexpr;
-                        if (nested) {
-                            dexpr = new NestedExpression(
-                                        escapeString(expr.substring(inested, column + 1)),
+                        column = StringParser.readString(strb, expr, column + 1, c);
+                        continue;
+                    case '{':
+                        if (expr.charAt(column - 1) == immediateChar) {
+                            inner1 += 1;
+                            strb.deleteCharAt(strb.length() - 1);
+                            nested = true;
+                        } else {
+                            deferred1 += 1;
+                            strb.append(c);
+                        }
+                        continue;
+                    case '}':
+                        // balance nested immediate
+                        if (deferred1 > 0) {
+                            deferred1 -= 1;
+                            strb.append(c);
+                        } else if (inner1 > 0) {
+                            inner1 -= 1;
+                        } else if (!isIgnorable(c)) {
+                            // materialize the nested/deferred expr
+                            final String src = escapeString(strb);
+                            final JexlInfo srcInfo = info.at(lineno, column);
+                            TemplateExpression dexpr;
+                            if (nested) {
+                                dexpr = new NestedExpression(
+                                            escapeString(expr.substring(inested, column + 1)),
+                                            jexl.jxltParse(srcInfo, noscript, src, scope),
+                                     null);
+                            } else {
+                                dexpr = new DeferredExpression(
+                                        src,
                                         jexl.jxltParse(srcInfo, noscript, src, scope),
                                  null);
-                        } else {
-                            dexpr = new DeferredExpression(
-                                    src,
-                                    jexl.jxltParse(srcInfo, noscript, src, scope),
-                             null);
+                            }
+                            builder.add(dexpr);
+                            strb.delete(0, Integer.MAX_VALUE);
+                            nested = false;
+                            state = ParseState.CONST;
                         }
-                        builder.add(dexpr);
-                        strb.delete(0, Integer.MAX_VALUE);
-                        nested = false;
-                        state = ParseState.CONST;
-                    }
-                    break;
-                default:
-                    // do buildup expr
-                    column = append(strb, expr, column, c);
-                    break;
+                        break;
+                    default:
+                        // do buildup expr
+                        column = append(strb, expr, column, c);
+                        break;
                 }
                 break;
             case ESCAPE:
@@ -1183,6 +1183,11 @@ public final class TemplateEngine extends JxltEngine {
     private String escapeString(final CharSequence str) {
         return StringParser.escapeString(str, (char) 0);
     }
+
+    private static boolean isIgnorable(char c) {
+        return c == '\n' || c == '\r' || c == '\t' || c == '\f' || c == '\b';
+    }
+
 
     /**
      * Reads lines of a template grouping them by typed blocks.
