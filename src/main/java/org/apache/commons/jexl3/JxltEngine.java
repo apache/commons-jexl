@@ -309,7 +309,19 @@ public abstract class JxltEngine {
          * @param context the context to prepare against
          * @return the prepared version of the template
          */
-        Template prepare(JexlContext context);
+        default Template prepare(JexlContext context) {
+            return prepare(context, (Object[]) null);
+        }
+
+        /**
+         * Prepares this template by expanding any contained deferred TemplateExpression with optional arguments.
+         * This allows currying template parameters at prepare-time.
+         *
+         * @param context the context to prepare against
+         * @param args the arguments to bind (optional)
+         * @return the prepared version of the template
+         */
+        Template prepare(JexlContext context, Object... args);
     }
 
     /**
