@@ -322,7 +322,9 @@ public abstract class JxltEngine {
          * @since 3.6.2
          */
         default Template prepare(JexlContext context, Object... args) {
-            throw new UnsupportedOperationException("No default implementation");
+            throw new UnsupportedOperationException(
+                    "This template implementation does not support prepare with arguments. "
+                    + "Override this method to provide support.");
         }
     }
 
