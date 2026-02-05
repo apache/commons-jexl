@@ -45,11 +45,11 @@ Apache Commons JEXL
 
 [![Java CI](https://github.com/apache/commons-jexl/actions/workflows/maven.yml/badge.svg)](https://github.com/apache/commons-jexl/actions/workflows/maven.yml)
 [![Maven Central](https://img.shields.io/maven-central/v/org.apache.commons/commons-jexl3?label=Maven%20Central)](https://search.maven.org/artifact/org.apache.commons/commons-jexl3)
-[![Javadocs](https://javadoc.io/badge/org.apache.commons/commons-jexl3/3.6.1.svg)](https://javadoc.io/doc/org.apache.commons/commons-jexl3/3.6.1)
+[![Javadocs](https://javadoc.io/badge/org.apache.commons/commons-jexl3/3.6.2.svg)](https://javadoc.io/doc/org.apache.commons/commons-jexl3/3.6.2)
 [![CodeQL](https://github.com/apache/commons-jexl/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/apache/commons-jexl/actions/workflows/codeql-analysis.yml)
 [![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/apache/commons-jexl/badge)](https://api.securityscorecards.dev/projects/github.com/apache/commons-jexl)
 
-Apache Commons JEXL is a library that enables the implementation of scripting features in Java applications and frameworks.
+Apache Commons JEXL is a library that enables scripting features in Java applications and frameworks..
 
 Documentation
 -------------
@@ -68,7 +68,7 @@ Alternatively, you can pull it from the central Maven repositories:
 <dependency>
   <groupId>org.apache.commons</groupId>
   <artifactId>commons-jexl3</artifactId>
-  <version>3.6.1</version>
+  <version>3.6.2</version>
 </dependency>
 ```
 
@@ -111,7 +111,6 @@ Additional Resources
 + [Apache Commons Homepage](https://commons.apache.org/)
 + [Apache Issue Tracker (JIRA)](https://issues.apache.org/jira/browse/JEXL)
 + [Apache Commons Slack Channel](https://the-asf.slack.com/archives/C60NVB8AD)
-+ [Apache Commons Twitter Account](https://twitter.com/ApacheCommons)
 
 Apache Commons Components
 -------------------------

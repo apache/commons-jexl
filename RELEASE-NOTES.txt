@@ -1,25 +1,30 @@
+Apache Commons JEXL 3.6.2 Release Notes
+---------------------------------------
 
+The Apache Commons JEXL team is pleased to announce the release of Apache Commons JEXL 3.6.2.
 
+Introduction
+------------
 
-                            Apache Commons JEXL
-                               Version 3.6.2
-                               Release Notes
-
-
-INTRODUCTION:
-=============
-
-JEXL is a library intended to facilitate the implementation of dynamic and scripting features in
-applications and frameworks written in Java.
-
-JEXL implements an Expression Language based on some extensions to the JSTL Expression Language supporting most of the
-constructs seen in shell-script or ECMAScript.
-
-Its goal is to expose scripting features usable by technical operatives or consultants working with enterprise platforms.
+Apache Commons JEXL is a library that enables scripting features in Java applications and frameworks..
 
 This is a feature and maintenance release. Java 8 or later is required.
 
-Historical list of changes: https://commons.apache.org/proper/commons-jexl/changes-report.html
+
+Fixed Bugs
+----------
+
+o JEXL-455:  Tokenization error with multiline expressions. Thanks to Vincent Bussol. 
+o JEXL-454:  Switch NaN case not found. Thanks to Vincent Bussol. 
+o JEXL-453:  Finally clause is not evaluated. Thanks to Vincent Bussol. 
+
+Changes
+-------
+
+o          Bump org.apache.commons:commons-parent from 93 to 96. Thanks to Gary Gregory. 
+
+
+Historical list of changes: https://commons.apache.org/proper/commons-jexl/changes.html
 
 For complete information on Apache Commons JEXL, including instructions on how to submit bug reports,
 patches, or suggestions for improvement, see the Apache Commons JEXL website:
@@ -28,25 +33,6 @@ https://commons.apache.org/proper/commons-jexl/
 
 Download page: https://commons.apache.org/proper/commons-jexl/download_jexl.cgi
 
-Have fun!
--Apache Commons Team
-
-========================================================================================================================
-Release 3.6.2
-========================================================================================================================
-
-Version 3.6.2 is a minor release.
-
-Compatibility with previous releases
-====================================
-Version 3.6.2 is source and binary compatible with 3.6.
-
-
-Bugs Fixed in 3.6.2:
-====================
-* JEXL-455:     Tokenization error with multiline expressions.
-* JEXL-454:     Switch NaN case not found.
-* JEXL-453:     Finally clause is not evaluated.
 
 ========================================================================================================================
 Release 3.6.1
