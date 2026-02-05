@@ -1026,7 +1026,7 @@ public class Issues400Test {
     }
 
     @Test
-    public void testIssue455e() {
+    void testIssue455e() {
         final JexlEngine jexl = new JexlBuilder().create();
         // Evaluate nested immediate inside deferred at runtime using a parameterized script
         final String src = "(name, suffix) -> `#{name} Hello ${name} ! #{suffix}`";
@@ -1036,7 +1036,7 @@ public class Issues400Test {
     }
 
     @Test
-    public void testIssue455f() {
+    void testIssue455f() {
         final JexlEngine jexl = new JexlBuilder().create();
         // Evaluate nested immediate inside deferred at runtime using a parameterized script
         final String src = "(name, suffix) -> `#{name + ' Hello'} ${name + ' !'} #{suffix}`";
