@@ -24,10 +24,12 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.apache.commons.jexl3.introspection.JexlPermissions;
+import org.apache.commons.jexl3.introspection.JexlUberspect;
 import org.apache.commons.logging.Log;
 
 /**
@@ -150,7 +152,8 @@ public final class Introspector {
      */
     public Class<?> getClassByName(final String className) {
         try {
-            final Class<?> clazz = Class.forName(className, false, loader);
+            final ClassLoader classLoader = Objects.requireNonNull(loader, "class loader should not be null");
+            final Class<?> clazz = Class.forName(className, false, classLoader);
             return permissions.allow(clazz)? clazz : null;
         } catch (final ClassNotFoundException xignore) {
             return null;
@@ -383,7 +386,7 @@ public final class Introspector {
      * @param classLoader the class loader; if null, use this instance class loader
      */
     public void setLoader(final ClassLoader classLoader) {
-        final ClassLoader current = classLoader == null ? getClass().getClassLoader() : classLoader;
+        final ClassLoader current = classLoader == null ? JexlUberspect.class.getClassLoader() : classLoader;
         lock.writeLock().lock();
         try {
             final ClassLoader previous = loader;

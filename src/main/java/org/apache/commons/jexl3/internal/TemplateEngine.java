@@ -45,12 +45,10 @@ import org.apache.commons.logging.Log;
  * @since 3.0
  */
 public final class TemplateEngine extends JxltEngine {
-
     /**
      * Abstract the source fragments, verbatim or immediate typed text blocks.
      */
     static final class Block {
-
         /** The type of block: verbatim or directive. */
         private final BlockType type;
 
@@ -116,7 +114,6 @@ public final class TemplateEngine extends JxltEngine {
      * The enum capturing the difference between verbatim and code source fragments.
      */
     enum BlockType {
-
         /** Block is to be output "as is" but may be a unified expression. */
         VERBATIM,
 
@@ -126,7 +123,6 @@ public final class TemplateEngine extends JxltEngine {
 
     /** A composite unified expression: "... ${...} ... #{...} ...". */
     final class CompositeExpression extends TemplateExpression {
-
         /** Bit encoded (deferred count > 0) bit 1, (immediate count > 0) bit 0. */
         private final int meta;
 
@@ -227,16 +223,11 @@ public final class TemplateEngine extends JxltEngine {
 
     /** A constant unified expression. */
     final class ConstantExpression extends TemplateExpression {
-
         /** The constant held by this unified expression. */
         private final Object value;
 
         /**
          * Creates a constant unified expression.
-         * <p>
-         * If the wrapped constant is a string, it is treated
-         * as a JEXL strings with respect to escaping.
-         * </p>
          *
          * @param val    the constant value
          * @param source the source TemplateExpression if any
@@ -270,16 +261,14 @@ public final class TemplateEngine extends JxltEngine {
 
     /** A deferred unified expression: #{jexl}. */
     final class DeferredExpression extends JexlBasedExpression {
-
         /**
          * Creates a deferred unified expression.
          *
          * @param expr   the unified expression as a string
          * @param node   the unified expression as an AST
-         * @param source the source unified expression if any
          */
-        DeferredExpression(final CharSequence expr, final JexlNode node, final TemplateExpression source) {
-            super(expr, node, source);
+        DeferredExpression(final CharSequence expr, final JexlNode node) {
+            super(expr, node, null);
         }
 
         @Override
@@ -308,7 +297,6 @@ public final class TemplateEngine extends JxltEngine {
      * Keeps count of sub-expressions by type.
      */
     static final class ExpressionBuilder {
-
         /** Per TemplateExpression type counters. */
         private final int[] counts;
 
@@ -390,7 +378,6 @@ public final class TemplateEngine extends JxltEngine {
      * @see ExpressionBuilder
      */
     enum ExpressionType {
-
         /** Constant TemplateExpression, count index 0. */
         CONSTANT(0),
 
@@ -429,7 +416,6 @@ public final class TemplateEngine extends JxltEngine {
 
     /** An immediate unified expression: ${jexl}. */
     final class ImmediateExpression extends JexlBasedExpression {
-
         /**
          * Creates an immediate unified expression.
          *
@@ -456,7 +442,6 @@ public final class TemplateEngine extends JxltEngine {
 
     /** The base for JEXL based unified expressions. */
     abstract class JexlBasedExpression extends TemplateExpression {
-
         /** The JEXL string for this unified expression. */
         protected final CharSequence expr;
 
@@ -519,17 +504,17 @@ public final class TemplateEngine extends JxltEngine {
      * Note that the deferred syntax is JEXL's.
      */
     final class NestedExpression extends JexlBasedExpression {
-
+        private final Scope scope;
         /**
          * Creates a nested unified expression.
          *
          * @param expr   the unified expression as a string
          * @param node   the unified expression as an AST
-         * @param source the source unified expression if any
          */
-        NestedExpression(final CharSequence expr, final JexlNode node, final TemplateExpression source) {
-            super(expr, node, source);
-            if (this.source != this) {
+        NestedExpression(final CharSequence expr, final JexlNode node, final Scope sc) {
+            super(expr, node, null);
+            this.scope = sc;
+            if (source != this) {
                 throw new IllegalArgumentException("Nested TemplateExpression cannot have a source");
             }
         }
@@ -558,7 +543,7 @@ public final class TemplateEngine extends JxltEngine {
         @Override
         protected TemplateExpression prepare(final Interpreter interpreter) {
             final String value = interpreter.interpret(node).toString();
-            final JexlNode dnode = jexl.jxltParse(node.jexlInfo(), noscript, value, null);
+            final JexlNode dnode = jexl.jxltParse(node.jexlInfo(), noscript, value, scope);
             return new ImmediateExpression(value, dnode, this);
         }
     }
@@ -589,7 +574,6 @@ public final class TemplateEngine extends JxltEngine {
      * The abstract base class for all unified expressions, immediate '${...}' and deferred '#{...}'.
      */
     abstract class TemplateExpression implements Expression {
-
         /** The source of this template expression(see {@link TemplateEngine.TemplateExpression#prepare}). */
         protected final TemplateExpression source;
 
@@ -722,14 +706,15 @@ public final class TemplateEngine extends JxltEngine {
          *
          * @param frame the frame storing parameters and local variables
          * @param context the context storing global variables
-         * @param opts flags and properties that can alter the evaluation behavior.
+         * @param options flags and properties that can alter the evaluation behavior.
          * @return the expression value
          * @throws JexlException if expression preparation fails
          */
-        protected final TemplateExpression prepare(final JexlContext context, final Frame frame, final JexlOptions opts) {
+        protected final TemplateExpression prepare(final JexlContext context, final Frame frame, final JexlOptions options) {
             try {
-                final JexlOptions interOptions = opts != null ? opts : jexl.evalOptions(context);
-                final Interpreter interpreter = jexl.createInterpreter(context, frame, interOptions);
+                final TemplateInterpreter.Arguments args = new TemplateInterpreter.Arguments(jexl).context(context)
+                    .options(options != null ? options : options(context)).frame(frame);
+                final Interpreter interpreter = jexl.createTemplateInterpreter(args);
                 return prepare(interpreter);
             } catch (final JexlException xjexl) {
                 final JexlException xuel = createException(xjexl.getInfo(), "prepare", this, xjexl);
@@ -1068,12 +1053,13 @@ public final class TemplateEngine extends JxltEngine {
                         // materialize the immediate expr
                         final String src = escapeString(strb);
                         final JexlInfo srcInfo = info.at(lineno, column);
-                        final TemplateExpression iexpr = new ImmediateExpression(src, jexl.jxltParse(srcInfo, noscript, src, scope), null);
+                        final TemplateExpression iexpr = new ImmediateExpression(src,
+                            jexl.jxltParse(srcInfo, noscript, src, scope), null);
                         builder.add(iexpr);
                         strb.delete(0, Integer.MAX_VALUE);
                         state = ParseState.CONST;
                     }
-                } else {
+                } else if (!isIgnorable(c)) {
                     if (c == '{') {
                         immediate1 += 1;
                     }
@@ -1082,58 +1068,59 @@ public final class TemplateEngine extends JxltEngine {
                 }
                 break;
             case DEFERRED1: // #{...
-                // skip inner strings (for '}')
+                // skip inner strings - for '}' -
                 // nested immediate in deferred; need to balance count of '{' & '}'
                 // closing '}'
                 switch (c) {
-                case '"':
-                case '\'':
-                    strb.append(c);
-                    column = StringParser.readString(strb, expr, column + 1, c);
-                    continue;
-                case '{':
-                    if (expr.charAt(column - 1) == immediateChar) {
-                        inner1 += 1;
-                        strb.deleteCharAt(strb.length() - 1);
-                        nested = true;
-                    } else {
-                        deferred1 += 1;
+                    case '"':
+                    case '\'':
                         strb.append(c);
-                    }
-                    continue;
-                case '}':
-                    // balance nested immediate
-                    if (deferred1 > 0) {
-                        deferred1 -= 1;
-                        strb.append(c);
-                    } else if (inner1 > 0) {
-                        inner1 -= 1;
-                    } else {
-                        // materialize the nested/deferred expr
-                        final String src = escapeString(strb);
-                        final JexlInfo srcInfo = info.at(lineno, column);
-                        TemplateExpression dexpr;
-                        if (nested) {
-                            dexpr = new NestedExpression(
+                        column = StringParser.readString(strb, expr, column + 1, c);
+                        continue;
+                    case '{':
+                        if (expr.charAt(column - 1) == immediateChar) {
+                            inner1 += 1;
+                            strb.deleteCharAt(strb.length() - 1);
+                            nested = true;
+                        } else {
+                            deferred1 += 1;
+                            strb.append(c);
+                        }
+                        continue;
+                    case '}':
+                        // balance nested immediate
+                        if (deferred1 > 0) {
+                            deferred1 -= 1;
+                            strb.append(c);
+                        } else if (inner1 > 0) {
+                            inner1 -= 1;
+                        } else {
+                            // materialize the nested/deferred expr
+                            final String src = escapeString(strb);
+                            final JexlInfo srcInfo = info.at(lineno, column);
+                            TemplateExpression dexpr;
+                            if (nested) {
+                                dexpr = new NestedExpression(
                                         escapeString(expr.substring(inested, column + 1)),
                                         jexl.jxltParse(srcInfo, noscript, src, scope),
-                                 null);
-                        } else {
-                            dexpr = new DeferredExpression(
-                                    src,
-                                    jexl.jxltParse(srcInfo, noscript, src, scope),
-                             null);
+                                        scope);
+                            } else {
+                                dexpr = new DeferredExpression(
+                                        src,
+                                        jexl.jxltParse(srcInfo, noscript, src, scope));
+                            }
+                            builder.add(dexpr);
+                            strb.delete(0, Integer.MAX_VALUE);
+                            nested = false;
+                            state = ParseState.CONST;
                         }
-                        builder.add(dexpr);
-                        strb.delete(0, Integer.MAX_VALUE);
-                        nested = false;
-                        state = ParseState.CONST;
-                    }
-                    break;
-                default:
-                    // do buildup expr
-                    column = append(strb, expr, column, c);
-                    break;
+                        break;
+                    default:
+                        if (!isIgnorable(c)) {
+                            // do buildup expr
+                            column = append(strb, expr, column, c);
+                        }
+                        break;
                 }
                 break;
             case ESCAPE:
@@ -1182,6 +1169,25 @@ public final class TemplateEngine extends JxltEngine {
 
     private String escapeString(final CharSequence str) {
         return StringParser.escapeString(str, (char) 0);
+    }
+
+    /**
+     * Determines whether the given character is considered ignorable whitespace in
+     * template expressions.
+     * <p>
+     * The characters newline ({@code '\n'}), carriage return ({@code '\r'}), tab
+     * ({@code '\t'}) and form feed ({@code '\f'}) are treated as ignorable within
+     * template expressions and are skipped by the parser. These characters are
+     * <em>not</em> ignored between the expression prefix ({@code '$'} or
+     * {@code '#'}) and the opening brace {@code '{'}; in that position they
+     * influence parsing instead of being discarded.
+     * </p>
+     *
+     * @param c the character to test
+     * @return {@code true} if the character is ignorable, {@code false} otherwise
+     */
+    private static boolean isIgnorable(char c) {
+        return c == '\n' || c == '\r' || c == '\t' || c == '\f';
     }
 
     /**

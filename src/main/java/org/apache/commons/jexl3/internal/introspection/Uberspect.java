@@ -460,16 +460,17 @@ public class Uberspect implements JexlUberspect {
     }
 
     @Override
-    public void setClassLoader(final ClassLoader nloader) {
+    public void setClassLoader(final ClassLoader loader) {
+        final ClassLoader classLoader = loader == null ? JexlUberspect.class.getClassLoader() : loader;
         synchronized (this) {
             Introspector intro = ref.get();
             if (intro != null) {
-                intro.setLoader(nloader);
+                intro.setLoader(classLoader);
             } else {
-                intro = new Introspector(logger, nloader, permissions);
+                intro = new Introspector(logger, classLoader, permissions);
                 ref = new SoftReference<>(intro);
             }
-            loader = new SoftReference<>(intro.getLoader());
+            this.loader = new SoftReference<>(intro.getLoader());
             operatorMap.clear();
             version.incrementAndGet();
         }

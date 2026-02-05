@@ -39,13 +39,11 @@ import org.apache.commons.jexl3.parser.JexlNode;
  * <p>public for introspection purpose.</p>
  */
 public class TemplateInterpreter extends Interpreter {
-
     /**
      * Helper ctor.
      * <p>Stores the different properties required to create a Template interpreter.
      */
     public static class Arguments {
-
         /** The engine. */
         Engine jexl;
 
@@ -218,11 +216,11 @@ public class TemplateInterpreter extends Interpreter {
      * @param composite the composite expression
      */
     private void printComposite(final TemplateEngine.CompositeExpression composite) {
-        final TemplateEngine.TemplateExpression[] cexprs = composite.exprs;
+        final TemplateEngine.TemplateExpression[] composites = composite.exprs;
         Object value;
-        for (final TemplateExpression cexpr : cexprs) {
-            value = cexpr.evaluate(this);
-            doPrint(cexpr.getInfo(), value);
+        for (final TemplateExpression expr : composites) {
+            value = expr.evaluate(this);
+            doPrint(expr.getInfo(), value);
         }
     }
 
@@ -299,14 +297,22 @@ public class TemplateInterpreter extends Interpreter {
             };
         }
         // otherwise...
-        final int numChildren = script.jjtGetNumChildren();
-        Object result = null;
-        for (int i = 0; i < numChildren; i++) {
-            final JexlNode child = script.jjtGetChild(i);
-            result = child.jjtAccept(this, data);
-            cancelCheck(child);
+        final Object[] stack = saveStack();
+        try {
+            return runScript(script, data);
+        } finally {
+            restoreStack(stack);
         }
-        return result;
+    }
+
+    private Object[] saveStack() {
+        return frame != null && frame.stack != null? frame.stack.clone() : null;
+    }
+
+    private void restoreStack(Object[] stack) {
+        if (stack != null) {
+            System.arraycopy(stack, 0, frame.stack, 0, stack.length);
+        }
     }
 
 }

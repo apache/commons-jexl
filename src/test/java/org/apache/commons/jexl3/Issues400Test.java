@@ -30,6 +30,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.Closeable;
 import java.io.File;
+import java.io.StringWriter;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -980,5 +981,91 @@ public class Issues400Test {
         assertThrows(JexlException.Property.class,
             () -> jexl451.createScript("o.class.classLoader", "o").execute(null, new Object()));
     }
+
+    @Test
+    void testIssue455a() {
+        final JexlEngine jexl = new JexlBuilder().create();
+        String code = "name -> `${name +\n\t\f\r name}`";
+        JexlScript script = jexl.createScript(code);
+        Object o = script.execute(null, "Hello");
+        String ctl = "HelloHello";
+        Assertions.assertEquals(ctl, o);
+    }
+
+    @Test
+    void testIssue455b() {
+        final JexlEngine jexl = new JexlBuilder().create();
+        String code = "name -> `${name}\n${name}`;";
+        JexlScript script = jexl.createScript(code);
+        Object o = script.execute(null, "Hello");
+        String ctl = "Hello\nHello";
+        Assertions.assertEquals(ctl, o);
+    }
+
+    @Test
+    void testIssue455c() {
+        final JexlEngine jexl = new JexlBuilder().create();
+        final JexlContext context = new MapContext();
+        context.set("name", "Hello");
+        final JxltEngine jxlt = jexl.createJxltEngine();
+        final JxltEngine.Template template = jxlt.createTemplate("<b>\n\t${name\n\t+\r\f name}\n</b>");
+        final StringWriter writer = new StringWriter();
+        template.evaluate(context, writer);
+        assertEquals("<b>\n\tHelloHello\n</b>", writer.toString());
+    }
+
+    @Test
+    void testIssue455d() {
+        final JexlEngine jexl = new JexlBuilder().create();
+        // 'ref' contains 'greeting' which is the name of the variable to expand
+        String code = "`#{${\nref\t}}\n#{${\rref\f}}`;";
+        JexlScript script = jexl.createScript(code, "ref", "greeting");
+        Object o = script.execute(null, "greeting", "Hello");
+        String ctl = "Hello\nHello";
+        Assertions.assertEquals(ctl, o);
+    }
+
+    @Test
+    void testIssue455e() {
+        final JexlEngine jexl = new JexlBuilder().create();
+        // Evaluate nested immediate inside deferred at runtime using a parameterized script
+        final String src = "(name, suffix) -> `#{name} Hello ${name} ! #{suffix}`";
+        final JexlScript script = jexl.createScript(src);
+        final Object result = script.execute(null, "World", "~");
+        Assertions.assertEquals("World Hello World ! ~", result);
+    }
+
+    @Test
+    void testIssue455f() {
+        final JexlEngine jexl = new JexlBuilder().create();
+        // Evaluate nested immediate inside deferred at runtime using a parameterized script
+        final String src = "(name, suffix) -> `#{name + ' Hello'} ${name + ' !'} #{suffix}`";
+        final JexlScript script = jexl.createScript(src);
+        final Object result = script.execute(null, "World", "~");
+        Assertions.assertEquals("World Hello World ! ~", result);
+    }
+
+    @Test
+    void testIssue455g() {
+        final JexlEngine jexl = new JexlBuilder().create();
+        final JxltEngine jxlt = jexl.createJxltEngine();
+        final JxltEngine.Template template = jxlt.createTemplate("${name} #{suffix}", "name", "suffix");
+        final StringWriter writer = new StringWriter();
+        // prepare requires immediate arguments; evaluate needs deferred arguments
+        template.prepare(null, "World", null).evaluate(null, writer, null, "~");
+        Assertions.assertEquals("World ~", writer.toString());
+    }
+
+    @Test
+    void testIssue455h() {
+        final JexlEngine jexl = new JexlBuilder().create();
+        final JxltEngine jxlt = jexl.createJxltEngine();
+        final JxltEngine.Template template = jxlt.createTemplate("#{name + ' Hello'} ${name + ' !'} #{suffix}", "name", "suffix");
+        final StringWriter writer = new StringWriter();
+        // Prepare only the immediate name argument; evaluate needs both deferred arguments - name and suffix
+        template.prepare(null, "World").evaluate(null, writer, "World", "~");
+        Assertions.assertEquals("World Hello World ! ~", writer.toString());
+    }
+
 }
 

@@ -1498,17 +1498,21 @@ public class Interpreter extends InterpreterBase {
         }
         block = new LexicalFrame(frame, block).defineArgs();
         try {
-            final int numChildren = script.jjtGetNumChildren();
-            Object result = null;
-            for (int i = 0; i < numChildren; i++) {
-                final JexlNode child = script.jjtGetChild(i);
-                result = child.jjtAccept(this, data);
-                cancelCheck(child);
-            }
-            return result;
+            return runScript(script, data);
         } finally {
             block = block.pop();
         }
+    }
+
+    protected final Object runScript(final ASTJexlScript script, final Object data) {
+        final int numChildren = script.jjtGetNumChildren();
+        Object result = null;
+        for (int i = 0; i < numChildren; i++) {
+            final JexlNode child = script.jjtGetChild(i);
+            result = child.jjtAccept(this, data);
+            cancelCheck(child);
+        }
+        return result;
     }
 
     @Override

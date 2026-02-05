@@ -319,19 +319,24 @@ public final class TemplateScript implements JxltEngine.Template {
 
     @Override
     public TemplateScript prepare(final JexlContext context) {
+        return prepare(context, (Object[]) null);
+    }
+
+    @Override
+    public TemplateScript prepare(final JexlContext context, final Object... args) {
         final Engine jexl = jxlt.getEngine();
         final JexlOptions options = jexl.evalOptions(script, context);
-        final Frame frame = script.createFrame((Object[]) null);
+        final Frame frame = script.createFrame(args);
         final TemplateInterpreter.Arguments targs = new TemplateInterpreter
                 .Arguments(jxlt.getEngine())
                 .context(context)
                 .options(options)
                 .frame(frame);
         final Interpreter interpreter = jexl.createTemplateInterpreter(targs);
-        final TemplateExpression[] immediates = new TemplateExpression[exprs.length];
+        final TemplateExpression[] prepared = new TemplateExpression[exprs.length];
         for (int e = 0; e < exprs.length; ++e) {
             try {
-                immediates[e] = exprs[e].prepare(interpreter);
+                prepared[e] = exprs[e].prepare(interpreter);
             } catch (final JexlException xjexl) {
                 final JexlException xuel = TemplateEngine.createException(xjexl.getInfo(), "prepare", exprs[e], xjexl);
                 if (jexl.isSilent()) {
@@ -343,7 +348,7 @@ public final class TemplateScript implements JxltEngine.Template {
                 throw xuel;
             }
         }
-        return new TemplateScript(jxlt, prefix, source, script, immediates);
+        return new TemplateScript(jxlt, prefix, source, script, prepared);
     }
 
     @Override

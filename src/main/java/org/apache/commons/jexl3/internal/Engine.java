@@ -1042,7 +1042,8 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
     }
 
     @Override
-    public void setClassLoader(final ClassLoader loader) {
+    public void setClassLoader(final ClassLoader classLoader) {
+        final ClassLoader loader = classLoader == null?  JexlUberspect.class.getClassLoader() : classLoader;
         uberspect.setClassLoader(loader);
         if (functions != null) {
             final Iterable<String> names = new ArrayList<>(functions.keySet());
