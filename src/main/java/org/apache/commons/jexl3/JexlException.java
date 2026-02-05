@@ -39,6 +39,8 @@ import org.apache.commons.jexl3.parser.TokenMgrException;
  */
 public class JexlException extends RuntimeException {
 
+    private static final StackTraceElement[] EMPTY_STACK_TRACE_ELEMENT_ARRAY = {};
+
     /**
      * Thrown when parsing fails due to an ambiguous statement.
      *
@@ -742,7 +744,7 @@ public class JexlException extends RuntimeException {
                     stackJexl.add(se);
                 }
             }
-            xthrow.setStackTrace(stackJexl.toArray(new StackTraceElement[0]));
+            xthrow.setStackTrace(stackJexl.toArray(EMPTY_STACK_TRACE_ELEMENT_ARRAY));
         }
         return xthrow;
     }
