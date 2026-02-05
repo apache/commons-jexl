@@ -306,10 +306,7 @@ public class TemplateInterpreter extends Interpreter {
     }
 
     private Object[] saveStack() {
-        if (frame != null && frame.stack != null) {
-            return frame.stack.clone();
-        }
-        return  null;
+        return frame != null && frame.stack != null? frame.stack.clone() : null;
     }
 
     private void restoreStack(Object[] stack) {
