@@ -288,7 +288,7 @@ public abstract class JxltEngine {
         /**
          * Gets this script pragmas.
          *
-         * @return the (non null, may be empty) pragmas map
+         * @return the (non-null, possibly empty) pragmas map
          * @since 3.1
          */
         Map<String, Object> getPragmas();
@@ -309,19 +309,21 @@ public abstract class JxltEngine {
          * @param context the context to prepare against
          * @return the prepared version of the template
          */
-        default Template prepare(JexlContext context) {
-            return prepare(context, (Object[]) null);
-        }
+        Template prepare(JexlContext context);
 
         /**
          * Prepares this template by expanding any contained deferred TemplateExpression with optional arguments.
-         * This allows currying template parameters at prepare-time.
+         * <p>This binds arguments to template parameters for immediate expressions when the template also
+         * uses deferred/nested expressions.</p>
          *
          * @param context the context to prepare against
          * @param args the arguments to bind (optional)
          * @return the prepared version of the template
+         * @since 3.6.2
          */
-        Template prepare(JexlContext context, Object... args);
+        default Template prepare(JexlContext context, Object... args) {
+            throw new UnsupportedOperationException("No default implementation");
+        }
     }
 
     /**

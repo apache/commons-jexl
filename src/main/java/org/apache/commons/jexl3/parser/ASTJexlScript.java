@@ -83,7 +83,7 @@ public class ASTJexlScript extends JexlLexicalNode  {
      * @return the captured variable names
      */
     public String[] getCapturedVariables() {
-        return scope != null ? scope.getCapturedVariables() : null;
+        return scope != null ? scope.getCapturedVariables() : new String[0];
     }
 
     /**
@@ -99,7 +99,7 @@ public class ASTJexlScript extends JexlLexicalNode  {
      * @return the local variable names
      */
     public String[] getLocalVariables() {
-        return scope != null ? scope.getLocalVariables() : null;
+        return scope != null ? scope.getLocalVariables() : new String[0];
     }
 
     /**
@@ -108,7 +108,7 @@ public class ASTJexlScript extends JexlLexicalNode  {
      * @return the parameter names
      */
     public String[] getParameters() {
-        return scope != null ? scope.getParameters() : null;
+        return scope != null ? scope.getParameters() : new String[0];
     }
 
     /**

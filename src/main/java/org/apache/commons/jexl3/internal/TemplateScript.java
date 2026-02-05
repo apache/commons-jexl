@@ -318,6 +318,11 @@ public final class TemplateScript implements JxltEngine.Template {
     }
 
     @Override
+    public TemplateScript prepare(final JexlContext context) {
+        return prepare(context, (Object[]) null);
+    }
+
+    @Override
     public TemplateScript prepare(final JexlContext context, final Object... args) {
         final Engine jexl = jxlt.getEngine();
         final JexlOptions options = jexl.evalOptions(script, context);
