@@ -24,7 +24,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -140,7 +139,7 @@ public final class Introspector {
      */
     public Introspector(final Log log, final ClassLoader loader, final JexlPermissions perms) {
         this.logger = log;
-        this.loader = loader;
+        this.loader = loader != null ? loader : JexlUberspect.class.getClassLoader();
         this.permissions = perms == null ? JexlPermissions.RESTRICTED : perms;
     }
 
@@ -152,7 +151,7 @@ public final class Introspector {
      */
     public Class<?> getClassByName(final String className) {
         try {
-            final ClassLoader classLoader = Objects.requireNonNull(loader, "class loader should not be null");
+            final ClassLoader classLoader = loader;
             final Class<?> clazz = Class.forName(className, false, classLoader);
             return permissions.allow(clazz)? clazz : null;
         } catch (final ClassNotFoundException xignore) {

@@ -44,6 +44,7 @@ Version 3.6.2 is source and binary compatible with 3.6.
 
 Bugs Fixed in 3.6.2:
 ====================
+* JEXL-455:     Tokenization error with multiline expressions.
 * JEXL-454:     Switch NaN case not found.
 * JEXL-453:     Finally clause is not evaluated.
 
