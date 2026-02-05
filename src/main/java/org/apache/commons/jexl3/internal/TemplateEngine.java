@@ -1171,6 +1171,21 @@ public final class TemplateEngine extends JxltEngine {
         return StringParser.escapeString(str, (char) 0);
     }
 
+    /**
+     * Determines whether the given character is considered ignorable whitespace in
+     * template expressions.
+     * <p>
+     * The characters newline ({@code '\n'}), carriage return ({@code '\r'}), tab
+     * ({@code '\t'}) and form feed ({@code '\f'}) are treated as ignorable within
+     * template expressions and are skipped by the parser. These characters are
+     * <em>not</em> ignored between the expression prefix ({@code '$'} or
+     * {@code '#'}) and the opening brace {@code '{'}; in that position they
+     * influence parsing instead of being discarded.
+     * </p>
+     *
+     * @param c the character to test
+     * @return {@code true} if the character is ignorable, {@code false} otherwise
+     */
     private static boolean isIgnorable(char c) {
         return c == '\n' || c == '\r' || c == '\t' || c == '\f';
     }
