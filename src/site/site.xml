@@ -42,7 +42,7 @@
         <item name="Javadoc Last 1.x (1.1)"   href="javadocs/apidocs-1.1/index.html"/>
       </item>
       <!-- End: For all components. -->
-      <item name="Release Notes"           href="relnotes35.html"/>
+      <item name="Release Notes"           href="relnotes.html"/>
       <item name="Reference"               href="reference/index.html"/>
     </menu>
   </body>
