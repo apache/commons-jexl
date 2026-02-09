@@ -27,6 +27,12 @@
         <author email="dev@commons.apache.org">Commons Developers</author>
     </properties>
     <body>
+        <release version="3.6.3" date="YYYY-MM-DD"
+                 description="This is a feature and maintenance release. Java 8 or later is required.">
+            <!-- FIX -->
+            <!-- ADD -->
+            <!-- UPDATE -->
+        </release>
         <release version="3.6.2" date="2026-02-05"
                  description="This is a feature and maintenance release. Java 8 or later is required.">
             <!-- FIX -->
