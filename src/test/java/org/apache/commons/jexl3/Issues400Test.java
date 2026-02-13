@@ -1116,7 +1116,7 @@ public class Issues400Test {
             // parsing error in '&'
             Assertions.assertTrue(xjexl.getMessage().contains("&"));
         }
-        // JEXL-456: java.lang.NullPointerException: 
+        // JEXL-456: java.lang.NullPointerException:
         // Cannot invoke "org.apache.commons.jexl3.internal.Scope.getCaptureDeclaration(int)" because "blockScope" is null
         jexl.createScript("var foo = 0;\nfoo = 42;");
         // JEXL-456: same error with the template creation below
