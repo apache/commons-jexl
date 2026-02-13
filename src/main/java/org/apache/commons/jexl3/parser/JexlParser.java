@@ -777,7 +777,7 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
                 final Scope unitScope = blockScopes.get(unit);
                 // follow through potential capture
                 if (blockScope != unitScope) {
-                    final int declared = blockScope.getCaptureDeclaration(lexical);
+                    final int declared = blockScope != null ? blockScope.getCaptureDeclaration(lexical) : -1;
                     if (declared >= 0) {
                         lexical = declared;
                     }
@@ -961,7 +961,13 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
      */
     @Override
     public ASTJexlScript jxltParse(final JexlInfo info, final JexlFeatures features, final String src, final Scope scope) {
-        return new Parser(this).parse(info, features, src, scope);
+        JexlFeatures previous = getFeatures();
+        try {
+            return new Parser(this).parse(info, features, src, scope);
+        } catch (JexlException.Parsing ex) {
+            cleanup(previous);
+            throw ex;
+        }
     }
 
     /**

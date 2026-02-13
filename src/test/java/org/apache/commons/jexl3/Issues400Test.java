@@ -1067,5 +1067,79 @@ public class Issues400Test {
         Assertions.assertEquals("World Hello World ! ~", writer.toString());
     }
 
+    @Test
+    void testIssue350_456_strict() {
+        final JexlEngine jexl = new JexlBuilder().strict(true).create();
+        final JxltEngine jxlt = jexl.createJxltEngine();
+        // creation/parse is OK
+        final JxltEngine.Template template = jxlt.createTemplate("$$ var foo = 'foo';\n$$ var bar = 'bar';\n${foo + bar}");
+        final StringWriter writer = new StringWriter();
+            template.evaluate(null, writer);
+            Assertions.assertEquals("foobar", writer.toString());
+    }
+
+    @Test
+    void testIssue350_456_notStrict() {
+        final JexlEngine jexl = new JexlBuilder().strict(false).create();
+        final JxltEngine jxlt = jexl.createJxltEngine();
+        // creation/parse is OK
+        final JxltEngine.Template template = jxlt.createTemplate("$$ var foo = 'foo';\n$$ var bar = 'bar';\n${foo + bar}");
+        final StringWriter writer = new StringWriter();
+        template.evaluate(null, writer);
+        Assertions.assertEquals("foobar", writer.toString());
+    }
+
+    @Test
+    void testIssue350_456_strictWithVariable() {
+        final JexlEngine jexl = new JexlBuilder().strict(true).create();
+        final JxltEngine jxlt = jexl.createJxltEngine();
+        // creation/parse is OK
+        final JxltEngine.Template template = jxlt.createTemplate("$$ var foo = 'foo';\n$$ var bar = 'bar';\n${foo + bar}");
+        // add a '$$' global context variable
+        JexlContext ctxt = new MapContext();
+        ctxt.set("$$", "");
+        final StringWriter writer = new StringWriter();
+        template.evaluate(ctxt, writer);
+        Assertions.assertEquals("foobar", writer.toString());
+    }
+
+    @Test
+    void testIssue36x_456_var() {
+        final JexlEngine jexl = new JexlBuilder().create();
+        final JxltEngine jxlt = jexl.createJxltEngine();
+        // OK
+        jexl.createScript("var foo = 0;\nfoo = 42;");
+        try {
+            jxlt.createTemplate("$$ var foo = 'foo'; if (true) { var foo = 'bar'; var err =&; }");
+            Assertions.fail("should have thrown a parsing error in '&'");
+        } catch (JexlException xjexl) {
+            // parsing error in '&'
+            Assertions.assertTrue(xjexl.getMessage().contains("&"));
+        }
+        // JEXL-456: java.lang.NullPointerException: Cannot invoke "org.apache.commons.jexl3.internal.Scope.getCaptureDeclaration(int)" because "blockScope" is null
+        jexl.createScript("var foo = 0;\nfoo = 42;");
+        // JEXL-456: same error with the template creation below
+        jxlt.createTemplate("$$ var foo = 'foo'; foo = 'bar';");
+    }
+
+    @Test
+    void testIssue36x_456_let() {
+        final JexlEngine jexl = new Engine32(new JexlBuilder().strict(true));
+        // OK
+        jexl.createScript("let foo = 0;\nfoo = 42;");
+        final JxltEngine jxlt = jexl.createJxltEngine();
+        try {
+            jxlt.createTemplate("$$ var err =&;");
+            Assertions.fail("should have thrown a parsing error in '&'");
+        } catch (JexlException xjexl) {
+            // parsing error in '&'
+            Assertions.assertTrue(xjexl.getMessage().contains("&"));
+        }
+        // JEXL-456: parsing error in 'foo: variable is already declared'
+        jexl.createScript("let foo = 0;\nfoo = 42;");
+        // JEXL-456: same error with the template creation below
+        jxlt.createTemplate("$$ let foo = 0;\nfoo = 42;");
+    }
+
 }
 
