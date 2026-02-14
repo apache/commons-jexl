@@ -508,6 +508,8 @@ public final class JexlFeatures {
      * Sets whether to ignore template prefixes in template expressions.
      * <p>Note that this precludes using a variable whose name is the template prefix (ie default $$)</p>
      * @param flag true to enable, false to disable
+     * @return this features instance
+     * @since 3.6.3
      */
     public JexlFeatures ignoreTemplatePrefix(final boolean flag) {
         setFeature(IGNORE_TEMPLATE_PREFIX, flag);
@@ -517,6 +519,7 @@ public final class JexlFeatures {
     /**
      * Gets whether to ignore template prefixes in template expressions.
      * @return true if enabled, false otherwise
+     * @since 3.6.3
      */
     public boolean isIgnoreTemplatePrefix() {
         return getFeature(IGNORE_TEMPLATE_PREFIX);
