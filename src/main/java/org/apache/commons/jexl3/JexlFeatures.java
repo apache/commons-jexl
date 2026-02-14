@@ -506,7 +506,9 @@ public final class JexlFeatures {
 
     /**
      * Sets whether to ignore template prefixes in template expressions.
-     * <p>Note that this precludes using a variable whose name is the template prefix (ie default $$)</p>
+     * <p>Note that this only precludes using a variable whose name is exactly the template prefix
+     * (for example, with the default prefix "$$", a variable named "$$" is ignored, but "$", "$a", or "$$$"
+     * are still valid variable names).</p>
      * @param flag true to enable, false to disable
      * @return this features instance
      * @since 3.6.3
