@@ -27,7 +27,7 @@ import org.apache.commons.jexl3.JexlInfo;
 public class TemplateInfo extends JexlInfo {
   private final Set<String> ignoredTokens;
 
-  public TemplateInfo(JexlInfo info, Set<String> ignoredTokens) {
+  public TemplateInfo(final JexlInfo info, final Set<String> ignoredTokens) {
     super(info);
     this.ignoredTokens = ignoredTokens;
   }
