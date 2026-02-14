@@ -41,6 +41,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Function;
 
 import org.apache.commons.jexl3.internal.Debugger;
 import org.apache.commons.jexl3.internal.Engine32;
@@ -1068,39 +1069,50 @@ public class Issues400Test {
     }
 
     @Test
-    void testIssue350_456_strict() {
-        final JexlEngine jexl = new JexlBuilder().strict(true).create();
-        final JxltEngine jxlt = jexl.createJxltEngine();
-        // creation/parse is OK
-        final JxltEngine.Template template = jxlt.createTemplate("$$ var foo = 'foo';\n$$ var bar = 'bar';\n${foo + bar}");
-        final StringWriter writer = new StringWriter();
-            template.evaluate(null, writer);
-            Assertions.assertEquals("foobar", writer.toString());
+    void testIssue456a() {
+        final JexlFeatures features = JexlFeatures.createDefault();
+        Assertions.assertThrows(JexlException.Parsing.class, () -> run456(
+            f -> new JexlBuilder().features(f).strict(true).create(),
+            features, null));
+    }
+
+
+    @Test
+    void testIssue456b() {
+        final JexlFeatures features = JexlFeatures.createDefault().ignoreTemplatePrefix(true);
+        Assertions.assertNotNull(run456(
+            f -> new JexlBuilder().features(f).strict(true).create(),
+            features, null));
     }
 
     @Test
-    void testIssue350_456_notStrict() {
-        final JexlEngine jexl = new JexlBuilder().strict(false).create();
-        final JxltEngine jxlt = jexl.createJxltEngine();
-        // creation/parse is OK
-        final JxltEngine.Template template = jxlt.createTemplate("$$ var foo = 'foo';\n$$ var bar = 'bar';\n${foo + bar}");
-        final StringWriter writer = new StringWriter();
-        template.evaluate(null, writer);
-        Assertions.assertEquals("foobar", writer.toString());
+    void testIssue456c() {
+        final JexlFeatures features = JexlFeatures.createDefault().ignoreTemplatePrefix(true);
+        Assertions.assertNotNull(run456(
+            f -> new JexlBuilder().features(f).strict(false).create(),
+            features, null));
     }
 
     @Test
-    void testIssue350_456_strictWithVariable() {
-        final JexlEngine jexl = new JexlBuilder().strict(true).create();
-        final JxltEngine jxlt = jexl.createJxltEngine();
-        // creation/parse is OK
-        final JxltEngine.Template template = jxlt.createTemplate("$$ var foo = 'foo';\n$$ var bar = 'bar';\n${foo + bar}");
+    void testIssue456d() {
         // add a '$$' global context variable
         JexlContext ctxt = new MapContext();
         ctxt.set("$$", "");
+        final JexlFeatures features = JexlFeatures.createDefault().ignoreTemplatePrefix(true);
+        Assertions.assertNotNull(run456(
+            f -> new JexlBuilder().features(f).strict(true).create(),
+            features, ctxt));
+    }
+
+    JxltEngine run456(Function<JexlFeatures, JexlEngine> engineFactory, JexlFeatures features, JexlContext ctxt) {
+        final JexlEngine jexl = engineFactory.apply(features);
+        final JxltEngine jxlt = jexl.createJxltEngine();
+        // creation/parse is OK
+        final JxltEngine.Template template = jxlt.createTemplate("$$ var foo = 'foo';$$ var bar = 'bar';\n${foo + bar}");
         final StringWriter writer = new StringWriter();
         template.evaluate(ctxt, writer);
         Assertions.assertEquals("foobar", writer.toString());
+        return jxlt;
     }
 
     @Test

@@ -18,6 +18,7 @@ package org.apache.commons.jexl3.internal;
 
 import java.io.Reader;
 import java.io.Writer;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -216,7 +217,10 @@ public final class TemplateScript implements JxltEngine.Template {
         // allow lambda defining params
         final JexlInfo info = jexlInfo == null ? jexl.createInfo() : jexlInfo;
         final Scope scope = parms == null ? null : new Scope(null, parms);
-        final ASTJexlScript callerScript = jexl.jxltParse(info.at(1, 1), false, scriptSource, scope).script();
+        final JexlInfo templateInfo = jexl.scriptFeatures.isIgnoreTemplatePrefix()
+            ? new TemplateInfo(info.at(1, 1), Collections.singleton(prefix))
+            : info.at(1, 1);
+        final ASTJexlScript callerScript = jexl.jxltParse(templateInfo, false, scriptSource, scope).script();
         // seek the map of expression number to scope so we can parse Unified
         // expression blocks with the appropriate symbols
         final JexlNode.Info[] callSites = new JexlNode.Info[verbatims];

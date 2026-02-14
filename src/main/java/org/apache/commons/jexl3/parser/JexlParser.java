@@ -333,31 +333,31 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
      * The name of the null case constant.
      */
     public static final Object NIL = new Object() {
-
         @Override
         public String toString() {
             return "null";
-        }};
+        }
+    };
 
     /**
      * The name of the default case constant.
      */
     public static final Object DFLT = new Object() {
-
         @Override
         public String toString() {
             return "default";
-        }};
+        }
+    };
 
     /**
      * The name of the default NaN constant.
      */
     public static final Object NAN = new Object() {
-
         @Override
         public String toString() {
             return "NaN";
-        }};
+        }
+    };
 
     /**
      * Encode a value to a switch predicate.
@@ -964,7 +964,7 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
         JexlFeatures previous = getFeatures();
         try {
             return new Parser(this).parse(info, features, src, scope);
-        } catch (JexlException.Parsing ex) {
+        } catch (JexlException ex) {
             cleanup(previous);
             throw ex;
         }

@@ -39,6 +39,7 @@ package org.apache.commons.jexl3.parser;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
@@ -46,6 +47,7 @@ import org.apache.commons.jexl3.JexlInfo;
 import org.apache.commons.jexl3.JexlFeatures;
 import org.apache.commons.jexl3.JexlException;
 import org.apache.commons.jexl3.internal.Scope;
+import org.apache.commons.jexl3.internal.TemplateInfo;
 
 public final class Parser extends JexlParser
 {
@@ -79,6 +81,9 @@ public final class Parser extends JexlParser
             }
             this.scopeReference.set(jexlScope);
             token_source.comparatorNames = jexlFeatures.supportsComparatorNames();
+            if (jexlInfo instanceof TemplateInfo) {
+              token_source.ignoredTokens = ((TemplateInfo) jexlInfo).getIgnoredTokens();
+            }
             ReInit(jexlSrc);
             ASTJexlScript script = jexlFeatures.supportsScript()
                 ? JexlScript(jexlScope, jexlFeatures)
@@ -91,10 +96,13 @@ public final class Parser extends JexlParser
         } catch (TokenMgrException xtme) {
             throw new JexlException.Tokenization(info, xtme).clean();
         } catch (ParseException xparse) {
-            Token errortok = errorToken(jj_lastpos, jj_scanpos, token.next, token);
-            throw new JexlException.Parsing(info.at(errortok.beginLine, errortok.beginColumn), errortok.image).clean();
+            Token et = errorToken(jj_lastpos, jj_scanpos, token.next, token);
+            JexlInfo ji = et == null ? info : info.at(et.beginLine, et.beginColumn);
+            String msg = et == null ? xparse.getMessage() : et.image;
+            throw new JexlException.Parsing(ji, msg).clean();
         } finally {
             token_source.defaultLexState = DEFAULT;
+            token_source.ignoredTokens = Collections.emptySet();
             cleanup(previous);
             jjtree.reset();
         }
@@ -106,6 +114,7 @@ PARSER_END(Parser)
 TOKEN_MGR_DECLS : {
     boolean comparatorNames = false;
     boolean jexl331 = true;
+    Set<String> ignoredTokens = Collections.emptySet();
 }
 
 /***************************************
@@ -288,27 +297,36 @@ TOKEN_MGR_DECLS : {
 {
   < IDENTIFIER: <LETTER> (<LETTER>|<DIGIT>|<ESCAPE>)* >
   {
-      matchedToken.image = StringParser.unescapeIdentifier(matchedToken.image);
-      final int length = matchedToken.image.length();
-      if (comparatorNames && length == 2) {
-          switch (matchedToken.image) {
-             case "ne" : matchedToken.kind = NE; break;
-             case "eq" : matchedToken.kind = EQ; break;
-             case "lt" : matchedToken.kind = LT; break;
-             case "le" : matchedToken.kind = LE; break;
-             case "gt" : matchedToken.kind = GT; break;
-             case "ge" : matchedToken.kind = GE; break;
-          }
-      } else if (jexl331 && length >= 3 && length <= 10) {
-          switch (matchedToken.image) {
-             case "try" : matchedToken.kind = TRY; break;
-             case "catch" : matchedToken.kind = CATCH; break;
-             case "finally" : matchedToken.kind = FINALLY; break;
-             case "throw" : matchedToken.kind = THROW; break;
-             case "instanceof": matchedToken.kind = ISA; break;
-             case "!instanceof": matchedToken.kind = NISA; break;
-          }
-      }
+    matchedToken.image = StringParser.unescapeIdentifier(matchedToken.image);
+    final int length = matchedToken.image.length();
+    if (ignoredTokens.contains(matchedToken.image)) {
+        // ignore by getting next token instead
+        Token n = getNextToken();
+        matchedToken.kind = n.kind;
+        matchedToken.image = n.image;
+        matchedToken.beginLine = n.beginLine;
+        matchedToken.endLine = n.endLine;
+        matchedToken.beginColumn = n.beginColumn;
+        matchedToken.endColumn = n.endColumn;
+    } else if (comparatorNames && length == 2) {
+        switch (matchedToken.image) {
+            case "ne" : matchedToken.kind = NE; break;
+            case "eq" : matchedToken.kind = EQ; break;
+            case "lt" : matchedToken.kind = LT; break;
+            case "le" : matchedToken.kind = LE; break;
+            case "gt" : matchedToken.kind = GT; break;
+            case "ge" : matchedToken.kind = GE; break;
+        }
+    } else if (jexl331 && length >= 3 && length <= 10) {
+        switch (matchedToken.image) {
+            case "try" : matchedToken.kind = TRY; break;
+            case "catch" : matchedToken.kind = CATCH; break;
+            case "finally" : matchedToken.kind = FINALLY; break;
+            case "throw" : matchedToken.kind = THROW; break;
+            case "instanceof": matchedToken.kind = ISA; break;
+            case "!instanceof": matchedToken.kind = NISA; break;
+        }
+    }
   }
 |
   < #LETTER: [ "a"-"z", "A"-"Z", "_", "$", "@" ] >

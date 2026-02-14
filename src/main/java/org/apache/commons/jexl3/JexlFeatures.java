@@ -157,6 +157,9 @@ public final class JexlFeatures {
     /** Ambiguous or strict statement allowed. */
     public static final int AMBIGUOUS_STATEMENT = 25;
 
+    /** Ignore template prefix. */
+    public static final int IGNORE_TEMPLATE_PREFIX = 26;
+
     /** Bad naming, use AMBIGUOUS_STATEMENT.
      * @deprecated 3.6
      */
@@ -167,7 +170,7 @@ public final class JexlFeatures {
      * All features.
      * Ensure this is updated if additional features are added.
      */
-    private static final long ALL_FEATURES = (1L << AMBIGUOUS_STATEMENT + 1) - 1L; // MUST REMAIN PRIVATE
+    private static final long ALL_FEATURES = (1L << IGNORE_TEMPLATE_PREFIX + 1) - 1L; // MUST REMAIN PRIVATE
 
     /**
      * The default features flag mask.
@@ -496,9 +499,27 @@ public final class JexlFeatures {
     @Override
     public int hashCode() { //CSOFF: MagicNumber
         int hash = 3;
-        hash = 53 * hash + (int) (this.flags ^ this.flags >>> 32);
+        hash = 53 * hash + Long.hashCode(this.flags);
         hash = 53 * hash + (this.reservedNames != null ? this.reservedNames.hashCode() : 0);
         return hash;
+    }
+
+    /**
+     * Sets whether to ignore template prefixes in template expressions.
+     * <p>Note that this precludes using a variable whose name is the template prefix (ie default $$)</p>
+     * @param flag true to enable, false to disable
+     */
+    public JexlFeatures ignoreTemplatePrefix(final boolean flag) {
+        setFeature(IGNORE_TEMPLATE_PREFIX, flag);
+        return this;
+    }
+
+    /**
+     * Gets whether to ignore template prefixes in template expressions.
+     * @return true if enabled, false otherwise
+     */
+    public boolean isIgnoreTemplatePrefix() {
+        return getFeature(IGNORE_TEMPLATE_PREFIX);
     }
 
     /**

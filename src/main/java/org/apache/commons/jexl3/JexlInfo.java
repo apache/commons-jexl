@@ -87,7 +87,9 @@ public class JexlInfo {
             final String className = se.getClassName();
             if (!className.equals(cname)) {
                 // go deeper if called from jexl implementation classes
-                if (!className.startsWith(pkgname + ".internal.") && !className.startsWith(pkgname + ".Jexl")
+                if (!className.startsWith(pkgname + ".internal.")
+                    && !className.startsWith(pkgname + ".Jexl")
+                    && !className.startsWith(pkgname + ".Jxlt")
                     && !className.startsWith(pkgname + ".parser")) {
                     break;
                 }
