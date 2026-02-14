@@ -144,6 +144,23 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
         return null;
     }
 
+    static Token assignToken(Token src, Token dest) {
+        if (dest == null) {
+            return src;
+        }
+        if (src != null) {
+            dest.beginLine = src.beginLine;
+            dest.beginColumn = src.beginColumn;
+            dest.endLine = src.endLine;
+            dest.endColumn = src.endColumn;
+            dest.image = src.image;
+            dest.kind = src.kind;
+            dest.next = src.next;
+            dest.specialToken = src.specialToken;
+        }
+        return dest;
+    }
+
     /**
      * Reads a given source line.
      *

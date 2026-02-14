@@ -300,14 +300,12 @@ TOKEN_MGR_DECLS : {
     matchedToken.image = StringParser.unescapeIdentifier(matchedToken.image);
     final int length = matchedToken.image.length();
     if (ignoredTokens.contains(matchedToken.image)) {
-        // ignore by getting next token instead
-        Token n = getNextToken();
-        matchedToken.kind = n.kind;
-        matchedToken.image = n.image;
-        matchedToken.beginLine = n.beginLine;
-        matchedToken.endLine = n.endLine;
-        matchedToken.beginColumn = n.beginColumn;
-        matchedToken.endColumn = n.endColumn;
+        // a bit hacky: ignore by getting next token instead
+        Token n;
+        do {
+            n = getNextToken();
+        } while (n != null && ignoredTokens.contains(n.image));
+        matchedToken = JexlParser.assignToken(n, matchedToken);
     } else if (comparatorNames && length == 2) {
         switch (matchedToken.image) {
             case "ne" : matchedToken.kind = NE; break;

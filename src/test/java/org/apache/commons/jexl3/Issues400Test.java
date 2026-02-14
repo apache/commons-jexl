@@ -1122,7 +1122,7 @@ public class Issues400Test {
         // OK
         jexl.createScript("var foo = 0;\nfoo = 42;");
         try {
-            jxlt.createTemplate("$$ var foo = 'foo'; if (true) { var foo = 'bar'; var err =&; }");
+            jxlt.createTemplate("$$ var foo = 'foo';  if (true) { var foo = 'bar'; var err =&; }");
             Assertions.fail("should have thrown a parsing error in '&'");
         } catch (JexlException xjexl) {
             // parsing error in '&'
@@ -1137,7 +1137,8 @@ public class Issues400Test {
 
     @Test
     void testIssue36x_456_let() {
-        final JexlEngine jexl = new Engine32(new JexlBuilder().strict(true));
+        final JexlFeatures features = JexlFeatures.createDefault().ignoreTemplatePrefix(true);
+        final JexlEngine jexl = new Engine32(new JexlBuilder().features(features).strict(true));
         // OK
         jexl.createScript("let foo = 0;\nfoo = 42;");
         final JxltEngine jxlt = jexl.createJxltEngine();
@@ -1151,7 +1152,10 @@ public class Issues400Test {
         // JEXL-456: parsing error in 'foo: variable is already declared'
         jexl.createScript("let foo = 0;\nfoo = 42;");
         // JEXL-456: same error with the template creation below
-        jxlt.createTemplate("$$ let foo = 0;\nfoo = 42;");
+        final JxltEngine.Template template = jxlt.createTemplate("$$ var foo = 0;\n$$ $$ foo = 42;\n${foo}");
+        final StringWriter writer = new StringWriter();
+        template.evaluate(null, writer);
+        Assertions.assertEquals("42", writer.toString());
     }
 
 }
