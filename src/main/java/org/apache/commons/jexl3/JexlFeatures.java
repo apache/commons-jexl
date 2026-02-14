@@ -76,7 +76,7 @@ public final class JexlFeatures {
         "global assign/modify", "array reference", "create instance", "loop", "function",
         "method call", "set/map/array literal", "pragma", "annotation", "script", "lexical", "lexicalShade",
         "thin-arrow", "fat-arrow", "namespace pragma", "namespace identifier", "import pragma", "comparator names", "pragma anywhere",
-        "const capture", "ref capture", "ambiguous statement"
+        "const capture", "ref capture", "ambiguous statement", "ignore template prefix"
     };
 
     /** Registers feature ordinal. */

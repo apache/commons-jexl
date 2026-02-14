@@ -144,7 +144,14 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
         return null;
     }
 
-    static Token assignToken(Token src, Token dest) {
+    /**
+     * Assigns the content of a token to another token.
+     *
+     * @param src the source token, if null, the destination token is returned
+     * @param dest the destination token, if null, the source token is returned
+     * @return the destination token with the content of the source token
+     */
+    static Token assignToken(final Token src, final Token dest) {
         if (dest == null) {
             return src;
         }
