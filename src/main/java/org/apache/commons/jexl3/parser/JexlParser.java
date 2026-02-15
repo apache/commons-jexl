@@ -145,6 +145,30 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
     }
 
     /**
+     * Assigns the content of a token to another token.
+     *
+     * @param src the source token, if null, the destination token is returned
+     * @param dest the destination token, if null, the source token is returned
+     * @return the destination token with the content of the source token
+     */
+    static Token assignToken(final Token src, final Token dest) {
+        if (dest == null) {
+            return src;
+        }
+        if (src != null) {
+            dest.beginLine = src.beginLine;
+            dest.beginColumn = src.beginColumn;
+            dest.endLine = src.endLine;
+            dest.endColumn = src.endColumn;
+            dest.image = src.image;
+            dest.kind = src.kind;
+            dest.next = src.next;
+            dest.specialToken = src.specialToken;
+        }
+        return dest;
+    }
+
+    /**
      * Reads a given source line.
      *
      * @param src the source
@@ -333,31 +357,31 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
      * The name of the null case constant.
      */
     public static final Object NIL = new Object() {
-
         @Override
         public String toString() {
             return "null";
-        }};
+        }
+    };
 
     /**
      * The name of the default case constant.
      */
     public static final Object DFLT = new Object() {
-
         @Override
         public String toString() {
             return "default";
-        }};
+        }
+    };
 
     /**
      * The name of the default NaN constant.
      */
     public static final Object NAN = new Object() {
-
         @Override
         public String toString() {
             return "NaN";
-        }};
+        }
+    };
 
     /**
      * Encode a value to a switch predicate.
@@ -777,7 +801,7 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
                 final Scope unitScope = blockScopes.get(unit);
                 // follow through potential capture
                 if (blockScope != unitScope) {
-                    final int declared = blockScope.getCaptureDeclaration(lexical);
+                    final int declared = blockScope != null ? blockScope.getCaptureDeclaration(lexical) : -1;
                     if (declared >= 0) {
                         lexical = declared;
                     }
@@ -961,7 +985,13 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
      */
     @Override
     public ASTJexlScript jxltParse(final JexlInfo info, final JexlFeatures features, final String src, final Scope scope) {
-        return new Parser(this).parse(info, features, src, scope);
+        JexlFeatures previous = getFeatures();
+        try {
+            return new Parser(this).parse(info, features, src, scope);
+        } catch (JexlException ex) {
+            cleanup(previous);
+            throw ex;
+        }
     }
 
     /**

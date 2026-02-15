@@ -76,7 +76,7 @@ public final class JexlFeatures {
         "global assign/modify", "array reference", "create instance", "loop", "function",
         "method call", "set/map/array literal", "pragma", "annotation", "script", "lexical", "lexicalShade",
         "thin-arrow", "fat-arrow", "namespace pragma", "namespace identifier", "import pragma", "comparator names", "pragma anywhere",
-        "const capture", "ref capture", "ambiguous statement"
+        "const capture", "ref capture", "ambiguous statement", "ignore template prefix"
     };
 
     /** Registers feature ordinal. */
@@ -157,6 +157,9 @@ public final class JexlFeatures {
     /** Ambiguous or strict statement allowed. */
     public static final int AMBIGUOUS_STATEMENT = 25;
 
+    /** Ignore template prefix. */
+    public static final int IGNORE_TEMPLATE_PREFIX = 26;
+
     /** Bad naming, use AMBIGUOUS_STATEMENT.
      * @deprecated 3.6
      */
@@ -167,7 +170,7 @@ public final class JexlFeatures {
      * All features.
      * Ensure this is updated if additional features are added.
      */
-    private static final long ALL_FEATURES = (1L << AMBIGUOUS_STATEMENT + 1) - 1L; // MUST REMAIN PRIVATE
+    private static final long ALL_FEATURES = (1L << IGNORE_TEMPLATE_PREFIX + 1) - 1L; // MUST REMAIN PRIVATE
 
     /**
      * The default features flag mask.
@@ -496,9 +499,32 @@ public final class JexlFeatures {
     @Override
     public int hashCode() { //CSOFF: MagicNumber
         int hash = 3;
-        hash = 53 * hash + (int) (this.flags ^ this.flags >>> 32);
+        hash = 53 * hash + Long.hashCode(this.flags);
         hash = 53 * hash + (this.reservedNames != null ? this.reservedNames.hashCode() : 0);
         return hash;
+    }
+
+    /**
+     * Sets whether to ignore template prefixes in template expressions.
+     * <p>Note that this only precludes using a variable whose name is exactly the template prefix
+     * (for example, with the default prefix "$$", a variable named "$$" is ignored, but "$", "$a", or "$$$"
+     * are still valid variable names).</p>
+     * @param flag true to enable, false to disable
+     * @return this features instance
+     * @since 3.6.3
+     */
+    public JexlFeatures ignoreTemplatePrefix(final boolean flag) {
+        setFeature(IGNORE_TEMPLATE_PREFIX, flag);
+        return this;
+    }
+
+    /**
+     * Gets whether to ignore template prefixes in template expressions.
+     * @return true if enabled, false otherwise
+     * @since 3.6.3
+     */
+    public boolean isIgnoreTemplatePrefix() {
+        return getFeature(IGNORE_TEMPLATE_PREFIX);
     }
 
     /**
