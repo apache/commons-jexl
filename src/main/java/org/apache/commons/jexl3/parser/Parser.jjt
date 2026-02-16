@@ -103,7 +103,7 @@ public final class Parser extends JexlParser
             String msg = et == null ? xparse.getMessage() : et.image;
             throw new JexlException.Parsing(ji, msg).clean();
         } finally {
-            token_source.defaultLexState = DEFAULT;
+            //token_source.defaultLexState = DEFAULT;
             token_source.ignoredTokens = Collections.emptySet();
             cleanup(previous);
             jjtree.reset();

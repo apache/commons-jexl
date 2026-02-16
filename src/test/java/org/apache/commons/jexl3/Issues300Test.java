@@ -685,7 +685,7 @@ class Issues300Test {
         final String parsed = expr0.getParsedText();
         assertEquals(src42, parsed);
         final JexlException.Parsing xparse = assertThrows(JexlException.Parsing.class, () -> jexl.createExpression("new()"), "should not parse");
-        assertTrue(xparse.toString().contains(")"));
+        assertTrue(xparse.toString().contains("("));
     }
 
     @Test
