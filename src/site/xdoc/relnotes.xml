@@ -18,13 +18,13 @@
 
 <document>
   <properties>
-    <title>Apache Commons JEXL 3.6.2 Release Notes</title>
+    <title>Apache Commons JEXL 3.6.3 Release Notes</title>
   </properties>
 
   <body>
     <section name="Compatibility with previous release">
       <p>
-        Version 3.6.2 is source and binary compatible with 3.6.0.
+        Version 3.6.3 is source and binary compatible with 3.6.0.
       </p>
     </section>
     <section name="Compatibility with older releases (&lt; 3.3, 2.x)">
@@ -50,10 +50,29 @@
       </p>
     </section>
 
-    <section name="What is new in 3.6.2:">
+    <section name="What is new in 3.6.3:">
       <p>
-        JEXL 3.6.2 is a minor release that fixes some bugs.
+        JEXL 3.6.3 is a minor release that fixes some bugs.
         It does not introduce any breaking change.
+      </p>
+    </section>
+    <section name="Bugs fixed in 3.6.3:">
+      <p>
+        <table>
+          <tr>
+            <td>
+              <a href="https://issues.apache.org/jira/browse/JEXL-456">JEXL-456:</a>
+            </td>
+            <td>Change in template parser behavior.</td>
+          </tr>
+        </table>
+      </p>
+    </section>
+
+    <section name="What was new in 3.6.2:">
+      <p>
+        JEXL 3.6.2 was a minor release that fixed some bugs.
+        It did not introduce any breaking change.
       </p>
     </section>
     <section name="Bugs fixed in 3.6.2:">
@@ -63,7 +82,7 @@
             <td>
               <a href="https://issues.apache.org/jira/browse/JEXL-455">JEXL-455:</a>
             </td>
-            <td>Tokenization error with multiline expressions..</td>
+            <td>Tokenization error with multiline expressions.</td>
           </tr>
           <tr>
             <td>
@@ -83,8 +102,8 @@
 
     <section name="What was new in 3.6.1:">
       <p>
-        JEXL 3.6.1 is a minor release that fixes some bugs.
-        It does not introduce any breaking change.
+        JEXL 3.6.1 was a minor release that fixed some bugs.
+        It did not introduce any breaking change.
       </p>
     </section>
     <section name="Bugs fixed in 3.6.1:">
@@ -120,8 +139,8 @@
 
     <section name="What was new in 3.6.0:">
       <p>
-        JEXL 3.6.0 introduces a switch statement and expressions (JEXL-440).
-        It is a minor release that does not introduce any breaking change.
+        JEXL 3.6.0 introduced a switch statement and expressions (JEXL-440).
+        It was a minor release that did not introduce any breaking change.
       </p>
     </section>
     <section name="New Features in 3.6.0:">
