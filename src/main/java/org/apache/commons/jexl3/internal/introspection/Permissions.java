@@ -51,6 +51,7 @@ import org.apache.commons.jexl3.introspection.JexlPermissions;
  * not be altered using an instance of permissions using {@link JexlPermissions#parse(String...)}.</p>
  */
 public class Permissions implements JexlPermissions {
+
     /**
      * A positive NoJexl construct that defines what is denied by absence in the set.
      * <p>Field or method that are named are the only one allowed access.</p>
@@ -111,6 +112,7 @@ public class Permissions implements JexlPermissions {
 
         /**
          * Ctor.
+         *
          * @param map the map of NoJexl classes
          */
         NoJexlPackage(final Map<String, NoJexlClass> map) {
@@ -184,6 +186,7 @@ public class Permissions implements JexlPermissions {
     /**
      * Creates a class key joining enclosing ascendants with '$'.
      * <p>As in {@code outer$inner} for <code>class outer { class inner...</code>.</p>
+     *
      * @param clazz the clazz
      * @return the clazz key
      */
@@ -194,6 +197,7 @@ public class Permissions implements JexlPermissions {
     /**
      * Creates a class key joining enclosing ascendants with '$'.
      * <p>As in {@code outer$inner} for <code>class outer { class inner...</code>.</p>
+     *
      * @param clazz the clazz
      * @param strb the buffer to compose the key
      * @return the clazz key
@@ -214,8 +218,10 @@ public class Permissions implements JexlPermissions {
         }
         return clazz.getSimpleName();
     }
+
     /**
      * Whether the wilcard set of packages allows a given package to be introspected.
+     *
      * @param allowed the allowed set (not null, may be empty)
      * @param name the package name (not null)
      * @return true if allowed, false otherwise
@@ -250,6 +256,7 @@ public class Permissions implements JexlPermissions {
 
     /**
      * Default ctor.
+     *
      * @param perimeter the allowed wildcard set of packages
      * @param nojexl the NoJexl external map
      */
@@ -261,6 +268,7 @@ public class Permissions implements JexlPermissions {
     /**
      * Checks whether a class or one of its super-classes or implemented interfaces
      * explicitly disallows JEXL introspection.
+     *
      * @param clazz the class to check
      * @return true if JEXL is allowed to introspect, false otherwise
      */
@@ -296,6 +304,7 @@ public class Permissions implements JexlPermissions {
 
     /**
      * Check whether a method is allowed to be introspected in one superclass or interface.
+     *
      * @param clazz the superclass or interface to check
      * @param method the method
      * @param explicit carries whether the package holding the method is explicitly allowed
@@ -325,6 +334,7 @@ public class Permissions implements JexlPermissions {
 
     /**
      * Checks whether a constructor explicitly disallows JEXL introspection.
+     *
      * @param ctor the constructor to check
      * @return true if JEXL is allowed to introspect, false otherwise
      */
@@ -349,6 +359,7 @@ public class Permissions implements JexlPermissions {
 
     /**
      * Checks whether a field explicitly disallows JEXL introspection.
+     *
      * @param field the field to check
      * @return true if JEXL is allowed to introspect, false otherwise
      */
@@ -375,6 +386,7 @@ public class Permissions implements JexlPermissions {
      * Checks whether a method explicitly disallows JEXL introspection.
      * <p>Since methods can be overridden, this also checks that no superclass or interface
      * explicitly disallows this methods.</p>
+     *
      * @param method the method to check
      * @return true if JEXL is allowed to introspect, false otherwise
      */
@@ -410,6 +422,7 @@ public class Permissions implements JexlPermissions {
 
     /**
      * Checks whether a package explicitly disallows JEXL introspection.
+     *
      * @param pack the package
      * @return true if JEXL is allowed to introspect, false otherwise
      */
@@ -420,6 +433,7 @@ public class Permissions implements JexlPermissions {
 
     /**
      * Creates a new set of permissions by composing these permissions with a new set of rules.
+     *
      * @param src the rules
      * @return the new permissions
      */
@@ -431,6 +445,7 @@ public class Permissions implements JexlPermissions {
     /**
      * Tests whether a whole class is denied Jexl visibility.
      * <p>Also checks package visibility.</p>
+     *
      * @param clazz the class
      * @return true if denied, false otherwise
      */
@@ -450,6 +465,7 @@ public class Permissions implements JexlPermissions {
 
     /**
      * Tests whether a constructor is denied Jexl visibility.
+     *
      * @param ctor the constructor
      * @return true if denied, false otherwise
      */
@@ -464,6 +480,7 @@ public class Permissions implements JexlPermissions {
 
     /**
      * Tests whether a field is denied Jexl visibility.
+     *
      * @param field the field
      * @return true if denied, false otherwise
      */
@@ -478,6 +495,7 @@ public class Permissions implements JexlPermissions {
 
     /**
      * Tests whether a method is denied Jexl visibility.
+     *
      * @param method the method
      * @return true if denied, false otherwise
      */
@@ -492,6 +510,7 @@ public class Permissions implements JexlPermissions {
 
     /**
      * Tests whether a whole package is denied Jexl visibility.
+     *
      * @param pack the package
      * @return true if denied, false otherwise
      */
@@ -506,6 +525,7 @@ public class Permissions implements JexlPermissions {
 
     /**
      * Tests whether a method is denied.
+     *
      * @param method the method
      * @return true if it has been disallowed through annotation or declaration
      */
@@ -517,6 +537,7 @@ public class Permissions implements JexlPermissions {
     /**
      * Gets the class constraints.
      * <p>If nothing was explicitly forbidden, everything is allowed.</p>
+     *
      * @param clazz the class
      * @return the class constraints instance, not-null.
      */
@@ -534,6 +555,7 @@ public class Permissions implements JexlPermissions {
 
     /**
      * Gets the package constraints.
+     *
      * @param packageName the package name
      * @return the package constraints instance, not-null.
      */
@@ -557,6 +579,7 @@ public class Permissions implements JexlPermissions {
 
     /**
      * Whether the wildcard set of packages allows a given class to be introspected.
+     *
      * @param clazz the package name (not null)
      * @return true if allowed, false otherwise
      */

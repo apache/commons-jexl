@@ -21,6 +21,7 @@ package org.apache.commons.jexl3.parser;
  */
 public class ASTForeachStatement extends JexlLexicalNode {
     private static final long serialVersionUID = 1L;
+
     /** For(:)=0 vs for(;;)=1|2|4 form. */
     private int loopForm;
 

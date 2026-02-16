@@ -21,18 +21,22 @@ package org.apache.commons.jexl3.parser;
  * This exception is thrown when parse errors are encountered.
  */
 public class ParseException extends Exception implements JavaccError {
+
     /**
      * The version identifier.
      */
     private static final long serialVersionUID = 1L;
+
     /**
      * Last correct input before error occurs.
      */
     private String after = "";
+
     /**
      * Error line.
      */
     private int line = -1;
+
     /**
      * Error column.
      */
@@ -60,6 +64,7 @@ public class ParseException extends Exception implements JavaccError {
      * in the generated parser.  Calling this constructor generates
      * a new object of this type with the fields "currentToken",
      * "expectedTokenSequences", and "tokenImage" set.
+     *
      * @param currentToken This is the last token that has been consumed successfully.  If
      * this object has been created due to a parse error, the token
      * following this token will (therefore) be the first error token.

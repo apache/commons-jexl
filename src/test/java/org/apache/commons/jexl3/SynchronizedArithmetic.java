@@ -29,6 +29,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * An example arithmetic that uses object intrinsic monitors to synchronize get/set/iteration on Maps.
  */
 public class SynchronizedArithmetic extends JexlArithmetic {
+
     /**
      * An indirect way to determine we are actually calling what is needed.
      * <p>
@@ -99,7 +100,7 @@ public class SynchronizedArithmetic extends JexlArithmetic {
                     }
                 }
             } catch (final InterruptedException xint) {
-                // oops
+                Thread.currentThread().interrupt();
             }
         }
 
@@ -238,6 +239,7 @@ public class SynchronizedArithmetic extends JexlArithmetic {
             abstractMonitor.monitorExit(map);
         }
     }
+
     /**
      * Jexl pseudo-overload for array-like access set operator (map[key] = value) for maps.
      * <p>synchronized(map) { map.put(key, value); }
@@ -253,6 +255,7 @@ public class SynchronizedArithmetic extends JexlArithmetic {
             abstractMonitor.monitorExit(map);
         }
     }
+
     /**
      * Creates an iterator on the map values that executes under the map monitor.
      * @param map the map

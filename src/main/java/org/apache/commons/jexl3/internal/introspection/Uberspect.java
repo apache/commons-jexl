@@ -51,20 +51,28 @@ import org.apache.commons.logging.LogFactory;
  * @since 1.0
  */
 public class Uberspect implements JexlUberspect {
+
     /** Publicly exposed special failure object returned by tryInvoke. */
     public static final Object TRY_FAILED = JexlEngine.TRY_FAILED;
+
     /** The logger to use for all warnings and errors. */
     protected final Log logger;
+
     /** The resolver strategy. */
     private final JexlUberspect.ResolverStrategy strategy;
+
     /** The permissions. */
     private final JexlPermissions permissions;
+
     /** The introspector version. */
     private final AtomicInteger version;
+
     /** The soft reference to the introspector currently in use. */
     private volatile Reference<Introspector> ref;
+
     /** The class loader reference; used to recreate the introspector when necessary. */
     private volatile Reference<ClassLoader> loader;
+
     /**
      * The map from arithmetic classes to overloaded operator sets.
      * <p>
@@ -75,6 +83,7 @@ public class Uberspect implements JexlUberspect {
 
     /**
      * Creates a new Uberspect.
+     *
      * @param runtimeLogger the logger used for all logging needs
      * @param sty the resolver strategy
      */
@@ -84,16 +93,18 @@ public class Uberspect implements JexlUberspect {
 
     /**
      * Creates a new Uberspect.
+     *
      * @param runtimeLogger the logger used for all logging needs
      * @param sty the resolver strategy
      * @param perms the introspector permissions
      */
     public Uberspect(final Log runtimeLogger, final JexlUberspect.ResolverStrategy sty, final JexlPermissions perms) {
+        final ClassLoader cl = getClass().getClassLoader();
         logger = runtimeLogger == null ? LogFactory.getLog(JexlEngine.class) : runtimeLogger;
         strategy = sty == null ? JexlUberspect.JEXL_STRATEGY : sty;
         permissions = perms == null ? JexlPermissions.RESTRICTED : perms;
         ref = new SoftReference<>(null);
-        loader = new SoftReference<>(getClass().getClassLoader());
+        loader = new SoftReference<>(cl);
         operatorMap = new ConcurrentHashMap<>();
         version = new AtomicInteger();
     }
@@ -102,6 +113,7 @@ public class Uberspect implements JexlUberspect {
      * Gets the current introspector base.
      * <p>
      * If the reference has been collected, this method will recreate the underlying introspector.</p>
+     *
      * @return the introspector
      */
     protected final Introspector base() {
@@ -124,6 +136,7 @@ public class Uberspect implements JexlUberspect {
     /**
      * Computes which operators have an overload implemented in the arithmetic.
      * <p>This is used to speed up resolution and avoid introspection when possible.</p>
+     *
      * @param arithmetic the arithmetic instance
      * @return the set of overloaded operators
      */
@@ -174,6 +187,7 @@ public class Uberspect implements JexlUberspect {
 
     /**
      * Gets a class by name through this introspector class loader.
+     *
      * @param className the class name
      * @return the class instance or null if it could not be found
      */
@@ -209,6 +223,7 @@ public class Uberspect implements JexlUberspect {
 
     /**
      * Gets the accessible field names known for a given class.
+     *
      * @param c the class
      * @return the class field names
      */
@@ -290,6 +305,7 @@ public class Uberspect implements JexlUberspect {
 
     /**
      * Gets the accessible methods names known for a given class.
+     *
      * @param c the class
      * @return the class method names
      */
@@ -299,6 +315,7 @@ public class Uberspect implements JexlUberspect {
 
     /**
      * Gets all the methods with a given name from this map.
+     *
      * @param c          the class
      * @param methodName the seeked methods name
      * @return the array of methods
@@ -444,16 +461,17 @@ public class Uberspect implements JexlUberspect {
     }
 
     @Override
-    public void setClassLoader(final ClassLoader nloader) {
+    public void setClassLoader(final ClassLoader loader) {
+        final ClassLoader classLoader = loader == null ? JexlUberspect.class.getClassLoader() : loader;
         synchronized (this) {
             Introspector intro = ref.get();
             if (intro != null) {
-                intro.setLoader(nloader);
+                intro.setLoader(classLoader);
             } else {
-                intro = new Introspector(logger, nloader, permissions);
+                intro = new Introspector(logger, classLoader, permissions);
                 ref = new SoftReference<>(intro);
             }
-            loader = new SoftReference<>(intro.getLoader());
+            this.loader = new SoftReference<>(intro.getLoader());
             operatorMap.clear();
             version.incrementAndGet();
         }

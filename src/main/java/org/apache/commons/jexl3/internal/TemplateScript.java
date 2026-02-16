@@ -18,6 +18,7 @@ package org.apache.commons.jexl3.internal;
 
 import java.io.Reader;
 import java.io.Writer;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -42,10 +43,12 @@ import org.apache.commons.jexl3.parser.JexlNode;
  * A Template instance.
  */
 public final class TemplateScript implements JxltEngine.Template {
+
     /**
      * Collects the call-site surrounding a call to jexl:print(i).
      * <p>This allows parsing the blocks with the known symbols
      * in the frame visible to the parser.</p>
+     *
      * @param node the visited node
      * @param callSites the map of printed expression number to node info
      */
@@ -75,6 +78,7 @@ public final class TemplateScript implements JxltEngine.Template {
 
     /**
      * Gets the scope from a node info.
+     *
      * @param info the node info
      * @param scope the outer scope
      * @return the scope
@@ -94,6 +98,7 @@ public final class TemplateScript implements JxltEngine.Template {
 
     /**
      * Creates the expression array from the list of blocks.
+     *
      * @param scope the outer scope
      * @param blocks the list of blocks
      * @return the array of expressions
@@ -121,10 +126,11 @@ public final class TemplateScript implements JxltEngine.Template {
      * Creates the script calling the list of blocks.
      * <p>This is used to create a script from a list of blocks
      * that were parsed from a template.</p>
+     *
      * @param blocks the list of blocks
      * @return the script source
      */
-    private static String callerScript(Block[] blocks) {
+    private static String callerScript(final Block[] blocks) {
         final StringBuilder strb = new StringBuilder();
         int nuexpr = 0;
         int line = 1;
@@ -155,17 +161,22 @@ public final class TemplateScript implements JxltEngine.Template {
 
     /** The prefix marker. */
     private final String prefix;
+
     /** The array of source blocks. */
     private final Block[] source;
+
     /** The resulting script. */
     private final ASTJexlScript script;
+
     /** The TemplateEngine expressions called by the script. */
     private final TemplateExpression[] exprs;
+
     /** The engine. */
     private final TemplateEngine jxlt;
 
     /**
      * Creates a new template from an character input.
+     *
      * @param engine the template engine
      * @param jexlInfo the source info
      * @param directive the prefix for lines of code; cannot be "$", "${", "#" or "#{"
@@ -197,7 +208,7 @@ public final class TemplateScript implements JxltEngine.Template {
         // create the caller script
         final Block[] blocks = jxlt.readTemplate(prefix, reader).toArray(new Block[0]);
         int verbatims = 0;
-        for(Block b : blocks) {
+        for(final Block b : blocks) {
             if (BlockType.VERBATIM == b.getType()) {
                 verbatims += 1;
             }
@@ -206,7 +217,10 @@ public final class TemplateScript implements JxltEngine.Template {
         // allow lambda defining params
         final JexlInfo info = jexlInfo == null ? jexl.createInfo() : jexlInfo;
         final Scope scope = parms == null ? null : new Scope(null, parms);
-        ASTJexlScript callerScript = jexl.jxltParse(info.at(1, 1), false, scriptSource, scope).script();
+        final JexlInfo templateInfo = jexl.scriptFeatures.isIgnoreTemplatePrefix()
+            ? new TemplateInfo(info.at(1, 1), Collections.singleton(prefix))
+            : info.at(1, 1);
+        final ASTJexlScript callerScript = jexl.jxltParse(templateInfo, false, scriptSource, scope).script();
         // seek the map of expression number to scope so we can parse Unified
         // expression blocks with the appropriate symbols
         final JexlNode.Info[] callSites = new JexlNode.Info[verbatims];
@@ -219,6 +233,7 @@ public final class TemplateScript implements JxltEngine.Template {
 
     /**
      * Private ctor used to expand deferred expressions during prepare.
+     *
      * @param engine    the template engine
      * @param thePrefix the directive prefix
      * @param theSource the source
@@ -308,19 +323,24 @@ public final class TemplateScript implements JxltEngine.Template {
 
     @Override
     public TemplateScript prepare(final JexlContext context) {
+        return prepare(context, (Object[]) null);
+    }
+
+    @Override
+    public TemplateScript prepare(final JexlContext context, final Object... args) {
         final Engine jexl = jxlt.getEngine();
         final JexlOptions options = jexl.evalOptions(script, context);
-        final Frame frame = script.createFrame((Object[]) null);
+        final Frame frame = script.createFrame(args);
         final TemplateInterpreter.Arguments targs = new TemplateInterpreter
                 .Arguments(jxlt.getEngine())
                 .context(context)
                 .options(options)
                 .frame(frame);
         final Interpreter interpreter = jexl.createTemplateInterpreter(targs);
-        final TemplateExpression[] immediates = new TemplateExpression[exprs.length];
+        final TemplateExpression[] prepared = new TemplateExpression[exprs.length];
         for (int e = 0; e < exprs.length; ++e) {
             try {
-                immediates[e] = exprs[e].prepare(interpreter);
+                prepared[e] = exprs[e].prepare(interpreter);
             } catch (final JexlException xjexl) {
                 final JexlException xuel = TemplateEngine.createException(xjexl.getInfo(), "prepare", exprs[e], xjexl);
                 if (jexl.isSilent()) {
@@ -332,7 +352,7 @@ public final class TemplateScript implements JxltEngine.Template {
                 throw xuel;
             }
         }
-        return new TemplateScript(jxlt, prefix, source, script, immediates);
+        return new TemplateScript(jxlt, prefix, source, script, prepared);
     }
 
     @Override

@@ -32,6 +32,7 @@ import org.apache.commons.jexl3.parser.Parser;
  * Helper methods for validate sessions.
  */
 public class Util {
+
     /**
      * Checks the equality of 2 nodes by comparing all their descendants.
      * Descendants must have the same class and same image if non null.
@@ -88,8 +89,13 @@ public class Util {
         parser.allowRegisters(true);
         final Debugger dbg = new Debugger();
         // iterate over all expression in
-        for (final Map.Entry<Source, ASTJexlScript> entry : jexl.cache.entries()) {
-            final JexlNode node = entry.getValue();
+        for (final Map.Entry<Source, Object> entry : jexl.cache.entries()) {
+            final Object c = entry.getValue();
+            // we may have cached Jxlt expressions due to interpolation strings, skip them
+            if (!(c instanceof ASTJexlScript)) {
+                continue;
+            }
+            final ASTJexlScript node = (ASTJexlScript) c;
             // recreate expr string from AST
             dbg.debug(node);
             final String expressiondbg = dbg.toString();

@@ -24,8 +24,10 @@ import org.apache.commons.jexl3.introspection.JexlPropertySet;
  * Wraps a reference or optional property set executor.
  */
 public class ReferenceSetExecutor implements JexlPropertySet {
+
     /** The reference handler. */
     private final ReferenceUberspect.ReferenceHandler handler;
+
     /** The previous setter we did delegate to. */
     private final JexlPropertySet setter;
 

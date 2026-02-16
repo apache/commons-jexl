@@ -20,6 +20,7 @@ package org.apache.commons.jexl3.parser;
  * Token Manager Error.
  */
 public class TokenMgrException extends RuntimeException implements JavaccError {
+
     /**
      * The version identifier for this Serializable class.
      * Increment only if the <em>serialized</em> form of the
@@ -30,22 +31,27 @@ public class TokenMgrException extends RuntimeException implements JavaccError {
     /*
      * Ordinals for various reasons why an Error of this type can be thrown.
      */
+
     /**
      * Lexical error occurred.
      */
     public static final int LEXICAL_ERROR = 0;
+
     /**
      * An attempt was made to create a second instance of a static token manager.
      */
     public static final int STATIC_LEXER_ERROR = 1;
+
     /**
      * Tried to change to an invalid lexical state.
      */
     public static final int INVALID_LEXICAL_STATE = 2;
+
     /**
      * Detected (and bailed out of) an infinite loop in the token manager.
      */
     public static final int LOOP_DETECTED = 3;
+
     /**
       * Replaces unprintable characters by their espaced (or unicode escaped)
       * equivalents in the given string
@@ -94,28 +100,34 @@ public class TokenMgrException extends RuntimeException implements JavaccError {
         }
         return retval.toString();
      }
+
     /**
      * Indicates the reason why the exception is thrown. It will have
      * one of the above 4 values.
      */
     private final int errorCode;
+
     /**
      * The lexer state.
      */
     @SuppressWarnings("unused") // not read currently
     private int state;
+
     /**
      * The current character.
      */
     private char current;
+
     /**
      * Last correct input before error occurs.
      */
     private String after;
+
     /**
      * Whether eof was reached whilst expecting more input.
      */
     private boolean eof;
+
     /**
      * Error line.
      */
@@ -158,6 +170,7 @@ public class TokenMgrException extends RuntimeException implements JavaccError {
 
     /**
      * Gets the reason why the exception is thrown.
+     *
      * @return one of the 4 lexical error codes
      */
     public int getErrorCode() {
@@ -172,6 +185,7 @@ public class TokenMgrException extends RuntimeException implements JavaccError {
      /**
      * Returns a detailed message for the Error when it is thrown by the
      * token manager to indicate a lexical error.
+     *
      * @return the message
      */
     @Override

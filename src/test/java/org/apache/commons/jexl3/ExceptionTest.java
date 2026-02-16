@@ -23,7 +23,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
-import org.apache.commons.jexl3.internal.Engine;
+import java.util.function.Supplier;
+
 import org.junit.jupiter.api.Test;
 
 /**
@@ -52,12 +53,18 @@ class ExceptionTest extends JexlTestCase {
         }
     }
 
+    public static class ConstructNPE {
+        public ConstructNPE() {
+            throw new NullPointerException("ConstructNPE");
+        }
+    }
+
     /** Create a named test */
     public ExceptionTest() {
         super("ExceptionTest");
     }
 
-    private void doTest206(final String src, final boolean strict, final boolean silent) throws Exception {
+    private void doTest206(final String src, final boolean strict, final boolean silent) {
         final CaptureLog l = new CaptureLog();
         final JexlContext jc = new MapContext();
         final JexlEngine jexl = new JexlBuilder().logger(l).strict(strict).silent(silent).create();
@@ -108,7 +115,7 @@ class ExceptionTest extends JexlTestCase {
     // Unknown vars and properties versus null operands
     // JEXL-73
     @Test
-    void testEx() throws Exception {
+    void testEx() {
         final JexlEngine jexl = createEngine(false);
         final JexlExpression e = jexl.createExpression("c.e * 6");
         final JexlEvalContext ctxt = new JexlEvalContext();
@@ -143,7 +150,7 @@ class ExceptionTest extends JexlTestCase {
 
     // Unknown vars and properties versus null operands
     @Test
-    void testExMethod() throws Exception {
+    void testExMethod() {
         final JexlEngine jexl = createEngine(false);
         final JexlExpression e = jexl.createExpression("c.e.foo()");
         final JexlEvalContext ctxt = new JexlEvalContext();
@@ -167,7 +174,7 @@ class ExceptionTest extends JexlTestCase {
 
     // null local vars and strict arithmetic effects
     @Test
-    void testExVar() throws Exception {
+    void testExVar() {
         final JexlEngine jexl = createEngine(false);
         final JexlScript e = jexl.createScript("(x)->{ x * 6 }");
         final JexlEvalContext ctxt = new JexlEvalContext();
@@ -188,18 +195,67 @@ class ExceptionTest extends JexlTestCase {
     }
 
     @Test
-    void testWrappedEx() throws Exception {
-        final JexlEngine jexl = new Engine();
-        final JexlExpression e = jexl.createExpression("npe()");
+    void testWrappedEx() {
+        runWrappedEx(true, true);
+        runWrappedEx(false, true);
+        runWrappedEx(true, false);
+        runWrappedEx(false, false);
+    }
+
+    /**
+     * Runs various calls that throw NPE wrapped in JexlExceptions.
+     * @param debug if true/false, debug mode is on/off
+     * @param silent if true/false, silent mode is on/off
+     */
+    private static void runWrappedEx(boolean debug, boolean silent) {
+        final CaptureLog log = new CaptureLog();
+        final JexlBuilder builder = new JexlBuilder().safe(false).strict(true)
+                .logger(log).debug(debug).silent(silent);
+        final JexlEngine jexl = builder.create();
         final JexlContext jc = new ObjectContext<>(jexl, new ThrowNPE());
-        final JexlException xany = assertThrows(JexlException.class, () -> e.evaluate(jc));
-        final Throwable xth = xany.getCause();
-        assertEquals(NullPointerException.class, xth.getClass(), "Should have thrown NPE");
+        callWrappedEx(debug, silent, log, () -> jexl.createExpression("npe()").evaluate(jc));
+        callWrappedEx(debug, silent, log, () -> jexl.newInstance(ConstructNPE.class));
+        ThrowNPE npe = new ThrowNPE();
+        callWrappedEx(debug, silent, log, () -> jexl.invokeMethod(npe, "npe"));
+        // side effect to set failure in getter coming next
+        callWrappedEx(debug, silent, log, () -> {
+            jexl.setProperty(npe, "fail", true);
+            return null;
+        });
+        callWrappedEx(debug, silent, log, () -> jexl.getProperty(npe, "fail"));
+    }
+
+    /**
+     * Calls a NPE throwing call wrapped in JexlException and checks the outcome.
+     * @param debug if true/false, debug mode is on/off
+     * @param silent if true/false, silent mode is on/off
+     * @param npeCall the NPE throwing call
+     */
+    private static void callWrappedEx(boolean debug, boolean silent, CaptureLog log, Supplier<Object> npeCall) {
+        try {
+            npeCall.get();
+            if (!silent) {
+                fail("should have thrown");
+            } else {
+                // in silent mode, ensure a log was captured
+                assertEquals(1, log.count("warn"), "should have 1 warn log");
+                String msg = log.getCapturedMessages().get(0);
+                assertEquals(debug, msg.contains("runWrappedEx"), "class/method/line?");
+                log.clear();
+            }
+        } catch (final JexlException exception) {
+            if (silent) {
+                fail("should not have throw, should be silent");
+            }
+            assertEquals(debug, exception.getMessage().contains("runWrappedEx"), "class/method/line?");
+            final Throwable xth = exception.getCause();
+            assertEquals(NullPointerException.class, xth.getClass(), "Should have thrown NPE");
+        }
     }
 
     @Test
-    void testWrappedExmore() throws Exception {
-        final JexlEngine jexl = new Engine();
+    void testWrappedExmore() {
+        final JexlEngine jexl = new JexlBuilder().debug(true).safe(false).create();
         final ThrowNPE npe = new ThrowNPE();
         assertNull(assertThrows(JexlException.Property.class, () -> jexl.getProperty(npe, "foo")).getCause());
         assertNull(assertThrows(JexlException.Property.class, () -> jexl.setProperty(npe, "foo", 42)).getCause());

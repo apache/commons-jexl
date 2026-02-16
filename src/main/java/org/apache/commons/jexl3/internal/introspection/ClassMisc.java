@@ -29,6 +29,7 @@ import java.util.Set;
  * attempting to reflect the (hopefully intended) abstraction order (from strong to weak).</p>
  */
 public class ClassMisc {
+
   /**
    * Collect super classes and interfaces in super-order.
    * <p>This orders from stronger to weaker abstraction in the sense that
@@ -48,6 +49,7 @@ public class ClassMisc {
       addSuperInterfaces(superSet, clazz);
     }
   }
+
   /**
    * Recursively add super-interfaces in super-order.
    * <p>On the premise that a class also tends to enumerate interface in the order of weaker abstraction and

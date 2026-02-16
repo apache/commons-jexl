@@ -27,8 +27,10 @@ import org.apache.commons.jexl3.introspection.JexlMethod;
  * A JexlMethod that wraps a constructor.
  */
 public final class ConstructorMethod implements JexlMethod {
+
     /**
      * Discovers a class constructor and wrap it as a JexlMethod.
+     *
      * @param is the introspector
      * @param ctorHandle a class or class name
      * @param args constructor arguments
@@ -54,8 +56,10 @@ public final class ConstructorMethod implements JexlMethod {
 
     /** The wrapped constructor. */
     private final Constructor<?> ctor;
+
     /**
      * Creates a constructor method.
+     *
      * @param theCtor the constructor to wrap
      */
     ConstructorMethod(final Constructor<?> theCtor) {

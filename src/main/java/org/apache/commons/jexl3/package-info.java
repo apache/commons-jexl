@@ -101,24 +101,28 @@
  * <pre>
  * // test outer class
  * public static class Froboz {
- * int value;
- * public Froboz(int v) { value = v; }
- * public void setValue(int v) { value = v; }
- * public int getValue() { return value; }
+ *     int value;
+ *     public Froboz(int v) { value = v; }
+ *     public void setValue(int v) { value = v; }
+ *     public int getValue() { return value; }
  * }
+ *
  * // test inner class
  * public static class Quux {
- * String str;
- * Froboz froboz;
- * public Quux(String str, int fro) {
- * this.str = str;
- * froboz = new Froboz(fro);
+ *     String str;
+ *     Froboz froboz;
+ *
+ *     public Quux(String str, int fro) {
+ *       this.str = str;
+ *       froboz = new Froboz(fro);
+ *     }
+ *
+ *     public Froboz getFroboz() { return froboz; }
+ *     public void setFroboz(Froboz froboz) { this.froboz = froboz; }
+ *     public String getStr() { return str; }
+ *     public void setStr(String str) { this.str = str; }
  * }
- * public Froboz getFroboz() { return froboz; }
- * public void setFroboz(Froboz froboz) { this.froboz = froboz; }
- * public String getStr() { return str; }
- * public void setStr(String str) { this.str = str; }
- * }
+ *
  * // test API
  * JexlEngine jexl = new JexlBuilder().create();
  * Quux quux = jexl.newInstance(Quux.class, "xuuq", 100);
@@ -391,7 +395,7 @@
  * and internal package classes imply you might have to re-adapt your code when new JEXL versions are released.
  * <p>
  * {@link org.apache.commons.jexl3.internal.Engine} can be
- * extended to let you capture your own configuration defaults wrt cache sizes and various flags.
+ * extended to let you capture your own configuration defaults regarding cache sizes and various flags.
  * Implementing your own cache - instead of the basic LinkedHashMap based one - would be
  * another possible extension.
  * </p>

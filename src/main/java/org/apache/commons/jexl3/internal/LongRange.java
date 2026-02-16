@@ -25,15 +25,19 @@ import java.util.NoSuchElementException;
  * An iterator on a long range.
  */
 final class AscLongIterator implements Iterator<Long> {
+
     /** The lower boundary. */
     private final long min;
+
     /** The upper boundary. */
     private final long max;
+
     /** The current value. */
     private long cursor;
 
     /**
      * Creates a iterator on the range.
+     *
      * @param l low boundary
      * @param h high boundary
      */
@@ -61,15 +65,19 @@ final class AscLongIterator implements Iterator<Long> {
  * An iterator on a long range.
  */
 final class DescLongIterator implements Iterator<Long> {
+
     /** The lower boundary. */
     private final long min;
+
     /** The upper boundary. */
     private final long max;
+
     /** The current value. */
     private long cursor;
 
     /**
      * Creates a iterator on the range.
+     *
      * @param l low boundary
      * @param h high boundary
      */
@@ -99,12 +107,15 @@ final class DescLongIterator implements Iterator<Long> {
  * Behaves as a readonly collection of longs.
  */
 public abstract class LongRange implements Collection<Long> {
+
     /**
      * Ascending long range.
      */
     public static class Ascending extends LongRange {
+
         /**
          * Constructs a new instance.
+         *
          * @param from lower boundary
          * @param to upper boundary
          */
@@ -117,12 +128,15 @@ public abstract class LongRange implements Collection<Long> {
             return new AscLongIterator(min, max);
         }
     }
+
     /**
      * Descending long range.
      */
     public static class Descending extends LongRange {
+
         /**
          * Constructs a new instance.
+         *
          * @param from upper boundary
          * @param to lower boundary
          */
@@ -138,6 +152,7 @@ public abstract class LongRange implements Collection<Long> {
 
     /**
      * Creates a range, ascending or descending depending on boundaries order.
+     *
      * @param from the lower inclusive boundary
      * @param to   the higher inclusive boundary
      * @return a range
@@ -157,6 +172,7 @@ public abstract class LongRange implements Collection<Long> {
 
     /**
      * Creates a new range.
+     *
      * @param from the lower inclusive boundary
      * @param to   the higher inclusive boundary
      */
@@ -219,6 +235,7 @@ public abstract class LongRange implements Collection<Long> {
 
     /**
      * Gets the interval maximum value.
+     *
      * @return the high boundary
      */
     public long getMax() {
@@ -227,6 +244,7 @@ public abstract class LongRange implements Collection<Long> {
 
     /**
      * Gets the interval minimum value.
+     *
      * @return the low boundary
      */
     public long getMin() {

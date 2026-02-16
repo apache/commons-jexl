@@ -29,6 +29,7 @@ import org.apache.commons.jexl3.JexlException;
  * @since 1.0
  */
 public interface JexlPropertyGet {
+
     /**
      * Method used to get the property value of an object.
      *
@@ -48,6 +49,7 @@ public interface JexlPropertyGet {
 
     /**
      * Checks whether this JexlPropertyGet returns a constant.
+     *
      * @return true if invoking this getter will always return the same value, false otherwise
      */
     default boolean isConstant() {

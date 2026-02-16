@@ -36,6 +36,7 @@ import java.util.Objects;
  * </p>
  */
 public class StringParser {
+
     /** The length of an escaped unicode sequence. */
     private static final int UCHAR_LEN = 4;
 
@@ -53,14 +54,17 @@ public class StringParser {
 
     /**
      * Builds a regex pattern string, handles escaping '/' through '\/' syntax.
+     *
      * @param str the string to build from
      * @return the built string
      */
     public static String buildRegex(final CharSequence str) {
         return buildString(str.subSequence(1, str.length()), true);
     }
+
     /**
      * Builds a string, handles escaping through '\' syntax.
+     *
      * @param str the string to build from
      * @param eatsep whether the separator, the first character, should be considered
      * @return the built string
@@ -71,6 +75,7 @@ public class StringParser {
 
     /**
      * Builds a string, handles escaping through '\' syntax.
+     *
      * @param str the string to build from
      * @param eatsep whether the separator, the first character, should be considered
      * @param esc whether escape characters are interpreted or escaped
@@ -84,8 +89,10 @@ public class StringParser {
         read(strb, str, begin, end, sep, esc);
         return strb.toString();
     }
+
     /**
      * Builds a template, does not escape characters.
+     *
      * @param str the string to build from
      * @param eatsep whether the separator, the first character, should be considered
      * @return the built string
@@ -93,8 +100,10 @@ public class StringParser {
     public static String buildTemplate(final CharSequence str, final boolean eatsep) {
         return buildString(str, eatsep, false);
     }
+
     /**
      * Adds a escape char ('\') where needed in a string form of an ide
+     *
      * @param str the identifier un-escaped string
      * @return the string with added  backslash character before space, quote, double-quote and backslash
      */
@@ -131,6 +140,7 @@ public class StringParser {
 
     /**
      * Escapes a String representation, expand non-ASCII characters as Unicode escape sequence.
+     *
      * @param delim the delimiter character (if 0, no delimiter is added)
      * @param str the string to escape
      * @return the escaped representation
@@ -203,6 +213,7 @@ public class StringParser {
     /**
      * Reads the remainder of a string till a given separator,
      * handles escaping through '\' syntax.
+     *
      * @param strb the destination buffer to copy characters into
      * @param str the origin
      * @param begin the relative offset in str to begin reading
@@ -266,9 +277,11 @@ public class StringParser {
         }
         return index;
     }
+
     /**
      * Reads the remainder of a string till a given separator,
      * handles escaping through '\' syntax.
+     *
      * @param strb the destination buffer to copy characters into
      * @param str the origin
      * @param index the offset into the origin
@@ -281,6 +294,7 @@ public class StringParser {
 
     /**
      * Reads a Unicode escape character.
+     *
      * @param strb the builder to write the character to
      * @param str the sequence
      * @param begin the begin offset in sequence (after the '\\u')
@@ -310,6 +324,7 @@ public class StringParser {
 
     /**
      * Remove escape char ('\') from an identifier.
+     *
      * @param str the identifier escaped string, ie with a backslash before space, quote, double-quote and backslash
      * @return the string with no '\\' character
      */

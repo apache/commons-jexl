@@ -55,12 +55,16 @@ import java.util.concurrent.ConcurrentHashMap;
  * </pre>
  */
 public class PermissionsParser {
+
     /** The source. */
     private String src;
+
     /** The source size. */
     private int size;
+
     /** The @NoJexl execution-time map. */
     private Map<String, Permissions.NoJexlPackage> packages;
+
     /** The set of wildcard imports. */
     private Set<String> wildcards;
 
@@ -80,6 +84,7 @@ public class PermissionsParser {
 
     /**
      * Parses permissions from a source.
+     *
      * @param wildcards the set of allowed packages
      * @param packages the map of restricted elements
      * @param srcs the sources
@@ -106,6 +111,7 @@ public class PermissionsParser {
 
     /**
      * Parses permissions from a source.
+     *
      * @param srcs the sources
      * @return the permissions map
      */
@@ -115,6 +121,7 @@ public class PermissionsParser {
 
     /**
      * Reads a class permission.
+     *
      * @param njpackage the owning package
      * @param nojexl whether the restriction is explicitly denying (true) or allowing (false) members
      * @param outer the outer class (if any)
@@ -220,6 +227,7 @@ public class PermissionsParser {
 
     /**
      * Reads a comment till end-of-line.
+     *
      * @param offset initial position
      * @return position after comment
      */
@@ -237,6 +245,7 @@ public class PermissionsParser {
 
     /**
      * Reads an identifier (optionally dot-separated).
+     *
      * @param id the builder to fill the identifier character with
      * @param offset the initial reading position
      * @return the position after the identifier
@@ -247,6 +256,7 @@ public class PermissionsParser {
 
     /**
      * Reads an identifier (optionally dot-separated).
+     *
      * @param id the builder to fill the identifier character with
      * @param offset the initial reading position
      * @param dot whether dots (.) are allowed
@@ -352,6 +362,7 @@ public class PermissionsParser {
 
     /**
      * Reads spaces.
+     *
      * @param offset initial position
      * @return position after spaces
      */
@@ -369,6 +380,7 @@ public class PermissionsParser {
 
     /**
      * Compose a parsing error message.
+     *
      * @param c the offending character
      * @param i the offset position
      * @return the error message

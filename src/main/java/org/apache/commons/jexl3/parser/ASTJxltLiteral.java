@@ -16,21 +16,23 @@
  */
 package org.apache.commons.jexl3.parser;
 
-import org.apache.commons.jexl3.JexlEngine;
 import org.apache.commons.jexl3.JxltEngine;
 import org.apache.commons.jexl3.internal.Scope;
-import org.apache.commons.jexl3.internal.TemplateEngine;
 
 public final class ASTJxltLiteral extends JexlNode implements JexlNode.JxltHandle {
+
     /** Serial uid.*/
     private static final long serialVersionUID = 1L;
+
     /** The actual literal value. */
     private String literal;
+
     /** The expression (parsed). */
     private transient JxltEngine.Expression jxltExpression;
 
     /**
      * Creates a Jxlt literal node.
+     *
      * @param id the node id
      */
     ASTJxltLiteral(final int id) {
@@ -49,6 +51,7 @@ public final class ASTJxltLiteral extends JexlNode implements JexlNode.JxltHandl
 
     /**
      * Gets the literal value.
+     *
      * @return the string literal
      */
     public String getLiteral() {
@@ -67,15 +70,7 @@ public final class ASTJxltLiteral extends JexlNode implements JexlNode.JxltHandl
 
     void setLiteral(final String src, final Scope scope) {
         this.literal = src;
-        if (src != null && !src.isEmpty()) {
-            JexlEngine jexl = JexlEngine.getThreadEngine();
-            if (jexl != null) {
-                JxltEngine jxlt = jexl.createJxltEngine();
-                if (jxlt instanceof TemplateEngine) {
-                  this.jxltExpression = ((TemplateEngine) jxlt).createExpression(jexlInfo(), src, scope);
-                }
-            }
-        }
+        this.jxltExpression = JexlParser.parseInterpolation(jexlInfo(), src, scope);
     }
 
     @Override

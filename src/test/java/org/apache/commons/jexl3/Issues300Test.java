@@ -124,6 +124,7 @@ class Issues300Test {
     }
 
     public static class Context0930 extends MapContext {
+
         /**
          * This allows using a JEXL lambda as a filter.
          *
@@ -754,7 +755,7 @@ class Issues300Test {
         JexlEngine jexl = new JexlBuilder().safe(true).create();
         final JexlScript script = jexl.createScript(src);
         Object result = script.execute(null);
-        // safe navigation is lenient wrt null
+        // Safe navigation is lenient regarding null.
         assertFalse((Boolean) result);
 
         jexl = new JexlBuilder().strict(true).safe(false).create();
@@ -1058,7 +1059,6 @@ class Issues300Test {
         final JexlEngine jexl = new JexlBuilder()
                 .safe(false)
                 .strict(true)
-                .debug(true)
                 .create();
         // @formatter:on
         JexlScript script = null;
@@ -1090,7 +1090,7 @@ class Issues300Test {
     }
 
     @Test
-    void testBackslashes() throws Exception {
+    void testBackslashes() {
         final JexlEngine jexl = new JexlBuilder().safe(false).create();
         final String src = "\"\b\t\f\"";
         JexlScript s = jexl.createScript(src);
@@ -1306,7 +1306,7 @@ class Issues300Test {
     }
 
     @Test
-    void testUnsolvableMethod() throws Exception {
+    void testUnsolvableMethod() {
         final JexlEngine jexl = new JexlBuilder().create();
         // @formatter:off
         final JexlScript script = jexl.createScript(

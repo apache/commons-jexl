@@ -46,26 +46,34 @@ public class TemplateInterpreter extends Interpreter {
     public static class Arguments {
         /** The engine. */
         Engine jexl;
+
         /** The options. */
         JexlOptions options;
+
         /** The context. */
         JexlContext jcontext;
+
         /** The frame. */
         Frame jframe;
+
         /** The expressions. */
         TemplateExpression[] expressions;
+
         /** The writer. */
         Writer out;
 
         /**
          * Sole ctor.
+         *
          * @param e the JEXL engine
          */
         Arguments(final Engine e) {
             this.jexl = e;
         }
+
         /**
          * Sets the context.
+         *
          * @param j the context
          * @return {@code this} instance
          */
@@ -73,8 +81,10 @@ public class TemplateInterpreter extends Interpreter {
             this.jcontext = j;
             return this;
         }
+
         /**
          * Sets the expressions.
+         *
          * @param e the expressions
          * @return {@code this} instance
          */
@@ -82,8 +92,10 @@ public class TemplateInterpreter extends Interpreter {
             this.expressions = e;
             return this;
         }
+
         /**
          * Sets the frame.
+         *
          * @param f the frame
          * @return {@code this} instance
          */
@@ -91,8 +103,10 @@ public class TemplateInterpreter extends Interpreter {
             this.jframe = f;
             return this;
         }
+
         /**
          * Sets the options.
+         *
          * @param o the options
          * @return {@code this} instance
          */
@@ -100,8 +114,10 @@ public class TemplateInterpreter extends Interpreter {
             this.options = o;
             return this;
         }
+
         /**
          * Sets the writer.
+         *
          * @param o the writer
          * @return {@code this} instance
          */
@@ -110,6 +126,7 @@ public class TemplateInterpreter extends Interpreter {
             return this;
         }
     }
+
     /** The array of template expressions. */
     final TemplateExpression[] exprs;
 
@@ -118,6 +135,7 @@ public class TemplateInterpreter extends Interpreter {
 
     /**
      * Creates a template interpreter instance.
+     *
      * @param args the template interpreter arguments
      */
     protected TemplateInterpreter(final Arguments args) {
@@ -133,6 +151,7 @@ public class TemplateInterpreter extends Interpreter {
      * This will dynamically try to find the best suitable method in the writer through uberspection.
      * Subclassing Writer by adding 'print' methods should be the preferred way to specialize output.
      * </p>
+     *
      * @param info the source info
      * @param arg  the argument to print out
      */
@@ -163,6 +182,7 @@ public class TemplateInterpreter extends Interpreter {
      * Includes a call to another template.
      * <p>
      * Includes another template using this template initial context and writer.</p>
+     *
      * @param script the TemplateScript to evaluate
      * @param args   the arguments
      */
@@ -172,6 +192,7 @@ public class TemplateInterpreter extends Interpreter {
 
     /**
      * Prints a unified expression evaluation result.
+     *
      * @param e the expression number
      */
     public void print(final int e) {
@@ -191,14 +212,15 @@ public class TemplateInterpreter extends Interpreter {
 
     /**
      * Prints a composite expression.
+     *
      * @param composite the composite expression
      */
     private void printComposite(final TemplateEngine.CompositeExpression composite) {
-        final TemplateEngine.TemplateExpression[] cexprs = composite.exprs;
+        final TemplateEngine.TemplateExpression[] composites = composite.exprs;
         Object value;
-        for (final TemplateExpression cexpr : cexprs) {
-            value = cexpr.evaluate(this);
-            doPrint(cexpr.getInfo(), value);
+        for (final TemplateExpression expr : composites) {
+            value = expr.evaluate(this);
+            doPrint(expr.getInfo(), value);
         }
     }
 
@@ -211,6 +233,7 @@ public class TemplateInterpreter extends Interpreter {
      * Interprets a function node.
      * print() and include() must be decoded by this interpreter since delegating to the Uberspect
      * may be sandboxing the interpreter itself making it unable to call the function.
+     *
      * @param node the function node
      * @param data the data
      * @return the function evaluation result.
@@ -274,14 +297,22 @@ public class TemplateInterpreter extends Interpreter {
             };
         }
         // otherwise...
-        final int numChildren = script.jjtGetNumChildren();
-        Object result = null;
-        for (int i = 0; i < numChildren; i++) {
-            final JexlNode child = script.jjtGetChild(i);
-            result = child.jjtAccept(this, data);
-            cancelCheck(child);
+        final Object[] stack = saveStack();
+        try {
+            return runScript(script, data);
+        } finally {
+            restoreStack(stack);
         }
-        return result;
+    }
+
+    private Object[] saveStack() {
+        return frame != null && frame.stack != null? frame.stack.clone() : null;
+    }
+
+    private void restoreStack(Object[] stack) {
+        if (stack != null) {
+            System.arraycopy(stack, 0, frame.stack, 0, stack.length);
+        }
     }
 
 }

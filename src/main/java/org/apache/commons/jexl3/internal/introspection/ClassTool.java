@@ -24,18 +24,25 @@ import java.lang.invoke.MethodType;
  * Utility for Java9+ backport in Java8 of class and module related methods.
  */
 final class ClassTool {
+
     /** The Class.getModule() method. */
     private static final MethodHandle GET_MODULE;
+
     /** The Class.getPackageName() method. */
     private static final MethodHandle GET_PKGNAME;
+
     /** The Module.isExported(String packageName) method. */
     private static final MethodHandle IS_EXPORTED;
+
+    /** The Module of JEXL itself. */
+    private static final Object JEXL_MODULE;
 
     static {
         final MethodHandles.Lookup LOOKUP = MethodHandles.lookup();
         MethodHandle getModule = null;
         MethodHandle getPackageName = null;
         MethodHandle isExported = null;
+        Object myModule = null;
         try {
             final Class<?> modulec = ClassTool.class.getClassLoader().loadClass("java.lang.Module");
             if (modulec != null) {
@@ -43,13 +50,15 @@ final class ClassTool {
                 if (getModule != null) {
                     getPackageName = LOOKUP.findVirtual(Class.class, "getPackageName", MethodType.methodType(String.class));
                     if (getPackageName != null) {
-                        isExported = LOOKUP.findVirtual(modulec, "isExported", MethodType.methodType(boolean.class, String.class));
+                        myModule = getModule.invoke(ClassTool.class);
+                        isExported = LOOKUP.findVirtual(modulec, "isExported", MethodType.methodType(boolean.class, String.class, modulec));
                     }
                 }
             }
-        } catch (final Exception e) {
+        } catch (final Throwable e) {
             // ignore all
         }
+        JEXL_MODULE = myModule;
         GET_MODULE = getModule;
         GET_PKGNAME = getPackageName;
         IS_EXPORTED = isExported;
@@ -103,18 +112,25 @@ final class ClassTool {
     }
 
     /**
-     * Checks whether a class is exported by its module (Java 9+).
+     * Checks whether a class is exported by its module (Java 9+) to JEXL.
      * The code performs the following sequence through reflection (since the same jar can run
      * on a Java8 or Java9+ runtime and the module features does not exist on 8).
      * {@code
+     * Module jexlModule ClassTool.getClass().getModule();
      * Module module = declarator.getModule();
-     * return module.isExported(declarator.getPackageName());
+     * return module.isExported(declarator.getPackageName(), jexlModule);
      * }
      * This is required since some classes and methods may not be exported thus not callable through
-     * reflection.
+     * reflection.  A package can be non-exported, <em>unconditionally</em> exported (to all reading
+     * modules), or use <em>qualified</em> exports to only export the package to specifically named
+     * modules.  This method is only concerned with whether JEXL may reflectively access the
+     * package, so a qualified export naming the JEXL module is the least-privilege access required.
+     * The declarator's module may also use: unqualified exports, qualified {@code opens}, or
+     * unqualified {@code opens}, in increasing order of privilege; the last two allow reflective
+     * access to non-public members and are not recommended.
      *
      * @param declarator the class
-     * @return true if class is exported or no module support exists
+     * @return true if class is exported (to JEXL) or no module support exists
      */
     static boolean isExported(final Class<?> declarator) {
         if (IS_EXPORTED != null) {
@@ -122,7 +138,7 @@ final class ClassTool {
                 final Object module = GET_MODULE.invoke(declarator);
                 if (module != null) {
                     final String pkgName = (String) GET_PKGNAME.invoke(declarator);
-                    return (Boolean) IS_EXPORTED.invoke(module, pkgName);
+                    return (Boolean) IS_EXPORTED.invoke(module, pkgName, JEXL_MODULE);
                 }
             } catch (final Throwable e) {
                 // ignore

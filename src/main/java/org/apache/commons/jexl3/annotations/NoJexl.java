@@ -29,9 +29,11 @@ import java.lang.annotation.Target;
  * This allows to completely hide a package, class, interface, constructor, method or field from
  * JEXL; a NoJexl annotated element will not be usable through any kind of JEXL expression or script.
  * </p>
+ * <p>
  * See {@link org.apache.commons.jexl3.introspection.JexlPermissions} for the general mechanism to restrict
  * what JEXL allows in scripts.
  * See {@link org.apache.commons.jexl3.introspection.JexlSandbox} for another way to further constrain JEXL access.
+ * </p>
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)

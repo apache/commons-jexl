@@ -21,15 +21,19 @@ import java.util.List;
 
 /**
  * Specialized executor to get a property from a List or array.
+ *
  * @since 2.0
  */
 public final class ListGetExecutor extends AbstractExecutor.Get {
+
     /** The java.lang.reflect.Array.get method used as an active marker in ListGet. */
     private static final java.lang.reflect.Method ARRAY_GET =
             initMarker(Array.class, "get", Object.class, Integer.TYPE);
+
     /** The java.util.obj.get method used as an active marker in ListGet. */
     private static final java.lang.reflect.Method LIST_GET =
             initMarker(List.class, "get", Integer.TYPE);
+
     /**
      * Attempts to discover a ListGetExecutor.
      *
@@ -56,6 +60,7 @@ public final class ListGetExecutor extends AbstractExecutor.Get {
 
     /**
      * Creates an instance.
+     *
      * @param clazz he class the get method applies to
      * @param method the method held by this executor
      * @param index the index to use as an argument to the get method

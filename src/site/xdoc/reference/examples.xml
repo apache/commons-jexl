@@ -69,7 +69,7 @@
         The easiest way of obtaining a context is to use the
         <a href="https://commons.apache.org/jexl/apidocs/org/apache/commons/jexl3/MapContext.html#MapContext()">new MapContext()</a>
         statement. This creates a context implemented using an underlying
-        <a href="https://docs.oracle.com/javase/6/docs/api/java/util/HashMap.html">HashMap</a>
+        <a href="https://docs.oracle.com/javase/8/docs/api/java/util/HashMap.html">HashMap</a>
       </p>
       <p>
         <a href="https://commons.apache.org/jexl/apidocs/org/apache/commons/jexl3/Expression.html">Expressions</a> are

@@ -70,9 +70,11 @@ import org.apache.commons.logging.LogFactory;
 
 /**
  * A JexlEngine implementation.
+ *
  * @since 2.0
  */
 public class Engine extends JexlEngine implements JexlUberspect.ConstantResolverFactory {
+
     /**
      * Gets the default instance of Uberspect.
      * <p>This is lazily initialized to avoid building a default instance if there
@@ -82,6 +84,7 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
      * <p>Implemented as on demand holder idiom.</p>
      */
     private static final class UberspectHolder {
+
         /** The default uberspector that handles all introspection patterns. */
         static final Uberspect UBERSPECT =
                 new Uberspect(LogFactory.getLog(JexlEngine.class),
@@ -91,22 +94,27 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
         /** Non-instantiable. */
         private UberspectHolder() {}
     }
+
     /**
      * Utility class to collect variables.
      */
     protected static class VarCollector {
+
         /**
          * The collected variables represented as a set of list of strings.
          */
         private final Set<List<String>> refs = new LinkedHashSet<>();
+
         /**
          * The current variable being collected.
          */
         private List<String> ref = new ArrayList<>();
+
         /**
          * The node that started the collect.
          */
         private JexlNode root;
+
         /**
          * Whether constant array-access is considered equivalent to dot-access;
          * if so, > 1 means collect any constant (set,map,...) instead of just
@@ -116,6 +124,7 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
 
         /**
          * Constructs a new instance.
+         *
          * @param constaa whether constant array-access is considered equivalent to dot-access
          */
         protected VarCollector(final int constaa) {
@@ -124,6 +133,7 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
 
         /**
          * Adds a 'segment' to the variable being collected.
+         *
          * @param name the name
          */
         public void add(final String name) {
@@ -132,6 +142,7 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
 
         /**
          * Starts/stops a variable collect.
+         *
          * @param node starts if not null, stop if null
          */
         public void collect(final JexlNode node) {
@@ -156,6 +167,7 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
             return root instanceof ASTIdentifier;
         }
     }
+
     /**
      * The features allowed for property set/get methods.
      */
@@ -167,12 +179,14 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
             .arrayReferenceExpr(false)
             .methodCall(false)
             .register(true);
+
     /**
      * Use {@link Engine#getUberspect(Log, JexlUberspect.ResolverStrategy, JexlPermissions)}.
-     * @deprecated 3.3
+     *
      * @param logger the logger
      * @param strategy the strategy
      * @return an Uberspect instance
+     * @deprecated 3.3
      */
     @Deprecated
     public static Uberspect getUberspect(final Log logger, final JexlUberspect.ResolverStrategy strategy) {
@@ -187,6 +201,7 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
      * <li>Using a (low level) introspector created with a given logger instead of the default one</li>
      * <li>Using a (restricted) set of permissions</li>
      * </lu>
+     *
      * @param logger the logger to use for the underlying Uberspect
      * @param strategy the property resolver strategy
      * @param permissions the introspection permissions
@@ -204,8 +219,10 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
         }
         return new Uberspect(logger, strategy, permissions);
     }
+
     /**
      * Solves an optional option.
+     *
      * @param conf the option as configured, may be null
      * @param def the default value if null, shall not be null
      * @param <T> the option type
@@ -214,78 +231,96 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
     private static <T> T option(final T conf, final T def) {
         return conf == null ? def : conf;
     }
+
     /**
      * The Log to which all JexlEngine messages will be logged.
      */
     protected final Log logger;
+
     /**
      * The JexlUberspect instance.
      */
     protected final JexlUberspect uberspect;
+
     /**
      * The {@link JexlArithmetic} instance.
      */
     protected final JexlArithmetic arithmetic;
+
     /**
      * The map of 'prefix:function' to object implementing the namespaces.
      */
     protected final Map<String, Object> functions;
+
     /**
      * The default class name resolver.
      */
     protected final FqcnResolver classNameSolver;
+
     /**
      * The maximum stack height.
      */
     protected final int stackOverflow;
+
     /**
      * Whether this engine considers unknown variables, methods and constructors as errors.
      */
     protected final boolean strict;
+
     /**
      * Whether this engine considers null in navigation expression as errors.
      */
     protected final boolean safe;
+
     /**
      * Whether expressions evaluated by this engine will throw exceptions (false) or return null (true) on errors.
      * Default is false.
      */
     protected final boolean silent;
+
     /**
      * Whether expressions evaluated by this engine will throw JexlException.Cancel (true) or return null (false) when
      * interrupted.
      * Default is true when not silent and strict.
      */
     protected final boolean cancellable;
+
     /**
      * Whether error messages will carry debugging information.
      */
     protected final boolean debug;
+
     /**
      * The set of default script parsing features.
      */
     protected final JexlFeatures scriptFeatures;
+
     /**
      * The set of default expression parsing features.
      */
     protected final JexlFeatures expressionFeatures;
+
     /**
      * The default charset.
      */
     protected final Charset charset;
+
     /**
      * The Jexl script parser factory.
      */
     protected final Supplier<JexlScriptParser> parserFactory;
+
     /**
      * The atomic parsing flag; true whilst parsing.
      */
     protected final AtomicBoolean parsing = new AtomicBoolean();
+
     /**
      * The {@link Parser}; when parsing expressions, this engine uses the parser if it
      * is not already in use otherwise it will create a new temporary one.
      */
     protected final JexlScriptParser parser;
+
     /**
      * The expression max length to hit the cache.
      */
@@ -294,12 +329,7 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
     /**
      * The expression cache.
      */
-    protected final JexlCache<Source, ASTJexlScript> cache;
-
-    /**
-     * The default jxlt engine.
-     */
-    protected volatile TemplateEngine jxlt;
+    protected final JexlCache<Source, Object> cache;
 
     /**
      * Collect all or only dot references.
@@ -312,9 +342,10 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
     protected final JexlOptions options;
 
     /**
-     * The cache factory method.
+     * The set of caches created by this engine.
+     * <p>Caches are soft-referenced by the engine so they can be cleaned on class loader change.</p>
      */
-    protected final IntFunction<JexlCache<?, ?>> cacheFactory;
+    protected final MetaCache metaCache;
 
     /**
      * Creates an engine with default arguments.
@@ -325,9 +356,17 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
 
     /**
      * Creates a JEXL engine using the provided {@link JexlBuilder}.
+     *
      * @param conf the builder
      */
     public Engine(final JexlBuilder conf) {
+        // core properties:
+        final JexlUberspect uber = conf.uberspect() == null
+            ? getUberspect(conf.logger(), conf.strategy(), conf.permissions())
+            : conf.uberspect();
+        if (uber == null) {
+            throw new IllegalArgumentException("uberspect cannot be null");
+        }
         // options:
         this.options = conf.options().copy();
         this.strict = options.isStrict();
@@ -338,10 +377,6 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
         this.debug = option(conf.debug(), true);
         this.collectMode = conf.collectMode();
         this.stackOverflow = conf.stackOverflow() > 0? conf.stackOverflow() : Integer.MAX_VALUE;
-        // core properties:
-        final JexlUberspect uber = conf.uberspect() == null
-                ? getUberspect(conf.logger(), conf.strategy(), conf.permissions())
-                : conf.uberspect();
         final ClassLoader loader = conf.loader();
         if (loader != null) {
             uber.setClassLoader(loader);
@@ -372,12 +407,9 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
         this.charset = conf.charset();
         // caching:
         final IntFunction<JexlCache<?, ?>> factory = conf.cacheFactory();
-        this.cacheFactory = factory == null ? SoftCache::new : factory;
-        this.cache = (JexlCache<Source, ASTJexlScript>) (conf.cache() > 0 ? cacheFactory.apply(conf.cache()) : null);
+        this.metaCache = new MetaCache(factory == null ? SoftCache::new : factory);
+        this.cache = metaCache.createCache(conf.cache());
         this.cacheThreshold = conf.cacheThreshold();
-        if (uberspect == null) {
-            throw new IllegalArgumentException("uberspect cannot be null");
-        }
         this.parserFactory = conf.parserFactory() == null ?
                () -> new Parser(new StringProvider(";"))
                 : conf.parserFactory();
@@ -391,6 +423,10 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
         }
     }
 
+    JexlCache<Source, Object> getCache() {
+        return cache;
+    }
+
     @Override
     public Script createExpression(final JexlInfo info, final String expression) {
         return createScript(expressionFeatures, info, expression);
@@ -398,6 +434,7 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
 
     /**
      * Creates an interpreter.
+     *
      * @param context a JexlContext; if null, the empty context is used instead.
      * @param frame   the interpreter frame
      * @param opts    the evaluation options
@@ -424,6 +461,7 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
 
     /**
      * Creates a template interpreter.
+     *
      * @param args the template interpreter arguments
      */
     protected Interpreter createTemplateInterpreter(final TemplateInterpreter.Arguments args) {
@@ -433,6 +471,7 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
     /**
      * Creates a new instance of an object using the most appropriate constructor
      * based on the arguments.
+     *
      * @param clazz the class to instantiate
      * @param args  the constructor arguments
      * @return the created object instance or null on failure when silent
@@ -440,7 +479,7 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
     protected Object doCreateInstance(final Object clazz, final Object... args) {
         JexlException xjexl = null;
         Object result = null;
-        final JexlInfo info = debug ? createInfo() : null;
+        final JexlInfo info = createInfo();
         try {
             JexlMethod ctor = uberspect.getConstructor(clazz, args);
             if (ctor == null && arithmetic.narrowArguments(args)) {
@@ -471,6 +510,7 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
     /**
      * Compute a script options for evaluation.
      * <p>This calls processPragma(...).
+     *
      * @param script the script
      * @param context the context
      * @return the options
@@ -501,6 +541,7 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
      * options otherwise.
      * <p>If the context is an options handle and the handled options shared instance flag
      * is false, this method creates a copy of the options making them immutable during execution.
+     *
      * @param context the context
      * @return the options if any
      */
@@ -519,6 +560,7 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
 
     /**
      * Obsolete version of options evaluation.
+     *
      * @param opts the obsolete instance of options
      * @return the newer class of options
      */
@@ -548,16 +590,20 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
 
     /**
      * Gets the array of local variable from a script.
+     *
      * @param script the script
      * @return the local variables array which may be empty (but not null) if no local variables were defined
      * @since 3.0
+     * @deprecated 3.6.1
      */
+    @Deprecated()
     protected String[] getLocalVariables(final JexlScript script) {
         return script.getLocalVariables();
     }
 
     /**
      * Solves a namespace using this engine map of functions.
+     *
      * @param name the namespoce name
      * @return the object associated
      */
@@ -567,10 +613,13 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
 
     /**
      * Gets the array of parameters from a script.
+     *
      * @param script the script
      * @return the parameters which may be empty (but not null) if no parameters were defined
      * @since 3.0
+     * @deprecated 3.6.1
      */
+    @Deprecated
     protected String[] getParameters(final JexlScript script) {
         return script.getParameters();
     }
@@ -582,7 +631,7 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
         src = "#0" + (src.charAt(0) == '[' ? "" : ".") + src;
         try {
             final Scope scope = new Scope(null, "#0");
-            final ASTJexlScript script = parse(null, PROPERTY_FEATURES, src, scope);
+            final ASTJexlScript script = parse(createInfo(), PROPERTY_FEATURES, src, scope);
             final JexlNode node = script.jjtGetChild(0);
             final Frame frame = script.createFrame(bean);
             final Interpreter interpreter = createInterpreter(context == null ? EMPTY_CONTEXT : context, frame, options);
@@ -612,6 +661,7 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
      * Gets the list of variables accessed by a script.
      * <p>This method will visit all nodes of a script and extract all variables whether they
      * are written in 'dot' or 'bracketed' notation. (a.b is equivalent to a['b']).</p>
+     *
      * @param script the script
      * @return the set of variables, each as a list of strings (ant-ish variables use more than 1 string)
      *         or the empty set if no variables are used
@@ -624,6 +674,7 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
 
     /**
      * Fills up the list of variables accessed by a node.
+     *
      * @param script the owning script
      * @param node the node
      * @param collector the variable collector
@@ -691,7 +742,7 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
     public Object invokeMethod(final Object obj, final String meth, final Object... args) {
         JexlException xjexl = null;
         Object result = null;
-        final JexlInfo info = debug ? createInfo() : null;
+        final JexlInfo info = createInfo();
         try {
             JexlMethod method = uberspect.getMethod(obj, meth, args);
             if (method == null && arithmetic.narrowArguments(args)) {
@@ -738,24 +789,6 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
         return this.strict;
     }
 
-    /**
-     * Gets and/or creates a default template engine.
-     * @return a template engine
-     */
-    protected TemplateEngine jxlt() {
-        TemplateEngine e = jxlt;
-        if (e == null) {
-            synchronized(this) {
-                e = jxlt;
-                if (e == null) {
-                    e = new TemplateEngine(this, true, 0, '$', '#');
-                    jxlt = e;
-                }
-            }
-        }
-        return e;
-    }
-
     @Override
     public <T> T newInstance(final Class<? extends T> clazz, final Object... args) {
         return clazz.cast(doCreateInstance(clazz, args));
@@ -767,7 +800,7 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
     }
 
     @Override
-    public JexlUberspect.ClassConstantResolver createConstantResolver(Collection<String> imports) {
+    public JexlUberspect.ClassConstantResolver createConstantResolver(final Collection<String> imports) {
         return imports == null || imports.isEmpty()
                 ? classNameSolver
                 : new FqcnResolver(classNameSolver).importPackages(imports);
@@ -775,6 +808,7 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
 
     /**
      * Sets options from this engine options.
+     *
      * @param opts the options to set
      * @return the options
      */
@@ -798,16 +832,16 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
     protected ASTJexlScript parse(final JexlInfo info, final JexlFeatures parsingf, final String src, final Scope scope) {
         final boolean cached = src.length() < cacheThreshold && cache != null;
         final JexlFeatures features = parsingf != null ? parsingf : DEFAULT_FEATURES;
-        final Source source = cached? new Source(features, src) : null;
-        ASTJexlScript script;
+        final Source source = cached ? new Source(features, Scope.getSymbolsMap(scope), src) : null;
         if (source != null) {
-            script = cache.get(source);
-            if (script != null && (scope == null || scope.equals(script.getScope()))) {
-                return script;
+            final Object c = cache.get(source);
+            if (c instanceof ASTJexlScript) {
+                return (ASTJexlScript) c;
             }
         }
-        final JexlInfo ninfo = info == null && debug ? createInfo() : info;
-        JexlEngine se = putThreadEngine(this);
+        final JexlInfo ninfo = info != null ? info : createInfo();
+        final JexlEngine se = putThreadEngine(this);
+        ASTJexlScript script;
         try {
             // if parser not in use...
             if (parsing.compareAndSet(false, true)) {
@@ -836,6 +870,7 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
 
     /**
      * Parses a Jexl expression or script.
+     *
      * @param info the JexlInfo
      * @param expr whether to parse an expression or a script
      * @param src the source to parse
@@ -853,6 +888,7 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
      *
      * <p>If the value is empty, the namespace will be cleared which may be useful to debug and force unload
      * the object bound to the namespace.</p>
+     *
      * @param ns the namespace map
      * @param key the key the namespace
      * @param value the value, ie the expression to evaluate and its result bound to the namespace
@@ -895,6 +931,7 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
 
     /**
      * Processes jexl.namespace.ns pragma.
+     *
      * @param ns the namespace map
      * @param key the key
      * @param value the value, ie the class
@@ -922,6 +959,7 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
     /**
      * Processes a script pragmas.
      * <p>Only called from options(...)
+     *
      * @param script the script
      * @param context the context
      * @param opts the options
@@ -981,6 +1019,7 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
 
     /**
      * Swaps the current thread local engine.
+     *
      * @param jexl the engine or null
      * @return the previous thread local engine
      */
@@ -992,6 +1031,7 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
 
     /**
      * Swaps the current thread local context.
+     *
      * @param tls the context or null
      * @return the previous thread local context
      */
@@ -1002,8 +1042,8 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
     }
 
     @Override
-    public void setClassLoader(final ClassLoader loader) {
-        jxlt = null;
+    public void setClassLoader(final ClassLoader classLoader) {
+        final ClassLoader loader = classLoader == null?  JexlUberspect.class.getClassLoader() : classLoader;
         uberspect.setClassLoader(loader);
         if (functions != null) {
             final Iterable<String> names = new ArrayList<>(functions.keySet());
@@ -1022,9 +1062,7 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
                 }
             }
         }
-        if (cache != null) {
-            cache.clear();
-        }
+        metaCache.clearCaches();
     }
 
     @Override
@@ -1034,7 +1072,7 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
         src = "#0" + (src.charAt(0) == '[' ? "" : ".") + src + "=#1";
         try {
             final Scope scope = new Scope(null, "#0", "#1");
-            final ASTJexlScript script = parse(null, PROPERTY_FEATURES, src, scope);
+            final ASTJexlScript script = parse(createInfo(), PROPERTY_FEATURES, src, scope);
             final JexlNode node = script.jjtGetChild(0);
             final Frame frame = script.createFrame(bean, value);
             final Interpreter interpreter = createInterpreter(context != null ? context : EMPTY_CONTEXT, frame, options);
@@ -1057,6 +1095,7 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
 
     /**
      * Trims the source from front and ending spaces.
+     *
      * @param str expression to clean
      * @return trimmed expression ending in a semicolon
      */
@@ -1082,6 +1121,7 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
 
     /**
      * Creates a collector instance.
+     *
      * @return a collector instance
      */
     protected VarCollector varCollector() {
@@ -1090,6 +1130,7 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
 
     /**
      * Utility to deal with single value or set of values.
+     *
      * @param value the value or the set
      * @param consumer the consumer of values
      */
@@ -1101,4 +1142,16 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
             consumer.accept(o);
         }
     }
+
+    /**
+     * Creates a new cache instance.
+     * <p>This uses the metacache instance as factory.</p>
+     *
+     * @param capacity the cache capacity
+     * @return a cache instance, null if capacity == 0, the JEXL cache if capacity &lt; 0
+     */
+    protected JexlCache<Source, Object> createCache(final int capacity) {
+        return capacity < 0 ? cache : capacity > 0 ? metaCache.createCache(capacity) : null;
+    }
+
 }

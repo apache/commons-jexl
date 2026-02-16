@@ -66,10 +66,12 @@ import org.apache.commons.logging.LogFactory;
  * @since 2.0
  */
 public class JexlScriptEngine extends AbstractScriptEngine implements Compilable {
+
     /**
      * Holds singleton JexlScriptEngineFactory (IODH).
      */
     private static final class FactorySingletonHolder {
+
         /** The engine factory singleton instance. */
         static final JexlScriptEngineFactory DEFAULT_FACTORY = new JexlScriptEngineFactory();
 
@@ -81,6 +83,7 @@ public class JexlScriptEngine extends AbstractScriptEngine implements Compilable
      * Wrapper to help convert a JEXL JexlScript into a JSR-223 CompiledScript.
      */
     private final class JexlCompiledScript extends CompiledScript {
+
         /** The underlying JEXL expression instance. */
         private final JexlScript script;
 
@@ -115,12 +118,14 @@ public class JexlScriptEngine extends AbstractScriptEngine implements Compilable
             return script.getSourceText();
         }
     }
+
     /**
      * Wrapper to help convert a JSR-223 ScriptContext into a JexlContext.
      *
      * Current implementation only gives access to ENGINE_SCOPE binding.
      */
     private final class JexlContextWrapper implements JexlContext {
+
         /** The wrapped script context. */
         final ScriptContext scriptContext;
 
@@ -354,6 +359,7 @@ public class JexlScriptEngine extends AbstractScriptEngine implements Compilable
      *                 .permissions(JexlPermissions.UNRESTRICTED)
      *                 .create());
      * }
+     *
      * @param engine the JexlEngine instance to use
      * @since 3.3
      */
@@ -368,6 +374,7 @@ public class JexlScriptEngine extends AbstractScriptEngine implements Compilable
      * {@code
      *         JexlScriptEngine.setPermissions(JexlPermissions.UNRESTRICTED);
      * }
+     *
      * @param permissions the permissions instance to use or null to use the {@link JexlBuilder} default
      * @since 3.3
      */

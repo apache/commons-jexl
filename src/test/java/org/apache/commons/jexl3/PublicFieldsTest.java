@@ -29,6 +29,7 @@ import org.junit.jupiter.api.Test;
 @SuppressWarnings({"UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
 class PublicFieldsTest extends JexlTestCase {
     public enum Gender { MALE, FEMALE }
+
     /**
      * An Inner class.
      */
@@ -36,6 +37,7 @@ class PublicFieldsTest extends JexlTestCase {
         public static double NOT42 = -42.0;
         public double aDouble = 42.0;
     }
+
     /**
      * A Struct, all fields public
      */

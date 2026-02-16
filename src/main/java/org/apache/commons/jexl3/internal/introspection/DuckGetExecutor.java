@@ -29,11 +29,14 @@ import org.apache.commons.jexl3.JexlException;
  * }
  * </code>
  * </p>
+ *
  * @since 2.0
  */
 public final class DuckGetExecutor extends AbstractExecutor.Get {
+
     /**
      * Attempts to discover a DuckGetExecutor.
+     *
      * @param is the introspector
      * @param clazz the class to find the get method from
      * @param identifier the key to use as an argument to the get method
@@ -49,6 +52,7 @@ public final class DuckGetExecutor extends AbstractExecutor.Get {
 
     /**
      * Creates an instance.
+     *
      * @param clazz he class the get method applies to
      * @param method the method held by this executor
      * @param identifier the property to get

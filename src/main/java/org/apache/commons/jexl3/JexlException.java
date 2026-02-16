@@ -38,6 +38,9 @@ import org.apache.commons.jexl3.parser.TokenMgrException;
  * @since 2.0
  */
 public class JexlException extends RuntimeException {
+
+    private static final StackTraceElement[] EMPTY_STACK_TRACE_ELEMENT_ARRAY = {};
+
     /**
      * Thrown when parsing fails due to an ambiguous statement.
      *
@@ -45,10 +48,13 @@ public class JexlException extends RuntimeException {
      */
     public static class Ambiguous extends Parsing {
         private static final long serialVersionUID = 20210606123903L;
+
         /** The mark at which ambiguity might stop and recover. */
         private final transient JexlInfo recover;
+
         /**
          * Creates a new Ambiguous statement exception instance.
+         *
          * @param begin  the start location information
          * @param end the end location information
          * @param expr  the source expression line
@@ -60,6 +66,7 @@ public class JexlException extends RuntimeException {
 
         /**
          * Creates a new Ambiguous statement exception instance.
+         *
          * @param info  the location information
          * @param expr  the source expression line
          */
@@ -74,6 +81,7 @@ public class JexlException extends RuntimeException {
 
         /**
          * Tries to remove this ambiguity in the source.
+         *
          * @param src the source that triggered this exception
          * @return the source with the ambiguous statement removed
          *         or null if no recovery was possible
@@ -93,6 +101,7 @@ public class JexlException extends RuntimeException {
      */
     public static class Annotation extends JexlException {
         private static final long serialVersionUID = 20210606124101L;
+
         /**
          * Creates a new Annotation exception instance.
          *
@@ -111,6 +120,7 @@ public class JexlException extends RuntimeException {
 
         /**
          * Gets the annotation name
+         *
          * @return the annotation name
          */
         public String getAnnotation() {
@@ -125,6 +135,7 @@ public class JexlException extends RuntimeException {
      */
     public static class Assignment extends Parsing {
         private static final long serialVersionUID = 20210606123905L;
+
         /**
          * Creates a new Assignment statement exception instance.
          *
@@ -148,6 +159,7 @@ public class JexlException extends RuntimeException {
      */
     public static class Break extends JexlException {
         private static final long serialVersionUID = 20210606124103L;
+
         /**
          * Creates a new instance of Break.
          *
@@ -165,6 +177,7 @@ public class JexlException extends RuntimeException {
      */
     public static class Cancel extends JexlException {
         private static final long serialVersionUID = 7735706658499597964L;
+
         /**
          * Creates a new instance of Cancel.
          *
@@ -182,6 +195,7 @@ public class JexlException extends RuntimeException {
      */
     public static class Continue extends JexlException {
         private static final long serialVersionUID = 20210606124104L;
+
         /**
          * Creates a new instance of Continue.
          *
@@ -199,10 +213,13 @@ public class JexlException extends RuntimeException {
      */
     public static class Feature extends Parsing {
         private static final long serialVersionUID = 20210606123906L;
+
         /** The feature code. */
         private final int code;
+
         /**
          * Creates a new Ambiguous statement exception instance.
+         *
          * @param info  the location information
          * @param feature the feature code
          * @param expr  the source expression line
@@ -225,6 +242,7 @@ public class JexlException extends RuntimeException {
      */
     public static class Method extends JexlException {
         private static final long serialVersionUID = 20210606123909L;
+
         /**
          * Creates a new Method exception instance.
          *
@@ -294,6 +312,7 @@ public class JexlException extends RuntimeException {
 
         /**
          * Gets the method name
+         *
          * @return the method name
          */
         public String getMethod() {
@@ -304,6 +323,7 @@ public class JexlException extends RuntimeException {
 
         /**
          * Gets  the method signature
+         *
          * @return the method signature
          * @since 3.2
          */
@@ -319,6 +339,7 @@ public class JexlException extends RuntimeException {
      */
     public static class Operator extends JexlException {
         private static final long serialVersionUID = 20210606124100L;
+
         /**
          * Creates a new Operator exception instance.
          *
@@ -337,6 +358,7 @@ public class JexlException extends RuntimeException {
 
         /**
          * Gets the method name
+         *
          * @return the method name
          */
         public String getSymbol() {
@@ -351,6 +373,7 @@ public class JexlException extends RuntimeException {
      */
     public static class Parsing extends JexlException {
         private static final long serialVersionUID = 20210606123902L;
+
         /**
          * Creates a new Parsing exception instance.
          *
@@ -384,6 +407,7 @@ public class JexlException extends RuntimeException {
      */
     public static class Property extends JexlException {
         private static final long serialVersionUID = 20210606123908L;
+
         /**
          * Undefined variable flag.
          */
@@ -434,6 +458,7 @@ public class JexlException extends RuntimeException {
 
         /**
          * Gets the property name
+         *
          * @return the property name
          */
         public String getProperty() {
@@ -475,6 +500,7 @@ public class JexlException extends RuntimeException {
 
         /**
          * Gets the returned value
+         *
          * @return the returned value
          */
         public Object getValue() {
@@ -489,6 +515,7 @@ public class JexlException extends RuntimeException {
      */
     public static class StackOverflow extends JexlException {
         private static final long serialVersionUID = 20210606123904L;
+
         /**
          * Creates a new stack overflow exception instance.
          *
@@ -530,6 +557,7 @@ public class JexlException extends RuntimeException {
 
         /**
          * Gets the thrown value
+         *
          * @return the thrown value
          */
         public Object getValue() {
@@ -544,8 +572,10 @@ public class JexlException extends RuntimeException {
      */
     public static class Tokenization extends JexlException {
         private static final long serialVersionUID = 20210606123901L;
+
         /**
          * Creates a new Tokenization exception instance.
+         *
          * @param info  the location info
          * @param cause the javacc cause
          */
@@ -563,12 +593,15 @@ public class JexlException extends RuntimeException {
      * Thrown when method/ctor invocation fails.
      * <p>These wrap InvocationTargetException as runtime exception
      * allowing to go through without signature modifications.
+     *
      * @since 3.2
      */
     public static class TryFailed extends JexlException {
         private static final long serialVersionUID = 20210606124105L;
+
         /**
          * Creates a new instance.
+         *
          * @param xany the original invocation target exception
          */
         TryFailed(final InvocationTargetException xany) {
@@ -583,6 +616,7 @@ public class JexlException extends RuntimeException {
      */
     public static class Variable extends JexlException {
         private static final long serialVersionUID = 20210606123907L;
+
         /**
          * Undefined variable flag.
          */
@@ -618,6 +652,7 @@ public class JexlException extends RuntimeException {
 
         /**
          * Gets the variable name
+         *
          * @return the variable name
          */
         public String getVariable() {
@@ -638,17 +673,22 @@ public class JexlException extends RuntimeException {
      * The various type of variable issues.
      */
     public enum VariableIssue {
+
         /** The variable is undefined. */
         UNDEFINED,
+
         /** The variable is already declared. */
         REDEFINED,
+
         /** The variable has a null value. */
         NULLVALUE,
+
         /** THe variable is const and an attempt is made to assign it*/
         CONST;
 
         /**
          * Stringifies the variable issue.
+         *
          * @param var the variable name
          * @return the issue message
          */
@@ -704,7 +744,7 @@ public class JexlException extends RuntimeException {
                     stackJexl.add(se);
                 }
             }
-            xthrow.setStackTrace(stackJexl.toArray(new StackTraceElement[0]));
+            xthrow.setStackTrace(stackJexl.toArray(EMPTY_STACK_TRACE_ELEMENT_ARRAY));
         }
         return xthrow;
     }
@@ -810,6 +850,7 @@ public class JexlException extends RuntimeException {
 
     /**
      * Creates a signed-name for a given method name and arguments.
+     *
      * @param name the method name
      * @param args the method arguments
      * @return a suitable signed name
@@ -882,6 +923,7 @@ public class JexlException extends RuntimeException {
 
     /**
      * Removes a slice from a source.
+     *
      * @param src the source
      * @param froml the beginning line
      * @param fromc the beginning column
@@ -917,6 +959,7 @@ public class JexlException extends RuntimeException {
     /**
      * Wrap an invocation exception.
      * <p>Return the cause if it is already a JexlException.
+     *
      * @param xinvoke the invocation exception
      * @return a JexlException
      */
@@ -1051,6 +1094,7 @@ public class JexlException extends RuntimeException {
 
     /**
      * Gets the exception specific detail
+     *
      * @return this exception specific detail
      * @since 3.2
      */
@@ -1069,12 +1113,17 @@ public class JexlException extends RuntimeException {
 
     /**
      * Detailed info message about this error.
+     * <p>
      * Format is "debug![begin,end]: string \n msg" where:
-     * - debug is the debugging information if it exists (@link JexlEngine.setDebug)
-     * - begin, end are character offsets in the string for the precise location of the error
-     * - string is the string representation of the offending expression
-     * - msg is the actual explanation message for this error
+     * </p>
+     * <ul>
+     * <li>debug is the debugging information if it exists {@link JexlBuilder#debug(boolean)}</li>
+     * <li>begin, end are character offsets in the string for the precise location of the error</li>
+     * <li>string is the string representation of the offending expression</li>
+     * <li>msg is the actual explanation message for this error</li>
+     * </ul>
      *
+     * @see JexlEngine#isDebug()
      * @return this error as a string
      */
     @Override
@@ -1096,6 +1145,7 @@ public class JexlException extends RuntimeException {
 
     /**
      * Pleasing checkstyle.
+     *
      * @return the info
      */
     protected JexlInfo info() {

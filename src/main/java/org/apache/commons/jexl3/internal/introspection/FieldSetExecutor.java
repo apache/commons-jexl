@@ -26,6 +26,7 @@ import org.apache.commons.jexl3.introspection.JexlPropertySet;
  * A JexlPropertySet for public fields.
  */
 public final class FieldSetExecutor implements JexlPropertySet {
+
     /**
      * Attempts to discover a FieldSetExecutor.
      *
@@ -57,6 +58,7 @@ public final class FieldSetExecutor implements JexlPropertySet {
 
     /**
      * Creates a new instance of FieldPropertySet.
+     *
      * @param theField the class public field
      */
     private FieldSetExecutor(final Field theField) {

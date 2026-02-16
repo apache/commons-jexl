@@ -21,12 +21,15 @@ import java.util.Map;
 
 /**
  * Specialized executor to get a property from a Map.
+ *
  * @since 2.0
  */
 public final class MapGetExecutor extends AbstractExecutor.Get {
+
     /** The java.util.map.get method used as an active marker in MapGet. */
     private static final java.lang.reflect.Method MAP_GET =
             initMarker(Map.class, "get", Object.class);
+
     /**
      * Attempts to discover a MapGetExecutor.
      *
@@ -48,6 +51,7 @@ public final class MapGetExecutor extends AbstractExecutor.Get {
 
     /**
      * Creates an instance.
+     *
      * @param clazz he class the get method applies to
      * @param method the method held by this executor
      * @param key the property to get

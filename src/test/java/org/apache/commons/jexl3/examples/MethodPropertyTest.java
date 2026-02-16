@@ -28,10 +28,12 @@ import org.junit.jupiter.api.Test;
  *  Simple example to show how to access method and properties.
  */
 class MethodPropertyTest {
+
     /**
      * Helper example class.
      */
     public static class Foo {
+
         /**
          * Gets a string from the argument.
          * @param i a long.

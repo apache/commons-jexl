@@ -34,6 +34,7 @@ import org.apache.commons.jexl3.JexlOperator;
  * @since 1.0
  */
 public interface JexlUberspect {
+
     /**
      * The various builtin property resolvers.
      * <p>
@@ -43,6 +44,7 @@ public interface JexlUberspect {
      * @since 3.0
      */
     enum JexlResolver implements PropertyResolver {
+
         /** Seeks methods named get{P,p}property and is{P,p}property. */
         PROPERTY,
 
@@ -80,11 +82,14 @@ public interface JexlUberspect {
     /**
      * A marker interface that solves a simple class name into a fully qualified one.
      * <p>The base implementation uses imports.</p>
-     * @since 3.3
+     *
+     * @since 3.6.0
      */
     interface ClassNameResolver {
+
         /**
          * Resolves a class name.
+         *
          * @param name the simple class name
          * @return the fully qualified class name
          */
@@ -94,11 +99,14 @@ public interface JexlUberspect {
     /**
      * A marker interface that solves a class constant by name.
      * <p>The base implementation uses imports to solve enums and public static final fields.</p>
-     * @since 3.6
+     *
+     * @since 3.6.0
      */
     interface ClassConstantResolver extends ClassNameResolver {
+
         /**
          * Resolves a constant by its name.
+         *
          * @param name the constant name, a qualified name
          * @return the constant value or TRY_FAILED if not found
          */
@@ -107,10 +115,14 @@ public interface JexlUberspect {
 
     /**
      * The factory type for creating constant resolvers.
+     *
+     * @since 3.6.0
      */
     interface ConstantResolverFactory {
+
         /**
          * Creates a constant resolver.
+         *
          * @param imports the collection of imports (packages and classes) to use
          * @return a constant resolver
          */
@@ -165,6 +177,7 @@ public interface JexlUberspect {
      * @since 3.0
      */
     interface ResolverStrategy {
+
         /**
          * Applies this strategy to a list of resolver types.
          *
@@ -260,6 +273,7 @@ public interface JexlUberspect {
 
     /**
      * Seeks a class by name using this uberspect class-loader.
+     *
      * @param className the class name
      * @return the class instance or null if the class cannot be located by this uberspect class loader or if
      * permissions deny access to the class
@@ -274,6 +288,7 @@ public interface JexlUberspect {
 
     /**
      * Gets the current class loader.
+     *
      * @return the class loader
      */
     ClassLoader getClassLoader();

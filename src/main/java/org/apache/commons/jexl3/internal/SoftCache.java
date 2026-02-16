@@ -44,12 +44,15 @@ import org.apache.commons.jexl3.JexlCache;
  * @param <V> the cache key value type
  */
 public class SoftCache<K, V> implements JexlCache<K, V> {
+
     /**
      * The default cache load factor.
      */
     protected static final float LOAD_FACTOR = 0.75f;
+
     /**
      * Creates a synchronized LinkedHashMap.
+     *
      * @param capacity the map capacity
      * @return the map instance
      * @param <K> key type
@@ -57,6 +60,7 @@ public class SoftCache<K, V> implements JexlCache<K, V> {
      */
     public static <K, V> Map<K, V> createSynchronizedLinkedHashMap(final int capacity) {
         return Collections.synchronizedMap(new java.util.LinkedHashMap<K, V>(capacity, LOAD_FACTOR, true) {
+
             /**
              * Serial version UID.
              */
@@ -68,6 +72,7 @@ public class SoftCache<K, V> implements JexlCache<K, V> {
             }
         });
     }
+
     /**
      * The cache capacity.
      */

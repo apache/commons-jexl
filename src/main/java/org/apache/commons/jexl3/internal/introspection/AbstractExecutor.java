@@ -29,12 +29,15 @@ import org.apache.commons.jexl3.introspection.JexlPropertySet;
  * @since 1.0
  */
 abstract class AbstractExecutor {
+
     /**
      * Abstract class that is used to execute an arbitrary 'get' method.
      */
     public abstract static class Get extends AbstractExecutor implements JexlPropertyGet {
+
         /**
          * Default and sole constructor.
+         *
          * @param theClass the class this executor applies to
          * @param theMethod the method held by this executor
          */
@@ -47,11 +50,13 @@ abstract class AbstractExecutor {
      * Abstract class that is used to execute an arbitrary method.
      */
     public abstract static class Method extends AbstractExecutor implements JexlMethod {
+
         /** The method key discovered from the arguments. */
         protected final MethodKey key;
 
         /**
          * Creates a new instance.
+         *
          * @param c the class this executor applies to
          * @param m the method
          * @param k the MethodKey
@@ -76,8 +81,10 @@ abstract class AbstractExecutor {
      * Abstract class that is used to execute an arbitrary 'set' method.
      */
     public abstract static class Set extends AbstractExecutor implements JexlPropertySet {
+
         /**
          * Default and sole constructor.
+         *
          * @param theClass the class this executor applies to
          * @param theMethod the method held by this executor
          */
@@ -91,6 +98,7 @@ abstract class AbstractExecutor {
 
     /**
      * Coerce an Object which must be a number to an Integer.
+     *
      * @param arg the Object to coerce
      * @return an Integer if it can be converted, null otherwise
      */
@@ -100,6 +108,7 @@ abstract class AbstractExecutor {
 
     /**
      * Coerce an Object to a String.
+     *
      * @param arg the Object to coerce
      * @return a String if it can be converted, null otherwise
      */
@@ -109,14 +118,17 @@ abstract class AbstractExecutor {
 
     /**
      * Gets the class of an object or Object if null.
+     *
      * @param instance the instance
      * @return the class
      */
     static Class<?> classOf(final Object instance) {
         return instance == null ? Object.class : instance.getClass();
     }
+
     /**
      * A helper to initialize the marker methods (array.get, list.get, etc...).
+     *
      * @param clazz the class to introspect
      * @param name the name of the method
      * @param parms the parameters
@@ -132,6 +144,7 @@ abstract class AbstractExecutor {
 
     /**
      * Creates an arguments array.
+     *
      * @param args the list of arguments
      * @return the arguments array
      */
@@ -147,6 +160,7 @@ abstract class AbstractExecutor {
 
     /**
      * Default and sole constructor.
+     *
      * @param theClass the class this executor applies to
      * @param theMethod the method held by this executor
      */
@@ -156,7 +170,8 @@ abstract class AbstractExecutor {
     }
 
     /**
-     *  Indicates whether some other executor is equivalent to this one.
+     * Indicates whether some other executor is equivalent to this one.
+     *
      * @param arg the other executor to check
      * @return true if both executors are equivalent, false otherwise
      */
@@ -190,6 +205,7 @@ abstract class AbstractExecutor {
 
     /**
      * Gets the method to be executed or used as a marker.
+     *
      * @return Method The method used by execute in derived classes.
      */
     public final java.lang.reflect.Method getMethod() {
@@ -198,6 +214,7 @@ abstract class AbstractExecutor {
 
     /**
      * Gets the method name used.
+     *
      * @return method name
      */
     public final String getMethodName() {
@@ -206,6 +223,7 @@ abstract class AbstractExecutor {
 
     /**
      * Gets the object class targeted by this executor.
+     *
      * @return the target object class
      */
     public final Class<?> getTargetClass() {
@@ -214,6 +232,7 @@ abstract class AbstractExecutor {
 
     /**
      * Gets the property targeted by this executor.
+     *
      * @return the target property
      */
     public Object getTargetProperty() {
@@ -247,6 +266,7 @@ abstract class AbstractExecutor {
 
     /**
      * Checks whether a tryExecute failed or not.
+     *
      * @param exec the value returned by tryExecute
      * @return true if tryExecute failed, false otherwise
      */

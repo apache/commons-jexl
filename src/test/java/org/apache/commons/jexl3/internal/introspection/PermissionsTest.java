@@ -29,6 +29,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -46,6 +47,8 @@ import org.apache.commons.jexl3.MapContext;
 import org.apache.commons.jexl3.internal.introspection.nojexlpackage.Invisible;
 import org.apache.commons.jexl3.introspection.JexlPermissions;
 import org.apache.commons.jexl3.introspection.JexlUberspect;
+import org.example.Pair;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -493,5 +496,42 @@ class PermissionsTest {
         assertTrue(found);
         found = Permissions.wildcardAllow(wildcards, "com.google.spexl");
         assertFalse(found);
+    }
+
+    public static class Scheme {
+        public Pair cons(Object first, Object second) {
+            return new Pair(first, second);
+        }
+    }
+
+    @Test
+    void testPair0() {
+        final Map<String, Object> funcs = new HashMap<>();
+        funcs.put("lisp", new Scheme());
+        final JexlPermissions permissions = JexlPermissions.RESTRICTED.compose("org.example.*");
+        final JexlEngine jexl = new JexlBuilder().cache(8).permissions(permissions).namespaces(funcs).create();
+        String src = "let p = lisp:cons(17, 25); p.car + p.cdr;";
+        JexlScript script = jexl.createScript(src);
+        Assertions.assertEquals(42, script.execute(null));
+        Assertions.assertEquals(42, script.execute(null));
+        src = "(p, x, y) -> { p.car = x; p.cdr = y; }";
+        Pair p = new Pair(-1, -41);
+        script = jexl.createScript(src);
+        Assertions.assertNotNull(script.execute(null, p, 22, 20));
+        Assertions.assertEquals(22, p.car);
+        Assertions.assertEquals(20, p.cdr);
+        Assertions.assertNotNull(script.execute(null, p, 18, 24));
+        Assertions.assertEquals(18, p.car);
+        Assertions.assertEquals(24, p.cdr);
+    }
+
+    @Test
+    void testPair1() {
+        final Map<String, Object> funcs = new HashMap<>();
+        final JexlPermissions permissions = JexlPermissions.RESTRICTED.compose("org.example.*");
+        final JexlEngine jexl = new JexlBuilder().cache(8).permissions(permissions).namespaces(funcs).create();
+        final String src = "import org.example.Pair; new Pair(17, 25);";
+        final JexlScript script = jexl.createScript(src);
+        Assertions.assertThrows(JexlException.class, ()-> script.execute(null));
     }
 }

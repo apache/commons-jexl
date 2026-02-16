@@ -61,6 +61,7 @@ import org.apache.commons.jexl3.internal.introspection.PermissionsParser;
  *     JEXL 3.2 default by calling {@link org.apache.commons.jexl3.scripting.JexlScriptEngine#setPermissions(JexlPermissions)}
  *     with {@link #UNRESTRICTED} as parameter.
  * </p>
+ *
  * @since 3.3
  */
 public interface JexlPermissions {
@@ -74,11 +75,13 @@ public interface JexlPermissions {
      * <code>RESTRICTED.compose("java.lang { +Class {} }")</code>.</p>
      */
      final class ClassPermissions extends JexlPermissions.Delegate {
+
         /** The set of explicitly allowed classes, overriding the delegate permissions. */
         private final Set<String> allowedClasses;
 
         /**
          * Creates permissions based on the RESTRICTED set but allowing an explicit set.
+         *
          * @param allow the set of allowed classes
          */
         public ClassPermissions(final Class<?>... allow) {
@@ -90,6 +93,7 @@ public interface JexlPermissions {
 
         /**
          * Required for compose().
+         *
          * @param delegate the base to delegate to
          * @param allow the list of class canonical names
          */
@@ -128,6 +132,7 @@ public interface JexlPermissions {
      * Overloads should call the appropriate validate() method early in their body.
      */
      class Delegate implements JexlPermissions {
+
          /** The permissions we delegate to. */
         protected final JexlPermissions base;
 
@@ -174,6 +179,7 @@ public interface JexlPermissions {
     /**
      * The unrestricted permissions.
      * <p>This enables any public class, method, constructor or field to be visible to JEXL and used in scripts.</p>
+     *
      * @since 3.3
      */
     JexlPermissions UNRESTRICTED = JexlPermissions.parse();
@@ -226,7 +232,9 @@ public interface JexlPermissions {
             "org.w3c.dom.*",
             "org.apache.commons.jexl3.*",
             "org.apache.commons.jexl3 { JexlBuilder {} }",
-            "org.apache.commons.jexl3.internal { Engine {} }",
+            "org.apache.commons.jexl3.introspection { JexlPermissions {} JexlPermissions$ClassPermissions {} }",
+            "org.apache.commons.jexl3.internal { Engine {} Engine32 {} TemplateEngine {} }",
+            "org.apache.commons.jexl3.internal.introspection { Uberspect {} Introspector {} }",
             "java.lang { Runtime{} System{} ProcessBuilder{} Process{}" +
                     " RuntimePermission{} SecurityManager{}" +
                     " Thread{} ThreadGroup{} Class{} }",
@@ -326,63 +334,71 @@ public interface JexlPermissions {
      * as well as derived classes are visible to JEXL and cannot be used in scripts or expressions.
      * If one of its super-classes is not allowed, tbe class is not allowed either.</p>
      * <p>For interfaces, only methods and fields are disallowed in derived interfaces or implementing classes.</p>
+     *
      * @param clazz the class to check
      * @return true if JEXL is allowed to introspect, false otherwise
      * @since 3.3
      */
-    boolean allow(final Class<?> clazz);
+    boolean allow(Class<?> clazz);
 
     /**
      * Checks whether a constructor allows JEXL introspection.
      * <p>If a constructor is not allowed, the new operator cannot be used to instantiate its declared class
      * in scripts or expressions.</p>
+     *
      * @param ctor the constructor to check
      * @return true if JEXL is allowed to introspect, false otherwise
      * @since 3.3
      */
-    boolean allow(final Constructor<?> ctor);
+    boolean allow(Constructor<?> ctor);
 
     /**
      * Checks whether a field explicitly disallows JEXL introspection.
      * <p>If a field is not allowed, it cannot resolved and accessed in scripts or expressions.</p>
+     *
      * @param field the field to check
      * @return true if JEXL is allowed to introspect, false otherwise
      * @since 3.3
      */
-    boolean allow(final Field field);
+    boolean allow(Field field);
+
     /**
      * Checks whether a method allows JEXL introspection.
      * <p>If a method is not allowed, it cannot resolved and called in scripts or expressions.</p>
      * <p>Since methods can be overridden and overloaded, this also checks that no superclass or interface
      * explicitly disallows this methods.</p>
+     *
      * @param method the method to check
      * @return true if JEXL is allowed to introspect, false otherwise
      * @since 3.3
      */
-    boolean allow(final Method method);
+    boolean allow(Method method);
 
     /**
      * Checks whether a package allows JEXL introspection.
      * <p>If the package disallows JEXL introspection, none of its classes or interfaces are visible
      * to JEXL and cannot be used in scripts or expression.</p>
+     *
      * @param pack the package
      * @return true if JEXL is allowed to introspect, false otherwise
      * @since 3.3
      */
-    boolean allow(final Package pack);
+    boolean allow(Package pack);
 
     /**
      * Compose these permissions with a new set.
      * <p>This is a convenience method meant to easily give access to the packages JEXL is
      * used to integrate with. For instance, using <code>{@link #RESTRICTED}.compose("com.my.app.*")</code>
      * would extend the restricted set of permissions by allowing the com.my.app package.</p>
+     *
      * @param src the new constraints
      * @return the new permissions
      */
-    JexlPermissions compose(final String... src);
+    JexlPermissions compose(String... src);
 
     /**
      * Checks that a class is valid for permission check.
+     *
      * @param clazz the class
      * @return true if the class is not null, false otherwise
      */
@@ -392,6 +408,7 @@ public interface JexlPermissions {
 
     /**
      * Checks that a constructor is valid for permission check.
+     *
      * @param constructor the constructor
      * @return true if constructor is not null and public, false otherwise
      */
@@ -401,6 +418,7 @@ public interface JexlPermissions {
 
     /**
      * Checks that a field is valid for permission check.
+     *
      * @param field the constructor
      * @return true if field is not null and public, false otherwise
      */
@@ -410,6 +428,7 @@ public interface JexlPermissions {
 
     /**
      * Checks that a method is valid for permission check.
+     *
      * @param method the method
      * @return true if method is not null and public, false otherwise
      */
@@ -419,6 +438,7 @@ public interface JexlPermissions {
 
     /**
      * Checks that a package is valid for permission check.
+     *
      * @param pack the package
      * @return true if the class is not null, false otherwise
      */

@@ -21,6 +21,7 @@ import org.apache.commons.jexl3.JexlFeatures;
 import org.apache.commons.jexl3.JexlInfo;
 import org.apache.commons.jexl3.internal.Debugger;
 import org.apache.commons.jexl3.internal.ScriptVisitor;
+
 /**
  * Controls that a script only uses enabled features.
  */
@@ -39,6 +40,7 @@ public class FeatureController extends ScriptVisitor {
     /**
      * Perform the control on a node.
      * <p>Note that controlNode() does *not* visit node children in this class.
+     *
      * @param node the node to controlNode
      * @throws JexlException.Feature if required feature is disabled
      */
@@ -69,6 +71,7 @@ public class FeatureController extends ScriptVisitor {
 
     /**
      * Checks whether a node is a string or an integer.
+     *
      * @param child the child node
      * @return true if string / integer, false otherwise
      */
@@ -84,6 +87,7 @@ public class FeatureController extends ScriptVisitor {
 
     /**
      * Sets the features to controlNode.
+     *
      * @param fdesc the features
      */
     public void setFeatures(final JexlFeatures fdesc) {
@@ -92,6 +96,7 @@ public class FeatureController extends ScriptVisitor {
 
     /**
      * Throws a feature exception.
+     *
      * @param feature the feature code
      * @param node    the node that caused it
      */

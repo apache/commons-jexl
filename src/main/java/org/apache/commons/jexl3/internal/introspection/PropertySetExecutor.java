@@ -23,14 +23,17 @@ import org.apache.commons.jexl3.JexlException;
 
 /**
  * Specialized executor to set a property in an object.
+ *
  * @since 2.0
  */
 public class PropertySetExecutor extends AbstractExecutor.Set {
-    /** Index of the first character of the set{p,P}roperty. */
+
+    /** Index of the first character of the "set{p,P}roperty". */
     private static final int SET_START_INDEX = 3;
+
     /**
      * Discovers a PropertySetExecutor.
-     * <p>The method to be found should be named "set{P,p}property.</p>
+     * <p>The method to be found should be named "set{P,p}property".</p>
      *
      * @param is       the introspector
      * @param clazz    the class to find the get method from
@@ -48,9 +51,10 @@ public class PropertySetExecutor extends AbstractExecutor.Set {
         final java.lang.reflect.Method method = discoverSet(is, clazz, property, value);
         return method != null ? new PropertySetExecutor(clazz, method, property, value) : null;
     }
+
     /**
      * Discovers the method for a {@link org.apache.commons.jexl3.introspection.JexlPropertySet}.
-     * <p>The method to be found should be named "set{P,p}property.
+     * <p>The method to be found should be named "set{P,p}property".
      * As a special case, any empty array will try to find a valid array-setting non-ambiguous method.
      *
      * @param is       the introspector
@@ -91,6 +95,7 @@ public class PropertySetExecutor extends AbstractExecutor.Set {
 
     /**
      * Checks whether an argument is an empty array.
+     *
      * @param arg the argument
      * @return true if {@code arg} is an empty array
      */
@@ -101,6 +106,7 @@ public class PropertySetExecutor extends AbstractExecutor.Set {
     /**
      * Finds an empty array property setter method by {@code methodName}.
      * <p>This checks only one method with that name accepts an array as sole parameter.
+     *
      * @param is       the introspector
      * @param clazz    the class to find the get method from
      * @param methodName    the method name to find
@@ -133,6 +139,7 @@ public class PropertySetExecutor extends AbstractExecutor.Set {
 
     /**
      * Creates an instance.
+     *
      * @param clazz  the class the set method applies to
      * @param method the method called through this executor
      * @param key    the key to use as 1st argument to the set method
@@ -181,10 +188,10 @@ public class PropertySetExecutor extends AbstractExecutor.Set {
             && valueClass.equals(classOf(value))) {
             try {
                 return invoke(o, value);
-            } catch (IllegalAccessException | IllegalArgumentException xill) {
+            } catch (IllegalAccessException | IllegalArgumentException illegal) {
                 return TRY_FAILED; // fail
-            } catch (final InvocationTargetException xinvoke) {
-                throw JexlException.tryFailed(xinvoke); // throw
+            } catch (final InvocationTargetException invoke) {
+                throw JexlException.tryFailed(invoke); // throw
             }
         }
         return TRY_FAILED;

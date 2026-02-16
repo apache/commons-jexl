@@ -31,10 +31,15 @@ import org.apache.commons.jexl3.parser.JexlNode;
 
 /**
  * An Engine that behaves like JEXL 3.2, bugs included.
+ *
+ * @deprecated 3.6.1, use Engine with JexlOptions instead.
  */
+@Deprecated
 public class Engine32 extends Engine {
+
     /**
      * Static delegation of getVariable.
+     *
      * @param ii the interpreter
      * @param frame the frame
      * @param block the scope
@@ -69,6 +74,7 @@ public class Engine32 extends Engine {
 
     /**
      * Static delegation of isTernaryProtected.
+     *
      * @param ii the interpreter (unused)
      * @param startNode the node
      * @return true if node is navigation-safe, false otherwise

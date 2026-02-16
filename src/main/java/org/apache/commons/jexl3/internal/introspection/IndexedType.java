@@ -29,19 +29,23 @@ import org.apache.commons.jexl3.introspection.JexlPropertyGet;
  * It implements JexlPropertyGet since such a container can only be accessed from its owning instance (not set).
  */
 public final class IndexedType implements JexlPropertyGet {
+
     /**
      * A generic indexed property container, exposes get(key) and set(key, value)
      * and solves method call dynamically based on arguments.
      * <p>Must remain public for introspection purpose.</p>
      */
     public static final class IndexedContainer {
+
         /** The container instance. */
         final Object container;
+
         /** The container type instance. */
         final IndexedType type;
 
         /**
          * Creates a new duck container.
+         *
          * @param theType the container type
          * @param theContainer the container instance
          */
@@ -52,6 +56,7 @@ public final class IndexedType implements JexlPropertyGet {
 
         /**
          * Gets a property from this indexed container.
+         *
          * @param key the property key
          * @return the property value
          * @throws Exception if inner invocation fails
@@ -62,6 +67,7 @@ public final class IndexedType implements JexlPropertyGet {
 
         /**
          * Gets the property container class.
+         *
          * @return the container class
          */
         public Class<?> getContainerClass() {
@@ -70,6 +76,7 @@ public final class IndexedType implements JexlPropertyGet {
 
         /**
          * Gets the property container name.
+         *
          * @return the container name
          */
         public String getContainerName() {
@@ -78,6 +85,7 @@ public final class IndexedType implements JexlPropertyGet {
 
         /**
          * Sets a property in this indexed container.
+         *
          * @param key the property key
          * @param value the property value
          * @return the invocation result (frequently null)
@@ -87,6 +95,7 @@ public final class IndexedType implements JexlPropertyGet {
             return type.invokeSet(container, key, value);
         }
     }
+
     /**
      * Attempts to find an indexed-property getter in an object.
      * The code attempts to find the list of methods getXXX() and setXXX().
@@ -101,22 +110,25 @@ public final class IndexedType implements JexlPropertyGet {
     public static JexlPropertyGet discover(final Introspector is, final Object object, final String name) {
         if (object != null && name != null && !name.isEmpty()) {
             final String base = name.substring(0, 1).toUpperCase() + name.substring(1);
-            final String container = name;
             final Class<?> clazz = object.getClass();
             final Method[] getters = is.getMethods(object.getClass(), "get" + base);
             final Method[] setters = is.getMethods(object.getClass(), "set" + base);
             if (getters != null) {
-                return new IndexedType(container, clazz, getters, setters);
+                return new IndexedType(name, clazz, getters, setters);
             }
         }
         return null;
     }
+
     /** The container name. */
     final String container;
+
     /** The container class. */
     final Class<?> clazz;
+
     /** The array of getter methods. */
     private final Method[] getters;
+
     /** Last get method used. */
     private volatile Method get;
 
@@ -128,6 +140,7 @@ public final class IndexedType implements JexlPropertyGet {
 
     /**
      * Creates a new indexed property container type.
+     *
      * @param name the container name
      * @param c the owning class
      * @param gets the array of getter methods
@@ -150,6 +163,7 @@ public final class IndexedType implements JexlPropertyGet {
 
     /**
      * Gets the value of a property from a container.
+     *
      * @param object the container instance (not null)
      * @param key the property key (not null)
      * @return the property value
@@ -160,8 +174,8 @@ public final class IndexedType implements JexlPropertyGet {
         if (getters != null && getters.length > 0) {
             Method jm = get;
             if (jm != null) {
-                final Class<?>[] ptypes = jm.getParameterTypes();
-                if (ptypes[0].isAssignableFrom(key.getClass())) {
+                final Class<?>[] types = jm.getParameterTypes();
+                if (types[0].isAssignableFrom(key.getClass())) {
                     return jm.invoke(object, key);
                 }
             }
@@ -176,12 +190,12 @@ public final class IndexedType implements JexlPropertyGet {
             }
         }
         throw new IntrospectionException("property get error: "
-                + object.getClass().toString()
-                + "@" + key.toString());
+                + object.getClass() + "@" + key.toString());
     }
 
     /**
      * Sets the value of a property in a container.
+     *
      * @param object the container instance (not null)
      * @param key the property key (not null)
      * @param value the property value (not null)
@@ -193,10 +207,10 @@ public final class IndexedType implements JexlPropertyGet {
         if (setters != null && setters.length > 0) {
             Method jm = set;
             if (jm != null) {
-                final Class<?>[] ptypes = jm.getParameterTypes();
-                if (ptypes[0].isAssignableFrom(key.getClass())
+                final Class<?>[] types = jm.getParameterTypes();
+                if (types[0].isAssignableFrom(key.getClass())
                     && (value == null
-                        || ptypes[1].isAssignableFrom(value.getClass()))) {
+                        || types[1].isAssignableFrom(value.getClass()))) {
                     return jm.invoke(object, key, value);
                 }
             }
@@ -211,8 +225,7 @@ public final class IndexedType implements JexlPropertyGet {
             }
         }
         throw new IntrospectionException("property set error: "
-                + object.getClass().toString()
-                + "@" + key.toString());
+                + object.getClass() + "@" + key.toString());
     }
 
     @Override
@@ -221,8 +234,8 @@ public final class IndexedType implements JexlPropertyGet {
     }
 
     @Override
-    public boolean tryFailed(final Object rval) {
-        return rval == Uberspect.TRY_FAILED;
+    public boolean tryFailed(final Object val) {
+        return val == Uberspect.TRY_FAILED;
     }
 
     @Override

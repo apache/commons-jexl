@@ -30,8 +30,10 @@ import org.apache.commons.jexl3.internal.introspection.ClassMisc;
  * Helper class to create typed arrays.
  */
 public class ArrayBuilder implements JexlArithmetic.ArrayBuilder {
+
     /** The number of primitive types. */
     private static final int PRIMITIVE_SIZE = 8;
+
     /** The boxing types to primitive conversion map. */
     private static final Map<Class<?>, Class<?>> BOXING_CLASSES;
     static {
@@ -48,6 +50,7 @@ public class ArrayBuilder implements JexlArithmetic.ArrayBuilder {
 
     /**
      * Gets the primitive type of given class (when it exists).
+     *
      * @param parm a class
      * @return the primitive type or null it the argument is not unboxable
      */
@@ -57,19 +60,25 @@ public class ArrayBuilder implements JexlArithmetic.ArrayBuilder {
 
     /** The intended class array. */
     protected Class<?> commonClass;
+
     /** Whether the array stores numbers. */
     protected boolean isNumber = true;
+
     /** Whether we can try unboxing. */
     protected boolean unboxing = true;
+
     /** The untyped list of items being added. */
     protected final Object[] untyped;
+
     /** Number of added items. */
     protected int added;
+
     /** Extended? */
     protected final boolean extended;
 
     /**
      * Creates a new builder.
+     *
      * @param size the exact array size
      */
     public ArrayBuilder(final int size) {
@@ -78,6 +87,7 @@ public class ArrayBuilder implements JexlArithmetic.ArrayBuilder {
 
     /**
      * Creates a new builder.
+     *
      * @param size the exact array size
      * @param extended whether the array is extended
      */
@@ -145,6 +155,7 @@ public class ArrayBuilder implements JexlArithmetic.ArrayBuilder {
     /**
      * Computes the best super class/super interface.
      * <p>Used to try and maintain type safe arrays.</p>
+     *
      * @param baseClass the baseClass
      * @param other another class
      * @return a common ancestor, class or interface, worst case being class Object
@@ -155,6 +166,7 @@ public class ArrayBuilder implements JexlArithmetic.ArrayBuilder {
 
     /**
      * Creates a new list (aka extended array)/
+     *
      * @param clazz the class
      * @param size the size
      * @return the instance

@@ -20,6 +20,7 @@ package org.apache.commons.jexl3.parser;
  * Declares a local variable.
  */
 public class ASTVar extends ASTIdentifier {
+
     /**
      */
     private static final long serialVersionUID = 1L;

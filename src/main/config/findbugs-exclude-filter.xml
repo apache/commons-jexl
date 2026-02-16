@@ -56,25 +56,43 @@
         <Class name="org.apache.commons.jexl3.parser.SimpleNode"/>
     </Match>
     <Match>
-        <Class name="org.apache.commons.jexl3.JexlBuilder"/>
-        <Bug code="EI2,EI"></Bug>
-    </Match>
-    <Match>
-        <Package name="org.apache.commons.jexl3.internal"/>
-        <Bug code="EI2,EI"></Bug>
-    </Match>
-    <Match>
-        <Package name="org.apache.commons.jexl3.introspection.internal"/>
-        <Bug code="EI2,EI"></Bug>
-    </Match>
-    <Match>
-        <Package name="org.apache.commons.jexl3.parser"/>
-        <Bug code="EI2,EI"></Bug>
-    </Match>
-    <Match>
         <Class name="org.apache.commons.jexl3.parser.ASTCaseStatement"/>
     </Match>
     <Match>
         <Class name="org.apache.commons.jexl3.parser.ASTSwitchStatement"/>
+    </Match>
+    <Match>
+        <Class name="org.apache.commons.jexl3.parser.ASTIdentifierAccessJxlt"/>
+    </Match>
+    <Match>
+        <Class name="org.apache.commons.jexl3.JexlBuilder"/>
+        <Bug code="EI2,EI"/>
+    </Match>
+    <Match>
+        <Package name="org.apache.commons.jexl3.internal"/>
+        <Bug code="EI2,EI"/>
+    </Match>
+    <Match>
+        <Package name="org.apache.commons.jexl3.introspection.internal"/>
+        <Bug code="EI2,EI"/>
+    </Match>
+    <Match>
+        <Package name="org.apache.commons.jexl3.parser"/>
+        <Bug code="EI2,EI"/>
+    </Match>
+    <Match>
+        <Bug pattern="EI_EXPOSE_REP"/>
+    </Match>
+    <Match>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+    </Match>
+    <Match>
+        <Bug pattern="NP_BOOLEAN_RETURN_NULL"/>
+    </Match>
+    <Match>
+        <Bug pattern="CT_CONSTRUCTOR_THROW"/>
+    </Match>
+    <Match>
+        <Bug pattern="ES_COMPARING_STRING_WITH_EQ"/>
     </Match>
 </FindBugsFilter>

@@ -27,9 +27,47 @@
         <author email="dev@commons.apache.org">Commons Developers</author>
     </properties>
     <body>
-        <release version="3.6.0" date="YYYY-MM-DD"
+        <release version="3.6.3" date="YYYY-MM-DD"
                  description="This is a feature and maintenance release. Java 8 or later is required.">
             <!-- FIX -->
+            <action dev="henrib" type="fix" issue="JEXL-456" due-to="Vincent Bussol">Change in template parser behavior.</action>
+            <!-- ADD -->
+            <!-- UPDATE -->
+        </release>
+        <release version="3.6.2" date="2026-02-05"
+                 description="This is a feature and maintenance release. Java 8 or later is required.">
+            <!-- FIX -->
+            <action dev="henrib" type="fix" issue="JEXL-455" due-to="Vincent Bussol">Tokenization error with multiline expressions.</action>
+            <action dev="henrib" type="fix" issue="JEXL-454" due-to="Vincent Bussol">Switch NaN case not found.</action>
+            <action dev="henrib" type="fix" issue="JEXL-453" due-to="Vincent Bussol">Finally clause is not evaluated.</action>
+            <!-- ADD -->
+            <!-- UPDATE -->
+            <action type="update" dev="ggregory" due-to="Gary Gregory">Bump org.apache.commons:commons-parent from 93 to 96.</action>
+        </release>
+        <release version="3.6.1" date="2025-12-09"
+                 description="This is a feature and maintenance release. Java 8 or later is required.">
+            <!-- FIX -->
+            <action dev="henrib" type="fix" issue="JEXL-452" due-to="Gary Gregory">Debug setting in Engine shows class/method/line even when set to false.</action>
+            <action dev="henrib" type="fix" issue="JEXL-451" due-to="Xu Pengcheng">Restore JexlSandbox permission capabilities on Object.class.</action>
+            <action dev="henrib" type="fix" issue="JEXL-450">Disable instantiation of internal classes in RESTRICTED mode.</action>
+            <action dev="henrib" type="fix" issue="JEXL-449" due-to="William Price">Inconsistency on nature of curly-bracket syntactic elements regarding annotations.</action>
+            <!-- ADD -->
+            <!-- UPDATE -->
+            <action type="update" dev="ggregory" due-to="Gary Gregory, Dependabot">Bump org.apache.commons:commons-parent from 91 to 93 #391, #396.</action>
+            <action type="update" dev="ggregory" due-to="Gary Gregory">Bump org.apache.commons:commons-lang3 from 3.17.0 to 3.20.0.</action>
+        </release>
+        <release version="3.6.0" date="2025-11-10"
+                 description="This is a feature and maintenance release. Java 8 or later is required.">
+            <!-- FIX -->
+            <action dev="henrib" type="fix" issue="JEXL-448">
+                Engines caching misses local variables handling and global eviction capability.
+            </action>
+            <action dev="henrib" type="fix" issue="JEXL-447" due-to="William Price">
+                Regression in script-defined functions.
+            </action>
+            <action dev="William Price" type="fix" issue="JEXL-446" due-to="William Price">
+                ClassTool module inspection is too strict.
+            </action>
             <action dev="henrib" type="fix" issue="JEXL-442" due-to="Xu Pengcheng">
                 Local variables are not resolved in interpolation string expression.
             </action>
@@ -37,30 +75,29 @@
                 Tokenization error if "\n" in template expression.
             </action>
             <action dev="henrib" type="fix" issue="JEXL-439" due-to="Xu Pengcheng">
-                When using reference capture, incorrect scoping when local variable redefines a captured symbol
+                When using reference capture, incorrect scoping when local variable redefines a captured symbol.
             </action>
             <action dev="henrib" type="fix" issue="JEXL-437" due-to="William Price">
-                Semicolons not actually optional between function calls on separate lines
+                Semicolons not actually optional between function calls on separate lines.
             </action>
             <action type="fix" dev="ggregory" due-to="Gary Gregory">
-                oac....AbstractExecutor.initMarker(Class, String, Class...) throws IllegalArgumentException instead of Error.
+                org.apache.commons.jexl3.internal.introspection.AbstractExecutor.initMarker(Class, String, Class...) throws IllegalArgumentException instead of Exception.
             </action>
             <action type="fix" dev="ggregory" due-to="Gary Gregory">
-                Reuse BigInteger constants instead of creating new
-                instances in org.apache.commons.jexl3.JexlArithmetic.toBigInteger(Object).
+                Reuse BigInteger constants instead of creating new instances in JexlArithmetic.toBigInteger(Object).
             </action>
             <!-- ADD -->
             <action dev="henrib" type="add" issue="JEXL-440">
-                Switch statement &amp; expressions
+                Switch statement &amp; expressions.
             </action>
           <!-- UPDATE -->
-          <action type="update" dev="ggregory" due-to="Gary Gregory, Dependabot">Bump org.apache.commons:commons-parent from 81 to 87 #344, #368.</action>
-          <action type="update" dev="ggregory" due-to="Gary Gregory, Dependabot">Bump org.apache.commons:commons-lang3 from 3.17.0 to 3.18.0 #355.</action>
+          <action type="update" dev="ggregory" due-to="Gary Gregory, Dependabot">Bump org.apache.commons:commons-parent from 81 to 91 #344, #368, #372.</action>
+          <action type="update" dev="ggregory" due-to="Gary Gregory, Dependabot">Bump org.apache.commons:commons-lang3 from 3.17.0 to 3.19.0 #355.</action>
           <action type="update" dev="ggregory" due-to="Gary Gregory, Dependabot">Bump com.google.code.gson:gson from 2.13.1 to 2.13.2 #371.</action>
         </release>
         <release version="3.5.0" date="2025-04-11"
                  description="This is a feature and maintenance release. Java 8 or later is required.">
-            <!-- FIX -->
+          <!-- FIX -->
             <action dev="henrib" type="fix" issue="JEXL-436" due-to="Vincent Bussol">
                 The increment (decrement) operator does not check for null operand
             </action>
@@ -89,7 +126,7 @@
               Replace NumberParser use of Locale.ENGLISH with Locale.ROOT.
             </action>
             <action type="fix" dev="ggregory" due-to="Gary Gregory">Pick up maven-antrun-plugin version from parent POM org.apache:apache.</action>
-            <!-- ADD -->
+          <!-- ADD -->
             <action dev="henrib" type="add" issue="JEXL-438" due-to="Yair Lenga">
                 Allow parser factory specification.
             </action>
@@ -111,7 +148,7 @@
           <action type="update" dev="ggregory">Bump org.codehaus.mojo:animal-sniffer-maven-plugin from 1.23 to 1.24 #266.</action>
           <action type="update" dev="ggregory">Bump org.apache.commons:commons-lang3 from 3.14.0 to 3.17.0 #270, #274, #283.</action>
           <action type="update" dev="ggregory" due-to="Dependabot, Gary Gregory">Bump org.ow2.asm:asm from 9.7 to 9.7.1 #294.</action>
-          <action type="update" dev="ggregory" due-to="Dependabot, Gary Gregory">Bump com.google.code.gson:gson from 2.11.0 to 2.13.1 #321, #342.</action>
+          <action type="update" dev="ggregory" due-to="Dependabot, Gary Gregory">Bump com.google.code.gson:gson from 2.11.0 to 2.13.0 #321.</action>
         </release>
         <release version="3.4.0" date="2024-06-02" description="Java 8 is required.">
             <!-- ADD -->

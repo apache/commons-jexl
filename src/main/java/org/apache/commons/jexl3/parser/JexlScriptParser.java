@@ -23,9 +23,11 @@ import org.apache.commons.jexl3.internal.Scope;
 
 /**
  * The interface that produces a JEXL script AST from a source.
+ *
  * @since 3.5.0
  */
 public interface JexlScriptParser {
+
   /**
    * Parses a script or expression.
    *
@@ -48,7 +50,7 @@ public interface JexlScriptParser {
    * @return the parsed tree
    * @throws JexlException if any error occurred during parsing
    */
-  default ASTJexlScript jxltParse(JexlInfo info, JexlFeatures features, String src, Scope scope) {
+  default ASTJexlScript jxltParse(final JexlInfo info, final JexlFeatures features, final String src, final Scope scope) {
     return parse(info, features, src, scope);
   }
 

@@ -29,22 +29,28 @@ import org.apache.commons.jexl3.JexlInfo;
 import org.apache.commons.jexl3.JexlOptions;
 import org.apache.commons.jexl3.JexlScript;
 import org.apache.commons.jexl3.parser.ASTJexlScript;
+
 /**
  * <p>A JexlScript implementation.</p>
+ *
  * @since 1.1
  */
 public class Script implements JexlScript, JexlExpression {
+
     /**
      * Implements the Future and Callable interfaces to help delegation.
      */
     public class Callable implements java.util.concurrent.Callable<Object> {
+
         /** The actual interpreter. */
         protected final Interpreter interpreter;
+
         /** Use interpreter as marker for not having run. */
         protected volatile Object result;
 
         /**
          * The base constructor.
+         *
          * @param intrprtr the interpreter to use
          */
         protected Callable(final Interpreter intrprtr) {
@@ -65,6 +71,7 @@ public class Script implements JexlScript, JexlExpression {
 
         /**
          * Soft cancel the execution.
+         *
          * @return true if cancel was successful, false otherwise
          */
         public boolean cancel() {
@@ -73,6 +80,7 @@ public class Script implements JexlScript, JexlExpression {
 
         /**
          * Run the interpreter.
+         *
          * @return the evaluation result
          */
         protected Object interpret() {
@@ -98,14 +106,17 @@ public class Script implements JexlScript, JexlExpression {
      * The engine for this expression.
      */
     protected final Engine jexl;
+
     /**
      * Original expression stripped from leading and trailing spaces.
      */
     protected final String source;
+
     /**
      * The resulting AST we can interpret.
      */
     protected final ASTJexlScript script;
+
     /**
      * The engine version (as class loader change count) that last evaluated this script.
      */
@@ -129,6 +140,7 @@ public class Script implements JexlScript, JexlExpression {
      * Creates a Callable from this script.
      * <p>This allows submitting it to an executor pool and provides support for asynchronous calls.</p>
      * <p>The interpreter will handle interruption/cancellation gracefully if needed.</p>
+     *
      * @param context the context
      * @return the callable
      */
@@ -141,6 +153,7 @@ public class Script implements JexlScript, JexlExpression {
      * Creates a Callable from this script.
      * <p>This allows submitting it to an executor pool and provides support for asynchronous calls.</p>
      * <p>The interpreter will handle interruption/cancellation gracefully if needed.</p>
+     *
      * @param context the context
      * @param args    the script arguments
      * @return the callable
@@ -171,6 +184,7 @@ public class Script implements JexlScript, JexlExpression {
 
     /**
      * Creates this script frame for evaluation.
+     *
      * @param args the arguments to bind to parameters
      * @return the frame (may be null)
      */
@@ -180,6 +194,7 @@ public class Script implements JexlScript, JexlExpression {
 
     /**
      * Creates this script interpreter.
+     *
      * @param context the context
      * @param frame the calling frame
      * @return  the interpreter
@@ -190,6 +205,7 @@ public class Script implements JexlScript, JexlExpression {
 
     /**
      * Creates this script interpreter.
+     *
      * @param context the context
      * @param frame the calling frame
      * @param options the interpreter options
@@ -249,6 +265,7 @@ public class Script implements JexlScript, JexlExpression {
 
     /**
      * Gets this script captured variable, i.e. symbols captured from outer scopes.
+     *
      * @return the captured variable names
      */
     public String[] getCapturedVariables() {
@@ -301,6 +318,7 @@ public class Script implements JexlScript, JexlExpression {
     /**
      * Gets this script pragmas
      * <p>Pragma keys are ant-ish variables, their values are scalar literals.
+     *
      * @return the pragmas
      */
     @Override
@@ -329,6 +347,7 @@ public class Script implements JexlScript, JexlExpression {
      * Gets this script variables.
      * <p>Note that since variables can be in an ant-ish form (ie foo.bar.quux), each variable is returned as
      * a list of strings where each entry is a fragment of the variable ({"foo", "bar", "quux"} in the example.</p>
+     *
      * @return the variables or null
      */
     @Override

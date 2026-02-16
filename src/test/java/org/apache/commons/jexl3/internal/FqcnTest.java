@@ -61,28 +61,28 @@ public class FqcnTest extends JexlTestCase {
     UNDEFINED, UNDECLARED, GLOBAL, LOCAL, THIS, SUPER;
   }
 
-  Object getConstant(List<String> imports, String name) throws Exception {
-    JexlUberspect uber = new Uberspect(null, null, JexlPermissions.UNRESTRICTED);
+  Object getConstant(final List<String> imports, final String name) throws Exception {
+    final JexlUberspect uber = new Uberspect(null, null, JexlPermissions.UNRESTRICTED);
     final FqcnResolver resolver = new FqcnResolver(uber, imports);
     return resolver.resolveConstant(name);
   }
 
   @Test
   void testBadImport0() {
-    List<String> imports = Collections.singletonList("org.apache.commons.jexl4242");
+    final List<String> imports = Collections.singletonList("org.apache.commons.jexl4242");
     assertThrows(JexlException.class, () -> new JexlBuilder().imports(imports).create());
   }
 
   @Test
   void testBadImport1() {
     // permissions will not allow this import
-    List<String> imports = Collections.singletonList("org.apache.commons.jexl.JexlEngine");
+    final List<String> imports = Collections.singletonList("org.apache.commons.jexl.JexlEngine");
     assertThrows(JexlException.class, () -> new JexlBuilder().imports(imports).create());
   }
 
   @Test
   public void testFqcn() throws Exception {
-    List<String> imports = Arrays.asList("org.apache.commons.jexl3.internal.FqcnTest", "org.apache.commons.jexl3.internal", "java.lang");
+    final List<String> imports = Arrays.asList("org.apache.commons.jexl3.internal.FqcnTest", "org.apache.commons.jexl3.internal", "java.lang");
     Object c = getConstant(imports, "FqcnScope.UNDEFINED");
     assertNotNull(c);
     assertEquals(FqcnScope.UNDEFINED, c);

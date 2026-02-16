@@ -36,6 +36,7 @@ import java.util.concurrent.Callable;
  * @since 1.0
  */
 public interface JexlExpression {
+
     /**
      * Creates a Callable from this expression.
      *

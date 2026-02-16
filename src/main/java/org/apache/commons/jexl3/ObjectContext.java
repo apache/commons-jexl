@@ -70,6 +70,7 @@ public class ObjectContext<T> implements JexlContext, JexlContext.NamespaceResol
 
     /**
      * Gets the object exposed by this context
+     *
      * @return the object exposed by this context
      */
     protected T getObject() {

@@ -38,6 +38,7 @@ import org.junit.jupiter.api.Test;
  */
 @SuppressWarnings({"UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
 class CacheTest extends JexlTestCase {
+
     /**
      * A task to check boolean assignment.
      */
@@ -75,6 +76,7 @@ class CacheTest extends JexlTestCase {
             return Integer.valueOf(loops);
         }
     }
+
     /**
      * A task to check list assignment.
      */
@@ -119,6 +121,7 @@ class CacheTest extends JexlTestCase {
             return Integer.valueOf(loops);
         }
     }
+
     /**
      * A task to check null assignment.
      */
@@ -146,6 +149,7 @@ class CacheTest extends JexlTestCase {
             return runAssign("foo");
         }
     }
+
     /**
      * A set of classes that define different getter/setter methods for the same properties.
      * The goal is to verify that the cached JexlPropertyGet / JexlPropertySet in the AST Nodes are indeed
@@ -521,13 +525,11 @@ class CacheTest extends JexlTestCase {
 
     private static final JexlEngine jexlCache = new JexlBuilder()
         .cache(1024)
-        .debug(true)
         .strict(true)
         .create();
 
     private static final JexlEngine jexlNoCache = new JexlBuilder()
         .cache(0)
-        .debug(true)
         .strict(true)
         .create();
 

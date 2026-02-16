@@ -449,7 +449,7 @@ class Issues200Test extends JexlTestCase {
         final JexlScript script = jexl.createScript("while(true);");
         assertThrows(JexlException.class, () -> jexl.createExpression("while(true);"), "expr do not allow 'while' statement");
     }
-  
+
     @Test
     void test245() {
         final MapContext ctx = new MapContext();

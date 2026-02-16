@@ -70,6 +70,7 @@ public class JexlTestCase {
     static {
         JexlOptions.setDefaultFlags("-safe", "+lexical");
     }
+
     /** No parameters signature for test run. */
     private static final Class<?>[] NO_PARMS = {};
 
@@ -104,6 +105,7 @@ public class JexlTestCase {
     static JexlEngine createEngine(final JexlFeatures features) {
         return new JexlBuilder().features(features).create();
     }
+
     /**
      * Will force testing the debugger for each derived test class by
      * recreating each expression from the JexlNode in the JexlEngine cache &

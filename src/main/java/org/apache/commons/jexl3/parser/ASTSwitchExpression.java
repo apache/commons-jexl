@@ -18,12 +18,13 @@ package org.apache.commons.jexl3.parser;
 
 
 public class ASTSwitchExpression extends ASTSwitchStatement {
-  public ASTSwitchExpression(int id) {
+  public ASTSwitchExpression(final int id) {
     super(id);
+    isStatement = false;
   }
 
   @Override
-  public Object jjtAccept(ParserVisitor visitor, Object data) {
+  public Object jjtAccept(final ParserVisitor visitor, final Object data) {
     return visitor.visit(this, data);
   }
 }

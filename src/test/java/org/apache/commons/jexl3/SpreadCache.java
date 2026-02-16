@@ -60,6 +60,7 @@ public class SpreadCache<K, V> extends SoftCache<K, V> {
  * @param <V>
  */
 class SpreadMap<K, V> extends AbstractMap<K, V> {
+
   /**
    * Returns a power of two for the given target capacity.
    *

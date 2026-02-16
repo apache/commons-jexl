@@ -44,17 +44,25 @@ public interface JexlContext {
     /**
      * A marker interface of the JexlContext that processes annotations.
      * It is used by the interpreter during evaluation to execute annotation evaluations.
-     * <p>If the JexlContext is not an instance of an AnnotationProcessor, encountering an annotation will generate
+     * <p>
+     * If the JexlContext is not an instance of an AnnotationProcessor, encountering an annotation will generate
      * an error or a warning depending on the engine strictness.
+     * </p>
+     *
      * @since 3.1
      */
     interface AnnotationProcessor {
+
         /**
          * Processes an annotation.
-         * <p>All annotations are processed through this method; the statement 'call' is to be performed within
+         * <p>
+         * All annotations are processed through this method; the statement 'call' is to be performed within
          * the processAnnotation method. The implementation <em>must</em> perform the call explicitly.
-         * <p>The arguments and the statement <em>must not</em> be referenced or cached for longer than the duration
+         * </p>
+         * <p>
+         * The arguments and the statement <em>must not</em> be referenced or cached for longer than the duration
          * of the processAnnotation call.
+         * </p>
          *
          * @param name the annotation name
          * @param args the arguments of the annotation, evaluated as arguments of this call
@@ -67,41 +75,52 @@ public interface JexlContext {
 
     /**
      * A marker interface of the JexlContext sharing a cancelling flag.
-     * <p>A script running in a thread can thus be notified through this reference
+     * <p>
+     * A script running in a thread can thus be notified through this reference
      * of its cancellation through the context. It uses the same interpreter logic
      * that reacts to cancellation and is an alternative to using callable() and/or
      * interrupting script interpreter threads.
+     * </p>
+     *
      * @since 3.2
      */
     interface CancellationHandle {
+
         /**
-         * Gets a cancelable boolean used by the interpreter
-         * @return a cancelable boolean used by the interpreter
+         * Gets a cancelable boolean used by the interpreter.
+         *
+         * @return a cancelable boolean used by the interpreter.
          */
         AtomicBoolean getCancellation();
     }
 
     /**
      * A marker interface that solves a simple class name into a fully-qualified one.
+     *
      * @since 3.3
+     * @since 3.6.0 Removes {@code String resolveClassName(String name)} and extends {@link JexlUberspect.ClassNameResolver} which implements
+     *        {@code String resolveClassName(String name)}.
      */
     interface ClassNameResolver extends JexlUberspect.ClassNameResolver {}
 
     /**
      * A marker interface of the JexlContext that processes module definitions.
      * It is used by the interpreter during evaluation of the pragma module definitions.
+     *
      * @since 3.3
      */
     interface ModuleProcessor {
+
         /**
          * Defines a module.
          * The module name will be the namespace mapped to the object returned by the evaluation
          * of its body.
-         * @param engine the engine evaluating this module pragma
-         * @param info the info at the pragma location
-         * @param name the module name
-         * @param body the module definition which can be its location or source
-         * @return the module object
+         *
+         * @param engine the engine evaluating this module pragma.
+         * @param info the info at the pragma location.
+         * @param name the module name.
+         * @param body the module definition which can be its location or source.
+         * @return the module object.
          */
         Object processModule(JexlEngine engine, JexlInfo info, String name, String body);
     }
@@ -113,10 +132,12 @@ public interface JexlContext {
      * <p>The functor is created once during the lifetime of a script evaluation.</p>
      */
     interface NamespaceFunctor {
+
         /**
          * Creates the functor object that will be used instead of the namespace.
-         * @param context the context
-         * @return the namespace functor instance
+         *
+         * @param context the context.
+         * @return the namespace functor instance.
          */
         Object createFunctor(JexlContext context);
     }
@@ -139,17 +160,20 @@ public interface JexlContext {
 
         /**
          * Resolves a namespace by its name.
-         * @param name the name
-         * @return the namespace object
+         *
+         * @param name the name.
+         * @return the namespace object.
          */
         Object resolveNamespace(String name);
     }
 
     /**
      * A marker interface of the JexlContext that exposes runtime evaluation options.
+     *
      * @since 3.2
      */
     interface OptionsHandle {
+
         /**
          * Gets the current set of options though the context.
          * <p>
@@ -157,7 +181,9 @@ public interface JexlContext {
          * of the context handled JexlOptions instance used for the duration of the execution;
          * the context handled JexlOptions instance being only used as the source of that copy,
          * it can safely alter its boolean flags during execution with no effect, avoiding any behavior ambiguity.
-         * @return the engine options
+         * </p>
+         *
+         * @return the engine options.
          */
         JexlOptions getEngineOptions();
     }
@@ -167,14 +193,17 @@ public interface JexlContext {
      * It is called by the engine before interpreter creation; as a marker of
      * JexlContext, it is expected to have access and interact with the context
      * instance.
+     *
      * @since 3.2
      */
     interface PragmaProcessor {
+
         /**
          * Process one pragma.
-         * @param opts the current evaluator options
-         * @param key the key
-         * @param value the value
+         *
+         * @param opts the current evaluator options.
+         * @param key the key.
+         * @param value the value.
          * @since 3.3
          */
         default void processPragma(final JexlOptions opts, final String key, final Object value) {
@@ -183,6 +212,7 @@ public interface JexlContext {
 
         /**
          * Process one pragma.
+         *
          * <p>Never called in 3.3, must be implemented for 3.2 binary compatibility reasons.</p>
          * <p>Typical implementation in 3.3:</p>
          * <code>
@@ -191,8 +221,9 @@ public interface JexlContext {
          *             processPragma(null, key, value);
          *         }
          * </code>
-         * @param key the key
-         * @param value the value
+         *
+         * @param key the key.
+         * @param value the value.
          * @deprecated 3.3
          */
         @Deprecated
@@ -200,13 +231,15 @@ public interface JexlContext {
     }
 
     /**
-     * A marker interface  of the JexlContext that indicates the interpreter to put this context
-     * in the JexlEngine thread local context instance during evaluation.
+     * A marker interface of the {@link JexlContext} that indicates the interpreter to put this context
+     * in the {@link JexlEngine} thread local context instance during evaluation.
+     * <p>
      * This allows user functions or methods to access the context during a call.
-     * Note that the usual caveats wrt using thread local apply (caching/leaking references, etc.); in particular,
+     * Note that the usual caveats regarding using thread local apply (caching, leaking references, and so on); in particular,
      * keeping a reference to such a context is to be considered with great care and caution.
      * It should also be noted that sharing such a context between threads should implicate synchronizing variable
      * accessing the implementation class.
+     * </p>
      *
      * @see JexlEngine#setThreadContext(JexlContext.ThreadLocal)
      * @see JexlEngine#getThreadContext()
@@ -218,8 +251,8 @@ public interface JexlContext {
     /**
      * Gets the value of a variable.
      *
-     * @param name the variable's name
-     * @return the value
+     * @param name the variable's name.
+     * @return the value.
      */
     Object get(String name);
 
@@ -229,16 +262,16 @@ public interface JexlContext {
      * <p>A variable may be defined with a null value; this method checks whether the
      * value is null or if the variable is undefined.</p>
      *
-     * @param name the variable's name
-     * @return true if it exists, false otherwise
+     * @param name the variable's name.
+     * @return true if it exists, false otherwise.
      */
     boolean has(String name);
 
     /**
      * Sets the value of a variable.
      *
-     * @param name the variable's name
-     * @param value the variable's value
+     * @param name the variable's name.
+     * @param value the variable's value.
      */
     void set(String name, Object value);
 }

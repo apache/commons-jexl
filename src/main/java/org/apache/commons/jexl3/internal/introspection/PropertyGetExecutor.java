@@ -22,11 +22,14 @@ import org.apache.commons.jexl3.JexlException;
 
 /**
  * Specialized executor to get a property from an object.
+ *
  * @since 2.0
  */
 public final class PropertyGetExecutor extends AbstractExecutor.Get {
+
     /** A static signature for method(). */
     private static final Object[] EMPTY_PARAMS = {};
+
     /**
      * Discovers a PropertyGetExecutor.
      * <p>The method to be found should be named "get{P,p}property.</p>
@@ -43,6 +46,7 @@ public final class PropertyGetExecutor extends AbstractExecutor.Get {
 
     /**
      * Base method for boolean and object property get.
+     *
      * @param is the introspector
      * @param which "is" or "get" for boolean or object
      * @param clazz The class being examined.
@@ -79,6 +83,7 @@ public final class PropertyGetExecutor extends AbstractExecutor.Get {
 
     /**
      * Creates an instance.
+     *
      * @param clazz he class the get method applies to
      * @param method the method held by this executor
      * @param identifier the property to get

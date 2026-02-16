@@ -23,20 +23,23 @@ import java.util.List;
 import java.util.Map;
 
 public class ASTSwitchStatement extends JexlNode {
-  /** Pointless serial UID */
-  private static final long serialVersionUID = 1L;
+
+  /**
+   * Whether this switch is a statement (true) or an expression (false).
+   */
+  protected boolean isStatement = true;
 
   /**
    * The map of cases, where the key is the case value and the value is the switch index.
    */
   protected Map<Object, Integer> cases = Collections.emptyMap();
 
-  public ASTSwitchStatement(int id) {
+  public ASTSwitchStatement(final int id) {
     super(id);
   }
 
   @Override
-  public Object jjtAccept(ParserVisitor visitor, Object data) {
+  public Object jjtAccept(final ParserVisitor visitor, final Object data) {
     return visitor.visit(this, data);
   }
 
@@ -50,9 +53,9 @@ public class ASTSwitchStatement extends JexlNode {
    */
   public List<Object>[] getCasesList() {
     @SuppressWarnings("unchecked")
-    List<Object>[] list = (List<Object>[]) new List[jjtGetNumChildren() -1];
-    for (Map.Entry<Object, Integer> entry : cases.entrySet()) {
-      int index = entry.getValue();
+    final List<Object>[] list = new List[jjtGetNumChildren() -1];
+    for (final Map.Entry<Object, Integer> entry : cases.entrySet()) {
+      final int index = entry.getValue();
       if (index < 0 || index >= list.length) {
         throw new IndexOutOfBoundsException("switch index out of bounds: " + index);
       }
@@ -65,17 +68,12 @@ public class ASTSwitchStatement extends JexlNode {
     return list;
   }
 
-  @SuppressWarnings("unchecked")
-  public void setCases(Map cases) {
-    this.cases = cases == null ? Collections.emptyMap() : (Map<Object, Integer>) cases;
+  public boolean isStatement() {
+    return isStatement;
   }
 
-  Map<Object, Integer> getCases() {
-    return cases;
-  }
-
-  public int switchIndex(Object value) {
-    Object code = JexlParser.switchCode(value);
+  public int switchIndex(final Object value) {
+    final Object code = JexlParser.switchCode(value);
     Integer index = cases.get(code);
     if (index == null) {
       index = cases.get(JexlParser.DFLT);
@@ -91,30 +89,29 @@ public class ASTSwitchStatement extends JexlNode {
    * <p>It detects duplicates cases and default.</p>
    */
   public static class Helper {
-    private int nswitch = 1; // switch index, starts at 1 since the first child is the switch expression
-    private boolean defaultDefined = false;
+    private int switchIndex = 1; // switch index, starts at 1 since the first child is the switch expression
+    private boolean defaultDefined;
     private final Map<Object, Integer> dispatch = new LinkedHashMap<>();
 
-    void defineCase(JexlParser.SwitchSet constants) throws ParseException {
-      if (constants.isEmpty()) {
+    void defineCase(final JexlParser.SwitchSet switchSet) throws ParseException {
+      if (switchSet.isEmpty()) {
         if (defaultDefined) {
           throw new ParseException("default clause is already defined");
-        } else {
-          defaultDefined = true;
-          dispatch.put(JexlParser.DFLT, nswitch);
         }
+        defaultDefined = true;
+        dispatch.put(JexlParser.DFLT, switchIndex);
       } else {
-        for (Object constant : constants) {
-          if (dispatch.put(constant == null ? JexlParser.NIL : constant, nswitch) != null) {
+        for (final Object constant : switchSet) {
+          if (dispatch.put(constant, switchIndex) != null) {
             throw new ParseException("duplicate case in switch statement for value: " + constant);
           }
         }
-        constants.clear();
+        switchSet.clear();
       }
-      nswitch += 1;
+      switchIndex += 1;
     }
 
-    void defineSwitch(ASTSwitchStatement statement) {
+    void defineSwitch(final ASTSwitchStatement statement) {
       statement.cases = dispatch;
     }
   }

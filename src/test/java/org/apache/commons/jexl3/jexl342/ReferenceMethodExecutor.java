@@ -24,8 +24,10 @@ import org.apache.commons.jexl3.introspection.JexlMethod;
  * Wraps a reference or optional method executor.
  */
 public class ReferenceMethodExecutor implements JexlMethod {
+
     /** The reference handler. */
     private final ReferenceUberspect.ReferenceHandler handler;
+
     /** The method to delegate to. */
     private final JexlMethod method;
 

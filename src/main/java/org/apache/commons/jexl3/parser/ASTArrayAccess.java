@@ -21,6 +21,7 @@ package org.apache.commons.jexl3.parser;
  */
 public class ASTArrayAccess extends JexlLexicalNode {
   private static final long serialVersionUID = 1L;
+
   /** Which children are accessed using a safe notation.
    * Note that this does not really work after the 64th child.
    * However, an expression like 'a?[b]?[c]?...?[b0]' with 64 terms is very unlikely

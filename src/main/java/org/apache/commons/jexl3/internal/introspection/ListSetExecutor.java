@@ -21,22 +21,26 @@ import java.util.List;
 
 /**
  * Specialized executor to set a property in a List or array.
+ *
  * @since 2.0
  */
 public final class ListSetExecutor extends AbstractExecutor.Set {
+
     /** The java.lang.reflect.Array.get method used as an active marker in ListGet. */
     private static final java.lang.reflect.Method ARRAY_SET =
             initMarker(Array.class, "set", Object.class, Integer.TYPE, Object.class);
+
     /** The java.util.obj.set method used as an active marker in ListSet. */
     private static final java.lang.reflect.Method LIST_SET =
             initMarker(List.class, "set", Integer.TYPE, Object.class);
+
     /**
      * Attempts to discover a ListSetExecutor.
      *
      * @param is the introspector
      * @param clazz the class to find the get method from
      * @param identifier the key to use as an argument to the get method
-     * @param value the value to use as argument in list.put(key,value)
+     * @param value the value to use as argument in list.put(key, value)
      * @return the executor if found, null otherwise
      */
     public static ListSetExecutor discover(final Introspector is,

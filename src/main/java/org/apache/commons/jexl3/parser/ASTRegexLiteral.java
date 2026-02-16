@@ -24,6 +24,7 @@ public final class ASTRegexLiteral extends JexlNode implements JexlNode.Constant
     /**
      */
     private static final long serialVersionUID = 1L;
+
     /** The actual literal value; the inherited 'value' member may host a cached getter. */
 
     private Pattern literal;
@@ -34,6 +35,7 @@ public final class ASTRegexLiteral extends JexlNode implements JexlNode.Constant
 
     /**
      * Gets the literal value.
+     *
      * @return the Pattern literal
      */
     @Override

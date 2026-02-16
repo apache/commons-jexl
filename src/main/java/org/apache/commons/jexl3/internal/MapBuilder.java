@@ -26,11 +26,13 @@ import org.apache.commons.jexl3.JexlArithmetic;
  * Helper class to create map literals.
  */
 public class MapBuilder implements JexlArithmetic.MapBuilder {
+
     /** The map being created. */
     protected final Map<Object, Object> map;
 
     /**
      * Creates a new builder.
+     *
      * @param size the expected map size
      */
     public MapBuilder(final int size) {
@@ -39,6 +41,7 @@ public class MapBuilder implements JexlArithmetic.MapBuilder {
 
     /**
      * Creates a new builder.
+     *
      * @param size the expected map size
      * @param extended whether the map is extended
      */

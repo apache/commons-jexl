@@ -31,6 +31,7 @@ import org.junit.jupiter.api.Test;
  *  Simple example to show how to access arrays.
  */
 class ArrayTest {
+
     /**
      * An example for array access.
      */

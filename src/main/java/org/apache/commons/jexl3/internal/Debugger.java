@@ -34,9 +34,11 @@ import org.apache.commons.jexl3.parser.*;
  * It rebuilds an expression string from the tree and the start/end offsets of the cause in that string.
  * This implies that exceptions during evaluation do always carry the node that's causing the error.
  * </p>
+ *
  * @since 2.0
  */
 public class Debugger extends ParserVisitor implements JexlInfo.Detail {
+
     /** Checks identifiers that contain spaces or punctuation
      * (but underscore, at-sign, sharp-sign and dollar).
      */
@@ -45,14 +47,16 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     private static  boolean isLambdaExpr(final ASTJexlLambda lambda) {
         return lambda.jjtGetNumChildren() == 1 && !isStatement(lambda.jjtGetChild(0));
     }
+
     /**
      * Tests whether a node is a statement (vs an expression).
+     *
      * @param child the node
      * @return true if node is a statement
      */
     private static boolean isStatement(final JexlNode child) {
         if (child instanceof ASTCaseStatement) {
-            return isStatement(child.jjtGetChild(0));
+            return child.jjtGetNumChildren() > 0 && isStatement(child.jjtGetChild(0));
         }
         return child instanceof ASTJexlScript
                 || child instanceof ASTBlock
@@ -65,8 +69,10 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
                 || child instanceof ASTThrowStatement
                 || child instanceof ASTSwitchStatement;
     }
+
     /**
      * Tests whether a script or expression ends with a semicolumn.
+     *
      * @param cs the string
      * @return true if a semicolumn is the last non-whitespace character
      */
@@ -82,8 +88,10 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
         }
         return false;
     }
+
     /**
      * Stringifies the pragmas.
+     *
      * @param builder where to stringify
      * @param pragmas the pragmas, may be null
      */
@@ -106,14 +114,19 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
         }
 
     }
+
     /** The builder to compose messages. */
     protected final StringBuilder builder = new StringBuilder();
+
     /** The cause of the issue to debug. */
     protected JexlNode cause;
+
     /** The starting character location offset of the cause in the builder. */
     protected int start;
+
     /** The ending character location offset of the cause in the builder. */
     protected int end;
+
     /** The indentation level. */
     protected int indentLevel;
 
@@ -141,6 +154,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
 
     /**
      * Checks if a child node is the cause to debug &amp; adds its representation to the rebuilt expression.
+     *
      * @param node the child node
      * @param data visitor pattern argument
      * @return visitor pattern value
@@ -164,6 +178,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
 
     /**
      * Adds a statement node to the rebuilt expression.
+     *
      * @param child the child node
      * @param data  visitor pattern argument
      * @return visitor pattern value
@@ -194,6 +209,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
 
     /**
      * Rebuilds an additive expression.
+     *
      * @param node the node
      * @param op   the operator
      * @param data visitor pattern argument
@@ -221,6 +237,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
 
     /**
      * Checks if a terminal node is the cause to debug &amp; adds its representation to the rebuilt expression.
+     *
      * @param node  the child node
      * @param image the child node token image (optionally null)
      * @param data  visitor pattern argument
@@ -243,6 +260,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
 
     /**
      * Rebuilds an expression from a JEXL node.
+     *
      * @param node the node to rebuilt from
      * @return the rebuilt expression
      * @since 3.0
@@ -262,6 +280,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
 
     /**
      * Position the debugger on the root of an expression.
+     *
      * @param jscript the expression
      * @return true if the expression was a {@link Script} instance, false otherwise
      */
@@ -275,6 +294,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
 
     /**
      * Seeks the location of an error cause (a node) in an expression.
+     *
      * @param node the node to debug
      * @return true if the cause was located, false otherwise
      */
@@ -284,6 +304,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
 
     /**
      * Seeks the location of an error cause (a node) in an expression.
+     *
      * @param node the node to debug
      * @param r whether we should actively find the root node of the debugged node
      * @return true if the cause was located, false otherwise
@@ -310,6 +331,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
 
     /**
      * Position the debugger on the root of a script.
+     *
      * @param jscript the script
      * @return true if the script was a {@link Script} instance, false otherwise
      */
@@ -323,6 +345,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
 
     /**
      * Sets this debugger relative maximum depth.
+     *
      * @param rdepth the maximum relative depth from the debugged node
      * @return this debugger instance
      */
@@ -341,6 +364,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
 
     /**
      * Tries (hard) to find the features used to parse a node.
+     *
      * @param node the node
      * @return the features or null
      */
@@ -358,6 +382,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
 
     /**
      * Sets the indentation level.
+     *
      * @param level the number of spaces for indentation, none if less or equal to zero
      * @return this debugger instance
      */
@@ -370,6 +395,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     /**
      * Checks if the children of a node using infix notation is the cause to debug, adds their representation to the
      * rebuilt expression.
+     *
      * @param node  the child node
      * @param infix the child node token
      * @param paren whether the child should be parenthesized
@@ -395,6 +421,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
 
     /**
      * Sets this debugger line-feed string.
+     *
      * @param lf the string used to delineate lines (usually "\" or "")
      * @return this debugger instance
      */
@@ -405,6 +432,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
 
     /**
      * Checks whether an identifier should be quoted or not.
+     *
      * @param str the identifier
      * @return true if needing quotes, false otherwise
      */
@@ -416,6 +444,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
 
     /**
      * Lets the debugger write out pragmas if any.
+     *
      * @param flag turn on or off
      * @return this debugger instance
      */
@@ -426,6 +455,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
 
     /**
      * Postfix operators.
+     *
      * @param node a postfix operator
      * @param prefix the postfix
      * @param data visitor pattern argument
@@ -447,6 +477,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     /**
      * Checks if the child of a node using prefix notation is the cause to debug, adds their representation to the
      * rebuilt expression.
+     *
      * @param node   the node
      * @param prefix the node token
      * @param data   visitor pattern argument
@@ -464,12 +495,14 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
         }
         return data;
     }
+
     /**
      * Accepts a (simple) value and appends its representation to the builder.
+     *
      * @param builder where to append
      * @param value   the value to append
      */
-    static void acceptValue(StringBuilder builder, Object value, boolean quotedStrings) {
+    static void acceptValue(final StringBuilder builder, final Object value, final boolean quotedStrings) {
         if (value == null) {
             builder.append("null");
         } else if (value instanceof String) {
@@ -498,6 +531,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
 
     /**
      * Sets the arrow style (fat or thin) depending on features.
+     *
      * @param node the node to start seeking features from.
      */
     protected void setArrowSymbol(final JexlNode node) {
@@ -511,6 +545,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
 
     /**
      * Sets the indentation level.
+     *
      * @param level the number of spaces for indentation, none if less or equal to zero
      */
     public void setIndentation(final int level) {
@@ -647,7 +682,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
         return acceptBlock(node, 0, data);
     }
 
-    private Object acceptBlock(final JexlNode node, int begin, final Object data) {
+    private Object acceptBlock(final JexlNode node, final int begin, final Object data) {
         builder.append('{');
         if (indent > 0) {
             indentLevel += 1;
@@ -709,7 +744,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     }
 
     @Override
-    protected Object visit(ASTSwitchStatement node, Object data) {
+    protected Object visit(final ASTSwitchStatement node, final Object data) {
         builder.append("switch (");
         accept(node.jjtGetChild(0), data);
         builder.append(") ");
@@ -718,39 +753,54 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     }
 
     @Override
-    protected Object visit(ASTCaseStatement node, Object data) {
-        List<Object> values = node.getValues();
+    protected Object visit(final ASTSwitchExpression node, final Object data) {
+        return visit((ASTSwitchStatement) node, data);
+    }
+
+    @Override
+    protected Object visit(final ASTCaseStatement node, final Object data) {
+        final JexlNode parent = node.jjtGetParent();
+        final boolean isStatement = parent instanceof ASTSwitchStatement && ((ASTSwitchStatement) parent).isStatement();
+        if (isStatement) {
+            return visitCaseStatement(node, data);
+        }
+        return visitCaseExpression(node, data);
+    }
+
+    private Object visitCaseStatement(final ASTCaseStatement node, final Object data) {
+        final List<Object> values = node.getValues();
         if (values.isEmpty()) {
             // default case
             builder.append("default : ");
         } else {
             // regular case
-            for (Object value : values) {
+            for (final Object value : values) {
                 builder.append("case ");
                 acceptValue(builder, value, true);
                 builder.append(" : ");
             }
         }
-        accept(node.jjtGetChild(0), data);
+        if (node.jjtGetNumChildren() > 0) {
+            accept(node.jjtGetChild(0), data);
+        }
         return data;
     }
 
     @Override
-    protected Object visit(ASTSwitchExpression node, Object data) {
-        return visit((ASTSwitchStatement) node, data);
+    protected Object visit(final ASTCaseExpression node, final Object data) {
+        return visitCaseExpression(node, data);
     }
 
-    @Override
-    protected Object visit(ASTCaseExpression node, Object data) {
-        List<Object> values = node.getValues();
+    private Object visitCaseExpression(final ASTCaseStatement node, final Object data) {
+        final List<Object> values = node.getValues();
         if (values.isEmpty()) {
             // default case
             builder.append("default -> ");
         } else {
-            builder.append("case -> ");
+            builder.append("case ");
             // regular case
             boolean first = true;
-            for (Object value : values) {
+            for (final Object value : values) {
                 if (!first) {
                     builder.append(", ");
                 } else {
@@ -758,7 +808,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
                 }
                 acceptValue(builder, value, true);
             }
-            builder.append(" : ");
+            builder.append(" -> ");
         }
         accept(node.jjtGetChild(0), data);
         return data;
@@ -1473,6 +1523,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
 
     /**
      * A pseudo visitor for parameters.
+     *
      * @param p the parameter name
      * @param data the visitor argument
      * @return the parameter name to use

@@ -54,6 +54,7 @@ public abstract class JexlEngine {
      * The empty context class, public for instrospection.
      */
     public static final class EmptyContext implements JexlContext {
+
         /**
          * Default ctor.
          */
@@ -79,6 +80,7 @@ public abstract class JexlEngine {
      * The  empty/static/non-mutable JexlNamespace class, public for instrospection.
      */
     public static final class EmptyNamespaceResolver implements JexlContext.NamespaceResolver {
+
         /**
          * Default ctor.
          */
@@ -92,6 +94,7 @@ public abstract class JexlEngine {
 
     /** The failure marker class. */
     private static final class FailObject {
+
         /**
          * Default ctor.
          */
@@ -106,6 +109,7 @@ public abstract class JexlEngine {
     /**
      * Script evaluation options.
      * <p>The JexlContext used for evaluation can implement this interface to alter behavior.</p>
+     *
      * @deprecated 3.2
      */
     @Deprecated
@@ -117,6 +121,7 @@ public abstract class JexlEngine {
          * @return the math context
          */
         MathContext getArithmeticMathContext();
+
         /**
          * The BigDecimal scale used for comparison and coercion operations.
          *
@@ -133,6 +138,7 @@ public abstract class JexlEngine {
 
         /**
          * Tests whether evaluation will throw JexlException.Cancel (true) or return null (false) when interrupted.
+         *
          * @return true when cancellable, false otherwise
          * @since 3.1
          */
@@ -205,6 +211,7 @@ public abstract class JexlEngine {
      * Accesses the current thread local engine.
      * <p>Advanced: you should only use this to retrieve the engine within a method/ctor called through the evaluation
      * of a script/expression.</p>
+     *
      * @return the engine or null
      */
     public static JexlEngine getThreadEngine() {
@@ -274,7 +281,7 @@ public abstract class JexlEngine {
      * @return a JexlInfo instance
      */
     public JexlInfo createInfo() {
-        return new JexlInfo();
+        return isDebug()? new JexlInfo() : new JexlInfo("jexl", 1, 1);
     }
 
     /**
@@ -388,6 +395,7 @@ public abstract class JexlEngine {
     public final JexlScript createScript(final JexlInfo info, final String source, final String... names) {
         return createScript(null, info, source, names);
     }
+
     /**
      * Creates a Script from a {@link URL} containing valid JEXL syntax.
      * This method parses the script and validates the syntax.
@@ -528,6 +536,14 @@ public abstract class JexlEngine {
 
     /**
      * Checks whether this engine is in debug mode.
+     *
+     * <p>If set to true which is the default, when calling {@link JexlEngine#newInstance}, {@link JexlEngine#invokeMethod},
+     * {@link JexlEngine#setProperty}, {@link JexlEngine#getProperty} or if no {@link JexlInfo} instance is provided when
+     * creating a script and an error occurs during execution, the error message will contain the stack-trace (class/method/line)
+     * location of the caller for the methods, of the creator for the script; this may not be desirable in rare environments where
+     * vulnerability assessments are strict.</p>
+     *
+     * @see JexlBuilder#debug(boolean)
      *
      * @return true if debug is on, false otherwise
      */

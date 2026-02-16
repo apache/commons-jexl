@@ -16,6 +16,8 @@
  */
 package org.apache.commons.jexl3.internal;
 
+import java.util.Collections;
+import java.util.Map;
 import java.util.Objects;
 
 import org.apache.commons.jexl3.JexlFeatures;
@@ -26,30 +28,52 @@ import org.apache.commons.jexl3.JexlFeatures;
  * scripts with different features and prevent false sharing.
  */
 public final class Source implements Comparable<Source> {
+
     /** The hash code, pre-computed for fast op. */
     private final int hashCode;
+
     /** The set of features. */
     private final JexlFeatures features;
+
+    /** The local symbols, if any. */
+    private final Map<String, Integer> symbols;
+
     /** The actual source script/expression. */
     private final String str;
 
     /**
      * Default constructor.
+     *
      * @param theFeatures the features
+     * @param theSymbols the map of variable name to symbol offset in evaluation frame
      * @param theStr the script source
      */
-    Source(final JexlFeatures theFeatures, final String theStr) { // CSOFF: MagicNumber
+    Source(final JexlFeatures theFeatures, final Map<String, Integer> theSymbols,  final String theStr) {
         this.features = theFeatures;
+        this.symbols = theSymbols == null ? Collections.emptyMap() : theSymbols;
         this.str = theStr;
-        int hash = 3;
-        hash = 37 * hash + features.hashCode();
-        hash = 37 * hash + str.hashCode() ;
-        this.hashCode = hash;
+        this.hashCode = Objects.hash(features, symbols, str);
     }
 
     @Override
     public int compareTo(final Source s) {
-        return str.compareTo(s.str);
+        int cmp = str.compareTo(s.str);
+        if (cmp == 0) {
+            cmp = Integer.compare(features.hashCode(), s.features.hashCode());
+            if (cmp == 0) {
+                cmp = Integer.compare(symbols.hashCode(), s.symbols.hashCode());
+                if (cmp == 0) {
+                    if (Objects.equals(features, s.features)) {
+                        if (Objects.equals(symbols, s.symbols)) {
+                            return 0;
+                        }
+                       return -1; // Same features, different symbols
+                    }
+                    return +1; // Different features
+                }
+            }
+        }
+        return cmp;
     }
 
     @Override
@@ -65,6 +89,9 @@ public final class Source implements Comparable<Source> {
         }
         final Source other = (Source) obj;
         if (!Objects.equals(this.features, other.features)) {
+            return false;
+        }
+        if (!Objects.equals(this.symbols, other.symbols)) {
             return false;
         }
         if (!Objects.equals(this.str, other.str)) {

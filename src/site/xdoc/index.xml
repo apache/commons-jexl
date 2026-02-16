@@ -283,7 +283,7 @@ and ensure their execution within controlled functional constraints.
             </subsection>
         </section>
 
-        <section name="Anyone Using It Yet?">
+        <section name="Projects Using Commons JEXL">
             <ul>
                 <li>
                     <a href="https://commons.apache.org/configuration">Commons Configuration</a>

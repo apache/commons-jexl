@@ -31,13 +31,16 @@ import org.apache.commons.jexl3.introspection.JexlPropertySet;
  * @since 2.0
  */
 public abstract class JexlNode extends SimpleNode implements JexlCache.Reference {
+
     /**
      * A marker interface for constants.
+     *
      * @param <T> the literal type
      */
     public interface Constant<T> {
         T getLiteral();
     }
+
     /**
      * Marker interface for cachable function calls.
      */
@@ -47,6 +50,7 @@ public abstract class JexlNode extends SimpleNode implements JexlCache.Reference
      * Marker interface for nodes hosting a JxltExpression.
      */
     public interface JxltHandle {
+
         /** @return the expression source. */
         String getExpressionSource();
 
@@ -55,6 +59,7 @@ public abstract class JexlNode extends SimpleNode implements JexlCache.Reference
 
         /**
          * Sets the template expression.
+         *
          * @param expr a TemplateEngine.TemplateExpression instance
          */
         void setExpression(JxltEngine.Expression expr);
@@ -79,6 +84,7 @@ public abstract class JexlNode extends SimpleNode implements JexlCache.Reference
 
         /**
          * Default ctor.
+         *
          * @param jnode the node
          */
         public Info(final JexlNode jnode) {
@@ -87,6 +93,7 @@ public abstract class JexlNode extends SimpleNode implements JexlCache.Reference
 
         /**
          * Copy ctor.
+         *
          * @param jnode the node
          * @param info the
          */
@@ -96,6 +103,7 @@ public abstract class JexlNode extends SimpleNode implements JexlCache.Reference
 
         /**
          * Full detail ctor.
+         *
          * @param jnode the node
          * @param name the file name
          * @param l the line
@@ -229,6 +237,7 @@ public abstract class JexlNode extends SimpleNode implements JexlCache.Reference
 
     /**
      * Tests whether this node is a left value.
+     *
      * @return true if node is assignable, false otherwise
      */
     public boolean isLeftValue() {
@@ -251,6 +260,7 @@ public abstract class JexlNode extends SimpleNode implements JexlCache.Reference
     /**
      * Tests whether this node is the left-hand side of a safe access identifier as in.
      * For instance, in 'x?.y' , 'x' is safe.
+     *
      * @param safe whether the engine is in safe-navigation mode
      * @return true if safe lhs, false otherwise
      */

@@ -18,6 +18,7 @@ package org.apache.commons.jexl3.internal;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,9 +26,11 @@ import java.util.Map;
 /**
  * A script scope, stores the declaration of parameters and local variables as symbols.
  * <p>This also acts as the functional scope and variable definition store.</p>
+ *
  * @since 3.0
  */
 public final class Scope {
+
     /**
      * The value of an as-yet undeclared but variable, for instance: x; before var x;.
      */
@@ -36,6 +39,7 @@ public final class Scope {
             return "??";
         }
     };
+
     /**
      * The value of a declared but undefined variable, for instance: var x;.
      */
@@ -44,32 +48,39 @@ public final class Scope {
             return "?";
         }
     };
+
     /**
      * The empty string array.
      */
     private static final String[] EMPTY_STRS = {};
+
     /**
      * The parent scope.
      */
     private final Scope parent;
+
     /**
      * The number of parameters.
      */
     private int parms;
+
     /**
      * The number of local variables.
      */
     private int vars;
+
     /**
      * The map of named variables aka script parameters and local variables.
      * Each parameter is associated with a symbol and is materialized as an offset in the stacked array used
      * during evaluation.
      */
     private Map<String, Integer> namedVariables;
+
     /**
      * The map of local captured variables to parent scope variables, i.e., closure.
      */
     private Map<Integer, Integer> capturedVariables;
+
     /**
      * Let symbols.
      */
@@ -77,6 +88,7 @@ public final class Scope {
 
     /**
      * Creates a new scope with a list of parameters.
+     *
      * @param scope the parent scope if any
      * @param parameters the list of parameters
      */
@@ -95,7 +107,21 @@ public final class Scope {
     }
 
     /**
+     * Gets an unmodifiable view of a scope&quote;s symbols map.
+     *
+     * @param scope the scope
+     * @return the symbols map
+     */
+     static Map<String, Integer> getSymbolsMap(final Scope scope) {
+        if (scope != null && scope.namedVariables != null) {
+            return Collections.unmodifiableMap(scope.namedVariables);
+        }
+        return Collections.emptyMap();
+    }
+
+    /**
      * Marks a symbol as lexical, declared through let or const.
+     *
      * @param s the symbol
      * @return true if the symbol was not already present in the lexical set
      */
@@ -109,6 +135,7 @@ public final class Scope {
     /**
      * Creates a frame by copying values up to the number of parameters.
      * <p>This captures the captured variables values.</p>
+     *
      * @param frame the caller frame
      * @param args the arguments
      * @return the arguments array
@@ -142,6 +169,7 @@ public final class Scope {
      * <p>
      * This method creates a new entry in the symbol map.
      * </p>
+     *
      * @param param the parameter name
      * @return the register index storing this variable
      */
@@ -163,6 +191,7 @@ public final class Scope {
      * <p>
      * This method creates a new entry in the symbol map.
      * </p>
+     *
      * @param varName the variable name
      * @return the register index storing this variable
      */
@@ -189,6 +218,7 @@ public final class Scope {
 
     /**
      * Gets the (maximum) number of arguments this script expects.
+     *
      * @return the number of parameters
      */
     public int getArgCount() {
@@ -197,6 +227,7 @@ public final class Scope {
 
     /**
      * Gets the captured index of a given symbol, i.e., the target index of a symbol in a child scope.
+     *
      * @param symbol the symbol index
      * @return the target symbol index or null if the symbol is not captured
      */
@@ -214,6 +245,7 @@ public final class Scope {
 
     /**
      * Gets the index of a captured symbol, i.e., the source index of a symbol in a parent scope.
+     *
      * @param symbol the symbol index
      * @return the source symbol index or -1 if the symbol is not captured
      */
@@ -225,6 +257,7 @@ public final class Scope {
     /**
      * Gets this script captured symbols names, i.e., local variables defined in outer scopes and used
      * by this scope.
+     *
      * @return the captured names
      */
     public String[] getCapturedVariables() {
@@ -245,6 +278,7 @@ public final class Scope {
 
     /**
      * Gets this script local variable, i.e. symbols assigned to local variables excluding captured variables.
+     *
      * @return the local variable names
      */
     public String[] getLocalVariables() {
@@ -263,6 +297,7 @@ public final class Scope {
 
     /**
      * Gets this script parameters, i.e., symbols assigned before creating local variables.
+     *
      * @return the parameter names
      */
     public String[] getParameters() {
@@ -271,6 +306,7 @@ public final class Scope {
 
     /**
      * Gets this script parameters.
+     *
      * @param bound number of known bound parameters (curry)
      * @return the parameter names
      */
@@ -297,6 +333,7 @@ public final class Scope {
     /**
      * Checks whether an identifier is a local variable or argument, i.e., a symbol.
      * If this fails, look within parents for a symbol that can be captured.
+     *
      * @param name the symbol name
      * @return the symbol index
      */
@@ -306,6 +343,7 @@ public final class Scope {
 
     /**
      * Checks whether an identifier is a local variable or argument, i.e., a symbol.
+     *
      * @param name the symbol name
      * @param capture whether solving by capturing a parent symbol is allowed
      * @return the symbol index
@@ -331,6 +369,7 @@ public final class Scope {
 
     /**
      * Gets this script symbols names, i.e., parameters and local variables.
+     *
      * @return the symbol names
      */
     public String[] getSymbols() {
@@ -339,6 +378,7 @@ public final class Scope {
 
     /**
      * Checks whether a given symbol is captured.
+     *
      * @param symbol the symbol number
      * @return true if captured, false otherwise
      */
@@ -348,6 +388,7 @@ public final class Scope {
 
     /**
      * Checks whether a symbol is declared through a let or const.
+     *
      * @param s the symbol
      * @return true if symbol was declared through let or const
      */

@@ -28,6 +28,7 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.apache.commons.jexl3.introspection.JexlPermissions;
+import org.apache.commons.jexl3.introspection.JexlUberspect;
 import org.apache.commons.logging.Log;
 
 /**
@@ -44,21 +45,27 @@ import org.apache.commons.logging.Log;
  * @since 1.0
  */
 public final class Introspector {
+
     /**
      * A Constructor get cache-miss.
      */
     private static final class CacheMiss {
+
         /** The constructor used as cache-miss. */
         @SuppressWarnings("unused")
         public CacheMiss() {
+            // empty
         }
     }
+
     /**
      * The cache-miss marker for the constructors map.
      */
     private static final Constructor<?> CTOR_MISS = CacheMiss.class.getConstructors()[0];
+
     /**
      * Checks whether a class is loaded through a given class loader or one of its ascendants.
+     *
      * @param loader the class loader
      * @param clazz  the class to check
      * @return true if clazz was loaded through the loader, false otherwise
@@ -75,26 +82,27 @@ public final class Introspector {
         }
         return false;
     }
+
     /**
      * the logger.
      */
     private final Log logger;
-    /**
-     * The class loader used to solve constructors if needed.
-     */
-    private ClassLoader loader;
+
     /**
      * The permissions.
      */
     private final JexlPermissions permissions;
+
     /**
      * The read/write lock.
      */
     private final ReadWriteLock lock = new ReentrantReadWriteLock();
+
     /**
      * Holds the method maps for the classes we know about, keyed by Class.
      */
     private final Map<Class<?>, ClassMap> classMethodMaps = new HashMap<>();
+
     /**
      * Holds the map of classes ctors we know about as well as unknown ones.
      */
@@ -106,7 +114,15 @@ public final class Introspector {
     private final Map<String, Class<?>> constructibleClasses = new HashMap<>();
 
     /**
+     * The class loader used to solve constructors if needed.
+     * <p>Cheap read-write lock pattern: exclusive lock for write, read visibility through volatile.</p>
+     */
+    @SuppressWarnings("java:S3077")
+    private volatile ClassLoader loader;
+
+    /**
      * Create the introspector.
+     *
      * @param log     the logger to use
      * @param cloader the class loader
      */
@@ -116,24 +132,27 @@ public final class Introspector {
 
     /**
      * Create the introspector.
+     *
      * @param log     the logger to use
-     * @param cloader the class loader
+     * @param loader the class loader
      * @param perms the permissions
      */
-    public Introspector(final Log log, final ClassLoader cloader, final JexlPermissions perms) {
+    public Introspector(final Log log, final ClassLoader loader, final JexlPermissions perms) {
         this.logger = log;
-        this.loader = cloader;
+        this.loader = loader != null ? loader : JexlUberspect.class.getClassLoader();
         this.permissions = perms == null ? JexlPermissions.RESTRICTED : perms;
     }
 
     /**
      * Gets a class by name through this introspector class loader.
+     *
      * @param className the class name
      * @return the class instance or null if it could not be found
      */
     public Class<?> getClassByName(final String className) {
         try {
-            final Class<?> clazz = Class.forName(className, false, loader);
+            final ClassLoader classLoader = loader;
+            final Class<?> clazz = Class.forName(className, false, classLoader);
             return permissions.allow(clazz)? clazz : null;
         } catch (final ClassNotFoundException xignore) {
             return null;
@@ -142,6 +161,7 @@ public final class Introspector {
 
     /**
      * Gets the constructor defined by the {@code MethodKey}.
+     *
      * @param c   the class we want to instantiate
      * @param key Key of the constructor being searched for
      * @return The desired constructor object
@@ -177,19 +197,20 @@ public final class Introspector {
                     if (c != null && c.getName().equals(key.getMethod())) {
                         clazz = c;
                     } else {
+                        // read under lock
                         clazz = loader.loadClass(constructorName);
                     }
                     // add it to list of known loaded classes
                     constructibleClasses.put(constructorName, clazz);
                 }
-                final List<Constructor<?>> l = new ArrayList<>();
+                final List<Constructor<?>> constructors = new ArrayList<>();
                 for (final Constructor<?> ictor : clazz.getConstructors()) {
                     if (permissions.allow(ictor)) {
-                        l.add(ictor);
+                        constructors.add(ictor);
                     }
                 }
                 // try to find one
-                ctor = key.getMostSpecificConstructor(l.toArray(new Constructor<?>[0]));
+                ctor = key.getMostSpecificConstructor(constructors.toArray(new Constructor<?>[0]));
                 if (ctor != null) {
                     constructorsMap.put(key, ctor);
                 } else {
@@ -239,6 +260,7 @@ public final class Introspector {
 
     /**
      * Gets the array of accessible field names known for a given class.
+     *
      * @param c the class
      * @return the class field names
      */
@@ -252,6 +274,7 @@ public final class Introspector {
 
     /**
      * Gets the class loader used by this introspector.
+     *
      * @return the class loader
      */
     public ClassLoader getLoader() {
@@ -260,6 +283,7 @@ public final class Introspector {
 
     /**
      * Gets the ClassMap for a given class.
+     *
      * @param c the class
      * @return the class map
      */
@@ -314,6 +338,7 @@ public final class Introspector {
 
     /**
      * Gets a method defined by a class, a name and a set of parameters.
+     *
      * @param c      the class
      * @param name   the method name
      * @param params the method parameters
@@ -326,6 +351,7 @@ public final class Introspector {
 
     /**
      * Gets the array of accessible methods names known for a given class.
+     *
      * @param c the class
      * @return the class method names
      */
@@ -339,6 +365,7 @@ public final class Introspector {
 
     /**
      * Gets the array of accessible method known for a given class.
+     *
      * @param c          the class
      * @param methodName the method name
      * @return the array of methods (null or not empty)
@@ -354,38 +381,41 @@ public final class Introspector {
     /**
      * Sets the class loader used to solve constructors.
      * <p>Also cleans the constructors and methods caches.</p>
+     *
      * @param classLoader the class loader; if null, use this instance class loader
      */
     public void setLoader(final ClassLoader classLoader) {
-        final ClassLoader previous = loader;
-        final ClassLoader current = classLoader == null ? getClass().getClassLoader() : classLoader;
-        if (!current.equals(loader)) {
-            lock.writeLock().lock();
-            try {
+        final ClassLoader current = classLoader == null ? JexlUberspect.class.getClassLoader() : classLoader;
+        lock.writeLock().lock();
+        try {
+            final ClassLoader previous = loader;
+            if (!current.equals(previous)) {
                 // clean up constructor and class maps
-                final Iterator<Map.Entry<MethodKey, Constructor<?>>> mentries = constructorsMap.entrySet().iterator();
-                while (mentries.hasNext()) {
-                    final Map.Entry<MethodKey, Constructor<?>> entry = mentries.next();
+                final Iterator<Map.Entry<MethodKey, Constructor<?>>> constructors = constructorsMap.entrySet().iterator();
+                while (constructors.hasNext()) {
+                    final Map.Entry<MethodKey, Constructor<?>> entry = constructors.next();
                     final Class<?> clazz = entry.getValue().getDeclaringClass();
                     if (isLoadedBy(previous, clazz)) {
-                        mentries.remove();
-                        // the method name is the name of the class
-                        constructibleClasses.remove(entry.getKey().getMethod());
+                        constructors.remove();
+                        if (!CTOR_MISS.equals(entry.getValue())) {
+                            // the method name is the name of the class
+                            constructibleClasses.remove(entry.getKey().getMethod());
+                        }
                     }
                 }
                 // clean up method maps
-                final Iterator<Map.Entry<Class<?>, ClassMap>> centries = classMethodMaps.entrySet().iterator();
-                while (centries.hasNext()) {
-                    final Map.Entry<Class<?>, ClassMap> entry = centries.next();
+                final Iterator<Map.Entry<Class<?>, ClassMap>> methods = classMethodMaps.entrySet().iterator();
+                while (methods.hasNext()) {
+                    final Map.Entry<Class<?>, ClassMap> entry = methods.next();
                     final Class<?> clazz = entry.getKey();
                     if (isLoadedBy(previous, clazz)) {
-                        centries.remove();
+                        methods.remove();
                     }
                 }
                 loader = current;
-            } finally {
-                lock.writeLock().unlock();
             }
+        } finally {
+            lock.writeLock().unlock();
         }
     }
 }

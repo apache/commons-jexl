@@ -49,10 +49,12 @@ import java.util.function.Consumer;
  * @since 3.0
  */
 public enum JexlOperator {
+
     /**
      * Add operator.
      * <br><strong>Syntax:</strong> {@code x + y}
      * <br><strong>Method:</strong> {@code T add(L x, R y);}.
+     *
      * @see JexlArithmetic#add(Object, Object)
      */
     ADD("+", "add", 2),
@@ -61,6 +63,7 @@ public enum JexlOperator {
      * Subtract operator.
      * <br><strong>Syntax:</strong> {@code x - y}
      * <br><strong>Method:</strong> {@code T subtract(L x, R y);}.
+     *
      * @see JexlArithmetic#subtract(Object, Object)
      */
     SUBTRACT("-", "subtract", 2),
@@ -69,6 +72,7 @@ public enum JexlOperator {
      * Multiply operator.
      * <br><strong>Syntax:</strong> {@code x * y}
      * <br><strong>Method:</strong> {@code T multiply(L x, R y);}.
+     *
      * @see JexlArithmetic#multiply(Object, Object)
      */
     MULTIPLY("*", "multiply", 2),
@@ -77,6 +81,7 @@ public enum JexlOperator {
      * Divide operator.
      * <br><strong>Syntax:</strong> {@code x / y}
      * <br><strong>Method:</strong> {@code T divide(L x, R y);}.
+     *
      * @see JexlArithmetic#divide(Object, Object)
      */
     DIVIDE("/", "divide", 2),
@@ -85,6 +90,7 @@ public enum JexlOperator {
      * Modulo operator.
      * <br><strong>Syntax:</strong> {@code x % y}
      * <br><strong>Method:</strong> {@code T mod(L x, R y);}.
+     *
      * @see JexlArithmetic#mod(Object, Object)
      */
     MOD("%", "mod", 2),
@@ -93,6 +99,7 @@ public enum JexlOperator {
      * Bitwise-and operator.
      * <br><strong>Syntax:</strong> {@code x & y}
      * <br><strong>Method:</strong> {@code T and(L x, R y);}.
+     *
      * @see JexlArithmetic#and(Object, Object)
      */
     AND("&", "and", 2),
@@ -101,6 +108,7 @@ public enum JexlOperator {
      * Bitwise-or operator.
      * <br><strong>Syntax:</strong> {@code x | y}
      * <br><strong>Method:</strong> {@code T or(L x, R y);}.
+     *
      * @see JexlArithmetic#or(Object, Object)
      */
     OR("|", "or", 2),
@@ -109,6 +117,7 @@ public enum JexlOperator {
      * Bitwise-xor operator.
      * <br><strong>Syntax:</strong> {@code x ^ y}
      * <br><strong>Method:</strong> {@code T xor(L x, R y);}.
+     *
      * @see JexlArithmetic#xor(Object, Object)
      */
     XOR("^", "xor", 2),
@@ -117,6 +126,7 @@ public enum JexlOperator {
      * Bit-pattern right-shift operator.
      * <br><strong>Syntax:</strong> {@code x >> y}
      * <br><strong>Method:</strong> {@code T rightShift(L x, R y);}.
+     *
      * @see JexlArithmetic#shiftRight(Object, Object)
      */
     SHIFTRIGHT(">>", "shiftRight", 2),
@@ -125,6 +135,7 @@ public enum JexlOperator {
      * Bit-pattern right-shift unsigned operator.
      * <br><strong>Syntax:</strong> {@code x >>> y}
      * <br><strong>Method:</strong> {@code T rightShiftUnsigned(L x, R y);}.
+     *
      * @see JexlArithmetic#shiftRightUnsigned(Object, Object)
      */
     SHIFTRIGHTU(">>>", "shiftRightUnsigned", 2),
@@ -133,6 +144,7 @@ public enum JexlOperator {
      * Bit-pattern left-shift operator.
      * <br><strong>Syntax:</strong> {@code x << y}
      * <br><strong>Method:</strong> {@code T leftShift(L x, R y);}.
+     *
      * @see JexlArithmetic#shiftLeft(Object, Object)
      */
     SHIFTLEFT("<<", "shiftLeft", 2),
@@ -141,6 +153,7 @@ public enum JexlOperator {
      * Equals operator.
      * <br><strong>Syntax:</strong> {@code x == y}
      * <br><strong>Method:</strong> {@code boolean equals(L x, R y);}.
+     *
      * @see JexlArithmetic#equals(Object, Object)
      */
     EQ("==", "equals", 2),
@@ -149,6 +162,7 @@ public enum JexlOperator {
      * Equal-strict operator.
      * <br><strong>Syntax:</strong> {@code x === y}
      * <br><strong>Method:</strong> {@code boolean strictEquals(L x, R y);}.
+     *
      * @see JexlArithmetic#strictEquals(Object, Object)
      */
     EQSTRICT("===", "strictEquals", 2),
@@ -157,6 +171,7 @@ public enum JexlOperator {
      * Less-than operator.
      * <br><strong>Syntax:</strong> {@code x < y}
      * <br><strong>Method:</strong> {@code boolean lessThan(L x, R y);}.
+     *
      * @see JexlArithmetic#lessThan(Object, Object)
      */
     LT("<", "lessThan", 2),
@@ -165,6 +180,7 @@ public enum JexlOperator {
      * Less-than-or-equal operator.
      * <br><strong>Syntax:</strong> {@code x <= y}
      * <br><strong>Method:</strong> {@code boolean lessThanOrEqual(L x, R y);}.
+     *
      * @see JexlArithmetic#lessThanOrEqual(Object, Object)
      */
     LTE("<=", "lessThanOrEqual", 2),
@@ -173,6 +189,7 @@ public enum JexlOperator {
      * Greater-than operator.
      * <br><strong>Syntax:</strong> {@code x > y}
      * <br><strong>Method:</strong> {@code boolean greaterThan(L x, R y);}.
+     *
      * @see JexlArithmetic#greaterThan(Object, Object)
      */
     GT(">", "greaterThan", 2),
@@ -181,6 +198,7 @@ public enum JexlOperator {
      * Greater-than-or-equal operator.
      * <br><strong>Syntax:</strong> {@code x >= y}
      * <br><strong>Method:</strong> {@code boolean greaterThanOrEqual(L x, R y);}.
+     *
      * @see JexlArithmetic#greaterThanOrEqual(Object, Object)
      */
     GTE(">=", "greaterThanOrEqual", 2),
@@ -189,6 +207,7 @@ public enum JexlOperator {
      * Contains operator.
      * <br><strong>Syntax:</strong> {@code x =~ y}
      * <br><strong>Method:</strong> {@code boolean contains(L x, R y);}.
+     *
      * @see JexlArithmetic#contains(Object, Object)
      */
     CONTAINS("=~", "contains", 2),
@@ -197,6 +216,7 @@ public enum JexlOperator {
      * Starts-with operator.
      * <br><strong>Syntax:</strong> {@code x =^ y}
      * <br><strong>Method:</strong> {@code boolean startsWith(L x, R y);}.
+     *
      * @see JexlArithmetic#startsWith(Object, Object)
      */
     STARTSWITH("=^", "startsWith", 2),
@@ -205,6 +225,7 @@ public enum JexlOperator {
      * Ends-with operator.
      * <br><strong>Syntax:</strong> {@code x =$ y}
      * <br><strong>Method:</strong> {@code boolean endsWith(L x, R y);}.
+     *
      * @see JexlArithmetic#endsWith(Object, Object)
      */
     ENDSWITH("=$", "endsWith", 2),
@@ -213,6 +234,7 @@ public enum JexlOperator {
      * Not operator.
      * <br><strong>Syntax:</strong> {@code !x}
      * <br><strong>Method:</strong> {@code T not(L x);}.
+     *
      * @see JexlArithmetic#not(Object)
      */
     NOT("!", "not", 1),
@@ -221,6 +243,7 @@ public enum JexlOperator {
      * Complement operator.
      * <br><strong>Syntax:</strong> {@code ~x}
      * <br><strong>Method:</strong> {@code T complement(L x);}.
+     *
      * @see JexlArithmetic#complement(Object)
      */
     COMPLEMENT("~", "complement", 1),
@@ -229,6 +252,7 @@ public enum JexlOperator {
      * Negate operator.
      * <br><strong>Syntax:</strong> {@code -x}
      * <br><strong>Method:</strong> {@code T negate(L x);}.
+     *
      * @see JexlArithmetic#negate(Object)
      */
     NEGATE("-", "negate", 1),
@@ -237,6 +261,7 @@ public enum JexlOperator {
      * Positivize operator.
      * <br><strong>Syntax:</strong> {@code +x}
      * <br><strong>Method:</strong> {@code T positivize(L x);}.
+     *
      * @see JexlArithmetic#positivize(Object)
      */
     POSITIVIZE("+", "positivize", 1),
@@ -245,6 +270,7 @@ public enum JexlOperator {
      * Empty operator.
      * <br><strong>Syntax:</strong> {@code empty x} or {@code empty(x)}
      * <br><strong>Method:</strong> {@code boolean empty(L x);}.
+     *
      * @see JexlArithmetic#empty(Object)
      */
     EMPTY("empty", "empty", 1),
@@ -253,6 +279,7 @@ public enum JexlOperator {
      * Size operator.
      * <br><strong>Syntax:</strong> {@code size x} or {@code size(x)}
      * <br><strong>Method:</strong> {@code int size(L x);}.
+     *
      * @see JexlArithmetic#size(Object)
      */
     SIZE("size", "size", 1),
@@ -337,6 +364,7 @@ public enum JexlOperator {
     /**
      * Increment pseudo-operator.
      * <br>No syntax, used as helper for the prefix and postfix versions of {@code ++}.
+     *
      * @see JexlArithmetic#increment(Object)
      */
     INCREMENT("+1", "increment", 1),
@@ -344,6 +372,7 @@ public enum JexlOperator {
     /**
      * Decrement pseudo-operator.
      * <br>No syntax, used as helper for the prefix and postfix versions of {@code --}.
+     *
      * @see JexlArithmetic#decrement(Object)
      */
     DECREMENT("-1", "decrement", 1),
@@ -378,10 +407,14 @@ public enum JexlOperator {
 
     /**
      * Marker for side effect.
-     * <br>Returns this from 'self*' overload method to let the engine know the side effect has been performed and
+     * <p>
+     * Returns this from 'self*' overload method to let the engine know the side effect has been performed and
      * there is no need to assign the result.
+     * </p>
+     *
      * @deprecated 3.5.0
      */
+    @Deprecated
     ASSIGN("=", null, null),
 
     /**
@@ -417,6 +450,7 @@ public enum JexlOperator {
      * If the returned Iterator is AutoCloseable, close will be called after the last execution of the loop block.
      * <br><strong>Syntax:</strong> <code>for(var x : y){...}</code>
      * <br><strong>Method:</strong> {@code Iterator<Object> forEach(R y);}.
+     *
      * @since 3.1
      */
     FOR_EACH("for(...)", "forEach", 1),
@@ -424,6 +458,7 @@ public enum JexlOperator {
     /**
      * Test condition in if, for, while.
      * <br><strong>Method:</strong> {@code boolean testCondition(R y);}.
+     *
      * @since 3.3
      */
     CONDITION("?", "testCondition", 1),
@@ -431,6 +466,7 @@ public enum JexlOperator {
     /**
      * Compare overload as in compare(x, y).
      * <br><strong>Method:</strong> {@code boolean compare(L x, R y);}.
+     *
      * @since 3.5.0
      */
     COMPARE("<>", "compare", 2),
@@ -553,9 +589,11 @@ public enum JexlOperator {
      * <p>This also allows reusing the core logic when extending the applicative type-system; for
      * instance, implementing a Comparator class that calls compare
      * (<code>operator.tryOverload(this, JexlOperator.COMPARE, left, right)</code>, etc.</p>
+     *
      * @since 3.5.0
      */
     public interface Uberspect extends JexlArithmetic.Uberspect {
+
         /**
          * Try to find the most specific method and evaluate an operator.
          * <p>This method does not call {@link #overloads(JexlOperator)} and shall not be called with an
@@ -576,6 +614,7 @@ public enum JexlOperator {
          * If an overloads returns a value not-equal to TRY_FAILED, it means the side-effect is complete.
          * Otherwise, {@code a += b <=> a = a + b}
          * </p>
+         *
          * @param node     an optional reference caching resolved method or failing signature
          * @param operator the operator
          * @param assign   the actual function that performs the side effect
@@ -583,10 +622,10 @@ public enum JexlOperator {
          * @return JexlEngine.TRY_FAILED if no operation was performed,
          *         the value to use as the side effect argument otherwise
          */
-        Object tryAssignOverload(final JexlCache.Reference node,
-                                 final JexlOperator operator,
-                                 final Consumer<Object> assign,
-                                 final Object... args);
+        Object tryAssignOverload(JexlCache.Reference node,
+                                 JexlOperator operator,
+                                 Consumer<Object> assign,
+                                 Object... args);
 
         /**
          * Calculate the {@code size} of various types:
@@ -598,7 +637,7 @@ public enum JexlOperator {
          * @param object the object to get the size of
          * @return the evaluation result
          */
-        Object size(final JexlCache.Reference node, final Object object);
+        Object size(JexlCache.Reference node, Object object);
 
         /**
          * Check for emptiness of various types: Collection, Array, Map, String, and anything that has a boolean isEmpty()
@@ -610,7 +649,7 @@ public enum JexlOperator {
          * @param object the object to check the emptiness of
          * @return the evaluation result
          */
-        Object empty(final JexlCache.Reference node, final Object object);
+        Object empty(JexlCache.Reference node, Object object);
 
         /**
          * The 'match'/'in' operator implementation.
@@ -619,43 +658,46 @@ public enum JexlOperator {
          * Note that 'x in y' or 'x matches y' means 'y contains x' ;
          * the JEXL operator arguments order syntax is the reverse of this method call.
          * </p>
+         *
          * @param node  an optional reference caching resolved method or failing signature
          * @param operator    the calling operator, =~ or !~
          * @param right the left operand
          * @param left  the right operand
          * @return true if left matches right, false otherwise
          */
-        boolean contains(final JexlCache.Reference node,
-                         final JexlOperator operator,
-                         final Object left,
-                         final Object right);
+        boolean contains(JexlCache.Reference node,
+                         JexlOperator operator,
+                         Object left,
+                         Object right);
 
         /**
          * The 'startsWith' operator implementation.
          * <p>Seeks an overload or use the default arithmetic implementation.</p>
+         *
          * @param node     an optional reference caching resolved method or failing signature
          * @param operator the calling operator, $= or $!
          * @param left     the left operand
          * @param right    the right operand
          * @return true if left starts with right, false otherwise
          */
-        boolean startsWith(final JexlCache.Reference node,
-                           final JexlOperator operator,
-                           final Object left,
-                           final Object right);
+        boolean startsWith(JexlCache.Reference node,
+                           JexlOperator operator,
+                           Object left,
+                           Object right);
 
         /**
          * The 'endsWith' operator implementation.
          * <p>Seeks an overload or use the default arithmetic implementation.</p>
+         *
          * @param node     an optional reference caching resolved method or failing signature
          * @param operator the calling operator, ^= or ^!
          * @param left     the left operand
          * @param right    the right operand
          * @return true if left ends with right, false otherwise
          */
-        boolean endsWith(final JexlCache.Reference node,
-                         final JexlOperator operator,
-                         final Object left,
-                         final Object right);
+        boolean endsWith(JexlCache.Reference node,
+                         JexlOperator operator,
+                         Object left,
+                         Object right);
     }
 }

@@ -27,9 +27,11 @@ import java.util.Locale;
  * Parses number literals.
  */
 public final class NumberParser implements Serializable {
+
     /**
      */
     private static final long serialVersionUID = 1L;
+
     /** JEXL locale-neutral big decimal format. */
     static final DecimalFormat BIGDF = new DecimalFormat("0.0b", new DecimalFormatSymbols(Locale.ROOT));
     private static boolean isNegative(final Token token) {
@@ -47,7 +49,7 @@ public final class NumberParser implements Serializable {
         this(null);
     }
 
-    public NumberParser(Number number) {
+    public NumberParser(final Number number) {
         if (number != null) {
             this.literal = number;
             this.clazz = number.getClass();
@@ -66,6 +68,7 @@ public final class NumberParser implements Serializable {
     /**
      * Sets this node as a natural literal.
      * Originally from OGNL.
+     *
      * @param negative whether the natural should be negative
      * @param natural the natural as string
      * @return this parser instance
@@ -128,6 +131,7 @@ public final class NumberParser implements Serializable {
     /**
      * Sets this node as an (optionally) signed natural literal.
      * Originally from OGNL.
+     *
      * @param str the natural as string
      * @return this parser instance
      */
@@ -154,6 +158,7 @@ public final class NumberParser implements Serializable {
     /**
      * Sets this node as a real literal.
      * Originally from OGNL.
+     *
      * @param negative whether the real should be negative
      * @param s the real as string
      * @return this parser instance
@@ -209,6 +214,7 @@ public final class NumberParser implements Serializable {
     /**
      * Sets this node as an (optionally) signed real literal.
      * Originally from OGNL.
+     *
      * @param str the real as string
      * @return this parser instance
      */

@@ -46,19 +46,23 @@ import java.util.Map;
  * Roughly 3x faster than string key to access the map and uses less memory.
  */
 public final class MethodKey {
+
     /**
      * Simple distinguishable exception, used when
      * we run across ambiguous overloading. Caught
      * by the introspector.
      */
     public static class AmbiguousException extends RuntimeException {
+
         /** Version identifier for serializable. */
         private static final long serialVersionUID = -201801091655L;
+
         /** Whether this exception should be considered severe. */
         private final boolean severe;
 
         /**
          * A severe or not ambiguous exception.
+         *
          * @param flag logging flag
          */
         AmbiguousException(final boolean flag) {
@@ -78,12 +82,16 @@ public final class MethodKey {
             return severe;
         }
     }
+
     /** The initial size of the primitive conversion map. */
     private static final int PRIMITIVE_SIZE = 11;
+
     /** A marker for empty parameter list. */
     private static final Class<?>[] NOARGS = {};
+
     /** The hash code constants. */
     private static final int HASH = 37;
+
     /**
      * Maps from primitive types to invocation compatible classes.
      * <p>Considering the key as a parameter type, the value is the list of argument classes that are invocation
@@ -192,6 +200,7 @@ public final class MethodKey {
 
     /**
      * Helper to build class arrays.
+     *
      * @param args the classes
      * @return the array
      */
@@ -440,6 +449,7 @@ public final class MethodKey {
      * class introspection order, the isVarargs flag on the method itself will be false.
      * To circumvent the potential problem, fetch the method with the same signature from the super-classes,
      * - which will be different if override  -and get the varargs flag from it.
+     *
      * @param method the method or constructor to check for varargs
      * @return true if declared varargs, false otherwise
      */
@@ -532,6 +542,7 @@ public final class MethodKey {
         // Incomparable due to non-related arguments (i.e.foo(Runnable) vs. foo(Serializable))
         return INCOMPARABLE;
     }
+
     /** Converts a primitive type to its corresponding class.
      * <p>
      * If the argument type is primitive then we want to convert our
@@ -539,6 +550,7 @@ public final class MethodKey {
      * introspection for methods with primitive types will work
      * correctly.
      * </p>
+     *
      * @param parm a may-be primitive type class
      * @return the equivalent object class
      */
@@ -551,6 +563,7 @@ public final class MethodKey {
 
     /** The hash code. */
     private final int hashCode;
+
     /** The method name. */
     private final String method;
 
@@ -559,13 +572,16 @@ public final class MethodKey {
 
     /**
      * Creates a key from a method.
+     *
      * @param aMethod the method to generate the key from.
      */
     MethodKey(final Executable aMethod) {
         this(aMethod.getName(), aMethod.getParameterTypes());
     }
+
     /**
      * Creates a key from a method name and a set of parameters.
+     *
      * @param aMethod the method to generate the key from, class name for constructors
      * @param args    the intended method parameters
      */
@@ -587,8 +603,10 @@ public final class MethodKey {
         }
         this.hashCode = hash;
     }
+
     /**
      * Creates a key from a method name and a set of arguments.
+     *
      * @param aMethod the method to generate the key from
      * @param args    the intended method arguments
      */
@@ -615,6 +633,7 @@ public final class MethodKey {
 
     /**
      * Outputs a human-readable debug representation of this key.
+     *
      * @return method(p0, p1, ...)
      */
     public String debugString() {
@@ -641,6 +660,7 @@ public final class MethodKey {
 
     /**
      * Gets this key's method name.
+     *
      * @return the method name
      */
     String getMethod() {
@@ -720,6 +740,7 @@ public final class MethodKey {
 
     /**
      * Gets the most specific constructor that is applicable to the parameters of this key.
+     *
      * @param methods a list of constructors.
      * @return the most specific constructor.
      * @throws MethodKey.AmbiguousException if there is more than one.
@@ -730,6 +751,7 @@ public final class MethodKey {
 
     /**
      * Gets the most specific method that is applicable to the parameters of this key.
+     *
      * @param methods a list of methods.
      * @return the most specific method.
      * @throws MethodKey.AmbiguousException if there is more than one.
@@ -740,6 +762,7 @@ public final class MethodKey {
 
     /**
      * Gets this key's method parameter classes.
+     *
      * @return the parameters
      */
     Class<?>[] getParameters() {

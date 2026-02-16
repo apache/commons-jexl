@@ -28,6 +28,7 @@ final class OperatorController extends ScriptVisitor {
 
     /**
      * Checks whether an operator is strict for a given arithmetic.
+     *
      * @param node the node which should delegate to an operator
      * @return true if node points to a (null-unsafe) operator
      */

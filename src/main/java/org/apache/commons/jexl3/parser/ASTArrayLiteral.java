@@ -20,6 +20,7 @@ package org.apache.commons.jexl3.parser;
  * An array literal.
  */
 public final class ASTArrayLiteral extends ExtensibleNode {
+
     /**
      */
     private static final long serialVersionUID = 1L;

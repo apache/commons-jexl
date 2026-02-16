@@ -42,21 +42,27 @@ import org.apache.commons.jexl3.parser.*;
  * @since 2.0
  */
 public class Interpreter extends InterpreterBase {
+
     /**
      * An annotated call.
      */
     public class AnnotatedCall implements Callable<Object> {
+
         /** The statement. */
         private final ASTAnnotatedStatement stmt;
+
         /** The child index. */
         private final int index;
+
         /** The data. */
         private final Object data;
+
         /** Tracking whether we processed the annotation. */
         private boolean processed;
 
         /**
          * Simple ctor.
+         *
          * @param astmt the statement
          * @param aindex the index
          * @param adata the data
@@ -91,11 +97,13 @@ public class Interpreter extends InterpreterBase {
             return processed;
         }
     }
+
     /**
      * The thread local interpreter.
      */
     protected static final ThreadLocal<Interpreter> INTER =
                        new ThreadLocal<>();
+
     /** Frame height. */
     protected int fp;
 
@@ -107,6 +115,7 @@ public class Interpreter extends InterpreterBase {
 
     /**
      * Creates an interpreter.
+     *
      * @param engine   the engine creating this interpreter
      * @param aContext the evaluation context, global variables, methods and functions
      * @param opts     the evaluation options, flags modifying evaluation behavior
@@ -119,6 +128,7 @@ public class Interpreter extends InterpreterBase {
 
     /**
      * Copy constructor.
+     *
      * @param ii  the interpreter to copy
      * @param jexla the arithmetic instance to use (or null)
      */
@@ -352,6 +362,7 @@ public class Interpreter extends InterpreterBase {
     /**
      * Evaluates an access identifier based on the 2 main implementations;
      * static (name or numbered identifier) or dynamic (jxlt).
+     *
      * @param node the identifier access node
      * @return the evaluated identifier
      */
@@ -375,12 +386,13 @@ public class Interpreter extends InterpreterBase {
     /**
      * Evaluates a JxltHandle node.
      * <p>This parses and stores the JXLT template if necessary (upon first execution)</p>
+     *
      * @param node the node
      * @return the JXLT template evaluation.
      * @param <NODE> the node type
      */
     private <NODE extends JexlNode & JexlNode.JxltHandle> Object evalJxltHandle(final NODE node) {
-        JxltEngine.Expression expr = node.getExpression();
+        final JxltEngine.Expression expr = node.getExpression();
         // internal classes to evaluate in context
         if (expr instanceof TemplateEngine.TemplateExpression) {
             final Object eval = ((TemplateEngine.TemplateExpression) expr).evaluate(context, frame, options);
@@ -398,6 +410,7 @@ public class Interpreter extends InterpreterBase {
 
     /**
      * Executes an assignment with an optional side effect operator.
+     *
      * @param node     the node
      * @param assignop the assignment operator or null if simply assignment
      * @param data     the data
@@ -743,6 +756,7 @@ public class Interpreter extends InterpreterBase {
      * <p>
      * If the underlying JEXL engine is silent, errors will be logged through
      * its logger as warning.
+     *
      * @param node the script or expression to interpret.
      * @return the result of the interpretation.
      * @throws JexlException if any error occurs during interpretation.
@@ -815,6 +829,7 @@ public class Interpreter extends InterpreterBase {
 
     /**
      * Determines if the specified Object is assignment-compatible with the object represented by the Class.
+     *
      * @param object the Object
      * @param clazz the Class
      * @return the result of isInstance call
@@ -831,6 +846,7 @@ public class Interpreter extends InterpreterBase {
 
     /**
      * Processes an annotated statement.
+     *
      * @param stmt the statement
      * @param index the index of the current annotation being processed
      * @param data the contextual data
@@ -888,6 +904,7 @@ public class Interpreter extends InterpreterBase {
 
     /**
      * Delegates the annotation processing to the JexlContext if it is an AnnotationProcessor.
+     *
      * @param annotation    the annotation name
      * @param args          the annotation arguments
      * @param stmt          the statement / block that was annotated
@@ -902,6 +919,7 @@ public class Interpreter extends InterpreterBase {
 
     /**
      * Swaps the current thread local interpreter.
+     *
      * @param inter the interpreter or null
      * @return the previous thread local interpreter
      */
@@ -913,6 +931,7 @@ public class Interpreter extends InterpreterBase {
 
     /**
      * Resolves a class name.
+     *
      * @param name the simple class name
      * @return the fully qualified class name or the name
      */
@@ -935,6 +954,7 @@ public class Interpreter extends InterpreterBase {
 
     /**
      * Runs a closure.
+     *
      * @param closure the closure
      * @return the closure return value
      */
@@ -975,6 +995,7 @@ public class Interpreter extends InterpreterBase {
 
     /**
      * Short-circuit evaluation of logical expression.
+     *
      * @param check the fuse value that will stop evaluation, true for OR, false for AND
      * @param node a ASTAndNode or a ASTOrNode
      * @param data the data, usually null and unused
@@ -1221,7 +1242,7 @@ public class Interpreter extends InterpreterBase {
     }
 
     @Override
-    protected Object visit(ASTCaseStatement node, Object data) {
+    protected Object visit(final ASTCaseStatement node, final Object data) {
         final int argc = node.jjtGetNumChildren();
         Object result = null;
         for (int i = 0; i < argc; i++) {
@@ -1231,7 +1252,7 @@ public class Interpreter extends InterpreterBase {
     }
 
     @Override
-    protected Object visit(ASTCaseExpression node, Object data) {
+    protected Object visit(final ASTCaseExpression node, final Object data) {
         return node.jjtGetChild(0).jjtAccept(this, data);
     }
 
@@ -1477,17 +1498,21 @@ public class Interpreter extends InterpreterBase {
         }
         block = new LexicalFrame(frame, block).defineArgs();
         try {
-            final int numChildren = script.jjtGetNumChildren();
-            Object result = null;
-            for (int i = 0; i < numChildren; i++) {
-                final JexlNode child = script.jjtGetChild(i);
-                result = child.jjtAccept(this, data);
-                cancelCheck(child);
-            }
-            return result;
+            return runScript(script, data);
         } finally {
             block = block.pop();
         }
+    }
+
+    protected final Object runScript(final ASTJexlScript script, final Object data) {
+        final int numChildren = script.jjtGetNumChildren();
+        Object result = null;
+        for (int i = 0; i < numChildren; i++) {
+            final JexlNode child = script.jjtGetChild(i);
+            result = child.jjtAccept(this, data);
+            cancelCheck(child);
+        }
+        return result;
     }
 
     @Override
@@ -1547,6 +1572,7 @@ public class Interpreter extends InterpreterBase {
 
     /**
      * Execute a method call, ie syntactically written as name.call(...).
+     *
      * @param node the actual method call node
      * @param antish non-null when name.call is an antish variable
      * @param data the context
@@ -1865,6 +1891,12 @@ public class Interpreter extends InterpreterBase {
             ? node.jjtGetChild(0).jjtAccept(this, data)
             : null;
         cancelCheck(node);
+        final JexlNode parent = node.jjtGetParent();
+        // if return is last child of script, no need to throw
+        if (parent instanceof ASTJexlScript &&
+            parent.jjtGetChild(parent.jjtGetNumChildren() - 1) == node) {
+            return val;
+        }
         throw new JexlException.Return(node, null, val);
     }
 
@@ -2029,8 +2061,11 @@ public class Interpreter extends InterpreterBase {
     protected Object visit(final ASTSwitchStatement node, final Object data) {
         final int count = node.jjtGetNumChildren();
         Object value = node.jjtGetChild(0).jjtAccept(this, data);
-        int index = node.switchIndex(value);
+        final int index = node.switchIndex(value);
         if (index > 0) {
+            if (!node.isStatement()) {
+                return node.jjtGetChild(index).jjtAccept(this, data);
+            }
             for (int i = index; i < count; ++i) {
                 try {
                     // evaluate the switch body
@@ -2155,7 +2190,7 @@ public class Interpreter extends InterpreterBase {
         // if we have a 'finally' block, no matter what, evaluate it: its control flow will
         // take precedence over what the 'catch' block might have thrown.
         if (node.hasFinallyClause()) {
-            final JexlNode finallyBody = node.jjtGetChild(nc);
+            final JexlNode finallyBody = node.jjtGetChild(node.jjtGetNumChildren() - 1);
             try {
                 finallyBody.jjtAccept(this, data);
             } catch (JexlException.Break | JexlException.Continue | JexlException.Return flowException) {
@@ -2280,6 +2315,7 @@ public class Interpreter extends InterpreterBase {
 
     /**
      * Base visitation for blocks.
+     *
      * @param node the block
      * @param data the usual data
      * @return the result of the last expression evaluation
@@ -2296,6 +2332,7 @@ public class Interpreter extends InterpreterBase {
 
     /**
      * Runs a node.
+     *
      * @param node the node
      * @param data the usual data, always null
      * @return the return value

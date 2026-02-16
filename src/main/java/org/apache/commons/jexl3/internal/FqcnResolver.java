@@ -34,19 +34,23 @@ import org.apache.commons.jexl3.introspection.JexlUberspect;
  * <p>This only keeps the names of the classes to avoid any class loading/reloading/permissions issue.</p>
  */
 public class FqcnResolver implements JexlUberspect.ClassConstantResolver {
+
     /**
      * The uberspect.
      */
     private final JexlUberspect uberspect;
+
     /**
      * The set of packages to be used as import roots.
      */
     private final Set<String> imports = Collections.synchronizedSet(new LinkedHashSet<>());
+
     /**
      * The map of solved fqcns based on imports keyed on (simple) name,
      * valued as fully qualified class name.
      */
     private final Map<String, String> fqcns = new ConcurrentHashMap<>();
+
     /**
      * Optional parent solver.
      */
@@ -96,11 +100,11 @@ public class FqcnResolver implements JexlUberspect.ClassConstantResolver {
      * @param name the simple class name
      * @return the fully qualified class name or null if not found
      */
-    private String solveClassName(String name) {
+    private String solveClassName(final String name) {
         for (final String pkg : imports) {
             // try package.classname or fqcn$classname (inner class)
-            for (char dot : new char[]{'.', '$'}) {
-                Class<?> clazz = uberspect.getClassByName(pkg + dot + name);
+            for (final char dot : new char[]{'.', '$'}) {
+                final Class<?> clazz = uberspect.getClassByName(pkg + dot + name);
                 // solved it
                 if (clazz != null) {
                     return clazz.getName();
@@ -131,10 +135,10 @@ public class FqcnResolver implements JexlUberspect.ClassConstantResolver {
             return;
         }
         // check the package name actually points to a package to avoid clutter
-        Package pkg = Package.getPackage(name);
+        final Package pkg = Package.getPackage(name);
         if (pkg == null) {
             // if it is a class, solve it now
-            Class<?> clazz = uberspect.getClassByName(name);
+            final Class<?> clazz = uberspect.getClassByName(name);
             if (clazz == null) {
                 throw new JexlException(null, "Cannot import '" + name + "' as it is neither a package nor a class");
             }
@@ -190,24 +194,24 @@ public class FqcnResolver implements JexlUberspect.ClassConstantResolver {
     private Object getConstant(final String... ids) {
         if (ids.length == 1) {
             final String pname = ids[0];
-            for (String cname : fqcns.keySet()) {
-                Object constant = getConstant(cname, pname);
+            for (final String cname : fqcns.keySet()) {
+                final Object constant = getConstant(cname, pname);
                 if (constant != JexlEngine.TRY_FAILED) {
                     return constant;
                 }
             }
         } else if (ids.length == 2) {
-            String cname = ids[0];
-            String id = ids[1];
-            String fqcn = resolveClassName(cname);
+            final String cname = ids[0];
+            final String id = ids[1];
+            final String fqcn = resolveClassName(cname);
             if (fqcn != null) {
-                Class<?> clazz = uberspect.getClassByName(fqcn);
+                final Class<?> clazz = uberspect.getClassByName(fqcn);
                 if (clazz != null) {
-                    JexlPropertyGet getter = uberspect.getPropertyGet(clazz, id);
+                    final JexlPropertyGet getter = uberspect.getPropertyGet(clazz, id);
                     if (getter != null && getter.isConstant()) {
                         try {
                             return getter.invoke(clazz);
-                        } catch (Exception xany) {
+                        } catch (final Exception xany) {
                             // ignore
                         }
                     }

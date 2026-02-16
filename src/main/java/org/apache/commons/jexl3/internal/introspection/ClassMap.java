@@ -44,6 +44,7 @@ import org.apache.commons.logging.Log;
  * @since 1.0
  */
 final class ClassMap {
+
     /**
      * The cache miss marker method.
      */
@@ -53,6 +54,7 @@ final class ClassMap {
      * Singleton for permissions non-allowed classes.
      */
     private static final ClassMap EMPTY = new ClassMap();
+
     /**
      * A method that returns itself used as a marker for cache miss,
      * allows the underlying cache map to be strongly typed.
@@ -67,6 +69,7 @@ final class ClassMap {
             return null;
         }
     }
+
     /**
      * Populate the Map of direct hits. These are taken from all the public methods
      * that our class, its parents and their implemented interfaces provide.
@@ -117,6 +120,7 @@ final class ClassMap {
             }
         }
     }
+
     /**
      * @return the empty classmap instance
      */
@@ -189,7 +193,7 @@ final class ClassMap {
      * </p>
      * <p>
      * Since the invocation of the associated method is dynamic, there is no need (nor way) to differentiate between
-     * foo(int,int) and foo(Integer,Integer) since in practice only the latter form will be used through a call.
+     * foo(int, int) and foo(Integer, Integer) since in practice only the latter form will be used through a call.
      * This of course, applies to all 8 primitive types.
      * </p>
      * Uses ConcurrentMap since 3.0, marginally faster than 2.1 under contention.

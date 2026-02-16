@@ -27,13 +27,16 @@ import org.apache.commons.jexl3.parser.ASTJexlLambda;
  * A Script closure.
  */
 public class Closure extends Script {
+
     /** The frame. */
     protected final Frame frame;
+
     /** The options. */
     protected final JexlOptions options;
 
     /**
      * Creates a closure.
+     *
      * @param theCaller the calling interpreter
      * @param lambda the lambda
      */
@@ -46,6 +49,7 @@ public class Closure extends Script {
 
     /**
      * Creates a curried version of a script.
+     *
      * @param base the base script
      * @param args the script arguments
      */
@@ -80,6 +84,7 @@ public class Closure extends Script {
      * <p>This done allow a locally defined function to "see" and call  itself as a local (captured) variable.</p>
      * Typical case is: {@code const f = (x)->x <= 0? 1 : x*f(x-1)}. Since assignment of f occurs after
      * the lambda creation, we need to patch the lambda frame to expose itself through the captured symbol.
+     *
      * @param parentFrame the parent calling frame
      * @param symbol the symbol index (in the caller of this closure)
      */

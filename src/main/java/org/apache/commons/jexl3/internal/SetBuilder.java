@@ -26,11 +26,13 @@ import org.apache.commons.jexl3.JexlArithmetic;
  * Helper class to create set literals.
  */
 public class SetBuilder implements JexlArithmetic.SetBuilder {
+
     /** The set being created. */
     protected final Set<Object> set;
 
     /**
      * Creates a new builder.
+     *
      * @param size the expected set size
      */
     public SetBuilder(final int size) {
@@ -39,6 +41,7 @@ public class SetBuilder implements JexlArithmetic.SetBuilder {
 
     /**
      * Creates a new builder.
+     *
      * @param size the expected set size
      * @param extended whether the set is extended
      */

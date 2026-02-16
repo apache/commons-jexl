@@ -62,6 +62,7 @@ public class Arithmetic360 extends JexlArithmetic {
                 ? (Number) value
                 : null;
     }
+
     /**
      * Casts to Long if possible.
      * @param value the Long or else

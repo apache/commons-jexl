@@ -24,8 +24,10 @@ import org.apache.commons.jexl3.internal.Debugger;
  * <p>Captures constness and extensibility (...)</p>
  */
 public class ExtensibleNode extends JexlNode {
+
   /** Whether this array/set/map is constant or not. */
   protected boolean constant;
+
   /** Whether this array/set/map is extended or not. */
   private boolean extended;
 

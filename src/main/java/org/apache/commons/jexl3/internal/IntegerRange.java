@@ -25,14 +25,19 @@ import java.util.NoSuchElementException;
  * An ascending iterator on an integer range.
  */
 final class AscIntegerIterator implements Iterator<Integer> {
+
     /** The lower boundary. */
     private final int min;
+
     /** The upper boundary. */
     private final int max;
+
     /** The current value. */
     private int cursor;
+
     /**
      * Creates a iterator on the range.
+     *
      * @param l low boundary
      * @param h high boundary
      */
@@ -60,14 +65,19 @@ final class AscIntegerIterator implements Iterator<Integer> {
  * A descending iterator on an integer range.
  */
 final class DescIntegerIterator implements Iterator<Integer> {
+
     /** The lower boundary. */
     private final int min;
+
     /** The upper boundary. */
     private final int max;
+
     /** The current value. */
     private int cursor;
+
     /**
      * Creates a iterator on the range.
+     *
      * @param l low boundary
      * @param h high boundary
      */
@@ -95,12 +105,15 @@ final class DescIntegerIterator implements Iterator<Integer> {
  * A range of integers.
  */
 public abstract class IntegerRange implements Collection<Integer> {
+
     /**
      * Ascending integer range.
      */
     public static class Ascending extends IntegerRange {
+
         /**
          * Constructs a new instance.
+         *
          * @param from lower boundary
          * @param to upper boundary
          */
@@ -113,12 +126,15 @@ public abstract class IntegerRange implements Collection<Integer> {
             return new AscIntegerIterator(min, max);
         }
     }
+
     /**
      * Descending integer range.
      */
     public static class Descending extends IntegerRange {
+
         /**
          * Constructs a new instance.
+         *
          * @param from upper boundary
          * @param to lower boundary
          */
@@ -134,6 +150,7 @@ public abstract class IntegerRange implements Collection<Integer> {
 
     /**
      * Creates a range, ascending or descending depending on boundaries order.
+     *
      * @param from the lower inclusive boundary
      * @param to   the higher inclusive boundary
      * @return a range
@@ -144,6 +161,7 @@ public abstract class IntegerRange implements Collection<Integer> {
         }
         return new IntegerRange.Descending(to, from);
     }
+
     /** The lower boundary. */
     protected final int min;
 
@@ -152,6 +170,7 @@ public abstract class IntegerRange implements Collection<Integer> {
 
     /**
      * Creates a new range.
+     *
      * @param from the lower inclusive boundary
      * @param to  the higher inclusive boundary
      */
@@ -214,6 +233,7 @@ public abstract class IntegerRange implements Collection<Integer> {
 
     /**
      * Gets the interval maximum value.
+     *
      * @return the high boundary
      */
     public int getMax() {
@@ -222,6 +242,7 @@ public abstract class IntegerRange implements Collection<Integer> {
 
     /**
      * Gets the interval minimum value.
+     *
      * @return the low boundary
      */
     public int getMin() {

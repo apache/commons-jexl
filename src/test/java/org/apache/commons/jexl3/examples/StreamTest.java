@@ -49,8 +49,10 @@ class StreamTest {
      * A MapContext that can operate on streams and collections.
      */
     public static class CollectionContext extends MapContext {
+
         /**
          * This allows using a JEXL lambda as a filter.
+         *
          * @param collection the collection
          * @param filter the lambda to use as filter
          * @return the filtered result as a list
@@ -63,6 +65,7 @@ class StreamTest {
 
         /**
          * This allows using a JEXL lambda as a mapper.
+         *
          * @param collection the collection
          * @param mapper the lambda to use as mapper
          * @return the mapped result as a list
@@ -79,8 +82,10 @@ class StreamTest {
      * A MapContext that can operate on streams and collections.
      */
     public static class StreamContext extends MapContext {
+
         /**
          * This allows using a JEXL lambda as a filter.
+         *
          * @param stream the stream
          * @param filter the lambda to use as filter
          * @return the filtered stream
@@ -91,6 +96,7 @@ class StreamTest {
 
         /**
          * This allows using a JEXL lambda as a mapper.
+         *
          * @param stream the stream
          * @param mapper the lambda to use as mapper
          * @return the mapped stream
@@ -106,9 +112,9 @@ class StreamTest {
     public StreamTest() {
         // Restricting features; no loops, no side effects
         final JexlFeatures features = new JexlFeatures()
-                .loops(false)
-                .sideEffectGlobal(false)
-                .sideEffect(false);
+            .loops(false)
+            .sideEffectGlobal(false)
+            .sideEffect(false);
         // Restricted permissions to a safe set but with URI allowed
         final JexlPermissions permissions = new ClassPermissions(java.net.URI.class);
         // Create the engine
@@ -150,14 +156,14 @@ class StreamTest {
         assertInstanceOf(List.class, transformed);
         result = (List<URI>) transformed;
         assertEquals(2, result.size());
-        for(final URI uri : result) {
-          assertEquals("https", uri.getScheme());
+        for (final URI uri : result) {
+            assertEquals("https", uri.getScheme());
         }
     }
 
     @Test
     void testURIStream() {
-        // let's assume a collection of uris need to be processed and transformed to be simplified ;
+        // Assume a collection of uris need to be processed and transformed to be simplified ;
         // we want only http/https ones, only the host part and using a https scheme
         final List<URI> uris = Arrays.asList(
                 URI.create("http://user@www.apache.org:8000?qry=true"),
