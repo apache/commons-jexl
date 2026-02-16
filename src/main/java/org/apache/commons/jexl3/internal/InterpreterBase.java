@@ -617,24 +617,29 @@ public abstract class InterpreterBase extends ParserVisitor {
             throw new JexlException(node, "object is null");
         }
         cancelCheck(node);
-        final JexlOperator operator = node != null && node.jjtGetParent() instanceof ASTArrayAccess
-                ? JexlOperator.ARRAY_GET : JexlOperator.PROPERTY_GET;
-        final Object result = operators.tryOverload(node, operator, object, attribute);
-        if (result != JexlEngine.TRY_FAILED) {
-            return result;
-        }
         Exception xcause = null;
         try {
-            // attempt to reuse last executor cached in volatile JexlNode.value
-            if (node != null && cache) {
-                final Object cached = node.jjtGetValue();
-                if (cached instanceof JexlPropertyGet) {
-                    final JexlPropertyGet vg = (JexlPropertyGet) cached;
-                    final Object value = vg.tryInvoke(object, attribute);
-                    if (!vg.tryFailed(value)) {
-                        return value;
+            final JexlOperator operator;
+            if (node != null) {
+                // attempt to reuse last executor cached in volatile JexlNode.value
+                if (cache) {
+                    final Object cached = node.jjtGetValue();
+                    if (cached instanceof JexlPropertyGet) {
+                        final JexlPropertyGet vg = (JexlPropertyGet) cached;
+                        final Object value = vg.tryInvoke(object, attribute);
+                        if (!vg.tryFailed(value)) {
+                            return value;
+                        }
                     }
                 }
+                // try operator overload
+                operator = node.jjtGetParent() instanceof ASTArrayAccess ? JexlOperator.ARRAY_GET : JexlOperator.PROPERTY_GET;
+                final Object result = operators.tryOverload(node, operator, object, attribute);
+                if (result != JexlEngine.TRY_FAILED) {
+                    return result;
+                }
+            } else {
+                operator = JexlOperator.PROPERTY_GET;
             }
             // resolve that property
             final List<JexlUberspect.PropertyResolver> resolvers = uberspect.getResolvers(operator, object);
@@ -985,25 +990,31 @@ public abstract class InterpreterBase extends ParserVisitor {
      */
     protected void setAttribute(final Object object, final Object attribute, final Object value, final JexlNode node) {
         cancelCheck(node);
-        final JexlOperator operator = node != null && node.jjtGetParent() instanceof ASTArrayAccess
-                                      ? JexlOperator.ARRAY_SET : JexlOperator.PROPERTY_SET;
-        final Object result = operators.tryOverload(node, operator, object, attribute, value);
-        if (result != JexlEngine.TRY_FAILED) {
-            return;
-        }
         Exception xcause = null;
         try {
-            // attempt to reuse last executor cached in volatile JexlNode.value
-            if (node != null && cache) {
-                final Object cached = node.jjtGetValue();
-                if (cached instanceof JexlPropertySet) {
-                    final JexlPropertySet setter = (JexlPropertySet) cached;
-                    final Object eval = setter.tryInvoke(object, attribute, value);
-                    if (!setter.tryFailed(eval)) {
-                        return;
+            final JexlOperator operator;
+            if (node != null) {
+                // attempt to reuse last executor cached in volatile JexlNode.value
+                if (cache) {
+                    final Object cached = node.jjtGetValue();
+                    if (cached instanceof JexlPropertySet) {
+                        final JexlPropertySet setter = (JexlPropertySet) cached;
+                        final Object eval = setter.tryInvoke(object, attribute, value);
+                        if (!setter.tryFailed(eval)) {
+                            return;
+                        }
                     }
                 }
+                // try operator overload
+                operator = node.jjtGetParent() instanceof ASTArrayAccess ? JexlOperator.ARRAY_SET : JexlOperator.PROPERTY_SET;
+                final Object result = operators.tryOverload(node, operator, object, attribute, value);
+                if (result != JexlEngine.TRY_FAILED) {
+                    return;
+                }
+            } else {
+                operator = JexlOperator.PROPERTY_SET;
             }
+            // resolve that property
             final List<JexlUberspect.PropertyResolver> resolvers = uberspect.getResolvers(operator, object);
             JexlPropertySet vs = uberspect.getPropertySet(resolvers, object, attribute, value);
             // if we can't find an exact match, narrow the value argument and try again

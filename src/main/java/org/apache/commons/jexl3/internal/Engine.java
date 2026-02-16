@@ -360,6 +360,13 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
      * @param conf the builder
      */
     public Engine(final JexlBuilder conf) {
+        // core properties:
+        final JexlUberspect uber = conf.uberspect() == null
+            ? getUberspect(conf.logger(), conf.strategy(), conf.permissions())
+            : conf.uberspect();
+        if (uber == null) {
+            throw new IllegalArgumentException("uberspect cannot be null");
+        }
         // options:
         this.options = conf.options().copy();
         this.strict = options.isStrict();
@@ -370,13 +377,6 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
         this.debug = option(conf.debug(), true);
         this.collectMode = conf.collectMode();
         this.stackOverflow = conf.stackOverflow() > 0? conf.stackOverflow() : Integer.MAX_VALUE;
-        // core properties:
-        final JexlUberspect uber = conf.uberspect() == null
-                ? getUberspect(conf.logger(), conf.strategy(), conf.permissions())
-                : conf.uberspect();
-        if (uber == null) {
-            throw new IllegalArgumentException("uberspect cannot be null");
-        }
         final ClassLoader loader = conf.loader();
         if (loader != null) {
             uber.setClassLoader(loader);

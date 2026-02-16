@@ -317,7 +317,7 @@ public class TemplateDebugger extends Debugger {
             case COMPOSITE:
                 r = visit((CompositeExpression) expr, data);
                 break;
-            default:
+            default: // in case of new state in the future
                 r = null;
         }
         return r;

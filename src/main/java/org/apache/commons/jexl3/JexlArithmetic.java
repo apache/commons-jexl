@@ -240,6 +240,9 @@ public class JexlArithmetic {
                }
             } catch (final NoSuchMethodException xany) {
                 arithmeticClass = arithmeticClass.getSuperclass();
+            } catch (final SecurityException xany) {
+                // ignore
+                break;
             }
         }
         return false;
@@ -1624,7 +1627,7 @@ public class JexlArithmetic {
     @Deprecated
     public JexlArithmetic options(final JexlEngine.Options options) {
         if (options != null) {
-            final boolean isstrict = Boolean.TRUE == options.isStrictArithmetic() || isStrict();
+            final boolean strict = Boolean.TRUE.equals(options.isStrictArithmetic()) || isStrict();
             MathContext bigdContext = options.getArithmeticMathContext();
             if (bigdContext == null) {
                 bigdContext = getMathContext();
@@ -1633,10 +1636,10 @@ public class JexlArithmetic {
             if (bigdScale == Integer.MIN_VALUE) {
                 bigdScale = getMathScale();
             }
-            if (isstrict != isStrict()
+            if (strict != isStrict()
                 || bigdScale != getMathScale()
                 || bigdContext != getMathContext()) {
-                return createWithOptions(isstrict, bigdContext, bigdScale);
+                return createWithOptions(strict, bigdContext, bigdScale);
             }
         }
         return this;

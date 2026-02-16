@@ -339,7 +339,7 @@ public interface JexlPermissions {
      * @return true if JEXL is allowed to introspect, false otherwise
      * @since 3.3
      */
-    boolean allow(final Class<?> clazz);
+    boolean allow(Class<?> clazz);
 
     /**
      * Checks whether a constructor allows JEXL introspection.
@@ -350,7 +350,7 @@ public interface JexlPermissions {
      * @return true if JEXL is allowed to introspect, false otherwise
      * @since 3.3
      */
-    boolean allow(final Constructor<?> ctor);
+    boolean allow(Constructor<?> ctor);
 
     /**
      * Checks whether a field explicitly disallows JEXL introspection.
@@ -360,7 +360,7 @@ public interface JexlPermissions {
      * @return true if JEXL is allowed to introspect, false otherwise
      * @since 3.3
      */
-    boolean allow(final Field field);
+    boolean allow(Field field);
 
     /**
      * Checks whether a method allows JEXL introspection.
@@ -372,7 +372,7 @@ public interface JexlPermissions {
      * @return true if JEXL is allowed to introspect, false otherwise
      * @since 3.3
      */
-    boolean allow(final Method method);
+    boolean allow(Method method);
 
     /**
      * Checks whether a package allows JEXL introspection.
@@ -383,7 +383,7 @@ public interface JexlPermissions {
      * @return true if JEXL is allowed to introspect, false otherwise
      * @since 3.3
      */
-    boolean allow(final Package pack);
+    boolean allow(Package pack);
 
     /**
      * Compose these permissions with a new set.
@@ -394,7 +394,7 @@ public interface JexlPermissions {
      * @param src the new constraints
      * @return the new permissions
      */
-    JexlPermissions compose(final String... src);
+    JexlPermissions compose(String... src);
 
     /**
      * Checks that a class is valid for permission check.

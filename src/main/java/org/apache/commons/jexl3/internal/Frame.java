@@ -43,14 +43,14 @@ public class Frame {
      * @param c the number of curried parameters
      */
     protected Frame(final Scope s, final Object[] r, final int c) {
+        final String[] symbols = s.getSymbols();
+        if (symbols.length != r.length) {
+            throw new IllegalArgumentException("Scope and stack frame size mismatch: "
+                + symbols.length + " != " + r.length);
+        }
         scope = s;
         stack = r;
         curried = c;
-        final String[] symbols = scope.getSymbols();
-        if (symbols.length != r.length) {
-            throw new IllegalArgumentException("Scope and stack frame size mismatch: "
-                    + symbols.length + " != " + r.length);
-        }
     }
 
     /**

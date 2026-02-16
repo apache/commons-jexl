@@ -99,11 +99,12 @@ public class Uberspect implements JexlUberspect {
      * @param perms the introspector permissions
      */
     public Uberspect(final Log runtimeLogger, final JexlUberspect.ResolverStrategy sty, final JexlPermissions perms) {
+        final ClassLoader cl = getClass().getClassLoader();
         logger = runtimeLogger == null ? LogFactory.getLog(JexlEngine.class) : runtimeLogger;
         strategy = sty == null ? JexlUberspect.JEXL_STRATEGY : sty;
         permissions = perms == null ? JexlPermissions.RESTRICTED : perms;
         ref = new SoftReference<>(null);
-        loader = new SoftReference<>(getClass().getClassLoader());
+        loader = new SoftReference<>(cl);
         operatorMap = new ConcurrentHashMap<>();
         version = new AtomicInteger();
     }

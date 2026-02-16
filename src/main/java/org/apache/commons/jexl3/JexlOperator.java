@@ -622,10 +622,10 @@ public enum JexlOperator {
          * @return JexlEngine.TRY_FAILED if no operation was performed,
          *         the value to use as the side effect argument otherwise
          */
-        Object tryAssignOverload(final JexlCache.Reference node,
-                                 final JexlOperator operator,
-                                 final Consumer<Object> assign,
-                                 final Object... args);
+        Object tryAssignOverload(JexlCache.Reference node,
+                                 JexlOperator operator,
+                                 Consumer<Object> assign,
+                                 Object... args);
 
         /**
          * Calculate the {@code size} of various types:
@@ -637,7 +637,7 @@ public enum JexlOperator {
          * @param object the object to get the size of
          * @return the evaluation result
          */
-        Object size(final JexlCache.Reference node, final Object object);
+        Object size(JexlCache.Reference node, Object object);
 
         /**
          * Check for emptiness of various types: Collection, Array, Map, String, and anything that has a boolean isEmpty()
@@ -649,7 +649,7 @@ public enum JexlOperator {
          * @param object the object to check the emptiness of
          * @return the evaluation result
          */
-        Object empty(final JexlCache.Reference node, final Object object);
+        Object empty(JexlCache.Reference node, Object object);
 
         /**
          * The 'match'/'in' operator implementation.
@@ -665,10 +665,10 @@ public enum JexlOperator {
          * @param left  the right operand
          * @return true if left matches right, false otherwise
          */
-        boolean contains(final JexlCache.Reference node,
-                         final JexlOperator operator,
-                         final Object left,
-                         final Object right);
+        boolean contains(JexlCache.Reference node,
+                         JexlOperator operator,
+                         Object left,
+                         Object right);
 
         /**
          * The 'startsWith' operator implementation.
@@ -680,10 +680,10 @@ public enum JexlOperator {
          * @param right    the right operand
          * @return true if left starts with right, false otherwise
          */
-        boolean startsWith(final JexlCache.Reference node,
-                           final JexlOperator operator,
-                           final Object left,
-                           final Object right);
+        boolean startsWith(JexlCache.Reference node,
+                           JexlOperator operator,
+                           Object left,
+                           Object right);
 
         /**
          * The 'endsWith' operator implementation.
@@ -695,9 +695,9 @@ public enum JexlOperator {
          * @param right    the right operand
          * @return true if left ends with right, false otherwise
          */
-        boolean endsWith(final JexlCache.Reference node,
-                         final JexlOperator operator,
-                         final Object left,
-                         final Object right);
+        boolean endsWith(JexlCache.Reference node,
+                         JexlOperator operator,
+                         Object left,
+                         Object right);
     }
 }

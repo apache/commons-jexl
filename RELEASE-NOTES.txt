@@ -1,27 +1,24 @@
-Apache Commons JEXL 3.6.2 Release Notes
----------------------------------------
+Apache Commons JEXL 3.6.3 Release Notes
+=======================================
 
-The Apache Commons JEXL team is pleased to announce the release of Apache Commons JEXL 3.6.2.
+The Apache Commons JEXL team is pleased to announce the release of Apache Commons JEXL 3.6.3.
 
 Introduction
-------------
+============
 
 Apache Commons JEXL is a library that enables scripting features in Java applications and frameworks..
 
 This is a feature and maintenance release. Java 8 or later is required.
 
 
-Fixed Bugs
-----------
+Bugs Fixed in 3.6.3:
+====================
 
-o JEXL-455:  Tokenization error with multiline expressions. Thanks to Vincent Bussol. 
-o JEXL-454:  Switch NaN case not found. Thanks to Vincent Bussol. 
-o JEXL-453:  Finally clause is not evaluated. Thanks to Vincent Bussol. 
+o JEXL-456:  Change in template parser behavior.
 
-Changes
--------
 
-o          Bump org.apache.commons:commons-parent from 93 to 96. Thanks to Gary Gregory. 
+Changes in 3.6.3:
+=================
 
 
 Historical list of changes: https://commons.apache.org/proper/commons-jexl/changes.html
@@ -32,6 +29,28 @@ patches, or suggestions for improvement, see the Apache Commons JEXL website:
 https://commons.apache.org/proper/commons-jexl/
 
 Download page: https://commons.apache.org/proper/commons-jexl/download_jexl.cgi
+
+
+========================================================================================================================
+Release 3.6.2
+========================================================================================================================
+
+Version 3.6.2 is a minor release.
+
+Compatibility with previous releases
+====================================
+Version 3.6.2 is source and binary compatible with 3.6.
+
+
+Bugs Fixed in 3.6.2:
+====================
+o JEXL-455:  Tokenization error with multiline expressions.
+o JEXL-454:  Switch NaN case not found.
+o JEXL-453:  Finally clause is not evaluated.
+
+Changes in 3.6.2:
+=================
+o          Bump org.apache.commons:commons-parent from 93 to 96. Thanks to Gary Gregory.
 
 
 ========================================================================================================================

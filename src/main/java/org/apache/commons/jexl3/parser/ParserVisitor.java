@@ -61,17 +61,17 @@ public abstract class ParserVisitor {
 
     protected abstract Object visit(ASTConstructorNode node, Object data);
 
-    protected abstract Object visit(ASTSwitchStatement node, final Object data);
+    protected abstract Object visit(ASTSwitchStatement node, Object data);
 
-    protected abstract Object visit(ASTCaseStatement node, final Object data);
+    protected abstract Object visit(ASTCaseStatement node, Object data);
 
-    protected abstract Object visit(ASTSwitchExpression node, final Object data);
+    protected abstract Object visit(ASTSwitchExpression node, Object data);
 
-    protected abstract Object visit(ASTCaseExpression node, final Object data);
+    protected abstract Object visit(ASTCaseExpression node, Object data);
 
     protected abstract Object visit(ASTContinue node, Object data);
 
-    protected abstract Object visit(ASTDecrementGetNode node, final Object data);
+    protected abstract Object visit(ASTDecrementGetNode node, Object data);
 
     protected abstract Object visit(ASTDefineVars node, Object data);
 
@@ -99,9 +99,9 @@ public abstract class ParserVisitor {
 
     protected abstract Object visit(ASTGENode node, Object data);
 
-    protected abstract Object visit(ASTGetDecrementNode node, final Object data);
+    protected abstract Object visit(ASTGetDecrementNode node, Object data);
 
-    protected abstract Object visit(ASTGetIncrementNode node, final Object data);
+    protected abstract Object visit(ASTGetIncrementNode node, Object data);
 
     protected abstract Object visit(ASTGTNode node, Object data);
 
@@ -111,9 +111,9 @@ public abstract class ParserVisitor {
 
     protected abstract Object visit(ASTIfStatement node, Object data);
 
-    protected abstract Object visit(ASTIncrementGetNode node, final Object data);
+    protected abstract Object visit(ASTIncrementGetNode node, Object data);
 
-    protected abstract Object visit(final ASTInstanceOf node, final Object data);
+    protected abstract Object visit(ASTInstanceOf node, Object data);
 
     protected abstract Object visit(ASTJexlScript node, Object data);
 
@@ -139,7 +139,7 @@ public abstract class ParserVisitor {
 
     protected abstract Object visit(ASTNEWNode node, Object data);
 
-    protected abstract Object visit(final ASTNotInstanceOf node, final Object data);
+    protected abstract Object visit(ASTNotInstanceOf node, Object data);
 
     protected abstract Object visit(ASTNotNode node, Object data);
 
@@ -155,7 +155,7 @@ public abstract class ParserVisitor {
 
     protected abstract Object visit(ASTOrNode node, Object data);
 
-    protected abstract Object visit(final ASTQualifiedIdentifier node, final Object data);
+    protected abstract Object visit(ASTQualifiedIdentifier node, Object data);
 
     protected abstract Object visit(ASTRangeNode node, Object data);
 
@@ -181,21 +181,21 @@ public abstract class ParserVisitor {
 
     protected abstract Object visit(ASTSetOrNode node, Object data);
 
-    protected abstract Object visit(ASTSetShiftLeftNode node, final Object data);
+    protected abstract Object visit(ASTSetShiftLeftNode node, Object data);
 
-    protected abstract Object visit(ASTSetShiftRightNode node, final Object data);
+    protected abstract Object visit(ASTSetShiftRightNode node, Object data);
 
-    protected abstract Object visit(ASTSetShiftRightUnsignedNode node, final Object data);
+    protected abstract Object visit(ASTSetShiftRightUnsignedNode node, Object data);
 
     protected abstract Object visit(ASTSetSubNode node, Object data);
 
     protected abstract Object visit(ASTSetXorNode node, Object data);
 
-    protected abstract Object visit(ASTShiftLeftNode node, final Object data);
+    protected abstract Object visit(ASTShiftLeftNode node, Object data);
 
-    protected abstract Object visit(ASTShiftRightNode node, final Object data);
+    protected abstract Object visit(ASTShiftRightNode node, Object data);
 
-    protected abstract Object visit(ASTShiftRightUnsignedNode node, final Object data);
+    protected abstract Object visit(ASTShiftRightUnsignedNode node, Object data);
 
     protected abstract Object visit(ASTSizeFunction node, Object data);
 
