@@ -33,7 +33,7 @@
         <javacc-maven-plugin.version>3.8.0-SNAPSHOT</javacc-maven-plugin.version>
         <javacc.core.version>8.1.0-SNAPSHOT</javacc.core.version>
         <javacc.java.version>8.1.0-SNAPSHOT</javacc.java.version>
-    
+
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <commons.componentid>jexl</commons.componentid>
@@ -186,17 +186,6 @@
             </dependency>
           </dependencies>
         </plugin>
-          <!-- all used processors artifacts -->
-          <plugin>
-              <groupId>org.javacc</groupId>
-              <artifactId>core</artifactId>
-              <version>${javacc.core.version}</version>
-          </plugin>
-          <plugin>
-              <groupId>org.javacc.generator</groupId>
-              <artifactId>java</artifactId>
-              <version>${javacc.java.version}</version>
-          </plugin>
       </plugins>
     </pluginManagement>
         <plugins>
