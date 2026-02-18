@@ -230,7 +230,7 @@ public abstract class ParserVisitor {
      * @param data the data
      * @return does not return
      */
-    protected final Object visit(final SimpleNode node, final Object data) {
+    protected final Object visit(final Node node, final Object data) {
         throw new UnsupportedOperationException(node.getClass().getSimpleName() + " : not supported yet.");
     }
 }
