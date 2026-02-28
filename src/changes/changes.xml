@@ -33,6 +33,7 @@
             <action dev="henrib" type="fix" issue="JEXL-456" due-to="Vincent Bussol">Change in template parser behavior.</action>
             <!-- ADD -->
             <!-- UPDATE -->
+            <action type="update" dev="ggregory" due-to="Gary Gregory">Bump org.apache.commons:commons-parent from 96 to 97.</action>
         </release>
         <release version="3.6.2" date="2026-02-05"
                  description="This is a feature and maintenance release. Java 8 or later is required.">
