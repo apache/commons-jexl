@@ -19,6 +19,7 @@
 options
 {
    MULTI=true;
+   SINGLE_TREE_FILE=false;
    STATIC=false;
    JAVA_TEMPLATE_TYPE="modern";
    VISITOR=true;
@@ -31,6 +32,7 @@ options
    ERROR_REPORTING=false;
 //   DEBUG_PARSER=true;
 //   DEBUG_TOKEN_MANAGER=true;
+  // FORCE_LA_CHECK = true; // (JavaCC - default false)
 }
 
 PARSER_BEGIN(Parser)
@@ -101,7 +103,7 @@ public final class Parser extends JexlParser
             String msg = et == null ? xparse.getMessage() : et.image;
             throw new JexlException.Parsing(ji, msg).clean();
         } finally {
-            token_source.defaultLexState = DEFAULT;
+            //token_source.defaultLexState = DEFAULT;
             token_source.ignoredTokens = Collections.emptySet();
             cleanup(previous);
             jjtree.reset();
@@ -123,14 +125,15 @@ TOKEN_MGR_DECLS : {
 
 <*> SKIP : /* WHITE SPACE */
 {
-      " "
-    | "\t"
-    | "\n"
-    | "\r"
-    | "\f"
-    | <"##" (~["\n","\r"])* ("\n" | "\r" | "\r\n")? >
-    | <"/*" (~["*"])* "*" ("*" | ~["*","/"] (~["*"])* "*")* "/">
-    | <"//" (~["\n","\r"])* ("\n" | "\r" | "\r\n")? >
+      < sp_ : " " >
+    | < tab_ : "\t" >
+    | < lf_: "\n" >
+    | < cr_ : "\r" >
+    | < ff_ : "\f" >
+    | < pslc_ : "##" (~["\n","\r"])* ("\n" | "\r" | "\r\n")? >
+//    | < mlc1_ : "/*" (~["*"])* "*" ("*" | ~["*","/"] (~["*"])* "*")* "/">
+    | < mlc2_ : "/*" (~["*"])* ( "*" ~["*","/"] (~["*"])* )* "*/" >
+    | < sslc_ : "//" (~["\n","\r"])* ("\n" | "\r" | "\r\n")? >
 }
 
 <DEFAULT> TOKEN : /* Exception handling. */
@@ -397,7 +400,7 @@ ASTJexlScript JexlScript(Scope frame, JexlFeatures features) : {
    {
         pushUnit(jjtThis);
    }
-        ( Import())* ( Pragma() | { controlPragmaAnywhere(); } Statement() )* <EOF>
+        ( Import() )* ( Pragma() | { controlPragmaAnywhere(); } Statement() )* <EOF>
    {
         popUnit(jjtThis);
         return jjtThis.script();
@@ -459,10 +462,10 @@ void StatementSink() #void : {}
     | ThrowStatement()
     | TryStatement()
     | LOOKAHEAD(3) SwitchStatement()
-    | LOOKAHEAD(LambdaLookahead()) Lambda()
-    | LOOKAHEAD(Expression()) ExpressionStatement()
+    | LOOKAHEAD(LambdaLookahead()) Lambda() // changing to LA(3) causes AssertionFailedError: expected: <true> but was: <false> in LambdaTest.testFailParseFunc
+    | LOOKAHEAD(Expression()) ExpressionStatement() // changing to LA(3) produces 29 more errors and 1 failure
     | Block()
-    | LOOKAHEAD(<VAR>, { !getFeatures().isLexical()} ) Var()
+    | LOOKAHEAD(<VAR>, { !getFeatures().isLexical()} ) Var() // LA necessary (otherwise 2 failures in LambdaTest and LexicalTest) but strange
 }
 
 void Block() #Block : {}
@@ -472,7 +475,7 @@ void Block() #Block : {}
 
 void FunctionStatement() #JexlLambda : {}
 {
-<FUNCTION> DeclareFunction() { beginLambda(jjtThis); } Parameters() ( LOOKAHEAD(3) Block() | Expression()) { endLambda(jjtThis); }
+    <FUNCTION> DeclareFunction() { beginLambda(jjtThis); } Parameters() ( LOOKAHEAD(3) Block() | Expression()) { endLambda(jjtThis); }
 }
 
 void ExpressionStatement() #void : {}
@@ -483,16 +486,20 @@ void ExpressionStatement() #void : {}
 
 void IfStatement() : {}
 {
-    <IF> <LPAREN> Expression() <RPAREN> (LOOKAHEAD(1) Block() | StatementSink())
-    ( LOOKAHEAD(2) <ELSE> <IF> <LPAREN> Expression() <RPAREN> (LOOKAHEAD(1) Block() | StatementSink()) )*
-    ( LOOKAHEAD(1) <ELSE>  (LOOKAHEAD(1) Block() | StatementSink()) )?
+  // StatementSink() already includes Block(), so either the following choices should be removed or Block() should be removed from StatementSink()
+  // However removing the choices produces assertion failures in 3 tests probably because of the resulting different node trees, and so these tests would need to be modified
+  // BlockTest.testEmptyBlock:76 Result is wrong ==> expected: <null> but was: <[]>;  Issues100Test.test108:307 expected: <true> but was: <false>;  IssuesTest.test90:340 expected: <2> but was: <[2]>
+  // For the moment, we keep the old version, here and further (WhileStatement(), DoWhileStatement(), ForeachStatement, SwitchStatementCase)
+    <IF> <LPAREN> Expression() <RPAREN> (LOOKAHEAD(3) Block() | StatementSink())
+    ( LOOKAHEAD(2) <ELSE> <IF> <LPAREN> Expression() <RPAREN> (LOOKAHEAD(3) Block() | StatementSink()) )*
+    ( LOOKAHEAD(2) <ELSE>  (LOOKAHEAD(3) Block() | StatementSink()) )?
 }
 
 void TryStatement() : {}
 {
      <TRY> ( TryResources() | Block())
      ( <CATCH> { pushUnit(jjtThis); } <LPAREN> InlineVar() <RPAREN> Block() { jjtThis.catchClause(); popUnit(jjtThis);})?
-     ( <FINALLY>  Block() { jjtThis.finallyClause(); } )?
+     ( <FINALLY>  Block() { jjtThis.finallyClause(); })?
 }
 
 void TryResources() : {}
@@ -500,9 +507,9 @@ void TryResources() : {}
     {
         pushUnit(jjtThis);
     }
-<LPAREN>
-    TryResource() ( LOOKAHEAD(2) <SEMICOL> TryResource() )* (<SEMICOL>)?
-<RPAREN>
+    <LPAREN>
+        TryResource() ( LOOKAHEAD(2) <SEMICOL> TryResource() )* (<SEMICOL>)?
+    <RPAREN>
     Block()
     {
         popUnit(jjtThis);
@@ -516,12 +523,12 @@ LOOKAHEAD(2) Var() | Identifier(true)
 
 void WhileStatement() : {}
 {
-    <WHILE> <LPAREN> Expression() <RPAREN>  { loopCount.incrementAndGet(); }  (LOOKAHEAD(1) Block() | StatementSink()) { loopCount.decrementAndGet(); }
+    <WHILE> <LPAREN> Expression() <RPAREN>  { loopCount.incrementAndGet(); }  (LOOKAHEAD(1) Block() | StatementSink()) { loopCount.decrementAndGet(); } // see IfStatement()
 }
 
 void DoWhileStatement() : {}
 {
-    <DO> { loopCount.incrementAndGet(); } (LOOKAHEAD(1) Block() | StatementSink()) <WHILE> <LPAREN> Expression() <RPAREN> { loopCount.decrementAndGet(); }
+    <DO> { loopCount.incrementAndGet(); } (LOOKAHEAD(1) Block() | StatementSink()) <WHILE> <LPAREN> Expression() <RPAREN> { loopCount.decrementAndGet(); } // see IfStatement()
 }
 
 void ReturnStatement() : {
@@ -563,7 +570,7 @@ void ForeachStatement() : {
     (
         LOOKAHEAD(3) InlineVar() <COLON> Expression() { loopForm = 0; }
     |
-        ((LOOKAHEAD(1) Var() | Expression()) { loopForm = 1; })? <SEMICOL>
+        ((LOOKAHEAD(3) Var() | Expression()) { loopForm = 1; })? <SEMICOL>
         (Expression() { loopForm |= 2; })? <SEMICOL>
         (Expression() { loopForm |= 4; })? { loopForm |= 8; }
     )
@@ -571,7 +578,7 @@ void ForeachStatement() : {
     {
         loopCount.incrementAndGet();
     }
-        (LOOKAHEAD(1) Block() | StatementSink() )
+        (LOOKAHEAD(1) Block() | StatementSink() ) // see IfStatement()
     {
         loopCount.decrementAndGet();
         jjtThis.setLoopForm(loopForm);
@@ -601,12 +608,12 @@ void Var() #void : {}
 
  void DefineVar() #void : {}
  {
-    DeclareVar(false, false) (LOOKAHEAD(1) <assign> Expression() #Assignment(2))?
+    DeclareVar(false, false) ( <assign> Expression() #Assignment(2))?
  }
 
 void DefineLet() #void : {}
 {
-    DeclareVar(true, false) (LOOKAHEAD(1) <assign> Expression() #Assignment(2))?
+    DeclareVar(true, false) ( <assign> Expression() #Assignment(2))?
 }
 
 void DefineConst() #void : {}
@@ -662,7 +669,7 @@ void SwitchStatementCase(SwitchSet cases) #CaseStatement :
         { constants = Collections.singletonList(constant); jjtThis.setValues(constants); cases.addAll(constants); } )+
         |
         <CASE_DEFAULT> <COLON> )
-    ( LOOKAHEAD(<LCURLY>) Block() | (StatementSink() )+ )?
+    ( LOOKAHEAD(1) Block() | (StatementSink())+ )? // see IfStatement()
 {
     loopCount.decrementAndGet();
 }
@@ -700,7 +707,7 @@ void ConstLiterals(List<Object> constants) #void :
     Object constant;
 }
 {
-    constant=constLiteral() { constants.add(constant); } (LOOKAHEAD(2) <COMMA> constant=constLiteral() { constants.add(constant); })*
+    constant=constLiteral() { constants.add(constant); } ( <COMMA> constant=constLiteral() { constants.add(constant); } )*
 }
 
 
@@ -714,13 +721,13 @@ Object constLiteral() #void :
 {
   (
       LOOKAHEAD(2) (s=<plus>|s=<minus>)? v=<INTEGER_LITERAL> { result = NumberParser.parseInteger(s, v); }
-    | LOOKAHEAD(2) (s=<plus>|s=<minus>)? v=<FLOAT_LITERAL> { result = NumberParser.parseDouble(s, v); }
-    | LOOKAHEAD(1) v=<STRING_LITERAL> { result = Parser.buildString(v.image, true); }
-    | LOOKAHEAD(1) <TRUE> { result = true; }
-    | LOOKAHEAD(1) <FALSE> { result = false; }
-    | LOOKAHEAD(1) <NULL> { result = null; }
-    | LOOKAHEAD(1) <NAN_LITERAL> { result = Double.NaN; }
-    | LOOKAHEAD(1) propertyKey(lstr) { result = resolveConstant(stringify(lstr)); }
+    | (s=<plus>|s=<minus>)? v=<FLOAT_LITERAL> { result = NumberParser.parseDouble(s, v); }
+    | v=<STRING_LITERAL> { result = Parser.buildString(v.image, true); }
+    | <TRUE> { result = true; }
+    | <FALSE> { result = false; }
+    | <NULL> { result = null; }
+    | <NAN_LITERAL> { result = Double.NaN; }
+    | propertyKey(lstr) { result = resolveConstant(stringify(lstr)); }
   )
   {
     return result;
@@ -732,7 +739,7 @@ void Import() #void :
     List<String> imports = new ArrayList<String>();
 }
 {
-    <IMPORT> propertyKey(imports) (LOOKAHEAD(1) <SEMICOL>)?
+    <IMPORT> propertyKey(imports) (LOOKAHEAD(2) <SEMICOL>)?
     {
        addImport(stringify(imports));
     }
@@ -752,28 +759,28 @@ void propertyKey(List<String> lstr) #void :
     Token t;
 }
 {
-    t=<IDENTIFIER>  { lstr.add(t.image); } ( LOOKAHEAD(<DOT>) propertyKey(lstr) )*
+    t=<IDENTIFIER>  { lstr.add(t.image); } (LOOKAHEAD(1) <DOT> t=<DOT_IDENTIFIER> { lstr.add(t.image); } )*
    |
     <DOT> t=<DOT_IDENTIFIER> { lstr.add(t.image); }
 }
 
 Object pragmaValue() #void :
 {
-Token s = null;
-Token v;
-LinkedList<String> lstr = new LinkedList<String>();
-Object result;
+    Token s = null;
+    Token v;
+    LinkedList<String> lstr = new LinkedList<String>();
+    Object result;
 }
 {
   (
       LOOKAHEAD(2) (s=<plus>|s=<minus>)? v=<INTEGER_LITERAL> { result = NumberParser.parseInteger(s, v); }
-    | LOOKAHEAD(2) (s=<plus>|s=<minus>)? v=<FLOAT_LITERAL> { result = NumberParser.parseDouble(s, v); }
-    | LOOKAHEAD(1) v=<STRING_LITERAL> { result = Parser.buildString(v.image, true); }
-    | LOOKAHEAD(1)  propertyKey(lstr) { result = stringify(lstr); }
-    | LOOKAHEAD(1) <TRUE> { result = true; }
-    | LOOKAHEAD(1) <FALSE> { result = false; }
-    | LOOKAHEAD(1) <NULL> { result = null; }
-    | LOOKAHEAD(1) <NAN_LITERAL> { result = Double.NaN; }
+    | (s=<plus>|s=<minus>)? v=<FLOAT_LITERAL> { result = NumberParser.parseDouble(s, v); }
+    | v=<STRING_LITERAL> { result = Parser.buildString(v.image, true); }
+    | propertyKey(lstr) { result = stringify(lstr); }
+    | <TRUE> { result = true; }
+    | <FALSE> { result = false; }
+    | <NULL> { result = null; }
+    | <NAN_LITERAL> { result = Double.NaN; }
   )
   {
     return result;
@@ -979,7 +986,7 @@ void PostfixOperator() #void : {}
 
 void PostfixExpression() #void : {}
 {
-   ValueExpression() [ LOOKAHEAD(1) PostfixOperator() ]
+   ValueExpression() [ LOOKAHEAD(2) PostfixOperator() ]
 }
 
 /***************************************
@@ -1118,7 +1125,7 @@ void MapLiteral() : {}
     <LCURLY>
     (
         MapEntry() (LOOKAHEAD(2) <COMMA> MapEntry() )*
-            (<COMMA> (ExtendedLiteral(){ jjtThis.setExtended(true); })? )?
+            (<COMMA> (ExtendedLiteral() { jjtThis.setExtended(true); })? )?
     |
         <COLON>
     ) <RCURLY>
@@ -1126,7 +1133,7 @@ void MapLiteral() : {}
 
 void MapEntry() : {}
 {
-    LOOKAHEAD(2) Identifier(true) <COLON> Expression()
+    LOOKAHEAD(3/*2*/) Identifier(true) <COLON> Expression()
     |
     Expression() <COLON> Expression()
 }
@@ -1150,20 +1157,24 @@ void Arguments() #Arguments : {}
      <LPAREN> (Expression() (<COMMA> Expression())* )? <RPAREN>
 }
 
+// Quite unfrequent, a LA in a production called in a LA... need to check what is generated and executed.
 void FunctionCallLookahead() #void : {}
 {
-    LOOKAHEAD(4, <IDENTIFIER> <COLON> <IDENTIFIER> <LPAREN>,  { isNamespaceFuncall(getToken(1), getToken(2), getToken(3), getToken(4)) }) <IDENTIFIER> <COLON> <IDENTIFIER> <LPAREN>
-    |
-    LOOKAHEAD(2) <IDENTIFIER> <LPAREN>
-    |
-    LOOKAHEAD(2) <REGISTER> <LPAREN>
+    LOOKAHEAD(4, <IDENTIFIER> <COLON> <IDENTIFIER> <LPAREN>, { isNamespaceFuncall(getToken(1), getToken(2), getToken(3), getToken(4)) })
+    <IDENTIFIER> <COLON> <IDENTIFIER> <LPAREN>
+  |
+   <IDENTIFIER> <LPAREN>
+  |
+   <REGISTER> <LPAREN>
 }
 
 void FunctionCall() #void : {}
 {
-    LOOKAHEAD(4, <IDENTIFIER> <COLON> <IDENTIFIER> <LPAREN>,  { isNamespaceFuncall(getToken(1), getToken(2), getToken(3), getToken(4)) })  NamespaceIdentifier() Arguments() #FunctionNode(2)
-    |
-    LOOKAHEAD(<IDENTIFIER> <LPAREN>) Identifier(true) Arguments() #FunctionNode(2)
+  // semantic LA already performed in FunctionCallLookahead(), just need to scan up to the COLON to resolve the following conflict
+    LOOKAHEAD(2)
+    NamespaceIdentifier() Arguments() #FunctionNode(2)
+  |
+    Identifier(true) Arguments() #FunctionNode(2)
 }
 
 void QualifiedIdentifier() #QualifiedIdentifier : {
@@ -1180,35 +1191,65 @@ void Constructor() #ConstructorNode : {}
   <NEW> QualifiedIdentifier()  <LPAREN> [ Expression() ( <COMMA> Expression() )* ] <RPAREN>
 }
 
+// Writing productions to be used only in LA (LambdaLookahead() & ParametersLookahead()) is really non-academic...
+// It is very hard to check whether they are coherent with the productions they are meant to look ahead (Lambda() & Parameters()),
+// so one needs to format lines in a way that eases this at the maximum... and bingo... see further
+
 void Parameter() #void :
 {
     Token t;
 }
 {
     (<VAR>)? t=<IDENTIFIER> { declareParameter(t, false, false); }
-    |
-    <LET> t=<IDENTIFIER> { declareParameter(t, true, false); }
-    |
-    <CONST> t=<IDENTIFIER> { declareParameter(t, true, true); }
+  |
+    <LET>    t=<IDENTIFIER> { declareParameter(t, true, false); }
+  |
+    <CONST>  t=<IDENTIFIER> { declareParameter(t, true, true); }
 }
 
 void Parameters() #void : {}
 {
-     <LPAREN> [Parameter() (<COMMA> Parameter())* ] <RPAREN>
+     <LPAREN>
+     [
+       Parameter()
+       ( <COMMA> Parameter() )*
+     ]
+     <RPAREN>
 }
 
 void ParametersLookahead() #void : {}
 {
-     <LPAREN> [(<VAR>|<LET>|<CONST>)? <IDENTIFIER> (<COMMA> ((<VAR>|<LET>|<CONST>)? <IDENTIFIER>))*] <RPAREN>
+     <LPAREN>
+     [
+       ( <VAR> | <LET> | <CONST> )? <IDENTIFIER>
+       (
+         <COMMA>
+         ( <VAR> | <LET> | <CONST> )? <IDENTIFIER>
+       )*
+     ]
+     <RPAREN>
 }
 
 void LambdaLookahead() #void : {}
 {
-  <FUNCTION> ParametersLookahead()
+    <FUNCTION>
+// the following SHOULD be ADDED to correspond to ( DeclareFunction() )?, as it definitely looks missing
+// but LambdaTest.testFailParseFunc(String, String) fails with AssertionFailedError: expected: <true> but was: <false>
+// don't the test data first 2 lines expectedKeyword parameters should be changed to
+//    @CsvSource({
+//            "'if (false) function foo(x) { x + x }; var foo = 1', 'foo'",
+//            "'if (false) let foo = (x) -> { x + x }; var foo = 1', 'foo'",
+//            "'function foo(x) { x + x }; var foo = 42', 'foo'"
+//    })
+// which would be coherent with the 3rd line?
+    ( <IDENTIFIER> )?
+    ParametersLookahead()
   |
-  ParametersLookahead() (<LAMBDA> | <FATARROW>)
+    ParametersLookahead()
+    ( <LAMBDA> | <FATARROW> )
   |
-  <IDENTIFIER> (<LAMBDA> | <FATARROW>)
+    <IDENTIFIER>
+    ( <LAMBDA> | <FATARROW> )
 }
 
 void Lambda() #JexlLambda :
@@ -1216,12 +1257,24 @@ void Lambda() #JexlLambda :
    Token arrow;
 }
 {
-  <FUNCTION> (LOOKAHEAD(<IDENTIFIER>) DeclareFunction())? {
-   beginLambda(jjtThis); } Parameters() ( LOOKAHEAD(3) Block() | Expression()) { endLambda(jjtThis); }
+    <FUNCTION>
+    ( DeclareFunction() )?
+    { beginLambda(jjtThis); }
+    Parameters()
+    ( LOOKAHEAD(3) Block() | Expression() )
+    { endLambda(jjtThis); }
   |
-  { beginLambda(jjtThis); } Parameters() (arrow=<LAMBDA> | arrow=<FATARROW>) ( LOOKAHEAD(3) Block() | Expression()) { checkLambda(arrow); endLambda(jjtThis); }
+    { beginLambda(jjtThis); }
+    Parameters()
+    ( arrow=<LAMBDA> | arrow=<FATARROW> )
+    ( LOOKAHEAD(3) Block() | Expression() )
+    { checkLambda(arrow); endLambda(jjtThis); }
   |
-  { beginLambda(jjtThis); } Parameter() (arrow=<LAMBDA> | arrow=<FATARROW>)( LOOKAHEAD(3) Block() | Expression()) { checkLambda(arrow); endLambda(jjtThis); }
+    { beginLambda(jjtThis); }
+    Parameter()
+    ( arrow=<LAMBDA> | arrow=<FATARROW> )
+    ( LOOKAHEAD(3) Block() | Expression() )
+    { checkLambda(arrow); endLambda(jjtThis); }
 }
 
 
@@ -1235,20 +1288,24 @@ void IdentifierAccess() #void :
     Token t;
 }
 {
-    <DOT> (
-        t=<DOT_IDENTIFIER> { jjtThis.setIdentifier(t.image); } #IdentifierAccess
+  // it looks that in v8 you need the enclosing '(' and ')' to delimit the nodes, otherwise <DOT_IDENTIFIER> is not included in it
+  // it looks to be a regression from v7, caused by the presence of the final actions not handled in the same way
+    <DOT>
+    (
+      ( t=<DOT_IDENTIFIER> { jjtThis.setIdentifier(t.image); }                           ) #IdentifierAccess
     |
-        t=<STRING_LITERAL> { jjtThis.setIdentifier(Parser.buildString(t.image, true)); } #IdentifierAccess
+      ( t=<STRING_LITERAL> { jjtThis.setIdentifier(Parser.buildString(t.image, true)); } ) #IdentifierAccess
     |
-        t=<JXLT_LITERAL> { jjtThis.setIdentifier(Parser.buildString(t.image, true), getScope()); } #IdentifierAccessJxlt
+       (t=<JXLT_LITERAL>   { jjtThis.setIdentifier(Parser.buildString(t.image, true), getScope()); } ) #IdentifierAccessJxlt
     )
+  |
+    <QDOT>
+    (
+      ( t=<DOT_IDENTIFIER> { jjtThis.setIdentifier(t.image); }                           ) #IdentifierAccessSafe
     |
-    <QDOT> (
-        t=<DOT_IDENTIFIER> { jjtThis.setIdentifier(t.image); } #IdentifierAccessSafe
+      ( t=<STRING_LITERAL> { jjtThis.setIdentifier(Parser.buildString(t.image, true)); } ) #IdentifierAccessSafe
     |
-        t=<STRING_LITERAL> { jjtThis.setIdentifier(Parser.buildString(t.image, true)); } #IdentifierAccessSafe
-    |
-        t=<JXLT_LITERAL> { jjtThis.setIdentifier(Parser.buildString(t.image, true), getScope()); } #IdentifierAccessSafeJxlt
+      ( t=<JXLT_LITERAL>   { jjtThis.setIdentifier(Parser.buildString(t.image, true), getScope()); } ) #IdentifierAccessSafeJxlt
     )
 }
 
@@ -1257,42 +1314,51 @@ void ArrayAccess() : {
  int s = 0;
  }
 {
-    (LOOKAHEAD(2) (<LBRACKET>|<QLBRACKET> { safe |= (1L << s++); }) Expression() <RBRACKET>)+ { jjtThis.setSafe(safe); }
+  ( LOOKAHEAD(2)
+    ( < LBRACKET > | < QLBRACKET > { safe |= (1L << s++); } )
+    Expression() < RBRACKET >
+  ) +
+  { jjtThis.setSafe(safe); }
 }
 
 void MemberAccess() #void : {}
 {
-    LOOKAHEAD(<LBRACKET>|<QLBRACKET>) ArrayAccess()
-    |
-    LOOKAHEAD(<DOT>) IdentifierAccess()
-    |
-    LOOKAHEAD(<QDOT>) IdentifierAccess()
+    /*LOOKAHEAD(<LBRACKET>|<QLBRACKET>)*/ ArrayAccess()
+    | // why differentiating both cases???
+    /*LOOKAHEAD(<DOT>)*/ IdentifierAccess()
+//    |
+//    LOOKAHEAD(<QDOT>) IdentifierAccess()
 }
 
 void ReferenceExpression() #MethodNode(>1) : {}
 {
-    <LPAREN> Expression() <RPAREN> #ReferenceExpression(1) ( LOOKAHEAD(<LPAREN>) Arguments() )*
+    <LPAREN> Expression() <RPAREN> #ReferenceExpression(1) ( LOOKAHEAD(2/*<LPAREN>*/) Arguments() )*
 }
 
 void PrimaryExpression() #void : {}
 {
-       LOOKAHEAD( LambdaLookahead() ) Lambda()
+       LOOKAHEAD(LambdaLookahead()) Lambda() // changing to LA(3) causes 22 errors and 1 failure
     |
-       LOOKAHEAD( <LPAREN> ) ReferenceExpression()
+       /*LOOKAHEAD( <LPAREN> )*/ ReferenceExpression()
     |
-       LOOKAHEAD( <LCURLY> Expression() <COLON>) MapLiteral()
+    // this LA does not accept MapLiteral() with 2 MapEntry() separated by a COMMA, which will be accepted by the 2nd next LA...
+//       LOOKAHEAD( <LCURLY> Expression() <COLON>) MapLiteral()
+//    |
+//       LOOKAHEAD( <LCURLY> <COLON>) MapLiteral()
+// so merge the previous 2 in 1 with a full syntactic LA
+       LOOKAHEAD( MapLiteral() ) MapLiteral()
     |
-       LOOKAHEAD( <LCURLY> <COLON>) MapLiteral()
+    // no need to distinguish the following 2
+//       LOOKAHEAD( <LCURLY> Expression() (<COMMA> | <RCURLY>)) SetLiteral()
+//    |
+//       LOOKAHEAD( <LCURLY> <RCURLY> ) SetLiteral()
+       SetLiteral()
     |
-       LOOKAHEAD( <LCURLY> Expression() (<COMMA> | <RCURLY>)) SetLiteral()
+       /*LOOKAHEAD( <LBRACKET> )*/ ArrayLiteral()
     |
-       LOOKAHEAD( <LCURLY> <RCURLY> ) SetLiteral()
+       /*LOOKAHEAD( <NEW> )*/ Constructor()
     |
-       LOOKAHEAD( <LBRACKET> ) ArrayLiteral()
-    |
-       LOOKAHEAD( <NEW> ) Constructor()
-    |
-       LOOKAHEAD( <SWITCH> ) SwitchExpression()
+       /*LOOKAHEAD( <SWITCH> )*/ SwitchExpression()
     |
        LOOKAHEAD( FunctionCallLookahead() ) FunctionCall()
     |
@@ -1303,23 +1369,28 @@ void PrimaryExpression() #void : {}
 
 void MethodCall() #void : {}
 {
-    (MemberAccess() (LOOKAHEAD(<LPAREN>) Arguments())+) #MethodNode(>1)
+  (
+    MemberAccess()
+    ( LOOKAHEAD(2 /*<LPAREN>*/) Arguments() )+
+  ) #MethodNode(> 1)
 }
 
 
-void MethodCallLookahead() #void : {}
-{
-    MemberAccess() <LPAREN>
-}
+// Too simple to be worth isolated, more clear to inline it
+//void MethodCallLookahead() #void : {}
+//{
+//    MemberAccess() <LPAREN>
+//}
 
 
 void MemberExpression() #void : {}
 {
-    LOOKAHEAD(MethodCallLookahead()) MethodCall() | MemberAccess()
+//    LOOKAHEAD( MethodCallLookahead() ) MethodCall() | MemberAccess()
+    LOOKAHEAD( MemberAccess() <LPAREN> ) MethodCall() | MemberAccess()
 }
 
 void ValueExpression() #void : {}
 {
-    ( PrimaryExpression() ( LOOKAHEAD(2) MemberExpression() )*) #Reference(>1)
+    ( PrimaryExpression() ( LOOKAHEAD(2) MemberExpression() )* ) #Reference(>1)
 }
 

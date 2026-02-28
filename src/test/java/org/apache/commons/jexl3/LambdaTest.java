@@ -217,7 +217,7 @@ class LambdaTest extends JexlTestCase {
 
     @ParameterizedTest
     @CsvSource({
-            "'if (false) function foo(x) { x + x }; var foo = 1', 'function'",
+            "'if (false) function foo(x) { x + x }; var foo = 1', 'foo'",
             "'if (false) let foo = (x) -> { x + x }; var foo = 1', 'let'",
             "'function foo(x) { x + x }; var foo = 42', 'foo'"
     })

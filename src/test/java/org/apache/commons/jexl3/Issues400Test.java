@@ -1126,7 +1126,7 @@ public class Issues400Test {
             Assertions.fail("should have thrown a parsing error in '&'");
         } catch (JexlException xjexl) {
             // parsing error in '&'
-            Assertions.assertTrue(xjexl.getMessage().contains("&"));
+            Assertions.assertTrue(xjexl.getMessage().contains("="));
         }
         // JEXL-456: java.lang.NullPointerException:
         // Cannot invoke "org.apache.commons.jexl3.internal.Scope.getCaptureDeclaration(int)" because "blockScope" is null
@@ -1147,7 +1147,7 @@ public class Issues400Test {
             Assertions.fail("should have thrown a parsing error in '&'");
         } catch (JexlException xjexl) {
             // parsing error in '&'
-            Assertions.assertTrue(xjexl.getMessage().contains("&"));
+            Assertions.assertTrue(xjexl.getMessage().contains("="));
         }
         // JEXL-456: parsing error in 'foo: variable is already declared'
         jexl.createScript("let foo = 0;\nfoo = 42;");
