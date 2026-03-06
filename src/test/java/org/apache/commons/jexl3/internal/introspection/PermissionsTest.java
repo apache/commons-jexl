@@ -583,7 +583,7 @@ class PermissionsTest {
                 script.execute(null);
                 Assertions.fail("should have thrown a permission exception");
             } catch (JexlException.Method exception) {
-                Assertions.assertTrue( exception.getMethod().contains("File"), "FileReader::new should not be allowed");
+                Assertions.assertTrue(exception.getMethod().contains("File"), "FileReader::new should not be allowed");
             }
         }
     }
