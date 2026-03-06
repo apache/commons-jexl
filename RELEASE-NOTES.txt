@@ -15,6 +15,7 @@ Bugs Fixed in 3.6.3:
 ====================
 
 o JEXL-456:  Change in template parser behavior.
+o JEXL-457:  Reduce default exposure for RESTRICTED JexlPermissions
 
 
 Changes in 3.6.3:
