@@ -1157,5 +1157,6 @@ public class Issues400Test {
         template.evaluate(null, writer);
         Assertions.assertEquals("42", writer.toString());
     }
+
 }
 

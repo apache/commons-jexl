@@ -121,8 +121,7 @@ public class JexlScriptEngine extends AbstractScriptEngine implements Compilable
 
     /**
      * Wrapper to help convert a JSR-223 ScriptContext into a JexlContext.
-     *
-     * Current implementation only gives access to ENGINE_SCOPE binding.
+     * <p>The current implementation only gives access to ENGINE_SCOPE binding.</p>
      */
     private final class JexlContextWrapper implements JexlContext {
 

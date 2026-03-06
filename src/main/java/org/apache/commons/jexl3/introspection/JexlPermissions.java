@@ -188,7 +188,7 @@ public interface JexlPermissions {
      * A restricted singleton.
      * <p>The RESTRICTED set is built using the following allowed packages and denied packages/classes.</p>
      * <p>Of particular importance are the restrictions on the {@link System},
-     * {@link Runtime}, {@link ProcessBuilder}, {@link Class} and those on {@link java.net}, {@link java.net},
+     * {@link Runtime}, {@link ProcessBuilder}, {@link Class} and those on {@link java.net},
      * {@link java.io} and {@link java.lang.reflect} that should provide a decent level of isolation between the scripts
      * and its host.
      * </p>
@@ -198,7 +198,6 @@ public interface JexlPermissions {
      * </p>
      * <ul>
      * <li>java.nio.*</li>
-     * <li>java.io.*</li>
      * <li>java.lang.*</li>
      * <li>java.math.*</li>
      * <li>java.text.*</li>
@@ -207,46 +206,55 @@ public interface JexlPermissions {
      * <li>org.apache.commons.jexl3.*</li>
      *
      * <li>org.apache.commons.jexl3 { JexlBuilder {} }</li>
-     * <li>org.apache.commons.jexl3.internal { Engine {} }</li>
-     * <li>java.lang { Runtime {} System {} ProcessBuilder {} Class {} }</li>
+     * <li>org.apache.commons.jexl3.introspection { JexlPermissions {} JexlPermissions$ClassPermissions {} }</li>
+     * <li>org.apache.commons.jexl3.internal { Engine {} Engine32 {} TemplateEngine {} }</li>
+     * <li>org.apache.commons.jexl3.internal.introspection { Uberspect {} Introspector {} }</li>
+     * <li>java.lang { Runtime {} System {} ProcessBuilder {} Process {} RuntimePermission {} SecurityManager {} Thread {} ThreadGroup {} Class {} }</li>
      * <li>java.lang.annotation {}</li>
+     * <li>java.lang.classfile {}</li>
+     * <li>java.lang.constant {}</li>
+     * <li>java.lang.foreign {}</li>
      * <li>java.lang.instrument {}</li>
      * <li>java.lang.invoke {}</li>
      * <li>java.lang.management {}</li>
+     * <li>java.lang.module {}</li>
      * <li>java.lang.ref {}</li>
      * <li>java.lang.reflect {}</li>
      * <li>java.net {}</li>
-     * <li>java.io { File { } }</li>
-     * <li>java.nio { Path { } Paths { } Files { } }</li>
+     * <li>java.io { +PrintWriter {} +Writer {} +StringWriter {} +Reader {} +InputStream {} +OutputStream {} }</li>
+     * <li>java.nio { Path {} Paths {} Files {} }</li>
      * <li>java.rmi {}</li>
      * </ul>
      */
     JexlPermissions RESTRICTED = JexlPermissions.parse(
             "# Restricted Uberspect Permissions",
             "java.nio.*",
-            "java.io.*",
             "java.lang.*",
             "java.math.*",
             "java.text.*",
             "java.util.*",
             "org.w3c.dom.*",
             "org.apache.commons.jexl3.*",
-            "org.apache.commons.jexl3 { JexlBuilder {} }",
-            "org.apache.commons.jexl3.introspection { JexlPermissions {} JexlPermissions$ClassPermissions {} }",
-            "org.apache.commons.jexl3.internal { Engine {} Engine32 {} TemplateEngine {} }",
-            "org.apache.commons.jexl3.internal.introspection { Uberspect {} Introspector {} }",
+            "org.apache.commons.jexl3 { JexlBuilder{} }",
+            "org.apache.commons.jexl3.introspection { JexlPermissions{} JexlPermissions$ClassPermissions{} }",
+            "org.apache.commons.jexl3.internal { Engine{} Engine32{} TemplateEngine{} }",
+            "org.apache.commons.jexl3.internal.introspection { Uberspect{} Introspector{} }",
             "java.lang { Runtime{} System{} ProcessBuilder{} Process{}" +
                     " RuntimePermission{} SecurityManager{}" +
                     " Thread{} ThreadGroup{} Class{} }",
             "java.lang.annotation {}",
+            "java.lang.classfile {}",
+            "java.lang.constant {}",
+            "java.lang.foreign {}",
             "java.lang.instrument {}",
             "java.lang.invoke {}",
             "java.lang.management {}",
+            "java.lang.module {}",
             "java.lang.ref {}",
             "java.lang.reflect {}",
             "java.net {}",
-            "java.io { File{} FileDescriptor{} }",
-            "java.nio { Path { } Paths { } Files { } }",
+            "java.io { +PrintWriter{} +Writer {} +StringWriter {} +Reader {} +InputStream {} +OutputStream {} }",
+            "java.nio { Path {} Paths {} Files {} }",
             "java.rmi"
     );
 

@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.BiPredicate;
 
 import org.apache.commons.jexl3.annotations.NoJexl;
 import org.apache.commons.jexl3.introspection.JexlPermissions;
@@ -320,7 +321,7 @@ public class Permissions implements JexlPermissions {
             }
             // explicit |= ...
             if (!explicit[0]) {
-                explicit[0] = wildcardAllow(clazz);
+                explicit[0] = wildcardAllow(clazz) || specifiedAllow(clazz, override, (njc, m) -> !njc.deny(m));
             }
             return true;
         } catch (final NoSuchMethodException ex) {
@@ -358,6 +359,31 @@ public class Permissions implements JexlPermissions {
     }
 
     /**
+     * Determines whether a specified permission check is allowed for a given class.
+     * The check involves verifying if a class or its corresponding package explicitly permits
+     * a name (e.g., method) based on a given condition.
+     *
+     * @param <T> the type of the name to check (e.g., method, constructor)
+     * @param clazz the class to evaluate (not null)
+     * @param name the name to verify (not null)
+     * @param check the condition to test whether the specified name is allowed (not null)
+     * @return true if the specified name is allowed based on the condition, false otherwise
+     */
+    private <T> boolean specifiedAllow(final Class<?> clazz, T name, BiPredicate<NoJexlClass, T> check) {
+        final NoJexlPackage njp = packages.get(ClassTool.getPackageName(clazz));
+        if (njp != null && check != null) {
+            // there is a package permission, check if there is a class permission
+            final NoJexlClass njc = njp.getNoJexl(clazz);
+            // if there is a class permission, perform the check
+            if (njc != null) {
+                return check.test(njc, name);
+            }
+        }
+        // nothing explicit
+        return false;
+    }
+
+    /**
      * Checks whether a field explicitly disallows JEXL introspection.
      *
      * @param field the field to check
@@ -379,7 +405,7 @@ public class Permissions implements JexlPermissions {
             return false;
         }
         // check wildcards
-        return wildcardAllow(clazz);
+        return wildcardAllow(clazz) || specifiedAllow(clazz, field, (njc, m) -> !njc.deny(m));
     }
 
     /**
@@ -401,8 +427,8 @@ public class Permissions implements JexlPermissions {
             return false;
         }
         Class<?> clazz = method.getDeclaringClass();
-        // gather if any implementation of the method is explicitly allowed by the packages
-        final boolean[] explicit = { wildcardAllow(clazz) };
+        // gather if the packages explicitly allow any implementation of the method
+        final boolean[] explicit = { wildcardAllow(clazz) || specifiedAllow(clazz, method, (njc, m) -> !njc.deny(m)) };
         // let's walk all interfaces
         for (final Class<?> inter : clazz.getInterfaces()) {
             if (!allow(inter, method, explicit)) {

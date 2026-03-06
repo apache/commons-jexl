@@ -2238,7 +2238,8 @@ class ArithmeticTest extends JexlTestCase {
 
         // JEXL-161
         final JexlContext jc = new MapContext();
-        jc.set("x", xml.getLastChild());
+        Object xmlx = xml.getLastChild();
+        jc.set("x", xmlx);
         final String y = "456";
         jc.set("y", y);
         final JexlScript s = jexl.createScript("x.attribute.info = y");
@@ -2251,7 +2252,7 @@ class ArithmeticTest extends JexlTestCase {
             assertEquals(y, info.getValue());
         } catch (final JexlException.Property xprop) {
             // test fails in java > 11 because modules, etc; need investigation
-            assertTrue(xprop.getMessage().contains("info"));
+            assertTrue(xprop.getMessage().contains("attribute"));
             assertTrue(getJavaVersion() > 11);
         }
     }

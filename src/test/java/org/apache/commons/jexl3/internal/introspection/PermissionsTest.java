@@ -24,13 +24,13 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.FileWriter;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -238,7 +238,7 @@ class PermissionsTest {
     }
 
     @Test
-    void testParsePermissions0a() throws Exception {
+    void testParsePermissions0a() {
         final String src = "java.lang { Runtime { exit(); exec(); } }\njava.net { URL {} }";
         final Permissions p = (Permissions) JexlPermissions.parse(src);
         final Map<String, Permissions.NoJexlPackage> nojexlmap = p.getPackages();
@@ -259,7 +259,7 @@ class PermissionsTest {
     }
 
     @Test
-    void testParsePermissions0b() throws Exception {
+    void testParsePermissions0b() {
         final String src = "java.lang { -Runtime { exit(); } }";
         final Permissions p = (Permissions) JexlPermissions.parse(src);
         final Method exit = getMethod(java.lang.Runtime.class,"exit");
@@ -268,7 +268,7 @@ class PermissionsTest {
     }
 
     @Test
-    void testParsePermissions0c() throws Exception {
+    void testParsePermissions0c() {
         final String src = "java.lang { +Runtime { availableProcessorCount(); } }";
         final Permissions p = (Permissions) JexlPermissions.parse(src);
         final Method exit = getMethod(java.lang.Runtime.class,"exit");
@@ -301,7 +301,7 @@ class PermissionsTest {
     }
 
     @Test
-    void testParsePermissions0f() throws Exception {
+    void testParsePermissions0f() {
         final String src = "java.lang { +Class { getName(); getSimpleName(); } }";
         final JexlPermissions p = RESTRICTED.compose(src);
         final Method getName = getMethod(java.lang.Class.class,"getName");
@@ -323,7 +323,7 @@ class PermissionsTest {
     }
 
     @Test
-    void testParsePermissions0g() throws Exception {
+    void testParsePermissions0g() {
         final String src = "java.lang { +Class {  } }";
         final JexlPermissions p = RESTRICTED.compose(src);
         final Method getName = getMethod(java.lang.Class.class,"getName");
@@ -341,23 +341,23 @@ class PermissionsTest {
     @Test
     void testParsePermissions1() {
         final String[] src = {
-                "java.lang.*",
-                "java.math.*",
-                "java.text.*",
-                "java.util.*",
-                "java.lang { Runtime {} }",
-                "java.rmi {}",
-                "java.io { File {} }",
-                "java.nio { Path {} }" ,
-                "org.apache.commons.jexl3.internal.introspection { " +
-                    "PermissionsTest { #level 0\n" +
-                        " Outer { #level 1\n" +
-                            " Inner { #level 2\n" +
-                                " callMeNot();" +
-                            " }" +
+            "java.lang.*",
+            "java.math.*",
+            "java.text.*",
+            "java.util.*",
+            "java.lang { Runtime {} }",
+            "java.rmi {}",
+            "java.io { File {} }",
+            "java.nio { Path {} }" ,
+            "org.apache.commons.jexl3.internal.introspection { " +
+                "PermissionsTest { #level 0\n" +
+                    " Outer { #level 1\n" +
+                        " Inner { #level 2\n" +
+                            " callMeNot();" +
                         " }" +
                     " }" +
-                " }"};
+                " }" +
+            " }"};
         final Permissions p = (Permissions) JexlPermissions.parse(src);
         final Map<String, Permissions.NoJexlPackage> nojexlmap = p.getPackages();
         assertNotNull(nojexlmap);
@@ -365,7 +365,8 @@ class PermissionsTest {
         assertEquals(4, wildcards.size());
 
         final JexlEngine jexl = new JexlBuilder().permissions(p).safe(false).lexical(true).create();
-
+        final Class<?> longz = Long.TYPE;
+        assertTrue(p.allow(longz));
         final Method exit = getMethod(java.lang.Runtime.class,"exit");
         assertNotNull(exit);
         assertFalse(p.allow(exit));
@@ -422,7 +423,7 @@ class PermissionsTest {
         runTestPermissions(new JexlPermissions.ClassPermissions(permissions0(), Collections.emptySet()));
     }
 
-    @Test void testPrivateOverload1() throws Exception {
+    @Test void testPrivateOverload1() {
         final String src = "parseDouble(\"PHM1\".substring(3)).intValue()";
         final JexlArithmetic jexla = new I33Arithmetic(true);
         final JexlEngine jexl = new JexlBuilder().safe(false).arithmetic(jexla).create();
@@ -491,7 +492,7 @@ class PermissionsTest {
     void testWildCardPackages() {
         Set<String> wildcards;
         boolean found;
-        wildcards = new HashSet<>(Arrays.asList("com.apache.*"));
+        wildcards = Collections.singleton("com.apache.*");
         found = Permissions.wildcardAllow(wildcards, "com.apache.commons.jexl3");
         assertTrue(found);
         found = Permissions.wildcardAllow(wildcards, "com.google.spexl");
@@ -533,5 +534,57 @@ class PermissionsTest {
         final String src = "import org.example.Pair; new Pair(17, 25);";
         final JexlScript script = jexl.createScript(src);
         Assertions.assertThrows(JexlException.class, ()-> script.execute(null));
+    }
+
+    @Test
+    void testPermissions457a() {
+        Assertions.assertTrue(RESTRICTED.allow(Long.TYPE));
+        for (Constructor<?> ctor : FileWriter.class.getDeclaredConstructors()) {
+            Assertions.assertFalse(RESTRICTED.allow(ctor));
+        }
+        for (Method m : FileWriter.class.getMethods()) {
+            if (m.getName().equals("write")) {
+                Assertions.assertTrue(RESTRICTED.allow(m), m.toString());
+            }
+        }
+    }
+
+    @Test
+    void testPermissions457b() {
+        final JexlEngine jexl = new JexlBuilder().silent(false).permissions(RESTRICTED).create();
+        List<String> srcs = Arrays.asList(
+            "new('java.io.FileWriter', 'test.txt')",
+            "new('java.io.FileWriter', 'test.txt', true)",
+            "new('java.io.FileWriter', new java.io.File('test.txt'))",
+            "new('java.io.FileWriter', new java.io.File('test.txt'), true)",
+            "import java.io.FileWriter; new FileWriter('test.txt')"
+        );
+        for (String src : srcs) {
+            final JexlScript script = jexl.createScript(src);
+            try {
+                script.execute(null);
+                Assertions.fail("should have thrown a permission exception");
+            } catch (JexlException.Method exception) {
+                Assertions.assertTrue( exception.getMethod().contains("File"), "FileWriter::new should not be allowed");
+            }
+        }
+    }
+
+    @Test
+    void testPermissions457c() {
+        final JexlEngine jexl = new JexlBuilder().silent(false).permissions(RESTRICTED).create();
+        List<String> srcs = Arrays.asList(
+            "new('java.io.FileReader','test.txt')",
+            "new('java.io.FileReader', new java.io.File('test.txt'))",
+            "import java.io.FileReader; new FileReader('test.txt')");
+        for (String src : srcs) {
+            final JexlScript script = jexl.createScript(src);
+            try {
+                script.execute(null);
+                Assertions.fail("should have thrown a permission exception");
+            } catch (JexlException.Method exception) {
+                Assertions.assertTrue( exception.getMethod().contains("File"), "FileReader::new should not be allowed");
+            }
+        }
     }
 }
