@@ -213,8 +213,8 @@ class JexlScriptEngineTest {
         assertEquals(initialValue, engine.eval("0;123")); // multiple statements
         final ScriptException xscript = assertThrows(ScriptException.class,
                 () -> engine.eval("sys=context.class.forName(\"java.lang.System\");now=sys.currentTimeMillis();"));
-        final JexlException.Method xjexl = (JexlException.Method) xscript.getCause();
-        assertEquals("forName", xjexl.getMethod());
+        final JexlException.Property xjexl = (JexlException.Property) xscript.getCause();
+        assertEquals("class", xjexl.getProperty());
         engine.put("value", initialValue);
         assertEquals(initialValue, engine.get("value"));
         final Integer newValue = 124;

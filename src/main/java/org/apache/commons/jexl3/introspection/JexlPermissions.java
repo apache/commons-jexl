@@ -69,7 +69,7 @@ public interface JexlPermissions {
     /**
      * A permission delegation that augments the RESTRICTED permission with an explicit
      * set of classes.
-     * <p>Typical use case is to deny access to a package - and thus all its classes - but allow
+     * <p>A typical use case is to deny access to a package - and thus all its classes - but allow
      * a few specific classes.</p>
      * <p>Note that the newer positive restriction syntax is preferable as in:
      * <code>RESTRICTED.compose("java.lang { +Class {} }")</code>.</p>
@@ -104,17 +104,27 @@ public interface JexlPermissions {
 
         @Override
         public boolean allow(final Class<?> clazz) {
-            return validate(clazz) && isClassAllowed(clazz) || super.allow(clazz);
+            return validate(clazz) && (isClassAllowed(clazz) || super.allow(clazz));
         }
 
         @Override
         public boolean allow(final Constructor<?> constructor) {
-            return validate(constructor) && isClassAllowed(constructor.getDeclaringClass()) || super.allow(constructor);
+            return validate(constructor) &&
+                (allowedClasses.contains(constructor.getDeclaringClass().getCanonicalName()) || super.allow(constructor));
         }
 
         @Override
-        public boolean allow(final Method method) {
-            return validate(method) && isClassAllowed(method.getDeclaringClass()) || super.allow(method);
+        public boolean allow(final Class<?> clazz, final Method method) {
+            if (!validate(method)) {
+              return false;
+            }
+            if (!method.getDeclaringClass().isAssignableFrom(clazz)) {
+              return false;
+            }
+            if (super.allow(clazz, method)) {
+              return true;
+            }
+            return isClassAllowed(clazz);
         }
 
         @Override
@@ -122,9 +132,23 @@ public interface JexlPermissions {
             return new ClassPermissions(base.compose(src), allowedClasses);
         }
 
-        private boolean isClassAllowed(final Class<?> clazz) {
-            return allowedClasses.contains(clazz.getCanonicalName());
+      private boolean isClassAllowed(final Class<?> aClass) {
+        Class<?> clazz = aClass;
+        // let's walk all interfaces
+        for (final Class<?> inter : clazz.getInterfaces()) {
+          if (allowedClasses.contains(inter.getCanonicalName())) {
+            return true;
+          }
         }
+        // let's walk all super classes
+        while (clazz != null) {
+          if (allowedClasses.contains(clazz.getCanonicalName())) {
+            return true;
+          }
+          clazz = clazz.getSuperclass();
+        }
+        return false;
+      }
     }
 
     /**
@@ -210,52 +234,35 @@ public interface JexlPermissions {
      * <li>org.apache.commons.jexl3.internal { Engine {} Engine32 {} TemplateEngine {} }</li>
      * <li>org.apache.commons.jexl3.internal.introspection { Uberspect {} Introspector {} }</li>
      * <li>java.lang { Runtime {} System {} ProcessBuilder {} Process {} RuntimePermission {} SecurityManager {} Thread {} ThreadGroup {} Class {} }</li>
-     * <li>java.lang.annotation {}</li>
-     * <li>java.lang.classfile {}</li>
-     * <li>java.lang.constant {}</li>
-     * <li>java.lang.foreign {}</li>
-     * <li>java.lang.instrument {}</li>
-     * <li>java.lang.invoke {}</li>
-     * <li>java.lang.management {}</li>
-     * <li>java.lang.module {}</li>
-     * <li>java.lang.ref {}</li>
-     * <li>java.lang.reflect {}</li>
-     * <li>java.net {}</li>
      * <li>java.io { +PrintWriter {} +Writer {} +StringWriter {} +Reader {} +InputStream {} +OutputStream {} }</li>
-     * <li>java.nio { Path {} Paths {} Files {} }</li>
+     * <li>java.nio +{}</li>
      * <li>java.rmi {}</li>
      * </ul>
      */
-    JexlPermissions RESTRICTED = JexlPermissions.parse(
-            "# Restricted Uberspect Permissions",
-            "java.nio.*",
-            "java.lang.*",
-            "java.math.*",
-            "java.text.*",
-            "java.util.*",
-            "org.w3c.dom.*",
-            "org.apache.commons.jexl3.*",
-            "org.apache.commons.jexl3 { JexlBuilder{} }",
-            "org.apache.commons.jexl3.introspection { JexlPermissions{} JexlPermissions$ClassPermissions{} }",
-            "org.apache.commons.jexl3.internal { Engine{} Engine32{} TemplateEngine{} }",
-            "org.apache.commons.jexl3.internal.introspection { Uberspect{} Introspector{} }",
-            "java.lang { Runtime{} System{} ProcessBuilder{} Process{}" +
-                    " RuntimePermission{} SecurityManager{}" +
-                    " Thread{} ThreadGroup{} Class{} }",
-            "java.lang.annotation {}",
-            "java.lang.classfile {}",
-            "java.lang.constant {}",
-            "java.lang.foreign {}",
-            "java.lang.instrument {}",
-            "java.lang.invoke {}",
-            "java.lang.management {}",
-            "java.lang.module {}",
-            "java.lang.ref {}",
-            "java.lang.reflect {}",
-            "java.net {}",
-            "java.io { +PrintWriter{} +Writer {} +StringWriter {} +Reader {} +InputStream {} +OutputStream {} }",
-            "java.nio { Path {} Paths {} Files {} }",
-            "java.rmi"
+
+    JexlPermissions DEFAULT = JexlPermissions.parse(
+        "# Default Uberspect Permissions",
+        "java.math.*",
+        "java.text.*",
+        "java.time.*",
+        "java.util.*",
+        "org.w3c.dom.*",
+        "java.lang +{" +
+            "-Runtime{} -System{} -ProcessBuilder{} -Process{}" +
+            "-RuntimePermission{} -SecurityManager{}" +
+            "-Thread{} -ThreadGroup{} -Class{} -ClassLoader{}" +
+            "}",
+        "java.io -{ +PrintWriter{} +Writer{} +StringWriter{} +Reader{} +InputStream{} +OutputStream{} }",
+        "java.nio +{}",
+        "java.nio.charset +{}"
+    );
+    JexlPermissions RESTRICTED = DEFAULT.compose(
+        // the following ones are mostly for tests, these should be reassessed (jxlt)
+        "org.apache.commons.jexl3.*",
+        "org.apache.commons.jexl3 +{ -JexlBuilder{} }",
+        "org.apache.commons.jexl3.introspection -{ JexlPermissions{} JexlPermissions$ClassPermissions{} }",
+        "org.apache.commons.jexl3.internal -{ Engine{} Engine32{} TemplateEngine{} }",
+        "org.apache.commons.jexl3.internal.introspection -{ Uberspect{} Introspector{} }"
     );
 
     /**
@@ -361,8 +368,8 @@ public interface JexlPermissions {
     boolean allow(Constructor<?> ctor);
 
     /**
-     * Checks whether a field explicitly disallows JEXL introspection.
-     * <p>If a field is not allowed, it cannot resolved and accessed in scripts or expressions.</p>
+     * Checks whether a field explicitly allows JEXL introspection.
+     * <p>If a field is not allowed, it cannot be resolved and accessed in scripts or expressions.</p>
      *
      * @param field the field to check
      * @return true if JEXL is allowed to introspect, false otherwise
@@ -371,16 +378,42 @@ public interface JexlPermissions {
     boolean allow(Field field);
 
     /**
+     * Checks whether a field explicitly allows JEXL introspection.
+     * <p>If a field is not allowed, it cannot be resolved and accessed in scripts or expressions.</p>
+     * @param clazz the class from which the field is accessed, used to check that the field is allowed for this class
+     * @param field the field to check
+     * @return true if JEXL is allowed to introspect, false otherwise
+     * @since 3.7
+   */
+    default boolean allow(Class<?> clazz, Field field) {
+      return allow(field);
+    }
+
+    /**
      * Checks whether a method allows JEXL introspection.
-     * <p>If a method is not allowed, it cannot resolved and called in scripts or expressions.</p>
+     * <p>If a method is not allowed, it cannot be resolved and called in scripts or expressions.</p>
      * <p>Since methods can be overridden and overloaded, this also checks that no superclass or interface
-     * explicitly disallows this methods.</p>
+     * explicitly disallows this method.</p>
      *
      * @param method the method to check
      * @return true if JEXL is allowed to introspect, false otherwise
      * @since 3.3
      */
     boolean allow(Method method);
+
+    /**
+     * Checks whether a method allows JEXL introspection.
+     * <p>If a method is not allowed, it cannot be resolved and called in scripts or expressions.</p>
+     * <p>Since methods can be overridden and overloaded, this checks that this class explicitly allows
+     * this method - superseding any superclass or interface specified permissions.</p>
+     *
+     * @param method the method to check
+     * @return true if JEXL is allowed to introspect, false otherwise
+     * @since 3.7
+     */
+    default boolean allow(Class<?> clazz, Method method) {
+      return allow(method);
+    }
 
     /**
      * Checks whether a package allows JEXL introspection.

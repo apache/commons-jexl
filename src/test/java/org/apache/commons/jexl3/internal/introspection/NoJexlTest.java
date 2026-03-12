@@ -25,6 +25,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
 import org.apache.commons.jexl3.annotations.NoJexl;
+import org.apache.commons.jexl3.introspection.JexlPermissions;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -85,6 +86,7 @@ class NoJexlTest {
 
     @Test
     void testNoJexlPermissions() throws Exception {
+        final JexlPermissions r = Permissions.RESTRICTED;
         final Permissions p = Permissions.UNRESTRICTED;
         assertFalse(p.allow((Field) null));
         assertFalse(p.allow((Package) null));
@@ -115,7 +117,7 @@ class NoJexlTest {
 
         final Field fA = A.class.getField("i");
         assertNotNull(fA);
-        assertTrue(p.allow(fA));
+        assertTrue(p.allow(A.class, fA));
 
         final Field fA0 = A0.class.getField("i0");
         assertNotNull(fA0);

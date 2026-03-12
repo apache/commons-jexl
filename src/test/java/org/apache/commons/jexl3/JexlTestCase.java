@@ -79,7 +79,6 @@ public class JexlTestCase {
 
     // define mode pro50
     static final JexlOptions MODE_PRO50 = new JexlOptions();
-
     static {
         MODE_PRO50.setFlags("+strict +cancellable +lexical +lexicalShade -safe".split(" "));
     }
@@ -88,6 +87,13 @@ public class JexlTestCase {
      * A very secure singleton.
      */
     public static final JexlPermissions SECURE = JexlPermissions.RESTRICTED;
+
+    public static final JexlPermissions TESTPERMS = JexlPermissions.RESTRICTED.compose(
+        "org.apache.commons.jexl3.*",
+        "org.apache.commons.jexl3 +{ -JexlBuilder{} }",
+        "org.apache.commons.jexl3.introspection -{ JexlPermissions{} JexlPermissions$ClassPermissions{} }",
+        "org.apache.commons.jexl3.internal -{ Engine{} Engine32{} TemplateEngine{} }",
+        "org.apache.commons.jexl3.internal.introspection -{ Uberspect{} Introspector{} }");
 
     static JexlEngine createEngine() {
         return new JexlBuilder().create();

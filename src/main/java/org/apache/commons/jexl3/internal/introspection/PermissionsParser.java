@@ -216,11 +216,15 @@ public class PermissionsParser {
             i += 1;
         }
         // empty class means allow or deny all
-        if (njname != null && njclass.isEmpty()) {
-            njpackage.addNoJexl(njname, njclass instanceof Permissions.JexlClass
-                ? Permissions.JEXL_CLASS
-                : Permissions.NOJEXL_CLASS);
-
+        if (njname != null) {
+            if (njclass.isEmpty()) {
+                njpackage.addNoJexl(njname,
+                    njclass instanceof Permissions.JexlClass
+                        ? Permissions.JEXL_CLASS
+                        : Permissions.NOJEXL_CLASS);
+            } else {
+                njpackage.addNoJexl(njname, njclass);
+            }
         }
         return i;
     }
@@ -306,6 +310,7 @@ public class PermissionsParser {
         int i = 0;
         int j = -1;
         String pname = null;
+        Boolean negative = null;
         while (i < size) {
             final char c = src.charAt(i);
             // if no parsing progress can be made, we are in error
@@ -340,16 +345,44 @@ public class PermissionsParser {
             }
             // package mode
             if (njpackage == null) {
+                // negative or positive package
+                if (negative == null) {
+                    if (c == '-') {
+                        negative = true;
+                        i += 1;
+                        continue;
+                    }
+                    if (c == '+') {
+                        negative = false;
+                        i += 1;
+                        continue;
+                    }
+                    // default is deny specified classes
+                    //negative = true;
+                }
                 if (c == '{') {
+                    Boolean specified = negative;
                     njpackage = packages.compute(pname,
-                        (n, p) -> new Permissions.NoJexlPackage(p == null? null : p.nojexl)
+                        (n, p) -> {
+                            // if we haven't specified allow/deny,
+                            // keep the existing specification if any, otherwise default to deny
+                            boolean deny = specified == null ? !(p instanceof Permissions.JexlPackage) : specified;
+                            Map<String, Permissions.NoJexlClass> pkgMap = p == null ? null : p.nojexl;
+                            return deny
+                                ? new Permissions.NoJexlPackage(pkgMap)
+                                : new Permissions.JexlPackage(pkgMap);
+                        }
                     );
                     i += 1;
                 }
             } else if (c == '}') {
-                // empty means whole package
+                // empty means the whole package
                 if (njpackage.isEmpty()) {
-                    packages.put(pname, Permissions.NOJEXL_PACKAGE);
+                    packages.put(pname, negative == null || negative
+                        ? Permissions.NOJEXL_PACKAGE
+                        : Permissions.JEXL_PACKAGE);
+                } else {
+                    packages.put(pname, njpackage);
                 }
                 njpackage = null; // can restart anew
                 pname = null;

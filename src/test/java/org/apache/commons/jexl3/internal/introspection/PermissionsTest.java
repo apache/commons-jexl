@@ -201,6 +201,7 @@ class PermissionsTest {
         final Field fA0 = A0.class.getField("i0");
         assertNotNull(fA0);
         assertFalse(p.allow(fA0));
+        assertFalse(p.allow(A0.class, fA0));
         final Field fA1 = A1.class.getDeclaredField("i1");
         assertNotNull(fA1);
         assertFalse(p.allow(fA0));
@@ -482,6 +483,7 @@ class PermissionsTest {
                 java.lang.ref.SoftReference.class,
                 java.lang.reflect.Method.class);
         for(final Class<?> nac : nacs) {
+            assertFalse(JexlTestCase.SECURE.allow(nac), nac::getName);
             final Package p = nac.getPackage();
             assertNotNull(p, nac::getName);
             assertFalse(JexlTestCase.SECURE.allow(p), nac::getName);

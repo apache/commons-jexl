@@ -440,6 +440,9 @@ class ArithmeticTest extends JexlTestCase {
         }
     }
 
+    /**
+     * An arithmetic that has some DOM node knowledge.
+     */
     public static class XmlArithmetic extends JexlArithmetic {
         public XmlArithmetic(final boolean astrict) {
             super(astrict);
@@ -455,6 +458,27 @@ class ArithmeticTest extends JexlTestCase {
 
         public int size(final org.w3c.dom.Element elt) {
             return elt.getChildNodes().getLength();
+        }
+
+        public Object propertyGet(final NamedNodeMap attrs, final String name) {
+            Node node  = attrs.getNamedItem(name);
+            return node == null ? JexlEngine.TRY_FAILED : node.getNodeValue();
+        }
+
+        public Object propertySet(final NamedNodeMap attrs, final String name, final Object value) {
+            Node node = attrs.getNamedItem(name);
+            if (node == null) {
+                return JexlEngine.TRY_FAILED;
+            }
+            node.setNodeValue(value.toString());
+            return value;
+        }
+
+        public Object propertyGet(final Node elt, final String name) {
+            if ("attributes".equals(name)) {
+                return elt.getAttributes();
+            }
+            return JexlEngine.TRY_FAILED;
         }
     }
 
@@ -1022,8 +1046,8 @@ class ArithmeticTest extends JexlTestCase {
     }
 
     /**
-     * test some simple mathematical calculations
-     */
+   * test some simple mathematical calculations
+   */
     @Test
     void testCalculations() throws Exception {
         asserter.setStrict(true, false);
@@ -2242,18 +2266,18 @@ class ArithmeticTest extends JexlTestCase {
         jc.set("x", xmlx);
         final String y = "456";
         jc.set("y", y);
-        final JexlScript s = jexl.createScript("x.attribute.info = y");
+        final JexlScript s = jexl.createScript("x.attributes.info = y");
         Object r;
         try {
-            r = s.execute(jc);
             nnm = xml.getLastChild().getAttributes();
             info = (Attr) nnm.getNamedItem("info");
+            r = s.execute(jc);
             assertEquals(y, r);
             assertEquals(y, info.getValue());
         } catch (final JexlException.Property xprop) {
             // test fails in java > 11 because modules, etc; need investigation
             assertTrue(xprop.getMessage().contains("attribute"));
-            assertTrue(getJavaVersion() > 11);
+            assertTrue(getJavaVersion() > 11, getJavaVersion() + " >? 11");
         }
     }
 

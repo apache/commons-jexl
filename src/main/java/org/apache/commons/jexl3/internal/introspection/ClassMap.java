@@ -88,13 +88,13 @@ final class ClassMap {
         //
         // We also ignore all SecurityExceptions that might happen due to SecurityManager restrictions.
         //
-        for (Class<?> classToReflect = clazz; classToReflect != null; classToReflect = classToReflect.getSuperclass()) {
-            if (Modifier.isPublic(classToReflect.getModifiers()) && ClassTool.isExported(classToReflect)) {
-                populateWithClass(cache, permissions, classToReflect, log);
+        for (Class<?> superz = clazz; superz != null; superz = superz.getSuperclass()) {
+            if (Modifier.isPublic(superz.getModifiers()) && ClassTool.isExported(superz)) {
+                populateWithClass(clazz, cache, permissions, superz, log);
             }
-            final Class<?>[] interfaces = classToReflect.getInterfaces();
+            final Class<?>[] interfaces = superz.getInterfaces();
             for (final Class<?> anInterface : interfaces) {
-                populateWithInterface(cache, permissions, anInterface, log);
+                populateWithInterface(superz, cache, permissions, anInterface, log);
             }
         }
         // now that we've got all methods keyed in, lets organize them by name
@@ -136,7 +136,7 @@ final class ClassMap {
      * @param clazz       the class to populate the cache from
      * @param log         the Log
      */
-    private static void populateWithClass(final ClassMap cache,
+    private static void populateWithClass(final Class<?> source, final ClassMap cache,
                                           final JexlPermissions permissions,
                                           final Class<?> clazz,
                                           final Log log) {
@@ -149,7 +149,7 @@ final class ClassMap {
                 }
                 // add method to byKey cache; do not override
                 final MethodKey key = new MethodKey(mi);
-                final Method pmi = cache.byKey.putIfAbsent(key, permissions.allow(mi) ? mi : CACHE_MISS);
+                final Method pmi = cache.byKey.putIfAbsent(key, permissions.allow(source, mi) ? mi : CACHE_MISS);
                 if (pmi != null && pmi != CACHE_MISS && log.isDebugEnabled() && !key.equals(new MethodKey(pmi))) {
                     // foo(int) and foo(Integer) have the same signature for JEXL
                     log.debug("Method " + pmi + " is already registered, key: " + key.debugString());
@@ -171,15 +171,15 @@ final class ClassMap {
      * @param iface       the interface to populate the cache from
      * @param log         the Log
      */
-    private static void populateWithInterface(final ClassMap cache,
+    private static void populateWithInterface(final Class<?> source, final ClassMap cache,
                                               final JexlPermissions permissions,
                                               final Class<?> iface,
                                               final Log log) {
         if (Modifier.isPublic(iface.getModifiers())) {
-            populateWithClass(cache, permissions, iface, log);
+            populateWithClass(source, cache, permissions, iface, log);
             final Class<?>[] supers = iface.getInterfaces();
             for (final Class<?> aSuper : supers) {
-                populateWithInterface(cache, permissions, aSuper, log);
+                populateWithInterface(source, cache, permissions, aSuper, log);
             }
         }
     }
@@ -249,7 +249,7 @@ final class ClassMap {
         if (fields.length > 0) {
             final Map<String, Field> cache = new HashMap<>();
             for (final Field field : fields) {
-                if (permissions.allow(field)) {
+                if (permissions.allow(aClass, field)) {
                     cache.put(field.getName(), field);
                 }
             }
