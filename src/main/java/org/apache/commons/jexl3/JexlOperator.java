@@ -20,7 +20,7 @@ package org.apache.commons.jexl3;
 import java.util.function.Consumer;
 
 /**
- * The JEXL operators.
+ * Enumerates JEXL operators.
  *
  * These are the operators that are executed by JexlArithmetic methods.
  *

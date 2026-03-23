@@ -670,7 +670,7 @@ public class JexlException extends RuntimeException {
     }
 
     /**
-     * The various type of variable issues.
+     * Enumerates types of variable issues.
      */
     public enum VariableIssue {
 
