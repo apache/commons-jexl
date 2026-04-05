@@ -49,7 +49,6 @@ import org.apache.commons.jexl3.JexlBuilder;
 import org.apache.commons.jexl3.JexlException;
 import org.apache.commons.jexl3.introspection.JexlPermissions;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 class JexlScriptEngineTest {
@@ -278,7 +277,7 @@ class JexlScriptEngineTest {
                 "> >> 22" + LF +
                 "> >> 42" + LF +
                 "> ";
-        Assertions.assertEquals(ctl, strw.toString());
+        assertEquals(ctl, strw.toString());
     }
 
     @Test
@@ -287,7 +286,7 @@ class JexlScriptEngineTest {
         final StringReader strr = new StringReader("args[0]+args[1]");
         Main.run(new BufferedReader(strr), new PrintWriter(strw), new Object[]{20, 22});
         final String ctl = ">>: 42" + LF;
-        Assertions.assertEquals(ctl, strw.toString());
+        assertEquals(ctl, strw.toString());
     }
 
     @Test
@@ -303,7 +302,7 @@ class JexlScriptEngineTest {
             writer.close();
             final String ctl = ">>: 42" + LF;
             Main.main(new String[]{file.toString()});
-            Assertions.assertEquals(ctl, outContent.toString());
+            assertEquals(ctl, outContent.toString());
         } finally {
             System.setOut(originalOut);
             if (file != null) {

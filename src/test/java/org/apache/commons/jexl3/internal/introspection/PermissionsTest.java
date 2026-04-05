@@ -23,6 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.FileWriter;
 import java.lang.reflect.Constructor;
@@ -48,7 +49,6 @@ import org.apache.commons.jexl3.internal.introspection.nojexlpackage.Invisible;
 import org.apache.commons.jexl3.introspection.JexlPermissions;
 import org.apache.commons.jexl3.introspection.JexlUberspect;
 import org.example.Pair;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -513,17 +513,17 @@ class PermissionsTest {
         final JexlEngine jexl = new JexlBuilder().cache(8).permissions(permissions).namespaces(funcs).create();
         String src = "let p = lisp:cons(17, 25); p.car + p.cdr;";
         JexlScript script = jexl.createScript(src);
-        Assertions.assertEquals(42, script.execute(null));
-        Assertions.assertEquals(42, script.execute(null));
+        assertEquals(42, script.execute(null));
+        assertEquals(42, script.execute(null));
         src = "(p, x, y) -> { p.car = x; p.cdr = y; }";
         Pair p = new Pair(-1, -41);
         script = jexl.createScript(src);
-        Assertions.assertNotNull(script.execute(null, p, 22, 20));
-        Assertions.assertEquals(22, p.car);
-        Assertions.assertEquals(20, p.cdr);
-        Assertions.assertNotNull(script.execute(null, p, 18, 24));
-        Assertions.assertEquals(18, p.car);
-        Assertions.assertEquals(24, p.cdr);
+        assertNotNull(script.execute(null, p, 22, 20));
+        assertEquals(22, p.car);
+        assertEquals(20, p.cdr);
+        assertNotNull(script.execute(null, p, 18, 24));
+        assertEquals(18, p.car);
+        assertEquals(24, p.cdr);
     }
 
     @Test
@@ -533,18 +533,18 @@ class PermissionsTest {
         final JexlEngine jexl = new JexlBuilder().cache(8).permissions(permissions).namespaces(funcs).create();
         final String src = "import org.example.Pair; new Pair(17, 25);";
         final JexlScript script = jexl.createScript(src);
-        Assertions.assertThrows(JexlException.class, ()-> script.execute(null));
+        assertThrows(JexlException.class, ()-> script.execute(null));
     }
 
     @Test
     void testPermissions457a() {
-        Assertions.assertTrue(RESTRICTED.allow(Long.TYPE));
+        assertTrue(RESTRICTED.allow(Long.TYPE));
         for (Constructor<?> ctor : FileWriter.class.getDeclaredConstructors()) {
-            Assertions.assertFalse(RESTRICTED.allow(ctor));
+            assertFalse(RESTRICTED.allow(ctor));
         }
         for (Method m : FileWriter.class.getMethods()) {
             if (m.getName().equals("write")) {
-                Assertions.assertTrue(RESTRICTED.allow(m), m.toString());
+                assertTrue(RESTRICTED.allow(m), m.toString());
             }
         }
     }
@@ -563,9 +563,9 @@ class PermissionsTest {
             final JexlScript script = jexl.createScript(src);
             try {
                 script.execute(null);
-                Assertions.fail("should have thrown a permission exception");
+                fail("should have thrown a permission exception");
             } catch (JexlException.Method exception) {
-                Assertions.assertTrue(exception.getMethod().contains("File"), "FileWriter::new should not be allowed");
+                assertTrue(exception.getMethod().contains("File"), "FileWriter::new should not be allowed");
             }
         }
     }
@@ -581,9 +581,9 @@ class PermissionsTest {
             final JexlScript script = jexl.createScript(src);
             try {
                 script.execute(null);
-                Assertions.fail("should have thrown a permission exception");
+                fail("should have thrown a permission exception");
             } catch (JexlException.Method exception) {
-                Assertions.assertTrue(exception.getMethod().contains("File"), "FileReader::new should not be allowed");
+                assertTrue(exception.getMethod().contains("File"), "FileReader::new should not be allowed");
             }
         }
     }

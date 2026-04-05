@@ -53,7 +53,6 @@ import org.apache.commons.jexl3.parser.ASTJexlScript;
 import org.apache.commons.jexl3.parser.JexlScriptParser;
 import org.apache.commons.jexl3.parser.Parser;
 import org.apache.commons.jexl3.parser.StringProvider;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -752,7 +751,7 @@ public class Issues400Test {
         final String[] j = {"a!=b", "a == 2", "a.b.c != '1<>0'"};
         for (int i = 0; i < e.length; ++i) {
             final String je = transcodeSQLExpr(e[i]);
-            Assertions.assertEquals(j[i], je);
+            assertEquals(j[i], je);
         }
     }
 
@@ -761,7 +760,7 @@ public class Issues400Test {
         final String[] e = {"a <= 2", "a >= 2", "a := 2", "a + 3 << 4 > 5",};
         for (final String element : e) {
             final String je = transcodeSQLExpr(element);
-            Assertions.assertEquals(element, je);
+            assertEquals(element, je);
         }
     }
 
@@ -775,12 +774,12 @@ public class Issues400Test {
             .sideEffectGlobal(false);
         final JexlBuilder builder = new JexlBuilder().parserFactory(SQLParser::new).cache(32).features(f);
         final JexlEngine sqle = builder.create();
-        Assertions.assertTrue((boolean) sqle.createScript("a <> 25", "a").execute(null, 24));
-        Assertions.assertFalse((boolean) sqle.createScript("a <> 25", "a").execute(null, 25));
-        Assertions.assertFalse((boolean) sqle.createScript("a = 25", "a").execute(null, 24));
-        Assertions.assertTrue((boolean) sqle.createScript("a != 25", "a").execute(null, 24));
-        Assertions.assertTrue((boolean) sqle.createScript("a = 25", "a").execute(null, 25));
-        Assertions.assertFalse((boolean) sqle.createScript("a != 25", "a").execute(null, 25));
+        assertTrue((boolean) sqle.createScript("a <> 25", "a").execute(null, 24));
+        assertFalse((boolean) sqle.createScript("a <> 25", "a").execute(null, 25));
+        assertFalse((boolean) sqle.createScript("a = 25", "a").execute(null, 24));
+        assertTrue((boolean) sqle.createScript("a != 25", "a").execute(null, 24));
+        assertTrue((boolean) sqle.createScript("a = 25", "a").execute(null, 25));
+        assertFalse((boolean) sqle.createScript("a != 25", "a").execute(null, 25));
     }
 
     @Test
@@ -789,7 +788,7 @@ public class Issues400Test {
         String ctl = "\nab\nc`d\n";
         final JexlExpression e = jexl.createExpression("`\nab\nc\\`d\n`");
         Object o = e.evaluate(null);
-        Assertions.assertEquals(ctl, o);
+        assertEquals(ctl, o);
 
         final JexlContext context = new MapContext();
         context.set("name", "Hello");
@@ -797,7 +796,7 @@ public class Issues400Test {
         final JexlScript script = jexl.createScript(code);
         o = script.execute(context);
         ctl = "Hello\nHello";
-        Assertions.assertEquals(ctl, o);
+        assertEquals(ctl, o);
     }
 
     @Test
@@ -809,7 +808,7 @@ public class Issues400Test {
             "`${x} ${z}`;\n" + "}\n" + "test('world');";
         final JexlScript script = jexl.createScript(code);
         final Object result = script.execute(context);
-        Assertions.assertEquals("hello world", result);
+        assertEquals("hello world", result);
     }
 
 
@@ -821,17 +820,17 @@ public class Issues400Test {
             + "c+foo(a, b)";
         final JexlScript script = jexl.createScript(src, "a", "b");
         final Object result = script.execute(null, "a", "b");
-        Assertions.assertEquals("a\n?= ba\n?== b", result);
+        assertEquals("a\n?= ba\n?== b", result);
         String[] locals = script.getLocalVariables();
-        Assertions.assertArrayEquals(new String[]{"c", "foo"}, locals);
+        assertArrayEquals(new String[]{"c", "foo"}, locals);
         final String TEST447 = "src/test/scripts/test447.jexl";
         final File src447 = new File(TEST447);
         final JexlScript script447 = jexl.createScript(src447);
         final Object result447 = script447.execute(null);
-        Assertions.assertInstanceOf(List.class, result447);
+        assertInstanceOf(List.class, result447);
         @SuppressWarnings("unchecked") final List<Boolean> list = (List<Boolean>) result447;
         for (final Boolean item : list) {
-            Assertions.assertTrue(item);
+            assertTrue(item);
         }
     }
 
@@ -990,7 +989,7 @@ public class Issues400Test {
         JexlScript script = jexl.createScript(code);
         Object o = script.execute(null, "Hello");
         String ctl = "HelloHello";
-        Assertions.assertEquals(ctl, o);
+        assertEquals(ctl, o);
     }
 
     @Test
@@ -1000,7 +999,7 @@ public class Issues400Test {
         JexlScript script = jexl.createScript(code);
         Object o = script.execute(null, "Hello");
         String ctl = "Hello\nHello";
-        Assertions.assertEquals(ctl, o);
+        assertEquals(ctl, o);
     }
 
     @Test
@@ -1023,7 +1022,7 @@ public class Issues400Test {
         JexlScript script = jexl.createScript(code, "ref", "greeting");
         Object o = script.execute(null, "greeting", "Hello");
         String ctl = "Hello\nHello";
-        Assertions.assertEquals(ctl, o);
+        assertEquals(ctl, o);
     }
 
     @Test
@@ -1033,7 +1032,7 @@ public class Issues400Test {
         final String src = "(name, suffix) -> `#{name} Hello ${name} ! #{suffix}`";
         final JexlScript script = jexl.createScript(src);
         final Object result = script.execute(null, "World", "~");
-        Assertions.assertEquals("World Hello World ! ~", result);
+        assertEquals("World Hello World ! ~", result);
     }
 
     @Test
@@ -1043,7 +1042,7 @@ public class Issues400Test {
         final String src = "(name, suffix) -> `#{name + ' Hello'} ${name + ' !'} #{suffix}`";
         final JexlScript script = jexl.createScript(src);
         final Object result = script.execute(null, "World", "~");
-        Assertions.assertEquals("World Hello World ! ~", result);
+        assertEquals("World Hello World ! ~", result);
     }
 
     @Test
@@ -1054,7 +1053,7 @@ public class Issues400Test {
         final StringWriter writer = new StringWriter();
         // prepare requires immediate arguments; evaluate needs deferred arguments
         template.prepare(null, "World", null).evaluate(null, writer, null, "~");
-        Assertions.assertEquals("World ~", writer.toString());
+        assertEquals("World ~", writer.toString());
     }
 
     @Test
@@ -1065,13 +1064,13 @@ public class Issues400Test {
         final StringWriter writer = new StringWriter();
         // Prepare only the immediate name argument; evaluate needs both deferred arguments - name and suffix
         template.prepare(null, "World").evaluate(null, writer, "World", "~");
-        Assertions.assertEquals("World Hello World ! ~", writer.toString());
+        assertEquals("World Hello World ! ~", writer.toString());
     }
 
     @Test
     void testIssue456a() {
         final JexlFeatures features = JexlFeatures.createDefault();
-        Assertions.assertThrows(JexlException.Parsing.class, () -> run456(
+        assertThrows(JexlException.Parsing.class, () -> run456(
             f -> new JexlBuilder().features(f).strict(true).create(),
             features, null));
     }
@@ -1080,7 +1079,7 @@ public class Issues400Test {
     @Test
     void testIssue456b() {
         final JexlFeatures features = JexlFeatures.createDefault().ignoreTemplatePrefix(true);
-        Assertions.assertNotNull(run456(
+        assertNotNull(run456(
             f -> new JexlBuilder().features(f).strict(true).create(),
             features, null));
     }
@@ -1088,7 +1087,7 @@ public class Issues400Test {
     @Test
     void testIssue456c() {
         final JexlFeatures features = JexlFeatures.createDefault().ignoreTemplatePrefix(true);
-        Assertions.assertNotNull(run456(
+        assertNotNull(run456(
             f -> new JexlBuilder().features(f).strict(false).create(),
             features, null));
     }
@@ -1099,7 +1098,7 @@ public class Issues400Test {
         JexlContext ctxt = new MapContext();
         ctxt.set("$$", "");
         final JexlFeatures features = JexlFeatures.createDefault().ignoreTemplatePrefix(true);
-        Assertions.assertNotNull(run456(
+        assertNotNull(run456(
             f -> new JexlBuilder().features(f).strict(true).create(),
             features, ctxt));
     }
@@ -1111,7 +1110,7 @@ public class Issues400Test {
         final JxltEngine.Template template = jxlt.createTemplate("$$ var foo = 'foo';$$ var bar = 'bar';\n${foo + bar}");
         final StringWriter writer = new StringWriter();
         template.evaluate(ctxt, writer);
-        Assertions.assertEquals("foobar", writer.toString());
+        assertEquals("foobar", writer.toString());
         return jxlt;
     }
 
@@ -1123,10 +1122,10 @@ public class Issues400Test {
         jexl.createScript("var foo = 0;\nfoo = 42;");
         try {
             jxlt.createTemplate("$$ var foo = 'foo';  if (true) { var foo = 'bar'; var err =&; }");
-            Assertions.fail("should have thrown a parsing error in '&'");
+            fail("should have thrown a parsing error in '&'");
         } catch (JexlException xjexl) {
             // parsing error in '&'
-            Assertions.assertTrue(xjexl.getMessage().contains("&"));
+            assertTrue(xjexl.getMessage().contains("&"));
         }
         // JEXL-456: java.lang.NullPointerException:
         // Cannot invoke "org.apache.commons.jexl3.internal.Scope.getCaptureDeclaration(int)" because "blockScope" is null
@@ -1144,10 +1143,10 @@ public class Issues400Test {
         final JxltEngine jxlt = jexl.createJxltEngine();
         try {
             jxlt.createTemplate("$$ var err =&;");
-            Assertions.fail("should have thrown a parsing error in '&'");
+            fail("should have thrown a parsing error in '&'");
         } catch (JexlException xjexl) {
             // parsing error in '&'
-            Assertions.assertTrue(xjexl.getMessage().contains("&"));
+            assertTrue(xjexl.getMessage().contains("&"));
         }
         // JEXL-456: parsing error in 'foo: variable is already declared'
         jexl.createScript("let foo = 0;\nfoo = 42;");
@@ -1155,7 +1154,7 @@ public class Issues400Test {
         final JxltEngine.Template template = jxlt.createTemplate("$$ var foo = 0;\n$$ $$ foo = 42;\n${foo}");
         final StringWriter writer = new StringWriter();
         template.evaluate(null, writer);
-        Assertions.assertEquals("42", writer.toString());
+        assertEquals("42", writer.toString());
     }
 
 }
