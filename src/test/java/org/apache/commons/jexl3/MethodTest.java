@@ -418,8 +418,8 @@ class MethodTest extends JexlTestCase {
         final Functor func = new Functor();
         assertEquals(Integer.valueOf(10), JEXL.invokeMethod(func, "ten"));
         assertEquals(Integer.valueOf(42), JEXL.invokeMethod(func, "PLUS20", Integer.valueOf(22)));
-        assertThrows(Exception.class, () -> JEXL.invokeMethod(func, "nonExistentMethod"), "method does not exist!");
-        assertThrows(Exception.class, () -> JEXL.invokeMethod(func, "NPEIfNull", (Object[]) null), "method should have thrown!");
+        assertThrows(Exception.class, () -> JEXL.invokeMethod(func, "nonExistentMethod"), "method does not exist.");
+        assertThrows(Exception.class, () -> JEXL.invokeMethod(func, "NPEIfNull", (Object[]) null), "method should have thrown.");
         Object result = JEXL.invokeMethod(func, "over", "foo", 42);
         assertEquals("foo + 42", result);
         assertThrows(Exception.class, () -> JEXL.invokeMethod(func, "over", null, null));
