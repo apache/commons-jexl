@@ -306,7 +306,7 @@ class JexlScriptEngineTest {
                 System.setOut(printStream);
                 final String ctl = ">>: 42" + LF;
                 Main.main(new String[]{file.toString()});
-                Assertions.assertEquals(ctl, outContent.toString());
+                assertEquals(ctl, outContent.toString());
             } finally {
                 System.setOut(originalOut);
             }

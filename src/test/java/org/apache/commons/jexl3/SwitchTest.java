@@ -25,6 +25,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.jexl3.internal.Debugger;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -138,7 +139,7 @@ public class SwitchTest extends JexlTestCase {
 
     @Test
     void test440p() {
-        Assertions.assertTrue(TEST_PERMS.allow(this.getClass()));
+        assertTrue(TEST_PERMS.allow(this.getClass()));
     }
 
     @Test
