@@ -30,7 +30,6 @@ import java.util.concurrent.Callable;
 
 import org.apache.commons.jexl3.internal.Closure;
 import org.apache.commons.jexl3.internal.Script;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -591,7 +590,7 @@ class LambdaTest extends JexlTestCase {
         final JexlScript script = jexl.createScript(src);
         assertNotNull(script);
         final Object result = script.execute(null);
-        Assertions.assertEquals(-169, result);
+        assertEquals(-169, result);
     }
 
     @Test void testRefCapture6() {
@@ -604,6 +603,6 @@ class LambdaTest extends JexlTestCase {
         assertInstanceOf(JexlScript.class, result);
         script = jexl.createScript("f()", "f");
         result = script.execute(null, result);
-        Assertions.assertEquals(-167, result);
+        assertEquals(-167, result);
     }
 }

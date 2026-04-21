@@ -1687,7 +1687,7 @@ public class JexlArithmetic {
 
     /**
      * Convert a string to a BigDecimal.
-     * <>Empty string is considered as 0.</>
+     * <>Empty string is considered as 0.
      *
      * @param arg the arg
      * @return a BigDecimal
@@ -1703,7 +1703,7 @@ public class JexlArithmetic {
 
     /**
      * Converts a string to a big integer.
-     * <>Empty string is considered as 0.</>
+     * <>Empty string is considered as 0.
      *
      * @param arg the arg
      * @return a big integer
@@ -1719,7 +1719,7 @@ public class JexlArithmetic {
 
     /**
      * Convert a string to a double.
-     * <>Empty string is considered as NaN.</>
+     * <>Empty string is considered as NaN.
      *
      * @param arg the arg
      * @return a double

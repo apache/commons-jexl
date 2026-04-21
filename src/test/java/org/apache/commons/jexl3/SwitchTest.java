@@ -25,7 +25,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.jexl3.internal.Debugger;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -85,15 +84,15 @@ public class SwitchTest extends JexlTestCase {
         assertNotNull(dbgStr);
 
         Object result = script.execute(null, 10);
-        Assertions.assertEquals(3, result);
+        assertEquals(3, result);
         result = script.execute(null, 11);
-        Assertions.assertEquals(3, result);
+        assertEquals(3, result);
         result = script.execute(null, 20);
-        Assertions.assertEquals(4, result);
+        assertEquals(4, result);
         result = script.execute(null, 21);
-        Assertions.assertEquals(4, result);
+        assertEquals(4, result);
         result = script.execute(null, 38);
-        Assertions.assertEquals(42, result);
+        assertEquals(42, result);
         src = "let y = switch (x) { case 10,11 -> break; case 20, 21 -> 4; } y";
         try {
             script = jexl.createScript(src, "x");
@@ -121,15 +120,15 @@ public class SwitchTest extends JexlTestCase {
         assertNotNull(dbgStr);
 
         Object result = script.execute(null, 10);
-        Assertions.assertEquals(3, result);
+        assertEquals(3, result);
         result = script.execute(null, 20);
-        Assertions.assertEquals(4, result);
+        assertEquals(4, result);
         result = script.execute(null, 21);
-        Assertions.assertEquals(4, result);
+        assertEquals(4, result);
         result = script.execute(null, 32);
-        Assertions.assertEquals(169, result);
+        assertEquals(169, result);
         result = script.execute(null, 38);
-        Assertions.assertEquals(42, result);
+        assertEquals(42, result);
     }
 
     public enum Scope440 {
@@ -153,11 +152,11 @@ public class SwitchTest extends JexlTestCase {
         assertNotNull(dbgStr);
 
         Object result = script.execute(null, Scope440.UNDEFINED);
-        Assertions.assertEquals("undefined", result);
+        assertEquals("undefined", result);
         result = script.execute(null, Scope440.THIS);
-        Assertions.assertEquals("this", result);
+        assertEquals("this", result);
         result = script.execute(null, 21);
-        Assertions.assertEquals("OTHER", result);
+        assertEquals("OTHER", result);
     }
 
     @Test
@@ -179,7 +178,7 @@ public class SwitchTest extends JexlTestCase {
         final String src = "function f(x) { switch (x) { case Scope440.UNDEFINED : return 'undefined'; } } f(x)";
         final JexlScript script = jexl.createScript(src, "x");
         final Object result = script.execute(null, Scope440.UNDEFINED);
-        Assertions.assertEquals("undefined", result);
+        assertEquals("undefined", result);
         try {
             script.execute(null, Scope440.THIS);
             fail("should not be able to execute script with switch expression with no default");
@@ -221,15 +220,15 @@ public class SwitchTest extends JexlTestCase {
         final JexlScript script = jexl.createScript(src, "x");
         Object result;
         result = script.execute(null, 1);
-        Assertions.assertEquals("one", result);
+        assertEquals("one", result);
         result = script.execute(null, 2);
-        Assertions.assertEquals("two", result);
+        assertEquals("two", result);
         result = script.execute(null, 3);
-        Assertions.assertEquals("three", result);
+        assertEquals("three", result);
         result = script.execute(null, 4);
-        Assertions.assertEquals("many", result);
+        assertEquals("many", result);
         result = script.execute(null, 42);
-        Assertions.assertEquals("many", result);
+        assertEquals("many", result);
         final Debugger debugger = new Debugger();
         assertTrue(debugger.debug(script));
         final String dbgStr = debugger.toString();

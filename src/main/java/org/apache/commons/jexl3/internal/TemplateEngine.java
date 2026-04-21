@@ -1179,7 +1179,7 @@ public final class TemplateEngine extends JxltEngine {
      * ({@code '\t'}) and form feed ({@code '\f'}) are treated as ignorable within
      * template expressions and are skipped by the parser. These characters are
      * <em>not</em> ignored between the expression prefix ({@code '$'} or
-     * {@code '#'}) and the opening brace {@code '{'}; in that position they
+     * {@code '#'}) and the opening brace '{'; in that position they
      * influence parsing instead of being discarded.
      * </p>
      *

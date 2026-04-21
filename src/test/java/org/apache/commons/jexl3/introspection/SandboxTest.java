@@ -99,12 +99,12 @@ class SandboxTest extends JexlTestCase {
         }
 
         public @NoJexl Foo(final String name, final String notcallable) {
-            throw new UnsupportedOperationException("should not be callable!");
+            throw new UnsupportedOperationException("should not be callable.");
         }
 
         @NoJexl
         public String cantCallMe() {
-            throw new UnsupportedOperationException("should not be callable!");
+            throw new UnsupportedOperationException("should not be callable.");
         }
 
         public int doIt() {
@@ -125,12 +125,12 @@ class SandboxTest extends JexlTestCase {
 
         @Override
         public void tryMe() {
-            throw new UnsupportedOperationException("should not be callable!");
+            throw new UnsupportedOperationException("should not be callable.");
         }
 
         @Override
         public void tryMeARiver() {
-            throw new UnsupportedOperationException("should not be callable!");
+            throw new UnsupportedOperationException("should not be callable.");
         }
     }
 
@@ -460,9 +460,9 @@ class SandboxTest extends JexlTestCase {
         final JexlEngine sjexl = new JexlBuilder().permissions(JexlPermissions.UNRESTRICTED).sandbox(sandbox).safe(false).strict(true).create();
         Object result;
         final JexlScript script1 = sjexl.createScript("System.exit()");
-        assertThrows(JexlException.class, () -> script1.execute(context), "should not allow calling exit!");
+        assertThrows(JexlException.class, () -> script1.execute(context), "should not allow calling exit.");
         final JexlScript script2 = sjexl.createScript("System.exit(1)");
-        assertThrows(JexlException.class, () -> script2.execute(context), "should not allow calling exit!");
+        assertThrows(JexlException.class, () -> script2.execute(context), "should not allow calling exit.");
         final JexlScript script3 = sjexl.createScript("new('java.io.File', '/tmp/should-not-be-created')");
         assertThrows(JexlException.class, () -> script3.execute(context), "should not allow creating a file");
         final JexlScript script4 = sjexl.createScript("System.currentTimeMillis()");
