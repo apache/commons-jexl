@@ -624,10 +624,10 @@ public class Permissions implements JexlPermissions {
         if (deny(pack)) {
             return false;
         }
-        // must have specified a wildcard or some non-empty permission for this package
+        // an explicit package entry is allowed unless it is the deny marker
         final String name = pack.getName();
         final NoJexlPackage njp = packages.get(name);
-        return njp == null ? wildcardAllow(allowed, name) : !njp.isEmpty();
+        return njp == null ? wildcardAllow(allowed, name) : !Objects.equals(NOJEXL_PACKAGE, njp);
     }
 
 

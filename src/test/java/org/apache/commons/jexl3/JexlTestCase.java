@@ -43,7 +43,7 @@ public class JexlTestCase {
       "org.apache.commons.jexl3.introspection -{ JexlPermissions{} JexlPermissions$ClassPermissions{} }",
       "org.apache.commons.jexl3.internal -{ Engine{} Engine32{} TemplateEngine{} }",
       "org.apache.commons.jexl3.internal.introspection -{ Uberspect{} Introspector{} }",
-      "java.net -{ +URI { -toURL() } }");
+      "java.net -{ URI { toURL() } }");
 
   // define mode pro50
   static final JexlOptions MODE_PRO50 = new JexlOptions();

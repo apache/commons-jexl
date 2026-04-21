@@ -86,7 +86,6 @@ class NoJexlTest {
 
     @Test
     void testNoJexlPermissions() throws Exception {
-        final JexlPermissions r = Permissions.RESTRICTED;
         final Permissions p = Permissions.UNRESTRICTED;
         assertFalse(p.allow((Field) null));
         assertFalse(p.allow((Package) null));

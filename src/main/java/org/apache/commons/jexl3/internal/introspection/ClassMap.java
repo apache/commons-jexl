@@ -94,7 +94,7 @@ final class ClassMap {
             }
             final Class<?>[] interfaces = superz.getInterfaces();
             for (final Class<?> anInterface : interfaces) {
-                populateWithInterface(superz, cache, permissions, anInterface, log);
+                populateWithInterface(clazz, cache, permissions, anInterface, log);
             }
         }
         // now that we've got all methods keyed in, lets organize them by name

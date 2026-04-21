@@ -298,11 +298,14 @@ public class JexlScriptEngine extends AbstractScriptEngine implements Compilable
                             .safe(false)
                             .logger(JexlScriptEngine.LOG)
                             .cache(JexlScriptEngine.CACHE_SIZE);
-                    // ensure the script object class is always allowed for all permissions set
-                    JexlPermissions permissions = new JexlPermissions.ClassPermissions(
-                        PERMISSIONS == null ? JexlPermissions.RESTRICTED : PERMISSIONS,
-                        JexlScriptObject.class);
-                    builder.permissions(permissions);
+                    // preserve builder default permissions when PERMISSIONS is null;
+                    // otherwise ensure the script object class is always allowed
+                    if (PERMISSIONS != null) {
+                        final JexlPermissions permissions = new JexlPermissions.ClassPermissions(
+                            PERMISSIONS,
+                            JexlScriptObject.class);
+                        builder.permissions(permissions);
+                    }
                     engine = builder.create();
                     ENGINE = new SoftReference<>(engine);
                 }
@@ -453,7 +456,7 @@ public class JexlScriptEngine extends AbstractScriptEngine implements Compilable
     @Override
     public Object eval(final String script, final ScriptContext context) throws ScriptException {
         // This is mandated by JSR-223 (see SCR.5.5.2   Methods)
-        Objects.requireNonNull(script, CONTEXT_KEY);
+        Objects.requireNonNull(script, "script");
         Objects.requireNonNull(context, CONTEXT_KEY);
         // This is mandated by JSR-223 (end of section SCR.4.3.4.1.2 - JexlScript Execution)
         context.setAttribute(CONTEXT_KEY, context, ScriptContext.ENGINE_SCOPE);
