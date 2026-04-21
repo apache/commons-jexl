@@ -132,7 +132,8 @@ public interface JexlPermissions {
 
       @Override
       public boolean allow(final Class<?> clazz) {
-        return validate(clazz) && allowedClasses.contains(clazz.getCanonicalName()) || super.allow(clazz);
+        return validate(clazz) &&
+            (allowedClasses.contains(clazz.getCanonicalName()) || super.allow(clazz));
       }
 
       @Override
@@ -140,7 +141,10 @@ public interface JexlPermissions {
         if (!validate(field)) {
           return false;
         }
-        if (!clazz.isAssignableFrom(field.getDeclaringClass())) {
+        if (!validate(clazz)) {
+          return false;
+        }
+        if (!field.getDeclaringClass().isAssignableFrom(clazz)) {
           return false;
         }
         if (super.allow(clazz, field)) {
