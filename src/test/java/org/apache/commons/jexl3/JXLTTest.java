@@ -58,8 +58,6 @@ import org.junit.jupiter.params.provider.MethodSource;
  */
 @SuppressWarnings({"UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
 class JXLTTest extends JexlTestCase {
-    static JexlPermissions P0 = JexlPermissions.DEFAULT;
-    static JexlPermissions P1 = JexlPermissions.RESTRICTED;
 
     public static class Context311 extends MapContext
       implements JexlContext.OptionsHandle, JexlContext.ThreadLocal {
@@ -150,7 +148,7 @@ class JXLTTest extends JexlTestCase {
    public static List<JexlBuilder> engines() {
        final JexlFeatures f = new JexlFeatures();
        f.lexical(true).lexicalShade(true);
-       JexlPermissions permissions = JexlPermissions.DEFAULT.compose("org.apache.commons.jexl3 +{ JXLTTest{} }");
+       JexlPermissions permissions = JexlPermissions.RESTRICTED.compose("org.apache.commons.jexl3 +{ JXLTTest{} }");
       return Arrays.asList(
               new JexlBuilder().permissions(permissions).silent(false).lexical(true).lexicalShade(true).cache(128).strict(true),
               new JexlBuilder().permissions(permissions).features(f).silent(false).cache(128).strict(true),

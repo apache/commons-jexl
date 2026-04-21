@@ -17,7 +17,7 @@
 package org.apache.commons.jexl3;
 
 import static org.apache.commons.jexl3.internal.Util.debuggerCheck;
-import static org.apache.commons.jexl3.introspection.JexlPermissions.RESTRICTED;
+import static org.apache.commons.jexl3.JexlTestCase.TEST_PERMS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
@@ -48,6 +48,7 @@ import java.util.stream.Stream;
 import org.apache.commons.jexl3.internal.Engine32;
 import org.apache.commons.jexl3.internal.OptionsContext;
 import org.apache.commons.jexl3.introspection.JexlSandbox;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -62,11 +63,11 @@ class Issues300Test {
         @Override
         public boolean isStrict(final JexlOperator op) {
             switch (op) {
-            case NOT:
-            case CONDITION:
-                return false;
+                case NOT:
+                case CONDITION:
+                    return false;
+                default: return super.isStrict(op);
             }
-            return super.isStrict(op);
         }
     }
 
@@ -777,7 +778,9 @@ class Issues300Test {
         final String text = "(A ? C.D : E)";
         final JexlEngine jexl = new JexlBuilder().safe(true).create();
         final JexlExpression expr = jexl.createExpression(text);
+        Assertions.assertNotNull(expr);
         final JexlScript script = jexl.createScript(text);
+        Assertions.assertNotNull(script);
     }
 
     @Test
@@ -1143,7 +1146,7 @@ class Issues300Test {
     void testIssue397() {
         String result;
         final String control = Class397.class.getName();
-        final JexlEngine jexl = new JexlBuilder().permissions(RESTRICTED).create();
+        final JexlEngine jexl = new JexlBuilder().permissions(TEST_PERMS).create();
 
         final Interface397i instance = new Class397();
         result = (String) jexl.invokeMethod(instance, "summary");

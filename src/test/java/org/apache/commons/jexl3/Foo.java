@@ -34,11 +34,10 @@ public class Foo {
     }
     private boolean beenModified;
     private String property1 = "some value";
-    public Foo() {}
 
     public String bar()
     {
-        return JexlTest.METHOD_STRING;
+        return ExpressionsTest.METHOD_STRING;
     }
 
     public String convertBoolean(final boolean b)
@@ -58,7 +57,7 @@ public class Foo {
 
     public String getBar()
     {
-        return JexlTest.GET_METHOD_STRING;
+        return ExpressionsTest.GET_METHOD_STRING;
     }
 
     public List<String> getCheeseList()

@@ -17,10 +17,12 @@
 package org.apache.commons.jexl3.examples;
 
 import static java.lang.Boolean.TRUE;
+import static org.apache.commons.jexl3.JexlTestCase.TEST_PERMS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.lang.reflect.Method;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.Collection;
@@ -38,12 +40,18 @@ import org.apache.commons.jexl3.JexlScript;
 import org.apache.commons.jexl3.MapContext;
 import org.apache.commons.jexl3.introspection.JexlPermissions;
 import org.apache.commons.jexl3.introspection.JexlPermissions.ClassPermissions;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 /**
  * A test around scripting streams.
  */
-class StreamTest {
+public class StreamTest {
+    @BeforeAll
+    static void setUpClass() {
+        JexlBuilder.setDefaultPermissions(TEST_PERMS);
+    }
 
     /**
      * A MapContext that can operate on streams and collections.
@@ -108,25 +116,31 @@ class StreamTest {
 
     /** Our engine instance. */
     private final JexlEngine jexl;
+    private final JexlPermissions jexlPermissions;
 
-    public StreamTest() {
+    public StreamTest() throws Exception {
         // Restricting features; no loops, no side effects
         final JexlFeatures features = new JexlFeatures()
             .loops(false)
             .sideEffectGlobal(false)
             .sideEffect(false);
         // Restricted permissions to a safe set but with URI allowed
-        final JexlPermissions permissions = new ClassPermissions(java.net.URI.class);
-        // Create the engine
+        jexlPermissions = new ClassPermissions(java.net.URI.class, StreamContext.class, CollectionContext.class);
+       // Create the engine
         jexl = new JexlBuilder()
             .features(features)
-            .permissions(permissions)
+            .permissions(jexlPermissions)
             .namespaces(Collections.singletonMap("URI", java.net.URI.class))
             .create();
     }
 
     @Test
-    void testURICollection() {
+    void testURICollection() throws Exception {
+       Assertions.assertTrue(jexlPermissions.allow(java.net.URI.class));
+       Assertions.assertTrue(jexlPermissions.allow(java.util.stream.Stream.class));
+       for (Method m : Arrays.stream(Stream.class.getMethods()).filter(m -> m.getName().equals("filter")).collect(Collectors.toSet())) {
+            Assertions.assertTrue(jexlPermissions.allow(m));
+        }
         // A collection map/filter aware context
         final JexlContext sctxt = new CollectionContext();
         // Some uris
@@ -162,7 +176,9 @@ class StreamTest {
     }
 
     @Test
-    void testURIStream() {
+    void testURIStream() throws Exception {
+        Assertions.assertTrue(jexlPermissions.allow(StreamContext.class.getMethod("filter", new Class[]{Stream.class, JexlScript.class})));
+
         // Assume a collection of uris need to be processed and transformed to be simplified ;
         // we want only http/https ones, only the host part and using a https scheme
         final List<URI> uris = Arrays.asList(

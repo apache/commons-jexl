@@ -44,7 +44,27 @@ import org.apache.commons.jexl3.internal.introspection.PermissionsParser;
  * implementations shall delegate calls to its methods for {@link org.apache.commons.jexl3.annotations.NoJexl} to be
  * processed.</p>
  * <p>A simple textual configuration can be used to create user-defined permissions using
- * {@link JexlPermissions#parse(String...)}.</p>
+ * {@link JexlPermissions#parse(String...)}. The permission syntax supports both positive (+) and negative (-)
+ * declarations:</p>
+ * <ul>
+ * <li><b>Negative restrictions ({@code -})</b>: By default or when prefixed with {@code -}, class restrictions
+ * explicitly <b>deny</b> access to the specified members (or the entire class if the block is empty).
+ * This is the default mode and works like {@link org.apache.commons.jexl3.annotations.NoJexl}.</li>
+ * <li><b>Positive restrictions ({@code +})</b>: When prefixed with {@code +}, class restrictions
+ * explicitly <b>allow only</b> the specified members (or the entire class if the block is empty), denying
+ * all others. This provides a whitelist approach where you must explicitly list what is permitted.</li>
+ * </ul>
+ * <p>For example:</p>
+ * <pre>
+ * // Deny specific methods in a class (negative restriction - default)
+ * java.lang { System { exit(); } }  // or -System { exit(); }
+ *
+ * // Allow only specific methods in a class (positive restriction)
+ * java.lang { +System { currentTimeMillis(); nanoTime(); } }
+ *
+ * // Allow entire class (positive restriction with empty block)
+ * java.io -{ +PrintWriter{} +Writer{} }
+ * </pre>
  *
  *<p>To instantiate a JEXL engine using permissions, one should use a {@link org.apache.commons.jexl3.JexlBuilder}
  * and call {@link org.apache.commons.jexl3.JexlBuilder#permissions(JexlPermissions)}. Another approach would
@@ -74,63 +94,79 @@ public interface JexlPermissions {
      * <p>Note that the newer positive restriction syntax is preferable as in:
      * <code>RESTRICTED.compose("java.lang { +Class {} }")</code>.</p>
      */
-     final class ClassPermissions extends JexlPermissions.Delegate {
+    final class ClassPermissions extends JexlPermissions.Delegate {
+      /**
+       * The set of explicitly allowed classes, overriding the delegate permissions.
+       */
+      private final Set<String> allowedClasses;
 
-        /** The set of explicitly allowed classes, overriding the delegate permissions. */
-        private final Set<String> allowedClasses;
+      /**
+       * Creates permissions based on the RESTRICTED set but allowing an explicit set.
+       *
+       * @param allow the set of allowed classes
+       */
+      public ClassPermissions(final Class<?>... allow) {
+        this(JexlPermissions.RESTRICTED, allow);
+      }
 
-        /**
-         * Creates permissions based on the RESTRICTED set but allowing an explicit set.
-         *
-         * @param allow the set of allowed classes
-         */
-        public ClassPermissions(final Class<?>... allow) {
-            this(JexlPermissions.RESTRICTED,
-                    Arrays.stream(Objects.requireNonNull(allow))
-                        .map(Class::getCanonicalName)
-                        .collect(Collectors.toList()));
+      public ClassPermissions(final JexlPermissions permissions, final Class<?>... allow) {
+        this(permissions, Arrays.stream(Objects.requireNonNull(allow)).map(Class::getCanonicalName).collect(Collectors.toList()));
+      }
+
+      /**
+       * Required for compose().
+       *
+       * @param delegate the base to delegate to
+       * @param allow    the list of class canonical names
+       */
+      public ClassPermissions(final JexlPermissions delegate, final Collection<String> allow) {
+        super(Objects.requireNonNull(delegate));
+        allowedClasses = new HashSet<>(Objects.requireNonNull(allow));
+      }
+
+      @Override
+      public boolean allow(final Constructor<?> constructor) {
+        return validate(constructor) &&
+            (allowedClasses.contains(constructor.getDeclaringClass().getCanonicalName()) || super.allow(constructor));
+      }
+
+      @Override
+      public boolean allow(final Class<?> clazz) {
+        return validate(clazz) && allowedClasses.contains(clazz.getCanonicalName()) || super.allow(clazz);
+      }
+
+      @Override
+      public boolean allow(final Class<?> clazz, final Field field) {
+        if (!validate(field)) {
+          return false;
         }
-
-        /**
-         * Required for compose().
-         *
-         * @param delegate the base to delegate to
-         * @param allow the list of class canonical names
-         */
-        public ClassPermissions(final JexlPermissions delegate, final Collection<String> allow) {
-            super(Objects.requireNonNull(delegate));
-            allowedClasses = new HashSet<>(Objects.requireNonNull(allow));
+        if (!clazz.isAssignableFrom(field.getDeclaringClass())) {
+          return false;
         }
-
-        @Override
-        public boolean allow(final Class<?> clazz) {
-            return validate(clazz) && (isClassAllowed(clazz) || super.allow(clazz));
+        if (super.allow(clazz, field)) {
+          return true;
         }
+        return isClassAllowed(clazz);
+      }
 
-        @Override
-        public boolean allow(final Constructor<?> constructor) {
-            return validate(constructor) &&
-                (allowedClasses.contains(constructor.getDeclaringClass().getCanonicalName()) || super.allow(constructor));
+      @Override
+      public boolean allow(final Class<?> clazz, final Method method) {
+        if (!validate(method)) {
+          return false;
         }
+        if (!method.getDeclaringClass().isAssignableFrom(clazz)) {
+          return false;
+        }
+        if (super.allow(clazz, method)) {
+          return true;
+        }
+        return isClassAllowed(clazz);
+      }
 
-        @Override
-        public boolean allow(final Class<?> clazz, final Method method) {
-            if (!validate(method)) {
-              return false;
-            }
-            if (!method.getDeclaringClass().isAssignableFrom(clazz)) {
-              return false;
-            }
-            if (super.allow(clazz, method)) {
-              return true;
-            }
-            return isClassAllowed(clazz);
-        }
-
-        @Override
-        public JexlPermissions compose(final String... src) {
-            return new ClassPermissions(base.compose(src), allowedClasses);
-        }
+      @Override
+      public JexlPermissions compose(final String... src) {
+        return new ClassPermissions(base.compose(src), allowedClasses);
+      }
 
       private boolean isClassAllowed(final Class<?> aClass) {
         Class<?> clazz = aClass;
@@ -155,9 +191,10 @@ public interface JexlPermissions {
      * A base for permission delegation allowing functional refinement.
      * Overloads should call the appropriate validate() method early in their body.
      */
-     class Delegate implements JexlPermissions {
-
-         /** The permissions we delegate to. */
+    class Delegate implements JexlPermissions {
+        /**
+         * The permissions we delegate to.
+         */
         protected final JexlPermissions base;
 
         /**
@@ -181,12 +218,22 @@ public interface JexlPermissions {
 
         @Override
         public boolean allow(final Field field) {
-            return base.allow(field);
+            return validate(field) && allow(field.getDeclaringClass(), field);
+        }
+
+        @Override
+        public boolean allow(final Class<?> clazz, final Field field) {
+            return base.allow(clazz, field);
         }
 
         @Override
         public boolean allow(final Method method) {
-            return base.allow(method);
+            return validate(method) && allow(method.getDeclaringClass(), method);
+        }
+
+        @Override
+        public boolean allow(final Class<?> clazz, final Method method) {
+            return base.allow(clazz, method);
         }
 
         @Override
@@ -240,7 +287,7 @@ public interface JexlPermissions {
      * </ul>
      */
 
-    JexlPermissions DEFAULT = JexlPermissions.parse(
+    JexlPermissions RESTRICTED = JexlPermissions.parse(
         "# Default Uberspect Permissions",
         "java.math.*",
         "java.text.*",
@@ -254,15 +301,8 @@ public interface JexlPermissions {
             "}",
         "java.io -{ +PrintWriter{} +Writer{} +StringWriter{} +Reader{} +InputStream{} +OutputStream{} }",
         "java.nio +{}",
-        "java.nio.charset +{}"
-    );
-    JexlPermissions RESTRICTED = DEFAULT.compose(
-        // the following ones are mostly for tests, these should be reassessed (jxlt)
-        "org.apache.commons.jexl3.*",
-        "org.apache.commons.jexl3 +{ -JexlBuilder{} }",
-        "org.apache.commons.jexl3.introspection -{ JexlPermissions{} JexlPermissions$ClassPermissions{} }",
-        "org.apache.commons.jexl3.internal -{ Engine{} Engine32{} TemplateEngine{} }",
-        "org.apache.commons.jexl3.internal.introspection -{ Uberspect{} Introspector{} }"
+        "java.nio.charset +{}",
+        "org.apache.commons.jexl3 +{ -JexlBuilder{} }"
     );
 
     /**
@@ -290,6 +330,7 @@ public interface JexlPermissions {
      *  java.lang { Runtime {} System {} ProcessBuilder {} Class {} }
      *  org.apache.commons.jexl3 { JexlBuilder {} }
      *  </pre>
+     *  <p><b>Syntax Overview:</b></p>
      *  <ul>
      *  <li>Syntax for wildcards is the name of the package suffixed by {@code .*}.</li>
      *  <li>Syntax for restrictions is a list of package restrictions.</li>
@@ -301,26 +342,36 @@ public interface JexlPermissions {
      *  nested classes -, a field which is the Java field name suffixed with {@code ;}, a method composed of
      *  its Java name suffixed with {@code ();}. Constructor restrictions are specified like methods using the
      *  class name as method name.</li>
-     *  <li>By default or when prefixed with a {@code -}, a class restriction is explicitly denying the members
-     *  declared in its block (or the whole class)</li>
-     *  <li>When prefixed with a {@code +}, a class restriction is explicitly allowing the members
-     *  declared in its block (or the whole class)</li>
+     *  </ul>
+     *  <p><b>Negative ({@code -}) vs Positive ({@code +}) Restrictions:</b></p>
+     *  <ul>
+     *  <li><b>Negative restriction (default or {@code -} prefix)</b>: Explicitly <b>denies</b> access to the members
+     *  declared in its block. If the block is empty, the entire class is denied.
+     *  <br>Example: {@code java.lang { -System { exit(); } }} denies System.exit() but allows other System methods.
+     *  <br>Example: {@code java.lang { Runtime {} }} denies the entire Runtime class (empty block means deny all).</li>
+     *  <li><b>Positive restriction ({@code +} prefix)</b>: Explicitly <b>allows only</b> the members declared
+     *  in its block, denying all others not listed. If the block is empty, the entire class is allowed.
+     *  <br>Example: {@code java.lang { +System { currentTimeMillis(); } }} allows only System.currentTimeMillis(),
+     *  denying all other System methods.
+     *  <br>Example: {@code java.io -{ +PrintWriter{} +Writer{} }} in the context of a denied java.io package,
+     *  allows only PrintWriter and Writer classes entirely (empty blocks mean allow all members).</li>
      *  </ul>
      *  <p>
-     *  All overrides and overloads of a constructors or method are allowed or restricted at the same time,
+     *  All overrides and overloads of constructors or methods are allowed or restricted at the same time,
      *  the restriction being based on their names, not their whole signature. This differs from the @NoJexl annotation.
      *  </p>
+     *  <p><b>Complete Example:</b></p>
      *  <pre>
      *  # some wildcards
-     *  java.lang.*; # java.lang is pretty much a must have
+     *  java.util.* # java.util is pretty much a must-have
      *  my.allowed.package0.*
      *  another.allowed.package1.*
      *  # nojexl like restrictions
      *  my.package.internal {} # the whole package is hidden
      *  my.package {
-     *   +class4 { theMethod(); } # only theMethod can be called in class4
+     *   +class4 { theMethod(); } # POSITIVE: only theMethod can be called in class4, all others denied
      *   class0 {
-     *     class1 {} # the whole class1 is hidden
+     *     class1 {} # NEGATIVE (default): the whole class1 is hidden
      *     class2 {
      *         class2(); # class2 constructors cannot be invoked
      *         class3 {
@@ -407,6 +458,7 @@ public interface JexlPermissions {
      * <p>Since methods can be overridden and overloaded, this checks that this class explicitly allows
      * this method - superseding any superclass or interface specified permissions.</p>
      *
+     * @param clazz the class from which the method is accessed, used to check that the method is allowed for this class
      * @param method the method to check
      * @return true if JEXL is allowed to introspect, false otherwise
      * @since 3.7

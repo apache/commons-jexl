@@ -140,6 +140,8 @@ class JexlScriptEngineTest {
 
     @Test
     void testErrors() throws Exception {
+        JexlPermissions permissions = new JexlPermissions.ClassPermissions(Errors.class);
+        JexlScriptEngine.setPermissions(permissions);
         final ScriptEngineManager manager = new ScriptEngineManager();
         final JexlScriptEngine engine = (JexlScriptEngine) manager.getEngineByName("JEXL");
         engine.put("errors", new Errors());
@@ -259,8 +261,7 @@ class JexlScriptEngineTest {
 
     @Test
     void testScriptingPermissions1() throws Exception {
-        JexlBuilder.setDefaultPermissions(JexlPermissions.UNRESTRICTED);
-        JexlScriptEngine.setPermissions(null);
+        JexlScriptEngine.setPermissions(JexlPermissions.UNRESTRICTED);
         final ScriptEngineManager manager = new ScriptEngineManager();
         final ScriptEngine engine = manager.getEngineByName("jexl3");
         final Long time2 = (Long) engine.eval(
@@ -292,24 +293,28 @@ class JexlScriptEngineTest {
 
     @Test
     void testMain2() throws Exception {
-        final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
         final PrintStream originalOut = System.out;
         Path file = null;
         try {
-            System.setOut(new PrintStream(outContent));
             file = Files.createTempFile("test-jsr233", ".jexl");
-            final BufferedWriter writer = new BufferedWriter(new FileWriter(file.toFile()));
-            writer.write("a=20;\nb=22;\na+b\n");
-            writer.close();
-            final String ctl = ">>: 42" + LF;
-            Main.main(new String[]{file.toString()});
-            Assertions.assertEquals(ctl, outContent.toString());
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(file.toFile()));
+                 ByteArrayOutputStream outContent = new ByteArrayOutputStream();
+                 PrintStream printStream = new PrintStream(outContent)) {
+
+                writer.write("a=20;\nb=22;\na+b\n");
+                writer.close(); // Explicit close before using the file
+
+                System.setOut(printStream);
+                final String ctl = ">>: 42" + LF;
+                Main.main(new String[]{file.toString()});
+                Assertions.assertEquals(ctl, outContent.toString());
+            } finally {
+                System.setOut(originalOut);
+            }
         } finally {
-            System.setOut(originalOut);
             if (file != null) {
                 Files.delete(file);
             }
         }
     }
-
 }

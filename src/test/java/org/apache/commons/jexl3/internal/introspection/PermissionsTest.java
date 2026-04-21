@@ -54,7 +54,7 @@ import org.junit.jupiter.api.Test;
 /**
  * Checks the CacheMap.MethodKey implementation
  */
-
+@SuppressWarnings({"unused","empty"})
 class PermissionsTest {
 
     public static class A {
@@ -464,7 +464,7 @@ class PermissionsTest {
 
     @Test
     void testSecurePermissions() {
-        assertNotNull(JexlTestCase.SECURE);
+        assertNotNull(JexlTestCase.TEST_PERMS);
         final List<Class<?>> acs = Arrays.asList(
             java.lang.Runtime.class,
             java.math.BigDecimal.class,
@@ -473,7 +473,7 @@ class PermissionsTest {
         for(final Class<?> ac: acs) {
             final Package p = ac.getPackage();
             assertNotNull(p, ac::getName);
-            assertTrue(JexlTestCase.SECURE.allow(p), ac::getName);
+            assertTrue(JexlTestCase.TEST_PERMS.allow(p), ac::getName);
         }
         final List<Class<?>> nacs = Arrays.asList(
                 java.lang.annotation.ElementType.class,
@@ -483,10 +483,10 @@ class PermissionsTest {
                 java.lang.ref.SoftReference.class,
                 java.lang.reflect.Method.class);
         for(final Class<?> nac : nacs) {
-            assertFalse(JexlTestCase.SECURE.allow(nac), nac::getName);
+            assertFalse(JexlTestCase.TEST_PERMS.allow(nac), nac::getName);
             final Package p = nac.getPackage();
             assertNotNull(p, nac::getName);
-            assertFalse(JexlTestCase.SECURE.allow(p), nac::getName);
+            assertFalse(JexlTestCase.TEST_PERMS.allow(p), nac::getName);
         }
     }
 
@@ -508,10 +508,11 @@ class PermissionsTest {
     }
 
     @Test
-    void testPair0() {
+    void testPair0() throws Exception {
         final Map<String, Object> funcs = new HashMap<>();
         funcs.put("lisp", new Scheme());
-        final JexlPermissions permissions = JexlPermissions.RESTRICTED.compose("org.example.*");
+        final JexlPermissions permissions = JexlPermissions.RESTRICTED.compose("org.example.*", "org.apache.commons.jexl3.internal.introspection { +PermissionsTest$Scheme {}");
+        Assertions.assertTrue(permissions.allow(Scheme.class.getMethod("cons", new Class[]{ Object.class, Object.class})));
         final JexlEngine jexl = new JexlBuilder().cache(8).permissions(permissions).namespaces(funcs).create();
         String src = "let p = lisp:cons(17, 25); p.car + p.cdr;";
         JexlScript script = jexl.createScript(src);

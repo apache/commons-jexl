@@ -43,7 +43,7 @@ import org.junit.jupiter.api.Test;
  * Simple test cases.
  */
 @SuppressWarnings({"UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
-public final class JexlTest extends JexlTestCase {
+public final class ExpressionsTest extends JexlTestCase {
     public static final class Duck {
         int user = 10;
 
@@ -79,8 +79,8 @@ public final class JexlTest extends JexlTestCase {
 
     static final String GET_METHOD_STRING = "GetMethod string";
 
-    public JexlTest() {
-        super("JexlTest",
+    public ExpressionsTest() {
+        super("ExpressionsTest",
                 new JexlBuilder()
                         .strict(false)
                         .imports(Arrays.asList("java.lang","java.math"))
