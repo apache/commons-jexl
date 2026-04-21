@@ -17,6 +17,7 @@
 
 package org.apache.commons.jexl3;
 
+import java.util.Arrays;
 import org.apache.commons.jexl3.internal.Debugger;
 import org.apache.commons.jexl3.internal.OptionsContext;
 import org.apache.commons.jexl3.internal.Util;
@@ -25,7 +26,6 @@ import org.apache.commons.jexl3.introspection.JexlPermissions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 
-import java.util.Arrays;
 
 /**
  * Implements runTest methods to dynamically instantiate and invoke a test,

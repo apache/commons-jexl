@@ -511,7 +511,9 @@ class PermissionsTest {
     void testPair0() throws Exception {
         final Map<String, Object> funcs = new HashMap<>();
         funcs.put("lisp", new Scheme());
-        final JexlPermissions permissions = JexlPermissions.RESTRICTED.compose("org.example.*", "org.apache.commons.jexl3.internal.introspection { +PermissionsTest$Scheme {}");
+        final JexlPermissions permissions = JexlPermissions.RESTRICTED.compose(
+      "org.example.*",
+            "org.apache.commons.jexl3.internal.introspection { +PermissionsTest$Scheme {}");
         Assertions.assertTrue(permissions.allow(Scheme.class.getMethod("cons", new Class[]{ Object.class, Object.class})));
         final JexlEngine jexl = new JexlBuilder().cache(8).permissions(permissions).namespaces(funcs).create();
         String src = "let p = lisp:cons(17, 25); p.car + p.cdr;";
