@@ -109,6 +109,11 @@ public interface JexlPermissions {
         this(JexlPermissions.RESTRICTED, allow);
       }
 
+      /**
+       * Creates permissions by augmenting an existing set with an explicit set of allowed classes.
+       * @param permissions the base permissions to augment
+       * @param allow the set of allowed classes
+       */
       public ClassPermissions(final JexlPermissions permissions, final Class<?>... allow) {
         this(permissions, Arrays.stream(Objects.requireNonNull(allow)).map(Class::getCanonicalName).collect(Collectors.toList()));
       }
