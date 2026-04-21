@@ -298,14 +298,11 @@ public class JexlScriptEngine extends AbstractScriptEngine implements Compilable
                             .safe(false)
                             .logger(JexlScriptEngine.LOG)
                             .cache(JexlScriptEngine.CACHE_SIZE);
-                    // preserve builder default permissions when PERMISSIONS is null;
-                    // otherwise ensure the script object class is always allowed
-                    if (PERMISSIONS != null) {
-                        final JexlPermissions permissions = new JexlPermissions.ClassPermissions(
-                            PERMISSIONS,
+                    // ensure the script object class is always allowed for all permissions set
+                    JexlPermissions permissions = new JexlPermissions.ClassPermissions(
+                        PERMISSIONS == null ? JexlPermissions.RESTRICTED : PERMISSIONS,
                             JexlScriptObject.class);
                         builder.permissions(permissions);
-                    }
                     engine = builder.create();
                     ENGINE = new SoftReference<>(engine);
                 }
