@@ -386,6 +386,7 @@ public class PermissionsParser {
                 }
                 njpackage = null; // can restart anew
                 pname = null;
+                negative = null;
                 i += 1;
             } else {
                 i = readClass(njpackage, true,null, null, i);

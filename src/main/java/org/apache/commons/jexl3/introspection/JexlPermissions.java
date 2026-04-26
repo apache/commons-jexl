@@ -119,7 +119,7 @@ public interface JexlPermissions {
       }
 
       /**
-       * Required for compose().
+       * Creates permissions by augmenting an existing set with an explicit set of allowed canonical class names.
        *
        * @param delegate the base to delegate to
        * @param allow    the list of class canonical names
