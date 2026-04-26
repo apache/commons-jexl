@@ -32,11 +32,13 @@ import org.apache.commons.jexl3.internal.Engine;
 import org.apache.commons.jexl3.introspection.JexlMethod;
 import org.apache.commons.jexl3.introspection.JexlPropertyGet;
 import org.apache.commons.jexl3.introspection.JexlPropertySet;
+import org.apache.commons.jexl3.introspection.JexlUberspect;
 import org.junit.jupiter.api.Test;
 
 /**
  * Tests for checking introspection discovery.
  */
+@SuppressWarnings("unused")
 class DiscoveryTest extends JexlTestCase {
     public static class Bean {
         private String value;
@@ -144,7 +146,7 @@ class DiscoveryTest extends JexlTestCase {
 
     @Test
     void testBeanIntrospection() throws Exception {
-        final Uberspect uber = Engine.getUberspect(null, null);
+        final JexlUberspect uber = Engine.getUberspect(null, null, JexlTestCase.TEST_PERMS);
         final Bean bean = new Bean("JEXL", "LXEJ");
 
         final JexlPropertyGet get = uber.getPropertyGet(bean, "value");
@@ -173,7 +175,7 @@ class DiscoveryTest extends JexlTestCase {
 
     @Test
     void testDuckIntrospection() throws Exception {
-        final Uberspect uber = Engine.getUberspect(null, null);
+        final JexlUberspect uber = Engine.getUberspect(null, null, JexlTestCase.TEST_PERMS);
         final Duck duck = new Duck("JEXL", "LXEJ");
 
         final JexlPropertyGet get = uber.getPropertyGet(duck, "value");
@@ -201,7 +203,7 @@ class DiscoveryTest extends JexlTestCase {
 
     @Test
     void testListIntrospection() throws Exception {
-        final Uberspect uber = Engine.getUberspect(null, null);
+        final JexlUberspect uber = new Uberspect(null, null);
         final List<Object> list = new ArrayList<>();
         list.add("LIST");
         list.add("TSIL");
@@ -215,7 +217,7 @@ class DiscoveryTest extends JexlTestCase {
         assertEquals(set, uber.getPropertySet(list, 1, "foo"));
         // different property should return different setter/getter
         assertNotEquals(get, uber.getPropertyGet(list, 0));
-        assertNotEquals(get, uber.getPropertySet(list, 0, "foo"));
+        assertNotEquals(set, uber.getPropertySet(list, 0, "foo"));
         // setter returns argument
         final Object bar = set.invoke(list, "bar");
         assertEquals("bar", bar);
@@ -232,7 +234,7 @@ class DiscoveryTest extends JexlTestCase {
 
     @Test
     void testMapIntrospection() throws Exception {
-        final Uberspect uber = Engine.getUberspect(null, null);
+        final JexlUberspect uber = new Uberspect(null, null);
         final Map<String, Object> map = new HashMap<>();
         map.put("value", "MAP");
         map.put("eulav", "PAM");
@@ -246,7 +248,7 @@ class DiscoveryTest extends JexlTestCase {
         assertEquals(set, uber.getPropertySet(map, "value", "foo"));
         // different property should return different setter/getter
         assertNotEquals(get, uber.getPropertyGet(map, "eulav"));
-        assertNotEquals(get, uber.getPropertySet(map, "eulav", "foo"));
+        assertNotEquals(set, uber.getPropertySet(map, "eulav", "foo"));
         // setter returns argument
         final Object bar = set.invoke(map, "bar");
         assertEquals("bar", bar);
@@ -263,7 +265,7 @@ class DiscoveryTest extends JexlTestCase {
 
     @Test
     void testMethodIntrospection() throws Exception {
-        final Uberspect uber = new Uberspect(null, null);
+        final JexlUberspect uber = new Uberspect(null, null, JexlTestCase.TEST_PERMS);
         final Bulgroz bulgroz = new Bulgroz();
         JexlMethod jmethod;
         Object result;

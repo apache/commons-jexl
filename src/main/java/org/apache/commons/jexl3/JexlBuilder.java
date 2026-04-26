@@ -87,7 +87,7 @@ public class JexlBuilder {
 
     /**
      * The set of default permissions used when creating a new builder.
-     * <p>Static but modifiable so these default permissions can be changed to a purposeful set.</p>
+     * <p>Static but modifiable, so these default permissions can be changed to a purposeful set.</p>
      * <p>In JEXL 3.3, these are {@link JexlPermissions#RESTRICTED}.</p>
      * <p>In JEXL 3.2, these were equivalent to {@link JexlPermissions#UNRESTRICTED}.</p>
      */
@@ -167,7 +167,7 @@ public class JexlBuilder {
      * and methods are visible to JEXL and usable in scripts using default implicit behaviors.
      * </p><p>
      * However, without mitigation, this change will likely break some scripts at runtime, especially those exposing
-     * your own class instances through arguments, contexts or namespaces.
+     * your own class instances through arguments, contexts, or namespaces.
      * The new default set of allowed packages and denied classes is described by {@link JexlPermissions#RESTRICTED}.
      * </p><p>
      * The recommended mitigation if your usage of JEXL is impacted is to first thoroughly review what should be
@@ -550,7 +550,7 @@ public class JexlBuilder {
     /**
      * Sets whether the engine is in lexical shading mode.
      *
-     * @param flag true means lexical shading is in effect, false implies no lexical shading
+     * @param flag true means lexical shading is in effect; false implies no lexical shading
      * @return this builder
      * @since 3.2
      */

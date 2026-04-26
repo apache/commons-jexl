@@ -47,8 +47,10 @@ import javax.script.ScriptException;
 
 import org.apache.commons.jexl3.JexlBuilder;
 import org.apache.commons.jexl3.JexlException;
+import org.apache.commons.jexl3.LoggingPermissions;
 import org.apache.commons.jexl3.introspection.JexlPermissions;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class JexlScriptEngineTest {
@@ -70,6 +72,12 @@ class JexlScriptEngineTest {
                                                             "application/x-jexl3");
 
     private static final String LF = System.lineSeparator();
+
+    @BeforeEach
+    void setUp() {
+        // quiesce LoggingPermissions logging, set level to error (instead of info)
+        java.util.logging.Logger.getLogger(LoggingPermissions.class.getName()).setLevel(java.util.logging.Level.SEVERE);
+    }
 
     @AfterEach
     void tearDown() {
@@ -139,6 +147,8 @@ class JexlScriptEngineTest {
 
     @Test
     void testErrors() throws Exception {
+        JexlPermissions permissions = new JexlPermissions.ClassPermissions(Errors.class);
+        JexlScriptEngine.setPermissions(permissions);
         final ScriptEngineManager manager = new ScriptEngineManager();
         final JexlScriptEngine engine = (JexlScriptEngine) manager.getEngineByName("JEXL");
         engine.put("errors", new Errors());
@@ -212,8 +222,8 @@ class JexlScriptEngineTest {
         assertEquals(initialValue, engine.eval("0;123")); // multiple statements
         final ScriptException xscript = assertThrows(ScriptException.class,
                 () -> engine.eval("sys=context.class.forName(\"java.lang.System\");now=sys.currentTimeMillis();"));
-        final JexlException.Method xjexl = (JexlException.Method) xscript.getCause();
-        assertEquals("forName", xjexl.getMethod());
+        final JexlException.Property xjexl = (JexlException.Property) xscript.getCause();
+        assertEquals("class", xjexl.getProperty());
         engine.put("value", initialValue);
         assertEquals(initialValue, engine.get("value"));
         final Integer newValue = 124;
@@ -258,8 +268,14 @@ class JexlScriptEngineTest {
 
     @Test
     void testScriptingPermissions1() throws Exception {
-        JexlBuilder.setDefaultPermissions(JexlPermissions.UNRESTRICTED);
-        JexlScriptEngine.setPermissions(null);
+        // shows what is required to access System.currentTimeMillis()
+        JexlScriptEngine.setPermissions(new LoggingPermissions(
+            JexlPermissions.RESTRICTED.compose(
+                "javax.script { +SimpleScriptContext { getClass(); } }"
+                    + "java.lang { "
+                    + "+System { currentTimeMillis(); }"
+                    + "+Class { forName(); } "
+                    + "}")));
         final ScriptEngineManager manager = new ScriptEngineManager();
         final ScriptEngine engine = manager.getEngineByName("jexl3");
         final Long time2 = (Long) engine.eval(
@@ -291,24 +307,26 @@ class JexlScriptEngineTest {
 
     @Test
     void testMain2() throws Exception {
-        final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
         final PrintStream originalOut = System.out;
         Path file = null;
         try {
-            System.setOut(new PrintStream(outContent));
             file = Files.createTempFile("test-jsr233", ".jexl");
-            final BufferedWriter writer = new BufferedWriter(new FileWriter(file.toFile()));
-            writer.write("a=20;\nb=22;\na+b\n");
-            writer.close();
-            final String ctl = ">>: 42" + LF;
-            Main.main(new String[]{file.toString()});
-            assertEquals(ctl, outContent.toString());
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(file.toFile()));
+                 ByteArrayOutputStream outContent = new ByteArrayOutputStream();
+                 PrintStream printStream = new PrintStream(outContent)) {
+                writer.write("a=20;\nb=22;\na+b\n");
+                writer.flush();
+                System.setOut(printStream);
+                final String ctl = ">>: 42" + LF;
+                Main.main(new String[]{file.toString()});
+                assertEquals(ctl, outContent.toString());
+            } finally {
+                System.setOut(originalOut);
+            }
         } finally {
-            System.setOut(originalOut);
             if (file != null) {
                 Files.delete(file);
             }
         }
     }
-
 }

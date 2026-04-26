@@ -115,7 +115,7 @@ class NoJexlTest {
 
         final Field fA = A.class.getField("i");
         assertNotNull(fA);
-        assertTrue(p.allow(fA));
+        assertTrue(p.allow(A.class, fA));
 
         final Field fA0 = A0.class.getField("i0");
         assertNotNull(fA0);

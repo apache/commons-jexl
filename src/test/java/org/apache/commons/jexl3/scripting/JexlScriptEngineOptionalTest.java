@@ -27,12 +27,20 @@ import javax.script.CompiledScript;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 
+import org.apache.commons.jexl3.JexlBuilder;
+import org.apache.commons.jexl3.JexlTestCase;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 class JexlScriptEngineOptionalTest {
     private final JexlScriptEngineFactory factory = new JexlScriptEngineFactory();
     private final ScriptEngineManager manager = new ScriptEngineManager();
     private final ScriptEngine engine = manager.getEngineByName("jexl");
+
+    @BeforeAll
+    static void setUpClass() {
+        JexlBuilder.setDefaultPermissions(JexlTestCase.TEST_PERMS);
+    }
 
     @Test
     void testCompilable() throws Exception {

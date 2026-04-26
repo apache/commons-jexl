@@ -19,7 +19,6 @@ package org.apache.commons.jexl3;
 
 import java.util.Map;
 
-import org.apache.commons.jexl3.internal.Engine;
 
 /**
  * Command line interface for JEXL for use in testing
@@ -29,7 +28,7 @@ import org.apache.commons.jexl3.internal.Engine;
 public class Jexl {
 
     public static void main(final String[] args) {
-        final JexlEngine JEXL = new Engine();
+        final JexlEngine JEXL = new JexlBuilder().create();
         final Map<Object, Object> m = System.getProperties();
         // dummy context to get variables
         final JexlContext context = new MapContext();

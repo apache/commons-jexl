@@ -53,6 +53,7 @@ import org.apache.commons.jexl3.parser.ASTJexlScript;
 import org.apache.commons.jexl3.parser.JexlScriptParser;
 import org.apache.commons.jexl3.parser.Parser;
 import org.apache.commons.jexl3.parser.StringProvider;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -112,6 +113,11 @@ public class Issues400Test {
         }
         final Object result = script.execute(null, a);
         assertEquals(42, result);
+    }
+
+    @BeforeAll
+    static void setUpClass() {
+        JexlBuilder.setDefaultPermissions(JexlTestCase.TEST_PERMS);
     }
 
     @Test
@@ -863,21 +869,27 @@ public class Issues400Test {
     }
 
     @Test
-    void test450b() {
+    void test450b() throws NoSuchMethodException {
         // cannot load System with RESTRICTED
         assertThrows(JexlException.Method.class, () -> run450b(JexlPermissions.RESTRICTED),
             "should not be able to load System with RESTRICTED");
-        // can load System with UNRESTRICTED
+        // can load System.exit with UNRESTRICTED
+        Method exitMethod = java.lang.System.class.getMethod("exit", int.class);
+        assertTrue(UNRESTRICTED.allow(exitMethod));
+        assertFalse(RESTRICTED.allow(exitMethod));
         assertEquals(java.lang.System.class, run450b(UNRESTRICTED));
         // need to explicitly allow Uberspect and the current class loader to load System
+        Class<? extends ClassLoader> cloader = getClass().getClassLoader().getClass();
         JexlPermissions perm = new JexlPermissions.ClassPermissions(
             getClass().getClassLoader().getClass(),
             org.apache.commons.jexl3.internal.introspection.Uberspect.class);
+        assertTrue(perm.allow(cloader), "should be able to access ClassLoader");
+        assertTrue(perm.allow(cloader, cloader.getMethod("loadClass", String.class)), "should be able to access ClassLoader::loadClass");
         assertEquals(java.lang.System.class, run450b(perm));
     }
 
     private static Object run450b(JexlPermissions perm) {
-        JexlEngine jexl = new JexlBuilder().silent(false).permissions(perm).create();
+        JexlEngine jexl = new JexlBuilder().safe(false).strict(true).silent(false).permissions(perm).create();
         String uscript = "new('org.apache.commons.jexl3.internal.introspection.Uberspect', "
             + "null, null, perm).getClassLoader().loadClass('java.lang.System')";
         JexlScript u0 = jexl.createScript(uscript, "perm");
@@ -891,8 +903,11 @@ public class Issues400Test {
         // need explicit permissions to ClassPermissions and Uberspect to reach and invoke
         // System::currentTimeMillis
         JexlPermissions perm = new JexlPermissions.ClassPermissions(
+            getClass().getClassLoader().getClass(),
             JexlPermissions.ClassPermissions.class,
-            org.apache.commons.jexl3.internal.introspection.Uberspect.class);
+            org.apache.commons.jexl3.internal.introspection.Uberspect.class,
+            org.apache.commons.jexl3.internal.introspection.MethodExecutor.class,
+            BrkContext.class);
         assertNotNull(run450c(perm));
         // cannot reach and invoke System::currentTimeMillis with RESTRICTED
         assertThrows(JxltEngine.Exception.class, () -> run450c(JexlPermissions.RESTRICTED),
@@ -908,17 +923,21 @@ public class Issues400Test {
                 + "sys = x?.getClassLoader()?.loadClass('java.lang.System') ?: SYSTEM;"
                 + "p = new('org.apache.commons.jexl3.introspection.JexlPermissions$ClassPermissions', [sys]);"
                 + "c = new('org.apache.commons.jexl3.internal.introspection.Uberspect', null, null, p);"
-                + "z = c.getMethod(sys,'currentTimeMillis').invoke(x,null);}")
+                + "z = brk(c.getMethod(sys,'currentTimeMillis')).invoke(x,null);}")
             .evaluate(new BrkContext());
         return result;
     }
 
     @Test
-    void test450() {
+    void test450() throws Exception {
+        JexlPermissions perms =  Engine33.createPermissions();
+        Class<? extends ClassLoader> cl = Issues400Test.class.getClassLoader().getClass();
+        assertTrue(perms.allow(cl, cl.getMethod("loadClass", String.class)),
+            "should be able to access ClassLoader::loadClass with specific permissions");
         assertNotNull(run450(JexlPermissions.UNRESTRICTED),
             "should be able to reach and invoke System::currentTimeMillis with UNRESTRICTED");
         assertNotNull(
-            run450(new JexlPermissions.ClassPermissions(
+            run450(new JexlPermissions.ClassPermissions(perms,
                 org.apache.commons.jexl3.internal.TemplateEngine.class)),
             "should be able to reach and invoke System::currentTimeMillis with TemplateEngine permission");
         assertThrows(JexlException.Method.class, () -> run450(RESTRICTED),
@@ -934,12 +953,18 @@ public class Issues400Test {
             super(builder);
         }
 
-        static JexlBuilder createBuilder() {
-            JexlPermissions perm = new JexlPermissions.ClassPermissions(
-                Issues400Test.class.getClassLoader().getClass(),
+        static JexlPermissions createPermissions() {
+            // Need a lot of things on top of JEXL37 to allow execution
+            return new JexlPermissions.ClassPermissions(JexlTestCase.TEST_PERMS,
+                Engine33.class.getClassLoader().getClass(),
+                Engine33.class,
                 JexlPermissions.ClassPermissions.class,
                 org.apache.commons.jexl3.internal.TemplateEngine.class,
                 org.apache.commons.jexl3.internal.introspection.Uberspect.class);
+        }
+
+        static JexlBuilder createBuilder() {
+            JexlPermissions perm = createPermissions();
             return new JexlBuilder().safe(false).silent(false).permissions(perm);
         }
     }
@@ -961,10 +986,11 @@ public class Issues400Test {
     }
 
     @Test
-    void test451() {
+    void test451() throws NoSuchMethodException {
         JexlEngine jexl = new JexlBuilder().create();
         assertEquals("42", jexl.createScript("o.toString()", "o").execute(null, "42"));
         JexlPermissions perms = RESTRICTED.compose("java.lang { +Class { getSimpleName(); } }");
+        assertTrue(perms.allow(String.class.getMethod("toString")));
         JexlSandbox sandbox = new JexlSandbox(false, true);
         sandbox.permissions(Object.class.getName(), true, true, false, false);
         sandbox.allow(String.class.getName()).execute("toString");

@@ -44,6 +44,7 @@ import org.apache.commons.jexl3.internal.TemplateDebugger;
 import org.apache.commons.jexl3.internal.TemplateInterpreter;
 import org.apache.commons.jexl3.internal.introspection.Permissions;
 import org.apache.commons.jexl3.internal.introspection.Uberspect;
+import org.apache.commons.jexl3.introspection.JexlPermissions;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.jupiter.api.AfterEach;
@@ -57,6 +58,7 @@ import org.junit.jupiter.params.provider.MethodSource;
  */
 @SuppressWarnings({"UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
 class JXLTTest extends JexlTestCase {
+
     public static class Context311 extends MapContext
       implements JexlContext.OptionsHandle, JexlContext.ThreadLocal {
         private JexlOptions options;
@@ -146,10 +148,11 @@ class JXLTTest extends JexlTestCase {
    public static List<JexlBuilder> engines() {
        final JexlFeatures f = new JexlFeatures();
        f.lexical(true).lexicalShade(true);
+       JexlPermissions permissions = JexlPermissions.RESTRICTED.compose("org.apache.commons.jexl3 +{ JXLTTest{} }");
       return Arrays.asList(
-              new JexlBuilder().silent(false).lexical(true).lexicalShade(true).cache(128).strict(true),
-              new JexlBuilder().features(f).silent(false).cache(128).strict(true),
-              new JexlBuilder().silent(false).cache(128).strict(true));
+              new JexlBuilder().permissions(permissions).silent(false).lexical(true).lexicalShade(true).cache(128).strict(true),
+              new JexlBuilder().permissions(permissions).features(f).silent(false).cache(128).strict(true),
+              new JexlBuilder().permissions(permissions).silent(false).cache(128).strict(true));
    }
 
    private static String refactor(final TemplateDebugger td, final JxltEngine.Template ts) {

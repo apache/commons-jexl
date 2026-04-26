@@ -16,7 +16,6 @@
  */
 package org.apache.commons.jexl3;
 
-import static org.apache.commons.jexl3.introspection.JexlPermissions.RESTRICTED;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -139,7 +138,7 @@ public class SwitchTest extends JexlTestCase {
 
     @Test
     void test440p() {
-        assertTrue(RESTRICTED.allow(this.getClass()));
+        assertTrue(TEST_PERMS.allow(this.getClass()));
     }
 
     @Test
