@@ -883,7 +883,7 @@ public class Issues400Test {
         JexlPermissions perm = new JexlPermissions.ClassPermissions(
             getClass().getClassLoader().getClass(),
             org.apache.commons.jexl3.internal.introspection.Uberspect.class);
-        //assertTrue(perm.allow(cloader), "should be able to access ClassLoader");
+        assertTrue(perm.allow(cloader), "should be able to access ClassLoader");
         assertTrue(perm.allow(cloader, cloader.getMethod("loadClass", String.class)), "should be able to access ClassLoader::loadClass");
         assertEquals(java.lang.System.class, run450b(perm));
     }

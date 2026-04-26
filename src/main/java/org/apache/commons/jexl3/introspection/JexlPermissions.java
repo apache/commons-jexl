@@ -443,7 +443,7 @@ public interface JexlPermissions {
      * @param clazz the class from which the field is accessed, used to check that the field is allowed for this class
      * @param field the field to check
      * @return true if JEXL is allowed to introspect, false otherwise
-     * @since 3.7
+     * @since 3.6.3
    */
     default boolean allow(Class<?> clazz, Field field) {
       return allow(field);
@@ -470,7 +470,7 @@ public interface JexlPermissions {
      * @param clazz the class from which the method is accessed, used to check that the method is allowed for this class
      * @param method the method to check
      * @return true if JEXL is allowed to introspect, false otherwise
-     * @since 3.7
+     * @since 3.6.3
      */
     default boolean allow(Class<?> clazz, Method method) {
       return allow(method);
