@@ -17,12 +17,12 @@
 
 package org.apache.commons.jexl3;
 
-import org.apache.commons.jexl3.introspection.JexlPermissions;
-
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.logging.Logger;
+
+import org.apache.commons.jexl3.introspection.JexlPermissions;
 
 /**
  * A debugging class to determine what is allowed/denied.
