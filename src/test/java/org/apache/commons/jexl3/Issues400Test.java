@@ -33,7 +33,6 @@ import java.io.File;
 import java.io.StringWriter;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
-import java.math.MathContext;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -46,7 +45,6 @@ import java.util.function.Function;
 
 import org.apache.commons.jexl3.internal.Debugger;
 import org.apache.commons.jexl3.internal.Engine32;
-import org.apache.commons.jexl3.internal.Operator;
 import org.apache.commons.jexl3.internal.Scope;
 import org.apache.commons.jexl3.internal.TemplateEngine;
 import org.apache.commons.jexl3.introspection.JexlPermissions;
@@ -55,7 +53,6 @@ import org.apache.commons.jexl3.parser.ASTJexlScript;
 import org.apache.commons.jexl3.parser.JexlScriptParser;
 import org.apache.commons.jexl3.parser.Parser;
 import org.apache.commons.jexl3.parser.StringProvider;
-import org.apache.commons.logging.Log;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
