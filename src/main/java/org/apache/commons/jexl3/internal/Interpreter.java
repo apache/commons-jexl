@@ -23,6 +23,7 @@ import java.util.Objects;
 import java.util.Queue;
 import java.util.concurrent.Callable;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 import org.apache.commons.jexl3.JexlArithmetic;
 import org.apache.commons.jexl3.JexlContext;
@@ -1314,12 +1315,10 @@ public class Interpreter extends InterpreterBase {
 
     @Override
     protected Object visit(final ASTEmptyFunction node, final Object data) {
-        try {
-            final Object value = node.jjtGetChild(0).jjtAccept(this, data);
-            return operators.empty(node, value);
-        } catch (final JexlException xany) {
-            return true;
-        }
+        final JexlNode arg = node.jjtGetChild(0);
+        final Supplier<Object> eval = () -> arg.jjtAccept(this, data);
+        Object value = arithmetic.evaluate(logger, eval);
+        return value == eval ? true : operators.empty(node, value);
     }
 
     @Override
@@ -2008,12 +2007,10 @@ public class Interpreter extends InterpreterBase {
 
     @Override
     protected Object visit(final ASTSizeFunction node, final Object data) {
-        try {
-            final Object val = node.jjtGetChild(0).jjtAccept(this, data);
-            return operators.size(node, val);
-        } catch (final JexlException xany) {
-            return 0;
-        }
+        final JexlNode arg = node.jjtGetChild(0);
+        final Supplier<Object> eval = () -> arg.jjtAccept(this, data);
+        Object value = arithmetic.evaluate(logger, eval);
+        return value == eval ? 0 : operators.size(node, value);
     }
 
     @Override

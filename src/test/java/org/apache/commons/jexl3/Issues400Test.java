@@ -33,6 +33,7 @@ import java.io.File;
 import java.io.StringWriter;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
+import java.math.MathContext;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -45,6 +46,7 @@ import java.util.function.Function;
 
 import org.apache.commons.jexl3.internal.Debugger;
 import org.apache.commons.jexl3.internal.Engine32;
+import org.apache.commons.jexl3.internal.Operator;
 import org.apache.commons.jexl3.internal.Scope;
 import org.apache.commons.jexl3.internal.TemplateEngine;
 import org.apache.commons.jexl3.introspection.JexlPermissions;
@@ -53,6 +55,7 @@ import org.apache.commons.jexl3.parser.ASTJexlScript;
 import org.apache.commons.jexl3.parser.JexlScriptParser;
 import org.apache.commons.jexl3.parser.Parser;
 import org.apache.commons.jexl3.parser.StringProvider;
+import org.apache.commons.logging.Log;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -1181,6 +1184,21 @@ public class Issues400Test {
         final StringWriter writer = new StringWriter();
         template.evaluate(null, writer);
         assertEquals("42", writer.toString());
+    }
+
+
+    @Test
+    void test459() {
+        CaptureLog capture = new CaptureLog("test459");
+        final JexlBuilder builder = new JexlBuilder().logger(capture).safe(true).strict(false).silent(true);
+        final JexlEngine jexl = builder.create();
+        String expr = "empty('aaa'.substring(400,500))";
+        JexlScript script = jexl.createScript(expr);
+        Object result = script.execute(null);
+        assertEquals(true, result);
+        List<String> errors = capture.getCapturedMessages();
+        assertEquals(1, errors.size());
+        assertTrue(errors.get(0).contains("substring"));
     }
 
 }
