@@ -1027,7 +1027,12 @@ public class JexlArithmetic {
             return arg.get();
         } catch (JexlException e) {
             if (logger != null && logger.isWarnEnabled()) {
-                logger.warn(e.getMessage(), e);
+                Throwable t = e.getCause();
+                if (t == null) {
+                    logger.warn(e.getMessage(), e.clean());
+                } else {
+                    logger.warn(e.getMessage() + ", " + t.getMessage(), JexlException.clean(t));
+                }
             }
         }
         return arg;

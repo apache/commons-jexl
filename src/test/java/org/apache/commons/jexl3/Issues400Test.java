@@ -1194,8 +1194,8 @@ public class Issues400Test {
         Object result = script.execute(null);
         assertEquals(true, result);
         List<String> errors = capture.getCapturedMessages();
-        assertEquals(1, errors.size());
-        assertTrue(errors.get(0).contains("substring"));
+        assertEquals(1, capture.count("warn"));
+        assertTrue(errors.stream().anyMatch(error -> error.contains("substring")));
     }
 
 }
