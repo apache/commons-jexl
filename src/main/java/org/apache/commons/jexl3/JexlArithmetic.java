@@ -1022,10 +1022,10 @@ public class JexlArithmetic {
      * @return the evaluated result on success, or the supplier itself on JexlException
      * @since 3.6.3
      */
-    public Object evaluate(Log logger, Supplier<Object> arg) {
+    public Object evaluate(final Log logger, final Supplier<Object> arg) {
         try {
             return arg.get();
-        } catch (JexlException e) {
+        } catch (final JexlException e) {
             if (logger != null && logger.isWarnEnabled()) {
                 Throwable t = e.getCause();
                 if (t == null) {

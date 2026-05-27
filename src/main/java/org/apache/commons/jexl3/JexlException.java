@@ -744,10 +744,9 @@ public class JexlException extends RuntimeException {
                 if (startsWithAny(CLEAN_STOP, className)) {
                     break;
                 }
-                if (startsWithAny(CLEAN_SKIP, className)) {
-                    continue;
+                if (!startsWithAny(CLEAN_SKIP, className)) {
+                    stackJexl.add(se);
                 }
-                stackJexl.add(se);
             }
             xthrow.setStackTrace(stackJexl.toArray(EMPTY_STACK_TRACE_ELEMENT_ARRAY));
         }
@@ -760,7 +759,7 @@ public class JexlException extends RuntimeException {
      * @param name the name to check
      * @return true if the name starts with any of the prefixes, false otherwise
      */
-    private static boolean startsWithAny(final List<String> prefixes, final String name) {
+    private static boolean startsWithAny(final String[] prefixes, final String name) {
         for (final String prefix : prefixes) {
             if (name.startsWith(prefix)) {
                 return true;
@@ -770,25 +769,25 @@ public class JexlException extends RuntimeException {
     }
 
     /**
-     * A static, immutable list of package names that will be skipped during
+     * A static array of package names that will be skipped during
      * exception stack-trace cleansing.
      */
-    private static final List<String> CLEAN_SKIP = Arrays.asList(
+    private static final String[] CLEAN_SKIP = {
       "org.apache.commons.jexl3.internal",
       "org.apache.commons.jexl3.parser",
       "java.lang.reflect",
       "sun.reflect"
-    );
+    };
 
     /**
-     * A static, immutable list of package names that will be considered as a stop point during
+     * A static array of package names that will be considered as a stop point during
      * exception stack-trace cleansing.
      * <p>
      * All stacktrace elements occurring after one of these packages matches an element class name
      * will be discarded.
      * </p>
      */
-    private static final List<String> CLEAN_STOP = Collections.singletonList("org.junit");
+    private static final String[] CLEAN_STOP = { "org.junit" };
 
     /**
      * Gets the most specific information attached to a node.

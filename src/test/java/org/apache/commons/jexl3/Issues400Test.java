@@ -1189,13 +1189,24 @@ public class Issues400Test {
         CaptureLog capture = new CaptureLog("test459");
         final JexlBuilder builder = new JexlBuilder().logger(capture).safe(true).strict(false).silent(true);
         final JexlEngine jexl = builder.create();
-        String expr = "empty('aaa'.substring(400,500))";
-        JexlScript script = jexl.createScript(expr);
-        Object result = script.execute(null);
-        assertEquals(true, result);
-        List<String> errors = capture.getCapturedMessages();
-        assertEquals(1, capture.count("warn"));
-        assertTrue(errors.stream().anyMatch(error -> error.contains("substring")));
+        Object[] expected = { true, true, 0, 0 };
+        String[] expressions = {
+          "empty('aaa'.substring(400,500))",
+          "empty('aaa'.substring(-1, 2))",
+          "size('aaa'.substring(400,500))",
+          "size('aaa'.substring(-1, 2))",
+        };
+        for (int i = 0; i < expressions.length; ++i) {
+            String expr = expressions[i];
+            Object control = expected[i];
+            capture.clear();
+            JexlScript script = jexl.createScript(expr);
+            Object result = script.execute(null);
+            assertEquals(control, result);
+            List<String> errors = capture.getCapturedMessages();
+            assertEquals(1, capture.count("warn"));
+            assertTrue(errors.stream().anyMatch(error -> error.contains("substring")));
+        }
     }
 
 }
