@@ -2108,7 +2108,7 @@ public class JexlArithmetic {
      *
      * @param strict true if the calling operator or casting is strict, false otherwise
      * @param val the object to be coerced.
-     * @return a BigDecimal
+     * @return a BigInteger
      * @throws ArithmeticException if val is null and mode is strict or if coercion is not possible
      * @since 3.3
      */
@@ -2122,7 +2122,7 @@ public class JexlArithmetic {
      * <p>Boolean false is 0, true is 1.</p>
      *
      * @param val the object to be coerced.
-     * @return a BigDecimal
+     * @return a BigInteger
      * @throws ArithmeticException if val is null and mode is strict or if coercion is not possible
      */
     public BigInteger toBigInteger(final Object val) {
