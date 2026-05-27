@@ -33,6 +33,7 @@
             <action dev="henrib" type="fix" issue="JEXL-458" due-to="Daniil Averin">Improve permissions expressivity</action>
             <action dev="henrib" type="fix" issue="JEXL-457" due-to="Daniil Averin">Reduce default exposure for RESTRICTED JexlPermissions</action>
             <action dev="henrib" type="fix" issue="JEXL-456" due-to="Vincent Bussol">Change in template parser behavior.</action>
+            <action dev="ggregory" type="fix" due-to="David Costanzo">Fix the @return tags in the Javadoc for JexlArithmetic.toBigInteger() overloads (#403).</action>
             <!-- ADD -->
             <!-- UPDATE -->
             <action type="update" dev="ggregory" due-to="Gary Gregory">Bump org.apache.commons:commons-parent from 96 to 100.</action>
