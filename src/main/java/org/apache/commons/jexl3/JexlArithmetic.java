@@ -1012,14 +1012,13 @@ public class JexlArithmetic {
      *
      * <p>Used primarily by {@link #empty(Object)} and {@link #size(Object)} to guard argument evaluation.
      * If evaluation succeeds, returns the supplier's result. If a {@link JexlException} occurs, logs a
-     * warning and returns the supplier itself.</p>
+     * warning and returns {@link JexlEngine#TRY_FAILED} as an exception-occurred sentinel to the caller.</p>
      *
-     * <p>This method is public to allow overriding. Implementations that change the exception handling
-     * behavior must still return the supplier on failure to maintain the contract.</p>
+     * <p>This method is public to allow overriding.</p>
      *
      * @param logger the logger for warning messages; may be null
      * @param arg the supplier providing the argument to evaluate
-     * @return the evaluated result on success, or the supplier itself on JexlException
+     * @return the evaluated result on success or {@link JexlEngine#TRY_FAILED} on failure
      * @since 3.6.3
      */
     public Object evaluate(final Log logger, final Supplier<Object> arg) {
@@ -1027,15 +1026,18 @@ public class JexlArithmetic {
             return arg.get();
         } catch (final JexlException e) {
             if (logger != null && logger.isWarnEnabled()) {
-                Throwable t = e.getCause();
+                final String em = e.getMessage();
+                final Throwable t = e.getCause();
                 if (t == null) {
-                    logger.warn(e.getMessage(), e.clean());
+                    logger.warn(em, e.clean());
                 } else {
-                    logger.warn(e.getMessage() + ", " + t.getMessage(), JexlException.clean(t));
+                    final String tm = t.getMessage();
+                    String warning = em != null ? (tm != null ? em + ", " + tm : em) : tm;
+                    logger.warn(warning, JexlException.clean(t));
                 }
             }
         }
-        return arg;
+        return JexlEngine.TRY_FAILED;
     }
 
     /**

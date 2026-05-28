@@ -1318,7 +1318,7 @@ public class Interpreter extends InterpreterBase {
         final JexlNode arg = node.jjtGetChild(0);
         final Supplier<Object> eval = () -> arg.jjtAccept(this, data);
         Object value = arithmetic.evaluate(logger, eval);
-        return value == eval ? true : operators.empty(node, value);
+        return value == JexlEngine.TRY_FAILED ? true : operators.empty(node, value);
     }
 
     @Override
@@ -2010,7 +2010,7 @@ public class Interpreter extends InterpreterBase {
         final JexlNode arg = node.jjtGetChild(0);
         final Supplier<Object> eval = () -> arg.jjtAccept(this, data);
         Object value = arithmetic.evaluate(logger, eval);
-        return value == eval ? 0 : operators.size(node, value);
+        return value == JexlEngine.TRY_FAILED ? 0 : operators.size(node, value);
     }
 
     @Override

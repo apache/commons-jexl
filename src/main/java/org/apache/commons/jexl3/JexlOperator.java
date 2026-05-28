@@ -35,10 +35,10 @@ import java.util.function.Consumer;
  * <li>Operator methods should be public</li>
  * <li>Operators return type should be respected when primitive (int, boolean,...)</li>
  * <li>Operators may be overloaded multiple times with different signatures</li>
- * <li>Operators may return JexlEngine.TRY_AGAIN to fallback on default JEXL implementation</li>
+ * <li>Operators may return JexlEngine.TRY_FAIL to fall back on default JEXL implementation</li>
  * </ul>
  *
- * For side effect operators, operators that modify the left-hand size value (+=, -=, etc.), the user implemented
+ * For side effect operators, operators that modify the left-hand size value (+=, -=, etc.), the user-implemented
  * overload methods may return:
  * <ul>
  *     <li>JexlEngine.TRY_FAIL to let the default fallback behavior be executed.</li>
