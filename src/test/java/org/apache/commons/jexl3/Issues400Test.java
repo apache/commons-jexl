@@ -1209,5 +1209,34 @@ public class Issues400Test {
         }
     }
 
+    public static class Namespace461 {
+        public static int func(int i) {
+            return i * 42;
+        }
+    }
+
+    @Test
+    void test461() {
+        JexlFeatures f = JexlFeatures.createDefault().namespaceIdentifier(true);
+        final JexlEngine jexl = new JexlBuilder()
+          .namespaces(Collections.singletonMap("z", Namespace461.class))
+          .features(f)
+          .create();
+
+        final JexlContext jc = new MapContext();
+        jc.set("x", 1);
+        jc.set("y", 2);
+        jc.set("my_function", jexl.createScript("(a) -> { a * 1000 }"));
+
+        JexlScript script = jexl.createScript("x != null ? x : my_function(y)");
+        Object result = script.execute(jc);
+        assertEquals(1, result, "Result is not x");
+        script = jexl.createScript("x != null ? z:func(x) : my_function(y)");
+        result = script.execute(jc);
+        assertEquals(42, result);
+        script = jexl.createScript("y == 1 ?  my_function(x) : z:func(x)");
+        result = script.execute(jc);
+        assertEquals(42, result);
+    }
 }
 
