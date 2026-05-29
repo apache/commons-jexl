@@ -1209,17 +1209,17 @@ public class Issues400Test {
         }
     }
 
-    public static class Namespace461 {
+    public static class Namespace460 {
         public static int func(int i) {
             return i * 42;
         }
     }
 
     @Test
-    void test461() {
+    void test460() {
         JexlFeatures f = JexlFeatures.createDefault().namespaceIdentifier(true);
         final JexlEngine jexl = new JexlBuilder()
-          .namespaces(Collections.singletonMap("z", Namespace461.class))
+          .namespaces(Collections.singletonMap("z", Namespace460.class))
           .features(f)
           .create();
 
