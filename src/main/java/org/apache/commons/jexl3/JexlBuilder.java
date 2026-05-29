@@ -736,7 +736,7 @@ public class JexlBuilder {
      * Sets whether the engine will throw JexlException during evaluation when an error is triggered.
      * <p>When <em>not</em> silent, the engine throws an exception when the evaluation triggers an exception or an
      * error.</p>
-     * <p>It is recommended to use <em>silent(true)</em> as an explicit default.</p>
+     * <p>It is recommended to use <em>silent(false)</em> as an explicit default.</p>
      *
      * @param flag true means no JexlException will occur, false allows them
      * @return this builder
@@ -795,7 +795,7 @@ public class JexlBuilder {
     }
 
     /**
-     * Sets whether the engine considers unknown variables, methods, functions and constructors as errors or
+     * Sets whether the engine considers unknown variables, methods, functions, and constructors as errors or
      * evaluates them as null.
      * <p>When <em>not</em> strict, operators or functions using null operands return null on evaluation. When
      * strict, those raise exceptions.</p>

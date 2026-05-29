@@ -236,7 +236,7 @@ public class JexlException extends RuntimeException {
     }
 
     /**
-     * Thrown when a method or ctor is unknown, ambiguous or inaccessible.
+     * Thrown when a method or ctor is unknown, ambiguous, or inaccessible.
      *
      * @since 3.0
      */
@@ -322,7 +322,7 @@ public class JexlException extends RuntimeException {
         }
 
         /**
-         * Gets  the method signature
+         * Gets the method signature.
          *
          * @return the method signature
          * @since 3.2
@@ -728,10 +728,10 @@ public class JexlException extends RuntimeException {
     }
 
     /**
-     * Cleans a Throwable from any org.apache.commons.jexl3.internal stack trace element.
+     * Cleans a Throwable from cluttering stack trace elements.
      *
      * @param <X>    the throwable type
-     * @param xthrow the thowable
+     * @param xthrow the throwable
      * @return the throwable
      */
      static <X extends Throwable> X clean(final X xthrow) {
@@ -739,8 +739,10 @@ public class JexlException extends RuntimeException {
             final List<StackTraceElement> stackJexl = new ArrayList<>();
             for (final StackTraceElement se : xthrow.getStackTrace()) {
                 final String className = se.getClassName();
-                if (!className.startsWith("org.apache.commons.jexl3.internal")
-                        && !className.startsWith("org.apache.commons.jexl3.parser")) {
+                if (startsWithAny(CLEAN_STOP, className)) {
+                    break;
+                }
+                if (!startsWithAny(CLEAN_SKIP, className)) {
                     stackJexl.add(se);
                 }
             }
@@ -748,6 +750,42 @@ public class JexlException extends RuntimeException {
         }
         return xthrow;
     }
+
+    /**
+     * Checks whether a given name starts with any of the given prefixes.
+     * @param prefixes the prefixes to check
+     * @param name the name to check
+     * @return true if the name starts with any of the prefixes, false otherwise
+     */
+    private static boolean startsWithAny(final String[] prefixes, final String name) {
+        for (final String prefix : prefixes) {
+            if (name.startsWith(prefix)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * A static array of package names that will be skipped during
+     * exception stack-trace cleansing.
+     */
+    private static final String[] CLEAN_SKIP = {
+      "org.apache.commons.jexl3.internal",
+      "org.apache.commons.jexl3.parser",
+      "java.lang.reflect",
+      "sun.reflect"
+    };
+
+    /**
+     * A static array of package names that will be considered as a stop point during
+     * exception stack-trace cleansing.
+     * <p>
+     * All stacktrace elements occurring after one of these packages matches an element class name
+     * will be discarded.
+     * </p>
+     */
+    private static final String[] CLEAN_STOP = { "org.junit" };
 
     /**
      * Gets the most specific information attached to a node.
@@ -781,7 +819,7 @@ public class JexlException extends RuntimeException {
         final JexlInfo info = node != null ? detailedInfo(node, node.jexlInfo()) : null;
         final StringBuilder msg = new StringBuilder();
         if (info != null) {
-            msg.append(info.toString());
+            msg.append(info);
         } else {
             msg.append("?:");
         }
@@ -803,7 +841,7 @@ public class JexlException extends RuntimeException {
     }
 
     /**
-     * Merge the node info and the cause info to obtain the best possible location.
+     * Merge the node info and the cause info to get the best possible location.
      *
      * @param info  the node
      * @param cause the cause
@@ -820,7 +858,7 @@ public class JexlException extends RuntimeException {
     }
 
     /**
-     * Generates a message for a unsolvable method error.
+     * Generates a message for an unsolvable method error.
      *
      * @param node the node where the error occurred
      * @param method the method name
@@ -833,7 +871,7 @@ public class JexlException extends RuntimeException {
     }
 
     /**
-     * Generates a message for a unsolvable method error.
+     * Generates a message for an unsolvable method error.
      *
      * @param node the node where the error occurred
      * @param method the method name
@@ -929,7 +967,7 @@ public class JexlException extends RuntimeException {
      * @param fromc the beginning column
      * @param tol the ending line
      * @param toc the ending column
-     * @return the source with the (begin) to (to) zone removed
+     * @return the source with the zone from (from) to (to) removed
      */
     public static String sliceSource(final String src, final int froml, final int fromc, final int tol, final int toc) {
         final BufferedReader reader = new BufferedReader(new StringReader(src));
@@ -1073,7 +1111,7 @@ public class JexlException extends RuntimeException {
     }
 
     /**
-     * Cleans a JexlException from any org.apache.commons.jexl3.internal stack trace element.
+     * Cleans a JexlException from cluttering stack trace elements.
      *
      * @return this exception
      */
@@ -1082,7 +1120,7 @@ public class JexlException extends RuntimeException {
     }
 
     /**
-     * Accesses detailed message.
+     * Accesses the detailed message.
      *
      * @return the message
      */
@@ -1093,9 +1131,9 @@ public class JexlException extends RuntimeException {
     }
 
     /**
-     * Gets the exception specific detail
+     * Gets the exception-specific detail.
      *
-     * @return this exception specific detail
+     * @return this exception-specific detail
      * @since 3.2
      */
     public final String getDetail() {
@@ -1130,7 +1168,7 @@ public class JexlException extends RuntimeException {
     public String getMessage() {
         final StringBuilder msg = new StringBuilder();
         if (info != null) {
-            msg.append(info.toString());
+            msg.append(info);
         } else {
             msg.append("?:");
         }

@@ -21,7 +21,7 @@ import java.util.Collections;
 import java.util.Map;
 
 /**
- * Caching scripts or templates interface.
+ * Caching script or template interface.
  *
  * @param <K> source
  * @param <V> script or template
@@ -54,7 +54,7 @@ public interface JexlCache<K, V> {
     }
 
     /**
-     * Gets a value from cache.
+     * Gets a value from this cache.
      *
      * @param key the cache entry key
      * @return the cache entry value
@@ -62,7 +62,7 @@ public interface JexlCache<K, V> {
     V get(K key);
 
     /**
-     * Puts a value in cache.
+     * Puts a value in this cache.
      *
      * @param key    the cache entry key
      * @param script the cache entry value

@@ -30,11 +30,13 @@ import java.math.MathContext;
 import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Supplier;
 import java.util.function.ToLongFunction;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.jexl3.introspection.JexlMethod;
+import org.apache.commons.logging.Log;
 
 /**
  * Perform arithmetic, implements JexlOperator methods.
@@ -1003,6 +1005,39 @@ public class JexlArithmetic {
             return (byte) ((Byte) val + incr);
         }
         throw new ArithmeticException("Object "+(incr < 0? "decrement":"increment")+":(" + val + ")");
+    }
+
+    /**
+     * Evaluates a supplier argument, eventually catching and logging any JexlException.
+     *
+     * <p>Used primarily by {@link #empty(Object)} and {@link #size(Object)} to guard argument evaluation.
+     * If evaluation succeeds, returns the supplier's result. If a {@link JexlException} occurs, logs a
+     * warning and returns {@link JexlEngine#TRY_FAILED} as an exception-occurred sentinel to the caller.</p>
+     *
+     * <p>This method is public to allow overriding.</p>
+     *
+     * @param logger the logger for warning messages; may be null
+     * @param arg the supplier providing the argument to evaluate
+     * @return the evaluated result on success or {@link JexlEngine#TRY_FAILED} on failure
+     * @since 3.6.3
+     */
+    public Object evaluate(final Log logger, final Supplier<Object> arg) {
+        try {
+            return arg.get();
+        } catch (final JexlException e) {
+            if (logger != null && logger.isWarnEnabled()) {
+                final String em = e.getMessage();
+                final Throwable t = e.getCause();
+                if (t == null) {
+                    logger.warn(em, e.clean());
+                } else {
+                    final String tm = t.getMessage();
+                    String warning = em != null ? (tm != null ? em + ", " + tm : em) : tm;
+                    logger.warn(warning, JexlException.clean(t));
+                }
+            }
+        }
+        return JexlEngine.TRY_FAILED;
     }
 
     /**
