@@ -29,7 +29,7 @@ import org.apache.commons.jexl3.internal.Engine;
  * The flags, briefly explained, are the following:
  * <ul>
  * <li>silent: whether errors throw exception</li>
- * <li>safe: whether navigation through null is <em>not</em>an error</li>
+ * <li>safe: whether navigation through null is <em>not</em> an error</li>
  * <li>cancellable: whether thread interruption is an error</li>
  * <li>lexical: whether redefining local variables is an error</li>
  * <li>lexicalShade: whether local variables shade global ones even outside their scope</li>
