@@ -45,7 +45,7 @@
                         <a href="#Conditional">Conditional Statements</a>
                     </li>
                     <li>
-                        <a href="#Control Flow">Flow Control</a>
+                        <a href="#Control Flow">Control Flow</a>
                     </li>
                 </ol>
             </p>
@@ -97,7 +97,18 @@
                         </p>
                         <p>
                             <strong>N.B.</strong> the following keywords are reserved, and cannot be used as a variable name or property when using the dot operator:
-                            <code>or and eq ne lt gt le ge div mod not null true false new var do while break continue function return</code>
+                            <code>or</code> <code>and</code> <code>not</code>
+                            <code>eq</code> <code>ne</code> <code>lt</code> <code>gt</code> <code>le</code> <code>ge</code>
+                            <code>div</code> <code>mod</code> <code>instanceof</code>
+                            <code>null</code> <code>true</code> <code>false</code>
+                            <code>new</code> <code>size</code> <code>empty</code>
+                            <code>var</code> <code>const</code> <code>let</code> <code>NaN</code>
+                            <code>if</code> <code>else</code> <code>for</code>
+                            <code>do</code> <code>while</code> <code>break</code> <code>continue</code>
+                            <code>switch</code> <code>case</code> <code>default</code>
+                            <code>try</code> <code>catch</code> <code>finally</code> <code>throw</code>
+                            <code>function</code> <code>return</code>
+                            <code>import</code>.
                             For example, the following is invalid:
                             <code>my.new.dotted.var // invalid ('new' is keyword)</code>
                             In such cases, quoted identifiers or the [ ] operator can be used, for example:
@@ -171,7 +182,7 @@
                 <tr>
                     <td>Block</td>
                     <td>
-                        A block is simply multiple statements inside curly braces (<code>{, }</code>).
+                        A block is simply multiple statements inside curly braces (<code>{</code> and <code>}</code>).
                     </td>
                 </tr>
                 <tr>
@@ -445,6 +456,7 @@
                         with <code>]</code>, e.g.
                         <code>[ 1, 2, "three" ]</code>
                         <p>This syntax creates an <code>Object[]</code>.</p>
+                        <p>A trailing <code>,</code> may be given between the final expression and the closing <code>]</code>.</p>
                         <p>Empty array literal can be specified as <code>[]</code> with result of creating <code>Object[]</code></p>
                         <p>
                             JEXL will attempt to strongly type the array; if all entries are of the same class or if all
@@ -472,6 +484,7 @@
                         with <code>}</code>, e.g.
                         <code>{ "one" , 2, "more"}</code>
                         <p>This syntax creates a <code>HashSet&lt;Object&gt;</code>.</p>
+                        <p>A trailing <code>,</code> may be given between the final expression and the closing <code>}</code>.</p>
                         <p>Empty set literal can be specified as <code>{}</code></p>
                     </td>
                 </tr>
@@ -482,6 +495,7 @@
                         with <code>}</code>, e.g.
                         <code>{ "one" : 1, "two" : 2, "three" : 3, "more": "many more" }</code>
                         <p>This syntax creates a <code>HashMap&lt;Object,Object&gt;</code>.</p>
+                        <p>A trailing <code>,</code> may be given between the final key : value pair and the closing <code>}</code>.</p>
                         <p>Empty map literal can be specified as <code>{:}</code></p>
                     </td>
                 </tr>
@@ -556,7 +570,7 @@
                         <p>In case of multiple constructors, JEXL will make the best effort to find
                             the most appropriate non ambiguous constructor to call.</p>
                         <p>
-                        Alternatively, using <code>#pragma jexl.import java.lang</code>code>, one can use the
+                        Alternatively, using <code>#pragma jexl.import java.lang</code>, one can use the
                         following syntax: <code>new Double(10)</code>.
                         </p>
                     </td>
@@ -782,7 +796,7 @@
                     <td>In or Match<code>=~</code></td>
                     <td>
                         The syntactically Perl inspired <code>=~</code> operator can be used to check that a <code>string</code> matches
-                        a regular expression (expressed either a Java String or a java.util.regex.Pattern).
+                        a regular expression (expressed as either a Java String or a java.util.regex.Pattern).
                         For example
                         <code>"abcdef" =~ "abc.*</code> returns <code>true</code>.
                         It also checks whether any collection, set or map (on keys) contains a value or not; in that case, it behaves
@@ -1143,6 +1157,33 @@
                             f(41);
                         </code>
                         Will evaluate as 41.
+                    </td>
+                </tr>
+                <tr>
+                    <td>switch</td>
+                    <td>
+                        Switch expressions or switch statements can replace long if/else if/else chains
+                        when all conditions test the same variable for equality with a different literal.
+                        <br/>
+                        An example switch statement:
+                        <pre><code>switch (s) {
+case 1: {
+    // some code
+    break;
+
+case 2:
+    // more code, fall through to 3
+case 3:
+    return 5; // return is allowed
+}</code></pre>
+
+                        An example switch expression:
+                        <pre><code>let v = switch (s) {
+case 1 -> 10;
+case 2, 3 -> 20;
+case 4 -> { 30 + 10 } // jexl is functional, last eval is expression value, no yield needed
+default -> null // if not present and no case match, error
+}</code></pre>
                     </td>
                 </tr>
                 <tr>
