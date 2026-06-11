@@ -37,7 +37,7 @@
             <action dev="ggregory" type="fix" due-to="David Costanzo">Fix the @return tags in the Javadoc for JexlArithmetic.toBigInteger() overloads (#403).</action>
             <!-- ADD -->
             <!-- UPDATE -->
-            <action type="update" dev="ggregory" due-to="Gary Gregory">Bump org.apache.commons:commons-parent from 96 to 101.</action>
+            <action type="update" dev="ggregory" due-to="Gary Gregory">Bump org.apache.commons:commons-parent from 96 to 102.</action>
             <action type="update" dev="ggregory" due-to="Gary Gregory">Bump commons-logging:commons-logging from 1.3.5 to 1.3.6.</action>
         </release>
         <release version="3.6.2" date="2026-02-05"
