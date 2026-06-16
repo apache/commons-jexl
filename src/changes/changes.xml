@@ -40,6 +40,7 @@
             <!-- UPDATE -->
             <action type="update" dev="ggregory" due-to="Gary Gregory">Bump org.apache.commons:commons-parent from 96 to 102.</action>
             <action type="update" dev="ggregory" due-to="Gary Gregory">Bump commons-logging:commons-logging from 1.3.5 to 1.3.6.</action>
+            <action type="update" dev="ggregory" due-to="Gary Gregory">Bump com.google.code.gson:gson from 2.13.2 to 2.14.0.</action>
         </release>
         <release version="3.6.2" date="2026-02-05"
                  description="This is a feature and maintenance release. Java 8 or later is required.">
