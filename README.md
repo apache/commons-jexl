@@ -45,7 +45,7 @@ Apache Commons JEXL
 
 [![Java CI](https://github.com/apache/commons-jexl/actions/workflows/maven.yml/badge.svg)](https://github.com/apache/commons-jexl/actions/workflows/maven.yml)
 [![Maven Central](https://img.shields.io/maven-central/v/org.apache.commons/commons-jexl3?label=Maven%20Central)](https://search.maven.org/artifact/org.apache.commons/commons-jexl3)
-[![Javadocs](https://javadoc.io/badge/org.apache.commons/commons-jexl3/3.6.2.svg)](https://javadoc.io/doc/org.apache.commons/commons-jexl3/3.6.2)
+[![Javadocs](https://javadoc.io/badge/org.apache.commons/commons-jexl3/3.6.3.svg)](https://javadoc.io/doc/org.apache.commons/commons-jexl3/3.6.3)
 [![CodeQL](https://github.com/apache/commons-jexl/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/apache/commons-jexl/actions/workflows/codeql-analysis.yml)
 [![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/apache/commons-jexl/badge)](https://api.securityscorecards.dev/projects/github.com/apache/commons-jexl)
 
@@ -68,7 +68,7 @@ Alternatively, you can pull it from the central Maven repositories:
 <dependency>
   <groupId>org.apache.commons</groupId>
   <artifactId>commons-jexl3</artifactId>
-  <version>3.6.2</version>
+  <version>3.6.3</version>
 </dependency>
 ```
 
@@ -115,4 +115,5 @@ Additional Resources
 Apache Commons Components
 -------------------------
 
-Please see the [list of components](https://commons.apache.org/components.html)
++ [List of Apache Commons components](https://commons.apache.org/components.html): homepages and documentation for all components.
++ [`REPOSITORIES.md`](https://github.com/apache/commons-parent/blob/master/REPOSITORIES.md): overview of the code repositories and their build status.
