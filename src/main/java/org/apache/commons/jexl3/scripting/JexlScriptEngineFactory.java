@@ -50,7 +50,7 @@ public class JexlScriptEngineFactory implements ScriptEngineFactory {
     /**
      * The default factory permissions.
      */
-    private static JexlPermissions defaultPermissions = null;
+    private static JexlPermissions defaultPermissions;
 
     /**
      * The engine permissions.
