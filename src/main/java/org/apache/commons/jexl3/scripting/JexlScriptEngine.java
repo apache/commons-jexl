@@ -36,7 +36,6 @@ import javax.script.ScriptEngineFactory;
 import javax.script.ScriptException;
 import javax.script.SimpleBindings;
 
-import org.apache.commons.jexl3.JexlBuilder;
 import org.apache.commons.jexl3.JexlContext;
 import org.apache.commons.jexl3.JexlEngine;
 import org.apache.commons.jexl3.JexlException;
@@ -265,12 +264,7 @@ public class JexlScriptEngine extends AbstractScriptEngine implements Compilable
      * The shared engine instance.
      * <p>A single soft-reference JEXL engine and JexlUberspect is shared by all instances of JexlScriptEngine.</p>
      */
-    private static Reference<JexlEngine> ENGINE;
-
-    /**
-     * The permissions used to create the script engine.
-     */
-    private static JexlPermissions PERMISSIONS;
+    private static Reference<JexlEngine> engineReference;
 
     /** The logger. */
     static final Log LOG = LogFactory.getLog(JexlScriptEngine.class);
@@ -284,27 +278,26 @@ public class JexlScriptEngine extends AbstractScriptEngine implements Compilable
     /** Reserved key for JexlScriptObject. */
     public static final String JEXL_OBJECT_KEY = "JEXL";
 
+    /** Reserved key for script. */
+    private static final String SCRIPT = "script";
+
     /**
      * @return the shared JexlEngine instance, create it if necessary
      */
-    private static JexlEngine getEngine() {
-        JexlEngine engine = ENGINE != null ? ENGINE.get() : null;
+    private static JexlEngine getEngine(ScriptEngineFactory scriptEngineFactory) {
+        Reference<JexlEngine> ref = engineReference;
+        JexlEngine engine = ref != null ? ref.get() : null;
         if (engine == null) {
             synchronized (JexlScriptEngineFactory.class) {
-                engine = ENGINE != null ? ENGINE.get() : null;
+                ref = engineReference;
+                engine = ref != null ? ref.get() : null;
                 if (engine == null) {
-                    final JexlBuilder builder = new JexlBuilder()
-                            .strict(true)
-                            .safe(false)
-                            .logger(JexlScriptEngine.LOG)
-                            .cache(JexlScriptEngine.CACHE_SIZE);
-                    // ensure the script object class is always allowed for all permissions set
-                    JexlPermissions permissions = new JexlPermissions.ClassPermissions(
-                        PERMISSIONS == null ? JexlPermissions.RESTRICTED : PERMISSIONS,
-                            JexlScriptObject.class);
-                        builder.permissions(permissions);
-                    engine = builder.create();
-                    ENGINE = new SoftReference<>(engine);
+                    if (!(scriptEngineFactory instanceof JexlScriptEngineFactory)) {
+                        throw new IllegalArgumentException("ScriptEngineFactory is not JexlScriptEngineFactory");
+                    }
+                    JexlScriptEngineFactory factory = (JexlScriptEngineFactory) scriptEngineFactory;
+                    engine = factory.createJexlEngine();
+                    engineReference = new SoftReference<>(engine);
                 }
             }
         }
@@ -367,23 +360,18 @@ public class JexlScriptEngine extends AbstractScriptEngine implements Compilable
      * @since 3.3
      */
     public static void setInstance(final JexlEngine engine) {
-        ENGINE = new SoftReference<>(engine);
+        engineReference = new SoftReference<>(engine);
     }
 
     /**
      * Sets the permissions instance used to create the script engine.
-     * <p>Calling this method will force engine instance re-creation.</p>
-     * <p>To restore 3.2 script behavior:</p>
-     * {@code
-     *         JexlScriptEngine.setPermissions(JexlPermissions.UNRESTRICTED);
-     * }
-     *
-     * @param permissions the permissions instance to use or null to use the {@link JexlBuilder} default
-     * @since 3.3
+     * <p>This method has been considered unsafe and is no longer supported.</p>
+     * @deprecated 3.6.3
+     * @param permissions unused, method will throw
      */
+    @Deprecated
     public static void setPermissions(final JexlPermissions permissions) {
-        PERMISSIONS = permissions;
-        ENGINE = null; // will force recreation
+        throw new UnsupportedOperationException("JexlScriptEngine.setPermissions is unsafe and no longer supported");
     }
 
     /** The JexlScriptObject instance. */
@@ -414,21 +402,21 @@ public class JexlScriptEngine extends AbstractScriptEngine implements Compilable
     public JexlScriptEngine(final ScriptEngineFactory scriptEngineFactory) {
         Objects.requireNonNull(scriptEngineFactory, "scriptEngineFactory");
         parentFactory = scriptEngineFactory;
-        jexlEngine = getEngine();
+        jexlEngine = getEngine(scriptEngineFactory);
         jexlObject = new JexlScriptObject();
     }
 
     @Override
     public CompiledScript compile(final Reader script) throws ScriptException {
         // This is mandated by JSR-223
-        Objects.requireNonNull(script, "script");
+        Objects.requireNonNull(script, SCRIPT);
         return compile(readerToString(script));
     }
 
     @Override
     public CompiledScript compile(final String script) throws ScriptException {
         // This is mandated by JSR-223
-        Objects.requireNonNull(script, "script");
+        Objects.requireNonNull(script, SCRIPT);
         try {
             final JexlScript jexlScript = jexlEngine.createScript(script);
             return new JexlCompiledScript(jexlScript);
@@ -453,7 +441,7 @@ public class JexlScriptEngine extends AbstractScriptEngine implements Compilable
     @Override
     public Object eval(final String script, final ScriptContext context) throws ScriptException {
         // This is mandated by JSR-223 (see SCR.5.5.2   Methods)
-        Objects.requireNonNull(script, "script");
+        Objects.requireNonNull(script, SCRIPT);
         Objects.requireNonNull(context, CONTEXT_KEY);
         // This is mandated by JSR-223 (end of section SCR.4.3.4.1.2 - JexlScript Execution)
         context.setAttribute(CONTEXT_KEY, context, ScriptContext.ENGINE_SCOPE);

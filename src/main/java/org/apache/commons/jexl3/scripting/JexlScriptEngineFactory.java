@@ -24,6 +24,9 @@ import java.util.List;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineFactory;
 
+import org.apache.commons.jexl3.JexlBuilder;
+import org.apache.commons.jexl3.JexlEngine;
+import org.apache.commons.jexl3.introspection.JexlPermissions;
 import org.apache.commons.jexl3.parser.StringParser;
 
 /**
@@ -44,9 +47,65 @@ import org.apache.commons.jexl3.parser.StringParser;
  * @since 2.0
  */
 public class JexlScriptEngineFactory implements ScriptEngineFactory {
+    /**
+     * The default factory permissions.
+     */
+    private static JexlPermissions defaultPermissions = null;
+
+    /**
+     * The engine permissions.
+     */
+    private final JexlPermissions permissions;
 
     /** Default constructor */
-    public JexlScriptEngineFactory() {} // Keep Javadoc happy
+    public JexlScriptEngineFactory() { this(null); } // Keep Javadoc happy
+
+    /**
+     * Constructor with permissions.
+     * <p>Meant to reduce dependency to JEXL for extraordinary case of JSR233 </p>
+     * @param jexlPermissions the permissions instance to use or null to use the {@link JexlScriptEngineFactory} default
+     */
+    public JexlScriptEngineFactory(JexlPermissions jexlPermissions) {
+        permissions = jexlPermissions != null ? jexlPermissions : defaultPermissions;
+    }
+
+    /**
+     * @return a new JexlEngine instance
+     */
+    JexlEngine createJexlEngine() {
+        JexlBuilder builder = new JexlBuilder()
+          .strict(true)
+          .safe(false)
+          .logger(JexlScriptEngine.LOG)
+          .cache(JexlScriptEngine.CACHE_SIZE);
+        JexlPermissions p = permissions;
+        if (p == null) {
+            p = defaultPermissions;
+            if (p == null) {
+                p = builder.permissions();
+                if (p == null) {
+                    p = JexlPermissions.RESTRICTED;
+                }
+            }
+        }
+        JexlPermissions required = new JexlPermissions.ClassPermissions(p, JexlScriptEngine.JexlScriptObject.class);
+        builder.permissions(required);
+        return builder.create();
+    }
+
+    /**
+     * Sets the permissions instance used to create the script engine.
+     * <p>To restore 3.2 <em>unsafe</em> script behavior:</p>
+     * {@code
+     *         JexlScriptEngineFactory.setDefaultPermissions(JexlPermissions.UNRESTRICTED);
+     * }
+     *
+     * @param permissions the permissions instance to use or null to use the {@link JexlBuilder} default
+     * @since 3.6.3
+     */
+    public static void setDefaultPermissions(final JexlPermissions permissions) {
+        defaultPermissions = permissions;
+    }
 
     @Override
     public String getEngineName() {

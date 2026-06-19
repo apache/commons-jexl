@@ -45,7 +45,6 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
-import org.apache.commons.jexl3.JexlBuilder;
 import org.apache.commons.jexl3.JexlException;
 import org.apache.commons.jexl3.LoggingPermissions;
 import org.apache.commons.jexl3.introspection.JexlPermissions;
@@ -81,9 +80,8 @@ class JexlScriptEngineTest {
 
     @AfterEach
     void tearDown() {
-        JexlBuilder.setDefaultPermissions(null);
         JexlScriptEngine.setInstance(null);
-        JexlScriptEngine.setPermissions(null);
+        JexlScriptEngineFactory.setDefaultPermissions(null);
     }
 
     @Test
@@ -148,7 +146,7 @@ class JexlScriptEngineTest {
     @Test
     void testErrors() throws Exception {
         JexlPermissions permissions = new JexlPermissions.ClassPermissions(Errors.class);
-        JexlScriptEngine.setPermissions(permissions);
+        JexlScriptEngineFactory.setDefaultPermissions(permissions);
         final ScriptEngineManager manager = new ScriptEngineManager();
         final JexlScriptEngine engine = (JexlScriptEngine) manager.getEngineByName("JEXL");
         engine.put("errors", new Errors());
@@ -257,7 +255,7 @@ class JexlScriptEngineTest {
     }
     @Test
     void testScriptingInstance0() throws Exception {
-        JexlScriptEngine.setPermissions(JexlPermissions.UNRESTRICTED);
+        JexlScriptEngineFactory.setDefaultPermissions(JexlPermissions.UNRESTRICTED);
         final ScriptEngineManager manager = new ScriptEngineManager();
         final ScriptEngine engine = manager.getEngineByName("jexl3");
         final Long time2 = (Long) engine.eval(
@@ -269,7 +267,7 @@ class JexlScriptEngineTest {
     @Test
     void testScriptingPermissions1() throws Exception {
         // shows what is required to access System.currentTimeMillis()
-        JexlScriptEngine.setPermissions(new LoggingPermissions(
+        JexlScriptEngineFactory.setDefaultPermissions(new LoggingPermissions(
             JexlPermissions.RESTRICTED.compose(
                 "javax.script { +SimpleScriptContext { getClass(); } }"
                     + "java.lang { "
