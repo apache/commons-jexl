@@ -43,43 +43,6 @@ Have fun!
 
 ------------------------------------------------------------------------------
 
-Apache Commons JEXL 3.6.3 Release Notes
-=======================================
-
-The Apache Commons JEXL team is pleased to announce the release of Apache Commons JEXL 3.6.3.
-
-Introduction
-============
-
-Apache Commons JEXL is a library that enables scripting features in Java applications and frameworks..
-
-This is a feature and maintenance release. Java 8 or later is required.
-
-
-Bugs Fixed in 3.6.3:
-====================
-
-o JEXL-461:  Updates/improvements to the site documentation for JEXL Syntax
-o JEXL-459:  Empty/size functions swallow all exceptions with no trace.
-o JEXL-458:  Improve permissions expressivity.
-o JEXL-457:  Reduce default exposure for RESTRICTED JexlPermissions.
-o JEXL-456:  Change in template parser behavior.
-
-
-Changes in 3.6.3:
-=================
-
-
-Historical list of changes: https://commons.apache.org/proper/commons-jexl/changes.html
-
-For complete information on Apache Commons JEXL, including instructions on how to submit bug reports,
-patches, or suggestions for improvement, see the Apache Commons JEXL website:
-
-https://commons.apache.org/proper/commons-jexl/
-
-Download page: https://commons.apache.org/proper/commons-jexl/download_jexl.cgi
-
-
 ========================================================================================================================
 Release 3.6.2
 ========================================================================================================================
