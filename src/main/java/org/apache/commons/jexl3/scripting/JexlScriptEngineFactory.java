@@ -85,6 +85,7 @@ public class JexlScriptEngineFactory implements ScriptEngineFactory {
     }
 
     /**
+     * Creates a new JexlEngine instance.
      * @return a new JexlEngine instance
      */
     protected JexlEngine createJexlEngine() {

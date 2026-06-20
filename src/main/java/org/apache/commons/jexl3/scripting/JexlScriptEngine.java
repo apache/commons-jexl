@@ -22,8 +22,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Reader;
 import java.io.Writer;
-import java.lang.ref.Reference;
-import java.lang.ref.SoftReference;
 import java.util.Objects;
 
 import javax.script.AbstractScriptEngine;
@@ -75,10 +73,10 @@ public class JexlScriptEngine extends AbstractScriptEngine implements Compilable
     public static class Factory extends JexlScriptEngineFactory {
         /**
          * The shared engine instance.
-         * <p>A single soft-reference JEXL engine and JexlUberspect is shared by all instances of JexlScriptEngine
+         * <p>A single JEXL engine and JexlUberspect is shared by all instances of JexlScriptEngine
          * created by this factory.</p>
          */
-        private Reference<JexlEngine> engineReference;
+        private volatile JexlEngine jexl;
 
         /** Default constructor. */
         public Factory() {
@@ -95,15 +93,12 @@ public class JexlScriptEngine extends AbstractScriptEngine implements Compilable
 
         @Override
         protected JexlEngine getEngine() {
-            Reference<JexlEngine> ref = engineReference;
-            JexlEngine engine = ref != null ? ref.get() : null;
+            JexlEngine engine = jexl;
             if (engine == null) {
                 synchronized (this) {
-                    ref = engineReference;
-                    engine = ref != null ? ref.get() : null;
+                    engine = jexl;
                     if (engine == null) {
-                        engine = createJexlEngine();
-                        engineReference = new SoftReference<>(engine);
+                        engine = jexl = createJexlEngine();
                     }
                 }
             }
@@ -115,7 +110,7 @@ public class JexlScriptEngine extends AbstractScriptEngine implements Compilable
          * @param engine the engine
          */
         void setEngine(JexlEngine engine) {
-            engineReference = new SoftReference<>(engine);
+            jexl = engine;
         }
     }
 
