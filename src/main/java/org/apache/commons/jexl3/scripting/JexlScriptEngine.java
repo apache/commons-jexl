@@ -65,6 +65,59 @@ import org.apache.commons.logging.LogFactory;
  * @since 2.0
  */
 public class JexlScriptEngine extends AbstractScriptEngine implements Compilable {
+    /**
+     * A factory that shares the JexlEngine instance between all JexlScriptEngine instances it creates.
+     * <p>All JexlScriptEngine instances created by this factory share the same JexlEngine instance and JexlUberspect instance.</p>
+     * <p>To create a JexlScriptEngine with a different JexlEngine instance,
+     * use the {@link JexlScriptEngine#JexlScriptEngine(JexlScriptEngineFactory)} constructor.</p>
+     * @since 3.3
+     */
+    public static class Factory extends JexlScriptEngineFactory {
+        /**
+         * The shared engine instance.
+         * <p>A single soft-reference JEXL engine and JexlUberspect is shared by all instances of JexlScriptEngine
+         * created by this factory.</p>
+         */
+        private Reference<JexlEngine> engineReference;
+
+        /** Default constructor. */
+        public Factory() {
+            this(null);
+        }
+
+        /**
+         * For specialization.
+         * @param permissions the permissions to use for the engine
+         */
+        public Factory(JexlPermissions permissions) {
+            super(permissions);
+        }
+
+        @Override
+        protected JexlEngine getEngine() {
+            Reference<JexlEngine> ref = engineReference;
+            JexlEngine engine = ref != null ? ref.get() : null;
+            if (engine == null) {
+                synchronized (this) {
+                    ref = engineReference;
+                    engine = ref != null ? ref.get() : null;
+                    if (engine == null) {
+                        engine = createJexlEngine();
+                        engineReference = new SoftReference<>(engine);
+                    }
+                }
+            }
+            return engine;
+        }
+
+        /**
+         * Sets the shared engine instance.
+         * @param engine the engine
+         */
+        void setEngine(JexlEngine engine) {
+            engineReference = new SoftReference<>(engine);
+        }
+    }
 
     /**
      * Holds singleton JexlScriptEngineFactory (IODH).
@@ -72,7 +125,7 @@ public class JexlScriptEngine extends AbstractScriptEngine implements Compilable
     private static final class FactorySingletonHolder {
 
         /** The engine factory singleton instance. */
-        static final JexlScriptEngineFactory DEFAULT_FACTORY = new JexlScriptEngineFactory();
+        static final Factory DEFAULT_FACTORY = new Factory();
 
         /** Non instantiable. */
         private FactorySingletonHolder() {}
@@ -260,11 +313,6 @@ public class JexlScriptEngine extends AbstractScriptEngine implements Compilable
         }
     }
 
-    /**
-     * The shared engine instance.
-     * <p>A single soft-reference JEXL engine and JexlUberspect is shared by all instances of JexlScriptEngine.</p>
-     */
-    private static Reference<JexlEngine> engineReference;
 
     /** The logger. */
     static final Log LOG = LogFactory.getLog(JexlScriptEngine.class);
@@ -280,29 +328,6 @@ public class JexlScriptEngine extends AbstractScriptEngine implements Compilable
 
     /** Reserved key for script. */
     private static final String SCRIPT = "script";
-
-    /**
-     * @return the shared JexlEngine instance, create it if necessary
-     */
-    private static JexlEngine getEngine(ScriptEngineFactory scriptEngineFactory) {
-        Reference<JexlEngine> ref = engineReference;
-        JexlEngine engine = ref != null ? ref.get() : null;
-        if (engine == null) {
-            synchronized (JexlScriptEngineFactory.class) {
-                ref = engineReference;
-                engine = ref != null ? ref.get() : null;
-                if (engine == null) {
-                    if (!(scriptEngineFactory instanceof JexlScriptEngineFactory)) {
-                        throw new IllegalArgumentException("ScriptEngineFactory is not JexlScriptEngineFactory");
-                    }
-                    JexlScriptEngineFactory factory = (JexlScriptEngineFactory) scriptEngineFactory;
-                    engine = factory.createJexlEngine();
-                    engineReference = new SoftReference<>(engine);
-                }
-            }
-        }
-        return engine;
-    }
 
     /**
      * Reads from a reader into a local buffer and return a String with
@@ -344,7 +369,7 @@ public class JexlScriptEngine extends AbstractScriptEngine implements Compilable
     }
 
     /**
-     * Sets the shared instance used for the script engine.
+     * Sets the shared instance used for the script engine in the default factory.
      * <p>This should be called early enough to have an effect, ie before any
      * {@link javax.script.ScriptEngineManager} features.</p>
      * <p>To restore 3.2 script behavior:</p>
@@ -360,12 +385,14 @@ public class JexlScriptEngine extends AbstractScriptEngine implements Compilable
      * @since 3.3
      */
     public static void setInstance(final JexlEngine engine) {
-        engineReference = new SoftReference<>(engine);
+        FactorySingletonHolder.DEFAULT_FACTORY.setEngine(engine);
     }
 
     /**
      * Sets the permissions instance used to create the script engine.
-     * <p>This method has been considered unsafe and is no longer supported.</p>
+     * <p>This method has been considered unsafe and is no longer supported.
+     * Use {@link JexlScriptEngineFactory#setDefaultPermissions(JexlPermissions)} during initialization
+     * - <em>before</em> requesting an engine - to achieve the intended permission injection.</p>
      * @deprecated 3.6.3
      * @param permissions unused, method will throw
      */
@@ -378,7 +405,7 @@ public class JexlScriptEngine extends AbstractScriptEngine implements Compilable
     final JexlScriptObject jexlObject;
 
     /** The factory which created this instance. */
-    final ScriptEngineFactory parentFactory;
+    final JexlScriptEngineFactory parentFactory;
 
     /** The JEXL EL engine. */
     final JexlEngine jexlEngine;
@@ -399,10 +426,10 @@ public class JexlScriptEngine extends AbstractScriptEngine implements Compilable
      * @param scriptEngineFactory the factory which created this instance.
      * @throws NullPointerException if factory is null
      */
-    public JexlScriptEngine(final ScriptEngineFactory scriptEngineFactory) {
+    public JexlScriptEngine(final JexlScriptEngineFactory scriptEngineFactory) {
         Objects.requireNonNull(scriptEngineFactory, "scriptEngineFactory");
         parentFactory = scriptEngineFactory;
-        jexlEngine = getEngine(scriptEngineFactory);
+        jexlEngine = scriptEngineFactory.getEngine();
         jexlObject = new JexlScriptObject();
     }
 
