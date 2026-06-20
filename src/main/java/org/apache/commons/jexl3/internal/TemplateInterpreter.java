@@ -309,7 +309,7 @@ public class TemplateInterpreter extends Interpreter {
         return frame != null && frame.stack != null? frame.stack.clone() : null;
     }
 
-    private void restoreStack(Object[] stack) {
+    private void restoreStack(final Object[] stack) {
         if (stack != null) {
             System.arraycopy(stack, 0, frame.stack, 0, stack.length);
         }

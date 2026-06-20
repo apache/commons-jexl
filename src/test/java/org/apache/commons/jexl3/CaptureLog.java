@@ -53,7 +53,7 @@ public class CaptureLog implements Log {
     public List<String> getCapturedMessages() {
         return captured.stream()
                 .map(a -> a[2])
-                .filter(o -> o instanceof String)
+                .filter(String.class::isInstance)
                 .map(o -> (String) o).collect(Collectors.toList());
     }
 

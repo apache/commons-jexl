@@ -79,10 +79,7 @@ class Issues100Test extends JexlTestCase {
         }
 
         public Object and(final String lhs, final String rhs) {
-            if (rhs.isEmpty()) {
-                return "";
-            }
-            if (lhs.isEmpty()) {
+            if (rhs.isEmpty() || lhs.isEmpty()) {
                 return "";
             }
             return lhs + rhs;

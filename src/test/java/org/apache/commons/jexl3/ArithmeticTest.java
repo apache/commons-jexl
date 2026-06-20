@@ -461,12 +461,12 @@ class ArithmeticTest extends JexlTestCase {
         }
 
         public Object propertyGet(final NamedNodeMap attrs, final String name) {
-            Node node  = attrs.getNamedItem(name);
+            final Node node  = attrs.getNamedItem(name);
             return node == null ? JexlEngine.TRY_FAILED : node.getNodeValue();
         }
 
         public Object propertySet(final NamedNodeMap attrs, final String name, final Object value) {
-            Node node = attrs.getNamedItem(name);
+            final Node node = attrs.getNamedItem(name);
             if (node == null) {
                 return JexlEngine.TRY_FAILED;
             }
@@ -2262,7 +2262,7 @@ class ArithmeticTest extends JexlTestCase {
 
         // JEXL-161
         final JexlContext jc = new MapContext();
-        Object xmlx = xml.getLastChild();
+        final Object xmlx = xml.getLastChild();
         jc.set("x", xmlx);
         final String y = "456";
         jc.set("y", y);

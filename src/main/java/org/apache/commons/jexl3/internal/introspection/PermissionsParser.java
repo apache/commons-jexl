@@ -361,13 +361,13 @@ public class PermissionsParser {
                     //negative = true;
                 }
                 if (c == '{') {
-                    Boolean specified = negative;
+                    final Boolean specified = negative;
                     njpackage = packages.compute(pname,
                         (n, p) -> {
                             // if we haven't specified allow/deny,
                             // keep the existing specification if any, otherwise default to deny
-                            boolean deny = specified == null ? !(p instanceof Permissions.JexlPackage) : specified;
-                            Map<String, Permissions.NoJexlClass> pkgMap = p == null ? null : p.nojexl;
+                            final boolean deny = specified == null ? !(p instanceof Permissions.JexlPackage) : specified;
+                            final Map<String, Permissions.NoJexlClass> pkgMap = p == null ? null : p.nojexl;
                             return deny
                                 ? new Permissions.NoJexlPackage(pkgMap)
                                 : new Permissions.JexlPackage(pkgMap);

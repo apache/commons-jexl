@@ -138,7 +138,7 @@ public class StreamTest {
     void testURICollection() throws Exception {
        Assertions.assertTrue(jexlPermissions.allow(java.net.URI.class));
        Assertions.assertTrue(jexlPermissions.allow(java.util.stream.Stream.class));
-       for (Method m : Arrays.stream(Stream.class.getMethods()).filter(m -> m.getName().equals("filter")).collect(Collectors.toSet())) {
+       for (final Method m : Arrays.stream(Stream.class.getMethods()).filter(m -> m.getName().equals("filter")).collect(Collectors.toSet())) {
             Assertions.assertTrue(jexlPermissions.allow(m));
         }
         // A collection map/filter aware context
@@ -177,7 +177,7 @@ public class StreamTest {
 
     @Test
     void testURIStream() throws Exception {
-        Assertions.assertTrue(jexlPermissions.allow(StreamContext.class.getMethod("filter", new Class[]{Stream.class, JexlScript.class})));
+        Assertions.assertTrue(jexlPermissions.allow(StreamContext.class.getMethod("filter", Stream.class, JexlScript.class)));
 
         // Assume a collection of uris need to be processed and transformed to be simplified ;
         // we want only http/https ones, only the host part and using a https scheme

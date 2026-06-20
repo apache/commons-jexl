@@ -1186,7 +1186,7 @@ public final class TemplateEngine extends JxltEngine {
      * @param c the character to test
      * @return {@code true} if the character is ignorable, {@code false} otherwise
      */
-    private static boolean isIgnorable(char c) {
+    private static boolean isIgnorable(final char c) {
         return c == '\n' || c == '\r' || c == '\t' || c == '\f';
     }
 

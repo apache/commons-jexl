@@ -207,7 +207,7 @@ class ExceptionTest extends JexlTestCase {
      * @param debug if true/false, debug mode is on/off
      * @param silent if true/false, silent mode is on/off
      */
-    private static void runWrappedEx(boolean debug, boolean silent) {
+    private static void runWrappedEx(final boolean debug, final boolean silent) {
         final CaptureLog log = new CaptureLog();
         final JexlBuilder builder = new JexlBuilder().safe(false).strict(true)
                 .logger(log).debug(debug).silent(silent);
@@ -215,7 +215,7 @@ class ExceptionTest extends JexlTestCase {
         final JexlContext jc = new ObjectContext<>(jexl, new ThrowNPE());
         callWrappedEx(debug, silent, log, () -> jexl.createExpression("npe()").evaluate(jc));
         callWrappedEx(debug, silent, log, () -> jexl.newInstance(ConstructNPE.class));
-        ThrowNPE npe = new ThrowNPE();
+        final ThrowNPE npe = new ThrowNPE();
         callWrappedEx(debug, silent, log, () -> jexl.invokeMethod(npe, "npe"));
         // side effect to set failure in getter coming next
         callWrappedEx(debug, silent, log, () -> {
@@ -231,7 +231,7 @@ class ExceptionTest extends JexlTestCase {
      * @param silent if true/false, silent mode is on/off
      * @param npeCall the NPE throwing call
      */
-    private static void callWrappedEx(boolean debug, boolean silent, CaptureLog log, Supplier<Object> npeCall) {
+    private static void callWrappedEx(final boolean debug, final boolean silent, final CaptureLog log, final Supplier<Object> npeCall) {
         try {
             npeCall.get();
             if (!silent) {
@@ -239,7 +239,7 @@ class ExceptionTest extends JexlTestCase {
             } else {
                 // in silent mode, ensure a log was captured
                 assertEquals(1, log.count("warn"), "should have 1 warn log");
-                String msg = log.getCapturedMessages().get(0);
+                final String msg = log.getCapturedMessages().get(0);
                 assertEquals(debug, msg.contains("runWrappedEx"), "class/method/line?");
                 log.clear();
             }

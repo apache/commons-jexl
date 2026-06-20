@@ -23,16 +23,16 @@ public class Pair {
   public Object cdr;
 
   @NoJexl
-  public Pair(Object car, Object cdr) {
+  public Pair(final Object car, final Object cdr) {
     this.car = car;
     this.cdr = cdr;
   }
 
-  public static Pair cons(Number car, Number cdr) {
+  public static Pair cons(final Number car, final Number cdr) {
     return new Pair(car, cdr);
   }
 
-  public static Pair cons(Object car, Object cdr) {
+  public static Pair cons(final Object car, final Object cdr) {
     return new Pair(car, cdr);
   }
 }

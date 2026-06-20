@@ -261,7 +261,7 @@ public class SwitchTest extends JexlTestCase {
 
     @Test
     void testTryCatchFinally() {
-        JexlEngine jexl = new JexlBuilder().create();
+        final JexlEngine jexl = new JexlBuilder().create();
         final String src = "try { return 42 } catch(const xerror){} finally { return 169 }";
         final JexlScript script = jexl.createScript(src);
         assertNotNull(script);

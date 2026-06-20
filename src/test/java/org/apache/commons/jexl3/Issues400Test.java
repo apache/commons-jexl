@@ -827,7 +827,7 @@ public class Issues400Test {
         final JexlScript script = jexl.createScript(src, "a", "b");
         final Object result = script.execute(null, "a", "b");
         assertEquals("a\n?= ba\n?== b", result);
-        String[] locals = script.getLocalVariables();
+        final String[] locals = script.getLocalVariables();
         assertArrayEquals(new String[]{"c", "foo"}, locals);
         final String TEST447 = "src/test/scripts/test447.jexl";
         final File src447 = new File(TEST447);
@@ -842,12 +842,11 @@ public class Issues400Test {
 
     public static class BrkContext extends MapContext {
         public BrkContext() {
-            super();
             set("SYSTEM", System.class);
             set("UNRESTRICTED", UNRESTRICTED);
         }
 
-        public static Object brk(Object debug) {
+        public static Object brk(final Object debug) {
             return debug;
         }
 
@@ -855,13 +854,13 @@ public class Issues400Test {
 
     @Test
     void test450a() {
-        JexlEngine jexl0 = new JexlBuilder().silent(false).permissions(JexlPermissions.RESTRICTED).create();
+        final JexlEngine jexl0 = new JexlBuilder().silent(false).permissions(JexlPermissions.RESTRICTED).create();
         assertThrows(JexlException.Method.class,
             () -> jexl0.newInstance("org.apache.commons.jexl3.internal.introspection.Uberspect", null, null),
             "should not be able to create Uberspect with RESTRICTED");
-        JexlPermissions perm = new JexlPermissions.ClassPermissions(
+        final JexlPermissions perm = new JexlPermissions.ClassPermissions(
             org.apache.commons.jexl3.internal.introspection.Uberspect.class);
-        JexlEngine jexl1 = new JexlBuilder().silent(false).permissions(perm).create();
+        final JexlEngine jexl1 = new JexlBuilder().silent(false).permissions(perm).create();
         assertNotNull(jexl1.newInstance(
             "org.apache.commons.jexl3.internal.introspection.Uberspect", null, null),
             "should able to create Uberspect with Uberspect permission");
@@ -874,13 +873,13 @@ public class Issues400Test {
         assertThrows(JexlException.Method.class, () -> run450b(JexlPermissions.RESTRICTED),
             "should not be able to load System with RESTRICTED");
         // can load System.exit with UNRESTRICTED
-        Method exitMethod = java.lang.System.class.getMethod("exit", int.class);
+        final Method exitMethod = java.lang.System.class.getMethod("exit", int.class);
         assertTrue(UNRESTRICTED.allow(exitMethod));
         assertFalse(RESTRICTED.allow(exitMethod));
         assertEquals(java.lang.System.class, run450b(UNRESTRICTED));
         // need to explicitly allow Uberspect and the current class loader to load System
-        Class<? extends ClassLoader> cloader = getClass().getClassLoader().getClass();
-        JexlPermissions perm = new JexlPermissions.ClassPermissions(
+        final Class<? extends ClassLoader> cloader = getClass().getClassLoader().getClass();
+        final JexlPermissions perm = new JexlPermissions.ClassPermissions(
             getClass().getClassLoader().getClass(),
             org.apache.commons.jexl3.internal.introspection.Uberspect.class);
         assertTrue(perm.allow(cloader), "should be able to access ClassLoader");
@@ -888,11 +887,11 @@ public class Issues400Test {
         assertEquals(java.lang.System.class, run450b(perm));
     }
 
-    private static Object run450b(JexlPermissions perm) {
-        JexlEngine jexl = new JexlBuilder().safe(false).strict(true).silent(false).permissions(perm).create();
-        String uscript = "new('org.apache.commons.jexl3.internal.introspection.Uberspect', "
+    private static Object run450b(final JexlPermissions perm) {
+        final JexlEngine jexl = new JexlBuilder().safe(false).strict(true).silent(false).permissions(perm).create();
+        final String uscript = "new('org.apache.commons.jexl3.internal.introspection.Uberspect', "
             + "null, null, perm).getClassLoader().loadClass('java.lang.System')";
-        JexlScript u0 = jexl.createScript(uscript, "perm");
+        final JexlScript u0 = jexl.createScript(uscript, "perm");
         return u0.execute(null, perm);
     }
 
@@ -902,7 +901,7 @@ public class Issues400Test {
         assertNotNull(run450c(UNRESTRICTED));
         // need explicit permissions to ClassPermissions and Uberspect to reach and invoke
         // System::currentTimeMillis
-        JexlPermissions perm = new JexlPermissions.ClassPermissions(
+        final JexlPermissions perm = new JexlPermissions.ClassPermissions(
             getClass().getClassLoader().getClass(),
             JexlPermissions.ClassPermissions.class,
             org.apache.commons.jexl3.internal.introspection.Uberspect.class,
@@ -914,9 +913,9 @@ public class Issues400Test {
             "should not be able to load System with RESTRICTED");
     }
 
-    private static Object run450c(JexlPermissions perm) {
-        JexlBuilder builder = new JexlBuilder().silent(false).permissions(perm);
-        Object result = new TemplateEngine(new Engine32(builder), false, 2, '$', '#')
+    private static Object run450c(final JexlPermissions perm) {
+        final JexlBuilder builder = new JexlBuilder().silent(false).permissions(perm);
+        final Object result = new TemplateEngine(new Engine32(builder), false, 2, '$', '#')
             .createExpression(
                 "${x = new ('org.apache.commons.jexl3.internal.introspection.Uberspect', "
                 + "null, null, UNRESTRICTED);"
@@ -930,8 +929,8 @@ public class Issues400Test {
 
     @Test
     void test450() throws Exception {
-        JexlPermissions perms =  Engine33.createPermissions();
-        Class<? extends ClassLoader> cl = Issues400Test.class.getClassLoader().getClass();
+        final JexlPermissions perms =  Engine33.createPermissions();
+        final Class<? extends ClassLoader> cl = Issues400Test.class.getClassLoader().getClass();
         assertTrue(perms.allow(cl, cl.getMethod("loadClass", String.class)),
             "should be able to access ClassLoader::loadClass with specific permissions");
         assertNotNull(run450(JexlPermissions.UNRESTRICTED),
@@ -949,7 +948,7 @@ public class Issues400Test {
             this(createBuilder());
         }
 
-        public Engine33(JexlBuilder builder) {
+        public Engine33(final JexlBuilder builder) {
             super(builder);
         }
 
@@ -964,15 +963,15 @@ public class Issues400Test {
         }
 
         static JexlBuilder createBuilder() {
-            JexlPermissions perm = createPermissions();
+            final JexlPermissions perm = createPermissions();
             return new JexlBuilder().safe(false).silent(false).permissions(perm);
         }
     }
 
-    private static Object run450(JexlPermissions perm) {
-        JexlEngine jexl = new JexlBuilder().silent(false).strict(true).safe(false)
+    private static Object run450(final JexlPermissions perm) {
+        final JexlEngine jexl = new JexlBuilder().silent(false).strict(true).safe(false)
             .permissions(perm).create();
-        String script = "new('org.apache.commons.jexl3.internal.TemplateEngine',"
+        final String script = "new('org.apache.commons.jexl3.internal.TemplateEngine',"
             + "new('org.apache.commons.jexl3.Issues400Test$Engine33'),false,256,"
             + "'$'.charAt(0),'#'.charAt(0))"
             + ".createExpression("
@@ -987,11 +986,11 @@ public class Issues400Test {
 
     @Test
     void test451() throws NoSuchMethodException {
-        JexlEngine jexl = new JexlBuilder().create();
+        final JexlEngine jexl = new JexlBuilder().create();
         assertEquals("42", jexl.createScript("o.toString()", "o").execute(null, "42"));
-        JexlPermissions perms = RESTRICTED.compose("java.lang { +Class { getSimpleName(); } }");
+        final JexlPermissions perms = RESTRICTED.compose("java.lang { +Class { getSimpleName(); } }");
         assertTrue(perms.allow(String.class.getMethod("toString")));
-        JexlSandbox sandbox = new JexlSandbox(false, true);
+        final JexlSandbox sandbox = new JexlSandbox(false, true);
         sandbox.permissions(Object.class.getName(), true, true, false, false);
         sandbox.allow(String.class.getName()).execute("toString");
         final JexlEngine jexl451 = new JexlBuilder().safe(false).silent(false).permissions(perms).sandbox(sandbox).create();
@@ -1011,20 +1010,20 @@ public class Issues400Test {
     @Test
     void testIssue455a() {
         final JexlEngine jexl = new JexlBuilder().create();
-        String code = "name -> `${name +\n\t\f\r name}`";
-        JexlScript script = jexl.createScript(code);
-        Object o = script.execute(null, "Hello");
-        String ctl = "HelloHello";
+        final String code = "name -> `${name +\n\t\f\r name}`";
+        final JexlScript script = jexl.createScript(code);
+        final Object o = script.execute(null, "Hello");
+        final String ctl = "HelloHello";
         assertEquals(ctl, o);
     }
 
     @Test
     void testIssue455b() {
         final JexlEngine jexl = new JexlBuilder().create();
-        String code = "name -> `${name}\n${name}`;";
-        JexlScript script = jexl.createScript(code);
-        Object o = script.execute(null, "Hello");
-        String ctl = "Hello\nHello";
+        final String code = "name -> `${name}\n${name}`;";
+        final JexlScript script = jexl.createScript(code);
+        final Object o = script.execute(null, "Hello");
+        final String ctl = "Hello\nHello";
         assertEquals(ctl, o);
     }
 
@@ -1044,10 +1043,10 @@ public class Issues400Test {
     void testIssue455d() {
         final JexlEngine jexl = new JexlBuilder().create();
         // 'ref' contains 'greeting' which is the name of the variable to expand
-        String code = "`#{${\nref\t}}\n#{${\rref\f}}`;";
-        JexlScript script = jexl.createScript(code, "ref", "greeting");
-        Object o = script.execute(null, "greeting", "Hello");
-        String ctl = "Hello\nHello";
+        final String code = "`#{${\nref\t}}\n#{${\rref\f}}`;";
+        final JexlScript script = jexl.createScript(code, "ref", "greeting");
+        final Object o = script.execute(null, "greeting", "Hello");
+        final String ctl = "Hello\nHello";
         assertEquals(ctl, o);
     }
 
@@ -1121,7 +1120,7 @@ public class Issues400Test {
     @Test
     void testIssue456d() {
         // add a '$$' global context variable
-        JexlContext ctxt = new MapContext();
+        final JexlContext ctxt = new MapContext();
         ctxt.set("$$", "");
         final JexlFeatures features = JexlFeatures.createDefault().ignoreTemplatePrefix(true);
         assertNotNull(run456(
@@ -1129,7 +1128,7 @@ public class Issues400Test {
             features, ctxt));
     }
 
-    JxltEngine run456(Function<JexlFeatures, JexlEngine> engineFactory, JexlFeatures features, JexlContext ctxt) {
+    JxltEngine run456(final Function<JexlFeatures, JexlEngine> engineFactory, final JexlFeatures features, final JexlContext ctxt) {
         final JexlEngine jexl = engineFactory.apply(features);
         final JxltEngine jxlt = jexl.createJxltEngine();
         // creation/parse is OK
@@ -1149,7 +1148,7 @@ public class Issues400Test {
         try {
             jxlt.createTemplate("$$ var foo = 'foo';  if (true) { var foo = 'bar'; var err =&; }");
             fail("should have thrown a parsing error in '&'");
-        } catch (JexlException xjexl) {
+        } catch (final JexlException xjexl) {
             // parsing error in '&'
             assertTrue(xjexl.getMessage().contains("&"));
         }
@@ -1170,7 +1169,7 @@ public class Issues400Test {
         try {
             jxlt.createTemplate("$$ var err =&;");
             fail("should have thrown a parsing error in '&'");
-        } catch (JexlException xjexl) {
+        } catch (final JexlException xjexl) {
             // parsing error in '&'
             assertTrue(xjexl.getMessage().contains("&"));
         }
@@ -1186,38 +1185,38 @@ public class Issues400Test {
 
     @Test
     void test459() {
-        CaptureLog capture = new CaptureLog("test459");
+        final CaptureLog capture = new CaptureLog("test459");
         final JexlBuilder builder = new JexlBuilder().logger(capture).safe(true).strict(false).silent(true);
         final JexlEngine jexl = builder.create();
-        Object[] expected = { true, true, 0, 0 };
-        String[] expressions = {
+        final Object[] expected = { true, true, 0, 0 };
+        final String[] expressions = {
           "empty('aaa'.substring(400,500))",
           "empty('aaa'.substring(-1, 2))",
           "size('aaa'.substring(400,500))",
           "size('aaa'.substring(-1, 2))",
         };
         for (int i = 0; i < expressions.length; ++i) {
-            String expr = expressions[i];
-            Object control = expected[i];
+            final String expr = expressions[i];
+            final Object control = expected[i];
             capture.clear();
-            JexlScript script = jexl.createScript(expr);
-            Object result = script.execute(null);
+            final JexlScript script = jexl.createScript(expr);
+            final Object result = script.execute(null);
             assertEquals(control, result);
-            List<String> errors = capture.getCapturedMessages();
+            final List<String> errors = capture.getCapturedMessages();
             assertEquals(1, capture.count("warn"));
             assertTrue(errors.stream().anyMatch(error -> error.contains("substring")));
         }
     }
 
     public static class Namespace460 {
-        public static int func(int i) {
+        public static int func(final int i) {
             return i * 42;
         }
     }
 
     @Test
     void test460() {
-        JexlFeatures f = JexlFeatures.createDefault().namespaceIdentifier(true);
+        final JexlFeatures f = JexlFeatures.createDefault().namespaceIdentifier(true);
         final JexlEngine jexl = new JexlBuilder()
           .namespaces(Collections.singletonMap("z", Namespace460.class))
           .features(f)

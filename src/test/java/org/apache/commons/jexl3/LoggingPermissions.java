@@ -35,21 +35,21 @@ public class LoggingPermissions extends JexlPermissions.Delegate {
      *
      * @param delegate the delegate.
      */
-    public LoggingPermissions(JexlPermissions delegate) {
+    public LoggingPermissions(final JexlPermissions delegate) {
         super(delegate);
     }
 
     @Override
-    public boolean allow(Class<?> clazz) {
-        boolean allowed = super.allow(clazz);
+    public boolean allow(final Class<?> clazz) {
+        final boolean allowed = super.allow(clazz);
         logger.info(String.format("Class %s is %s",
             clazz.getCanonicalName(), allowed ? "allowed" : "denied"));
         return allowed;
     }
 
     @Override
-    public boolean allow(Constructor<?> ctor) {
-        boolean allowed = super.allow(ctor);
+    public boolean allow(final Constructor<?> ctor) {
+        final boolean allowed = super.allow(ctor);
         logger.info(String.format("Constructor %s.%s() is %s",
             ctor.getDeclaringClass().getCanonicalName(), ctor.getName(),
             allowed ? "allowed" : "denied"));
@@ -57,8 +57,8 @@ public class LoggingPermissions extends JexlPermissions.Delegate {
     }
 
     @Override
-    public boolean allow(Field field) {
-        boolean allowed = super.allow(field);
+    public boolean allow(final Field field) {
+        final boolean allowed = super.allow(field);
         logger.info(String.format("Field %s.%s is %s",
             field.getDeclaringClass().getCanonicalName(), field.getName(),
             allowed ? "allowed" : "denied"));
@@ -66,8 +66,8 @@ public class LoggingPermissions extends JexlPermissions.Delegate {
     }
 
     @Override
-    public boolean allow(Class<?> clazz, Field field) {
-        boolean allowed = super.allow(clazz, field);
+    public boolean allow(final Class<?> clazz, final Field field) {
+        final boolean allowed = super.allow(clazz, field);
         logger.info(String.format("Field %s.%s is %s for class %s",
             field.getDeclaringClass().getCanonicalName(), field.getName(),
             allowed ? "allowed" : "denied", clazz.getCanonicalName()));
@@ -75,8 +75,8 @@ public class LoggingPermissions extends JexlPermissions.Delegate {
     }
 
     @Override
-    public boolean allow(Method method) {
-        boolean allowed = super.allow(method);
+    public boolean allow(final Method method) {
+        final boolean allowed = super.allow(method);
         logger.info(String.format("Method %s.%s() is %s",
             method.getDeclaringClass().getCanonicalName(), method.getName(),
             allowed ? "allowed" : "denied"));
@@ -84,8 +84,8 @@ public class LoggingPermissions extends JexlPermissions.Delegate {
     }
 
     @Override
-    public boolean allow(Class<?> clazz, Method method) {
-        boolean allowed = super.allow(clazz, method);
+    public boolean allow(final Class<?> clazz, final Method method) {
+        final boolean allowed = super.allow(clazz, method);
         logger.info(String.format("Method %s.%s() is %s for class %s",
             method.getDeclaringClass().getCanonicalName(), method.getName(),
             allowed ? "allowed" : "denied", clazz.getCanonicalName()));

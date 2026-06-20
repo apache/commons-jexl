@@ -148,7 +148,7 @@ class JXLTTest extends JexlTestCase {
    public static List<JexlBuilder> engines() {
        final JexlFeatures f = new JexlFeatures();
        f.lexical(true).lexicalShade(true);
-       JexlPermissions permissions = JexlPermissions.RESTRICTED.compose("org.apache.commons.jexl3 +{ JXLTTest{} }");
+       final JexlPermissions permissions = JexlPermissions.RESTRICTED.compose("org.apache.commons.jexl3 +{ JXLTTest{} }");
       return Arrays.asList(
               new JexlBuilder().permissions(permissions).silent(false).lexical(true).lexicalShade(true).cache(128).strict(true),
               new JexlBuilder().permissions(permissions).features(f).silent(false).cache(128).strict(true),

@@ -321,7 +321,7 @@ public abstract class JxltEngine {
          * @return the prepared version of the template
          * @since 3.6.2
          */
-        default Template prepare(JexlContext context, Object... args) {
+        default Template prepare(final JexlContext context, final Object... args) {
             throw new UnsupportedOperationException(
                     "This template implementation does not support prepare with arguments. "
                     + "Override this method to provide support.");

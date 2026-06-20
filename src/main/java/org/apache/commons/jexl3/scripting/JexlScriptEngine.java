@@ -87,7 +87,7 @@ public class JexlScriptEngine extends AbstractScriptEngine implements Compilable
          * For specialization.
          * @param permissions the permissions to use for the engine
          */
-        public Factory(JexlPermissions permissions) {
+        public Factory(final JexlPermissions permissions) {
             super(permissions);
         }
 
@@ -109,7 +109,7 @@ public class JexlScriptEngine extends AbstractScriptEngine implements Compilable
          * Sets the shared engine instance.
          * @param engine the engine
          */
-        void setEngine(JexlEngine engine) {
+        void setEngine(final JexlEngine engine) {
             jexl = engine;
         }
     }

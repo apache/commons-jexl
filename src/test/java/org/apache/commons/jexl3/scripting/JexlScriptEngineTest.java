@@ -145,7 +145,7 @@ class JexlScriptEngineTest {
 
     @Test
     void testErrors() throws Exception {
-        JexlPermissions permissions = new JexlPermissions.ClassPermissions(Errors.class);
+        final JexlPermissions permissions = new JexlPermissions.ClassPermissions(Errors.class);
         JexlScriptEngineFactory.setDefaultPermissions(permissions);
         final ScriptEngineManager manager = new ScriptEngineManager();
         final JexlScriptEngine engine = (JexlScriptEngine) manager.getEngineByName("JEXL");
