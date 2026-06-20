@@ -421,9 +421,17 @@ public class JexlScriptEngine extends AbstractScriptEngine implements Compilable
     }
 
     /**
+     * JSR-223 compatibility constructor.
+     * @param scriptEngineFactory the factory which must be a {@link JexlScriptEngineFactory}
+     */
+    public JexlScriptEngine(final ScriptEngineFactory scriptEngineFactory) {
+        this((JexlScriptEngineFactory) scriptEngineFactory);
+    }
+
+    /**
      * Create a scripting engine using the supplied factory.
      *
-     * @param scriptEngineFactory the factory which created this instance.
+     * @param scriptEngineFactory the factory which creates this instance.
      * @throws NullPointerException if factory is null
      */
     public JexlScriptEngine(final JexlScriptEngineFactory scriptEngineFactory) {
