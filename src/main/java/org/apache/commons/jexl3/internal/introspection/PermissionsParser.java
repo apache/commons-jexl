@@ -381,6 +381,13 @@ public class PermissionsParser {
                     packages.put(pname, negative == null || negative
                         ? Permissions.NOJEXL_PACKAGE
                         : Permissions.JEXL_PACKAGE);
+                    // a wholly-allowed package (pkg +{}) joins the allowed perimeter as an exact match (no '.*').
+                    // This lets a closed set of packages be declared without wildcards - so future sub-packages are
+                    // never implicitly allowed - while still allowing types based on this package (e.g. a foreign
+                    // Map implementation extending java.util.AbstractMap) the same way a '.*' wildcard would.
+                    if (Boolean.FALSE.equals(negative)) {
+                        wildcards.add(pname);
+                    }
                 } else {
                     packages.put(pname, njpackage);
                 }

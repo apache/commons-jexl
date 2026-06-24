@@ -273,36 +273,58 @@ public interface JexlPermissions {
      * and its host.
      * </p>
      * <p>
-     * As a simple guide, any line that ends with &quot;.*&quot; is allowing a package, any other is
-     * denying a package, class or method.
+     * Every allowed package is declared explicitly using the positive {@code +{}} syntax rather than a
+     * {@code .*} wildcard. A wildcard matches a package <em>and all of its sub-packages</em>, which is not
+     * future-proof: a sub-package added by a later JDK (or a dangerous existing one such as
+     * {@code java.util.zip}/{@code java.util.jar} - which can read files - or {@code java.nio.file}) would be
+     * silently exposed. Listing each package explicitly keeps the perimeter closed: only the packages below are
+     * visible, nothing else.
      * </p>
+     * <p>Allowed packages (each member is visible unless explicitly denied):</p>
      * <ul>
-     * <li>java.nio.*</li>
-     * <li>java.lang.*</li>
-     * <li>java.math.*</li>
-     * <li>java.text.*</li>
-     * <li>java.util.*</li>
-     * <li>org.w3c.dom.*</li>
-     * <li>org.apache.commons.jexl3.*</li>
-     *
-     * <li>org.apache.commons.jexl3 { JexlBuilder {} }</li>
-     * <li>org.apache.commons.jexl3.introspection { JexlPermissions {} JexlPermissions$ClassPermissions {} }</li>
-     * <li>org.apache.commons.jexl3.internal { Engine {} Engine32 {} TemplateEngine {} }</li>
-     * <li>org.apache.commons.jexl3.internal.introspection { Uberspect {} Introspector {} }</li>
-     * <li>java.lang { Runtime {} System {} ProcessBuilder {} Process {} RuntimePermission {} SecurityManager {} Thread {} ThreadGroup {} Class {} }</li>
-     * <li>java.io { +PrintWriter {} +Writer {} +StringWriter {} +Reader {} +InputStream {} +OutputStream {} }</li>
-     * <li>java.nio +{}</li>
-     * <li>java.rmi {}</li>
+     * <li>java.math</li>
+     * <li>java.text</li>
+     * <li>java.time, java.time.chrono, java.time.format, java.time.temporal, java.time.zone</li>
+     * <li>java.util, java.util.concurrent, java.util.concurrent.atomic, java.util.function, java.util.stream, java.util.regex</li>
+     * <li>java.nio, java.nio.charset</li>
+     * <li>org.w3c.dom</li>
+     * <li>java.lang (minus the denied classes below)</li>
+     * <li>org.apache.commons.jexl3 (minus JexlBuilder)</li>
      * </ul>
+     * <p>Denied classes / members (carved out of otherwise-allowed packages):</p>
+     * <ul>
+     * <li>java.lang { Runtime, System, ProcessBuilder, Process, RuntimePermission, SecurityManager, Thread, ThreadGroup, Class, ClassLoader }</li>
+     * <li>java.io { everything except PrintWriter, Writer, StringWriter, Reader, InputStream, OutputStream }</li>
+     * <li>java.util.concurrent { Executors and the thread-pool / fork-join executor classes }</li>
+     * <li>java.time.zone { ZoneRulesProvider } (prevents JVM-wide time-zone provider registration)</li>
+     * <li>org.apache.commons.jexl3 { JexlBuilder }</li>
+     * </ul>
+     * <p>Notably absent (and therefore denied) are file/IO/persistence/loader-bearing packages such as
+     * {@code java.util.zip}, {@code java.util.jar}, {@code java.util.prefs}, {@code java.util.logging},
+     * {@code java.util.concurrent.locks}, {@code java.nio.file}, {@code java.lang.reflect},
+     * {@code java.lang.invoke} and {@code org.w3c.dom.ls}.</p>
      */
 
     JexlPermissions RESTRICTED = JexlPermissions.parse(
         "# Default Uberspect Permissions",
-        "java.math.*",
-        "java.text.*",
-        "java.time.*",
-        "java.util.*",
-        "org.w3c.dom.*",
+        "java.math +{}",
+        "java.text +{}",
+        "java.time +{}",
+        "java.time.chrono +{}",
+        "java.time.format +{}",
+        "java.time.temporal +{}",
+        "java.time.zone +{ -ZoneRulesProvider{} }",
+        "java.util +{}",
+        "java.util.concurrent +{" +
+            "-Executors{} -ExecutorService{} -AbstractExecutorService{}" +
+            "-ThreadPoolExecutor{} -ScheduledThreadPoolExecutor{} -ScheduledExecutorService{}" +
+            "-ForkJoinPool{} -ForkJoinTask{} -ForkJoinWorkerThread{}" +
+            "}",
+        "java.util.concurrent.atomic +{}",
+        "java.util.function +{}",
+        "java.util.stream +{}",
+        "java.util.regex +{}",
+        "org.w3c.dom +{}",
         "java.lang +{" +
             "-Runtime{} -System{} -ProcessBuilder{} -Process{}" +
             "-RuntimePermission{} -SecurityManager{}" +

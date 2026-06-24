@@ -172,6 +172,22 @@ public class Permissions implements JexlPermissions {
 
         boolean isEmpty() { return nojexl.isEmpty(); }
 
+        /**
+         * Whether this package has at least one explicitly-allowed class (a {@code JexlClass} entry).
+         * <p>A package with allowed-class entries acts as an allow-list: unlisted classes are denied.
+         * A package with only denied-class entries acts as a deny-list: unlisted classes are allowed.</p>
+         *
+         * @return true if at least one class is explicitly allowed
+         */
+        boolean hasAllowedClass() {
+            for (final NoJexlClass njc : nojexl.values()) {
+                if (njc instanceof JexlClass) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
         @Override public NoJexlPackage copy() {
             return new NoJexlPackage(copyMap(nojexl));
         }
@@ -250,13 +266,18 @@ public class Permissions implements JexlPermissions {
      */
     private final Map<String, NoJexlPackage> packages;
     /**
-     * The closed world package patterns.
+     * The allowed package patterns (wildcards or exact package names).
+     * <p>Empty together with an empty {@link #packages} map means open-world: every package is accessible
+     * and only explicitly denied elements are carved out — the behavior of {@link #UNRESTRICTED}.
+     * Empty with a non-empty {@link #packages} map, or non-empty, means closed-world: only declared
+     * packages are accessible.</p>
      */
     private final Set<String> allowed;
 
     /** Allow inheritance. */
     protected Permissions() {
-        this(Collections.emptySet(), Collections.emptyMap());
+        this.allowed = Collections.emptySet();
+        this.packages = Collections.emptyMap();
     }
 
     /**
@@ -362,13 +383,28 @@ public class Permissions implements JexlPermissions {
     }
 
     /**
+     * Whether a package belongs to the allowed perimeter.
+     * <p>Open-world ({@link #UNRESTRICTED}: no rules at all) allows every package. Closed-world requires the
+     * package to match an entry in {@link #allowed}; an empty perimeter in closed-world matches nothing.</p>
+     *
+     * @param packageName the package name (not null)
+     * @return true if allowed, false otherwise
+     */
+    private boolean allowedPackage(final String packageName) {
+        if (allowed.isEmpty() && packages.isEmpty()) {
+            return true;
+        }
+        return !allowed.isEmpty() && wildcardAllow(allowed, packageName);
+    }
+
+    /**
      * Whether the wildcard set of packages allows a given class to be introspected.
      *
      * @param clazz the package name (not null)
      * @return true if allowed, false otherwise
      */
     private boolean wildcardAllow(final Class<?> clazz) {
-        return wildcardAllow(allowed, ClassTool.getPackageName(clazz));
+        return allowedPackage(ClassTool.getPackageName(clazz));
     }
 
     /**
@@ -384,19 +420,21 @@ public class Permissions implements JexlPermissions {
      */
     private <T> boolean specifiedAllow(final Class<?> clazz, T name, BiPredicate<NoJexlClass, T> check) {
         final String packageName = ClassTool.getPackageName(clazz);
-        if (wildcardAllow(allowed, packageName)) {
+        if (allowedPackage(packageName)) {
             return true;
         }
         final NoJexlPackage njp = packages.get(packageName);
         if (njp != null && check != null) {
             // there is a package permission, check if there is a class permission
             final NoJexlClass njc = njp.getNoJexl(clazz);
-            // if there is a class permission, perform the check
             if (njc != null) {
                 return check.test(njc, name);
             }
+            // class not listed: allowed if the package is a deny-list (no explicit class allows);
+            // denied if the package is an allow-list (e.g. java.io -{ +PrintWriter{} ... })
+            return !njp.hasAllowedClass();
         }
-        // nothing explicit
+        // package not declared at all
         return false;
     }
 
@@ -627,7 +665,7 @@ public class Permissions implements JexlPermissions {
         // an explicit package entry is allowed unless it is the deny marker
         final String name = pack.getName();
         final NoJexlPackage njp = packages.get(name);
-        return njp == null ? wildcardAllow(allowed, name) : !Objects.equals(NOJEXL_PACKAGE, njp);
+        return njp == null ? allowedPackage(name) : !Objects.equals(NOJEXL_PACKAGE, njp);
     }
 
 
