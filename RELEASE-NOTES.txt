@@ -1,3 +1,36 @@
+Apache Commons JEXL 3.6.4 Release Notes
+---------------------------------------
+
+The Apache Commons JEXL team is pleased to announce the release of Apache Commons JEXL 3.6.4.
+
+Introduction
+------------
+
+Apache Commons JEXL is a library that enables scripting features in Java applications and frameworks..
+
+This is a feature and maintenance release. Java 8 or later is required.
+
+
+Fixed Bugs
+----------
+
+o JEXL-462:  JexlPermissions.RESTRICTED must ensure a better level of isolation.
+
+
+Historical list of changes: https://commons.apache.org/proper/commons-jexl/changes.html
+
+For complete information on Apache Commons JEXL, including instructions on how to submit bug reports,
+patches, or suggestions for improvement, see the Apache Commons JEXL website:
+
+https://commons.apache.org/proper/commons-jexl/
+
+Download page: https://commons.apache.org/proper/commons-jexl/download_jexl.cgi
+
+Have fun!
+-Apache Commons Team
+
+------------------------------------------------------------------------------
+
 Apache Commons JEXL 3.6.3 Release Notes
 ---------------------------------------
 

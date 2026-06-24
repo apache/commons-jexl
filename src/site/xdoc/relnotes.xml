@@ -18,13 +18,13 @@
 
 <document>
   <properties>
-    <title>Apache Commons JEXL 3.6.3 Release Notes</title>
+    <title>Apache Commons JEXL 3.6.4 Release Notes</title>
   </properties>
 
   <body>
     <section name="Compatibility with previous release">
       <p>
-        Version 3.6.3 is source and binary compatible with 3.6.0.
+        Version 3.6.4 is source and binary compatible with 3.6.0.
       </p>
     </section>
     <section name="Compatibility with older releases (&lt; 3.3, 2.x)">
@@ -50,7 +50,26 @@
       </p>
     </section>
 
-    <section name="What is new in 3.6.3:">
+    <section name="What is new in 3.6.4:">
+      <p>
+        JEXL 3.6.4 is a minor release that fixes a security issue in the RESTRICTED permission set.
+        It does not introduce any breaking change.
+      </p>
+    </section>
+    <section name="Bugs fixed in 3.6.4:">
+      <p>
+        <table>
+          <tr>
+            <td>
+              <a href="https://issues.apache.org/jira/browse/JEXL-462">JEXL-462:</a>
+            </td>
+            <td>JexlPermissions.RESTRICTED must ensure a better level of isolation.</td>
+          </tr>
+        </table>
+      </p>
+    </section>
+
+    <section name="What was new in 3.6.3:">
       <p>
         JEXL 3.6.3 is a minor release that fixes some bugs.
         It does not introduce any breaking change.
