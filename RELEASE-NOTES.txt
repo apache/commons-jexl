@@ -14,7 +14,8 @@ This is a feature and maintenance release. Java 8 or later is required.
 Fixed Bugs
 ----------
 
-o JEXL-462:  JexlPermissions.RESTRICTED must ensure a better level of isolation.
+o JEXL-462:  JexlPermissions.RESTRICTED must ensure a better level of isolation. 
+
 
 
 Historical list of changes: https://commons.apache.org/proper/commons-jexl/changes.html
