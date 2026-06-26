@@ -33,7 +33,12 @@
             <action dev="henrib" type="add" issue="JEXL-464">Default permissions are SECURE and default features harden parse-time behavior (disable new, global side-effects, pragmas and annotations; enable lexical scoping; loops remain available to scripts).</action>
             <action dev="henrib" type="add" issue="JEXL-463">Add JexlPermissions.logging() to wrap a permission set and log which reflective elements are allowed or denied.</action>
             <!-- FIX -->
+            <!-- UPDATE -->
+        </release>
+        <release version="3.6.4" date="2026-06-24" description="This is a feature and maintenance release. Java 8 or later is required.">
+            <!-- FIX -->
             <action dev="henrib" type="fix" issue="JEXL-462">JexlPermissions.RESTRICTED must ensure a better level of isolation.</action>
+            <!-- ADD -->
             <!-- UPDATE -->
         </release>
         <release version="3.6.3" date="2026-06-20"

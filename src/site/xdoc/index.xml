@@ -22,7 +22,7 @@
     </properties>
 
     <body>
-        <section name="Breaking change in 3.7.0">
+        <section name="Behavioral Compatibility Changes in 3.7.0">
             <p>
               JEXL 3.7.0 changes two defaults that can break existing applications at <em>parse time</em>:
             </p>
