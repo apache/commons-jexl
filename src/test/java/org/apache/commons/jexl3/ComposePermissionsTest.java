@@ -52,7 +52,7 @@ class ComposePermissionsTest extends JexlTestCase {
             assertNotNull(json);
         }
 
-        // will succeed because java.util.Map is allowed and gson LinkedTreeMap is one
+        // will succeed because the base permissions (UNRESTRICTED) allow the gson LinkedTreeMap
         final JexlEngine j0 = createEngine(false, p);
         final JexlScript s0 = j0.createScript("json.pageInfo.pagePic", "json");
         final Object r0 = s0.execute(null, json);
@@ -70,11 +70,11 @@ class ComposePermissionsTest extends JexlTestCase {
         xproperty = assertThrows(JexlException.Property.class, () -> s2.execute(null, json));
         assertEquals("pageInfo", xproperty.getProperty());
 
-        // will not fail since gson objects
-        j1 = createEngine(false, JexlPermissions.RESTRICTED);
+        // will succeed once the gson package is explicitly allowed (no reach-through via java.util.Map)
+        j1 = createEngine(false, JexlPermissions.RESTRICTED.compose("com.google.gson.internal +{}"));
         final JexlScript s3 = j1.createScript("json.pageInfo.pagePic", "json");
-        s3.execute(null, json);
-        assertEquals(check, r0);
+        final Object r3 = s3.execute(null, json);
+        assertEquals(check, r3);
     }
 
     @Test

@@ -135,6 +135,8 @@ public class PermissionsParser {
         String njname = null;
         String identifier = inner;
         boolean deny = nojexl;
+        boolean classPositive = false; // the class's own polarity (set at creation, never mutated)
+        boolean memberNegative = false; // whether the pending member is prefixed with '-'
         int i = offset;
         int j = -1;
         boolean isMethod = false;
@@ -164,6 +166,8 @@ public class PermissionsParser {
             if (identifier == null) {
                 // negative or positive set ?
                 if (c == '-') {
+                    // a '-' before a member denies it; tracked for a possible deny-list upgrade
+                    memberNegative = true;
                     i += 1;
                 } else if (c == '+') {
                     deny = false;
@@ -185,6 +189,8 @@ public class PermissionsParser {
                 }
                 // if we have a class, it has a name
                 njclass = deny ? new Permissions.NoJexlClass() : new Permissions.JexlClass();
+                classPositive = !deny;
+                memberNegative = false; // a class-level sign does not carry to members
                 njname = outer != null ? outer + "$" + identifier : identifier;
                 njpackage.addNoJexl(njname, njclass);
                 identifier = null;
@@ -194,9 +200,17 @@ public class PermissionsParser {
                     // inner class
                     i = readClass(njpackage, deny, njname, identifier, i - 1);
                     identifier = null;
+                    memberNegative = false; // an inner-class sign does not change the outer class
                     continue;
                 }
                 if (c == ';') {
+                    // a '-' before a member of a positive class turns it into an allowed deny-list class
+                    if (memberNegative && classPositive && !(njclass instanceof Permissions.AllowedNoJexlClass)) {
+                        final Permissions.AllowedNoJexlClass anc =
+                            new Permissions.AllowedNoJexlClass(njclass.methodNames, njclass.fieldNames);
+                        njpackage.addNoJexl(njname, anc);
+                        njclass = anc;
+                    }
                     // field or method?
                     if (isMethod) {
                         njclass.methodNames.add(identifier);
@@ -205,6 +219,7 @@ public class PermissionsParser {
                         njclass.fieldNames.add(identifier);
                     }
                     identifier = null;
+                    memberNegative = false;
                 } else if (c == '(' && !isMethod) {
                     // method; only one opening parenthesis allowed
                     isMethod = true;
@@ -219,7 +234,7 @@ public class PermissionsParser {
         if (njname != null) {
             if (njclass.isEmpty()) {
                 njpackage.addNoJexl(njname,
-                    njclass instanceof Permissions.JexlClass
+                    njclass.isPositive()
                         ? Permissions.JEXL_CLASS
                         : Permissions.NOJEXL_CLASS);
             } else {
@@ -376,18 +391,12 @@ public class PermissionsParser {
                     i += 1;
                 }
             } else if (c == '}') {
-                // empty means the whole package
+                // empty means the whole package; a positive package is recognized by its JexlPackage/JEXL_PACKAGE
+                // type in the map (it allows itself and anchors reach-through), so nothing is added to wildcards.
                 if (njpackage.isEmpty()) {
                     packages.put(pname, negative == null || negative
                         ? Permissions.NOJEXL_PACKAGE
                         : Permissions.JEXL_PACKAGE);
-                    // a wholly-allowed package (pkg +{}) joins the allowed perimeter as an exact match (no '.*').
-                    // This lets a closed set of packages be declared without wildcards - so future sub-packages are
-                    // never implicitly allowed - while still allowing types based on this package (e.g. a foreign
-                    // Map implementation extending java.util.AbstractMap) the same way a '.*' wildcard would.
-                    if (Boolean.FALSE.equals(negative)) {
-                        wildcards.add(pname);
-                    }
                 } else {
                     packages.put(pname, njpackage);
                 }

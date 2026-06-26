@@ -18,14 +18,58 @@
 
 <document>
   <properties>
-    <title>Apache Commons JEXL 3.6.4 Release Notes</title>
+    <title>Apache Commons JEXL 3.7.0 Release Notes</title>
   </properties>
 
   <body>
     <section name="Compatibility with previous release">
       <p>
-        Version 3.6.4 is source and binary compatible with 3.6.0.
+        Version 3.7.0 is source and binary compatible with 3.6.x but it changes default runtime and
+        parse-time behavior.
       </p>
+    </section>
+    <section name="Compatibility with older releases (&lt; 3.7)">
+      <p>
+        Since 3.7.0 the default permissions are <em>SECURE</em> (was RESTRICTED since 3.3) and the
+        default features disable <code>new(...)</code>, global side-effects, pragmas, and annotations
+        (lexical scoping is enabled; loops remain available to scripts).  Because features are enforced
+        at <em>parse time</em>, existing scripts that use a disabled construct will throw
+        <code>JexlException.Feature</code> when compiled against a 3.7 engine built with the default
+        settings.
+      </p>
+      <p>
+        Despite the obvious inconvenience - our sincere apologies on the matter -, how much functional
+        and semantic power is accessible through scripts has a real impact on your application security
+        and stability; that potential risk requires an informed review and conscious choice on your end.
+        Whether Files, URLs, networking, processes, class-loaders or reflection classes
+        or whether loops or side effects are accessible may be used as ingress points for nefarious usage.
+      </p>
+      <p>
+        The fastest mitigation is to load the bundled <code>jexl.yaml</code> configuration
+        (see <a href="apidocs/org/apache/commons/jexl3/JexlConfigLoader.html">JexlConfigLoader</a>)
+        which restores RESTRICTED permissions and enables <code>new</code>, loops, side-effects, and
+        lambdas:
+      </p>
+      <pre>
+try (InputStream in = getClass().getResourceAsStream("/jexl.yaml")) {
+    JexlEngine engine = JexlConfigLoader.load(in).create();
+}
+      </pre>
+      <p>
+        To discover which reflective elements the new SECURE permissions now deny in your workload,
+        wrap your permission set with
+        <a href="apidocs/org/apache/commons/jexl3/introspection/JexlPermissions.html">JexlPermissions.logging()</a>
+        before constructing the engine: each allow/deny decision is logged once.
+      </p>
+      <p>
+      As another mitigation approach, you can revert to the previous behaviors with a few lines of code
+      (see <a href="apidocs/org/apache/commons/jexl3/introspection/JexlPermissions.html">JexlPermissions</a>,
+        <a href="apidocs/org/apache/commons/jexl3/JexlFeatures.html">JexlFeatures</a>,
+      <a href="apidocs/org/apache/commons/jexl3/JexlBuilder.html">JexlBuilder</a>
+      and
+      <a href="apidocs/org/apache/commons/jexl3/scripting/JexlScriptEngine.html">JexlScriptEngine</a>
+      ).
+    </p>
     </section>
     <section name="Compatibility with older releases (&lt; 3.3, 2.x)">
       <p>
@@ -38,25 +82,68 @@
         power is accessible through scripts has a real impact on your application security and stability ;
         that potential risk requires an informed review and conscious choice on your end.
       </p>
-      <p>
-        To mitigate the change, you can revert to the previous behavior with one line of code
-        (see <a href="apidocs/org/apache/commons/jexl3/introspection/JexlPermissions.html">JexlPermissions</a>,
-        <a href="apidocs/org/apache/commons/jexl3/JexlBuilder.html">JexlBuilder</a>
-        and
-        <a href="apidocs/org/apache/commons/jexl3/scripting/JexlScriptEngine.html">JexlScriptEngine</a>
-        ) or use this
-        opportunity to reduce exposure. Whether Files, URLs, networking, processes, class-loaders or reflection classes
-        or whether loops or side effects are accessible are part of your choice to make.
-      </p>
+
     </section>
 
-    <section name="What is new in 3.6.4:">
+    <section name="What is new in 3.7.0:">
       <p>
-        JEXL 3.6.4 is a minor release that fixes a security issue in the RESTRICTED permission set.
-        It does not introduce any breaking change.
+        JEXL 3.7.0 hardens the default security posture of the engine.  Two defaults change:
+      </p>
+      <ul>
+        <li>The default permissions become <code>JexlPermissions.SECURE</code> — a minimum allow-list
+            covering only safe <code>java.lang</code> value types, <code>java.math</code>, and
+            <code>java.util</code>.  Everything else (system classes, I/O, reflection, ...) is denied
+            unless explicitly composed in.</li>
+        <li>The default feature set disables <code>new(...)</code>, global side-effects, pragmas, and
+            annotations, and enables lexical scoping; loops remain available to scripts (but never to
+            expressions).  Scripts using a disabled construct will throw <code>JexlException.Feature</code>
+            at parse time.</li>
+      </ul>
+      <p>
+        The RESTRICTED permission set was also hardened: a class is now accessible only when its
+        <em>own</em> package or class is explicitly permitted — access is no longer granted because a
+        super-type or interface sits in an allowed package (the former "reach-through"), which previously
+        exposed the entire foreign class.
+      </p>
+      <p>
+        The new <code>JexlPermissions.logging()</code> wrapper logs every allow/deny decision (each
+        distinct decision logged once) and is the recommended diagnostic when migrating.
+      </p>
+      <p>
+        The permissions DSL gained the ability to deny individual members (such as a constructor) of an
+        otherwise-allowed class, e.g. <code>"java.util +{ -Formatter { Formatter(); } }"</code>.
+      </p>
+      <p>
+        A new <code>JexlConfigLoader</code> lets applications load engine configuration from a YAML
+        file, including permissions (SECURE/RESTRICTED/UNRESTRICTED + compose rules), features, and
+        namespaces.
       </p>
     </section>
-    <section name="Bugs fixed in 3.6.4:">
+    <section name="New Features in 3.7.0:">
+      <p>
+        <table>
+          <tr>
+            <td>
+              <a href="https://issues.apache.org/jira/browse/JEXL-465">JEXL-465:</a>
+            </td>
+            <td>Add JexlConfigLoader to build a JexlEngine from a YAML configuration.</td>
+          </tr>
+          <tr>
+            <td>
+              <a href="https://issues.apache.org/jira/browse/JEXL-464">JEXL-464:</a>
+            </td>
+            <td>Default permissions are SECURE and default features harden parse-time behavior (disable new, global side-effects, pragmas and annotations; enable lexical scoping; loops remain available to scripts).</td>
+          </tr>
+          <tr>
+            <td>
+              <a href="https://issues.apache.org/jira/browse/JEXL-463">JEXL-463:</a>
+            </td>
+            <td>Add JexlPermissions.logging() to log which reflective elements are allowed or denied.</td>
+          </tr>
+        </table>
+      </p>
+    </section>
+    <section name="Bugs fixed in 3.7.0:">
       <p>
         <table>
           <tr>

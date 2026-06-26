@@ -25,9 +25,12 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import org.apache.commons.jexl3.internal.introspection.PermissionsParser;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * This interface describes permissions used by JEXL introspection that constrain which
@@ -257,6 +260,119 @@ public interface JexlPermissions {
     }
 
     /**
+     * A permission delegate that logs every allow/deny decision.
+     * <p>This is a debugging aid to determine which reflective elements (classes, constructors, methods, fields)
+     * a permission set allows or denies; wrap any permissions with {@link JexlPermissions#logging()} (or
+     * {@link JexlPermissions#logging(String)} to pick the logger name) and inspect the log to diagnose why a
+     * given object is or is not reachable from scripts.</p>
+     *
+     * @since 3.7.0
+     */
+    class LoggingPermissions extends Delegate {
+        /** The logger that decisions are written to (at info level). */
+        private final Log logger;
+        /** The set of already-emitted log lines, so each decision is logged only once. */
+        private final Set<String> logged = ConcurrentHashMap.newKeySet();
+
+        /**
+         * Constructs an instance logging to a logger named after this class.
+         *
+         * @param delegate the permissions to delegate to
+         */
+        public LoggingPermissions(final JexlPermissions delegate) {
+            this(LogFactory.getLog(LoggingPermissions.class), delegate);
+        }
+
+        /**
+         * Constructs an instance logging to a named logger.
+         *
+         * @param loggerName the name of the logger to use
+         * @param delegate the permissions to delegate to
+         */
+        public LoggingPermissions(final String loggerName, final JexlPermissions delegate) {
+            this(LogFactory.getLog(loggerName), delegate);
+        }
+
+        /**
+         * Constructs an instance with an explicit logger.
+         *
+         * @param log the logger
+         * @param delegate the permissions to delegate to
+         */
+        protected LoggingPermissions(final Log log, final JexlPermissions delegate) {
+            super(delegate);
+            this.logger = log;
+        }
+
+        /**
+         * Logs a decision once: the first time a given message is seen, it is written to the logger;
+         * subsequent identical messages are suppressed.
+         *
+         * @param allowed the decision to return
+         * @param message the message to log
+         * @return the decision
+         */
+        private boolean log(final boolean allowed, final String message) {
+            if (logged.add(message)) {
+                logger.info(message);
+            }
+            return allowed;
+        }
+
+        @Override
+        public boolean allow(final Class<?> clazz) {
+            final boolean allowed = super.allow(clazz);
+            return log(allowed, String.format("Class %s is %s",
+                clazz.getCanonicalName(), allowed ? "allowed" : "denied"));
+        }
+
+        @Override
+        public boolean allow(final Constructor<?> ctor) {
+            final boolean allowed = super.allow(ctor);
+            return log(allowed, String.format("Constructor %s.%s() is %s",
+                ctor.getDeclaringClass().getCanonicalName(), ctor.getName(),
+                allowed ? "allowed" : "denied"));
+        }
+
+        @Override
+        public boolean allow(final Field field) {
+            final boolean allowed = super.allow(field);
+            return log(allowed, String.format("Field %s.%s is %s",
+                field.getDeclaringClass().getCanonicalName(), field.getName(),
+                allowed ? "allowed" : "denied"));
+        }
+
+        @Override
+        public boolean allow(final Class<?> clazz, final Field field) {
+            final boolean allowed = super.allow(clazz, field);
+            return log(allowed, String.format("Field %s.%s is %s for class %s",
+                field.getDeclaringClass().getCanonicalName(), field.getName(),
+                allowed ? "allowed" : "denied", clazz.getCanonicalName()));
+        }
+
+        @Override
+        public boolean allow(final Method method) {
+            final boolean allowed = super.allow(method);
+            return log(allowed, String.format("Method %s.%s() is %s",
+                method.getDeclaringClass().getCanonicalName(), method.getName(),
+                allowed ? "allowed" : "denied"));
+        }
+
+        @Override
+        public boolean allow(final Class<?> clazz, final Method method) {
+            final boolean allowed = super.allow(clazz, method);
+            return log(allowed, String.format("Method %s.%s() is %s for class %s",
+                method.getDeclaringClass().getCanonicalName(), method.getName(),
+                allowed ? "allowed" : "denied", clazz.getCanonicalName()));
+        }
+
+        @Override
+        public JexlPermissions compose(final String... src) {
+            return new LoggingPermissions(logger, base.compose(src));
+        }
+    }
+
+    /**
      * The unrestricted permissions.
      * <p>This enables any public class, method, constructor or field to be visible to JEXL and used in scripts.</p>
      *
@@ -267,6 +383,14 @@ public interface JexlPermissions {
     /**
      * A restricted singleton.
      * <p>The RESTRICTED set is built using the following allowed packages and denied packages/classes.</p>
+     * <p>
+     * RESTRICTED attempts to strike a balance between reasonable out-of-the-box isolation and allowing most
+     * legitimate features; it is convenient when scripts need a broad slice of the JDK. In a mission-critical
+     * scenario, prefer {@link #SECURE} as a base instead and {@link #compose(String...) compose} only what your
+     * scripts actually need on top of it. Be aware that the isolation RESTRICTED provides may be incomplete and
+     * could expose more than intended; should such a case be identified, we will endeavour to resolve it in a
+     * subsequent release. Use {@link #logging()} to audit exactly which elements your workload reaches.
+     * </p>
      * <p>Of particular importance are the restrictions on the {@link System},
      * {@link Runtime}, {@link ProcessBuilder}, {@link Class} and those on {@link java.net},
      * {@link java.io} and {@link java.lang.reflect} that should provide a decent level of isolation between the scripts
@@ -303,6 +427,11 @@ public interface JexlPermissions {
      * {@code java.util.zip}, {@code java.util.jar}, {@code java.util.prefs}, {@code java.util.logging},
      * {@code java.util.concurrent.locks}, {@code java.nio.file}, {@code java.lang.reflect},
      * {@code java.lang.invoke} and {@code org.w3c.dom.ls}.</p>
+     * <p>A class is visible only when its <em>own</em> package or class declaration permits it; it is never made
+     * visible merely because one of its super-types is allowed. Consequently a foreign implementation of an allowed
+     * type (for instance a {@code java.util.Map} provided by another library) is not visible unless its own package
+     * is explicitly allowed, e.g. {@code RESTRICTED.compose("com.example.foreign +{}")}. Use {@link #logging()} to
+     * diagnose which elements are allowed or denied.</p>
      */
 
     JexlPermissions RESTRICTED = JexlPermissions.parse(
@@ -314,7 +443,7 @@ public interface JexlPermissions {
         "java.time.format +{}",
         "java.time.temporal +{}",
         "java.time.zone +{ -ZoneRulesProvider{} }",
-        "java.util +{}",
+        "java.util +{ -Formatter { Formatter(); } }",
         "java.util.concurrent +{" +
             "-Executors{} -ExecutorService{} -AbstractExecutorService{}" +
             "-ThreadPoolExecutor{} -ScheduledThreadPoolExecutor{} -ScheduledExecutorService{}" +
@@ -330,10 +459,44 @@ public interface JexlPermissions {
             "-RuntimePermission{} -SecurityManager{}" +
             "-Thread{} -ThreadGroup{} -Class{} -ClassLoader{}" +
             "}",
-        "java.io -{ +PrintWriter{} +Writer{} +StringWriter{} +Reader{} +InputStream{} +OutputStream{} }",
+        "java.io -{ +PrintWriter{ -PrintWriter(); } +Writer{} +StringWriter{} +Reader{} +InputStream{} +OutputStream{} }",
         "java.nio +{}",
         "java.nio.charset +{}",
-        "org.apache.commons.jexl3 +{ -JexlBuilder{} }"
+        "org.apache.commons.jexl3 +{ -JexlBuilder{} -JexlConfigLoader{} }"
+    );
+
+    /**
+     * An absolute-minimum, allow-list-first permission set.
+     * <p>This is the tightest sensible baseline: nothing is reachable unless explicitly whitelisted here.
+     * It exposes only the safe {@code java.lang} value types, {@code java.math} big numbers and the
+     * {@code java.util} collection types - enough for arithmetic, string and collection scripting.</p>
+     * <p>Allowed:</p>
+     * <ul>
+     * <li>{@code java.lang}: {@code Object} (minus {@code getClass}/{@code wait}/{@code notify}/{@code notifyAll}),
+     * {@code Number} and the boxed primitives, {@code String}, {@code CharSequence}, {@code StringBuilder},
+     * {@code Math}, {@code Comparable}, {@code Iterable}; everything else in {@code java.lang}
+     * (e.g. {@code System}, {@code Runtime}, {@code Thread}, {@code Class}, {@code ClassLoader}) is denied.</li>
+     * <li>{@code java.math} (for {@code BigInteger}/{@code BigDecimal}, i.e. the {@code 1B}/{@code 1H} literals).</li>
+     * <li>{@code java.util} - the collection types produced by list/map/set literals. Because a positive package
+     * does not cover sub-packages, {@code java.util.zip}/{@code concurrent}/{@code jar}/… stay denied.</li>
+     * </ul>
+     * <p>Arithmetic, comparisons and string concatenation require no permission at all (they are handled by
+     * {@link org.apache.commons.jexl3.JexlArithmetic}); ranges ({@code 1..n}) iterate as a language primitive.
+     * Compose more in with {@link #compose(String...)} (e.g. {@code SECURE.compose("java.time +{}")}), and use
+     * {@link #logging()} to discover what a script is denied. Note {@code java.util} still includes
+     * {@code Random}, {@code Scanner} and {@code ServiceLoader}; tighten with an explicit class list if needed.</p>
+     *
+     * @since 3.7.0
+     */
+    JexlPermissions SECURE = JexlPermissions.parse(
+        "# Absolute-minimum permissions: safe java.lang value types + java.math + java.util collections",
+        "java.lang -{"
+            + " +Object{ -getClass(); -wait(); -notify(); -notifyAll(); }"
+            + " +Number{} +Boolean{} +Character{} +Byte{} +Short{} +Integer{} +Long{} +Float{} +Double{}"
+            + " +String{} +CharSequence{} +StringBuilder{} +Math{} +Comparable{} +Iterable{}"
+            + " }",
+        "java.math +{}",
+        "java.util +{}"
     );
 
     /**
@@ -423,6 +586,41 @@ public interface JexlPermissions {
      */
     static JexlPermissions parse(final String... src) {
         return new PermissionsParser().parse(src);
+    }
+
+    /**
+     * Wraps these permissions in a {@link LoggingPermissions} that logs every allow/deny decision.
+     * <p>Useful to discover which reflective elements a permission set allows or denies.</p>
+     *
+     * @return a logging view of these permissions
+     * @since 3.7.0
+     */
+    default JexlPermissions logging() {
+        return new LoggingPermissions(this);
+    }
+
+    /**
+     * Wraps these permissions in a {@link LoggingPermissions} that logs every allow/deny decision
+     * to a named logger.
+     *
+     * @param loggerName the name of the logger to log decisions to
+     * @return a logging view of these permissions
+     * @since 3.7.0
+     */
+    default JexlPermissions logging(final String loggerName) {
+        return new LoggingPermissions(loggerName, this);
+    }
+
+    /**
+     * Wraps these permissions in a {@link LoggingPermissions} that logs every allow/deny decision
+     * to the given logger.
+     *
+     * @param log the logger to log decisions to
+     * @return a logging view of these permissions
+     * @since 3.7.0
+     */
+    default JexlPermissions logging(final Log log) {
+        return new LoggingPermissions(log, this);
     }
 
     /**

@@ -1237,5 +1237,26 @@ public class Issues400Test {
         result = script.execute(jc);
         assertEquals(42, result);
     }
+
+    @Test
+    void test462() {
+        // JEXL-462: under RESTRICTED, java.io.PrintWriter is reachable and its methods are allowed,
+        // but its constructors are denied - it cannot be instantiated from a script.
+        final JexlEngine jexl = new JexlBuilder().silent(false).permissions(RESTRICTED).create();
+        for (final String src : new String[] {
+                "new('java.io.PrintWriter', new('java.io.StringWriter'))",
+                "import java.io.PrintWriter; new PrintWriter(new('java.io.StringWriter'))" }) {
+            final JexlScript script = jexl.createScript(src);
+            final JexlException.Method xctor = assertThrows(JexlException.Method.class,
+                () -> script.execute(null), () -> "PrintWriter::new should be denied: " + src);
+            assertTrue(xctor.getMethod().contains("PrintWriter"));
+        }
+        // a PrintWriter method (println) is allowed on a provided instance
+        final StringWriter sw = new StringWriter();
+        final java.io.PrintWriter pw = new java.io.PrintWriter(sw);
+        jexl.createScript("p.println('hello')", "p").execute(null, pw);
+        pw.flush();
+        assertTrue(sw.toString().contains("hello"));
+    }
 }
 
