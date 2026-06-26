@@ -70,7 +70,7 @@ public final class JexlFeatures {
     /** The false predicate. */
     public static final Predicate<String> TEST_STR_FALSE = s -> false;
 
-    /** Te feature names (for toString()). */
+    /** The feature names (for toString()). */
     private static final String[] F_NAMES = {
         "register", "reserved variable", "local variable", "assign/modify",
         "global assign/modify", "array reference", "create instance", "loop", "function",

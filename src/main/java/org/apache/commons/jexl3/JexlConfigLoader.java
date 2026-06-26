@@ -74,7 +74,7 @@ import org.apache.commons.jexl3.introspection.JexlUberspect;
  * <p>Controls which classes and members are visible to scripts.</p>
  * <pre>
  * permissions:
- *   base: SECURE           # SECURE (default) | RESTRICTED | UNRESTRICTED
+ *   base: SECURE           # NONE (default) | SECURE | RESTRICTED | UNRESTRICTED
  *   rules:                 # list of JexlPermissions DSL strings composed on top of base
  *     - "com.example.api +{}"           # allow whole package
  *     - "com.example.api +{ Foo{} }"    # allow specific class
@@ -428,10 +428,11 @@ public final class JexlConfigLoader {
     private static void applyPermissions(final Map<String, Object> data,
                                          final JexlBuilder builder) {
         final Object baseVal = data.get("base");
+        // absent or "NONE" → deny-everything base (build from scratch with rules/classes)
         JexlPermissions perms = "UNRESTRICTED".equals(baseVal) ? JexlPermissions.UNRESTRICTED
             : "SECURE".equals(baseVal) ? JexlPermissions.SECURE
             : "RESTRICTED".equals(baseVal) ? JexlPermissions.RESTRICTED
-            : JexlPermissions.SECURE;
+            : JexlPermissions.NONE;
         final Object rules = data.get("rules");
         if (rules instanceof List && !((List<?>) rules).isEmpty()) {
             final List<String> ruleList = (List<String>) rules;

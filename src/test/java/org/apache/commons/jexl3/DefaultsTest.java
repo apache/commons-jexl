@@ -36,26 +36,26 @@ import org.junit.jupiter.api.Test;
 public class DefaultsTest {
 
     @BeforeEach
-    public void restoreHardenedDefaults() {
+    void restoreHardenedDefaults() {
         // Override whatever JexlTestCase may have set when running as part of the full suite.
         JexlBuilder.setDefaultPermissions(null);  // null → SECURE
-        JexlBuilder.setDefaultFeatures(null);     // null → hardened (no new, no loops, no global SE)
+        JexlBuilder.setDefaultFeatures(null);     // null → hardened (no new, no global SE)
     }
 
     @AfterEach
-    public void restoreTestPermissive() {
+    void restoreTestPermissive() {
         JexlBuilder.setDefaultPermissions(JexlTestCase.TEST_PERMS);
         JexlBuilder.setDefaultFeatures(JexlFeatures.createDefault());
     }
 
     @Test
-    public void testDefaultPermissionsAreSecure() {
+    void testDefaultPermissionsAreSecure() {
         final JexlBuilder builder = new JexlBuilder();
         assertSame(org.apache.commons.jexl3.introspection.JexlPermissions.SECURE, builder.permissions());
     }
 
     @Test
-    public void testNewInstanceDisabledByDefault() {
+    void testNewInstanceDisabledByDefault() {
         final JexlEngine engine = new JexlBuilder().create();
         assertThrows(JexlException.Feature.class,
             () -> engine.createScript("new('java.util.ArrayList')"),
@@ -63,7 +63,7 @@ public class DefaultsTest {
     }
 
     @Test
-    public void testLoopsEnabledForScriptsNotExpressions() {
+    void testLoopsEnabledForScriptsNotExpressions() {
         final JexlEngine engine = new JexlBuilder().create();
         // loops ARE allowed in scripts
         assertNotNull(engine.createScript("var s = 0; for (var i : [1,2,3]) { s += i; } s"),
@@ -75,7 +75,7 @@ public class DefaultsTest {
     }
 
     @Test
-    public void testGlobalSideEffectDisabledByDefault() {
+    void testGlobalSideEffectDisabledByDefault() {
         final JexlEngine engine = new JexlBuilder().create();
         assertThrows(JexlException.Feature.class,
             () -> engine.createScript("x = 1"),
@@ -83,7 +83,7 @@ public class DefaultsTest {
     }
 
     @Test
-    public void testPragmaDisabledByDefault() {
+    void testPragmaDisabledByDefault() {
         final JexlEngine engine = new JexlBuilder().create();
         assertThrows(JexlException.Feature.class,
             () -> engine.createScript("#pragma jexl.foo 'bar'\n42"),
@@ -91,7 +91,7 @@ public class DefaultsTest {
     }
 
     @Test
-    public void testAnnotationDisabledByDefault() {
+    void testAnnotationDisabledByDefault() {
         final JexlEngine engine = new JexlBuilder().create();
         assertThrows(JexlException.Feature.class,
             () -> engine.createScript("@silent var x = 1"),
@@ -99,7 +99,7 @@ public class DefaultsTest {
     }
 
     @Test
-    public void testLexicalEnabledByDefault() {
+    void testLexicalEnabledByDefault() {
         final JexlEngine engine = new JexlBuilder().create();
         // lexical shade: a local variable cannot shadow itself / redeclare in the same scope
         assertThrows(JexlException.class,
@@ -108,7 +108,7 @@ public class DefaultsTest {
     }
 
     @Test
-    public void testPackageDocExampleRunsUnderSecure() {
+    void testPackageDocExampleRunsUnderSecure() {
         // mirrors the "Brief Example" in package-info.java: must run as-is under hardened defaults
         final JexlEngine jexl = new JexlBuilder().create();
         final JexlExpression e = jexl.createExpression(
@@ -119,7 +119,28 @@ public class DefaultsTest {
     }
 
     @Test
-    public void testSecurePermsDenyRuntime() {
+    void testSecureDeniesFileAndKeepsCollections() {
+        // SECURE permissions with new(...) re-enabled: still no file write, collections still work
+        final JexlEngine jexl = new JexlBuilder()
+            .permissions(org.apache.commons.jexl3.introspection.JexlPermissions.SECURE)
+            .features(JexlFeatures.createDefault())
+            .create();
+        // a Formatter cannot be constructed under SECURE - no file can be opened for writing
+        assertThrows(JexlException.class,
+            () -> jexl.createScript("new('java.util.Formatter', '/tmp/jexl-should-not-exist')").execute(null),
+            "java.util.Formatter must be denied under SECURE");
+        // collection scripting (map iteration + a view method) is intact under the tightened SECURE
+        final Object r = jexl.createScript(
+            "var m = {1 : 'a'}; var s = ''; for (var e : m) { s += e; } s + m.size()").execute(null);
+        assertEquals("a1", r);
+        // getClass() is denied even on an allowed value type: no Class can be obtained
+        assertThrows(JexlException.Method.class,
+            () -> jexl.createScript("'x'.getClass()").execute(null),
+            "getClass() must be denied under SECURE");
+    }
+
+    @Test
+    void testSecurePermsDenyRuntime() {
         final JexlEngine engine = new JexlBuilder().features(JexlFeatures.createDefault()).create();
         // java.lang.Runtime is denied under SECURE
         assertThrows(JexlException.class,

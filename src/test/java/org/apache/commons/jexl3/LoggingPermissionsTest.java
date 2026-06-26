@@ -52,4 +52,50 @@ class LoggingPermissionsTest {
         assertTrue(msgs.contains("Method java.lang.String.length() is allowed"));
         assertTrue(msgs.contains("Method java.lang.String.length() is allowed for class java.lang.String"));
     }
+
+    @Test
+    void testLoggingConstructorAndField() throws Exception {
+        final CaptureLog log = new CaptureLog();
+        final JexlPermissions perms = JexlPermissions.RESTRICTED.logging(log);
+        // exercise the constructor and field overrides, twice each to check dedup
+        for (int i = 0; i < 2; i++) {
+            assertTrue(perms.allow(StringBuilder.class.getConstructor()));        // allowed ctor
+            assertFalse(perms.allow(java.io.File.class.getConstructor(String.class))); // denied ctor
+            assertTrue(perms.allow(Integer.class.getField("MAX_VALUE")));         // allowed field
+            assertFalse(perms.allow(System.class.getField("out")));              // denied field
+        }
+        final List<String> msgs = log.getCapturedMessages();
+        // constructor lines (ctor.getName() yields the declaring class binary name)
+        assertTrue(msgs.stream().anyMatch(m ->
+            m.startsWith("Constructor java.lang.StringBuilder") && m.endsWith("is allowed")), msgs::toString);
+        assertTrue(msgs.stream().anyMatch(m ->
+            m.startsWith("Constructor java.io.File") && m.endsWith("is denied")), msgs::toString);
+        // field lines (single-arg and the class-qualified form via delegation)
+        assertTrue(msgs.contains("Field java.lang.Integer.MAX_VALUE is allowed"), msgs::toString);
+        assertTrue(msgs.contains("Field java.lang.System.out is denied"), msgs::toString);
+        assertTrue(msgs.contains("Field java.lang.System.out is denied for class java.lang.System"), msgs::toString);
+        // dedup: a given line never repeats despite two rounds
+        assertEquals(msgs.size(), msgs.stream().distinct().count(), msgs::toString);
+    }
+
+    @Test
+    void testLoggingComposePreservesWrapper() throws Exception {
+        final CaptureLog log = new CaptureLog();
+        final JexlPermissions composed =
+            JexlPermissions.RESTRICTED.logging(log).compose("java.io { +File {} }");
+        assertTrue(composed instanceof JexlPermissions.LoggingPermissions);
+        assertTrue(composed.allow(java.io.File.class));   // newly allowed by the compose rule
+        assertTrue(log.getCapturedMessages().contains("Class java.io.File is allowed"));
+    }
+
+    @Test
+    void testLoggingFactories() {
+        // the (delegate) and (String, delegate) constructors via the instance factory methods
+        assertTrue(JexlPermissions.RESTRICTED.logging() instanceof JexlPermissions.LoggingPermissions);
+        final JexlPermissions named = JexlPermissions.RESTRICTED.logging("jexl.test.perms");
+        assertTrue(named instanceof JexlPermissions.LoggingPermissions);
+        // the wrapper still returns the delegate's verdict
+        assertTrue(named.allow(String.class));
+        assertFalse(named.allow(java.lang.Runtime.class));
+    }
 }

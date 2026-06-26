@@ -39,6 +39,16 @@
  * {@link org.apache.commons.jexl3.JxltEngine} adds a JSP/JSF-like templating layer on top of the same engine.
  * </p>
  * <p>
+ * <strong>Security disclaimer.</strong> Neither {@link org.apache.commons.jexl3.introspection.JexlPermissions#RESTRICTED}
+ * nor {@link org.apache.commons.jexl3.introspection.JexlPermissions#SECURE} is exhaustive, and neither must be
+ * considered completely safe or sufficient on its own for executing untrusted user input. They are hardened
+ * baselines, not guarantees. Any application that evaluates untrusted scripts <em>must</em> define its own tailored,
+ * strict whitelist of exactly the classes, methods and fields its scripts legitimately need - ideally by composing on
+ * top of {@link org.apache.commons.jexl3.introspection.JexlPermissions#NONE} (which denies everything) via
+ * {@link org.apache.commons.jexl3.introspection.JexlPermissions#create(java.lang.String...)} - and audit the result
+ * with {@link org.apache.commons.jexl3.introspection.JexlPermissions#logging()}.
+ * </p>
+ * <p>
  * <strong>Security note (since 3.7):</strong> a bare {@code new JexlBuilder().create()} engine is hardened by
  * default. Its permissions are {@link org.apache.commons.jexl3.introspection.JexlPermissions#SECURE} (only a small,
  * safe allow-list of {@code java.lang}/{@code java.math}/{@code java.util} types is reachable) and its default
@@ -164,8 +174,10 @@
  *     public void setStr(String str) { this.str = str; }
  * }
  *
- * // test API
- * JexlEngine jexl = new JexlBuilder().create();
+ * // test API - Quux and Froboz are in your own package; compose it into the permissions.
+ * JexlEngine jexl = new JexlBuilder()
+ *     .permissions(JexlPermissions.SECURE.compose("com.example +{}"))
+ *     .create();
  * Quux quux = jexl.newInstance(Quux.class, "xuuq", 100);
  * jexl.setProperty(quux, "froboz.value", Integer.valueOf(100));
  * Object o = jexl.getProperty(quux, "froboz.value");
@@ -188,7 +200,11 @@
  * </ul>
  * The following example illustrates their usage:
  * <pre>
- * JexlEngine jexl = new JexlBuilder().create();
+ * // new(...) needs the newInstance feature; Quux/Froboz need explicit permissions.
+ * JexlEngine jexl = new JexlBuilder()
+ *     .permissions(JexlPermissions.SECURE.compose("com.example +{}"))
+ *     .features(JexlFeatures.createDefault())
+ *     .create();
  * JexlContext jc = new MapContext();
  * jc.set("quuxClass", quux.class);
  * JexlExpression create = jexl.createExpression("quux = new(quuxClass, 'xuuq', 100)");
@@ -296,16 +312,20 @@
  * <h3><a id="config_security">Security: permissions, sandbox and {@code @NoJexl}</a></h3>
  * <p>
  * {@link org.apache.commons.jexl3.introspection.JexlPermissions} is the primary security gate; it controls which
- * packages, classes and members the introspection layer will expose. Three constants are provided:
+ * packages, classes and members the introspection layer will expose. Four constants are provided:
  * {@link org.apache.commons.jexl3.introspection.JexlPermissions#UNRESTRICTED} (everything),
- * {@link org.apache.commons.jexl3.introspection.JexlPermissions#RESTRICTED} (a broad but curated allow-list) and
+ * {@link org.apache.commons.jexl3.introspection.JexlPermissions#RESTRICTED} (a broad but curated allow-list),
  * {@link org.apache.commons.jexl3.introspection.JexlPermissions#SECURE} (the minimal safe allow-list and the
- * default since 3.7). A permission set is configured with
+ * default since 3.7) and {@link org.apache.commons.jexl3.introspection.JexlPermissions#NONE} (deny everything).
+ * A permission set is configured with
  * {@link org.apache.commons.jexl3.JexlBuilder#permissions(org.apache.commons.jexl3.introspection.JexlPermissions)}
  * and can be composed from a textual DSL through
  * {@link org.apache.commons.jexl3.introspection.JexlPermissions#parse(java.lang.String...)} or
- * {@code RESTRICTED.compose("com.example.api +{}")}. To diagnose what a permission set allows or denies under your
- * workload, wrap it with {@link org.apache.commons.jexl3.introspection.JexlPermissions#logging()}.
+ * {@code RESTRICTED.compose("com.example.api +{}")}. To build a closed-world, deny-by-default policy from scratch,
+ * start from {@code NONE} (or {@link org.apache.commons.jexl3.introspection.JexlPermissions#create(java.lang.String...)})
+ * and compose only what scripts need, e.g. {@code JexlPermissions.create("com.example.api +{}")}. To diagnose what a
+ * permission set allows or denies under your workload, wrap it with
+ * {@link org.apache.commons.jexl3.introspection.JexlPermissions#logging()}.
  * </p>
  * <p>
  * Two finer-grained mechanisms complement permissions: the
@@ -369,7 +389,11 @@
  * }
  * Map<String, Object> funcs = new HashMap<String, Object>();
  * funcs.put("math", new MyMath());
- * JexlEngine jexl = new JexlBuilder().namespaces(funcs).create();
+ * // MyMath is in your own package; compose it into the permissions.
+ * JexlEngine jexl = new JexlBuilder()
+ *     .namespaces(funcs)
+ *     .permissions(JexlPermissions.SECURE.compose("com.example +{}"))
+ *     .create();
  * JexlContext jc = new MapContext();
  * jc.set("pi", Math.PI);
  * JexlExpression e = jexl.createExpression("math:cos(pi)");
@@ -394,9 +418,11 @@
  * </p>
  * <p>
  * The library-wide defaults applied by a bare {@code new JexlBuilder()} are themselves configurable through static
- * setters: {@link org.apache.commons.jexl3.JexlBuilder#setDefaultPermissions(org.apache.commons.jexl3.introspection.JexlPermissions)}
- * and {@link org.apache.commons.jexl3.JexlBuilder#setDefaultFeatures(org.apache.commons.jexl3.JexlFeatures)}. The
- * pre-3.7 permissive feature set is exposed as {@link org.apache.commons.jexl3.JexlBuilder#FULL} so an application
+ * setters: {@link org.apache.commons.jexl3.JexlBuilder#setDefaultPermissions(org.apache.commons.jexl3.introspection.JexlPermissions)},
+ * {@link org.apache.commons.jexl3.JexlBuilder#setDefaultFeatures(org.apache.commons.jexl3.JexlFeatures)},
+ * and {@link org.apache.commons.jexl3.JexlBuilder#setDefaultOptions(String...)} (runtime evaluation flags such as
+ * {@code strict}, {@code safe}, and {@code cancellable}; see {@link org.apache.commons.jexl3.JexlOptions#setDefaultFlags(String...)}).
+ * The pre-3.7 permissive feature set is exposed as {@link org.apache.commons.jexl3.JexlBuilder#FULL} so an application
  * can restore the legacy behavior process-wide in one place.
  * </p>
  * <p>

@@ -147,6 +147,22 @@ public class JexlBuilder {
     }
 
     /**
+     * Sets the default option flags used when creating a new engine.
+     * <p>Delegates to {@link JexlOptions#setDefaultFlags(String...)}; see that method for the
+     * flag-name syntax ({@code "+flag"}/{@code "-flag"}) and the available flag names
+     * ({@code cancellable}, {@code strict}, {@code silent}, {@code safe}, {@code lexical},
+     * {@code antish}, {@code lexicalShade}, ...).</p>
+     * <p>Example: restore safe/antish defaults before creating any engine:</p>
+     * <pre>JexlBuilder.setDefaultOptions("+safe", "+antish");</pre>
+     *
+     * @param flags the flags to set or clear
+     * @since 3.7.0
+     */
+    public static void setDefaultOptions(final String... flags) {
+        JexlOptions.setDefaultFlags(flags);
+    }
+
+    /**
      * Builds the JEXL 3.7 hardened default feature set.
      * <p>Starting from {@link #FULL} (the pre-3.7 feature set), this disables {@code new(...)},
      * global side-effects, pragmas, and annotations, and enables lexical scoping and lexical shade.

@@ -622,10 +622,11 @@ public class Permissions implements JexlPermissions {
                 if (!declaring.isAssignableFrom(clazz)) {
                     return false;
                 }
-                // if there is an explicit permission, allow if not denied
-                NoJexlClass njc = getNoJexl(clazz, null);
-                if (njc != null) {
-                    return !njc.deny(method);
+                // an explicit permission on the concrete class can deny; otherwise fall through to
+                // allow(method) which honors carve-outs on the declaring class/interfaces (e.g. Object.getClass())
+                final NoJexlClass njc = getNoJexl(clazz, null);
+                if (njc != null && njc.deny(method)) {
+                    return false;
                 }
             }
         }
@@ -647,10 +648,11 @@ public class Permissions implements JexlPermissions {
                 if (!declaring.isAssignableFrom(clazz)) {
                     return false;
                 }
-                // if there is an explicit permission, allow if not denied
-                NoJexlClass njc = getNoJexl(clazz, null);
-                if (njc != null) {
-                    return !njc.deny(field);
+                // an explicit permission on the concrete class can deny; otherwise fall through to
+                // allow(field) which honors carve-outs on the declaring class
+                final NoJexlClass njc = getNoJexl(clazz, null);
+                if (njc != null && njc.deny(field)) {
+                    return false;
                 }
             }
         }

@@ -361,6 +361,94 @@ class PermissionsTest {
     }
 
     @Test
+    void testNoneDeniesEverything() throws Exception {
+        final JexlPermissions none = JexlPermissions.NONE;
+        assertFalse(none.allow(String.class));
+        assertFalse(none.allow(Integer.class));
+        assertFalse(none.allow(Object.class));
+        assertFalse(none.allow(java.util.ArrayList.class));
+        assertFalse(none.allow(getMethod(String.class, "length")));
+        for (final java.lang.reflect.Constructor<?> ctor : String.class.getConstructors()) {
+            assertFalse(none.allow(ctor));
+        }
+    }
+
+    @Test
+    void testCreateFromScratch() throws Exception {
+        // create() with no rules denies everything
+        assertFalse(JexlPermissions.create().allow(String.class));
+        // a positive rule grants exactly that class, nothing else
+        final JexlPermissions onlyString = JexlPermissions.create("java.lang { +String{} }");
+        assertTrue(onlyString.allow(String.class));
+        assertTrue(onlyString.allow(getMethod(String.class, "length")));
+        assertFalse(onlyString.allow(Integer.class));
+        assertFalse(onlyString.allow(java.util.ArrayList.class));
+        // composing onto NONE behaves the same as create
+        final JexlPermissions onlyUtil = JexlPermissions.NONE.compose("java.util.*");
+        assertTrue(onlyUtil.allow(java.util.ArrayList.class));
+        assertFalse(onlyUtil.allow(String.class));
+    }
+
+    @Test
+    void testRestrictedNoFileMethods() throws Exception {
+        final JexlPermissions r = RESTRICTED;
+        // file / loader members are denied while the classes stay visible
+        assertFalse(r.allow(getMethod(java.util.Properties.class, "load")));
+        assertFalse(r.allow(getMethod(java.util.Properties.class, "store")));
+        assertFalse(r.allow(getMethod(java.util.Properties.class, "loadFromXML")));
+        assertFalse(r.allow(getMethod(java.util.ResourceBundle.class, "getBundle")));
+        assertFalse(r.allow(getMethod(java.util.ServiceLoader.class, "load")));
+        for (final java.lang.reflect.Constructor<?> ctor : java.util.Scanner.class.getConstructors()) {
+            assertFalse(r.allow(ctor), () -> "Scanner ctor must be denied: " + ctor);
+        }
+        // classes remain visible and their benign members allowed (no over-restriction)
+        assertTrue(r.allow(java.util.Properties.class));
+        assertTrue(r.allow(java.util.Scanner.class));
+        assertTrue(r.allow(java.util.ResourceBundle.class));
+        assertTrue(r.allow(getMethod(java.util.Properties.class, "getProperty")));
+        assertTrue(r.allow(getMethod(java.util.ResourceBundle.class, "getString")));
+        // system-property readers denied; the classes and their other methods stay usable
+        assertFalse(r.allow(getMethod(Integer.class, "getInteger")));
+        assertFalse(r.allow(getMethod(Long.class, "getLong")));
+        assertFalse(r.allow(getMethod(Boolean.class, "getBoolean")));
+        assertTrue(r.allow(Integer.class));
+        assertTrue(r.allow(getMethod(Integer.class, "intValue")));
+    }
+
+    @Test
+    void testSecureNoFileNoEnv() throws Exception {
+        final JexlPermissions secure = JexlPermissions.SECURE;
+        // file / loader / thread bearing java.util classes are denied
+        assertFalse(secure.allow(java.util.Formatter.class));
+        assertFalse(secure.allow(java.util.Scanner.class));
+        assertFalse(secure.allow(java.util.ServiceLoader.class));
+        assertFalse(secure.allow(java.util.ResourceBundle.class));
+        assertFalse(secure.allow(java.util.Properties.class));
+        assertFalse(secure.allow(java.util.Timer.class));
+        // no java.util.Formatter constructor may be reached (no file can be opened for writing)
+        for (final java.lang.reflect.Constructor<?> ctor : java.util.Formatter.class.getConstructors()) {
+            assertFalse(secure.allow(ctor), () -> "Formatter ctor must be denied: " + ctor);
+        }
+        // getClass()/wait()/notify() are denied even on a positively-allowed concrete type (bypass fix)
+        assertFalse(secure.allow(String.class, getMethod(Object.class, "getClass")));
+        assertFalse(secure.allow(Integer.class, getMethod(Object.class, "getClass")));
+        assertFalse(secure.allow(String.class, getMethod(Object.class, "notify")));
+        // system-property readers stay denied
+        assertFalse(secure.allow(getMethod(Integer.class, "getInteger")));
+        assertFalse(secure.allow(getMethod(Long.class, "getLong")));
+        assertFalse(secure.allow(getMethod(Boolean.class, "getBoolean")));
+        // no regression: collection literals + their entry iteration still work under SECURE
+        assertTrue(secure.allow(java.util.LinkedHashMap.class));
+        assertTrue(secure.allow(java.util.HashSet.class));
+        assertTrue(secure.allow(java.util.LinkedHashSet.class));
+        final java.util.Map<String, String> m = new java.util.HashMap<>();
+        m.put("a", "b");
+        final java.util.Map.Entry<String, String> e = m.entrySet().iterator().next();
+        assertTrue(secure.allow(e.getClass()), () -> "map entry concrete class must be reachable: " + e.getClass());
+        assertTrue(secure.allow(e.getClass(), getMethod(e.getClass(), "getKey")));
+    }
+
+    @Test
     void testRangeIteratesUnderRestrictedAndSecure() {
         // ranges are a language primitive and must iterate even under the tightest permissions
         for (final JexlPermissions p : new JexlPermissions[] { RESTRICTED, JexlPermissions.SECURE }) {
