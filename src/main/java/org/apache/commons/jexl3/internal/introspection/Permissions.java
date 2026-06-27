@@ -114,6 +114,16 @@ public class Permissions implements JexlPermissions {
         }
 
         boolean isEmpty() { return methodNames.isEmpty() && fieldNames.isEmpty(); }
+
+        /**
+         * Whether this is a positive (allow-oriented) class declaration.
+         * <p>A positive class is explicitly allowed in its package (it contributes to
+         * {@link NoJexlPackage#hasAllowedClass()} and an empty one means &quot;allow the whole class&quot;).
+         * A plain deny-list {@code NoJexlClass} is not positive.</p>
+         *
+         * @return true if the class is positively allowed, false if it is a deny-list
+         */
+        boolean isPositive() { return false; }
     }
 
     /**
@@ -133,6 +143,27 @@ public class Permissions implements JexlPermissions {
         @Override boolean deny(final Constructor<?> method) { return !super.deny(method); }
         @Override boolean deny(final Field field) { return !super.deny(field); }
         @Override boolean deny(final Method method) { return !super.deny(method); }
+        @Override boolean isPositive() { return true; }
+    }
+
+    /**
+     * A class that is positively allowed in its package yet carries deny-list member semantics.
+     * <p>Used for {@code +ClassName{ -member(); }} inside a deny package: the class is added to the
+     * allowed set (so unlisted classes in the package stay denied) but the named members are denied
+     * while all others remain allowed. It is a {@link NoJexlClass} (deny-list) tagged as positive;
+     * the deny-list behavior is inherited unchanged.</p>
+     */
+    static class AllowedNoJexlClass extends NoJexlClass {
+        AllowedNoJexlClass() {
+            super();
+        }
+        AllowedNoJexlClass(final Set<String> methods, final Set<String> fields) {
+            super(methods, fields);
+        }
+        @Override public AllowedNoJexlClass copy() {
+            return new AllowedNoJexlClass(new HashSet<>(methodNames), new HashSet<>(fieldNames));
+        }
+        @Override boolean isPositive() { return true; }
     }
 
     /**
@@ -173,7 +204,7 @@ public class Permissions implements JexlPermissions {
         boolean isEmpty() { return nojexl.isEmpty(); }
 
         /**
-         * Whether this package has at least one explicitly-allowed class (a {@code JexlClass} entry).
+         * Whether this package has at least one explicitly-allowed class (a positive entry).
          * <p>A package with allowed-class entries acts as an allow-list: unlisted classes are denied.
          * A package with only denied-class entries acts as a deny-list: unlisted classes are allowed.</p>
          *
@@ -181,12 +212,20 @@ public class Permissions implements JexlPermissions {
          */
         boolean hasAllowedClass() {
             for (final NoJexlClass njc : nojexl.values()) {
-                if (njc instanceof JexlClass) {
+                if (njc.isPositive()) {
                     return true;
                 }
             }
             return false;
         }
+
+        /**
+         * Whether this is a positive (allow-oriented) package declaration.
+         * <p>A positive package allows its own classes by default; a deny-list package does not.</p>
+         *
+         * @return true if the package is positively allowed, false otherwise
+         */
+        boolean isPositive() { return false; }
 
         @Override public NoJexlPackage copy() {
             return new NoJexlPackage(copyMap(nojexl));
@@ -206,6 +245,8 @@ public class Permissions implements JexlPermissions {
             NoJexlClass njc = nojexl.get(classKey(clazz));
             return njc != null ? njc : JEXL_CLASS;
         }
+
+        @Override boolean isPositive() { return true; }
 
         @Override public JexlPackage copy() {
             return new JexlPackage(copyMap(nojexl));
@@ -253,6 +294,13 @@ public class Permissions implements JexlPermissions {
     static final NoJexlPackage JEXL_PACKAGE = new NoJexlPackage(Collections.emptyMap()) {
         @Override NoJexlClass getNoJexl(final Class<?> clazz) {
             return JEXL_CLASS;
+        }
+        @Override boolean isPositive() {
+            return true;
+        }
+        // a constant singleton survives copy as itself, preserving its positive nature through compose()
+        @Override public NoJexlPackage copy() {
+            return this;
         }
     };
 
@@ -394,17 +442,12 @@ public class Permissions implements JexlPermissions {
         if (allowed.isEmpty() && packages.isEmpty()) {
             return true;
         }
-        return !allowed.isEmpty() && wildcardAllow(allowed, packageName);
-    }
-
-    /**
-     * Whether the wildcard set of packages allows a given class to be introspected.
-     *
-     * @param clazz the package name (not null)
-     * @return true if allowed, false otherwise
-     */
-    private boolean wildcardAllow(final Class<?> clazz) {
-        return allowedPackage(ClassTool.getPackageName(clazz));
+        if (!allowed.isEmpty() && wildcardAllow(allowed, packageName)) {
+            return true;
+        }
+        // a package explicitly declared positive allows itself (exact match only, no sub-package inference)
+        final NoJexlPackage njp = packages.get(packageName);
+        return njp != null && njp.isPositive();
     }
 
     /**
@@ -455,24 +498,30 @@ public class Permissions implements JexlPermissions {
         if (Proxy.isProxyClass(clazz)) {
             return true;
         }
-        // class must be allowed
+        // class must not be denied, nor extend a denied class
         if (deny(clazz)) {
             return false;
         }
-        // no super class can be denied and at least one must be allowed
-        boolean explicit = specifiedAllow(clazz, clazz, (njc, c) -> njc instanceof JexlClass);
-        Class<?> walk = clazz.getSuperclass();
-        while (walk != null) {
+        // a subclass of a denied class is also denied; Object (the universal root) is skipped, and the
+        // null guard keeps the walk safe when clazz is an interface or Object itself (getSuperclass() null).
+        for (Class<?> walk = clazz.getSuperclass(); walk != null && walk != Object.class; walk = walk.getSuperclass()) {
             if (deny(walk)) {
                 return false;
             }
-            if (!explicit) {
-                explicit = wildcardAllow(walk);
-            }
-            walk = walk.getSuperclass();
         }
-        // check wildcards
-        return explicit;
+        // a class is allowed only by its own package or class-level declaration: there is deliberately no
+        // reach-through via an allowed super-type, which would otherwise expose the whole foreign class.
+        return allowedClass(clazz);
+    }
+
+    /**
+     * Whether a class is allowed by its own package or class-level declaration.
+     *
+     * @param clazz the class to check (not null)
+     * @return true if explicitly allowed
+     */
+    private boolean allowedClass(final Class<?> clazz) {
+        return specifiedAllow(clazz, clazz, (njc, c) -> njc.isPositive() || !njc.isEmpty());
     }
 
     /**
@@ -573,10 +622,11 @@ public class Permissions implements JexlPermissions {
                 if (!declaring.isAssignableFrom(clazz)) {
                     return false;
                 }
-                // if there is an explicit permission, allow if not denied
-                NoJexlClass njc = getNoJexl(clazz, null);
-                if (njc != null) {
-                    return !njc.deny(method);
+                // an explicit permission on the concrete class can deny; otherwise fall through to
+                // allow(method) which honors carve-outs on the declaring class/interfaces (e.g. Object.getClass())
+                final NoJexlClass njc = getNoJexl(clazz, null);
+                if (njc != null && njc.deny(method)) {
+                    return false;
                 }
             }
         }
@@ -598,10 +648,11 @@ public class Permissions implements JexlPermissions {
                 if (!declaring.isAssignableFrom(clazz)) {
                     return false;
                 }
-                // if there is an explicit permission, allow if not denied
-                NoJexlClass njc = getNoJexl(clazz, null);
-                if (njc != null) {
-                    return !njc.deny(field);
+                // an explicit permission on the concrete class can deny; otherwise fall through to
+                // allow(field) which honors carve-outs on the declaring class
+                final NoJexlClass njc = getNoJexl(clazz, null);
+                if (njc != null && njc.deny(field)) {
+                    return false;
                 }
             }
         }

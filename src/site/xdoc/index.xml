@@ -22,6 +22,67 @@
     </properties>
 
     <body>
+        <section name="Behavioral Compatibility Changes in 3.7.0">
+            <p>
+              JEXL 3.7.0 changes two defaults that can break existing applications at <em>parse time</em>:
+            </p>
+            <ul>
+              <li>The default permissions are now <strong>SECURE</strong>: only a safe subset of
+                  <code>java.lang</code>, <code>java.math</code>, and <code>java.util</code> is
+                  accessible.  Classes outside that set are denied unless explicitly composed in.</li>
+              <li>The default features <strong>disable</strong> <code>new(...)</code>, global
+                  side-effects, pragmas, and annotations, and <strong>enable</strong> lexical scoping;
+                  loops remain available to scripts (but never to expressions).  Scripts using a
+                  disabled construct will throw <code>JexlException.Feature</code> when compiled.</li>
+            </ul>
+            <p>
+              The fastest migration is to load <code>jexl.yaml</code> via
+              <a href="apidocs/org/apache/commons/jexl3/JexlConfigLoader.html">JexlConfigLoader</a>:
+              it restores RESTRICTED permissions and enables <code>new</code>, loops, side-effects,
+              and lambdas — matching the 3.6 defaults.
+            </p>
+            <pre>
+try (InputStream in = getClass().getResourceAsStream("/jexl.yaml")) {
+    JexlEngine engine = JexlConfigLoader.load(in).create();
+}
+            </pre>
+            <p>
+              Alternatively, you can restore the pre-3.7 behavior process-wide in a few lines of code by
+              resetting the static defaults before building any engine — use
+              <a href="apidocs/org/apache/commons/jexl3/JexlBuilder.html">JexlBuilder.setDefaultPermissions</a>
+              to revert the permissions and
+              <a href="apidocs/org/apache/commons/jexl3/JexlBuilder.html">JexlBuilder.setDefaultFeatures</a>
+              to revert the feature set (<code>JexlBuilder.FULL</code> is the pre-3.7 feature set),
+              and <a href="apidocs/org/apache/commons/jexl3/JexlBuilder.html">JexlBuilder.setDefaultOptions</a>
+              to tune runtime evaluation flags (strict, safe, cancellable, ...):
+            </p>
+            <pre>
+JexlBuilder.setDefaultPermissions(JexlPermissions.RESTRICTED);
+JexlBuilder.setDefaultFeatures(JexlBuilder.FULL);
+JexlBuilder.setDefaultOptions("+safe", "+antish"); // optional: restore JEXL 3.2 runtime behaviour
+            </pre>
+            <p>
+              Conversely, to keep the tighter control and discover which classes are now denied under your
+              workload, wrap your permission set with
+              <a href="apidocs/org/apache/commons/jexl3/introspection/JexlPermissions.html">JexlPermissions.logging()</a>:
+              each distinct allow/deny decision is logged once.
+            </p>
+            <p>
+              For full details and the full migration recipe, see the
+              <a href="relnotes.html">release notes</a>.
+            </p>
+            <p>
+              <strong>Security disclaimer.</strong> Neither
+              <a href="apidocs/org/apache/commons/jexl3/introspection/JexlPermissions.html">RESTRICTED</a> nor
+              <a href="apidocs/org/apache/commons/jexl3/introspection/JexlPermissions.html">SECURE</a> is exhaustive,
+              and neither must be considered completely safe or sufficient on its own for executing untrusted user
+              input. They are hardened baselines, not guarantees. Any application that evaluates untrusted scripts
+              <em>must</em> define its own tailored, strict whitelist of exactly the classes, methods and fields its
+              scripts legitimately need - ideally by composing on top of <code>JexlPermissions.NONE</code> (which denies
+              everything) - and audit the result with
+              <a href="apidocs/org/apache/commons/jexl3/introspection/JexlPermissions.html">JexlPermissions.logging()</a>.
+            </p>
+        </section>
         <section name="Java Expression Language (JEXL)">
             <p>
 JEXL is a library intended to facilitate the implementation of dynamic and scripting features in
@@ -41,11 +102,11 @@ and ensure their execution within controlled functional constraints.
             - the <a href="apidocs/org/apache/commons/jexl3/package-summary.html#usage">core features</a> fit in
             3 classes and 10 methods - that can be used in various conditions:
                 <ul>
-                    <li>Scripting features:
+                  <li><strong>Scripting features:</strong>
                         <ul><li>Your application lets (advanced) users evaluate or define some simple expressions
                         like computation formulas.</li></ul>
                     </li>
-                    <li>Module or component configuration:
+                  <li><strong>Module or component configuration:</strong>
                         <ul>
                             <li>Your application has configuration files (eventually generated by a design module)
                             consumed by the end-user module that would benefit from variables and expressions.
@@ -55,19 +116,59 @@ and ensure their execution within controlled functional constraints.
                             </li>
                         </ul>
                     </li>
-                    <li>Loose-coupling of interfaces and implementations or duck-typing:
+                  <li><strong>Loose-coupling of interfaces and implementations or duck-typing:</strong>
                         <ul>
                             <li>You have optional classes that your code cant consider as compilation dependencies.</li>
                             <li>You have to integrate and call "legacy" code or use components that you don't want to
                             strongly depend upon.</li>
                         </ul>
                     </li>
-                    <li>Simple template capabilities:
+                  <li><strong>Simple template capabilities:</strong>
                         <ul><li>Your application has basic template requirements and JSPs or
                         Velocity would be overkill or too inconvenient to deploy.</li></ul>
                     </li>
                 </ul>
             </p>
+            <p>
+              What sets JEXL apart from other embeddable scripting and expression engines
+              (Groovy, JavaScript/Nashorn, MVEL, Spring SpEL, ...) is that <strong>control and security are
+              designed-in, first-class concerns</strong> rather than afterthoughts:
+            </p>
+            <ul>
+              <li><strong>Secure by default, allow-list permissions.</strong>
+                  <a href="apidocs/org/apache/commons/jexl3/introspection/JexlPermissions.html">JexlPermissions</a>
+                  gate every class, method and field a script may reach through reflection. The default is
+                  <code>SECURE</code> - a minimal allow-list - so nothing in your application or the JDK (file system,
+                  process and network APIs, class loaders, reflection) is exposed unless you explicitly permit it. The
+                  <code>@NoJexl</code> annotation and a
+                  <a href="apidocs/org/apache/commons/jexl3/introspection/JexlSandbox.html">JexlSandbox</a> add
+                  source-level and per-class control on top.</li>
+              <li><strong>Parse-time language shaping.</strong>
+                  <a href="apidocs/org/apache/commons/jexl3/JexlFeatures.html">JexlFeatures</a> switch syntactic
+                  constructs on or off - loops, <code>new</code>, side-effects, lambdas, annotations, pragmas - so you
+                  can offer end-users a deliberately small, safe language surface and reject anything else <em>before</em>
+                  a single line is evaluated.</li>
+              <li><strong>No code generation, no class-loading leaks.</strong>
+                  JEXL interprets a parsed syntax tree; it does not compile scripts to bytecode or define new classes
+                  per script. That avoids the metaspace growth, class-loader retention and wide attack surface typical
+                  of compile-to-bytecode engines, and keeps long-lived, high-churn server usage predictable.</li>
+              <li><strong>Tiny footprint.</strong>
+                  A small, focused API (the core fits in a handful of classes) with a single runtime dependency
+                  (commons-logging) - easy to embed, reason about and audit.</li>
+              <li><strong>Tunable runtime behavior.</strong>
+                  <a href="apidocs/org/apache/commons/jexl3/JexlOptions.html">Options</a> - strict, silent,
+                  safe-navigation, lexical scoping, arithmetic <code>MathContext</code>, and cooperative
+                  <em>cancellation</em> of a running script - can be set per engine or overridden per evaluation.</li>
+              <li><strong>Deep, typed integration.</strong>
+                  Operator overloading and custom types through a derived
+                  <a href="apidocs/org/apache/commons/jexl3/JexlArithmetic.html">JexlArithmetic</a>, custom variable
+                  resolution through <a href="apidocs/org/apache/commons/jexl3/JexlContext.html">JexlContext</a>, and
+                  your own functions exposed as callable namespaces.</li>
+              <li><strong>Declarative configuration.</strong>
+                  Permissions, features, arithmetic and namespaces can be loaded from a YAML document through
+                  <a href="apidocs/org/apache/commons/jexl3/JexlConfigLoader.html">JexlConfigLoader</a>, keeping
+                  security policy in configuration rather than scattered through code.</li>
+            </ul>
             <p>
             JEXL name stands for Java EXpression Language, a simple expression language originally inspired by Apache
             Velocity and the Expression Language defined in the JavaServer Pages Standard Tag Library version 1.1 (JSTL)

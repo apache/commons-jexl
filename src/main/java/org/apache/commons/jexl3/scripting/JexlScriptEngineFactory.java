@@ -48,6 +48,10 @@ import org.apache.commons.jexl3.parser.StringParser;
  */
 public class JexlScriptEngineFactory implements ScriptEngineFactory {
     /**
+     * The engine and language version.
+     */
+    private static final String JEXL_VERSION = "3.7";
+    /**
      * The default factory permissions.
      */
     private static JexlPermissions defaultPermissions;
@@ -130,7 +134,7 @@ public class JexlScriptEngineFactory implements ScriptEngineFactory {
 
     @Override
     public String getEngineVersion() {
-        return "3.6"; // ensure this is updated if function changes are made to this class
+        return JEXL_VERSION;
     }
 
     @Override
@@ -145,7 +149,7 @@ public class JexlScriptEngineFactory implements ScriptEngineFactory {
 
     @Override
     public String getLanguageVersion() {
-        return "3.6"; // this should be derived from the actual version
+        return JEXL_VERSION;
     }
 
     @Override

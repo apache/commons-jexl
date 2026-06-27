@@ -1,21 +1,59 @@
-Apache Commons JEXL 3.6.4 Release Notes
----------------------------------------
+Apache Commons JEXL 3.7.0 Release Notes
+========================================
 
-The Apache Commons JEXL team is pleased to announce the release of Apache Commons JEXL 3.6.4.
+The Apache Commons JEXL team is pleased to announce the release of Apache Commons JEXL 3.7.0.
 
 Introduction
-------------
+============
 
-Apache Commons JEXL is a library that enables scripting features in Java applications and frameworks..
+Apache Commons JEXL is a library that enables scripting features in Java applications and frameworks.
 
 This is a feature and maintenance release. Java 8 or later is required.
 
+Compatibility with previous releases
+=====================================
+
+Version 3.7.0 is source and binary compatible with 3.6.x but changes default runtime and
+parse-time behavior (see below).
+
+
+Breaking change in 3.7.0
+=========================
+
+Two defaults change:
+
+  o The default permissions become SECURE — a minimum allow-list covering only safe java.lang
+    value types, java.math, and java.util. Everything else is denied unless explicitly composed in.
+
+  o The default features disable new(...), global side-effects, pragmas, and annotations, and enable
+    lexical scoping; loops remain available to scripts (but never to expressions). Scripts using a
+    disabled construct will throw JexlException.Feature at parse time with the default engine.
+
+To restore the previous (3.6.x) defaults, load the bundled jexl.yaml via JexlConfigLoader:
+
+    try (InputStream in = getClass().getResourceAsStream("/jexl.yaml")) {
+        JexlEngine engine = JexlConfigLoader.load(in).create();
+    }
+
+Use JexlPermissions.logging() to discover which reflective elements the new algorithm denies.
+
+
+New features
+============
+
+o JEXL-465:  Add JexlConfigLoader to build a JexlEngine from a YAML configuration (permissions,
+             features, arithmetic, namespaces, imports).
+o JEXL-464:  Default permissions are SECURE and default features harden parse-time behavior
+             (disable new, global side-effects, pragmas and annotations; enable lexical scoping;
+             loops remain available to scripts).
+o JEXL-463:  Add JexlPermissions.logging() to wrap a permission set and log which reflective
+             elements are allowed or denied.
+
 
 Fixed Bugs
-----------
+==========
 
-o JEXL-462:  JexlPermissions.RESTRICTED must ensure a better level of isolation. 
-
+o JEXL-462:  JexlPermissions.RESTRICTED must ensure a better level of isolation.
 
 
 Historical list of changes: https://commons.apache.org/proper/commons-jexl/changes.html
@@ -30,52 +68,29 @@ Download page: https://commons.apache.org/proper/commons-jexl/download_jexl.cgi
 Have fun!
 -Apache Commons Team
 
-------------------------------------------------------------------------------
 
-Apache Commons JEXL 3.6.3 Release Notes
----------------------------------------
-
-The Apache Commons JEXL team is pleased to announce the release of Apache Commons JEXL 3.6.3.
-
-Introduction
-------------
-
-Apache Commons JEXL is a library that enables scripting features in Java applications and frameworks..
-
-This is a feature and maintenance release. Java 8 or later is required.
-
+========================================================================================================================
+Release 3.6.3
+========================================================================================================================
 
 Fixed Bugs
-----------
+==========
 
-o JEXL-461:  Updates/improvements to the site documentation for JEXL Syntax. Thanks to David Costanzo. 
-o JEXL-459:  Empty/size functions swallow all exceptions with no trace. Thanks to Mirek Hankus. 
-o JEXL-458:  Improve permissions expressivity Thanks to Daniil Averin. 
-o JEXL-457:  Reduce default exposure for RESTRICTED JexlPermissions Thanks to Daniil Averin. 
-o JEXL-456:  Change in template parser behavior. Thanks to Vincent Bussol. 
-o          Fix the @return tags in the Javadoc for JexlArithmetic.toBigInteger() overloads (#403). Thanks to David Costanzo. 
+o JEXL-461:  Updates/improvements to the site documentation for JEXL Syntax. Thanks to David Costanzo.
+o JEXL-459:  Empty/size functions swallow all exceptions with no trace. Thanks to Mirek Hankus.
+o JEXL-458:  Improve permissions expressivity. Thanks to Daniil Averin.
+o JEXL-457:  Reduce default exposure for RESTRICTED JexlPermissions. Thanks to Daniil Averin.
+o JEXL-456:  Change in template parser behavior. Thanks to Vincent Bussol.
+o            Fix the @return tags in the Javadoc for JexlArithmetic.toBigInteger() overloads (#403).
+             Thanks to David Costanzo.
 
 Changes
--------
+=======
 
-o          Bump org.apache.commons:commons-parent from 96 to 102. Thanks to Gary Gregory. 
-o          Bump commons-logging:commons-logging from 1.3.5 to 1.4.0. Thanks to Gary Gregory. 
-o          Bump com.google.code.gson:gson from 2.13.2 to 2.14.0. Thanks to Gary Gregory. 
+o            Bump org.apache.commons:commons-parent from 96 to 102. Thanks to Gary Gregory.
+o            Bump commons-logging:commons-logging from 1.3.5 to 1.4.0. Thanks to Gary Gregory.
+o            Bump com.google.code.gson:gson from 2.13.2 to 2.14.0. Thanks to Gary Gregory.
 
-
-Historical list of changes: https://commons.apache.org/proper/commons-jexl/changes.html
-
-For complete information on Apache Commons JEXL, including instructions on how to submit bug reports,
-patches, or suggestions for improvement, see the Apache Commons JEXL website:
-
-https://commons.apache.org/proper/commons-jexl/
-
-Download page: https://commons.apache.org/proper/commons-jexl/download_jexl.cgi
-
-Have fun!
--Apache Commons Team
-
-------------------------------------------------------------------------------
 
 ========================================================================================================================
 Release 3.6.2
@@ -84,19 +99,20 @@ Release 3.6.2
 Version 3.6.2 is a minor release.
 
 Compatibility with previous releases
-====================================
+=====================================
 Version 3.6.2 is source and binary compatible with 3.6.
 
+Bugs Fixed
+==========
 
-Bugs Fixed in 3.6.2:
-====================
 o JEXL-455:  Tokenization error with multiline expressions.
 o JEXL-454:  Switch NaN case not found.
 o JEXL-453:  Finally clause is not evaluated.
 
-Changes in 3.6.2:
-=================
-o          Bump org.apache.commons:commons-parent from 93 to 96. Thanks to Gary Gregory.
+Changes
+=======
+
+o            Bump org.apache.commons:commons-parent from 93 to 96. Thanks to Gary Gregory.
 
 
 ========================================================================================================================
@@ -106,23 +122,24 @@ Release 3.6.1
 Version 3.6.1 is a minor release.
 
 Compatibility with previous releases
-====================================
+=====================================
 Version 3.6.1 is source and binary compatible with 3.6.
 
+Bugs Fixed
+==========
 
-Bugs Fixed in 3.6.1:
-====================
-* JEXL-452:     Debug setting in Engine shows class/method/line even when set to false.
-* JEXL-451:     Restore JexlSandbox permission capabilities on Object.class.
-* JEXL-450:     Disable instantiation of internal classes in RESTRICTED mode.
-* JEXL-449:     Inconsistency on nature of curly-bracket syntactic elements regarding annotations.
+o JEXL-452:  Debug setting in Engine shows class/method/line even when set to false.
+o JEXL-451:  Restore JexlSandbox permission capabilities on Object.class.
+o JEXL-450:  Disable instantiation of internal classes in RESTRICTED mode.
+o JEXL-449:  Inconsistency on nature of curly-bracket syntactic elements regarding annotations.
 
+Changes
+=======
 
-Changes in 3.6.1:
-=================
+o            Bump org.apache.commons:commons-parent from 91 to 93 #391, #396.
+             Thanks to Gary Gregory, Dependabot.
+o            Bump org.apache.commons:commons-lang3 from 3.17.0 to 3.20.0. Thanks to Gary Gregory.
 
-o               Bump org.apache.commons:commons-parent from 91 to 93 #391, #396. Thanks to Gary Gregory, Dependabot.
-o               Bump org.apache.commons:commons-lang3 from 3.17.0 to 3.20.0. Thanks to Gary Gregory.
 
 ========================================================================================================================
 Release 3.6.0
@@ -131,26 +148,35 @@ Release 3.6.0
 Version 3.6.0 is a minor release.
 
 Compatibility with previous releases
-====================================
+=====================================
 Version 3.6.0 is source and binary compatible with 3.5.
 
-
-What's new in 3.6.0:
-====================
+What's new
+==========
 Switch / case statements and expressions have been added to JEXL.
 
-New Features in 3.6.0:
-======================
-* JEXL-440:     Switch/case statement and expression
+New Features
+============
 
-Bugs Fixed in 3.6.0:
-====================
-* JEXL-447:     Regression in script-defined functions
-* JEXL-446:     ClassTool module inspection is too strict
-* JEXL-442:     Local variables are not resolved in interpolation string expression
-* JEXL-441:     Tokenization error if "\n" in template expression
-* JEXL-439:     When using reference capture, incorrect scoping when local variable redefines a captured symbol
-* JEXL-437:     Semicolons actually not optional between function calls on separate lines
+o JEXL-440:  Switch/case statement and expression.
+
+Bugs Fixed
+==========
+
+o JEXL-448:  Engines caching misses local variables handling and global eviction capability.
+o JEXL-447:  Regression in script-defined functions.
+o JEXL-446:  ClassTool module inspection is too strict.
+o JEXL-442:  Local variables are not resolved in interpolation string expression.
+o JEXL-441:  Tokenization error if "\n" in template expression.
+o JEXL-439:  When using reference capture, incorrect scoping when local variable redefines a captured symbol.
+o JEXL-437:  Semicolons not actually optional between function calls on separate lines.
+
+Changes
+=======
+
+o            Bump org.apache.commons:commons-parent from 81 to 91. Thanks to Gary Gregory.
+o            Bump org.apache.commons:commons-lang3 from 3.17.0 to 3.19.0. Thanks to Gary Gregory.
+o            Bump com.google.code.gson:gson from 2.13.1 to 2.13.2. Thanks to Gary Gregory.
 
 
 ========================================================================================================================
@@ -160,45 +186,42 @@ Release 3.5.0
 Version 3.5.0 is a minor release.
 
 Compatibility with previous releases
-====================================
+=====================================
 Version 3.5.0 is source and binary compatible with 3.4.
 
-
-What's new in 3.5.0:
+What's new in 3.5.0
 ====================
 Operator overloading has been enhanced so that overloading compare() will benefit all comparison operators.
 A feature flag has been introduced to allow pass-by-reference of captured variables closely mimicking
 EcmaScript behavior.
 
-New Features in 3.5.0:
-======================
-* JEXL-438:     Allow parser factory specification.
-* JEXL-428:     Make Comparable object high priority while comparing
-* JEXL-427:     Avoid coercing logical expressions to boolean
-* JEXL-426:     Enable pass-by-reference for Captured Variables
-o               Add and use CoercionException.CoercionException(String, Throwable). Thanks to Gary Gregory.
+New Features
+============
 
-Bugs Fixed in 3.5.0:
-====================
-* JEXL-436:     The increment (decrement) operator does not check for null operand
-* JEXL-435:     Changed behavior of empty operator overloading
-* JEXL-434:     The safe-access array operator is not safe
-* JEXL-433:     Debugger does not accept empty return statement
-* JEXL-432:     Namespace functors are not cleared when the classloader is updated
-* JEXL-431:     Parse error with variables declared in a catch clause
-* JEXL-429:     Ternary expression regression
-* JEXL-425:     Multiline format literals does not always return string
-o               Replace NumberParser use of Locale.ENGLISH with Locale.ROOT. Thanks to Gary Gregory.
-o               Pick up maven-antrun-plugin version from parent POM org.apache:apache. Thanks to Gary Gregory.
+o JEXL-438:  Allow parser factory specification.
+o JEXL-428:  Make Comparable object high priority while comparing.
+o JEXL-427:  Avoid coercing logical expressions to boolean.
+o JEXL-426:  Enable pass-by-reference for Captured Variables.
 
-Changes in 3.5.0:
-=================
-o               Bump org.apache.commons:commons-parent from 71 to 79 #279, #282, #287, #291, #295, #301. Thanks to Gary Gregory.
-o               Bump commons-logging:commons-logging from 1.3.2 to 1.3.5 #267, #280, #325.
-o               Bump org.codehaus.mojo:animal-sniffer-maven-plugin from 1.23 to 1.24 #266.
-o               Bump org.apache.commons:commons-lang3 from 3.14.0 to 3.17.0 #270, #274, #283.
-o               Bump org.ow2.asm:asm from 9.7 to 9.7.1 #294. Thanks to Dependabot, Gary Gregory.
-o               Bump com.google.code.gson:gson from 2.11.0 to 2.13.0 #321. Thanks to Dependabot, Gary Gregory.
+Bugs Fixed
+==========
+
+o JEXL-436:  The increment (decrement) operator does not check for null operand.
+o JEXL-435:  Changed behavior of empty operator overloading.
+o JEXL-434:  The safe-access array operator is not safe.
+o JEXL-433:  Debugger does not accept empty return statement.
+o JEXL-432:  Namespace functors are not cleared when the classloader is updated.
+o JEXL-431:  Parse error with variables declared in a catch clause.
+o JEXL-429:  Ternary expression regression.
+o JEXL-425:  Multiline format literals does not always return string.
+
+Changes
+=======
+
+o            Bump org.apache.commons:commons-parent from 71 to 79. Thanks to Gary Gregory.
+o            Bump commons-logging:commons-logging from 1.3.2 to 1.3.5.
+o            Bump org.apache.commons:commons-lang3 from 3.14.0 to 3.17.0. Thanks to Gary Gregory.
+o            Bump com.google.code.gson:gson from 2.11.0 to 2.13.0. Thanks to Dependabot, Gary Gregory.
 
 
 ========================================================================================================================
@@ -208,56 +231,52 @@ Release 3.4
 Version 3.4 is a minor release.
 
 Compatibility with previous releases
-====================================
+=====================================
 Version 3.4 is source and binary compatible with 3.3.
 
-
-What's new in 3.4:
+What's new in 3.4
 ==================
 Features and permissions are easier to define through new methods.
-Some new syntaxes are introduced (thus the new minor); try/catch/finally (including with resources),
-an array-access safe navigation ((x?[y]), strict equality/inequality operators (===, !==) and
-more permissive structured literals. See the JIRA tickets for more details.
+Some new syntaxes are introduced (thus the new minor): try/catch/finally (including with resources),
+an array-access safe navigation (x?[y]), strict equality/inequality operators (===, !==) and
+more permissive structured literals.
 
-New Features in 3.4:
-====================
-* JEXL-423:     Add support for instanceof / !instanceof
-* JEXL-422      Add strict equality (===) and inequality (!==) operators
-* JEXL-421:     ArrayBuilder: array type should reflect common class of its entries
-* JEXL-419:     Add permission syntax to allow class/method/field
-* JEXL-418:     Add try-catch-finally support
-* JEXL-408:     Using JexlFeatures is tedious
-* JEXL-404:     Support array-access safe navigation (x?[y])
-* JEXL-401:     Captured variables should be read-only
-* JEXL-398:     Allow 'trailing commas' or ellipsis while defining array, map and set literals
-o               Add Maven property project.build.outputTimestamp for build reproducibility. Thanks to Gary Gregory.
+New Features
+============
 
-Bugs Fixed in 3.4:
-==================
-* JEXL-420:     Error while comparing float and string value
-* JEXL-417:     JexlArithmetic looses precision during arithmetic operator execution
-* JEXL-416:     Null-valued pragma throws NPE in 3.3
-* JEXL-415:     Incorrect template eval result
-* JEXL-414:     SoftCache may suffer from race conditions
-* JEXL-412:     Ambiguous syntax between namespace function call and map object definition.
-* JEXL-410:     JexlFeatures: ctor does not enable all features
-* JEXL-409:     Disable LEXICAL should disable LEXICAL_SHADE
-* JEXL-405:     Recursive functions corrupt evaluation frame if reassigned
-* JEXL-403:     Exception while evaluating template literal used in array assignment in loop.
-* JEXL-402:     parse failed with empty return value.
-o               [StepSecurity] ci: Harden GitHub Actions #180. Thanks to step-security-bot, Gary Gregory.
-o               Guard logging calls. Thanks to PMD, Gary Gregory.
-o               Deprecate SimpleNode.SimpleNode(Parser, int) in favor of SimpleNode.SimpleNode(int). Thanks to PMD, Gary Gregory.
-o               Deprecate JexlNode.JexlNode(Parser, int) in favor of JexlNode.JexlNode(int). Thanks to PMD, Gary Gregory.
+o JEXL-423:  Add support for instanceof / !instanceof.
+o JEXL-422:  Add strict equality (===) and inequality (!==) operators.
+o JEXL-421:  ArrayBuilder: array type should reflect common class of its entries.
+o JEXL-419:  Add permission syntax to allow class/method/field.
+o JEXL-418:  Add try-catch-finally support.
+o JEXL-408:  Using JexlFeatures is tedious.
+o JEXL-404:  Support array-access safe navigation (x?[y]).
+o JEXL-401:  Captured variables should be read-only.
+o JEXL-398:  Allow 'trailing commas' or ellipsis while defining array, map and set literals.
 
-Changes in 3.4:
-===============
-o              Bump commons-parent from 67 to 69. Thanks to dependabot.
-o              Bump github actions. Thanks to dependabot.
-o              Bump commons-parent from 57 to 70. Thanks to Gary Gregory, Dependabot.
-o              Bump org.ow2.asm:asm from 9.5 to 9.7 #200, #242. Thanks to dependabot.
-o              Bump commons-logging from 1.2 to 1.3.2 #241, #255. Thanks to Gary Gregory, Dependabot.
-o              Bump com.google.code.gson:gson from 2.10.1 to 2.11.0 #258. Thanks to Gary Gregory, Dependabot.
+Bugs Fixed
+==========
+
+o JEXL-420:  Error while comparing float and string value.
+o JEXL-417:  JexlArithmetic looses precision during arithmetic operator execution.
+o JEXL-416:  Null-valued pragma throws NPE in 3.3.
+o JEXL-415:  Incorrect template eval result.
+o JEXL-414:  SoftCache may suffer from race conditions.
+o JEXL-412:  Ambiguous syntax between namespace function call and map object definition.
+o JEXL-410:  JexlFeatures: ctor does not enable all features.
+o JEXL-409:  Disable LEXICAL should disable LEXICAL_SHADE.
+o JEXL-405:  Recursive functions corrupt evaluation frame if reassigned.
+o JEXL-403:  Exception while evaluating template literal used in array assignment in loop.
+o JEXL-402:  Parse failed with empty return value.
+
+Changes
+=======
+
+o            Bump commons-parent from 57 to 70. Thanks to Gary Gregory, Dependabot.
+o            Bump org.ow2.asm:asm from 9.5 to 9.7. Thanks to dependabot.
+o            Bump commons-logging from 1.2 to 1.3.2. Thanks to Gary Gregory, Dependabot.
+o            Bump com.google.code.gson:gson from 2.10.1 to 2.11.0. Thanks to Gary Gregory, Dependabot.
+
 
 ========================================================================================================================
 Release 3.3
@@ -266,19 +285,20 @@ Release 3.3
 Version 3.3 is a minor release.
 
 Compatibility with previous releases
-====================================
+=====================================
 Version 3.3 is source and binary compatible with 3.2.
 However, the default setting for permissions that determine which packages, classes and methods are accessible
 to scripts has been reduced to a very narrow set. When migrating from previous version of JEXL, this may result
-in breaking your application behavior ; this breaking change requires remediation in your code.
+in breaking your application behavior; this breaking change requires remediation in your code.
 Despite the obvious inconvenience - our sincere apologies on the matter -, how much functional and semantic power is
-accessible through scripts has a real impact on your application security and stability ; that potential risk requires
+accessible through scripts has a real impact on your application security and stability; that potential risk requires
 an informed review and conscious choice on your end.
-To mitigate the change, you can revert to the previous behavior with one line of code  (see JexlPermissions, JexlBuilder
-and JexlScriptEngine) or use this opportunity to reduce exposure. Whether Files, URLs, networking, processes,
-class-loaders or reflection classes or whether loops or side effects are accessible are part of your choice to make.
+To mitigate the change, you can revert to the previous behavior with one line of code (see JexlPermissions,
+JexlBuilder and JexlScriptEngine) or use this opportunity to reduce exposure. Whether Files, URLs, networking,
+processes, class-loaders or reflection classes or whether loops or side effects are accessible are part of your
+choice to make.
 
-What's new in 3.3:
+What's new in 3.3
 ==================
 JEXL 3.3 brings the ability to configure permissions on libraries in the manner pioneered
 with the @NoJexl annotation on source code. This is achieved through a crude but light mechanism akin to
@@ -288,535 +308,42 @@ allow fine-tuning the end-user freedom and scripting integration through syntact
 JEXL 3.3 also adds some syntactic (ECMAScript) features (let, const, =>, for, ...) to further reduce
 the skill set required to write scripts.
 
-New Features in 3.3:
-====================
-* JEXL-392:     Enable namespace declaration based on scripts
-* JEXL-391:     Improve in/=~ operator when arguments are arrays and collections
-* JEXL-390:     Pragmas should not be statements
-* JEXL-389:     Improve parsing timings
-* JEXL-385:     Support disabling fortran-style relational operators syntax
-* JEXL-382:     Simplify grammar and lexical state management
-* JEXL-380:     Multiple values per pragma key
-* JEXL-379:     Allow new to use class identifier
-* JEXL-373:     Add support for prefix/postfix increment/decrement operators
-* JEXL-372:     Add support for 'standard' for loop
-* JEXL-369:     Add 'let' and 'const' variable declarations
-* JEXL-367:     Named function and fat-arrow (=>) lambda syntax
-* JEXL-366:     Fail to evaluate string and number comparison
-* JEXL-365:     Lambda expressions
-* JEXL-363:     Allow retrieving captured variables in script
-* JEXL-360:     Add missing bitshift operators ( >>, >>>, <<)
-* JEXL-359:     Allow per-operator arithmetic handling of null arguments
-* JEXL-357:     Configure accessible packages/classes/methods/fields
-
-Bugs Fixed in 3.3:
-==================
-* JEXL-386:     Non-inheritable permissions on interfaces are ignored in an inheritable sandbox
-* JEXL-384:     Improve control over JexlArithmetic null argument handling
-* JEXL-378:     Incremental operator and decremental operator do not honor the side-effect flag
-* JEXL-376:     Introspector captures methods on non-exported classes (modules, java9+)
-* JEXL-375:     Cannot access enums by their name when using sandbox
-* JEXL-374:     No exception if dereferencing null object using safe(false) and antish(false)
-* JEXL-371:     Override of a protected method with public visibility is not callable
-* JEXL-370:     Cannot check if variable is defined using ObjectContext if the value is null
-* JEXL-368:     Namespace functor resolution is not cached
-* JEXL-364:     Evaluator options not propagated in closures
-* JEXL-362:     JexlInfo position reporting is off
-* JEXL-361:     Null may be used as operand silently even in arithmetic strict(true) mode
-* JEXL-354:     #pragma does not handle negative integer or real literals
-* JEXL-353:     Documentation error for not-in/not-match operator
-
-========================================================================================================================
-Release 3.2.1
-========================================================================================================================
-
-Version 3.2.1 is a maintenance release.
-
-Compatibility with previous releases
-====================================
-Version 3.2.1 is source and binary compatible with 3.2.
-
-Bugs Fixed in 3.2.1:
-==================
-* JEXL-352:      Possible memory leak regarding parser jjtree nodes in JEXL 3.2
-* JEXL-351:      JXLT Template fails when using sandboxing
-* JEXL-350:      map[null] throws "unsolvable property" when a Sandbox is used
-
-========================================================================================================================
-Release 3.2
-========================================================================================================================
-
-Version 3.2 is a minor release.
-
-Compatibility with previous releases
-====================================
-Version 3.2 is binary compatible with 3.1. However, JEXL now requires Java 8 or above.
-
-Unfortunately, it is not strictly source compatible. This release does break source compatibility by adding methods to existing
-interfaces and an abstract method to an abstract class. However, since these interfaces and class are not expected to be implemented
-or derived by code external to the JEXL project, this compatibility break should remain unnoticeable.
-It is nevertheless possible and we are sorry if it causes problems to any of you.
-
-What's new in 3.2:
-==================
-* Lexical scoping for local variables and parameters allowing at parse and/or runtime to reduce scripting errors and bugs and align with
-  known development languages best practice (C, Java, ...).
-* Interpolated strings in identifiers, as in x.`${prefix}_${suffix}` that in many cases would be equivalent to
-  x[prefix + '_' + suffix] or x[`${prefix}_${suffix}`].
-* Safe-navigation mode and operator '?.' allowing lenient handling of non-existent or null properties so that an expression
-  like 'x?.y?.z' would behave as 'x.y.z' in nominal execution and return null instead of throwing an exception in error
-  cases. The safe() option on the builder enables the behavior making '.' and '[...]' behave as '?.'.
-* A set of syntactic restrictions can be applied to scripts ranging from not allowing side-effects to not allowing
-  loops enabling fine control over what end-users may be able to enter as expressions/scripts.
-
-New Features in 3.2:
-====================
-* JEXL-344:      Don't fill stack trace for JexlExpression#Return (to improve performance)
-* JEXL-334:      Remove offensive terminology from code and API
-* JEXL-333:      Allow declaration of namespace within script
-* JEXL-317:      Support script cancellation through less invasive API
-* JEXL-307:      Variable redeclaration option
-* JEXL-295:      Add unary plus operator
-* JEXL-292:      Allow specifying custom Permissions class for Uberspect to be used later by Introspector
-* JEXL-288:      Annotation can not be specified for a standalone statement
-* JEXL-275:      Allow safe navigation as option
-* JEXL-274:      Handle soft and hard stack overflow
-* JEXL-273:      Add do...while(...) loops
-* JEXL-264:      Allow space, quote & double-quote in identifiers
-* JEXL-260:      Automatically inject JexlContext in constructor call when possible
-* JEXL-253:      Permissions by super type in JexlSandbox
-* JEXL-252:      Allow for interpolated strings to be used in property access operators
-* JEXL-250:      Safe navigation operator (?.)
-* JEXL-249:      Java 1.8 as minimum supported version
-* JEXL-248:      Allow range subexpression as an array property assignment identifier
-* JEXL-243:      Allow restricting available features in Script/Expressions
-* JEXL-238:      Restrict getLiteralClass to a Number for NumberLiterals
-* JEXL-237:      Ability to restrict usage of certain names when declaring local variables
-* JEXL-236:      Support CharSequence in size(), empty() and contains() operators
-* JEXL-234:      Extend application of operators startsWith and endsWith from String to CharSequence types
-* JEXL-226:      Add ?? operator support
-* JEXL-224:      The ability to overload call() operator in customized JexlArithmetic implementation
-* JEXL-212:      Restrict usage of assignment statements in JexlExpression
-* JEXL-175:      java.util.regex.Pattern creation operator (regex literals)
-
-Bugs Fixed in 3.2:
-==================
-* JEXL-349:      Script valid in 3.0 no longer valid
-* JEXL-348:      Parsing error when mixing namespaces with conditional expressions
-* JEXL-347:      Missing unsolvable property exception for reference when used with equals
-* JEXL-346:      namespace function syntax leads to strange error for "common case" of ternary operator
-* JEXL-336:      Escape some control characters
-* JEXL-331:      Please document \uXXXX escape sequence
-* JEXL-330:      JexlException.Parsing.getMessage() throws exception when parse error is in long expression
-* JEXL-328:      JXLT template scripts evaluation do not process pragmas
-* JEXL-327:      map[null] does not work in assignment context
-* JEXL-326:      Link to "JavaCC" on syntax reference page is broken
-* JEXL-325:      Potential race-condition in NumberParser.toString()
-* JEXL-324:      JexlEngine.createExpression("new()").getParsedText() throws NPE
-* JEXL-323:      Ant-style variables can throw exception when evaluated for their value
-* JEXL-322:      JXLT String literals cannot contain curly brace
-* JEXL-321:      Empty do-while loop is broken
-* JEXL-320:      "mvn test" fails with COMPILATION ERROR in SynchronizedArithmetic.java on Java 11
-* JEXL-319:      Apache project documentation gives instructions in subversion
-* JEXL-318:      Annotation processing may fail in lexical mode
-* JEXL-315:      JxltEngine literal string strings ending in \ $ or # throw JxltEngine$Exception
-* JEXL-314:      Comparison NULL values of variables NAME1.NAME2
-* JEXL-312:      @NoJexl fails to disallow method call
-* JEXL-311:      Jxlt template scripts fail using verbatim expressions embedded in lambdas
-* JEXL-309:      Line numbers are not correct when template report errors
-* JEXL-306:      Ternary operator ? protects also its branches from resolution errors
-* JEXL-305:      Script debugger produces incorrect syntax
-* JEXL-304:      Error parsing overview.limit.var
-* JEXL-303:      Block syntax is broken
-* JEXL-302:      JexlScript.getVariables returns strange values for array access
-* JEXL-301:      Array access operator does not fail on null object in non-strict arithmetic mode
-* JEXL-300:      Ant-ish variables should not use safe-access operator syntax
-* JEXL-299:      Improve message error when method could not be found
-* JEXL-298:      Unable to call 'empty' and 'size' member methods with parameters
-* JEXL-296:      Real literal in scientific format is not parsed without suffix
-* JEXL-291:      Using sandbox prevents array-syntax lookup by number in Map
-* JEXL-290:      Safe navigation fails on chained method calls
-* JEXL-289:      Passing undeclared function parameter can overwrite a local function variable
-* JEXL-287:      Wrong resolution of local variables
-* JEXL-286:      For statement without a body should update its variable
-* JEXL-285:      For statement variable may seem unaffected by iteration
-* JEXL-282:      Pragmas with antish names are broken
-* JEXL-281:      MethodExecutor incorrectly tests for empty parameters list
-* JEXL-280:      break/continue statements outside of the loop
-* JEXL-279:      Null variables property access do not throw exceptions
-* JEXL-278:      Ambiguous exceptions should point to actual statement ambiguity
-* JEXL-272:      Dereferencing null property not reported on method call
-* JEXL-271:      Hoisted variable is lost when currying lambda
-* JEXL-270:      Wrong Script$Curried creation when script.curry() method is called inside script
-* JEXL-261:      JexlEngine.setClassLoader(...) should reload namespaces that are classes
-* JEXL-257:      Function throwing IllegalArgumentException may be called twice
-* JEXL-246:      Intermittent ambiguous method invocation when processing assignOverload
-* JEXL-245:      Engine in strict mode fails to fail on unsolvable variables or properties
-* JEXL-244:      Webapp classloader memory leaks
-* JEXL-241:      NPE when script containing string interpolation executed in multiple threads
-* JEXL-240:      Unable to invoke a call operator using antish style variable resolution
-* JEXL-231:      Syntax for accessing List elements is not mentioned in docs
-* JEXL-230:      List literal is not mentioned in docs
-* JEXL-227:      JexlScriptEngineFactory.getEngineVersion() should return actual version
-* JEXL-225:      Incorrect invoking methods with ObjectContext
-
-There are no other changes.
-
-
-========================================================================================================================
-Release 3.1
-========================================================================================================================
-
-Version 3.1 is a minor release.
-
-Compatibility with previous releases
-====================================
-Version 3.1 is binary compatible with 3.0.
-
-However it is not source compatible, this release does break source compatibility by adding methods to existing
-interfaces; these interfaces are however not expected to be implemented by code external to the JEXL project.
-This compatibility break should remain hypothetical. It is nevertheless possible and we are sorry if it causes problems
-to any of you.
-If you encounter this issue, besides continuing using JEXL 3.0, your code likely delegates method calls to JEXL3 objects
-and you shall be able to continue doing so with these new methods.
-
-The three interfaces and methods are:
-
-1 - 'isCancellable()' in interface org.apache.commons.jexl3.JexlEngine$Options
-2 - 'callable(JexlContext)' in interface org.apache.commons.jexl3.JexlExpression
-3 - 'getPragmas()' in interface org.apache.commons.jexl3.JxltEngine$Template
-
-What's new in 3.1:
-==================
-* Annotations syntax (@annotation) and processing capabilities.
-  Annotations in JEXL are 'meta-statements'; they allow to wrap the execution of the JEXL statement in a user provided
-  caller; a typical example would be: ""@synchronized(x) x.someMethod();". Annotations may be declared with zero or more
-  parameters. Annotation processing is implemented by providing a JexlContext.AnnotationProcessor; its processAnnotation
-  method will call the annotated statement encapsulated in a Callable. Annotation arguments are evaluated and passed
-  as arguments to processAnnotation.
-* Better support for script execution options, error handling and cancelling.
-* All operators can be overloaded.
-
-New Features in 3.1:
-====================
-* JEXL-222:     The ability to declare indexed property getter/setter in customized JexlArithmetic implementation
-* JEXL-219:     Blacklist by default in sandbox
-* JEXL-216:     Improve parsing concurrency in multithreaded environment
-* JEXL-211:     Add callable method to JexlExpression interface
-* JEXL-201:     Allow Interpreter to use live values from JexlEngine.Option interface implemented by JexlContext
-* JEXL-198:     JxltEngine Template does not expose pragmas
-* JEXL-197:     Add annotations
-* JEXL-194:     Allow synchronization on iterableValue in foreach statement
-
-Bugs Fixed in 3.1:
-==================
-* JEXL-221:     Sporadic undefined property error caused by NPE at MapGetExecutor.tryInvoke()
-* JEXL-217:     Interpreter.getAttribute() raises exception in non-strict mode when cached property resolver is used
-* JEXL-215:     JexlEngine.createInfo() is redundantly called when debug and caching is enabled leading to sub-optimal performance
-* JEXL-214:     Redundant call of fillInStackTrace() in JexlEngine.createInfo() ?
-* JEXL-213:     rename JexlBuilder.loader(Charset arg) to JexlBuilder.charset(Charset arg)
-* JEXL-210:     The way to cancel script execution with an error
-* JEXL-209:     Unsolvable function/method '<?>.<null>(...)'
-* JEXL-208:     Documentation typos/inconsistencies
-* JEXL-207:     Inconsistent error handling
-* JEXL-206:     testCallableCancel() test hangs sporadically
-* JEXL-205:     testCancelForever() is not terminated properly as 'Fixed'
-* JEXL-204:     Script is not interrupted by a method call throwing Exception
-* JEXL-203:     JexlArithmetic.options() diverts Interpreter to use default implementation of JexlArithmetic instead of custom one
-* JEXL-202:     Detect invalid assignment operator usage with non-assignable l-value during script parsing
-* JEXL-196:     Script execution hangs while calling method with one argument without parameter
-* JEXL-195:     Support for AtomicBoolean in logical expressions
-* JEXL-193:     InterruptedException is swallowed in function call in silent and non-strict mode
-* JEXL-192:     Invalid return type when expected result is null
-* JEXL-191:     Jexl3 unsolvable property exception when using enum
-* JEXL-190:     local function within context is not resolved if function resolver class without namespace is specified
-* JEXL-189:     Possible bug in Interpreter.isCancelled()
-* JEXL-188:     Possible bug in JexlArithmetic.isFloatingPointNumber()
-* JEXL-187:     Jexl Syntax doc does not mention 'continue' and 'break' operators
-* JEXL-186:     Performance regression in arithmetic operations compared to JEXL 2.1
-
-
-========================================================================================================================
-Release 3.0
-========================================================================================================================
-
-Version 3.0 is a major release changing the public JEXL API.
-
-Due to binary and source incompatibilities and the scope of modifications, JEXL has moved to the
-org.apache.commons.jexl3 package.
-However, this is a drop-in replacement through JSR-223 and casual code usage should find easy equivalence between
-jexl-2.x and 3.x (besides the package name).
-Also note that JEXL 3.0 now requires Java 6.
-
-
-What's new in 3.0:
-==================
-* A redesigned API that properly segregates the "public" part and the "internal" parts of JEXL.
-* A real difference between Expression and Script (scripts accept statements: for, while, etc).
-* The ability to create JEXL functions in script, closure/variables hoisting/currying included.
-* A set of assignment operators (+=, *= , ...).
-* A set of String matching operators (^= startsWith, $= endsWith) and their negative counterparts (!^, !$)
-* A range operator (x .. y) to ease writing loops (for(var x : 1 .. 10) ... )
-* A literal set syntax to ease creating sets: { 1, 2...}
-
-New features in 3.0:
-====================
-* JEXL-178:     'Unsolvable property' message to provide details about underlying exception
-* JEXL-177:     Unified expressions to be used in String literals in JEXL scripts
-* JEXL-176:     Synonym operator name 'in' for operator =~ // Remove 'foreach...in' syntax
-* JEXL-174:     Overloadable property access operators
-* JEXL-173:     Duck-typed java closures
-* JEXL-170:     Implement assignment operators
-* JEXL-164:     public getters for high/low properties for IntegerRange and LongRange
-* JEXL-152:     Extend Range literal to support Long values
-* JEXL-149:     Set Construction as per EL 3.0 spec
-* JEXL-133:     String matching Operator short-hand inspired by CSS3
-* JEXL-128:     ObjectContext<> should implement NamespaceResolver
-* JEXL-127:     Allow the creation of functions
-* JEXL-123:     Redesign API for stability
-* JEXL-122:     Move JEXL from org.apache.comms.jexl2 to org.apache.commons.jexl3
-* JEXL-136:     Script calls within scripts may fail with number arguments
-* JEXL-135:     Using map as script parameter or local variable
-* JEXL-134:     Issue with evaluation of concat of variables : \r + \n gives 0
-* JEXL-131:     UnifiedJexl parsing may fail with NPE
-* JEXL-130:     Ternary Conditional fails for Object values
-* JEXL-126:     Decimal numbers literals should be 'double' by default (instead of 'float')
-
-
-Bugs Fixed in 3.0:
-==================
-* JEXL-184:     dot-ed identifiers parsing failure
-* JEXL-180:     Documentation - suggests using float for financials
-* JEXL-171:     Map access operator does not work if key name clashes with map property name
-* JEXL-169:     A string is wrongly identified as FloatingPointNumber
-* JEXL-168:     Dedicated operator for String concatenation
-* JEXL-79:      Add support for growable arrays (ArrayLists)
-* JEXL-167:     Possible loss of value when converting BigDecimal to BigInteger
-* JEXL-166:     Incorrect operator symbol for bitwise complement in jexlArithmetic
-* JEXL-163:     empty(new ("java.lang.Long", 4294967296)) returns true
-* JEXL-162:     empty() function throws an exception : unsupported type
-* JEXL-160:     typo in package.html
-* JEXL-158:     Handle locale decimal separators correctly
-* JEXL-157:     Replace File.pathSeparator with File.separator
-* JEXL-146:     Performance problem in Interpreter.unknownVariable mechanism
-* JEXL-145:     Sandbox calling wrong check (classname vs class)
-* JEXL-144:     Empty array property setting fails
-* JEXL-142:     Map expression issue with empty key
-* JEXL-141:     Suffix for Big Decimal and Big Integer Literal is incorrectly mentioned in Java docs
-* JEXL-137:     Invalid script variable list for nested array/map access
-
-Detail of all changes in changes.xml.
-
-
-========================================================================================================================
-Release 2.1.1
-========================================================================================================================
-
-Version 2.1.1 is a micro release to fix a regression detected in 2.1:
-
-* JEXL-124:     Array parameters to methods don't work anymore (JEXL 2.1.1)
-
-There are no other changes.
-
-
-========================================================================================================================
-Release 2.1
-========================================================================================================================
-
-Version 2.1 is a minor release adding new features and fixing known issues detected in 2.0.
-
-Compatibility with previous releases
-====================================
-Version 2.1 is binary compatible with 2.0.1.
-
-However it is not source compatible.
-New methods have been added to the org.apache.commons.jexl2.Script and org.apache.commons.jexl2.JexlInfo interfaces.
-Any source code that implements these interfaces will need to be updated.
-
-What's new in 2.1:
-==================
-* A more thorough arithmetic (JexlArithmetic) that allows fine control over decimals (scale and precision), a
-  new syntax for numeric literals (OGNL inspired Big and Huge notations) and a better type handling keeping the most
-  appropriate representation in casual operations.
-* The introduction of script variables and parameters that reduce context dependencies and methods; this allows to
-  perform checks after script creation (light static checking hints). Plus the ability to call script from scripts.
-* A sandoxing feature to restrict and rename what JEXL can access from the environment allowing tighter control over security.
-* Extensions to UnifiedJEXL that allow the creation of templates.
-
-New features in 2.1:
-====================
-* JEXL-114:     Allow scripts to create local variables // Add return keyword
-* JEXL-113:     Add functions to extract which variables, parameters and local variables are used to evaluate a script
-* JEXL-118:     Provide an IN operator
-* JEXL-115:     Add support for asynchronous script execution and cancellation
-* JEXL-116:     Add control over classes, methods, constructors and properties allowed in scripts
-* JEXL-120:     Add simple template features
-* JEXL-119:     Allow indexed properties container resolution in expressions
-* JEXL-106:     When divide two BigDecimal values in an expression it results in java.lang.ArithmeticException
-* JEXL-102:     Add "jexl2" as a supported name
-
-Bugs Fixed in 2.1:
-==================
-* JEXL-83:      Make JexlArithmetic immutable (and threadsafe)
-* JEXL-24:      Support Long for integer literal instead of Integers
-* JEXL-107:     literals and parenthesized expressions can not be used as references
-* JEXL-108:     parsing error if i define a empty literal array/map
-* JEXL-101:     Vararg methods where the first argument is no vararg can not be called with only the fixed parameters given
-* JEXL-105:     Array literals are considered constant even when they are not
-* JEXL-104:     NPE in JexlArithmetic when an Array-Expression containing a null is used.
-* JEXL-112:     Cannot parse Integer.MIN_VALUE
-* JEXL-111:     expression execute error
-
-Bugs fixed in 2.0.1:
-====================
-
-* JEXL-100:     Array access expressions fail when evaluated twice and cache is enabled
-* JEXL-99:      Documentation of Thread Safety / Invalid code examples on homepage
-* JEXL-98:      Quote escaping cannot be escaped
-
-
-2.0
-==================
-
-Bugs fixed in 2.0:
-==================
-
-* JEXL-90:      JEXL parser allows invalid expressions, e.g. "a=1 b=2 3"
-* JEXL-88:      MethodKey.java - name clash getMostSpecific() with Java 1.5.0
-* JEXL-87:      Inconsistent behavior of arithmetical operations
-* JEXL-81:      Introspector does not use ListGetExecutor for List
-* JEXL-80:      Lenient mode should not throw exception when {g,s}etting an undefined property
-* JEXL-78:      Ternary operator throws Exception when JexlEngine in strict mode
-* JEXL-76:      Remove unnecessary class VisitorAdapter
-* JEXL-71:      Parsing errors?
-* JEXL-67:      Potential NPE in util.introspection.MethodKey
-* JEXL-66:      testDottedNames expects map enumeration order
-* JEXL-64:      Inconsistent behavior of dotted names
-* JEXL-62:      NPE in Interpreter
-* JEXL-59:      ClassMap holds a reference to class
-* JEXL-56:      Logging wrongly uses java.util.logging
-* JEXL-50:      Div operator does not do integer division
-* JEXL-49:      Block statements aren't parsed
-* JEXL-48:      NPE during expression evaluation
-* JEXL-45:      Unhandled division by zero
-* JEXL-42:      NullPointerException evaluating an expression
-* JEXL-40:      JEXL fails to find abstract public methods in the base class if overridden by non-public derived types
-* JEXL-32:      BigDecimal values are treated as Long values which results in loss of precision
-* JEXL-30:      ASTAddNode does not add BigDecimal objects correctly
-* JEXL-27:      Cannot assign a value to the property of an object, such as object.prop = value.
-* JEXL-26:      ASTArrayAccess messes up on fallback to JexlContext
-* JEXL-19:      Ternary conditional not supported
-* JEXL-3 :      Static method resolution and changes to context
-
-Other issues fixed (Improvements/New Features):
-===============================================
-
-* JEXL-95:      Enhance JSR-223 implementation
-* JEXL-94:      Allow stateful namespaces (ns:function)
-* JEXL-93:      Add public fields as targets of set/get property
-* JEXL-92:      JexlContext API should be more flexible
-* JEXL-89:      Drop main() and suite() methods from Test cases
-* JEXL-85:      2.0 grammar finishing touches & debugger update
-* JEXL-82:      Change foreach syntax
-* JEXL-77:      Rename last Velocity originated classes
-* JEXL-72:      Remove deprecated classes and methods entirely
-* JEXL-70:      Add main class to allow scripts etc to be tested
-* JEXL-63:      JSR-223 support
-* JEXL-61:      Usage of strong references on Method/Constructor & WeakHashMap usage
-* JEXL-60:      Refactor o.a.c.jexl.util and o.a.c.jexl.util.introspection
-* JEXL-58:      UnifiedJEXL
-* JEXL-57:      Change pom.xml to make it Netbeans Maven2 plugin friendly
-* JEXL-55:      JEXL 2.0 redux, attempting to restart the effort to release 2.0
-* JEXL-54:      Light performance enhancements
-* JEXL-47:      Allow single-line comments with //
-* JEXL-43:      Website overview does not mention method calls and new 2.0 features
-* JEXL-41:      Allow nested ${} evaluation
-* JEXL-35:      Final API requirements
-* JEXL-34:      Remove pre and post resolution of variables via the JexlExprResolver classes.
-* JEXL-33:      Remove unnecessary throws Exception from various classes
-* JEXL-29:      Support non-object-level functions/methods, as size and empty function
-* JEXL-25:      Call method with varargs
-* JEXL-24:      Support Long for integer literal instead of Integers
-* JEXL-21:      operator overloading / hooks on operator processing
-* JEXL-16:      allowing quote escaping
-* JEXL-15:      Needs definable functions
-* JEXL-11:      Don't make null convertible into anything
-* JEXL-10:      Make possible checking for unresolved variables
-
-Other Changes:
-==============
-
-o Add @since 2.0 tags to code so we can track API additions via Javadoc
-
-Upgrading from JEXL 1.x
-=======================
-
-JEXL now requires Java 1.5 or later.
-
-Version 2.0 resides in the org.apache.commons.jexl2 package; part of the version 1.x API is reimplemented as an
-add-on source library in the jexl-compat directory; since it can not fully reimplement the original public 1.x, it may
-only be used to ease transition in strictly controlled deployments.
-
-The following classes are implemented through the jexl-compat source library:
-  * ExpressionFactory
-  * ScriptFactory
-  * Expression
-  * Script
-  * JexlContext
-  * JexlHelper
-
-Migration notes
-===============
-
-When migrating from jexl 1.x to jexl 2.0, the following hints may be helpfull.
-
-The following classes no longer exist:
-  * ExpressionFactory, ScriptFactory: create a JexlEngine and use createExpression() or createScript()
-  instead.
-
-The following classes have been renamed and replaced:
-
-  * VelMethod <=> JexlMethod
-  * VelPropertyGet <=> JexlPropertyGet
-  * VelPropertySet <=> JexlPropertySet
-
-The following methods have been removed:
-
-  * Info.getTemplateName() - use Info.getName() instead
-  * Expression.addPostResolver() / Expression.addPreResolver() - set ant-like variables in JexlContext, implement
-    a specific JexlContext or derive JexlcontextInterpreter/JexlEngine instead
-
-Behavior changes
-================
-
-* Public fields are considered when using JexlPropertyGet / JexlPropertySet: JEXL 1.x behavior can be reimplemented
-by subclassing UberspectImpl.
-
-*Division (/ operator) behavior change: division between integers no longer casts its operands to double; integer division
-    allways results in a integer. The 1.x behavior can be reimplemented by subclassing JexlArithmetic.
-
-New Features:
-=============
-
-Assignment expression: a = b (and a.b.c = d)
-   * Assigns a variable (ant-like variable or bean-property)
-
-Ternary operator expression: a ? b : c  (and a ?: c)
-   * The usual inline conditional shortcut and its 'Elvis' form (a ?: b evaluates as a ? a : b)
-
-Constructor call expression: new('my.class.name', arguments...)
-   * Creates a new instance of a class using the most appropriate constructor according
-     to the actual arguments
-
-Function namespace: ns:func(arguments...)
-   * A function namespace allows the use of class or instance methods in function calls
-
-UnifiedJEXL
-   * Adds ${...} and #{...} JSP/EL syntax support on top of the JexlEngine
-
-JSR-223 support
-   * Implement JSR-223 Scripting Engine for JEXL script (need BSF-3.0 on Java < 6)
-
-Error and exception handling
-   * Configuring the leniency and verbosity of the JEXL engine allows user control over the
-     error handling policy
+New Features
+============
+
+o JEXL-392:  Enable namespace declaration based on scripts.
+o JEXL-391:  Improve in/=~ operator when arguments are arrays and collections.
+o JEXL-390:  Pragmas should not be statements.
+o JEXL-389:  Improve parsing timings.
+o JEXL-385:  Support disabling fortran-style relational operators syntax.
+o JEXL-382:  Simplify grammar and lexical state management.
+o JEXL-380:  Multiple values per pragma key.
+o JEXL-379:  Allow new to use class identifier.
+o JEXL-373:  Add support for prefix/postfix increment/decrement operators.
+o JEXL-372:  Add support for 'standard' for loop.
+o JEXL-369:  Add 'let' and 'const' variable declarations.
+o JEXL-367:  Named function and fat-arrow (=>) lambda syntax.
+o JEXL-366:  Fail to evaluate string and number comparison.
+o JEXL-365:  Lambda expressions.
+o JEXL-363:  Allow retrieving captured variables in script.
+o JEXL-360:  Add missing bitshift operators (>>, >>>, <<).
+o JEXL-359:  Allow per-operator arithmetic handling of null arguments.
+o JEXL-357:  Configure accessible packages/classes/methods/fields.
+
+Bugs Fixed
+==========
+
+o JEXL-386:  Non-inheritable permissions on interfaces are ignored in an inheritable sandbox.
+o JEXL-384:  Improve control over JexlArithmetic null argument handling.
+o JEXL-378:  Incremental operator and decremental operator do not honor the side-effect flag.
+o JEXL-376:  Introspector captures methods on non-exported classes (modules, java9+).
+o JEXL-375:  Cannot access enums by their name when using sandbox.
+o JEXL-374:  No exception if dereferencing null object using safe(false) and antish(false).
+o JEXL-371:  Override of a protected method with public visibility is not callable.
+o JEXL-370:  Cannot check if variable is defined using ObjectContext if the value is null.
+o JEXL-368:  Namespace functor resolution is not cached.
+o JEXL-364:  Evaluator options not propagated in closures.
+o JEXL-362:  JexlInfo position reporting is off.
+o JEXL-361:  Null may be used as operand silently even in arithmetic strict(true) mode.
+o JEXL-354:  #pragma does not handle negative integer or real literals.
+o JEXL-353:  Documentation error for not-in/not-match operator.

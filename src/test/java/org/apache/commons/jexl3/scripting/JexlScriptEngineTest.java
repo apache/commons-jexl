@@ -46,7 +46,6 @@ import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
 import org.apache.commons.jexl3.JexlException;
-import org.apache.commons.jexl3.LoggingPermissions;
 import org.apache.commons.jexl3.introspection.JexlPermissions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -72,10 +71,13 @@ class JexlScriptEngineTest {
 
     private static final String LF = System.lineSeparator();
 
+    /** The logger name used by the LoggingPermissions wrapper in this test. */
+    private static final String PERMS_LOGGER = "jexl.test.permissions";
+
     @BeforeEach
     void setUp() {
-        // quiesce LoggingPermissions logging, set level to error (instead of info)
-        java.util.logging.Logger.getLogger(LoggingPermissions.class.getName()).setLevel(java.util.logging.Level.SEVERE);
+        // quiesce the LoggingPermissions logger, set level to error (instead of info)
+        java.util.logging.Logger.getLogger(PERMS_LOGGER).setLevel(java.util.logging.Level.SEVERE);
     }
 
     @AfterEach
@@ -198,9 +200,9 @@ class JexlScriptEngineTest {
     void testScriptEngineFactory() {
         final JexlScriptEngineFactory factory = new JexlScriptEngineFactory();
         assertEquals("JEXL Engine", factory.getParameter(ScriptEngine.ENGINE));
-        assertEquals("3.6", factory.getParameter(ScriptEngine.ENGINE_VERSION));
+        assertEquals("3.7", factory.getParameter(ScriptEngine.ENGINE_VERSION));
         assertEquals("JEXL", factory.getParameter(ScriptEngine.LANGUAGE));
-        assertEquals("3.6", factory.getParameter(ScriptEngine.LANGUAGE_VERSION));
+        assertEquals("3.7", factory.getParameter(ScriptEngine.LANGUAGE_VERSION));
         assertNull(factory.getParameter("THREADING"));
         assertEquals(NAMES, factory.getParameter(ScriptEngine.NAME));
         assertEquals(EXTENSIONS, factory.getExtensions());
@@ -267,13 +269,13 @@ class JexlScriptEngineTest {
     @Test
     void testScriptingPermissions1() throws Exception {
         // shows what is required to access System.currentTimeMillis()
-        JexlScriptEngineFactory.setDefaultPermissions(new LoggingPermissions(
+        JexlScriptEngineFactory.setDefaultPermissions(
             JexlPermissions.RESTRICTED.compose(
                 "javax.script { +SimpleScriptContext { getClass(); } }"
                     + "java.lang { "
                     + "+System { currentTimeMillis(); }"
                     + "+Class { forName(); } "
-                    + "}")));
+                    + "}").logging(PERMS_LOGGER));
         final ScriptEngineManager manager = new ScriptEngineManager();
         final ScriptEngine engine = manager.getEngineByName("jexl3");
         final Long time2 = (Long) engine.eval(

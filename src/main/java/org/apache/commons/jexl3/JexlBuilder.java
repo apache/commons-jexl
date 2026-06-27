@@ -88,10 +88,39 @@ public class JexlBuilder {
     /**
      * The set of default permissions used when creating a new builder.
      * <p>Static but modifiable, so these default permissions can be changed to a purposeful set.</p>
-     * <p>In JEXL 3.3, these are {@link JexlPermissions#RESTRICTED}.</p>
+     * <p>In JEXL 3.7, these are {@link JexlPermissions#SECURE}.</p>
+     * <p>In JEXL 3.3, these were {@link JexlPermissions#RESTRICTED}.</p>
      * <p>In JEXL 3.2, these were equivalent to {@link JexlPermissions#UNRESTRICTED}.</p>
      */
-    private static JexlPermissions PERMISSIONS = JexlPermissions.RESTRICTED;
+    private static JexlPermissions PERMISSIONS = JexlPermissions.SECURE;
+
+    /**
+     * The full feature set that was the implicit default before JEXL 3.7.
+     * <p>This captures {@link JexlFeatures#createDefault()} - the feature set the engine used as its
+     * fallback throughout 3.x (since 3.3) before the 3.7 hardening. It enables {@code new(...)}, loops,
+     * side-effects, lambdas, method calls, structured literals, pragmas, etc. Use it (or
+     * {@link #setDefaultFeatures(JexlFeatures)}) to restore pre-3.7 behavior:</p>
+     * <pre>
+     * JexlEngine jexl = new JexlBuilder().features(JexlBuilder.FULL).create();
+     * </pre>
+     * <p>{@link JexlFeatures} instances are mutable; copy this one via {@code new JexlFeatures(JexlBuilder.FULL)}
+     * before customizing it rather than mutating the shared instance.</p>
+     *
+     * @since 3.7.0
+     */
+    public static final JexlFeatures FULL = JexlFeatures.createDefault();
+
+    /**
+     * The set of default features used when creating a new builder.
+     * <p>Static but modifiable via {@link #setDefaultFeatures(JexlFeatures)}.</p>
+     * <p>In JEXL 3.7, the default hardens the feature set relative to {@link #FULL}: {@code new(...)},
+     * global side-effects, pragmas, and annotations are disabled, and lexical scoping (with shade) is
+     * enabled.  Loops remain available to scripts (expressions never allow them).  Scripts using a
+     * disabled construct will throw {@link JexlException.Feature} at parse time.</p>
+     *
+     * @see #secureFeatures()
+     */
+    private static JexlFeatures FEATURES = secureFeatures();
 
     /** The default maximum expression length to hit the expression cache. */
     protected static final int CACHE_THRESHOLD = 64;
@@ -102,7 +131,56 @@ public class JexlBuilder {
      * @param permissions the permissions
      */
     public static void setDefaultPermissions(final JexlPermissions permissions) {
-        PERMISSIONS = permissions == null ? JexlPermissions.RESTRICTED : permissions;
+        PERMISSIONS = permissions == null ? JexlPermissions.SECURE : permissions;
+    }
+
+    /**
+     * Sets the default features used when creating a new builder.
+     * <p>Passing {@code null} restores the 3.7 hardened default (new-instance, global side-effects,
+     * pragmas, and annotations disabled, lexical scoping enabled; see {@link #secureFeatures()}).</p>
+     *
+     * @param features the features, or {@code null} to restore the hardened default
+     * @since 3.7.0
+     */
+    public static void setDefaultFeatures(final JexlFeatures features) {
+        FEATURES = features == null ? secureFeatures() : features;
+    }
+
+    /**
+     * Sets the default option flags used when creating a new engine.
+     * <p>Delegates to {@link JexlOptions#setDefaultFlags(String...)}; see that method for the
+     * flag-name syntax ({@code "+flag"}/{@code "-flag"}) and the available flag names
+     * ({@code cancellable}, {@code strict}, {@code silent}, {@code safe}, {@code lexical},
+     * {@code antish}, {@code lexicalShade}, ...).</p>
+     * <p>Example: restore safe/antish defaults before creating any engine:</p>
+     * <pre>JexlBuilder.setDefaultOptions("+safe", "+antish");</pre>
+     *
+     * @param flags the flags to set or clear
+     * @since 3.7.0
+     */
+    public static void setDefaultOptions(final String... flags) {
+        JexlOptions.setDefaultFlags(flags);
+    }
+
+    /**
+     * Builds the JEXL 3.7 hardened default feature set.
+     * <p>Starting from {@link #FULL} (the pre-3.7 feature set), this disables {@code new(...)},
+     * global side-effects, pragmas, and annotations, and enables lexical scoping and lexical shade.
+     * Loops are left enabled so scripts can iterate; expressions never allow loops since they are
+     * parsed as a single expression.</p>
+     *
+     * @return a fresh hardened feature set
+     * @since 3.7.0
+     */
+    private static JexlFeatures secureFeatures() {
+        return new JexlFeatures(FULL)
+            .newInstance(false)
+            .sideEffectGlobal(false)
+            .pragma(false)
+            .annotation(false)
+            .loops(true)
+            .lexical(true)
+            .lexicalShade(true);
     }
 
     /** The JexlUberspect instance. */
@@ -168,16 +246,19 @@ public class JexlBuilder {
      * </p><p>
      * However, without mitigation, this change will likely break some scripts at runtime, especially those exposing
      * your own class instances through arguments, contexts, or namespaces.
-     * The new default set of allowed packages and denied classes is described by {@link JexlPermissions#RESTRICTED}.
+     * The default set of allowed packages and denied classes is described by {@link JexlPermissions#SECURE}
+     * as of JEXL 3.7 (previously {@link JexlPermissions#RESTRICTED} since 3.3).
      * </p><p>
-     * The recommended mitigation if your usage of JEXL is impacted is to first thoroughly review what should be
-     * allowed and exposed to script authors and implement those through a set of {@link JexlPermissions};
-     * those are easily created using {@link JexlPermissions#parse(String...)}.
+     * As of JEXL 3.7, the default features also disable {@code new(...)}, global side-effects, pragmas,
+     * and annotations, and enable lexical scoping; loops remain available to scripts (but never to
+     * expressions). Scripts using a disabled construct will throw {@link JexlException.Feature} at parse
+     * time unless a permissive feature set is configured.
      * </p><p>
-     * In the urgent case of a strict 3.2 compatibility, the simplest and fastest mitigation is to use the 'unrestricted'
-     * set of permissions. The builder must be explicit about it either by setting the default permissions with a
-     * statement like {@code JexlBuilder.setDefaultPermissions(JexlPermissions.UNRESTRICTED);} or with a more precise
-     * one like {@code new JexlBuilder().permissions({@link JexlPermissions#UNRESTRICTED})}.
+     * The recommended mitigation if your usage of JEXL is impacted is to load a {@code jexl.yaml}
+     * configuration via {@link JexlConfigLoader} that restores the legacy permissions and features,
+     * or to explicitly configure them via {@link #permissions(JexlPermissions)} and
+     * {@link #features(JexlFeatures)}. Use {@link JexlPermissions#logging()} to discover which
+     * reflective elements the new algorithm denies.
      * </p><p>
      * Note that an explicit call to {@link #uberspect(JexlUberspect)} will supersede any permissions related behavior
      * by using the {@link JexlUberspect} provided as argument used as-is in the created {@link JexlEngine}.
@@ -187,6 +268,7 @@ public class JexlBuilder {
      */
     public JexlBuilder() {
         this.permissions = PERMISSIONS;
+        this.features = FEATURES == null ? null : new JexlFeatures(FEATURES);
     }
 
     /**

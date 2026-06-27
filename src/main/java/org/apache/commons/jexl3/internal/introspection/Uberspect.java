@@ -33,6 +33,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.commons.jexl3.JexlArithmetic;
 import org.apache.commons.jexl3.JexlEngine;
 import org.apache.commons.jexl3.JexlOperator;
+import org.apache.commons.jexl3.internal.IntegerRange;
+import org.apache.commons.jexl3.internal.LongRange;
 import org.apache.commons.jexl3.internal.Operator;
 import org.apache.commons.jexl3.introspection.JexlMethod;
 import org.apache.commons.jexl3.introspection.JexlPermissions;
@@ -234,7 +236,10 @@ public class Uberspect implements JexlUberspect {
     @Override
     @SuppressWarnings("unchecked")
     public Iterator<?> getIterator(final Object obj) {
-        if (!permissions.allow(obj.getClass())) {
+        // JEXL's own range types and plain arrays are safe language primitives that expose only primitive
+        // values; like arithmetic operators they iterate regardless of permissions.
+        if (!(obj instanceof IntegerRange) && !(obj instanceof LongRange)
+                && !obj.getClass().isArray() && !permissions.allow(obj.getClass())) {
             return null;
         }
         if (obj instanceof Iterator<?>) {

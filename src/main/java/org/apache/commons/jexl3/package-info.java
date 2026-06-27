@@ -16,7 +16,7 @@
  */
 
 /**
- * Provides a framework for evaluating JEXL expressions.
+ * Provides a framework for evaluating JEXL expressions and scripts.
  * <ul>
  * <li><a href="#intro">Introduction</a></li>
  * <li><a href="#example">Brief Example</a></li>
@@ -30,34 +30,81 @@
  * JEXL is a library intended to facilitate the implementation of dynamic and scripting features in applications
  * and frameworks.
  * </p>
+ * <p>
+ * The entry point is always a {@link org.apache.commons.jexl3.JexlEngine}, created and configured through a
+ * {@link org.apache.commons.jexl3.JexlBuilder}. An engine is thread-safe and meant to be created once and shared;
+ * it produces {@link org.apache.commons.jexl3.JexlExpression} (single expressions) and
+ * {@link org.apache.commons.jexl3.JexlScript} (multi-statement scripts) which are evaluated against a
+ * {@link org.apache.commons.jexl3.JexlContext} carrying the variable bindings. A
+ * {@link org.apache.commons.jexl3.JxltEngine} adds a JSP/JSF-like templating layer on top of the same engine.
+ * </p>
+ * <p>
+ * <strong>Security disclaimer.</strong> Neither {@link org.apache.commons.jexl3.introspection.JexlPermissions#RESTRICTED}
+ * nor {@link org.apache.commons.jexl3.introspection.JexlPermissions#SECURE} is exhaustive, and neither must be
+ * considered completely safe or sufficient on its own for executing untrusted user input. They are hardened
+ * baselines, not guarantees. Any application that evaluates untrusted scripts <em>must</em> define its own tailored,
+ * strict whitelist of exactly the classes, methods and fields its scripts legitimately need - ideally by composing on
+ * top of {@link org.apache.commons.jexl3.introspection.JexlPermissions#NONE} (which denies everything) via
+ * {@link org.apache.commons.jexl3.introspection.JexlPermissions#create(java.lang.String...)} - and audit the result
+ * with {@link org.apache.commons.jexl3.introspection.JexlPermissions#logging()}.
+ * </p>
+ * <p>
+ * <strong>Security note (since 3.7):</strong> a bare {@code new JexlBuilder().create()} engine is hardened by
+ * default. Its permissions are {@link org.apache.commons.jexl3.introspection.JexlPermissions#SECURE} (only a small,
+ * safe allow-list of {@code java.lang}/{@code java.math}/{@code java.util} types is reachable) and its default
+ * {@link org.apache.commons.jexl3.JexlFeatures} disable {@code new(...)}, global side-effects, pragmas and
+ * annotations (lexical scoping is on; loops remain available to scripts). Relax these deliberately - see the
+ * <a href="#configuration">configuration</a> section - rather than by accident.
+ * </p>
+ * <p>
+ * Permissions and features can be set programmatically on the {@link org.apache.commons.jexl3.JexlBuilder} or
+ * loaded from a YAML document through {@link org.apache.commons.jexl3.JexlConfigLoader}, which keeps security
+ * policy out of code and in configuration:
+ * </p>
+ * <pre>
+ * try (InputStream in = getClass().getResourceAsStream("/jexl.yaml")) {
+ *     JexlEngine jexl = JexlConfigLoader.load(in).create();
+ * }
+ * </pre>
+ * <p>
+ * A ready-made {@code jexl.yaml} that restores the pre-3.7 behavior (RESTRICTED permissions, the full feature
+ * set) is bundled as a migration aid; see {@link org.apache.commons.jexl3.JexlConfigLoader} for the full schema.
+ * </p>
  * <h2><a id="example">A Brief Example</a></h2>
  * <p>
  * In its simplest form, JEXL merges an
  * {@link org.apache.commons.jexl3.JexlExpression}
  * with a
  * {@link org.apache.commons.jexl3.JexlContext} when evaluating expressions.
- * An Expression is created using
+ * An expression is created using
  * {@link org.apache.commons.jexl3.JexlEngine#createExpression(String)},
  * passing a String containing valid JEXL syntax.  A simple JexlContext can be created using
  * a {@link org.apache.commons.jexl3.MapContext} instance;
  * a map of variables that will be internally wrapped can be optionally provided through its constructor.
- * The following example, takes a variable named 'car', and
- * invokes the checkStatus() method on the property 'engine'
+ * The following example binds a 'name' variable, calls a String method on it and concatenates the
+ * result. It relies only on a {@code java.lang.String} and arithmetic, so it runs as-is under the
+ * default (SECURE) permissions - no configuration needed.
  * </p>
  * <pre>
  * // Create a JexlEngine (could reuse one instead)
  * JexlEngine jexl = new JexlBuilder().create();
- * // Create an expression object equivalent to 'car.getEngine().checkStatus()':
- * String jexlExp = "car.engine.checkStatus()";
- * Expression e = jexl.createExpression( jexlExp );
- * // The car we have to handle coming as an argument...
- * Car car = theCarThatWeHandle;
+ * // An expression using a variable, a String method call and concatenation:
+ * String jexlExp = "'Hello ' + name + ', your name has ' + name.length() + ' letters'";
+ * JexlExpression e = jexl.createExpression( jexlExp );
  * // Create a context and add data
  * JexlContext jc = new MapContext();
- * jc.set("car", car );
- * // Now evaluate the expression, getting the result
+ * jc.set("name", "John");
+ * // Now evaluate the expression; result is "Hello John, your name has 4 letters"
  * Object o = e.evaluate(jc);
  * </pre>
+ * <p>
+ * To expose your <em>own</em> classes (a {@code Car} bean, a service, ...) to scripts, you must permit them
+ * explicitly: the default SECURE permissions deny application types, and passing an instance through the
+ * {@link org.apache.commons.jexl3.JexlContext} does not bypass that gate - the introspector still checks the
+ * object's class. Grant access by composing your package into the permission set
+ * (e.g. {@code new JexlBuilder().permissions(JexlPermissions.RESTRICTED.compose("com.example.app +{}"))})
+ * or choose a broader base; see the <a href="#configuration">configuration</a> section on permissions.
+ * </p>
  * <h2><a id="usage">Using JEXL</a></h2>
  * The API is composed of three levels addressing different functional needs:
  * <ul>
@@ -75,7 +122,7 @@
  * The following packages follow a "use at your own maintenance cost" policy; these are only intended to be used
  * for extending JEXL.
  * Their classes and methods are not guaranteed to remain compatible in subsequent versions.
- * If you think you need to use  directly some of their features or methods, it might be a good idea to check with
+ * If you think you need to use directly some of their features or methods, it might be a good idea to check with
  * the community through the mailing list first.
  * </p>
  * <ul>
@@ -84,6 +131,10 @@
  * <li>org.apache.commons.jexl3.internal</li>
  * <li>org.apache.commons.jexl3.internal.introspection</li>
  * </ul>
+ * <p>
+ * Note that the {@code org.apache.commons.jexl3.scripting} package implements the JSR-223
+ * ({@code javax.script}) integration through {@link org.apache.commons.jexl3.scripting.JexlScriptEngine}.
+ * </p>
  * <h3><a id="usage_api">Dynamic Invocation</a></h3>
  * <p>
  * These functionalities are close to the core level utilities found in
@@ -123,8 +174,10 @@
  *     public void setStr(String str) { this.str = str; }
  * }
  *
- * // test API
- * JexlEngine jexl = new JexlBuilder().create();
+ * // test API - Quux and Froboz are in your own package; compose it into the permissions.
+ * JexlEngine jexl = new JexlBuilder()
+ *     .permissions(JexlPermissions.SECURE.compose("com.example +{}"))
+ *     .create();
  * Quux quux = jexl.newInstance(Quux.class, "xuuq", 100);
  * jexl.setProperty(quux, "froboz.value", Integer.valueOf(100));
  * Object o = jexl.getProperty(quux, "froboz.value");
@@ -147,11 +200,15 @@
  * </ul>
  * The following example illustrates their usage:
  * <pre>
- * JexlEngine jexl = new JexlBuilder().create();
+ * // new(...) needs the newInstance feature; Quux/Froboz need explicit permissions.
+ * JexlEngine jexl = new JexlBuilder()
+ *     .permissions(JexlPermissions.SECURE.compose("com.example +{}"))
+ *     .features(JexlFeatures.createDefault())
+ *     .create();
  * JexlContext jc = new MapContext();
  * jc.set("quuxClass", quux.class);
  * JexlExpression create = jexl.createExpression("quux = new(quuxClass, 'xuuq', 100)");
- * JelxExpression assign = jexl.createExpression("quux.froboz.value = 10");
+ * JexlExpression assign = jexl.createExpression("quux.froboz.value = 10");
  * JexlExpression check = jexl.createExpression("quux[\"froboz\"].value");
  * Quux quux = (Quux) create.evaluate(jc);
  * Object o = assign.evaluate(jc);
@@ -234,14 +291,139 @@
  * </code></pre>
  * <h2><a id="configuration">JEXL Configuration</a></h2>
  * <p>
- * The JexlEngine can be configured through a few parameters that will drive how it reacts
- * in case of errors.
- * These configuration methods are embedded through a {@link org.apache.commons.jexl3.JexlBuilder}.
+ * Almost everything is configured through a {@link org.apache.commons.jexl3.JexlBuilder} before the engine is
+ * created. The builder controls four largely orthogonal concerns:
+ * </p>
+ * <ul>
+ * <li><strong>Permissions</strong> ({@link org.apache.commons.jexl3.introspection.JexlPermissions}) -
+ *     <em>what</em> classes, methods and fields scripts may reach through reflection.</li>
+ * <li><strong>Features</strong> ({@link org.apache.commons.jexl3.JexlFeatures}) -
+ *     <em>which</em> syntactic constructs are accepted at parse time.</li>
+ * <li><strong>Options</strong> ({@link org.apache.commons.jexl3.JexlOptions}) -
+ *     <em>how</em> the interpreter behaves at runtime (strict, silent, safe, cancellable, lexical, math).</li>
+ * <li><strong>Bindings</strong> (namespaces, imports, arithmetic, class loader, caches) -
+ *     the environment scripts execute against.</li>
+ * </ul>
+ * <p>
+ * For a declarative alternative, {@link org.apache.commons.jexl3.JexlConfigLoader} builds a pre-configured
+ * {@link org.apache.commons.jexl3.JexlBuilder} from a YAML document covering permissions, features, arithmetic,
+ * namespaces and imports - convenient for externalizing configuration or restoring pre-3.7 defaults.
+ * </p>
+ * <h3><a id="config_security">Security: permissions, sandbox and {@code @NoJexl}</a></h3>
+ * <p>
+ * {@link org.apache.commons.jexl3.introspection.JexlPermissions} is the primary security gate; it controls which
+ * packages, classes and members the introspection layer will expose. Four constants are provided:
+ * {@link org.apache.commons.jexl3.introspection.JexlPermissions#UNRESTRICTED} (everything),
+ * {@link org.apache.commons.jexl3.introspection.JexlPermissions#RESTRICTED} (a broad but curated allow-list),
+ * {@link org.apache.commons.jexl3.introspection.JexlPermissions#SECURE} (the minimal safe allow-list and the
+ * default since 3.7) and {@link org.apache.commons.jexl3.introspection.JexlPermissions#NONE} (deny everything).
+ * A permission set is configured with
+ * {@link org.apache.commons.jexl3.JexlBuilder#permissions(org.apache.commons.jexl3.introspection.JexlPermissions)}
+ * and can be composed from a textual DSL through
+ * {@link org.apache.commons.jexl3.introspection.JexlPermissions#parse(java.lang.String...)} or
+ * {@code RESTRICTED.compose("com.example.api +{}")}. To build a closed-world, deny-by-default policy from scratch,
+ * start from {@code NONE} (or {@link org.apache.commons.jexl3.introspection.JexlPermissions#create(java.lang.String...)})
+ * and compose only what scripts need, e.g. {@code JexlPermissions.create("com.example.api +{}")}. To diagnose what a
+ * permission set allows or denies under your workload, wrap it with
+ * {@link org.apache.commons.jexl3.introspection.JexlPermissions#logging()}.
+ * </p>
+ * <p>
+ * Two finer-grained mechanisms complement permissions: the
+ * {@link org.apache.commons.jexl3.annotations.NoJexl} annotation completely shields annotated classes and members
+ * from introspection at the source level, while a
+ * {@link org.apache.commons.jexl3.introspection.JexlSandbox} - set through
+ * {@link org.apache.commons.jexl3.JexlBuilder#sandbox(org.apache.commons.jexl3.introspection.JexlSandbox)} - gives
+ * per-class allow/deny control over properties and methods at configuration time.
+ * </p>
+ * <h3><a id="config_features">Language features (parse time)</a></h3>
+ * <p>
+ * {@link org.apache.commons.jexl3.JexlFeatures} restricts the grammar a script may use; violations are reported as
+ * {@link org.apache.commons.jexl3.JexlException.Feature} when the script is compiled, before any evaluation. Among
+ * the toggles are {@code newInstance} ({@code new(...)}), {@code loops}, {@code sideEffect}/{@code sideEffectGlobal},
+ * {@code lambda}, {@code methodCall}, {@code structuredLiteral}, {@code pragma}, {@code annotation} and lexical
+ * scoping. A feature set is applied with {@link org.apache.commons.jexl3.JexlBuilder#features(org.apache.commons.jexl3.JexlFeatures)};
+ * convenient bases are {@link org.apache.commons.jexl3.JexlFeatures#createDefault()},
+ * {@link org.apache.commons.jexl3.JexlFeatures#createScript()}, {@link org.apache.commons.jexl3.JexlFeatures#createAll()}
+ * and {@link org.apache.commons.jexl3.JexlFeatures#createNone()}.
+ * </p>
+ * <p>
+ * Since expressions are parsed as a single expression, statement-level features (loops, multiple statements, ...)
+ * never apply to them regardless of the feature set; they are relevant to scripts only.
+ * </p>
+ * <h3><a id="config_options">Runtime options</a></h3>
+ * <p>
+ * {@link org.apache.commons.jexl3.JexlOptions} carries the behavioral flags evaluated at runtime. They can be set
+ * as engine defaults either through the dedicated builder shortcuts or by mutating the builder's option set returned
+ * by {@link org.apache.commons.jexl3.JexlBuilder#options()}:
+ * </p>
+ * <ul>
+ * <li>{@link org.apache.commons.jexl3.JexlBuilder#strict(boolean)} - whether {@code null} operands, unknown
+ *     variables or failed calls are errors.</li>
+ * <li>{@link org.apache.commons.jexl3.JexlBuilder#silent(boolean)} - whether errors throw
+ *     {@link org.apache.commons.jexl3.JexlException} (unchecked) or are logged and yield {@code null}.</li>
+ * <li>{@link org.apache.commons.jexl3.JexlBuilder#safe(boolean)} - whether safe-navigation ({@code x?.y}) tolerates
+ *     {@code null} on dereference.</li>
+ * <li>{@link org.apache.commons.jexl3.JexlBuilder#cancellable(boolean)} - whether interrupting the evaluating
+ *     thread raises {@link org.apache.commons.jexl3.JexlException.Cancel}.</li>
+ * <li>{@link org.apache.commons.jexl3.JexlBuilder#lexical(boolean)} /
+ *     {@link org.apache.commons.jexl3.JexlBuilder#lexicalShade(boolean)} - lexical scoping of local variables.</li>
+ * <li>arithmetic strictness and math context, carried by the {@link org.apache.commons.jexl3.JexlArithmetic}
+ *     instance set with {@link org.apache.commons.jexl3.JexlBuilder#arithmetic(org.apache.commons.jexl3.JexlArithmetic)}.</li>
+ * </ul>
+ * <p>
+ * These engine defaults can be overridden per evaluation: a {@link org.apache.commons.jexl3.JexlContext} that also
+ * implements {@link org.apache.commons.jexl3.JexlContext.OptionsHandle} supplies a fresh
+ * {@link org.apache.commons.jexl3.JexlOptions} for each evaluation. (The legacy
+ * {@link org.apache.commons.jexl3.JexlEngine.Options} interface is deprecated in favor of this mechanism.)
+ * </p>
+ * <h3><a id="config_bindings">Namespaces, imports and arithmetic</a></h3>
+ * <p>
+ * {@link org.apache.commons.jexl3.JexlBuilder#namespaces(java.util.Map)} registers your own classes or instances as
+ * namespaces, exposing their methods as {@code prefix:function(...)} calls.
+ * </p>
+ * <pre>{@code
+ * public static class MyMath {
+ *   public double cos(double x) {
+ *     return Math.cos(x);
+ *   }
+ * }
+ * Map<String, Object> funcs = new HashMap<String, Object>();
+ * funcs.put("math", new MyMath());
+ * // MyMath is in your own package; compose it into the permissions.
+ * JexlEngine jexl = new JexlBuilder()
+ *     .namespaces(funcs)
+ *     .permissions(JexlPermissions.SECURE.compose("com.example +{}"))
+ *     .create();
+ * JexlContext jc = new MapContext();
+ * jc.set("pi", Math.PI);
+ * JexlExpression e = jexl.createExpression("math:cos(pi)");
+ * Object o = e.evaluate(jc);
+ * assertEquals(Double.valueOf(-1), o);
+ * }</pre>
+ * <p>
+ * If the <em>namespace</em> is a Class and that class declares a constructor that takes a JexlContext (or
+ * a class extending JexlContext), one <em>namespace</em> instance is created on first usage in an
+ * expression; this instance lifetime is limited to the expression evaluation.
+ * </p>
+ * <p>
+ * {@link org.apache.commons.jexl3.JexlBuilder#imports(java.util.Collection)} declares packages whose classes can be
+ * referenced by their unqualified name in {@code new(...)} and type references, mimicking Java imports.
+ * {@link org.apache.commons.jexl3.JexlBuilder#arithmetic(org.apache.commons.jexl3.JexlArithmetic)} substitutes a
+ * custom {@link org.apache.commons.jexl3.JexlArithmetic} - see <a href="#customization">customization</a>.
  * </p>
  * <h3><a id="static_configuration">Static &amp; Shared Configuration</a></h3>
  * <p>
  * Both JexlEngine and JxltEngine are thread-safe, most of their inner fields are final; the same instance can
- * be shared between different  threads and proper synchronization is enforced in critical areas (introspection caches).
+ * be shared between different threads and proper synchronization is enforced in critical areas (introspection caches).
+ * </p>
+ * <p>
+ * The library-wide defaults applied by a bare {@code new JexlBuilder()} are themselves configurable through static
+ * setters: {@link org.apache.commons.jexl3.JexlBuilder#setDefaultPermissions(org.apache.commons.jexl3.introspection.JexlPermissions)},
+ * {@link org.apache.commons.jexl3.JexlBuilder#setDefaultFeatures(org.apache.commons.jexl3.JexlFeatures)},
+ * and {@link org.apache.commons.jexl3.JexlBuilder#setDefaultOptions(String...)} (runtime evaluation flags such as
+ * {@code strict}, {@code safe}, and {@code cancellable}; see {@link org.apache.commons.jexl3.JexlOptions#setDefaultFlags(String...)}).
+ * The pre-3.7 permissive feature set is exposed as {@link org.apache.commons.jexl3.JexlBuilder#FULL} so an application
+ * can restore the legacy behavior process-wide in one place.
  * </p>
  * <p>
  * Of particular importance is {@link org.apache.commons.jexl3.JexlBuilder#loader(java.lang.ClassLoader)} which indicates
@@ -254,85 +436,51 @@
  * {@link org.apache.commons.jexl3.JexlEngine#setClassLoader} and all the scripts created through this engine instance
  * will automatically point to the newly loaded classes.
  * </p>
- * <p>
- * You can state what can be manipulated through scripting by the {@link org.apache.commons.jexl3.annotations.NoJexl}
- * annotation that completely shield classes and methods from JEXL introspection.
- * The other configurable way to restrict JEXL is by using a
- * {@link org.apache.commons.jexl3.introspection.JexlSandbox} which allows finer control over what is exposed; the sandbox
- * can be set through {@link org.apache.commons.jexl3.JexlBuilder#sandbox(org.apache.commons.jexl3.introspection.JexlSandbox)}.
- * </p>
- * <p>
- * {@link org.apache.commons.jexl3.JexlBuilder#namespaces} extends JEXL scripting by registering your own classes as
- * namespaces allowing your own functions to be exposed at will.
- * </p>
- * This can be used as in:
- * <pre>{@code
- * public static MyMath {
- * public double cos(double x) {
- * return Math.cos(x);
- * }
- * }
- * Map<String, Object> funcs = new HashMap<String, Object>();
- * funcs.put("math", new MyMath());
- * JexlEngine jexl = new JexlBuilder().namespaces(funcs).create();
- * JexlContext jc = new MapContext();
- * jc.set("pi", Math.PI);
- * JexlExpression e = JEXL.createExpression("math:cos(pi)");
- * o = e.evaluate(jc);
- * assertEquals(Double.valueOf(-1),o);
- * }</pre>
- * <p>
- * If the <em>namespace</em> is a Class and that class declares a constructor that takes a JexlContext (or
- * a class extending JexlContext), one <em>namespace</em> instance is created on first usage in an
- * expression; this instance lifetime is limited to the expression evaluation.
- * </p>
+ * <h3><a id="config_cache">Caches &amp; debugging</a></h3>
  * <p>
  * JexlEngine and JxltEngine expression caches can be configured as well. If you intend to use JEXL
  * repeatedly in your application, these are worth configuring since expression parsing is quite heavy.
- * Note that all caches created by JEXL are held through SoftReference; under high memory pressure, the GC will be able
- * to reclaim those caches and JEXL will rebuild them if needed. By default, a JexlEngine does create a cache for
- * "small" expressions and a JxltEngine does create one for Expression.
+ * Note that all caches created by JEXL are held through {@code SoftReference}; under high memory pressure, the GC will
+ * be able to reclaim those caches and JEXL will rebuild them if needed. By default, a JexlEngine does create a cache
+ * for "small" expressions and a JxltEngine does create one for Expression.
  * </p>
- * <p>{@link org.apache.commons.jexl3.JexlBuilder#cache(int)} will set how many expressions can be simultaneously cached by the
- * JEXL engine. JxltEngine allows to define the cache size through its constructor.
+ * <p>{@link org.apache.commons.jexl3.JexlBuilder#cache(int)} sets how many expressions can be simultaneously cached by
+ * the JEXL engine, {@link org.apache.commons.jexl3.JexlBuilder#cacheThreshold(int)} caps the size of cached
+ * expressions, and {@link org.apache.commons.jexl3.JexlBuilder#cacheFactory(java.util.function.IntFunction)} lets you
+ * supply an alternative {@link org.apache.commons.jexl3.JexlCache} implementation. JxltEngine allows defining the
+ * cache size through its constructor.
  * </p>
  * <p>
  * {@link org.apache.commons.jexl3.JexlBuilder#debug(boolean)}
- * makes stack traces carried by JExlException more meaningful; in particular, these
+ * makes stack traces carried by JexlException more meaningful; in particular, these
  * traces will carry the exact caller location the Expression was created from.
  * </p>
  * <h3><a id="dynamic_configuration">Dynamic Configuration</a></h3>
  * <p>
- * Those configuration options can be overridden during evaluation by implementing a
- * {@link org.apache.commons.jexl3.JexlContext}
- * that also implements {@link org.apache.commons.jexl3.JexlEngine.Options} to carry evaluation options.
- * An example of such a class exists in the test package.
+ * Beyond options, a {@link org.apache.commons.jexl3.JexlContext} can implement a number of handles to override
+ * engine behavior on a per-evaluation basis. The {@code MapContext}/{@link org.apache.commons.jexl3.ObjectContext}
+ * implementations cover the common cases; for finer control, implement one or more of:
  * </p>
- * <p>
- * {@link org.apache.commons.jexl3.JexlBuilder#strict} or {@link org.apache.commons.jexl3.JexlEngine.Options#isStrict}
- * configures when JEXL considers 'null' as an error or not in various situations;
- * when facing an unreferenceable variable, using null as an argument to an arithmetic operator or failing to call
- * a method or constructor. The lenient mode is close to JEXL-1.1 behavior.
- * </p>
- * <p>
- * {@link org.apache.commons.jexl3.JexlBuilder#silent} or {@link org.apache.commons.jexl3.JexlEngine.Options#isSilent}
- * configures how JEXL reacts to errors; if silent, the engine will not throw exceptions
- * but will warn through loggers and return null in case of errors. Note that when non-silent, JEXL throws
- * JexlException which are unchecked exception.
- * </p>
- * <p>
- * Implementing a {@link org.apache.commons.jexl3.JexlContext.NamespaceResolver} through a JexlContext - look at
- * JexlEvalContext in the test directory
- * as an example - allows to override the namespace resolution and the default namespace map defined
- * through {@link org.apache.commons.jexl3.JexlBuilder#namespaces}.
- * </p>
+ * <ul>
+ * <li>{@link org.apache.commons.jexl3.JexlContext.OptionsHandle} - supply per-evaluation
+ *     {@link org.apache.commons.jexl3.JexlOptions}.</li>
+ * <li>{@link org.apache.commons.jexl3.JexlContext.NamespaceResolver} - override namespace resolution and the
+ *     default namespace map defined through {@link org.apache.commons.jexl3.JexlBuilder#namespaces(java.util.Map)}.</li>
+ * <li>{@link org.apache.commons.jexl3.JexlContext.AnnotationProcessor} - handle {@code @annotation} statements.</li>
+ * <li>{@link org.apache.commons.jexl3.JexlContext.PragmaProcessor} - react to {@code #pragma} directives.</li>
+ * <li>{@link org.apache.commons.jexl3.JexlContext.ModuleProcessor} - resolve {@code #pragma jexl.module} imports.</li>
+ * <li>{@link org.apache.commons.jexl3.JexlContext.ClassNameResolver} - resolve unqualified class names.</li>
+ * <li>{@link org.apache.commons.jexl3.JexlContext.CancellationHandle} - expose a cancellation flag to interrupt
+ *     evaluation.</li>
+ * <li>{@link org.apache.commons.jexl3.JexlContext.ThreadLocal} - bind context data to the evaluating thread.</li>
+ * </ul>
  * <h2><a id="customization">JEXL Customization</a></h2>
  * <p>
  * The {@link org.apache.commons.jexl3.JexlContext}, {@link org.apache.commons.jexl3.JexlBuilder} and
- * {@link org.apache.commons.jexl3.JexlEngine.Options} are
+ * {@link org.apache.commons.jexl3.JexlOptions} are
  * the most likely interfaces you'll want to implement for customization. Since they expose variables and options,
- * they are the primary targets. Before you do so, have a look at JexlEvalContext in the test directory
- * and {@link org.apache.commons.jexl3.ObjectContext} which may already cover some of your needs.
+ * they are the primary targets. Before you do so, have a look at
+ * {@link org.apache.commons.jexl3.ObjectContext} which may already cover some of your needs.
  * </p>
  * <p>
  * {@link org.apache.commons.jexl3.JexlArithmetic}
@@ -351,7 +499,7 @@
  * If you overload some in your JexlArithmetic derived implementation, these methods will be called when the
  * arguments match your method signature.
  * For example, this would be the case if you wanted '+' to operate on arrays; you'd need to derive
- * JexlArithmetic and implement '{@code public Object add(Set<?;> x, Set<?;> y)}' method.
+ * JexlArithmetic and implement a {@code public Object add(Set<?> x, Set<?> y)} method.
  * Note however that you can <em>not</em> change the operator precedence.
  * The list of operator / method matches is described in {@link org.apache.commons.jexl3.JexlOperator}:
  * </p>
@@ -396,8 +544,8 @@
  * <p>
  * {@link org.apache.commons.jexl3.internal.Engine} can be
  * extended to let you capture your own configuration defaults regarding cache sizes and various flags.
- * Implementing your own cache - instead of the basic LinkedHashMap based one - would be
- * another possible extension.
+ * Implementing your own {@link org.apache.commons.jexl3.JexlCache} - instead of the default soft-reference based one -
+ * would be another possible extension.
  * </p>
  * <p>
  * {@link org.apache.commons.jexl3.internal.Interpreter}

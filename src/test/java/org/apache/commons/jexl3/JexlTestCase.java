@@ -53,6 +53,9 @@ public class JexlTestCase {
   // important can be identified by the builder  calling lexical(...).
   static {
     JexlBuilder.setDefaultPermissions(TEST_PERMS);
+    // Keep the full permissive feature set so all test subclasses can use new(), loops, side-effects.
+    // The 3.7 hardened default is the correct library default; tests bring their own configuration.
+    JexlBuilder.setDefaultFeatures(JexlFeatures.createDefault());
     JexlOptions.setDefaultFlags("-safe", "+lexical");
     MODE_PRO50.setFlags("+strict +cancellable +lexical +lexicalShade -safe".split(" "));
   }
@@ -122,6 +125,7 @@ public class JexlTestCase {
   @BeforeAll
   static void setUpClass() {
     JexlBuilder.setDefaultPermissions(TEST_PERMS);
+    JexlBuilder.setDefaultFeatures(JexlFeatures.createDefault());
   }
 
   public String simpleWhitespace(final String arg) {
