@@ -1,33 +1,29 @@
 Apache Commons JEXL 3.7.0 Release Notes
-========================================
+---------------------------------------
 
 The Apache Commons JEXL team is pleased to announce the release of Apache Commons JEXL 3.7.0.
 
 Introduction
-============
+------------
 
-Apache Commons JEXL is a library that enables scripting features in Java applications and frameworks.
+Apache Commons JEXL is a library that enables scripting features in Java applications and frameworks..
 
 This is a feature and maintenance release. Java 8 or later is required.
 
 Compatibility with previous releases
-=====================================
+------------------------------------
 
-Version 3.7.0 is source and binary compatible with 3.6.x but changes default runtime and
-parse-time behavior (see below).
+Version 3.7.0 is source and binary compatible with 3.6.x but changes the default runtime and parse-time behavior (see below).
 
+Behavior breaking change in 3.7.0
+---------------------------------
 
-Breaking change in 3.7.0
-=========================
+o The default permissions is now "SECURE": a minimum allow-list covering only safe java.lang
+  value types, java.math, and java.util. Everything else is denied unless explicitly composed in.
 
-Two defaults change:
-
-  o The default permissions become SECURE — a minimum allow-list covering only safe java.lang
-    value types, java.math, and java.util. Everything else is denied unless explicitly composed in.
-
-  o The default features disable new(...), global side-effects, pragmas, and annotations, and enable
-    lexical scoping; loops remain available to scripts (but never to expressions). Scripts using a
-    disabled construct will throw JexlException.Feature at parse time with the default engine.
+o The default features disable new(...), global side-effects, pragmas, and annotations, and enable
+  lexical scoping; loops remain available to scripts (but never to expressions). Scripts using a
+  disabled construct will throw JexlException.Feature at parse time with the default engine.
 
 To restore the previous (3.6.x) defaults, load the bundled jexl.yaml via JexlConfigLoader:
 
@@ -37,23 +33,12 @@ To restore the previous (3.6.x) defaults, load the bundled jexl.yaml via JexlCon
 
 Use JexlPermissions.logging() to discover which reflective elements the new algorithm denies.
 
-
 New features
-============
+------------
 
-o JEXL-465:  Add JexlConfigLoader to build a JexlEngine from a YAML configuration (permissions,
-             features, arithmetic, namespaces, imports).
-o JEXL-464:  Default permissions are SECURE and default features harden parse-time behavior
-             (disable new, global side-effects, pragmas and annotations; enable lexical scoping;
-             loops remain available to scripts).
-o JEXL-463:  Add JexlPermissions.logging() to wrap a permission set and log which reflective
-             elements are allowed or denied.
-
-
-Fixed Bugs
-==========
-
-o JEXL-462:  JexlPermissions.RESTRICTED must ensure a better level of isolation.
+o JEXL-465:  Add JexlConfigLoader to build a JexlEngine from a YAML configuration (permissions, features, arithmetic, namespaces, imports). 
+o JEXL-464:  Default permissions are SECURE and default features harden parse-time behavior (disable new, global side-effects, pragmas and annotations; enable lexical scoping; loops remain available to scripts). 
+o JEXL-463:  Add JexlPermissions.logging() to wrap a permission set and log which reflective elements are allowed or denied. 
 
 
 Historical list of changes: https://commons.apache.org/proper/commons-jexl/changes.html
@@ -68,6 +53,7 @@ Download page: https://commons.apache.org/proper/commons-jexl/download_jexl.cgi
 Have fun!
 -Apache Commons Team
 
+------------------------------------------------------------------------------
 
 Apache Commons JEXL 3.6.4 Release Notes
 ---------------------------------------
