@@ -692,7 +692,7 @@ class PermissionsTest {
     }
 
     public static class Scheme {
-        public Pair cons(Object first, Object second) {
+        public Pair cons(final Object first, final Object second) {
             return new Pair(first, second);
         }
     }
@@ -704,14 +704,14 @@ class PermissionsTest {
         final JexlPermissions permissions = JexlPermissions.RESTRICTED.compose(
       "org.example.*",
             "org.apache.commons.jexl3.internal.introspection { +PermissionsTest$Scheme {} }");
-        assertTrue(permissions.allow(Scheme.class.getMethod("cons", new Class[]{ Object.class, Object.class})));
+        assertTrue(permissions.allow(Scheme.class.getMethod("cons", Object.class, Object.class)));
         final JexlEngine jexl = new JexlBuilder().cache(8).permissions(permissions).namespaces(funcs).create();
         String src = "let p = lisp:cons(17, 25); p.car + p.cdr;";
         JexlScript script = jexl.createScript(src);
         assertEquals(42, script.execute(null));
         assertEquals(42, script.execute(null));
         src = "(p, x, y) -> { p.car = x; p.cdr = y; }";
-        Pair p = new Pair(-1, -41);
+        final Pair p = new Pair(-1, -41);
         script = jexl.createScript(src);
         assertNotNull(script.execute(null, p, 22, 20));
         assertEquals(22, p.car);
@@ -734,10 +734,10 @@ class PermissionsTest {
     @Test
     void testPermissions457a() {
         assertTrue(RESTRICTED.allow(Long.TYPE));
-        for (Constructor<?> ctor : FileWriter.class.getDeclaredConstructors()) {
+        for (final Constructor<?> ctor : FileWriter.class.getDeclaredConstructors()) {
             assertFalse(RESTRICTED.allow(ctor));
         }
-        for (Method m : FileWriter.class.getMethods()) {
+        for (final Method m : FileWriter.class.getMethods()) {
             if (m.getName().equals("write")) {
                 assertTrue(RESTRICTED.allow(m), m.toString());
             }
@@ -747,19 +747,19 @@ class PermissionsTest {
     @Test
     void testPermissions457b() {
         final JexlEngine jexl = new JexlBuilder().silent(false).permissions(RESTRICTED).create();
-        List<String> srcs = Arrays.asList(
+        final List<String> srcs = Arrays.asList(
             "new('java.io.FileWriter', 'test.txt')",
             "new('java.io.FileWriter', 'test.txt', true)",
             "new('java.io.FileWriter', new java.io.File('test.txt'))",
             "new('java.io.FileWriter', new java.io.File('test.txt'), true)",
             "import java.io.FileWriter; new FileWriter('test.txt')"
         );
-        for (String src : srcs) {
+        for (final String src : srcs) {
             final JexlScript script = jexl.createScript(src);
             try {
                 script.execute(null);
                 fail("should have thrown a permission exception");
-            } catch (JexlException.Method exception) {
+            } catch (final JexlException.Method exception) {
                 assertTrue(exception.getMethod().contains("File"), "FileWriter::new should not be allowed");
             }
         }
@@ -768,16 +768,16 @@ class PermissionsTest {
     @Test
     void testPermissions457c() {
         final JexlEngine jexl = new JexlBuilder().silent(false).permissions(RESTRICTED).create();
-        List<String> srcs = Arrays.asList(
+        final List<String> srcs = Arrays.asList(
             "new('java.io.FileReader','test.txt')",
             "new('java.io.FileReader', new java.io.File('test.txt'))",
             "import java.io.FileReader; new FileReader('test.txt')");
-        for (String src : srcs) {
+        for (final String src : srcs) {
             final JexlScript script = jexl.createScript(src);
             try {
                 script.execute(null);
                 fail("should have thrown a permission exception");
-            } catch (JexlException.Method exception) {
+            } catch (final JexlException.Method exception) {
                 assertTrue(exception.getMethod().contains("File"), "FileReader::new should not be allowed");
             }
         }

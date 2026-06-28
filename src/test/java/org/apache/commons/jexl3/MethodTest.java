@@ -389,7 +389,7 @@ class MethodTest extends JexlTestCase {
         asserter.assertExpression("test.callInts()", test.callInts());
         asserter.assertExpression("test.callInts(1)", test.callInts(1));
         asserter.assertExpression("test.callInts(1,2,3,4,5)", test.callInts(1, 2, 3, 4, 5));
-        asserter.assertExpression("test.concat(['1', '2', '3'])", test.concat(new String[]{"1", "2", "3"}));
+        asserter.assertExpression("test.concat(['1', '2', '3'])", test.concat("1", "2", "3"));
         asserter.assertExpression("test.concat('1', '2', '3')", test.concat("1", "2", "3"));
 
     }
@@ -540,7 +540,7 @@ class MethodTest extends JexlTestCase {
     @Test
     void testScriptCall() throws Exception {
         JexlContext context = new MapContext();
-        final JexlScript plus = JEXL.createScript("a + b", new String[]{"a", "b"});
+        final JexlScript plus = JEXL.createScript("a + b", "a", "b");
         context.set("plus", plus);
         JexlScript forty2 = JEXL.createScript("plus(4, 2) * plus(4, 3)");
         Object o = forty2.execute(context);
