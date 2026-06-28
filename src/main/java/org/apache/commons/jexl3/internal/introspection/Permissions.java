@@ -70,12 +70,12 @@ public class Permissions implements JexlPermissions {
      * @return the copy of the map
      * @param <T> the type of Copyable values
      */
-    static <T extends Copyable<T>> Map<String, T> copyMap(Map<String, T> map) {
-        Map<String, T> njc = new HashMap<>(map.size());
-        for(Map.Entry<String, T> entry : map.entrySet()) {
-            njc.put(entry.getKey(), entry.getValue().copy());
+    static <T extends Copyable<T>> Map<String, T> copyMap(final Map<String, T> map) {
+        final Map<String, T> copy = new HashMap<>(map.size());
+        for (final Map.Entry<String, T> entry : map.entrySet()) {
+            copy.put(entry.getKey(), entry.getValue().copy());
         }
-        return njc;
+        return copy;
     }
 
     /**
@@ -96,7 +96,7 @@ public class Permissions implements JexlPermissions {
             methodNames = methods;
             fieldNames = fields;
         }
-        
+
         @Override public NoJexlClass copy() {
             return new NoJexlClass(new HashSet<>(methodNames), new HashSet<>(fieldNames));
         }
@@ -131,11 +131,10 @@ public class Permissions implements JexlPermissions {
      * <p>Field or method that are named are the only one allowed access.</p>
      */
     static class JexlClass extends NoJexlClass {
-        JexlClass(Set<String> methods, Set<String> fields) {
+        JexlClass(final Set<String> methods, final Set<String> fields) {
             super(methods, fields);
         }
         JexlClass() {
-            super();
         }
         @Override public JexlClass copy() {
             return new JexlClass(new HashSet<>(methodNames), new HashSet<>(fieldNames));
@@ -155,7 +154,6 @@ public class Permissions implements JexlPermissions {
      */
     static class AllowedNoJexlClass extends NoJexlClass {
         AllowedNoJexlClass() {
-            super();
         }
         AllowedNoJexlClass(final Set<String> methods, final Set<String> fields) {
             super(methods, fields);
@@ -236,13 +234,13 @@ public class Permissions implements JexlPermissions {
      * A package where classes are allowed by default.
      */
     static class JexlPackage extends NoJexlPackage {
-        JexlPackage(Map<String, NoJexlClass> map) {
+        JexlPackage(final Map<String, NoJexlClass> map) {
             super(map);
         }
 
         @Override
         NoJexlClass getNoJexl(final Class<?> clazz) {
-            NoJexlClass njc = nojexl.get(classKey(clazz));
+            final NoJexlClass njc = nojexl.get(classKey(clazz));
             return njc != null ? njc : JEXL_CLASS;
         }
 
@@ -439,10 +437,7 @@ public class Permissions implements JexlPermissions {
      * @return true if allowed, false otherwise
      */
     private boolean allowedPackage(final String packageName) {
-        if (allowed.isEmpty() && packages.isEmpty()) {
-            return true;
-        }
-        if (!allowed.isEmpty() && wildcardAllow(allowed, packageName)) {
+        if ((allowed.isEmpty() && packages.isEmpty()) || (!allowed.isEmpty() && wildcardAllow(allowed, packageName))) {
             return true;
         }
         // a package explicitly declared positive allows itself (exact match only, no sub-package inference)
@@ -461,7 +456,7 @@ public class Permissions implements JexlPermissions {
      * @param check the condition to test whether the specified name is allowed (not null)
      * @return true if the specified name is allowed based on the condition, false otherwise
      */
-    private <T> boolean specifiedAllow(final Class<?> clazz, T name, BiPredicate<NoJexlClass, T> check) {
+    private <T> boolean specifiedAllow(final Class<?> clazz, final T name, final BiPredicate<NoJexlClass, T> check) {
         final String packageName = ClassTool.getPackageName(clazz);
         if (allowedPackage(packageName)) {
             return true;
@@ -565,11 +560,8 @@ public class Permissions implements JexlPermissions {
     @Override
     public boolean allow(final Constructor<?> ctor) {
         // method must be not null, public
-        if (!validate(ctor)) {
-            return false;
-        }
         // check declared restrictions
-        if (deny(ctor)) {
+        if (!validate(ctor) || deny(ctor)) {
             return false;
         }
         // class must agree
@@ -591,11 +583,8 @@ public class Permissions implements JexlPermissions {
     @Override
     public boolean allow(final Field field) {
         // field must be public
-        if (!validate(field)) {
-            return false;
-        }
         // check declared restrictions
-        if (deny(field)) {
+        if (!validate(field) || deny(field)) {
             return false;
         }
         // class must agree
@@ -613,13 +602,10 @@ public class Permissions implements JexlPermissions {
             return false;
         }
         if ((method.getModifiers() & Modifier.STATIC) == 0) {
-            Class<?> declaring = method.getDeclaringClass();
+            final Class<?> declaring = method.getDeclaringClass();
             if (clazz != declaring) {
-                if (deny(clazz)) {
-                    return false;
-                }
                 // just check this is an override of a method in clazz, if not, it is not allowed (obviously)
-                if (!declaring.isAssignableFrom(clazz)) {
+                if (deny(clazz) || !declaring.isAssignableFrom(clazz)) {
                     return false;
                 }
                 // an explicit permission on the concrete class can deny; otherwise fall through to
@@ -639,13 +625,10 @@ public class Permissions implements JexlPermissions {
             return false;
         }
         if ((field.getModifiers() & Modifier.STATIC) == 0) {
-            Class<?> declaring = field.getDeclaringClass();
+            final Class<?> declaring = field.getDeclaringClass();
             if (clazz != declaring) {
-                if (deny(clazz)) {
-                    return false;
-                }
                 // just check this clazz extends/inherits from declaring, if not, it is not allowed (obviously)
-                if (!declaring.isAssignableFrom(clazz)) {
+                if (deny(clazz) || !declaring.isAssignableFrom(clazz)) {
                     return false;
                 }
                 // an explicit permission on the concrete class can deny; otherwise fall through to
@@ -670,11 +653,8 @@ public class Permissions implements JexlPermissions {
     @Override
     public boolean allow(final Method method) {
         // method must be not null, public, not synthetic, not bridge
-        if (!validate(method)) {
-            return false;
-        }
         // method must be allowed
-        if (denyMethod(method)) {
+        if (!validate(method) || denyMethod(method)) {
             return false;
         }
         Class<?> clazz = method.getDeclaringClass();
@@ -706,11 +686,8 @@ public class Permissions implements JexlPermissions {
     @Override
     public boolean allow(final Package pack) {
         // field must be public
-        if (!validate(pack)) {
-            return false;
-        }
         // check declared restrictions
-        if (deny(pack)) {
+        if (!validate(pack) || deny(pack)) {
             return false;
         }
         // an explicit package entry is allowed unless it is the deny marker
@@ -822,7 +799,7 @@ public class Permissions implements JexlPermissions {
     private NoJexlClass getNoJexl(final Class<?> clazz) {
         return getNoJexl(clazz, JEXL_CLASS);
     }
-    private NoJexlClass getNoJexl(final Class<?> clazz, NoJexlClass ifNone) {
+    private NoJexlClass getNoJexl(final Class<?> clazz, final NoJexlClass ifNone) {
         final String pkgName = ClassTool.getPackageName(clazz);
         final NoJexlPackage njp = getNoJexlPackage(pkgName);
         if (njp != null) {
