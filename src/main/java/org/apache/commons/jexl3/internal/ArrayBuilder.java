@@ -170,7 +170,7 @@ public class ArrayBuilder implements JexlArithmetic.ArrayBuilder {
      * @param clazz the class
      * @param size the size
      * @return the instance
-     * @param <T> the type
+     * @param <T> The type
      */
     protected <T> List<T> newList(final Class<? extends T> clazz, final int size) {
         return new ArrayList<>(size);

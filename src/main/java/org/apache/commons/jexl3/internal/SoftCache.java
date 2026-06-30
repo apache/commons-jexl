@@ -40,8 +40,8 @@ import org.apache.commons.jexl3.JexlCache;
  *   cache handling is a marginal latency factor.
  * </p>
  *
- * @param <K> the cache key entry type
- * @param <V> the cache key value type
+ * @param <K> The cache key entry type
+ * @param <V> The cache key value type
  */
 public class SoftCache<K, V> implements JexlCache<K, V> {
 

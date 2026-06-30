@@ -35,7 +35,7 @@ public abstract class JexlNode extends SimpleNode implements JexlCache.Reference
     /**
      * A marker interface for constants.
      *
-     * @param <T> the literal type
+     * @param <T> The literal type
      */
     public interface Constant<T> {
         T getLiteral();

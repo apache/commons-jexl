@@ -225,7 +225,7 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
      *
      * @param conf the option as configured, may be null
      * @param def the default value if null, shall not be null
-     * @param <T> the option type
+     * @param <T> The option type
      * @return conf or def
      */
     private static <T> T option(final T conf, final T def) {

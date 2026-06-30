@@ -22,7 +22,7 @@ import org.apache.commons.jexl3.introspection.JexlPropertySet;
 /**
  * Wraps an Object as a JEXL context and NamespaceResolver.
  *
- * @param <T> the wrapped object type to use
+ * @param <T> The wrapped object type to use
  * @since 3.0
  */
 public class ObjectContext<T> implements JexlContext, JexlContext.NamespaceResolver {

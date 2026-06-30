@@ -58,7 +58,7 @@ public class Permissions implements JexlPermissions {
      * implementation for the {@code copy()} method, which returns
      * a new instance of the object that is a logical copy of the original.
      *
-     * @param <T> the type of object that can be copied
+     * @param <T> The type of object that can be copied
      */
     interface Copyable<T> {
         T copy() ;
@@ -68,7 +68,7 @@ public class Permissions implements JexlPermissions {
      * Creates a copy of a map containing copyable values.
      * @param map the map to copy
      * @return the copy of the map
-     * @param <T> the type of Copyable values
+     * @param <T> The type of Copyable values
      */
     static <T extends Copyable<T>> Map<String, T> copyMap(final Map<String, T> map) {
         final Map<String, T> copy = new HashMap<>(map.size());
@@ -450,7 +450,7 @@ public class Permissions implements JexlPermissions {
      * The check involves verifying if a class or its corresponding package explicitly permits
      * a name (e.g., method) based on a given condition.
      *
-     * @param <T> the type of the name to check (e.g., method, constructor)
+     * @param <T> The type of the name to check (e.g., method, constructor)
      * @param clazz the class to evaluate (not null)
      * @param name the name to verify (not null)
      * @param check the condition to test whether the specified name is allowed (not null)

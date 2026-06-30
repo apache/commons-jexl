@@ -659,7 +659,7 @@ public class JexlArithmetic {
      *
      * @param strictCast whether strict cast is required
      * @param defaultValue the default value to return, if not strict
-     * @param <T> the value type
+     * @param <T> The value type
      * @return the default value is strict is false
      * @throws JexlArithmetic.NullOperand if strict-cast
      * @since 3.3
@@ -1484,7 +1484,7 @@ public class JexlArithmetic {
      * @param rhs  the right-hand side operand that lead to the big result
      * @param big the number to narrow
      * @param toLongFunction the function to convert the number to a long
-     * @param <X> the number type
+     * @param <X> The number type
      * @return an Integer or Long if narrowing is possible, the original number otherwise
      */
     protected <X extends Number> Number narrowToLong(final Object lhs, final Object rhs, final X big, final ToLongFunction<X> toLongFunction) {

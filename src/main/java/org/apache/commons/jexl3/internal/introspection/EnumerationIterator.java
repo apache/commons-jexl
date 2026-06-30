@@ -23,7 +23,7 @@ import java.util.Iterator;
 /**
  * An Iterator wrapper for an Enumeration.
  *
- * @param <T> the type of object this iterator returns
+ * @param <T> The type of object this iterator returns
  * @since 1.0
  */
 public class EnumerationIterator<T> implements Iterator<T> {
