@@ -59,7 +59,7 @@ try (InputStream in = getClass().getResourceAsStream("/jexl.yaml")) {
             <pre>
 JexlBuilder.setDefaultPermissions(JexlPermissions.RESTRICTED);
 JexlBuilder.setDefaultFeatures(JexlBuilder.FULL);
-JexlBuilder.setDefaultOptions("+safe", "+antish"); // optional: restore JEXL 3.2 runtime behaviour
+JexlBuilder.setDefaultOptions("+safe", "+antish"); // optional: restore JEXL 3.2 runtime behavior
             </pre>
             <p>
               Conversely, to keep the tighter control and discover which classes are now denied under your
