@@ -153,7 +153,7 @@ public class Util {
     /**
      * A helper class to help validate AST problems.
      * @param e the script
-     * @return an indented version of the AST
+     * @return An indented version of the AST
      */
     protected static String flattenedStr(final JexlScript e) {
         return ""; //e.getText() + "\n" + flattenedStr(((Script)e).script);

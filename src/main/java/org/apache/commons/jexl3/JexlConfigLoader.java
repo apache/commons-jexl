@@ -233,7 +233,7 @@ public final class JexlConfigLoader {
      * Loads configuration from a YAML {@link InputStream} (UTF-8) into a {@link JexlBuilder}.
      *
      * @param in YAML input; the caller is responsible for closing it
-     * @return a configured JexlBuilder
+     * @return A configured JexlBuilder
      * @throws IOException if the stream cannot be read
      */
     public static JexlBuilder load(final InputStream in) throws IOException {
@@ -244,7 +244,7 @@ public final class JexlConfigLoader {
      * Loads configuration from a YAML {@link Reader} into a {@link JexlBuilder}.
      *
      * @param reader YAML input; the caller is responsible for closing it
-     * @return a configured JexlBuilder
+     * @return A configured JexlBuilder
      * @throws IOException if the reader cannot be read
      */
     public static JexlBuilder load(final Reader reader) throws IOException {
@@ -259,7 +259,7 @@ public final class JexlConfigLoader {
      * Convenience: loads YAML from {@code in} and creates the engine in one call.
      *
      * @param in YAML input; the caller is responsible for closing it
-     * @return a new JexlEngine configured from the YAML
+     * @return A new JexlEngine configured from the YAML
      * @throws IOException if the stream cannot be read
      */
     public static JexlEngine engine(final InputStream in) throws IOException {

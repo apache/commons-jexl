@@ -278,7 +278,7 @@ public abstract class JexlEngine {
      * <p>This gathers the class, method and line number of the first calling method
      * outside of o.a.c.jexl3.</p>
      *
-     * @return a JexlInfo instance
+     * @return A JexlInfo instance
      */
     public JexlInfo createInfo() {
         return isDebug()? new JexlInfo() : new JexlInfo("jexl", 1, 1);
@@ -290,7 +290,7 @@ public abstract class JexlEngine {
      * @param fn url/file/template/script user given name
      * @param l  line number
      * @param c  column number
-     * @return a JexlInfo instance
+     * @return A JexlInfo instance
      */
     public JexlInfo createInfo(final String fn, final int l, final int c) {
         return new JexlInfo(fn, l, c);
@@ -299,7 +299,7 @@ public abstract class JexlEngine {
     /**
      * Creates a new {@link JxltEngine} instance using this engine.
      *
-     * @return a JEXL Template engine
+     * @return A JEXL Template engine
      */
     public JxltEngine createJxltEngine() {
         return createJxltEngine(true);
@@ -309,7 +309,7 @@ public abstract class JexlEngine {
      * Creates a new {@link JxltEngine} instance using this engine.
      *
      * @param noScript  whether the JxltEngine only allows Jexl expressions or scripts
-     * @return a JEXL Template engine
+     * @return A JEXL Template engine
      */
     public JxltEngine createJxltEngine(final boolean noScript) {
         return createJxltEngine(noScript, JXLT_CACHE_SIZE, '$', '#');
@@ -322,7 +322,7 @@ public abstract class JexlEngine {
      * @param cacheSize the number of expressions in this cache, default is 256
      * @param immediate the immediate template expression character, default is '$'
      * @param deferred  the deferred template expression character, default is '#'
-     * @return a JEXL Template engine
+     * @return A JEXL Template engine
      */
     public abstract JxltEngine createJxltEngine(boolean noScript, int cacheSize, char immediate, char deferred);
 

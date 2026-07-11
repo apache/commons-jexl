@@ -124,7 +124,7 @@ class AntishCallTest extends JexlTestCase {
      * <p>Note that before 3.2, a class was not considered a functor.
      * @param ref the ClassReference of the class we seek to instantiate
      * @param args the constructor arguments
-     * @return an instance if that was possible
+     * @return An instance if that was possible
      */
     public static Object callConstructor(final JexlEngine engine, final ClassReference ref, final Object... args) {
         return callConstructor(engine, ref.clazz, args);

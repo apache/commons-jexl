@@ -813,7 +813,7 @@ public class JexlException extends RuntimeException {
      * Creates a string builder pre-filled with common error information (if possible).
      *
      * @param node the node
-     * @return a string builder
+     * @return A string builder
      */
      static StringBuilder errorAt(final JexlNode node) {
         final JexlInfo info = node != null ? detailedInfo(node, node.jexlInfo()) : null;
@@ -891,7 +891,7 @@ public class JexlException extends RuntimeException {
      *
      * @param name the method name
      * @param args the method arguments
-     * @return a suitable signed name
+     * @return A suitable signed name
      */
      static String methodSignature(final String name, final Object[] args) {
         if (args != null && args.length > 0) {
@@ -999,7 +999,7 @@ public class JexlException extends RuntimeException {
      * <p>Return the cause if it is already a JexlException.
      *
      * @param xinvoke the invocation exception
-     * @return a JexlException
+     * @return A JexlException
      */
     public static JexlException tryFailed(final InvocationTargetException xinvoke) {
         final Throwable cause = xinvoke.getCause();

@@ -217,7 +217,7 @@ public class Uberspect implements JexlUberspect {
      *
      * @param c   Class in which the field search is taking place
      * @param key Name of the field being searched for
-     * @return a {@link java.lang.reflect.Field} or null if it does not exist or is not accessible
+     * @return A {@link java.lang.reflect.Field} or null if it does not exist or is not accessible
      */
     public final Field getField(final Class<?> c, final String key) {
         return base().getField(c, key);
@@ -280,7 +280,7 @@ public class Uberspect implements JexlUberspect {
      *
      * @param c   Class in which the method search is taking place
      * @param key MethodKey of the method being searched for
-     * @return a {@link java.lang.reflect.Method}
+     * @return A {@link java.lang.reflect.Method}
      *         or null if no unambiguous method could be found through introspection.
      */
     public final Method getMethod(final Class<?> c, final MethodKey key) {
@@ -296,7 +296,7 @@ public class Uberspect implements JexlUberspect {
      * @param c      Class in which the method search is taking place
      * @param name   Name of the method being searched for
      * @param params An array of Objects (not Classes) that describe the parameters
-     * @return a {@link java.lang.reflect.Method}
+     * @return A {@link java.lang.reflect.Method}
      *         or null if no unambiguous method could be found through introspection.
      */
     public final Method getMethod(final Class<?> c, final String name, final Object[] params) {

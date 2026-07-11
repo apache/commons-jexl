@@ -89,7 +89,7 @@ public interface JexlContext {
         /**
          * Gets a cancelable boolean used by the interpreter.
          *
-         * @return a cancelable boolean used by the interpreter.
+         * @return A cancelable boolean used by the interpreter.
          */
         AtomicBoolean getCancellation();
     }

@@ -195,7 +195,7 @@ public final class JexlOptions {
     /**
      * Creates a copy of this instance.
      *
-     * @return a copy
+     * @return A copy
      */
     public JexlOptions copy() {
         return new JexlOptions().set(this);

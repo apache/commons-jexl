@@ -190,7 +190,7 @@ public abstract class JxltEngine {
          * <p>If the underlying JEXL engine is silent, errors will be logged through its logger as warning.* </p>
          *
          * @param context the context to use for immediate expression evaluations
-         * @return an {@link Expression} or null if an error occurs and the {@link JexlEngine} is running
+         * @return An {@link Expression} or null if an error occurs and the {@link JexlEngine} is running
          * in silent mode
          * @throws Exception if an error occurs and the {@link JexlEngine} is not in silent mode
          */

@@ -100,7 +100,7 @@ abstract class AbstractExecutor {
      * Coerce an Object which must be a number to an Integer.
      *
      * @param arg the Object to coerce
-     * @return an Integer if it can be converted, null otherwise
+     * @return An Integer if it can be converted, null otherwise
      */
     static Integer castInteger(final Object arg) {
         return arg instanceof Number? ((Number) arg).intValue() : null;
@@ -110,7 +110,7 @@ abstract class AbstractExecutor {
      * Coerce an Object to a String.
      *
      * @param arg the Object to coerce
-     * @return a String if it can be converted, null otherwise
+     * @return A String if it can be converted, null otherwise
      */
     static String castString(final Object arg) {
         return arg instanceof CharSequence || arg instanceof Integer ? arg.toString() : null;

@@ -34,7 +34,7 @@ public final class ConstructorMethod implements JexlMethod {
      * @param is the introspector
      * @param ctorHandle a class or class name
      * @param args constructor arguments
-     * @return a {@link JexlMethod}
+     * @return A {@link JexlMethod}
      */
     public static ConstructorMethod discover(final Introspector is, final Object ctorHandle, final Object... args) {
         String className;

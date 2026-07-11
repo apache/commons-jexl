@@ -49,7 +49,7 @@ public class ASTSwitchStatement extends JexlNode {
    * The list at each index contains the case values for that index.
    * If the values-list is empty for an index, it is the default case.
    *
-   * @return an array of case values
+   * @return An array of case values
    */
   public List<Object>[] getCasesList() {
     @SuppressWarnings("unchecked")

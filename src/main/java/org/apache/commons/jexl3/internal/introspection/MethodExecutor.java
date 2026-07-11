@@ -44,7 +44,7 @@ public final class MethodExecutor extends AbstractExecutor.Method {
      * @param obj the object to introspect
      * @param method the name of the method to find
      * @param args the method arguments
-     * @return a filled up parameter (may contain a null method)
+     * @return A filled up parameter (may contain a null method)
      */
     public static MethodExecutor discover(final Introspector is, final Object obj, final String method, final Object[] args) {
         final Class<?> clazz = obj.getClass();

@@ -89,7 +89,7 @@ public class Arithmetic360 extends JexlArithmetic {
      * <p>Narrowing will only occur if the initial operand is not a Long.
      * @param operand  the operand that lead to the long result
      * @param result the long result to narrow
-     * @return an Integer if narrowing is possible, the original Long otherwise
+     * @return An Integer if narrowing is possible, the original Long otherwise
      */
     protected Number narrowLong(final Object operand, final long result) {
         if (!(operand instanceof Long)) {
@@ -107,7 +107,7 @@ public class Arithmetic360 extends JexlArithmetic {
      * @param lhs  the left-hand side operand that lead to the long result
      * @param rhs  the right-hand side operand that lead to the long result
      * @param result the long to narrow
-     * @return an Integer if narrowing is possible, the original Long otherwise
+     * @return An Integer if narrowing is possible, the original Long otherwise
      */
     @Override
     protected Number narrowLong(final Object lhs, final Object rhs, final long result) {

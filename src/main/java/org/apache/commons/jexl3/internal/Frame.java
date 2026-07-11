@@ -81,7 +81,7 @@ public class Frame {
      * @param s the scope
      * @param r the arguments
      * @param c the number of curried parameters
-     * @return a new instance of frame
+     * @return A new instance of frame
      */
     Frame newFrame(final Scope s, final Object[] r, final int c) {
         return new Frame(s, r, c);

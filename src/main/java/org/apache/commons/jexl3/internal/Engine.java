@@ -185,7 +185,7 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
      *
      * @param logger the logger
      * @param strategy the strategy
-     * @return an Uberspect instance
+     * @return An Uberspect instance
      * @deprecated 3.3
      */
     @Deprecated
@@ -438,7 +438,7 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
      * @param context a JexlContext; if null, the empty context is used instead.
      * @param frame   the interpreter frame
      * @param opts    the evaluation options
-     * @return an Interpreter
+     * @return An Interpreter
      */
     protected Interpreter createInterpreter(final JexlContext context, final Frame frame, final JexlOptions opts) {
         return new Interpreter(this, opts, context, frame);
@@ -1122,7 +1122,7 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
     /**
      * Creates a collector instance.
      *
-     * @return a collector instance
+     * @return A collector instance
      */
     protected VarCollector varCollector() {
         return new VarCollector(this.collectMode);
@@ -1148,7 +1148,7 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
      * <p>This uses the metacache instance as factory.</p>
      *
      * @param capacity the cache capacity
-     * @return a cache instance, null if capacity == 0, the JEXL cache if capacity &lt; 0
+     * @return A cache instance, null if capacity == 0, the JEXL cache if capacity &lt; 0
      */
     protected JexlCache<Source, Object> createCache(final int capacity) {
         return capacity < 0 ? cache : capacity > 0 ? metaCache.createCache(capacity) : null;

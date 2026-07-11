@@ -105,7 +105,7 @@ public final class IndexedType implements JexlPropertyGet {
      * @param is the introspector
      * @param object the object
      * @param name the container name
-     * @return a JexlPropertyGet is successful, null otherwise
+     * @return A JexlPropertyGet is successful, null otherwise
      */
     public static JexlPropertyGet discover(final Introspector is, final Object object, final String name) {
         if (object != null && name != null && !name.isEmpty()) {

@@ -54,7 +54,7 @@ class MethodPropertyTest {
 
         /**
          * Gets foo.
-         * @return a string.
+         * @return A string.
          */
         public String getFoo() {
             return "This is from getFoo()";

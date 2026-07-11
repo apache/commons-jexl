@@ -328,7 +328,7 @@ public final class TemplateEngine extends JxltEngine {
          *
          * @param el     the unified el instance
          * @param source the source TemplateExpression
-         * @return an TemplateExpression
+         * @return An TemplateExpression
          */
         TemplateExpression build(final TemplateEngine el, final TemplateExpression source) {
             int sum = 0;
@@ -689,7 +689,7 @@ public final class TemplateEngine extends JxltEngine {
          * Prepares a sub-expression for interpretation.
          *
          * @param interpreter a JEXL interpreter
-         * @return a prepared unified expression
+         * @return A prepared unified expression
          * @throws JexlException (only for nested and composite)
          */
         protected TemplateExpression prepare(final Interpreter interpreter) {
@@ -780,7 +780,7 @@ public final class TemplateEngine extends JxltEngine {
      * @param action createExpression, prepare, evaluate
      * @param expr   the template expression
      * @param xany   the exception
-     * @return an exception containing an explicit error message
+     * @return An exception containing an explicit error message
      */
     static Exception createException(final JexlInfo info,
                                      final String action,

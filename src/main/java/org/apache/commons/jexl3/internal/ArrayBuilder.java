@@ -158,7 +158,7 @@ public class ArrayBuilder implements JexlArithmetic.ArrayBuilder {
      *
      * @param baseClass the baseClass
      * @param other another class
-     * @return a common ancestor, class or interface, worst case being class Object
+     * @return A common ancestor, class or interface, worst case being class Object
      */
     protected Class<?> getCommonSuperClass(final Class<?> baseClass, final Class<?> other) {
         return ClassMisc.getCommonSuperClass(baseClass, other);

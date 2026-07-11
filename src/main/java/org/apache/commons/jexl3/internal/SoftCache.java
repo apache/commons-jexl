@@ -121,7 +121,7 @@ public class SoftCache<K, V> implements JexlCache<K, V> {
      * @param <KT> the key type
      * @param <VT> the value type
      * @param cacheSize the cache size, must be &gt; 0
-     * @return a Map usable as a cache bounded to the given size
+     * @return A Map usable as a cache bounded to the given size
      */
     protected <KT, VT> Map<KT, VT> createMap(final int cacheSize) {
         return createSynchronizedLinkedHashMap(cacheSize);

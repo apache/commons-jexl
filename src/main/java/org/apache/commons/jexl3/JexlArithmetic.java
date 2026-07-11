@@ -223,7 +223,7 @@ public class JexlArithmetic {
      * <p>An array (as in int[]) is not convenient to call methods so when encountered we turn them into lists</p>
      *
      * @param container an array or on object
-     * @return an abstract list wrapping the array instance or the initial argument
+     * @return An abstract list wrapping the array instance or the initial argument
      * @see org.apache.commons.jexl3.internal.introspection.ArrayListWrapper
      */
     private static Object arrayWrap(final Object container) {
@@ -396,7 +396,7 @@ public class JexlArithmetic {
      * Creates an array builder.
      *
      * @param size the number of elements in the array
-     * @return an array builder instance
+     * @return An array builder instance
      * @deprecated since 3.3.1
      */
     @Deprecated
@@ -421,7 +421,7 @@ public class JexlArithmetic {
      *
      * @param strict whether null argument is converted as 0 or remains null
      * @param value  argument
-     * @return a non-null value if argument can be represented by a long
+     * @return A non-null value if argument can be represented by a long
      */
     protected Number asLongNumber(final boolean strict, final Object value) {
         if (value instanceof Long
@@ -448,7 +448,7 @@ public class JexlArithmetic {
      * <p>For convenience, booleans are converted as 1/0 (true/false).</p>
      *
      * @param value  argument
-     * @return a non-null value if argument can be represented by a long
+     * @return A non-null value if argument can be represented by a long
      */
     protected Number asLongNumber(final Object value) {
         return asLongNumber(strict, value);
@@ -1251,7 +1251,7 @@ public class JexlArithmetic {
      * Creates a map-builder.
      *
      * @param size the number of elements in the map
-     * @return a map-builder instance
+     * @return A map-builder instance
      * @deprecated 3.3
      */
     @Deprecated
@@ -1403,7 +1403,7 @@ public class JexlArithmetic {
      * succeed.</p>
      *
      * @param original the original number.
-     * @return a value of the smallest type the original number will fit into.
+     * @return A value of the smallest type the original number will fit into.
      */
     public Number narrow(final Number original) {
         return narrowNumber(original, null);
@@ -1452,7 +1452,7 @@ public class JexlArithmetic {
      * @param lhs  the left-hand side operand that lead to the bigd result
      * @param rhs  the right-hand side operand that lead to the bigd result
      * @param big the BigDecimal to narrow
-     * @return an Integer or Long if narrowing is possible, the original BigDecimal otherwise
+     * @return An Integer or Long if narrowing is possible, the original BigDecimal otherwise
      */
     protected Number narrowBigDecimal(final Object lhs, final Object rhs, final BigDecimal big) {
        return narrowToLong(lhs, rhs, big, BigDecimal::longValueExact);
@@ -1470,7 +1470,7 @@ public class JexlArithmetic {
      * @param lhs  the left-hand side operand that lead to the bigi result
      * @param rhs  the right-hand side operand that lead to the bigi result
      * @param big the BigInteger to narrow
-     * @return an Integer or Long if narrowing is possible, the original BigInteger otherwise
+     * @return An Integer or Long if narrowing is possible, the original BigInteger otherwise
      */
     protected Number narrowBigInteger(final Object lhs, final Object rhs, final BigInteger big) {
         return narrowToLong(lhs, rhs, big, BigInteger::longValueExact);
@@ -1485,7 +1485,7 @@ public class JexlArithmetic {
      * @param big the number to narrow
      * @param toLongFunction the function to convert the number to a long
      * @param <X> The number type
-     * @return an Integer or Long if narrowing is possible, the original number otherwise
+     * @return An Integer or Long if narrowing is possible, the original number otherwise
      */
     protected <X extends Number> Number narrowToLong(final Object lhs, final Object rhs, final X big, final ToLongFunction<X> toLongFunction) {
         if (isNumberable(lhs) || isNumberable(rhs)) {
@@ -1510,7 +1510,7 @@ public class JexlArithmetic {
      * @param lhs  the left hand side operand that lead to the long result
      * @param rhs  the right hand side operand that lead to the long result
      * @param r the long to narrow
-     * @return an Integer if narrowing is possible, the original Long otherwise
+     * @return An Integer if narrowing is possible, the original Long otherwise
      */
     protected Number narrowLong(final Object lhs, final Object rhs, final long r) {
         if (!(lhs instanceof Long || rhs instanceof Long) && (int) r == r) {
@@ -1638,7 +1638,7 @@ public class JexlArithmetic {
      *
      * @see #createWithOptions(boolean, java.math.MathContext, int)
      * @param context the context that may extend {@link JexlContext.OptionsHandle} to use
-     * @return a new arithmetic instance or this
+     * @return A new arithmetic instance or this
      * @since 3.1
      */
     public JexlArithmetic options(final JexlContext context) {
@@ -1656,7 +1656,7 @@ public class JexlArithmetic {
      *
      * @see #createWithOptions(boolean, java.math.MathContext, int)
      * @param options the {@link JexlEngine.Options} to use
-     * @return an arithmetic with those options set
+     * @return An arithmetic with those options set
      * @deprecated 3.2
      */
     @Deprecated
@@ -1685,7 +1685,7 @@ public class JexlArithmetic {
      *
      * @see #createWithOptions(boolean, java.math.MathContext, int)
      * @param options the {@link JexlEngine.Options} to use
-     * @return an arithmetic with those options set
+     * @return An arithmetic with those options set
      */
     public JexlArithmetic options(final JexlOptions options) {
         if (options != null) {
@@ -1725,7 +1725,7 @@ public class JexlArithmetic {
      * <>Empty string is considered as 0.
      *
      * @param arg the arg
-     * @return a BigDecimal
+     * @return A BigDecimal
      * @throws CoercionException if the string cannot be coerced into a BigDecimal
      */
     private BigDecimal parseBigDecimal(final String arg) throws ArithmeticException {
@@ -1741,7 +1741,7 @@ public class JexlArithmetic {
      * <>Empty string is considered as 0.
      *
      * @param arg the arg
-     * @return a big integer
+     * @return A big integer
      * @throws ArithmeticException if the string cannot be coerced into a big integer
      */
     private BigInteger parseBigInteger(final String arg) throws ArithmeticException {
@@ -1757,7 +1757,7 @@ public class JexlArithmetic {
      * <>Empty string is considered as NaN.
      *
      * @param arg the arg
-     * @return a double
+     * @return A double
      * @throws ArithmeticException if the string cannot be coerced into a double
      */
     private double parseDouble(final String arg) throws ArithmeticException {
@@ -1773,7 +1773,7 @@ public class JexlArithmetic {
      * <p>This ensures the represented number is a natural (not a real).</p>
      *
      * @param arg the arg
-     * @return an int
+     * @return An int
      * @throws ArithmeticException if the string cannot be coerced into a long
      */
     private int parseInteger(final String arg) throws ArithmeticException {
@@ -1790,7 +1790,7 @@ public class JexlArithmetic {
      * <p>This ensures the represented number is a natural (not a real).</p>
      *
      * @param arg the arg
-     * @return a long
+     * @return A long
      * @throws ArithmeticException if the string cannot be coerced into a long
      */
     private long parseLong(final String arg) throws ArithmeticException {
@@ -1810,7 +1810,7 @@ public class JexlArithmetic {
      * 0|([1-9][0-9]*)
      *
      * @param id the identifier
-     * @return an integer or null
+     * @return An integer or null
      */
     public static Integer parseIdentifier(final Object id) {
         if (id instanceof Number) {
@@ -1890,7 +1890,7 @@ public class JexlArithmetic {
      * Creates a set-builder.
      *
      * @param size the number of elements in the set
-     * @return a set-builder instance
+     * @return A set-builder instance
      * @deprecated since 3.3.1
      */
     @Deprecated
@@ -2087,7 +2087,7 @@ public class JexlArithmetic {
      *
      * @param strict true if the calling operator or casting is strict, false otherwise
      * @param val the object to be coerced.
-     * @return a BigDecimal.
+     * @return A BigDecimal.
      * @throws ArithmeticException if val is null and mode is strict or if coercion is not possible
      * @since 3.3
      */
@@ -2101,7 +2101,7 @@ public class JexlArithmetic {
      * <p>Boolean false is 0, true is 1.</p>
      *
      * @param val the object to be coerced.
-     * @return a BigDecimal.
+     * @return A BigDecimal.
      * @throws ArithmeticException if val is null and mode is strict or if coercion is not possible
      */
     public BigDecimal toBigDecimal(final Object val) {
@@ -2143,7 +2143,7 @@ public class JexlArithmetic {
      *
      * @param strict true if the calling operator or casting is strict, false otherwise
      * @param val the object to be coerced.
-     * @return a BigInteger
+     * @return A BigInteger
      * @throws ArithmeticException if val is null and mode is strict or if coercion is not possible
      * @since 3.3
      */
@@ -2157,7 +2157,7 @@ public class JexlArithmetic {
      * <p>Boolean false is 0, true is 1.</p>
      *
      * @param val the object to be coerced.
-     * @return a BigInteger
+     * @return A BigInteger
      * @throws ArithmeticException if val is null and mode is strict or if coercion is not possible
      */
     public BigInteger toBigInteger(final Object val) {

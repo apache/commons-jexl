@@ -169,7 +169,7 @@ public class JexlBuilder {
      * Loops are left enabled so scripts can iterate; expressions never allow loops since they are
      * parsed as a single expression.</p>
      *
-     * @return a fresh hardened feature set
+     * @return A fresh hardened feature set
      * @since 3.7.0
      */
     private static JexlFeatures secureFeatures() {
@@ -504,7 +504,7 @@ public class JexlBuilder {
     /**
      * Create a new engine
      *
-     * @return a {@link JexlEngine} instance
+     * @return A {@link JexlEngine} instance
      */
     public JexlEngine create() {
         return new Engine(this);

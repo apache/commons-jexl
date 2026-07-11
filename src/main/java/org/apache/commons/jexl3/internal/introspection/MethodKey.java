@@ -172,7 +172,7 @@ public final class MethodKey {
      *
      * @param classes     the argument args
      * @param applicables the list of applicable methods or constructors
-     * @return an ambiguous exception
+     * @return An ambiguous exception
      */
     private static <T extends Executable>
     AmbiguousException ambiguousException(final Class<?>[] classes, final Iterable<T> applicables) {
@@ -213,7 +213,7 @@ public final class MethodKey {
      *
      * @param methods list of all candidate methods
      * @param classes the actual types of the arguments
-     * @return a list that contains only applicable methods (number of
+     * @return A list that contains only applicable methods (number of
      * formal and actual arguments matches, and argument types are assignable
      * to formal types through a method invocation conversion).
      */

@@ -128,7 +128,7 @@ public class JexlInfo {
      *
      * @param l the line
      * @param c the column
-     * @return a new info instance
+     * @return A new info instance
      */
     public JexlInfo at(final int l, final int c) {
         return new JexlInfo(name, l, c);

@@ -669,7 +669,7 @@ public interface JexlPermissions {
      * Wraps these permissions in a {@link LoggingPermissions} that logs every allow/deny decision.
      * <p>Useful to discover which reflective elements a permission set allows or denies.</p>
      *
-     * @return a logging view of these permissions
+     * @return A logging view of these permissions
      * @since 3.7.0
      */
     default JexlPermissions logging() {
@@ -681,7 +681,7 @@ public interface JexlPermissions {
      * to a named logger.
      *
      * @param loggerName the name of the logger to log decisions to
-     * @return a logging view of these permissions
+     * @return A logging view of these permissions
      * @since 3.7.0
      */
     default JexlPermissions logging(final String loggerName) {
@@ -693,7 +693,7 @@ public interface JexlPermissions {
      * to the given logger.
      *
      * @param log the logger to log decisions to
-     * @return a logging view of these permissions
+     * @return A logging view of these permissions
      * @since 3.7.0
      */
     default JexlPermissions logging(final Log log) {

@@ -153,7 +153,7 @@ public abstract class IntegerRange implements Collection<Integer> {
      *
      * @param from the lower inclusive boundary
      * @param to   the higher inclusive boundary
-     * @return a range
+     * @return A range
      */
     public static IntegerRange create(final int from, final int to) {
         if (from <= to) {

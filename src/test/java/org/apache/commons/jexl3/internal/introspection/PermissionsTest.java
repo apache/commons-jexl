@@ -118,7 +118,7 @@ class PermissionsTest {
         /**
          * Same name signature as default private method.
          * @param s the string
-         * @return a double, NaN if fail
+         * @return A double, NaN if fail
          */
         public double parseDouble(final String s) {
             try {

@@ -96,7 +96,7 @@ public class ClassMisc {
    *
    * @param baseClass    the class to serve as base
    * @param otherClasses the (optional) other classes
-   * @return an empty set if nothing in common, the set of common classes and interfaces that
+   * @return An empty set if nothing in common, the set of common classes and interfaces that
    *  does not contain the baseClass nor Object class
    */
   public static Set<Class<?>> getSuperClasses(final Class<?> baseClass, final Class<?>... otherClasses) {

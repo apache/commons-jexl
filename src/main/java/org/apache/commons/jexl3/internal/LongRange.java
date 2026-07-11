@@ -155,7 +155,7 @@ public abstract class LongRange implements Collection<Long> {
      *
      * @param from the lower inclusive boundary
      * @param to   the higher inclusive boundary
-     * @return a range
+     * @return A range
      */
     public static LongRange create(final long from, final long to) {
         if (from <= to) {

@@ -227,7 +227,7 @@ public final class JexlFeatures {
      /**
      * Creates an all features enabled set.
      *
-     * @return a new instance of all features set
+     * @return A new instance of all features set
      * @since 3.3.1
      */
     public static JexlFeatures createAll() {
@@ -258,7 +258,7 @@ public final class JexlFeatures {
      *   <li>pragma anywhere, {@link JexlFeatures#supportsPragmaAnywhere()}</li>
      * </ul>
      *
-     * @return a new instance of a default scripting features set
+     * @return A new instance of a default scripting features set
      * @since 3.3.1
      */
     public static JexlFeatures createDefault() {
@@ -270,7 +270,7 @@ public final class JexlFeatures {
      * <p>This is the strictest base-set since no feature is allowed, suitable as-is only
      * for the simplest expressions.</p>
      *
-     * @return a new instance of an empty features set
+     * @return A new instance of an empty features set
      * @since 3.3.1
      */
     public static JexlFeatures createNone() {
@@ -292,7 +292,7 @@ public final class JexlFeatures {
      * <em>try, catch, throw, finally, switch, case, default, class, instanceof</em>
      * </p>
      *
-     * @return a new instance of a modern scripting features set
+     * @return A new instance of a modern scripting features set
      * @since 3.3.1
      */
     public static JexlFeatures createScript() {

@@ -219,7 +219,7 @@ public final class JexlSandbox {
     /**
      * Gets a copy of this sandbox
      *
-     * @return a copy of this sandbox
+     * @return A copy of this sandbox
      */
     public JexlSandbox copy() {
         // modified concurrently at runtime so...
@@ -523,7 +523,7 @@ public final class JexlSandbox {
         /**
          * Gets a copy of these Names
          *
-         * @return a copy of these Names
+         * @return A copy of these Names
          */
         protected Names copy() {
             return this;
@@ -596,7 +596,7 @@ public final class JexlSandbox {
         }
 
         /**
-         * @return a copy of these permissions
+         * @return A copy of these permissions
          */
         Permissions copy() {
             return new Permissions(inheritable, read.copy(), write.copy(), execute.copy());

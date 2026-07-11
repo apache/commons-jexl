@@ -172,7 +172,7 @@ public final class Operator implements JexlOperator.Uberspect {
      * @param methodName the method name
      * @param right the left argument in the operator
      * @param left the right argument in the operator
-     * @return a boolean is call was possible, null otherwise
+     * @return A boolean is call was possible, null otherwise
      * @throws Exception if invocation fails
      */
     private Boolean booleanDuckCall(final String methodName, final Object left, final Object right) throws Exception {
@@ -240,7 +240,7 @@ public final class Operator implements JexlOperator.Uberspect {
      * @param arithmetic the arithmetic instance
      * @param operator the operator
      * @param args the arguments
-     * @return a JexlMethod instance or null
+     * @return A JexlMethod instance or null
      */
     private JexlMethod uberspectOperator(final JexlArithmetic arithmetic,
                                        final JexlOperator operator,
@@ -572,7 +572,7 @@ public final class Operator implements JexlOperator.Uberspect {
      *
      * @param operator the operator
      * @param args the arguments
-     * @return an instance or null
+     * @return An instance or null
      */
     private JexlMethod getAlternateOverload(final JexlOperator operator, final Object... args) {
         // comparison operators may use the compare overload in derived arithmetic

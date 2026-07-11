@@ -723,7 +723,7 @@ public abstract class InterpreterBase extends ParserVisitor {
      * @param node       the node triggering the exception
      * @param methodName the method/function name
      * @param xany       the cause
-     * @return a JexlException that will be thrown
+     * @return A JexlException that will be thrown
      */
     protected JexlException invocationException(final JexlNode node, final String methodName, final Throwable xany) {
         final Throwable cause = xany.getCause();
