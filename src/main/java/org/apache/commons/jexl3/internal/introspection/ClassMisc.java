@@ -35,8 +35,8 @@ public class ClassMisc {
    * <p>This orders from stronger to weaker abstraction in the sense that
    * Integer is a stronger abstraction than Number.</p>
    *
-   * @param superSet  the set of super classes to collect into
-   * @param baseClass the root class.
+   * @param superSet  The set of super classes to collect into
+   * @param baseClass The root class.
    */
   private static void addSuperClasses(final Set<Class<?>> superSet, final Class<?> baseClass) {
     for (Class<?> clazz = baseClass.getSuperclass(); clazz != null && !Object.class.equals(clazz); clazz = clazz.getSuperclass()) {
@@ -55,8 +55,8 @@ public class ClassMisc {
    * <p>On the premise that a class also tends to enumerate interface in the order of weaker abstraction and
    * that interfaces follow the same convention (strong implements weak).</p>
    *
-   * @param superSet the set of super classes to fill
-   * @param clazz    the root class.
+   * @param superSet The set of super classes to fill
+   * @param clazz    The root class.
    */
   private static void addSuperInterfaces(final Set<Class<?>> superSet, final Class<?> clazz) {
     for (final Class<?> inter : clazz.getInterfaces()) {
@@ -69,8 +69,8 @@ public class ClassMisc {
    * Gets the closest common super-class of two classes.
    * <p>When building an array, this helps strong-typing the result.</p>
    *
-   * @param baseClass the class to serve as base
-   * @param other     the other class
+   * @param baseClass The class to serve as base
+   * @param other     The other class
    * @return Object.class if nothing in common, the closest common class or interface otherwise
    */
   public static Class<?> getCommonSuperClass(final Class<?> baseClass, final Class<?> other) {
@@ -94,8 +94,8 @@ public class ClassMisc {
    * <p>The returned set is ordered and puts classes in order of super-class appearance then
    * interfaces of each super-class.</p>
    *
-   * @param baseClass    the class to serve as base
-   * @param otherClasses the (optional) other classes
+   * @param baseClass    The class to serve as base
+   * @param otherClasses The (optional) other classes
    * @return An empty set if nothing in common, the set of common classes and interfaces that
    *  does not contain the baseClass nor Object class
    */

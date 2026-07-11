@@ -40,10 +40,10 @@ public final class MethodExecutor extends AbstractExecutor.Method {
      * method as a static method of that class.
      * </p>
      *
-     * @param is the introspector used to discover the method
-     * @param obj the object to introspect
-     * @param method the name of the method to find
-     * @param args the method arguments
+     * @param is The introspector used to discover the method
+     * @param obj The object to introspect
+     * @param method The name of the method to find
+     * @param args The method arguments
      * @return A filled up parameter (may contain a null method)
      */
     public static MethodExecutor discover(final Introspector is, final Object obj, final String method, final Object[] args) {
@@ -69,9 +69,9 @@ public final class MethodExecutor extends AbstractExecutor.Method {
     /**
      * Creates a new instance.
      *
-     * @param c the class this executor applies to
-     * @param m the method
-     * @param k the MethodKey
+     * @param c The class this executor applies to
+     * @param m The method
+     * @param k The MethodKey
      */
     private MethodExecutor(final Class<?> c, final java.lang.reflect.Method m, final MethodKey k) {
         super(c, m, k);

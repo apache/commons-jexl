@@ -170,8 +170,8 @@ public final class MethodKey {
      *  corresponding parameter of class 'Object'.</li>
      * </ul>
      *
-     * @param classes     the argument args
-     * @param applicables the list of applicable methods or constructors
+     * @param classes     The argument args
+     * @param applicables The list of applicable methods or constructors
      * @return An ambiguous exception
      */
     private static <T extends Executable>
@@ -201,7 +201,7 @@ public final class MethodKey {
     /**
      * Helper to build class arrays.
      *
-     * @param args the classes
+     * @param args The classes
      * @return The array
      */
     private static Class<?>[] asArray(final Class<?>... args) {
@@ -212,7 +212,7 @@ public final class MethodKey {
      * Returns all methods that are applicable to actual argument types.
      *
      * @param methods list of all candidate methods
-     * @param classes the actual types of the arguments
+     * @param classes The actual types of the arguments
      * @return A list that contains only applicable methods (number of
      * formal and actual arguments matches, and argument types are assignable
      * to formal types through a method invocation conversion).
@@ -301,9 +301,9 @@ public final class MethodKey {
     }
 
     /**
-     * @param formal         the formal parameter type to which the actual
+     * @param formal         The formal parameter type to which the actual
      *                       parameter type should be convertible
-     * @param actual         the actual parameter type.
+     * @param actual         The actual parameter type.
      * @param possibleVarArg whether we're dealing with the last parameter
      *                       in the method declaration
      * @return see isMethodInvocationConvertible.
@@ -324,9 +324,9 @@ public final class MethodKey {
      * an actual parameter list, and primitive types are represented by
      * their object duals in reflective method calls.
      *
-     * @param formal         the formal parameter type to which the actual
+     * @param formal         The formal parameter type to which the actual
      *                       parameter type should be convertible
-     * @param actual         the actual parameter type.
+     * @param actual         The actual parameter type.
      * @param possibleVarArg whether we're dealing with the last parameter
      *                       in the method declaration
      * @return true if either formal type is assignable from actual type,
@@ -343,8 +343,8 @@ public final class MethodKey {
     /**
      * Determines parameter-argument invocation compatibility.
      *
-     * @param formal         the formal parameter type
-     * @param type           the argument type
+     * @param formal         The formal parameter type
+     * @param type           The argument type
      * @param strict         whether the check is strict or not
      * @param possibleVarArg whether we're dealing with the last parameter in the method declaration
      * @return true if compatible, false otherwise
@@ -389,7 +389,7 @@ public final class MethodKey {
     /**
      * Checks whether a parameter class is a primitive.
      *
-     * @param c              the parameter class
+     * @param c              The parameter class
      * @param possibleVarArg true if this is the last parameter which can be a primitive array (vararg call)
      * @return true if primitive, false otherwise
      */
@@ -407,9 +407,9 @@ public final class MethodKey {
     }
 
     /**
-     * @param formal         the formal parameter type to which the actual
+     * @param formal         The formal parameter type to which the actual
      *                       parameter type should be convertible
-     * @param actual         the actual parameter type.
+     * @param actual         The actual parameter type.
      * @param possibleVarArg whether we're dealing with the last parameter
      *                       in the method declaration
      * @return see isStrictMethodInvocationConvertible.
@@ -428,9 +428,9 @@ public final class MethodKey {
      * types. This method is used to determine the more specific type when
      * comparing signatures of methods.
      *
-     * @param formal         the formal parameter type to which the actual
+     * @param formal         The formal parameter type to which the actual
      *                       parameter type should be convertible
-     * @param actual         the actual parameter type.
+     * @param actual         The actual parameter type.
      * @param possibleVarArg whether not we're dealing with the last parameter
      *                       in the method declaration
      * @return true if either formal type is assignable from actual type,
@@ -450,7 +450,7 @@ public final class MethodKey {
      * To circumvent the potential problem, fetch the method with the same signature from the super-classes,
      * - which will be different if override  -and get the varargs flag from it.
      *
-     * @param method the method or constructor to check for varargs
+     * @param method The method or constructor to check for varargs
      * @return true if declared varargs, false otherwise
      */
     public static boolean isVarArgs(final Executable method) {
@@ -486,7 +486,7 @@ public final class MethodKey {
      * Determines which method signature (represented by a class array) is more
      * specific. This defines a partial ordering on the method signatures.
      *
-     * @param a  the arguments signature
+     * @param a  The arguments signature
      * @param c1 first method signature to compare
      * @param c2 second method signature to compare
      * @return MORE_SPECIFIC if c1 is more specific than c2, LESS_SPECIFIC if
@@ -551,7 +551,7 @@ public final class MethodKey {
      * correctly.
      * </p>
      *
-     * @param parm a may-be primitive type class
+     * @param parm A may-be primitive type class
      * @return The equivalent object class
      */
     static Class<?> primitiveClass(final Class<?> parm) {
@@ -573,7 +573,7 @@ public final class MethodKey {
     /**
      * Creates a key from a method.
      *
-     * @param aMethod the method to generate the key from.
+     * @param aMethod The method to generate the key from.
      */
     MethodKey(final Executable aMethod) {
         this(aMethod.getName(), aMethod.getParameterTypes());
@@ -582,8 +582,8 @@ public final class MethodKey {
     /**
      * Creates a key from a method name and a set of parameters.
      *
-     * @param aMethod the method to generate the key from, class name for constructors
-     * @param args    the intended method parameters
+     * @param aMethod The method to generate the key from, class name for constructors
+     * @param args    The intended method parameters
      */
     MethodKey(final String aMethod, final Class<?>[] args) {
         // !! keep this in sync with the other ctor (hash code) !!
@@ -607,8 +607,8 @@ public final class MethodKey {
     /**
      * Creates a key from a method name and a set of arguments.
      *
-     * @param aMethod the method to generate the key from
-     * @param args    the intended method arguments
+     * @param aMethod The method to generate the key from
+     * @param args    The intended method arguments
      */
     public MethodKey(final String aMethod, final Object... args) {
         // !! keep this in sync with the other ctor (hash code) !!
@@ -681,7 +681,7 @@ public final class MethodKey {
      * like this is needed.
      * </p>
      *
-     * @param methods a list of methods
+     * @param methods A list of methods
      * @return The most specific method.
      * @throws MethodKey.AmbiguousException if there is more than one.
      */
@@ -741,7 +741,7 @@ public final class MethodKey {
     /**
      * Gets the most specific constructor that is applicable to the parameters of this key.
      *
-     * @param methods a list of constructors.
+     * @param methods A list of constructors.
      * @return The most specific constructor.
      * @throws MethodKey.AmbiguousException if there is more than one.
      */
@@ -752,7 +752,7 @@ public final class MethodKey {
     /**
      * Gets the most specific method that is applicable to the parameters of this key.
      *
-     * @param methods a list of methods.
+     * @param methods A list of methods.
      * @return The most specific method.
      * @throws MethodKey.AmbiguousException if there is more than one.
      */

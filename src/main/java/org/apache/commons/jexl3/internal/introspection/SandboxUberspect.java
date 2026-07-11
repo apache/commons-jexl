@@ -56,8 +56,8 @@ public final class SandboxUberspect implements JexlUberspect {
     /**
      * A constructor for JexlSandbox uberspect.
      *
-     * @param theUberspect the JexlUberspect to sandbox
-     * @param theSandbox the sandbox which is copied to avoid changes at runtime
+     * @param theUberspect The JexlUberspect to sandbox
+     * @param theSandbox The sandbox which is copied to avoid changes at runtime
      */
     public SandboxUberspect(final JexlUberspect theUberspect, final JexlSandbox theSandbox) {
         Objects.requireNonNull(theSandbox, "theSandbox");

@@ -56,7 +56,7 @@ public interface JexlCache<K, V> {
     /**
      * Gets a value from this cache.
      *
-     * @param key the cache entry key
+     * @param key The cache entry key
      * @return The cache entry value
      */
     V get(K key);
@@ -64,8 +64,8 @@ public interface JexlCache<K, V> {
     /**
      * Puts a value in this cache.
      *
-     * @param key    the cache entry key
-     * @param script the cache entry value
+     * @param key    The cache entry key
+     * @param script The cache entry value
      * @return The previously associated value if any
      */
     V put(K key, V script);
@@ -92,7 +92,7 @@ public interface JexlCache<K, V> {
         /**
          * Sets the referenced object.
          *
-         * @param cache the referenced object
+         * @param cache The referenced object
          */
         void setCache(Object cache);
     }

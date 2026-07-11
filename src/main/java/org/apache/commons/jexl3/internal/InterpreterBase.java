@@ -85,7 +85,7 @@ public abstract class InterpreterBase extends ParserVisitor {
         /**
          * Dispatcher ctor.
          *
-         * @param anode the syntactic node.
+         * @param anode The syntactic node.
          * @param acacheable whether resolution can be cached
          */
         CallDispatcher(final JexlNode anode, final boolean acacheable) {
@@ -96,7 +96,7 @@ public abstract class InterpreterBase extends ParserVisitor {
         /**
          * Evaluates the method previously dispatched.
          *
-         * @param methodName the method name
+         * @param methodName The method name
          * @return The method invocation result
          * @throws Exception when invocation fails
          */
@@ -117,8 +117,8 @@ public abstract class InterpreterBase extends ParserVisitor {
         /**
          * Whether the method is an arithmetic method.
          *
-         * @param methodName the method name
-         * @param arguments the method arguments
+         * @param methodName The method name
+         * @param arguments The method arguments
          * @return true if arithmetic, false otherwise
          */
         protected boolean isArithmeticMethod(final String methodName, final Object[] arguments) {
@@ -137,8 +137,8 @@ public abstract class InterpreterBase extends ParserVisitor {
         /**
          * Whether the method is a context method.
          *
-         * @param methodName the method name
-         * @param arguments the method arguments
+         * @param methodName The method name
+         * @param arguments The method arguments
          * @return true if arithmetic, false otherwise
          */
         protected boolean isContextMethod(final String methodName, final Object[] arguments) {
@@ -157,9 +157,9 @@ public abstract class InterpreterBase extends ParserVisitor {
         /**
          * Whether the method is a target method.
          *
-         * @param ntarget the target instance
-         * @param methodName the method name
-         * @param arguments the method arguments
+         * @param ntarget The target instance
+         * @param methodName The method name
+         * @param arguments The method arguments
          * @return true if arithmetic, false otherwise
          */
         protected boolean isTargetMethod(final Object ntarget, final String methodName, final Object[] arguments) {
@@ -180,9 +180,9 @@ public abstract class InterpreterBase extends ParserVisitor {
          * Attempt to reuse last funcall cached in volatile JexlNode.value (if
          * it was cacheable).
          *
-         * @param ntarget the target instance
-         * @param methodName the method name
-         * @param arguments the method arguments
+         * @param ntarget The target instance
+         * @param methodName The method name
+         * @param arguments The method arguments
          * @return TRY_FAILED if invocation was not possible or failed, the
          * result otherwise
          */
@@ -207,8 +207,8 @@ public abstract class InterpreterBase extends ParserVisitor {
         /**
          * Constructs a new instance.
          *
-         * @param jme  the method
-         * @param flag the narrow flag
+         * @param jme  The method
+         * @param flag The narrow flag
          */
         protected ArithmeticFuncall(final JexlMethod jme, final boolean flag) {
             super(jme, flag);
@@ -228,8 +228,8 @@ public abstract class InterpreterBase extends ParserVisitor {
         /**
          * Constructs a new instance.
          *
-         * @param jme  the method
-         * @param flag the narrow flag
+         * @param jme  The method
+         * @param flag The narrow flag
          */
         protected ContextFuncall(final JexlMethod jme, final boolean flag) {
             super(jme, flag);
@@ -249,8 +249,8 @@ public abstract class InterpreterBase extends ParserVisitor {
         /**
          * Constructs a new instance.
          *
-         * @param jme the method
-         * @param flag the narrow flag
+         * @param jme The method
+         * @param flag The narrow flag
          */
         protected ContextualCtor(final JexlMethod jme, final boolean flag) {
             super(jme, flag);
@@ -276,8 +276,8 @@ public abstract class InterpreterBase extends ParserVisitor {
         /**
          * Constructs a new instance.
          *
-         * @param jme  the method
-         * @param flag the narrow flag
+         * @param jme  The method
+         * @param flag The narrow flag
          */
         protected Funcall(final JexlMethod jme, final boolean flag) {
             this.me = jme;
@@ -287,10 +287,10 @@ public abstract class InterpreterBase extends ParserVisitor {
         /**
          * Try invocation.
          *
-         * @param ii     the interpreter
-         * @param name   the method name
-         * @param target the method target
-         * @param args   the method arguments
+         * @param ii     The interpreter
+         * @param name   The method name
+         * @param target The method target
+         * @param args   The method arguments
          * @return The method invocation result (or JexlEngine.TRY_FAILED)
          */
         protected Object tryInvoke(final InterpreterBase ii, final String name, final Object target, final Object[] args) {
@@ -305,7 +305,7 @@ public abstract class InterpreterBase extends ParserVisitor {
      * Pretty-prints a failing property value (de)reference.
      * <p>Used by calls to unsolvableProperty(...).</p>
      *
-     * @param node the property node
+     * @param node The property node
      * @return The (pretty) string value
      */
     protected static String stringifyPropertyValue(final JexlNode node) {
@@ -354,9 +354,9 @@ public abstract class InterpreterBase extends ParserVisitor {
     /**
      * Creates an interpreter base.
      *
-     * @param engine   the engine creating this interpreter
-     * @param opts     the evaluation options
-     * @param aContext the evaluation context
+     * @param engine   The engine creating this interpreter
+     * @param opts     The evaluation options
+     * @param aContext The evaluation context
      */
     protected InterpreterBase(final Engine engine, final JexlOptions opts, final JexlContext aContext) {
         this.jexl = engine;
@@ -396,8 +396,8 @@ public abstract class InterpreterBase extends ParserVisitor {
     /**
      * Copy constructor.
      *
-     * @param ii the base to copy
-     * @param jexla the arithmetic instance to use (or null)
+     * @param ii The base to copy
+     * @param jexla The arithmetic instance to use (or null)
      */
     protected InterpreterBase(final InterpreterBase ii, final JexlArithmetic jexla) {
         jexl = ii.jexl;
@@ -418,9 +418,9 @@ public abstract class InterpreterBase extends ParserVisitor {
     /**
      * Triggered when an annotation processing fails.
      *
-     * @param node     the node where the error originated from
-     * @param annotation the annotation name
-     * @param cause    the cause of error (if any)
+     * @param node     The node where the error originated from
+     * @param annotation The annotation name
+     * @param cause    The cause of error (if any)
      * @return throws a JexlException if strict and not silent, null otherwise
      */
     protected Object annotationError(final JexlNode node, final String annotation, final Throwable cause) {
@@ -436,9 +436,9 @@ public abstract class InterpreterBase extends ParserVisitor {
     /**
      * Concatenate arguments in call(...).
      *
-     * @param target the pseudo-method owner, first to-be argument
+     * @param target The pseudo-method owner, first to-be argument
      * @param narrow whether we should attempt to narrow number arguments
-     * @param args   the other (non-null) arguments
+     * @param args   The other (non-null) arguments
      * @return The arguments array
      */
     protected Object[] callArguments(final Object target, final boolean narrow, final Object[] args) {
@@ -468,7 +468,7 @@ public abstract class InterpreterBase extends ParserVisitor {
     /**
      * Throws a JexlException.Cancel if script execution was cancelled.
      *
-     * @param node the node being evaluated
+     * @param node The node being evaluated
      */
     protected void cancelCheck(final JexlNode node) {
         if (isCancelled()) {
@@ -480,7 +480,7 @@ public abstract class InterpreterBase extends ParserVisitor {
      * Attempt to call close() if supported.
      * <p>This is used when dealing with auto-closeable (duck-like) objects
      *
-     * @param closeable the object we'd like to close
+     * @param closeable The object we'd like to close
      */
     protected void closeIfSupported(final Object closeable) {
         if (closeable != null) {
@@ -499,7 +499,7 @@ public abstract class InterpreterBase extends ParserVisitor {
      * Attempt to call close() if supported.
      * <p>This is used when dealing with auto-closeable (duck-like) objects
      *
-     * @param closeables the object queue we'd like to close
+     * @param closeables The object queue we'd like to close
      */
     protected void closeIfSupported(final Queue<Object> closeables) {
         for(final Object closeable : closeables) {
@@ -510,8 +510,8 @@ public abstract class InterpreterBase extends ParserVisitor {
     /**
      * Triggered when a captured variable is const and assignment is attempted.
      *
-     * @param node  the node where the error originated from
-     * @param variable   the variable name
+     * @param node  The node where the error originated from
+     * @param variable   The variable name
      * @return throws JexlException if strict and not silent, null otherwise
      */
     protected Object constVariable(final JexlNode node, final String variable) {
@@ -521,8 +521,8 @@ public abstract class InterpreterBase extends ParserVisitor {
     /**
      * Defines a variable.
      *
-     * @param variable the variable to define
-     * @param frame the frame in which it will be defined
+     * @param variable The variable to define
+     * @param frame The frame in which it will be defined
      * @return true if definition succeeded, false otherwise
      */
     protected boolean defineVariable(final ASTVar variable, final LexicalFrame frame) {
@@ -539,9 +539,9 @@ public abstract class InterpreterBase extends ParserVisitor {
     /**
      * Finds the node causing a NPE for diadic operators.
      *
-     * @param node  the parent node
-     * @param left  the left argument
-     * @param right the right argument
+     * @param node  The parent node
+     * @param left  The left argument
+     * @param right The right argument
      * @return The left, right or parent node
      */
     protected JexlNode findNullOperand(final JexlNode node, final Object left, final Object right) {
@@ -566,7 +566,7 @@ public abstract class InterpreterBase extends ParserVisitor {
      * Optionally narrows an argument for a function call.
      *
      * @param narrow whether narrowing should occur
-     * @param arg    the argument
+     * @param arg    The argument
      * @return The narrowed argument
      */
     protected Object functionArgument(final boolean narrow, final Object arg) {
@@ -577,9 +577,9 @@ public abstract class InterpreterBase extends ParserVisitor {
      * Concatenate arguments in call(...).
      * <p>When target == context, we are dealing with a global namespace function call
      *
-     * @param target the pseudo-method owner, first to-be argument
+     * @param target The pseudo-method owner, first to-be argument
      * @param narrow whether we should attempt to narrow number arguments
-     * @param args   the other (non-null) arguments
+     * @param args   The other (non-null) arguments
      * @return The arguments array
      */
     protected Object[] functionArguments(final Object target, final boolean narrow, final Object[] args) {
@@ -608,8 +608,8 @@ public abstract class InterpreterBase extends ParserVisitor {
      * Gets an attribute of an object.
      *
      * @param object    to retrieve value from
-     * @param attribute the attribute of the object, e.g. an index (1, 0, 2) or key for a map
-     * @param node      the node that evaluated as the object
+     * @param attribute The attribute of the object, e.g. an index (1, 0, 2) or key for a map
+     * @param node      The node that evaluated as the object
      * @return The attribute value
      */
     protected Object getAttribute(final Object object, final Object attribute, final JexlNode node) {
@@ -674,9 +674,9 @@ public abstract class InterpreterBase extends ParserVisitor {
     /**
      * Gets a value of a defined local variable or from the context.
      *
-     * @param frame the local frame
-     * @param block the lexical block if any
-     * @param identifier the variable node
+     * @param frame The local frame
+     * @param block The lexical block if any
+     * @param identifier The variable node
      * @return The value
      */
     protected Object getVariable(final Frame frame, final LexicalScope block, final ASTIdentifier identifier) {
@@ -720,9 +720,9 @@ public abstract class InterpreterBase extends ParserVisitor {
     /**
      * Triggered when method, function or constructor invocation fails with an exception.
      *
-     * @param node       the node triggering the exception
-     * @param methodName the method/function name
-     * @param xany       the cause
+     * @param node       The node triggering the exception
+     * @param methodName The method/function name
+     * @param xany       The cause
      * @return A JexlException that will be thrown
      */
     protected JexlException invocationException(final JexlNode node, final String methodName, final Throwable xany) {
@@ -780,7 +780,7 @@ public abstract class InterpreterBase extends ParserVisitor {
     }
 
     /**
-     * @param node the operand node
+     * @param node The operand node
      * @return true if this node is an operand of a strict operator, false otherwise
      */
     protected boolean isStrictOperand(final JexlNode node) {
@@ -818,9 +818,9 @@ public abstract class InterpreterBase extends ParserVisitor {
      * <p>The var may be either a local variable declared in the frame and
      * visible from the block or defined in the context.
      *
-     * @param frame the frame
-     * @param block the block
-     * @param name the variable name
+     * @param frame The frame
+     * @param block The block
+     * @param name The variable name
      * @return true if variable is defined, false otherwise
      */
     protected boolean isVariableDefined(final Frame frame, final LexicalScope block, final String name) {
@@ -838,9 +838,9 @@ public abstract class InterpreterBase extends ParserVisitor {
     /**
      * Triggered when an operator fails.
      *
-     * @param node     the node where the error originated from
-     * @param operator the operator symbol
-     * @param cause    the cause of error (if any)
+     * @param node     The node where the error originated from
+     * @param operator The operator symbol
+     * @param cause    The cause of error (if any)
      * @return throws JexlException if strict and not silent, null otherwise
      */
     protected Object operatorError(final JexlNode node, final JexlOperator operator, final Throwable cause) {
@@ -856,8 +856,8 @@ public abstract class InterpreterBase extends ParserVisitor {
     /**
      * Triggered when a variable is lexically known as being redefined.
      *
-     * @param node  the node where the error originated from
-     * @param variable   the variable name
+     * @param node  The node where the error originated from
+     * @param variable   The variable name
      * @return throws JexlException if strict and not silent, null otherwise
      */
     protected Object redefinedVariable(final JexlNode node, final String variable) {
@@ -869,8 +869,8 @@ public abstract class InterpreterBase extends ParserVisitor {
      * <p>
      * The lifetime of such instances span the current expression or script evaluation.</p>
      *
-     * @param prefix the prefix name (can be null for global namespace)
-     * @param node   the AST node
+     * @param prefix The prefix name (can be null for global namespace)
+     * @param node   The AST node
      * @return The namespace instance
      */
     protected Object resolveNamespace(final String prefix, final JexlNode node) {
@@ -984,9 +984,9 @@ public abstract class InterpreterBase extends ParserVisitor {
      * Sets an attribute of an object.
      *
      * @param object    to set the value to
-     * @param attribute the attribute of the object, e.g. an index (1, 0, 2) or key for a map
-     * @param value     the value to assign to the object's attribute
-     * @param node      the node that evaluated as the object
+     * @param attribute The attribute of the object, e.g. an index (1, 0, 2) or key for a map
+     * @param value     The value to assign to the object's attribute
+     * @param node      The node that evaluated as the object
      */
     protected void setAttribute(final Object object, final Object attribute, final Object value, final JexlNode node) {
         cancelCheck(node);
@@ -1054,9 +1054,9 @@ public abstract class InterpreterBase extends ParserVisitor {
      * <p>If interpretation applies lexical shade, the variable must exist (ie
      * the context has(...) method returns true) otherwise an error occurs.
      *
-     * @param node the node
-     * @param name the variable name
-     * @param value the variable value
+     * @param node The node
+     * @param name The variable name
+     * @param value The variable value
      */
     protected void setContextVariable(final JexlNode node, final String name, final Object value) {
         boolean lexical = options.isLexicalShade();
@@ -1077,7 +1077,7 @@ public abstract class InterpreterBase extends ParserVisitor {
      * Pretty-prints a failing property (de)reference.
      * <p>Used by calls to unsolvableProperty(...).</p>
      *
-     * @param node the property node
+     * @param node The property node
      * @return The (pretty) string
      */
     protected String stringifyProperty(final JexlNode node) {
@@ -1102,8 +1102,8 @@ public abstract class InterpreterBase extends ParserVisitor {
     /**
      * Triggered when a variable is lexically known as undefined.
      *
-     * @param node  the node where the error originated from
-     * @param variable   the variable name
+     * @param node  The node where the error originated from
+     * @param variable   The variable name
      * @return throws JexlException if strict and not silent, null otherwise
      */
     protected Object undefinedVariable(final JexlNode node, final String variable) {
@@ -1113,8 +1113,8 @@ public abstract class InterpreterBase extends ParserVisitor {
     /**
      * Triggered when a method cannot be resolved.
      *
-     * @param node   the node where the error originated from
-     * @param method the method name
+     * @param node   The node where the error originated from
+     * @param method The method name
      * @return throws JexlException if strict and not silent, null otherwise
      */
     protected Object unsolvableMethod(final JexlNode node, final String method) {
@@ -1124,9 +1124,9 @@ public abstract class InterpreterBase extends ParserVisitor {
     /**
      * Triggered when a method cannot be resolved.
      *
-     * @param node   the node where the error originated from
-     * @param method the method name
-     * @param args the method arguments
+     * @param node   The node where the error originated from
+     * @param method The method name
+     * @param args The method arguments
      * @return throws JexlException if strict and not silent, null otherwise
      */
     protected Object unsolvableMethod(final JexlNode node, final String method, final Object[] args) {
@@ -1142,9 +1142,9 @@ public abstract class InterpreterBase extends ParserVisitor {
     /**
      * Triggered when a property cannot be resolved.
      *
-     * @param node  the node where the error originated from
-     * @param property   the property node
-     * @param cause the cause if any
+     * @param node  The node where the error originated from
+     * @param property   The property node
+     * @param cause The cause if any
      * @param undef whether the property is undefined or null
      * @return throws JexlException if strict and not silent, null otherwise
      */
@@ -1161,8 +1161,8 @@ public abstract class InterpreterBase extends ParserVisitor {
     /**
      * Triggered when a variable cannot be resolved.
      *
-     * @param node  the node where the error originated from
-     * @param variable   the variable name
+     * @param node  The node where the error originated from
+     * @param variable   The variable name
      * @param undef whether the variable is undefined or null
      * @return throws JexlException if strict and not silent, null otherwise
      */
@@ -1173,9 +1173,9 @@ public abstract class InterpreterBase extends ParserVisitor {
     /**
      * Triggered when a variable generates an issue.
      *
-     * @param node  the node where the error originated from
-     * @param variable   the variable name
-     * @param issue the issue type
+     * @param node  The node where the error originated from
+     * @param variable   The variable name
+     * @param issue The issue type
      * @return throws JexlException if strict and not silent, null otherwise
      */
     protected Object variableError(final JexlNode node, final String variable, final VariableIssue issue) {

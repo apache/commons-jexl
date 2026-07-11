@@ -81,7 +81,7 @@ public class LexicalScope {
     /**
      * Adds a constant in this scope.
      *
-     * @param symbol the symbol
+     * @param symbol The symbol
      * @return true if registered, false if symbol was already registered
      */
     public boolean addConstant(final int symbol) {
@@ -96,7 +96,7 @@ public class LexicalScope {
     /**
      * Adds a symbol in this scope.
      *
-     * @param symbol the symbol
+     * @param symbol The symbol
      * @return true if registered, false if symbol was already registered
      */
     public boolean addSymbol(final int symbol) {
@@ -111,7 +111,7 @@ public class LexicalScope {
     /**
      * Clear all symbols.
      *
-     * @param cleanSymbol a (optional, may be null) functor to call for each cleaned symbol
+     * @param cleanSymbol A (optional, may be null) functor to call for each cleaned symbol
      */
     public final void clearSymbols(final java.util.function.IntConsumer cleanSymbol) {
         // undefine symbols getting out of scope
@@ -150,7 +150,7 @@ public class LexicalScope {
     /**
      * Checks whether a symbol has already been declared.
      *
-     * @param symbol the symbol
+     * @param symbol The symbol
      * @return true if declared, false otherwise
      */
     public boolean hasSymbol(final int symbol) {
@@ -161,7 +161,7 @@ public class LexicalScope {
     /**
      * Checks whether a symbol is declared as a constant.
      *
-     * @param symbol the symbol
+     * @param symbol The symbol
      * @return true if declared as constant, false otherwise
      */
     public boolean isConstant(final int symbol) {
@@ -172,7 +172,7 @@ public class LexicalScope {
     /**
      * Tests whether a given bit (not symbol) is set.
      *
-     * @param bit the bit
+     * @param bit The bit
      * @return true if set
      */
     private boolean isSet(final int bit) {
@@ -197,7 +197,7 @@ public class LexicalScope {
     /**
      * Sets a given bit (not symbol).
      *
-     * @param bit the bit
+     * @param bit The bit
      * @return true if it was actually set, false if it was set before
      */
     private boolean set(final int bit) {

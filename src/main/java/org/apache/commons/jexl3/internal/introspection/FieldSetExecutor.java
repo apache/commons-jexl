@@ -30,10 +30,10 @@ public final class FieldSetExecutor implements JexlPropertySet {
     /**
      * Attempts to discover a FieldSetExecutor.
      *
-     * @param is the introspector
-     * @param clazz the class to find the get method from
-     * @param identifier the key to use as an argument to the get method
-     * @param value the value to set the field to
+     * @param is The introspector
+     * @param clazz The class to find the get method from
+     * @param identifier The key to use as an argument to the get method
+     * @param value The value to set the field to
      * @return The executor if found, null otherwise
      */
     public static JexlPropertySet discover(final Introspector is,
@@ -59,7 +59,7 @@ public final class FieldSetExecutor implements JexlPropertySet {
     /**
      * Creates a new instance of FieldPropertySet.
      *
-     * @param theField the class public field
+     * @param theField The class public field
      */
     private FieldSetExecutor(final Field theField) {
         field = theField;

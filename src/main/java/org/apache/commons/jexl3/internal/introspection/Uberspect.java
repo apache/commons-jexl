@@ -86,8 +86,8 @@ public class Uberspect implements JexlUberspect {
     /**
      * Creates a new Uberspect.
      *
-     * @param runtimeLogger the logger used for all logging needs
-     * @param sty the resolver strategy
+     * @param runtimeLogger The logger used for all logging needs
+     * @param sty The resolver strategy
      */
     public Uberspect(final Log runtimeLogger, final JexlUberspect.ResolverStrategy sty) {
         this(runtimeLogger, sty, null);
@@ -96,9 +96,9 @@ public class Uberspect implements JexlUberspect {
     /**
      * Creates a new Uberspect.
      *
-     * @param runtimeLogger the logger used for all logging needs
-     * @param sty the resolver strategy
-     * @param perms the introspector permissions
+     * @param runtimeLogger The logger used for all logging needs
+     * @param sty The resolver strategy
+     * @param perms The introspector permissions
      */
     public Uberspect(final Log runtimeLogger, final JexlUberspect.ResolverStrategy sty, final JexlPermissions perms) {
         final ClassLoader cl = getClass().getClassLoader();
@@ -139,7 +139,7 @@ public class Uberspect implements JexlUberspect {
      * Computes which operators have an overload implemented in the arithmetic.
      * <p>This is used to speed up resolution and avoid introspection when possible.</p>
      *
-     * @param arithmetic the arithmetic instance
+     * @param arithmetic The arithmetic instance
      * @return The set of overloaded operators
      */
     Set<JexlOperator> getOverloads(final JexlArithmetic arithmetic) {
@@ -190,7 +190,7 @@ public class Uberspect implements JexlUberspect {
     /**
      * Gets a class by name through this introspector class loader.
      *
-     * @param className the class name
+     * @param className The class name
      * @return The class instance or null if it could not be found
      */
     @Override
@@ -226,7 +226,7 @@ public class Uberspect implements JexlUberspect {
     /**
      * Gets the accessible field names known for a given class.
      *
-     * @param c the class
+     * @param c The class
      * @return The class field names
      */
     public final String[] getFieldNames(final Class<?> c) {
@@ -311,7 +311,7 @@ public class Uberspect implements JexlUberspect {
     /**
      * Gets the accessible methods names known for a given class.
      *
-     * @param c the class
+     * @param c The class
      * @return The class method names
      */
     public final String[] getMethodNames(final Class<?> c) {
@@ -321,8 +321,8 @@ public class Uberspect implements JexlUberspect {
     /**
      * Gets all the methods with a given name from this map.
      *
-     * @param c          the class
-     * @param methodName the seeked methods name
+     * @param c          The class
+     * @param methodName The seeked methods name
      * @return The array of methods
      */
     public final Method[] getMethods(final Class<?> c, final String methodName) {

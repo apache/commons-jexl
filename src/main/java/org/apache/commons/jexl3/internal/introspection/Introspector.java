@@ -66,8 +66,8 @@ public final class Introspector {
     /**
      * Checks whether a class is loaded through a given class loader or one of its ascendants.
      *
-     * @param loader the class loader
-     * @param clazz  the class to check
+     * @param loader The class loader
+     * @param clazz  The class to check
      * @return true if clazz was loaded through the loader, false otherwise
      */
     private static boolean isLoadedBy(final ClassLoader loader, final Class<?> clazz) {
@@ -123,8 +123,8 @@ public final class Introspector {
     /**
      * Create the introspector.
      *
-     * @param log     the logger to use
-     * @param cloader the class loader
+     * @param log     The logger to use
+     * @param cloader The class loader
      */
     public Introspector(final Log log, final ClassLoader cloader) {
         this(log, cloader, null);
@@ -133,9 +133,9 @@ public final class Introspector {
     /**
      * Create the introspector.
      *
-     * @param log     the logger to use
-     * @param loader the class loader
-     * @param perms the permissions
+     * @param log     The logger to use
+     * @param loader The class loader
+     * @param perms The permissions
      */
     public Introspector(final Log log, final ClassLoader loader, final JexlPermissions perms) {
         this.logger = log;
@@ -146,7 +146,7 @@ public final class Introspector {
     /**
      * Gets a class by name through this introspector class loader.
      *
-     * @param className the class name
+     * @param className The class name
      * @return The class instance or null if it could not be found
      */
     public Class<?> getClassByName(final String className) {
@@ -162,7 +162,7 @@ public final class Introspector {
     /**
      * Gets the constructor defined by the {@code MethodKey}.
      *
-     * @param c   the class we want to instantiate
+     * @param c   The class we want to instantiate
      * @param key Key of the constructor being searched for
      * @return The desired constructor object
      * or null if no unambiguous constructor could be found through introspection.
@@ -261,7 +261,7 @@ public final class Introspector {
     /**
      * Gets the array of accessible field names known for a given class.
      *
-     * @param c the class
+     * @param c The class
      * @return The class field names
      */
     public String[] getFieldNames(final Class<?> c) {
@@ -284,7 +284,7 @@ public final class Introspector {
     /**
      * Gets the ClassMap for a given class.
      *
-     * @param c the class
+     * @param c The class
      * @return The class map
      */
     private ClassMap getMap(final Class<?> c) {
@@ -339,9 +339,9 @@ public final class Introspector {
     /**
      * Gets a method defined by a class, a name and a set of parameters.
      *
-     * @param c      the class
-     * @param name   the method name
-     * @param params the method parameters
+     * @param c      The class
+     * @param name   The method name
+     * @param params The method parameters
      * @return The desired method object
      * @throws MethodKey.AmbiguousException if no unambiguous method could be found through introspection
      */
@@ -352,7 +352,7 @@ public final class Introspector {
     /**
      * Gets the array of accessible methods names known for a given class.
      *
-     * @param c the class
+     * @param c The class
      * @return The class method names
      */
     public String[] getMethodNames(final Class<?> c) {
@@ -366,8 +366,8 @@ public final class Introspector {
     /**
      * Gets the array of accessible method known for a given class.
      *
-     * @param c          the class
-     * @param methodName the method name
+     * @param c          The class
+     * @param methodName The method name
      * @return The array of methods (null or not empty)
      */
     public Method[] getMethods(final Class<?> c, final String methodName) {
@@ -382,7 +382,7 @@ public final class Introspector {
      * Sets the class loader used to solve constructors.
      * <p>Also cleans the constructors and methods caches.</p>
      *
-     * @param classLoader the class loader; if null, use this instance class loader
+     * @param classLoader The class loader; if null, use this instance class loader
      */
     public void setLoader(final ClassLoader classLoader) {
         final ClassLoader current = classLoader == null ? JexlUberspect.class.getClassLoader() : classLoader;

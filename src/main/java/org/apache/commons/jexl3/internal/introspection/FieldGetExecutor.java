@@ -32,9 +32,9 @@ public final class FieldGetExecutor implements JexlPropertyGet {
     /**
      * Attempts to discover a FieldGetExecutor.
      *
-     * @param is the introspector
-     * @param clazz the class to find the get method from
-     * @param identifier the key to use as an argument to the get method
+     * @param is The introspector
+     * @param clazz The class to find the get method from
+     * @param identifier The key to use as an argument to the get method
      * @return The executor if found, null otherwise
      */
     public static JexlPropertyGet discover(final Introspector is, final Class<?> clazz, final String identifier) {
@@ -55,7 +55,7 @@ public final class FieldGetExecutor implements JexlPropertyGet {
     /**
      * Creates a new instance of FieldPropertyGet.
      *
-     * @param theField the class public field
+     * @param theField The class public field
      */
     private FieldGetExecutor(final Field theField) {
         field = theField;

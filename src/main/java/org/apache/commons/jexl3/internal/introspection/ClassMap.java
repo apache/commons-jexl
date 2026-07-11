@@ -74,10 +74,10 @@ final class ClassMap {
      * Populate the Map of direct hits. These are taken from all the public methods
      * that our class, its parents and their implemented interfaces provide.
      *
-     * @param cache          the ClassMap instance we create
-     * @param permissions    the permissions to apply during introspection
-     * @param clazz          the class to cache
-     * @param log            the Log
+     * @param cache          The ClassMap instance we create
+     * @param permissions    The permissions to apply during introspection
+     * @param clazz          The class to cache
+     * @param log            The Log
      */
     private static void create(final ClassMap cache, final JexlPermissions permissions, final Class<?> clazz, final Log log) {
         //
@@ -131,10 +131,10 @@ final class ClassMap {
     /**
      * Recurses up class hierarchy to get all super classes.
      *
-     * @param cache       the cache to fill
-     * @param permissions the permissions to apply during introspection
-     * @param clazz       the class to populate the cache from
-     * @param log         the Log
+     * @param cache       The cache to fill
+     * @param permissions The permissions to apply during introspection
+     * @param clazz       The class to populate the cache from
+     * @param log         The Log
      */
     private static void populateWithClass(final Class<?> source, final ClassMap cache,
                                           final JexlPermissions permissions,
@@ -166,10 +166,10 @@ final class ClassMap {
     /**
      * Recurses up interface hierarchy to get all super interfaces.
      *
-     * @param cache       the cache to fill
-     * @param permissions the permissions to apply during introspection
-     * @param iface       the interface to populate the cache from
-     * @param log         the Log
+     * @param cache       The cache to fill
+     * @param permissions The permissions to apply during introspection
+     * @param iface       The interface to populate the cache from
+     * @param log         The Log
      */
     private static void populateWithInterface(final Class<?> source, final ClassMap cache,
                                               final JexlPermissions permissions,
@@ -234,9 +234,9 @@ final class ClassMap {
     /**
      * Standard constructor.
      *
-     * @param aClass      the class to deconstruct.
-     * @param permissions the permissions to apply during introspection
-     * @param log         the logger.
+     * @param aClass      The class to deconstruct.
+     * @param permissions The permissions to apply during introspection
+     * @param log         The logger.
      */
     @SuppressWarnings("LeakingThisInConstructor")
     ClassMap(final Class<?> aClass, final JexlPermissions permissions, final Log log) {
@@ -262,7 +262,7 @@ final class ClassMap {
     /**
      * Find a Field using its name.
      *
-     * @param fieldName the field name
+     * @param fieldName The field name
      * @return A Field object representing the field to invoke or null.
      */
     Field getField(final String fieldName) {
@@ -291,7 +291,7 @@ final class ClassMap {
      * and introspect the method from the MethodMap.
      * </p>
      *
-     * @param methodKey the method key
+     * @param methodKey The method key
      * @return A Method object representing the method to invoke or null.
      * @throws MethodKey.AmbiguousException When more than one method is a match for the parameters.
      */
@@ -333,7 +333,7 @@ final class ClassMap {
     /**
      * Gets all the methods with a given name from this map.
      *
-     * @param methodName the seeked methods name
+     * @param methodName The seeked methods name
      * @return The array of methods (null or non-empty)
      */
     Method[] getMethods(final String methodName) {

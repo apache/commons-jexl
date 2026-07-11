@@ -52,7 +52,7 @@ public class SimpleNode implements Node {
     /**
      * Creates a SimpleNode instance.
      *
-     * @param i the node type identifier
+     * @param i The node type identifier
      */
     public SimpleNode(final int i) {
         id = i;
@@ -62,7 +62,7 @@ public class SimpleNode implements Node {
      * Constructs a SimpleNode instance.
      *
      * @param p not used.
-     * @param i the node type identifier
+     * @param i The node type identifier
      * @deprecated Use {@link #SimpleNode(int)}.
      */
     @Deprecated
@@ -73,7 +73,7 @@ public class SimpleNode implements Node {
     /**
      * Accepts the visitor on all this node's children.
      *
-     * @param visitor the visitor
+     * @param visitor The visitor
      * @param data contextual data
      * @return result of visit
      **/
@@ -102,7 +102,7 @@ public class SimpleNode implements Node {
     /**
      * Override to dump output somewhere.
      *
-     * @param str the string to output
+     * @param str The string to output
      */
     protected void dumpOut(final String str) {
         // override to obtain an output
@@ -116,7 +116,7 @@ public class SimpleNode implements Node {
     /**
      * Accepts the visitor.
      *
-     * @param visitor the visitor
+     * @param visitor The visitor
      * @param data contextual data
      * @return result of visit
      **/
@@ -128,8 +128,8 @@ public class SimpleNode implements Node {
     /**
      * Adds a child node.
      *
-     * @param n the child node
-     * @param i the child offset
+     * @param n The child node
+     * @param i The child offset
      */
     @Override
     public void jjtAddChild(final Node n, final int i) {
@@ -150,7 +150,7 @@ public class SimpleNode implements Node {
     /**
      * Gets a child of this node.
      *
-     * @param i the child offset
+     * @param i The child offset
      * @return The child node
      */
     @Override
@@ -199,7 +199,7 @@ public class SimpleNode implements Node {
     /**
      * Sets this node's parent.
      *
-     * @param n the parent
+     * @param n The parent
      */
     @Override
     public void jjtSetParent(final Node n) {

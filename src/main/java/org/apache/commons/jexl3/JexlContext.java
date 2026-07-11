@@ -64,9 +64,9 @@ public interface JexlContext {
          * of the processAnnotation call.
          * </p>
          *
-         * @param name the annotation name
-         * @param args the arguments of the annotation, evaluated as arguments of this call
-         * @param statement the statement that was annotated; the processor should invoke this statement 'call' method
+         * @param name The annotation name
+         * @param args The arguments of the annotation, evaluated as arguments of this call
+         * @param statement The statement that was annotated; the processor should invoke this statement 'call' method
          * @return The result of statement.call()
          * @throws Exception if annotation processing fails
          */
@@ -116,10 +116,10 @@ public interface JexlContext {
          * The module name will be the namespace mapped to the object returned by the evaluation
          * of its body.
          *
-         * @param engine the engine evaluating this module pragma.
-         * @param info the info at the pragma location.
-         * @param name the module name.
-         * @param body the module definition which can be its location or source.
+         * @param engine The engine evaluating this module pragma.
+         * @param info The info at the pragma location.
+         * @param name The module name.
+         * @param body The module definition which can be its location or source.
          * @return The module object.
          */
         Object processModule(JexlEngine engine, JexlInfo info, String name, String body);
@@ -136,7 +136,7 @@ public interface JexlContext {
         /**
          * Creates the functor object that will be used instead of the namespace.
          *
-         * @param context the context.
+         * @param context The context.
          * @return The namespace functor instance.
          */
         Object createFunctor(JexlContext context);
@@ -161,7 +161,7 @@ public interface JexlContext {
         /**
          * Resolves a namespace by its name.
          *
-         * @param name the name.
+         * @param name The name.
          * @return The namespace object.
          */
         Object resolveNamespace(String name);
@@ -201,9 +201,9 @@ public interface JexlContext {
         /**
          * Process one pragma.
          *
-         * @param opts the current evaluator options.
-         * @param key the key.
-         * @param value the value.
+         * @param opts The current evaluator options.
+         * @param key The key.
+         * @param value The value.
          * @since 3.3
          */
         default void processPragma(final JexlOptions opts, final String key, final Object value) {
@@ -222,8 +222,8 @@ public interface JexlContext {
          *         }
          * </code>
          *
-         * @param key the key.
-         * @param value the value.
+         * @param key The key.
+         * @param value The value.
          * @deprecated 3.3
          */
         @Deprecated
@@ -251,7 +251,7 @@ public interface JexlContext {
     /**
      * Gets the value of a variable.
      *
-     * @param name the variable's name.
+     * @param name The variable's name.
      * @return The value.
      */
     Object get(String name);
@@ -262,7 +262,7 @@ public interface JexlContext {
      * <p>A variable may be defined with a null value; this method checks whether the
      * value is null or if the variable is undefined.</p>
      *
-     * @param name the variable's name.
+     * @param name The variable's name.
      * @return true if it exists, false otherwise.
      */
     boolean has(String name);
@@ -270,8 +270,8 @@ public interface JexlContext {
     /**
      * Sets the value of a variable.
      *
-     * @param name the variable's name.
-     * @param value the variable's value.
+     * @param name The variable's name.
+     * @param value The variable's value.
      */
     void set(String name, Object value);
 }

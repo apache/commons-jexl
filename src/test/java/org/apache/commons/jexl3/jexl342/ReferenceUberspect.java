@@ -50,7 +50,7 @@ public class ReferenceUberspect implements JexlUberspect {
 
         /**
          * Performs a call to get().
-         * @param ref the reference
+         * @param ref The reference
          * @return The value pointed by the reference
          */
         Object callGet(Object ref);
@@ -63,9 +63,9 @@ public class ReferenceUberspect implements JexlUberspect {
      * Discovers an optional getter.
      * <p>The method to be found should be named "{find}{P,p}property and return an Optional&lt;?&gt;.</p>
      *
-     * @param is the uberspector
-     * @param clazz the class to find the get method from
-     * @param property the property name to find
+     * @param is The uberspector
+     * @param clazz The class to find the get method from
+     * @param property The property name to find
      * @return The executor if found, null otherwise
      */
     private static JexlPropertyGet discoverFind(final JexlUberspect is, final Class<?> clazz, final String property) {
@@ -117,7 +117,7 @@ public class ReferenceUberspect implements JexlUberspect {
 
     /**
      * Find a reference handler for a given instance.
-     * @param ref the reference
+     * @param ref The reference
      * @return The handler or null if object cannot be handled
      */
     private static ReferenceHandler discoverHandler(final Object ref) {
@@ -139,7 +139,7 @@ public class ReferenceUberspect implements JexlUberspect {
 
     /**
      * Cast ref to atomic reference, call get().
-     * @param ref the reference
+     * @param ref The reference
      * @return The get() result if not null, ref otherwise
      */
     static Object handleAtomic(final Object ref) {
@@ -149,7 +149,7 @@ public class ReferenceUberspect implements JexlUberspect {
 
     /**
      * Cast ref to optional, call isPresent()/get().
-     * @param ref the reference
+     * @param ref The reference
      * @return The get() result
      */
     static Object handleOptional(final Object ref) {
@@ -160,7 +160,7 @@ public class ReferenceUberspect implements JexlUberspect {
 
     /**
      * Cast ref to reference, call get().
-     * @param ref the reference
+     * @param ref The reference
      * @return The get() result if not null, ref otherwise
      */
     static Object handleReference(final Object ref) {
@@ -183,7 +183,7 @@ public class ReferenceUberspect implements JexlUberspect {
 
     /**
      * Constructs a new instance.
-     * @param jexlUberspect the uberspect to delegate to
+     * @param jexlUberspect The uberspect to delegate to
      */
     public ReferenceUberspect(final JexlUberspect jexlUberspect) {
         uberspect = jexlUberspect;

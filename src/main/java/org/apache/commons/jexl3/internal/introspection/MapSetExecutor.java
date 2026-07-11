@@ -31,10 +31,10 @@ public final class MapSetExecutor extends AbstractExecutor.Set {
     /**
      * Attempts to discover a MapSetExecutor.
      *
-     * @param is the introspector
-     * @param clazz the class to find the set method from
-     * @param identifier the key to use as an argument to the get method
-     * @param value the value to use as argument in map.put(key, value)
+     * @param is The introspector
+     * @param clazz The class to find the set method from
+     * @param identifier The key to use as an argument to the get method
+     * @param value The value to use as argument in map.put(key, value)
      * @return The executor if found, null otherwise
      */
     public static MapSetExecutor discover(final Introspector is,
@@ -57,10 +57,10 @@ public final class MapSetExecutor extends AbstractExecutor.Set {
     /**
      * Creates an instance.
      *
-     * @param clazz the class the set method applies to
-     * @param method the method called through this executor
-     * @param key the key to use as 1st argument to the set method
-     * @param value the value to use as 2nd argument to the set method
+     * @param clazz The class the set method applies to
+     * @param method The method called through this executor
+     * @param key The key to use as 1st argument to the set method
+     * @param value The value to use as 2nd argument to the set method
      */
     private MapSetExecutor(final Class<?> clazz, final java.lang.reflect.Method method, final Object key, final Object value) {
         super(clazz, method);

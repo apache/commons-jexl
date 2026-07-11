@@ -46,8 +46,8 @@ public class LexicalFrame extends LexicalScope {
     /**
      * Lexical frame ctor.
      *
-     * @param scriptf the script frame
-     * @param outerf  the previous lexical frame
+     * @param scriptf The script frame
+     * @param outerf  The previous lexical frame
      */
     public LexicalFrame(final Frame scriptf, final LexicalFrame outerf) {
         this.previous = outerf;
@@ -57,7 +57,7 @@ public class LexicalFrame extends LexicalScope {
     /**
      * Copy ctor.
      *
-     * @param src the frame to copy
+     * @param src The frame to copy
      */
     public LexicalFrame(final LexicalFrame src) {
         super(src);
@@ -84,7 +84,7 @@ public class LexicalFrame extends LexicalScope {
     /**
      * Defines a symbol.
      *
-     * @param symbol  the symbol to define
+     * @param symbol  The symbol to define
      * @param capture whether this redefines a captured symbol
      * @return true if the symbol is defined, false otherwise
      */

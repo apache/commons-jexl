@@ -93,8 +93,8 @@ public final class JexlOptions {
     /**
      * Checks the value of a flag in the mask.
      *
-     * @param ordinal the flag ordinal
-     * @param mask the flags mask
+     * @param ordinal The flag ordinal
+     * @param mask The flags mask
      * @return The mask value with this flag or-ed in
      */
     private static boolean isSet(final int ordinal, final int mask) {
@@ -107,8 +107,8 @@ public final class JexlOptions {
      * The possible flag names are:
      * cancellable, strict, silent, safe, lexical, antish, lexicalShade
      *
-     * @param initial the initial mask state
-     * @param flags the flags to set
+     * @param initial The initial mask state
+     * @param flags The flags to set
      * @return The flag mask updated
      */
     public static int parseFlags(final int initial, final String... flags) {
@@ -141,8 +141,8 @@ public final class JexlOptions {
     /**
      * Sets the value of a flag in a mask.
      *
-     * @param ordinal the flag ordinal
-     * @param mask the flags mask
+     * @param ordinal The flag ordinal
+     * @param mask The flags mask
      * @param value true or false
      * @return The new flags mask value
      */
@@ -161,7 +161,7 @@ public final class JexlOptions {
      * <p>Calling JexlBuilder.setDefaultOptions("+safe") once before JEXL engine creation
      * may ease validating JEXL3.2 in your environment.
      *
-     * @param flags the flags to set
+     * @param flags The flags to set
      */
     public static void setDefaultFlags(final String...flags) {
         DEFAULT = parseFlags(DEFAULT, flags);
@@ -365,7 +365,7 @@ public final class JexlOptions {
     /**
      * Sets options from engine.
      *
-     * @param jexl the engine
+     * @param jexl The engine
      * @return {@code this} instance
      */
     public JexlOptions set(final JexlEngine jexl) {
@@ -378,7 +378,7 @@ public final class JexlOptions {
     /**
      * Sets options from options.
      *
-     * @param src the options
+     * @param src The options
      * @return {@code this} instance
      */
     public JexlOptions set(final JexlOptions src) {
@@ -436,7 +436,7 @@ public final class JexlOptions {
     /**
      * Sets this option flags using the +/- syntax.
      *
-     * @param opts the option flags
+     * @param opts The option flags
      */
     public void setFlags(final String... opts) {
         flags = parseFlags(flags, opts);
@@ -445,7 +445,7 @@ public final class JexlOptions {
     /**
      * Sets the optional set of imports.
      *
-     * @param imports the imported packages
+     * @param imports The imported packages
      */
     public void setImports(final Collection<String> imports) {
         this.imports = imports == null || imports.isEmpty()? Collections.emptySet() : imports;
@@ -479,7 +479,7 @@ public final class JexlOptions {
     /**
      * Sets the arithmetic math context.
      *
-     * @param mcontext the context
+     * @param mcontext The context
      */
     public void setMathContext(final MathContext mcontext) {
         this.mathContext = mcontext;
@@ -488,7 +488,7 @@ public final class JexlOptions {
     /**
      * Sets the arithmetic math scale.
      *
-     * @param mscale the scale
+     * @param mscale The scale
      */
     public void setMathScale(final int mscale) {
         this.mathScale = mscale;
@@ -497,7 +497,7 @@ public final class JexlOptions {
     /**
      * Sets the optional map of namespaces.
      *
-     * @param ns a namespaces map
+     * @param ns A namespaces map
      */
     public void setNamespaces(final Map<String, Object> ns) {
         this.namespaces = ns == null || ns.isEmpty()? Collections.emptyMap() : ns;

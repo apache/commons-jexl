@@ -302,7 +302,7 @@ public final class JexlFeatures {
     /**
      * The text corresponding to a feature code.
      *
-     * @param feature the feature number
+     * @param feature The feature number
      * @return The feature name
      */
     public static String stringify(final int feature) {
@@ -329,7 +329,7 @@ public final class JexlFeatures {
     /**
      * Copy constructor.
      *
-     * @param features the feature to copy from
+     * @param features The feature to copy from
      */
     public JexlFeatures(final JexlFeatures features) {
         this(features.flags, features.reservedNames, features.nameSpaces);
@@ -562,7 +562,7 @@ public final class JexlFeatures {
     /**
      * Checks whether a name is reserved.
      *
-     * @param name the name to check
+     * @param name The name to check
      * @return true if reserved, false otherwise
      */
     public boolean isReservedName(final String name) {
@@ -701,7 +701,7 @@ public final class JexlFeatures {
     /**
      * Sets a test to determine namespace declaration.
      *
-     * @param names the name predicate
+     * @param names The name predicate
      * @return this features instance
      */
     public JexlFeatures namespaceTest(final Predicate<String> names) {
@@ -775,7 +775,7 @@ public final class JexlFeatures {
     /**
      * Sets a collection of reserved r precluding those to be used as local variables or parameter r.
      *
-     * @param names the r to reserve
+     * @param names The r to reserve
      * @return this features instance
      */
     public JexlFeatures reservedNames(final Collection<String> names) {
@@ -805,7 +805,7 @@ public final class JexlFeatures {
     /**
      * Sets a feature flag.
      *
-     * @param feature the feature ordinal
+     * @param feature The feature ordinal
      * @param flag    turn-on, turn off
      */
     private void setFeature(final int feature, final boolean flag) {

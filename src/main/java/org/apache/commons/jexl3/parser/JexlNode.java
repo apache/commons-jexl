@@ -60,7 +60,7 @@ public abstract class JexlNode extends SimpleNode implements JexlCache.Reference
         /**
          * Sets the template expression.
          *
-         * @param expr a TemplateEngine.TemplateExpression instance
+         * @param expr A TemplateEngine.TemplateExpression instance
          */
         void setExpression(JxltEngine.Expression expr);
     }
@@ -85,7 +85,7 @@ public abstract class JexlNode extends SimpleNode implements JexlCache.Reference
         /**
          * Default ctor.
          *
-         * @param jnode the node
+         * @param jnode The node
          */
         public Info(final JexlNode jnode) {
             this(jnode, jnode.jexlInfo());
@@ -94,8 +94,8 @@ public abstract class JexlNode extends SimpleNode implements JexlCache.Reference
         /**
          * Copy ctor.
          *
-         * @param jnode the node
-         * @param info the
+         * @param jnode The node
+         * @param info The
          */
         public Info(final JexlNode jnode, final JexlInfo info) {
             this(jnode, info.getName(), info.getLine(), info.getColumn());
@@ -104,10 +104,10 @@ public abstract class JexlNode extends SimpleNode implements JexlCache.Reference
         /**
          * Full detail ctor.
          *
-         * @param jnode the node
-         * @param name the file name
-         * @param l the line
-         * @param c the column
+         * @param jnode The node
+         * @param name The file name
+         * @param l The line
+         * @param c The column
          */
         private Info(final JexlNode jnode, final String name, final int l, final int c) {
             super(name, l, c);
@@ -148,7 +148,7 @@ public abstract class JexlNode extends SimpleNode implements JexlCache.Reference
      * Constructs a new instance.
      *
      * @param p not used.
-     * @param id the node type identifier
+     * @param id The node type identifier
      * @deprecated Use {@link #JexlNode(int)}.
      */
     @Deprecated
@@ -312,7 +312,7 @@ public abstract class JexlNode extends SimpleNode implements JexlCache.Reference
      * even when arithmetic is in strict mode.
      * The default cases are equals and not equals.
      *
-     * @param arithmetic the node to test
+     * @param arithmetic The node to test
      * @return true if node accepts null arguments, false otherwise
      */
     public boolean isStrictOperator(final JexlArithmetic arithmetic) {
@@ -331,7 +331,7 @@ public abstract class JexlNode extends SimpleNode implements JexlCache.Reference
     /**
      * Gets the associated JexlInfo instance.
      *
-     * @param name the source name
+     * @param name The source name
      * @return The info
      */
     public JexlInfo jexlInfo(final String name) {

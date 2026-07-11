@@ -36,8 +36,8 @@ public class ObjectContext<T> implements JexlContext, JexlContext.NamespaceResol
     /**
      * Creates a new ObjectContext.
      *
-     * @param engine  the jexl engine to use to solve properties
-     * @param wrapped the object to wrap in this context
+     * @param engine  The jexl engine to use to solve properties
+     * @param wrapped The object to wrap in this context
      */
     public ObjectContext(final JexlEngine engine, final T wrapped) {
         this.jexl = engine;

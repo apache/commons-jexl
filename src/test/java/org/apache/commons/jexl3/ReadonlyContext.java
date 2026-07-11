@@ -32,8 +32,8 @@ public final class ReadonlyContext implements JexlContext, JexlContext.OptionsHa
 
     /**
      * Creates a new readonly context.
-     * @param context the wrapped context
-     * @param eopts the engine evaluation options
+     * @param context The wrapped context
+     * @param eopts The engine evaluation options
      */
     public ReadonlyContext(final JexlContext context, final JexlOptions eopts) {
         wrapped = context;
@@ -60,8 +60,8 @@ public final class ReadonlyContext implements JexlContext, JexlContext.OptionsHa
 
     /**
      * Will throw an UnsupportedOperationException when called; the JexlEngine deals with it appropriately.
-     * @param name the unused variable name
-     * @param value the unused variable value
+     * @param name The unused variable name
+     * @param value The unused variable value
      */
     @Override
     @NoJexl

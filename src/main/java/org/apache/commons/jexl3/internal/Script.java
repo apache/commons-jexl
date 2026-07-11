@@ -51,7 +51,7 @@ public class Script implements JexlScript, JexlExpression {
         /**
          * The base constructor.
          *
-         * @param intrprtr the interpreter to use
+         * @param intrprtr The interpreter to use
          */
         protected Callable(final Interpreter intrprtr) {
             this.interpreter = intrprtr;
@@ -125,9 +125,9 @@ public class Script implements JexlScript, JexlExpression {
     /**
      * Do not let this be generally instantiated with a 'new'.
      *
-     * @param engine the interpreter to evaluate the expression
-     * @param expr   the expression source.
-     * @param ref    the parsed expression.
+     * @param engine The interpreter to evaluate the expression
+     * @param expr   The expression source.
+     * @param ref    The parsed expression.
      */
     protected Script(final Engine engine, final String expr, final ASTJexlScript ref) {
         jexl = engine;
@@ -141,7 +141,7 @@ public class Script implements JexlScript, JexlExpression {
      * <p>This allows submitting it to an executor pool and provides support for asynchronous calls.</p>
      * <p>The interpreter will handle interruption/cancellation gracefully if needed.</p>
      *
-     * @param context the context
+     * @param context The context
      * @return The callable
      */
     @Override
@@ -154,8 +154,8 @@ public class Script implements JexlScript, JexlExpression {
      * <p>This allows submitting it to an executor pool and provides support for asynchronous calls.</p>
      * <p>The interpreter will handle interruption/cancellation gracefully if needed.</p>
      *
-     * @param context the context
-     * @param args    the script arguments
+     * @param context The context
+     * @param args    The script arguments
      * @return The callable
      */
     @Override
@@ -185,7 +185,7 @@ public class Script implements JexlScript, JexlExpression {
     /**
      * Creates this script frame for evaluation.
      *
-     * @param args the arguments to bind to parameters
+     * @param args The arguments to bind to parameters
      * @return The frame (may be null)
      */
     protected Frame createFrame(final Object[] args) {
@@ -195,8 +195,8 @@ public class Script implements JexlScript, JexlExpression {
     /**
      * Creates this script interpreter.
      *
-     * @param context the context
-     * @param frame the calling frame
+     * @param context The context
+     * @param frame The calling frame
      * @return  the interpreter
      */
     protected Interpreter createInterpreter(final JexlContext context, final Frame frame) {
@@ -206,9 +206,9 @@ public class Script implements JexlScript, JexlExpression {
     /**
      * Creates this script interpreter.
      *
-     * @param context the context
-     * @param frame the calling frame
-     * @param options the interpreter options
+     * @param context The context
+     * @param frame The calling frame
+     * @param options The interpreter options
      * @return  the interpreter
      */
     protected Interpreter createInterpreter(final JexlContext context, final Frame frame, final JexlOptions options) {

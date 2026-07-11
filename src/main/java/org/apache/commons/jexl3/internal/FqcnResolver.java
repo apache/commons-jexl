@@ -59,7 +59,7 @@ public class FqcnResolver implements JexlUberspect.ClassConstantResolver {
     /**
      * Creates a class name solver.
      *
-     * @param solver the parent solver
+     * @param solver The parent solver
      * @throws NullPointerException if parent solver is null
      */
     FqcnResolver(final FqcnResolver solver) {
@@ -70,8 +70,8 @@ public class FqcnResolver implements JexlUberspect.ClassConstantResolver {
     /**
      * Creates a class name solver.
      *
-     * @param uber     the optional class loader
-     * @param packages the optional package names
+     * @param uber     The optional class loader
+     * @param packages The optional package names
      */
     FqcnResolver(final JexlUberspect uber, final Iterable<String> packages) {
         this.uberspect = Objects.requireNonNull(uber, "uberspect");
@@ -82,7 +82,7 @@ public class FqcnResolver implements JexlUberspect.ClassConstantResolver {
     /**
      * Gets a fully qualified class name from a simple class name and imports.
      *
-     * @param name the simple name
+     * @param name The simple name
      * @return The fqcn
      */
     String getQualifiedName(final String name) {
@@ -97,7 +97,7 @@ public class FqcnResolver implements JexlUberspect.ClassConstantResolver {
      * Attempts to solve a fully qualified class name from a simple class name.
      * <p>It tries to solve the class name as package.classname or package$classname (inner class).</p>
      *
-     * @param name the simple class name
+     * @param name The simple class name
      * @return The fully qualified class name or null if not found
      */
     private String solveClassName(final String name) {
@@ -117,7 +117,7 @@ public class FqcnResolver implements JexlUberspect.ClassConstantResolver {
     /**
      * Adds a collection of packages/classes as import root, check each name point to one or the other.
      *
-     * @param names the package names
+     * @param names The package names
      */
     private void importCheck(final Iterable<String> names) {
         if (names != null) {
@@ -128,7 +128,7 @@ public class FqcnResolver implements JexlUberspect.ClassConstantResolver {
     /**
      * Adds a package as import root, checks the name points to a package or a class.
      *
-     * @param name the package name
+     * @param name The package name
      */
     private void importCheck(final String name) {
         if (name == null || name.isEmpty()) {
@@ -150,7 +150,7 @@ public class FqcnResolver implements JexlUberspect.ClassConstantResolver {
     /**
      * Imports a list of packages as solving roots.
      *
-     * @param packages the packages
+     * @param packages The packages
      * @return this solver
      */
     FqcnResolver importPackages(final Iterable<String> packages) {
@@ -171,7 +171,7 @@ public class FqcnResolver implements JexlUberspect.ClassConstantResolver {
     /**
      * Checks is a package is imported by this solver of one of its ascendants.
      *
-     * @param pkg the package name
+     * @param pkg The package name
      * @return true if an import exists for this package, false otherwise
      */
     boolean isImporting(final String pkg) {

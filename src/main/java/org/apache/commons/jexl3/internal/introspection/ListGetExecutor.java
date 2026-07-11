@@ -37,9 +37,9 @@ public final class ListGetExecutor extends AbstractExecutor.Get {
     /**
      * Attempts to discover a ListGetExecutor.
      *
-     * @param is the introspector
-     * @param clazz the class to find the get method from
-     * @param index the index to use as an argument to the get method
+     * @param is The introspector
+     * @param clazz The class to find the get method from
+     * @param index The index to use as an argument to the get method
      * @return The executor if found, null otherwise
      */
     public static ListGetExecutor discover(final Introspector is, final Class<?> clazz, final Integer index) {
@@ -62,8 +62,8 @@ public final class ListGetExecutor extends AbstractExecutor.Get {
      * Creates an instance.
      *
      * @param clazz he class the get method applies to
-     * @param method the method held by this executor
-     * @param index the index to use as an argument to the get method
+     * @param method The method held by this executor
+     * @param index The index to use as an argument to the get method
      */
     private ListGetExecutor(final Class<?> clazz, final java.lang.reflect.Method method, final Integer index) {
         super(clazz, method);

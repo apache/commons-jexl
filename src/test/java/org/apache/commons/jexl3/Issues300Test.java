@@ -129,8 +129,8 @@ class Issues300Test {
         /**
          * This allows using a JEXL lambda as a filter.
          *
-         * @param stream the stream
-         * @param filter the lambda to use as filter
+         * @param stream The stream
+         * @param filter The lambda to use as filter
          * @return The filtered stream
          */
         public Stream<?> filter(final Stream<?> stream, final JexlScript filter) {

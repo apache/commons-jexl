@@ -36,7 +36,7 @@ class MethodPropertyTest {
 
         /**
          * Gets a string from the argument.
-         * @param i a long.
+         * @param i A long.
          * @return The argument prefixed with 'The value is : '
          */
         public String convert(final long i) {

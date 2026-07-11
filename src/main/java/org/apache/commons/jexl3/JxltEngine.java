@@ -54,9 +54,9 @@ public abstract class JxltEngine {
         /**
          * Creates an Exception.
          *
-         * @param info the contextual information
-         * @param msg the exception message
-         * @param cause the exception cause
+         * @param info The contextual information
+         * @param msg The exception message
+         * @param cause The exception cause
          */
         public Exception(final JexlInfo info, final String msg, final Throwable cause) {
             super(info, msg, cause);
@@ -122,7 +122,7 @@ public abstract class JxltEngine {
         /**
          * Adds this expression's string representation to a StringBuilder.
          *
-         * @param strb the builder to fill
+         * @param strb The builder to fill
          * @return The builder argument
          */
         StringBuilder asString(StringBuilder strb);
@@ -132,7 +132,7 @@ public abstract class JxltEngine {
          *
          * <p>If the underlying JEXL engine is silent, errors will be logged through its logger as warning.</p>
          *
-         * @param context the variable context
+         * @param context The variable context
          * @return The result of this expression evaluation or null if an error occurs and the {@link JexlEngine} is
          * running in silent mode
          * @throws Exception if an error occurs and the {@link JexlEngine}
@@ -189,7 +189,7 @@ public abstract class JxltEngine {
          *
          * <p>If the underlying JEXL engine is silent, errors will be logged through its logger as warning.* </p>
          *
-         * @param context the context to use for immediate expression evaluations
+         * @param context The context to use for immediate expression evaluations
          * @return An {@link Expression} or null if an error occurs and the {@link JexlEngine} is running
          * in silent mode
          * @throws Exception if an error occurs and the {@link JexlEngine} is not in silent mode
@@ -264,17 +264,17 @@ public abstract class JxltEngine {
         /**
          * Evaluates this template.
          *
-         * @param context the context to use during evaluation
-         * @param writer the writer to use for output
+         * @param context The context to use during evaluation
+         * @param writer The writer to use for output
          */
         void evaluate(JexlContext context, Writer writer);
 
         /**
          * Evaluates this template.
          *
-         * @param context the context to use during evaluation
-         * @param writer the writer to use for output
-         * @param args the arguments
+         * @param context The context to use during evaluation
+         * @param writer The writer to use for output
+         * @param args The arguments
          */
         void evaluate(JexlContext context, Writer writer, Object... args);
 
@@ -306,7 +306,7 @@ public abstract class JxltEngine {
         /**
          * Prepares this template by expanding any contained deferred TemplateExpression.
          *
-         * @param context the context to prepare against
+         * @param context The context to prepare against
          * @return The prepared version of the template
          */
         Template prepare(JexlContext context);
@@ -316,8 +316,8 @@ public abstract class JxltEngine {
          * <p>This binds arguments to template parameters for immediate expressions when the template also
          * uses deferred/nested expressions.</p>
          *
-         * @param context the context to prepare against
-         * @param args the arguments to bind (optional)
+         * @param context The context to prepare against
+         * @param args The arguments to bind (optional)
          * @return The prepared version of the template
          * @since 3.6.2
          */
@@ -339,8 +339,8 @@ public abstract class JxltEngine {
      *
      * <p>If the underlying JEXL engine is silent, errors will be logged through its logger as warnings.</p>
      *
-     * @param info the {@link JexlInfo} source information
-     * @param expression the {@link Template} string expression
+     * @param info The {@link JexlInfo} source information
+     * @param expression The {@link Template} string expression
      * @return The {@link Expression}, null if silent and an error occurred
      * @throws Exception if an error occurs and the {@link JexlEngine} is not silent
      */
@@ -352,7 +352,7 @@ public abstract class JxltEngine {
      *
      * <p>If the underlying JEXL engine is silent, errors will be logged through its logger as warnings.</p>
      *
-     * @param expression the {@link Template} string expression
+     * @param expression The {@link Template} string expression
      * @return The {@link Expression}, null if silent and an error occurred
      * @throws Exception if an error occurs and the {@link JexlEngine} is not silent
      */
@@ -363,8 +363,8 @@ public abstract class JxltEngine {
     /**
      * Creates a new template.
      *
-     * @param info the source info
-     * @param source the source
+     * @param info The source info
+     * @param source The source
      * @return The template
      */
     public Template createTemplate(final JexlInfo info, final String source) {
@@ -374,10 +374,10 @@ public abstract class JxltEngine {
     /**
      * Creates a new template.
      *
-     * @param info the jexl info (file, line, column)
-     * @param prefix the directive prefix
-     * @param source the source
-     * @param parms the parameter names
+     * @param info The jexl info (file, line, column)
+     * @param prefix The directive prefix
+     * @param source The source
+     * @param parms The parameter names
      * @return The template
      */
     public abstract Template createTemplate(JexlInfo info, String prefix, Reader source, String... parms);
@@ -385,9 +385,9 @@ public abstract class JxltEngine {
     /**
      * Creates a new template.
      *
-     * @param info the source info
-     * @param parms the parameter names
-     * @param source the source
+     * @param info The source info
+     * @param parms The parameter names
+     * @param source The source
      * @return The template
      */
     public Template createTemplate(final JexlInfo info, final String source, final String... parms) {
@@ -397,7 +397,7 @@ public abstract class JxltEngine {
     /**
      * Creates a new template.
      *
-     * @param source the source
+     * @param source The source
      * @return The template
      */
     public Template createTemplate(final String source) {
@@ -407,9 +407,9 @@ public abstract class JxltEngine {
     /**
      * Creates a new template.
      *
-     * @param prefix the directive prefix
-     * @param source the source
-     * @param parms the parameter names
+     * @param prefix The directive prefix
+     * @param source The source
+     * @param parms The parameter names
      * @return The template
      */
     public Template createTemplate(final String prefix, final Reader source, final String... parms) {
@@ -419,8 +419,8 @@ public abstract class JxltEngine {
     /**
      * Creates a new template.
      *
-     * @param source the source
-     * @param parms the parameter names
+     * @param source The source
+     * @param parms The parameter names
      * @return The template
      */
     public Template createTemplate(final String source, final String... parms) {

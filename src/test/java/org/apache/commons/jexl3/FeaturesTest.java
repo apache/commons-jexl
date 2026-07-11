@@ -56,8 +56,8 @@ class FeaturesTest extends JexlTestCase {
     /**
      * Checks that the script is valid with all features on then verifies it
      * throws a feature exception with the given set (in features param).
-     * @param features the features
-     * @param scripts the scripts
+     * @param features The features
+     * @param scripts The scripts
      * @throws Exception
      */
     private void checkFeature(final JexlFeatures features, final String[] scripts) {

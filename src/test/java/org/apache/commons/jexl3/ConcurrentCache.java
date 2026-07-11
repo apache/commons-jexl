@@ -33,7 +33,7 @@ public class ConcurrentCache<K, V> extends SoftCache<K, V> {
   /**
    * Creates a new instance of a concurrent cache.
    *
-   * @param theSize the cache size
+   * @param theSize The cache size
    */
   public ConcurrentCache(final int theSize) {
     super(theSize);

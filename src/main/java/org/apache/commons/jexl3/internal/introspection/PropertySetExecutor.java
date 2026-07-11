@@ -35,10 +35,10 @@ public class PropertySetExecutor extends AbstractExecutor.Set {
      * Discovers a PropertySetExecutor.
      * <p>The method to be found should be named "set{P,p}property".</p>
      *
-     * @param is       the introspector
-     * @param clazz    the class to find the get method from
-     * @param property the property name to find
-     * @param value      the value to assign to the property
+     * @param is       The introspector
+     * @param clazz    The class to find the get method from
+     * @param property The property name to find
+     * @param value      The value to assign to the property
      * @return The executor if found, null otherwise
      */
     public static PropertySetExecutor discover(final Introspector is,
@@ -57,10 +57,10 @@ public class PropertySetExecutor extends AbstractExecutor.Set {
      * <p>The method to be found should be named "set{P,p}property".
      * As a special case, any empty array will try to find a valid array-setting non-ambiguous method.
      *
-     * @param is       the introspector
-     * @param clazz    the class to find the get method from
-     * @param property the name of the property to set
-     * @param arg      the value to assign to the property
+     * @param is       The introspector
+     * @param clazz    The class to find the get method from
+     * @param property The name of the property to set
+     * @param arg      The value to assign to the property
      * @return The method if found, null otherwise
      */
     private static java.lang.reflect.Method discoverSet(final Introspector is,
@@ -96,7 +96,7 @@ public class PropertySetExecutor extends AbstractExecutor.Set {
     /**
      * Checks whether an argument is an empty array.
      *
-     * @param arg the argument
+     * @param arg The argument
      * @return true if {@code arg} is an empty array
      */
     private static boolean isEmptyArray(final Object arg) {
@@ -107,9 +107,9 @@ public class PropertySetExecutor extends AbstractExecutor.Set {
      * Finds an empty array property setter method by {@code methodName}.
      * <p>This checks only one method with that name accepts an array as sole parameter.
      *
-     * @param is       the introspector
-     * @param clazz    the class to find the get method from
-     * @param methodName    the method name to find
+     * @param is       The introspector
+     * @param clazz    The class to find the get method from
+     * @param methodName    The method name to find
      * @return         the sole method that accepts an array as parameter
      */
     private static java.lang.reflect.Method lookupSetEmptyArray(final Introspector is, final Class<?> clazz, final String methodName) {
@@ -140,10 +140,10 @@ public class PropertySetExecutor extends AbstractExecutor.Set {
     /**
      * Creates an instance.
      *
-     * @param clazz  the class the set method applies to
-     * @param method the method called through this executor
-     * @param key    the key to use as 1st argument to the set method
-     * @param value    the value
+     * @param clazz  The class the set method applies to
+     * @param method The method called through this executor
+     * @param key    The key to use as 1st argument to the set method
+     * @param value    The value
      */
     protected PropertySetExecutor(final Class<?> clazz,
                                   final java.lang.reflect.Method method,

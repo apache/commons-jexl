@@ -50,8 +50,8 @@ public class ASTJexlScript extends JexlLexicalNode  {
     /**
      * Creates an array of arguments by copying values up to the number of parameters.
      *
-     * @param caller the calling frame
-     * @param values the argument values
+     * @param caller The calling frame
+     * @param values The argument values
      * @return The arguments array
      */
     public Frame createFrame(final Frame caller, final Object... values) {
@@ -61,7 +61,7 @@ public class ASTJexlScript extends JexlLexicalNode  {
     /**
      * Creates an array of arguments by copying values up to the number of parameters.
      *
-     * @param values the argument values
+     * @param values The argument values
      * @return The arguments array
      */
     public Frame createFrame(final Object... values) {
@@ -137,7 +137,7 @@ public class ASTJexlScript extends JexlLexicalNode  {
     /**
      * Checks whether a given symbol is captured.
      *
-     * @param symbol the symbol number
+     * @param symbol The symbol number
      * @return true if captured, false otherwise
      */
     public boolean isCapturedSymbol(final int symbol) {
@@ -167,7 +167,7 @@ public class ASTJexlScript extends JexlLexicalNode  {
     /**
      * Sets this script features.
      *
-     * @param theFeatures the features
+     * @param theFeatures The features
      */
     public void setFeatures(final JexlFeatures theFeatures) {
         this.features = theFeatures;
@@ -176,7 +176,7 @@ public class ASTJexlScript extends JexlLexicalNode  {
     /**
      * Sets this script pragmas.
      *
-     * @param thePragmas the pragmas
+     * @param thePragmas The pragmas
      */
     public void setPragmas(final Map<String, Object> thePragmas) {
         this.pragmas = thePragmas;
@@ -185,7 +185,7 @@ public class ASTJexlScript extends JexlLexicalNode  {
     /**
      * Sets this script scope.
      *
-     * @param theScope the scope
+     * @param theScope The scope
      */
     public void setScope(final Scope theScope) {
         this.scope = theScope;

@@ -151,8 +151,8 @@ public abstract class IntegerRange implements Collection<Integer> {
     /**
      * Creates a range, ascending or descending depending on boundaries order.
      *
-     * @param from the lower inclusive boundary
-     * @param to   the higher inclusive boundary
+     * @param from The lower inclusive boundary
+     * @param to   The higher inclusive boundary
      * @return A range
      */
     public static IntegerRange create(final int from, final int to) {
@@ -171,8 +171,8 @@ public abstract class IntegerRange implements Collection<Integer> {
     /**
      * Creates a new range.
      *
-     * @param from the lower inclusive boundary
-     * @param to  the higher inclusive boundary
+     * @param from The lower inclusive boundary
+     * @param to  The higher inclusive boundary
      */
     public IntegerRange(final int from, final int to) {
         min = from;

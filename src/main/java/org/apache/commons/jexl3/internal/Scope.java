@@ -89,8 +89,8 @@ public final class Scope {
     /**
      * Creates a new scope with a list of parameters.
      *
-     * @param scope the parent scope if any
-     * @param parameters the list of parameters
+     * @param scope The parent scope if any
+     * @param parameters The list of parameters
      */
     public Scope(final Scope scope, final String... parameters) {
         if (parameters != null) {
@@ -109,7 +109,7 @@ public final class Scope {
     /**
      * Gets an unmodifiable view of a scope&quote;s symbols map.
      *
-     * @param scope the scope
+     * @param scope The scope
      * @return The symbols map
      */
      static Map<String, Integer> getSymbolsMap(final Scope scope) {
@@ -122,7 +122,7 @@ public final class Scope {
     /**
      * Marks a symbol as lexical, declared through let or const.
      *
-     * @param s the symbol
+     * @param s The symbol
      * @return true if the symbol was not already present in the lexical set
      */
     public boolean addLexical(final int s) {
@@ -136,8 +136,8 @@ public final class Scope {
      * Creates a frame by copying values up to the number of parameters.
      * <p>This captures the captured variables values.</p>
      *
-     * @param frame the caller frame
-     * @param args the arguments
+     * @param frame The caller frame
+     * @param args The arguments
      * @return The arguments array
      */
     public Frame createFrame(final boolean ref, final Frame frame, final Object...args) {
@@ -170,7 +170,7 @@ public final class Scope {
      * This method creates a new entry in the symbol map.
      * </p>
      *
-     * @param param the parameter name
+     * @param param The parameter name
      * @return The register index storing this variable
      */
     public int declareParameter(final String param) {
@@ -192,7 +192,7 @@ public final class Scope {
      * This method creates a new entry in the symbol map.
      * </p>
      *
-     * @param varName the variable name
+     * @param varName The variable name
      * @return The register index storing this variable
      */
     public int declareVariable(final String varName) {
@@ -228,7 +228,7 @@ public final class Scope {
     /**
      * Gets the captured index of a given symbol, i.e., the target index of a symbol in a child scope.
      *
-     * @param symbol the symbol index
+     * @param symbol The symbol index
      * @return The target symbol index or null if the symbol is not captured
      */
     public Integer getCaptured(final int symbol) {
@@ -246,7 +246,7 @@ public final class Scope {
     /**
      * Gets the index of a captured symbol, i.e., the source index of a symbol in a parent scope.
      *
-     * @param symbol the symbol index
+     * @param symbol The symbol index
      * @return The source symbol index or -1 if the symbol is not captured
      */
     public int getCaptureDeclaration(final int symbol) {
@@ -334,7 +334,7 @@ public final class Scope {
      * Checks whether an identifier is a local variable or argument, i.e., a symbol.
      * If this fails, look within parents for a symbol that can be captured.
      *
-     * @param name the symbol name
+     * @param name The symbol name
      * @return The symbol index
      */
     public Integer getSymbol(final String name) {
@@ -344,7 +344,7 @@ public final class Scope {
     /**
      * Checks whether an identifier is a local variable or argument, i.e., a symbol.
      *
-     * @param name the symbol name
+     * @param name The symbol name
      * @param capture whether solving by capturing a parent symbol is allowed
      * @return The symbol index
      */
@@ -379,7 +379,7 @@ public final class Scope {
     /**
      * Checks whether a given symbol is captured.
      *
-     * @param symbol the symbol number
+     * @param symbol The symbol number
      * @return true if captured, false otherwise
      */
     public boolean isCapturedSymbol(final int symbol) {
@@ -389,7 +389,7 @@ public final class Scope {
     /**
      * Checks whether a symbol is declared through a let or const.
      *
-     * @param s the symbol
+     * @param s The symbol
      * @return true if symbol was declared through let or const
      */
     public boolean isLexical(final int s) {

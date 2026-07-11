@@ -57,7 +57,7 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
         /**
          * Declares a local symbol.
          *
-         * @param symbol the symbol index in the scope
+         * @param symbol The symbol index in the scope
          * @return true if declaration was successful, false if symbol was already declared
          */
         boolean declareSymbol(int symbol);
@@ -75,7 +75,7 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
         /**
          * Checks whether a symbol is declared in this lexical unit.
          *
-         * @param symbol the symbol
+         * @param symbol The symbol
          * @return true if declared, false otherwise
          */
         boolean hasSymbol(int symbol);
@@ -132,7 +132,7 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
     /**
      * Pick the most significant token for error reporting.
      *
-     * @param tokens the tokens to choose from
+     * @param tokens The tokens to choose from
      * @return The token
      */
     protected static Token errorToken(final Token... tokens) {
@@ -147,8 +147,8 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
     /**
      * Assigns the content of a token to another token.
      *
-     * @param src the source token, if null, the destination token is returned
-     * @param dest the destination token, if null, the source token is returned
+     * @param src The source token, if null, the destination token is returned
+     * @param dest The destination token, if null, the source token is returned
      * @return The destination token with the content of the source token
      */
     static Token assignToken(final Token src, final Token dest) {
@@ -171,8 +171,8 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
     /**
      * Reads a given source line.
      *
-     * @param src the source
-     * @param lineno the line number
+     * @param src The source
+     * @param lineno The line number
      * @return The line
      */
     protected static String readSourceLine(final String src, final int lineno) {
@@ -193,7 +193,7 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
     /**
      * Utility function to create '.' separated string from a list of string.
      *
-     * @param lstr the list of strings
+     * @param lstr The list of strings
      * @return The dotted version
      */
     protected static String stringify(final Iterable<String> lstr) {
@@ -386,7 +386,7 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
     /**
      * Encode a value to a switch predicate.
      *
-     * @param value the value.
+     * @param value The value.
      * @return The encoded value, which is either the value itself, or NAN (for NaN) or NIL (for null).
      */
     static Object switchCode(final Object value) {
@@ -429,7 +429,7 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
     /**
      * Tests whether a given variable name is allowed.
      *
-     * @param image the name.
+     * @param image The name.
      * @return true if allowed, false if reserved.
      */
     protected boolean allowVariable(final String image) {
@@ -446,7 +446,7 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
     /**
      * Check fat vs thin arrow syntax feature.
      *
-     * @param token the arrow token.
+     * @param token The arrow token.
      */
     protected void checkLambda(final Token token) {
         final String arrow = token.image;
@@ -464,8 +464,8 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
     /**
      * Checks whether an identifier is a local variable or argument, ie a symbol, stored in a register.
      *
-     * @param identifier the identifier.
-     * @param name      the identifier name.
+     * @param identifier The identifier.
+     * @param name      The identifier name.
      * @return The image.
      */
     protected String checkVariable(final ASTIdentifier identifier, final String name) {
@@ -516,7 +516,7 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
     /**
      * Cleanup.
      *
-     * @param features the feature set to restore if any.
+     * @param features The feature set to restore if any.
      */
     protected void cleanup(final JexlFeatures features) {
         info = null;
@@ -550,8 +550,8 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
     /**
      * Declares a local function.
      *
-     * @param variable the identifier used to declare.
-     * @param token      the variable name token.
+     * @param variable The identifier used to declare.
+     * @param token      The variable name token.
      */
     protected void declareFunction(final ASTVar variable, final Token token) {
         final String name = token.image;
@@ -586,7 +586,7 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
      * This method creates a new entry in the symbol map.
      * </p>
      *
-     * @param token the parameter name token.
+     * @param token The parameter name token.
      * @param lexical whether the parameter is lexical or not.
      * @param constant whether the parameter is constant or not.
      */
@@ -620,8 +620,8 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
     /**
      * Adds a pragma declaration.
      *
-     * @param key the pragma key.
-     * @param value the pragma value.
+     * @param key The pragma key.
+     * @param value The pragma value.
      */
     protected void declarePragma(final String key, final Object value) {
         final JexlFeatures features = getFeatures();
@@ -671,7 +671,7 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
     /**
      * Declares a symbol.
      *
-     * @param symbol the symbol index.
+     * @param symbol The symbol index.
      * @return true if symbol can be declared in lexical scope, false (error)
      * if it is already declared.
      */
@@ -695,10 +695,10 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
      * This method creates an new entry in the symbol map.
      * </p>
      *
-     * @param variable the identifier used to declare.
+     * @param variable The identifier used to declare.
      * @param lexical  whether the symbol is lexical.
      * @param constant whether the symbol is constant.
-     * @param token    the variable name token.
+     * @param token    The variable name token.
      */
     protected void declareVariable(final ASTVar variable, final Token token, final boolean lexical, final boolean constant) {
         final String name = token.image;
@@ -786,7 +786,7 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
     /**
      * Checks whether a symbol has been declared as a const in the current stack of lexical units.
      *
-     * @param symbol the symbol.
+     * @param symbol The symbol.
      * @return true if constant, false otherwise.
      */
     private boolean isConstant(final int symbol) {
@@ -820,7 +820,7 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
     /**
      * Checks whether a name is a declared namespace.
      *
-     * @param name the namespace name.
+     * @param name The namespace name.
      * @return true if declared, false otherwise.
      */
     private boolean isNamespace(final String name) {
@@ -843,9 +843,9 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
      * <p>Note that this check is performed before syntactic check so the expected parameters need to be
      * verified.</p>
      *
-     * @param ns the namespace token.
+     * @param ns The namespace token.
      * @param colon expected to be &quot;:&quot;
-     * @param fun the function name
+     * @param fun The function name
      * @param paren expected to be &quot;(&quot;
      * @return true if the name qualifies a namespace function call.
      */
@@ -877,8 +877,8 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
      * Checks if a symbol is defined in lexical scopes.
      * <p>This works with parsed scripts in template resolution only.
      *
-     * @param info an info linked to a node.
-     * @param symbol the symbol number.
+     * @param info An info linked to a node.
+     * @param symbol The symbol number.
      * @return true if symbol accessible in lexical scope.
      */
     private boolean isSymbolDeclared(final JexlNode.Info info, final int symbol) {
@@ -902,7 +902,7 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
     /**
      * Checks whether an identifier is a local variable or argument.
      *
-     * @param name the variable name.
+     * @param name The variable name.
      * @return true if a variable with that name was declared.
      */
     protected boolean isVariable(final String name) {
@@ -917,7 +917,7 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
      * and that may be confused with an expression.
      * </p>
      *
-     * @param semicolon the semicolon token kind.
+     * @param semicolon The semicolon token kind.
      * @return true if statement is ambiguous, false otherwise.
      */
     protected boolean isAmbiguousStatement(final int semicolon) {
@@ -937,7 +937,7 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
      * <p>
      * Detects "Ambiguous statement" and 'non-left value assignment'.</p>
      *
-     * @param node the node.
+     * @param node The node.
      * @throws JexlException.Parsing when parsing fails.
      */
     protected void jjtreeCloseNodeScope(final JexlNode node) {
@@ -979,8 +979,8 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
      * Parses an embedded Jexl expression within an interpolation node.
      * <p>This creates a sub-parser that shares the scopes of the parent parser.</p>
      *
-     * @param info the JexlInfo
-     * @param src the source to parse
+     * @param info The JexlInfo
+     * @param src The source to parse
      * @return The parsed tree
      */
     @Override
@@ -998,9 +998,9 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
      * Parses an interpolation expression.
      * <p>Requires the JEXL engine to be accessible through its thread-local.</p>
      *
-     * @param info the JexlInfo
-     * @param src the source to parse
-     * @param scope the scope
+     * @param info The JexlInfo
+     * @param src The source to parse
+     * @param scope The scope
      * @return The expression
      */
     static JxltEngine.Expression parseInterpolation(final JexlInfo info, final String src, final Scope scope) {
@@ -1019,7 +1019,7 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
     /**
      * Called by parser at the beginning of a node construction.
      *
-     * @param node the node.
+     * @param node The node.
      */
     protected void jjtreeOpenNodeScope(final JexlNode node) {
         // nothing
@@ -1028,7 +1028,7 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
     /**
      * Starts the definition of a lambda.
      *
-     * @param jjtThis the script.
+     * @param jjtThis The script.
      */
     protected void beginLambda(final ASTJexlScript jjtThis) {
         jjtThis.setFeatures(getFeatures());
@@ -1039,7 +1039,7 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
     /**
      * Ends the definition of a lambda.
      *
-     * @param jjtThis the script.
+     * @param jjtThis The script.
      */
     protected void endLambda(final ASTJexlScript jjtThis) {
         popUnit(jjtThis);
@@ -1086,7 +1086,7 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
     /**
      * Pushes a new lexical unit.
      *
-     * @param unit the new lexical unit.
+     * @param unit The new lexical unit.
      */
     protected void pushUnit(final LexicalUnit unit) {
         final Scope scope = scopeReference.get();
@@ -1119,7 +1119,7 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
     /**
      * Sets a new set of options.
      *
-     * @param features the parser features
+     * @param features The parser features
      */
     protected void setFeatures(final JexlFeatures features) {
         this.featureController.setFeatures(features);
@@ -1131,7 +1131,7 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
      * Seeks the end of the ambiguous statement to recover.
      * </p>
      *
-     * @param node the first token in ambiguous expression.
+     * @param node The first token in ambiguous expression.
      * @throws JexlException.Ambiguous in all cases.
      */
     protected void throwAmbiguousException(final JexlNode node) {
@@ -1145,8 +1145,8 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
     /**
      * Throws a feature exception.
      *
-     * @param feature the feature code.
-     * @param info the exception surroundings.
+     * @param feature The feature code.
+     * @param info The exception surroundings.
      * @throws JexlException.Feature in all cases.
      */
     protected void throwFeatureException(final int feature, final JexlInfo info) {
@@ -1157,8 +1157,8 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
     /**
      * Throws a feature exception.
      *
-     * @param feature the feature code.
-     * @param trigger the token that triggered it.
+     * @param feature The feature code.
+     * @param trigger The token that triggered it.
      * @throws JexlException.Parsing if actual error token cannot be found.
      * @throws JexlException.Feature in all other cases.
      */
@@ -1177,7 +1177,7 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
     /**
      * Throws a parsing exception.
      *
-     * @param parsed the token to report.
+     * @param parsed The token to report.
      * @throws JexlException.Parsing in all cases.
      */
     protected void throwParsingException(final Token parsed) {

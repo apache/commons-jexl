@@ -31,8 +31,8 @@ public final class ConstructorMethod implements JexlMethod {
     /**
      * Discovers a class constructor and wrap it as a JexlMethod.
      *
-     * @param is the introspector
-     * @param ctorHandle a class or class name
+     * @param is The introspector
+     * @param ctorHandle A class or class name
      * @param args constructor arguments
      * @return A {@link JexlMethod}
      */
@@ -60,7 +60,7 @@ public final class ConstructorMethod implements JexlMethod {
     /**
      * Creates a constructor method.
      *
-     * @param theCtor the constructor to wrap
+     * @param theCtor The constructor to wrap
      */
     ConstructorMethod(final Constructor<?> theCtor) {
         this.ctor = theCtor;

@@ -69,7 +69,7 @@ public class JexlScriptEngineFactory implements ScriptEngineFactory {
     /**
      * Constructor with permissions.
      * <p>Meant to reduce dependency to JEXL for extraordinary use case of JSR233.</p>
-     * @param jexlPermissions the permissions instance to use or null to use the {@link JexlScriptEngineFactory} default
+     * @param jexlPermissions The permissions instance to use or null to use the {@link JexlScriptEngineFactory} default
      */
     public JexlScriptEngineFactory(final JexlPermissions jexlPermissions) {
         permissions = jexlPermissions != null ? jexlPermissions : defaultPermissions;
@@ -120,7 +120,7 @@ public class JexlScriptEngineFactory implements ScriptEngineFactory {
      *         JexlScriptEngineFactory.setDefaultPermissions(JexlPermissions.UNRESTRICTED);
      * }
      *
-     * @param permissions the permissions instance to use or null to use the {@link JexlBuilder} default
+     * @param permissions The permissions instance to use or null to use the {@link JexlBuilder} default
      * @since 3.6.3
      */
     public static void setDefaultPermissions(final JexlPermissions permissions) {

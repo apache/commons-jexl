@@ -57,7 +57,7 @@ public final class ASTNumberLiteral extends JexlNode implements JexlNode.Constan
      * Sets this node as a natural literal.
      * Originally from OGNL.
      *
-     * @param s the natural as string
+     * @param s The natural as string
      */
     void setNatural(final String s) {
         nlp.assignNatural(s);
@@ -67,7 +67,7 @@ public final class ASTNumberLiteral extends JexlNode implements JexlNode.Constan
      * Sets this node as a real literal.
      * Originally from OGNL.
      *
-     * @param s the real as string
+     * @param s The real as string
      */
     void setReal(final String s) {
         nlp.assignReal(s);

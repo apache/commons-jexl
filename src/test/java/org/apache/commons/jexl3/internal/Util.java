@@ -36,8 +36,8 @@ public class Util {
     /**
      * Checks the equality of 2 nodes by comparing all their descendants.
      * Descendants must have the same class and same image if non null.
-     * @param lhs the left script
-     * @param rhs the right script
+     * @param lhs The left script
+     * @param rhs The right script
      * @return null if true, a reason otherwise
      */
     private static String checkEquals(JexlNode lhs, JexlNode rhs) {
@@ -128,7 +128,7 @@ public class Util {
 
     /**
      * Creates a list of all descendants of a script including itself.
-     * @param node the script to flatten
+     * @param node The script to flatten
      * @return The descendants-and-self list
      */
     protected static ArrayList<JexlNode> flatten(final JexlNode node) {
@@ -139,8 +139,8 @@ public class Util {
 
     /**
      * Recursively adds all children of a script to the list of descendants.
-     * @param list   the list of descendants to add to
-     * @param node the script & descendants to add
+     * @param list   The list of descendants to add to
+     * @param node The script & descendants to add
      */
     private static void flatten(final List<JexlNode> list, final JexlNode node) {
         final int nc = node.jjtGetNumChildren();
@@ -152,7 +152,7 @@ public class Util {
 
     /**
      * A helper class to help validate AST problems.
-     * @param e the script
+     * @param e The script
      * @return An indented version of the AST
      */
     protected static String flattenedStr(final JexlScript e) {

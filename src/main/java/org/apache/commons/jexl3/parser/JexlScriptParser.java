@@ -32,9 +32,9 @@ public interface JexlScriptParser {
    * Parses a script or expression.
    *
    * @param info      information structure
-   * @param features  the set of parsing features
-   * @param src      the expression to parse
-   * @param scope     the script frame
+   * @param features  The set of parsing features
+   * @param src      The expression to parse
+   * @param scope     The script frame
    * @return The parsed tree
    * @throws JexlException if any error occurred during parsing
    */
@@ -44,9 +44,9 @@ public interface JexlScriptParser {
    * Parses an embedded JXLT script or expression, an interpolation expression.
    *
    * @param info      information structure
-   * @param features  the set of parsing features
-   * @param src      the expression to parse
-   * @param scope     the script frame
+   * @param features  The set of parsing features
+   * @param src      The expression to parse
+   * @param scope     The script frame
    * @return The parsed tree
    * @throws JexlException if any error occurred during parsing
    */

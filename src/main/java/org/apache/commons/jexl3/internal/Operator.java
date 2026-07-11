@@ -77,8 +77,8 @@ public final class Operator implements JexlOperator.Uberspect {
      * Creates an instance.
      * <p>Mostly used as a compatibility measure by delegating instead of extending.</p>
      *
-     * @param theUberspect  the uberspect instance
-     * @param theArithmetic the arithmetic instance used to delegate operator overloads
+     * @param theUberspect  The uberspect instance
+     * @param theArithmetic The arithmetic instance used to delegate operator overloads
      */
     public Operator(final JexlUberspect theUberspect, final JexlArithmetic theArithmetic) {
         this.uberspect = theUberspect;
@@ -90,9 +90,9 @@ public final class Operator implements JexlOperator.Uberspect {
     /**
      * Creates an instance.
      *
-     * @param theUberspect the uberspect instance
-     * @param theArithmetic the arithmetic instance
-     * @param theOverloads  the overloaded operators
+     * @param theUberspect The uberspect instance
+     * @param theArithmetic The arithmetic instance
+     * @param theOverloads  The overloaded operators
      */
     public Operator(final JexlUberspect theUberspect,
                     final JexlArithmetic theArithmetic,
@@ -103,10 +103,10 @@ public final class Operator implements JexlOperator.Uberspect {
     /**
      * Creates an instance.
      *
-     * @param theUberspect the uberspect instance
-     * @param theArithmetic the arithmetic instance
-     * @param theOverloads  the overloaded operators
-     * @param theCache the caching state
+     * @param theUberspect The uberspect instance
+     * @param theArithmetic The arithmetic instance
+     * @param theOverloads  The overloaded operators
+     * @param theCache The caching state
      */
     public Operator(final JexlUberspect theUberspect,
                     final JexlArithmetic theArithmetic,
@@ -158,8 +158,8 @@ public final class Operator implements JexlOperator.Uberspect {
      * Tidy arguments based on operator arity.
      * <p>The interpreter may add a null to the arguments of operator expecting only one parameter.</p>
      *
-     * @param operator the operator
-     * @param args the arguments (as seen by the interpreter)
+     * @param operator The operator
+     * @param args The arguments (as seen by the interpreter)
      * @return The tidied arguments
      */
     private Object[] arguments(final JexlOperator operator, final Object...args) {
@@ -169,9 +169,9 @@ public final class Operator implements JexlOperator.Uberspect {
     /**
      * Attempts finding a method in left and eventually narrowing right.
      *
-     * @param methodName the method name
-     * @param right the left argument in the operator
-     * @param left the right argument in the operator
+     * @param methodName The method name
+     * @param right The left argument in the operator
+     * @param left The right argument in the operator
      * @return A boolean is call was possible, null otherwise
      * @throws Exception if invocation fails
      */
@@ -193,9 +193,9 @@ public final class Operator implements JexlOperator.Uberspect {
     /**
      * Throw a NPE if operator is strict and one of the arguments is null.
      *
-     * @param arithmetic the JEXL arithmetic instance
-     * @param operator the operator to check
-     * @param args the operands
+     * @param arithmetic The JEXL arithmetic instance
+     * @param operator The operator to check
+     * @param args The operands
      * @throws JexlArithmetic.NullOperand if operator is strict and an operand is null
      */
      private void controlNullOperands(final JexlArithmetic arithmetic, final JexlOperator operator, final Object...args) {
@@ -214,9 +214,9 @@ public final class Operator implements JexlOperator.Uberspect {
     /**
      * Triggered when an operator fails.
      *
-     * @param ref     the node where the error originated from
-     * @param operator the operator symbol
-     * @param cause    the cause of error (if any)
+     * @param ref     The node where the error originated from
+     * @param operator The operator symbol
+     * @param cause    The cause of error (if any)
      * @param alt      what to return if not strict
      * @param <T>      the return type
      * @return throws JexlException if strict and not silent, null otherwise
@@ -237,9 +237,9 @@ public final class Operator implements JexlOperator.Uberspect {
      * Seeks an implementation of an operator method in an arithmetic instance.
      * <p>Method must <em><>not/em belong to JexlArithmetic</p>
      *
-     * @param arithmetic the arithmetic instance
-     * @param operator the operator
-     * @param args the arguments
+     * @param arithmetic The arithmetic instance
+     * @param operator The operator
+     * @param args The arguments
      * @return A JexlMethod instance or null
      */
     private JexlMethod uberspectOperator(final JexlArithmetic arithmetic,
@@ -256,7 +256,7 @@ public final class Operator implements JexlOperator.Uberspect {
     /**
      * Checks whether a method returns a boolean or a Boolean.
      *
-     * @param vm the JexlMethod (can be null)
+     * @param vm The JexlMethod (can be null)
      * @return true of false
      */
     private boolean returnsBoolean(final JexlMethod vm) {
@@ -270,7 +270,7 @@ public final class Operator implements JexlOperator.Uberspect {
     /**
      * Checks whether a method returns an int or an Integer.
      *
-     * @param vm the JexlMethod (can be null)
+     * @param vm The JexlMethod (can be null)
      * @return true of false
      */
     private boolean returnsInteger(final JexlMethod vm) {
@@ -478,8 +478,8 @@ public final class Operator implements JexlOperator.Uberspect {
     /**
      * Performs the base operation of an assignment.
      *
-     * @param operator the operator
-     * @param args the arguments
+     * @param operator The operator
+     * @param args The arguments
      * @return The result
      */
     private Object performBaseOperation(final JexlOperator operator, final Object... args) {
@@ -520,9 +520,9 @@ public final class Operator implements JexlOperator.Uberspect {
     /**
      * Tries operator evaluation, handles method resolution caching.
      *
-     * @param node the node
-     * @param operator the operator
-     * @param args the operator arguments
+     * @param node The node
+     * @param operator The operator
+     * @param args The operator arguments
      * @return The operator evaluation result or TRY_FAILED
      */
     private Object tryEval(final JexlCache.Reference node, final JexlOperator operator, final Object...args) {
@@ -570,8 +570,8 @@ public final class Operator implements JexlOperator.Uberspect {
      * Special handling of overloads where another attempt at finding a method may be attempted.
      * <p>As of 3.5.0, only the comparison operators attempting to use compare() are handled.</p>
      *
-     * @param operator the operator
-     * @param args the arguments
+     * @param operator The operator
+     * @param args The arguments
      * @return An instance or null
      */
     private JexlMethod getAlternateOverload(final JexlOperator operator, final Object... args) {
@@ -632,7 +632,7 @@ public final class Operator implements JexlOperator.Uberspect {
         /**
          * From compare() int result to operator boolean result.
          *
-         * @param cmp the compare result
+         * @param cmp The compare result
          * @return The operator applied
          */
         protected boolean operate(final int cmp) {

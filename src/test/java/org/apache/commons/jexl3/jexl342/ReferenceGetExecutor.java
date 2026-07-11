@@ -33,8 +33,8 @@ public class ReferenceGetExecutor implements JexlPropertyGet {
     /**
      * Creates an instance.
      *
-     * @param referenceHandler the reference handler
-     * @param jexlGet the property getter
+     * @param referenceHandler The reference handler
+     * @param jexlGet The property getter
      */
     public ReferenceGetExecutor(final ReferenceUberspect.ReferenceHandler referenceHandler, final JexlPropertyGet jexlGet) {
         if (referenceHandler == null || jexlGet == null) {
@@ -47,7 +47,7 @@ public class ReferenceGetExecutor implements JexlPropertyGet {
     /**
      * Dereference an expected optional or reference.
      *
-     * @param ref the reference
+     * @param ref The reference
      * @return The reference value or the reference
      */
     protected Object getReference(final Object ref) {

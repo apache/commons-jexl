@@ -90,7 +90,7 @@ public class Main {
     /**
      * Reads an input.
      *
-     * @param path the file path or null for stdin
+     * @param path The file path or null for stdin
      * @return The reader
      * @throws IOException if anything goes wrong
      */

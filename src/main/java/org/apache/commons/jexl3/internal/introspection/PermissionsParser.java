@@ -85,9 +85,9 @@ public class PermissionsParser {
     /**
      * Parses permissions from a source.
      *
-     * @param wildcards the set of allowed packages
-     * @param packages the map of restricted elements
-     * @param srcs the sources
+     * @param wildcards The set of allowed packages
+     * @param packages The map of restricted elements
+     * @param srcs The sources
      * @return The permissions map
      */
     synchronized Permissions parse(final Set<String> wildcards, final Map<String, Permissions.NoJexlPackage> packages,
@@ -112,7 +112,7 @@ public class PermissionsParser {
     /**
      * Parses permissions from a source.
      *
-     * @param srcs the sources
+     * @param srcs The sources
      * @return The permissions map
      */
     public Permissions parse(final String... srcs) {
@@ -122,11 +122,11 @@ public class PermissionsParser {
     /**
      * Reads a class permission.
      *
-     * @param njpackage the owning package
+     * @param njpackage The owning package
      * @param nojexl whether the restriction is explicitly denying (true) or allowing (false) members
-     * @param outer the outer class (if any)
-     * @param inner the inner class name (if any)
-     * @param offset the initial parsing position in the source
+     * @param outer The outer class (if any)
+     * @param inner The inner class name (if any)
+     * @param offset The initial parsing position in the source
      * @return The new parsing position
      */
     private int readClass(final Permissions.NoJexlPackage njpackage, final boolean nojexl, final String outer, final String inner, final int offset) {
@@ -265,8 +265,8 @@ public class PermissionsParser {
     /**
      * Reads an identifier (optionally dot-separated).
      *
-     * @param id the builder to fill the identifier character with
-     * @param offset the initial reading position
+     * @param id The builder to fill the identifier character with
+     * @param offset The initial reading position
      * @return The position after the identifier
      */
     private int readIdentifier(final StringBuilder id, final int offset) {
@@ -276,8 +276,8 @@ public class PermissionsParser {
     /**
      * Reads an identifier (optionally dot-separated).
      *
-     * @param id the builder to fill the identifier character with
-     * @param offset the initial reading position
+     * @param id The builder to fill the identifier character with
+     * @param offset The initial reading position
      * @param dot whether dots (.) are allowed
      * @param star whether stars (*) are allowed
      * @return The position after the identifier
@@ -431,8 +431,8 @@ public class PermissionsParser {
     /**
      * Compose a parsing error message.
      *
-     * @param c the offending character
-     * @param i the offset position
+     * @param c The offending character
+     * @param i The offset position
      * @return The error message
      */
     private String unexpected(final char c, final int i) {

@@ -51,7 +51,7 @@ public interface JexlPropertySet {
     /**
      * Checks whether a tryInvoke failed or not.
      *
-     * @param rval the value returned by tryInvoke
+     * @param rval The value returned by tryInvoke
      * @return true if tryInvoke failed, false otherwise
      */
     boolean tryFailed(Object rval);
@@ -60,9 +60,9 @@ public interface JexlPropertySet {
      * Attempts to reuse this JexlPropertySet, checking that it is compatible with
      * the actual set of arguments.
      *
-     * @param obj the object to invoke the get upon
-     * @param key the property key to get
-     * @param value the property value to set
+     * @param obj The object to invoke the get upon
+     * @param key The property key to get
+     * @param value The property value to set
      * @return The result of the method invocation that should be checked by tryFailed to determine if it succeeded
      * or failed.
      * @throws JexlException.TryFailed if the underlying method was invoked but threw an exception

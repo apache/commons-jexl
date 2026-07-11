@@ -34,8 +34,8 @@ public class ReferenceMethodExecutor implements JexlMethod {
     /**
      * Creates an instance.
      *
-     * @param referenceHandler the reference handler
-     * @param jexlMethod the method executor
+     * @param referenceHandler The reference handler
+     * @param jexlMethod The method executor
      */
     public ReferenceMethodExecutor(final ReferenceUberspect.ReferenceHandler referenceHandler, final JexlMethod jexlMethod) {
         if (referenceHandler == null || jexlMethod == null) {
@@ -48,7 +48,7 @@ public class ReferenceMethodExecutor implements JexlMethod {
     /**
      * Dereference an expected optional or reference.
      *
-     * @param opt the reference
+     * @param opt The reference
      * @return The reference value
      */
     protected Object getReference(final Object opt) {

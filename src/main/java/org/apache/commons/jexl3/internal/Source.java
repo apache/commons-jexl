@@ -44,9 +44,9 @@ public final class Source implements Comparable<Source> {
     /**
      * Default constructor.
      *
-     * @param theFeatures the features
-     * @param theSymbols the map of variable name to symbol offset in evaluation frame
-     * @param theStr the script source
+     * @param theFeatures The features
+     * @param theSymbols The map of variable name to symbol offset in evaluation frame
+     * @param theStr The script source
      */
     Source(final JexlFeatures theFeatures, final Map<String, Integer> theSymbols,  final String theStr) {
         this.features = theFeatures;

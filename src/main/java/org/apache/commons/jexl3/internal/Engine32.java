@@ -40,10 +40,10 @@ public class Engine32 extends Engine {
     /**
      * Static delegation of getVariable.
      *
-     * @param ii the interpreter
-     * @param frame the frame
-     * @param block the scope
-     * @param identifier the variable identifier
+     * @param ii The interpreter
+     * @param frame The frame
+     * @param block The scope
+     * @param identifier The variable identifier
      * @return The variable value
      */
     static Object getVariable(final Interpreter ii, final Frame frame, final LexicalScope block, final ASTIdentifier identifier) {
@@ -75,8 +75,8 @@ public class Engine32 extends Engine {
     /**
      * Static delegation of isTernaryProtected.
      *
-     * @param ii the interpreter (unused)
-     * @param startNode the node
+     * @param ii The interpreter (unused)
+     * @param startNode The node
      * @return true if node is navigation-safe, false otherwise
      */
     static boolean isTernaryProtected(final Interpreter ii, final JexlNode startNode) {

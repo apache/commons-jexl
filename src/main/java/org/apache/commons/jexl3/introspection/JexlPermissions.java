@@ -116,7 +116,7 @@ public interface JexlPermissions {
       /**
        * Creates permissions based on the RESTRICTED set but allowing an explicit set.
        *
-       * @param allow the set of allowed classes
+       * @param allow The set of allowed classes
        */
       public ClassPermissions(final Class<?>... allow) {
         this(JexlPermissions.RESTRICTED, allow);
@@ -124,8 +124,8 @@ public interface JexlPermissions {
 
       /**
        * Creates permissions by augmenting an existing set with an explicit set of allowed classes.
-       * @param permissions the base permissions to augment
-       * @param allow the set of allowed classes
+       * @param permissions The base permissions to augment
+       * @param allow The set of allowed classes
        */
       public ClassPermissions(final JexlPermissions permissions, final Class<?>... allow) {
         this(permissions, Arrays.stream(Objects.requireNonNull(allow)).map(Class::getCanonicalName).collect(Collectors.toList()));
@@ -134,8 +134,8 @@ public interface JexlPermissions {
       /**
        * Creates permissions by augmenting an existing set with an explicit set of allowed canonical class names.
        *
-       * @param delegate the base to delegate to
-       * @param allow    the list of class canonical names
+       * @param delegate The base to delegate to
+       * @param allow    The list of class canonical names
        */
       public ClassPermissions(final JexlPermissions delegate, final Collection<String> allow) {
         super(Objects.requireNonNull(delegate));
@@ -222,7 +222,7 @@ public interface JexlPermissions {
         /**
          * Constructs a new instance.
          *
-         * @param delegate the delegate.
+         * @param delegate The delegate.
          */
         protected Delegate(final JexlPermissions delegate) {
             base = delegate;
@@ -287,7 +287,7 @@ public interface JexlPermissions {
         /**
          * Constructs an instance logging to a logger named after this class.
          *
-         * @param delegate the permissions to delegate to
+         * @param delegate The permissions to delegate to
          */
         public LoggingPermissions(final JexlPermissions delegate) {
             this(LogFactory.getLog(LoggingPermissions.class), delegate);
@@ -296,8 +296,8 @@ public interface JexlPermissions {
         /**
          * Constructs an instance logging to a named logger.
          *
-         * @param loggerName the name of the logger to use
-         * @param delegate the permissions to delegate to
+         * @param loggerName The name of the logger to use
+         * @param delegate The permissions to delegate to
          */
         public LoggingPermissions(final String loggerName, final JexlPermissions delegate) {
             this(LogFactory.getLog(loggerName), delegate);
@@ -306,8 +306,8 @@ public interface JexlPermissions {
         /**
          * Constructs an instance with an explicit logger.
          *
-         * @param log the logger
-         * @param delegate the permissions to delegate to
+         * @param log The logger
+         * @param delegate The permissions to delegate to
          */
         protected LoggingPermissions(final Log log, final JexlPermissions delegate) {
             super(delegate);
@@ -318,8 +318,8 @@ public interface JexlPermissions {
          * Logs a decision once: the first time a given message is seen, it is written to the logger;
          * subsequent identical messages are suppressed.
          *
-         * @param allowed the decision to return
-         * @param message the message to log
+         * @param allowed The decision to return
+         * @param message The message to log
          * @return The decision
          */
         private boolean log(final boolean allowed, final String message) {
@@ -642,7 +642,7 @@ public interface JexlPermissions {
      * } # end package my.package
      * </pre>
      *
-     * @param src the permissions source, the default (NoJexl aware) permissions if null
+     * @param src The permissions source, the default (NoJexl aware) permissions if null
      * @return The permissions instance
      * @since 3.3
      */
@@ -657,7 +657,7 @@ public interface JexlPermissions {
      * rules denies everything. This differs from {@link #parse(String...)}, whose empty form
      * ({@link #UNRESTRICTED}) allows everything.</p>
      *
-     * @param rules the permission DSL declarations
+     * @param rules The permission DSL declarations
      * @return The closed-world permission set
      * @since 3.7.0
      */
@@ -680,7 +680,7 @@ public interface JexlPermissions {
      * Wraps these permissions in a {@link LoggingPermissions} that logs every allow/deny decision
      * to a named logger.
      *
-     * @param loggerName the name of the logger to log decisions to
+     * @param loggerName The name of the logger to log decisions to
      * @return A logging view of these permissions
      * @since 3.7.0
      */
@@ -692,7 +692,7 @@ public interface JexlPermissions {
      * Wraps these permissions in a {@link LoggingPermissions} that logs every allow/deny decision
      * to the given logger.
      *
-     * @param log the logger to log decisions to
+     * @param log The logger to log decisions to
      * @return A logging view of these permissions
      * @since 3.7.0
      */
@@ -707,7 +707,7 @@ public interface JexlPermissions {
      * If one of its super-classes is not allowed, tbe class is not allowed either.</p>
      * <p>For interfaces, only methods and fields are disallowed in derived interfaces or implementing classes.</p>
      *
-     * @param clazz the class to check
+     * @param clazz The class to check
      * @return true if JEXL is allowed to introspect, false otherwise
      * @since 3.3
      */
@@ -718,7 +718,7 @@ public interface JexlPermissions {
      * <p>If a constructor is not allowed, the new operator cannot be used to instantiate its declared class
      * in scripts or expressions.</p>
      *
-     * @param ctor the constructor to check
+     * @param ctor The constructor to check
      * @return true if JEXL is allowed to introspect, false otherwise
      * @since 3.3
      */
@@ -728,7 +728,7 @@ public interface JexlPermissions {
      * Checks whether a field explicitly allows JEXL introspection.
      * <p>If a field is not allowed, it cannot be resolved and accessed in scripts or expressions.</p>
      *
-     * @param field the field to check
+     * @param field The field to check
      * @return true if JEXL is allowed to introspect, false otherwise
      * @since 3.3
      */
@@ -737,8 +737,8 @@ public interface JexlPermissions {
     /**
      * Checks whether a field explicitly allows JEXL introspection.
      * <p>If a field is not allowed, it cannot be resolved and accessed in scripts or expressions.</p>
-     * @param clazz the class from which the field is accessed, used to check that the field is allowed for this class
-     * @param field the field to check
+     * @param clazz The class from which the field is accessed, used to check that the field is allowed for this class
+     * @param field The field to check
      * @return true if JEXL is allowed to introspect, false otherwise
      * @since 3.6.3
    */
@@ -752,7 +752,7 @@ public interface JexlPermissions {
      * <p>Since methods can be overridden and overloaded, this also checks that no superclass or interface
      * explicitly disallows this method.</p>
      *
-     * @param method the method to check
+     * @param method The method to check
      * @return true if JEXL is allowed to introspect, false otherwise
      * @since 3.3
      */
@@ -764,8 +764,8 @@ public interface JexlPermissions {
      * <p>Since methods can be overridden and overloaded, this checks that this class explicitly allows
      * this method - superseding any superclass or interface specified permissions.</p>
      *
-     * @param clazz the class from which the method is accessed, used to check that the method is allowed for this class
-     * @param method the method to check
+     * @param clazz The class from which the method is accessed, used to check that the method is allowed for this class
+     * @param method The method to check
      * @return true if JEXL is allowed to introspect, false otherwise
      * @since 3.6.3
      */
@@ -778,7 +778,7 @@ public interface JexlPermissions {
      * <p>If the package disallows JEXL introspection, none of its classes or interfaces are visible
      * to JEXL and cannot be used in scripts or expression.</p>
      *
-     * @param pack the package
+     * @param pack The package
      * @return true if JEXL is allowed to introspect, false otherwise
      * @since 3.3
      */
@@ -790,7 +790,7 @@ public interface JexlPermissions {
      * used to integrate with. For instance, using <code>{@link #RESTRICTED}.compose("com.my.app.*")</code>
      * would extend the restricted set of permissions by allowing the com.my.app package.</p>
      *
-     * @param src the new constraints
+     * @param src The new constraints
      * @return The new permissions
      */
     JexlPermissions compose(String... src);
@@ -798,7 +798,7 @@ public interface JexlPermissions {
     /**
      * Checks that a class is valid for permission check.
      *
-     * @param clazz the class
+     * @param clazz The class
      * @return true if the class is not null, false otherwise
      */
     default boolean validate(final Class<?> clazz) {
@@ -808,7 +808,7 @@ public interface JexlPermissions {
     /**
      * Checks that a constructor is valid for permission check.
      *
-     * @param constructor the constructor
+     * @param constructor The constructor
      * @return true if constructor is not null and public, false otherwise
      */
     default boolean validate(final Constructor<?> constructor) {
@@ -818,7 +818,7 @@ public interface JexlPermissions {
     /**
      * Checks that a field is valid for permission check.
      *
-     * @param field the constructor
+     * @param field The constructor
      * @return true if field is not null and public, false otherwise
      */
     default boolean validate(final Field field) {
@@ -828,7 +828,7 @@ public interface JexlPermissions {
     /**
      * Checks that a method is valid for permission check.
      *
-     * @param method the method
+     * @param method The method
      * @return true if method is not null and public, false otherwise
      */
     default boolean validate(final Method method) {
@@ -838,7 +838,7 @@ public interface JexlPermissions {
     /**
      * Checks that a package is valid for permission check.
      *
-     * @param pack the package
+     * @param pack The package
      * @return true if the class is not null, false otherwise
      */
     default boolean validate(final Package pack) {

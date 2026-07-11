@@ -61,9 +61,9 @@ public final class TemplateEngine extends JxltEngine {
         /**
          * Creates a new block.
          *
-         * @param theType  the block type
-         * @param theLine  the line number
-         * @param theBlock the content
+         * @param theType  The block type
+         * @param theLine  The line number
+         * @param theBlock The content
          */
         Block(final BlockType theType, final int theLine, final String theBlock) {
             type = theType;
@@ -95,8 +95,8 @@ public final class TemplateEngine extends JxltEngine {
         /**
          * Appends this block string representation to a builder.
          *
-         * @param strb   the string builder to append to
-         * @param prefix the line prefix (immediate or deferred)
+         * @param strb   The string builder to append to
+         * @param prefix The line prefix (immediate or deferred)
          */
         void toString(final StringBuilder strb, final String prefix) {
             if (BlockType.VERBATIM == type) {
@@ -133,8 +133,8 @@ public final class TemplateEngine extends JxltEngine {
          * Creates a composite expression.
          *
          * @param counters counters of expressions per type
-         * @param list     the sub-expressions
-         * @param src      the source for this expression if any
+         * @param list     The sub-expressions
+         * @param src      The source for this expression if any
          */
         CompositeExpression(final int[] counters, final List<TemplateExpression> list, final TemplateExpression src) {
             super(src);
@@ -182,7 +182,7 @@ public final class TemplateEngine extends JxltEngine {
         /**
          * Fills up the list of variables accessed by this unified expression.
          *
-         * @param collector the variable collector
+         * @param collector The variable collector
          */
         @Override
         protected void getVariables(final Engine.VarCollector collector) {
@@ -229,8 +229,8 @@ public final class TemplateEngine extends JxltEngine {
         /**
          * Creates a constant unified expression.
          *
-         * @param val    the constant value
-         * @param source the source TemplateExpression if any
+         * @param val    The constant value
+         * @param source The source TemplateExpression if any
          */
         ConstantExpression(final Object val, final TemplateExpression source) {
             super(source);
@@ -264,8 +264,8 @@ public final class TemplateEngine extends JxltEngine {
         /**
          * Creates a deferred unified expression.
          *
-         * @param expr   the unified expression as a string
-         * @param node   the unified expression as an AST
+         * @param expr   The unified expression as a string
+         * @param node   The unified expression as an AST
          */
         DeferredExpression(final CharSequence expr, final JexlNode node) {
             super(expr, node, null);
@@ -306,7 +306,7 @@ public final class TemplateEngine extends JxltEngine {
         /**
          * Creates a builder.
          *
-         * @param size the initial TemplateExpression array size
+         * @param size The initial TemplateExpression array size
          */
         ExpressionBuilder(final int size) {
             counts = new int[]{0, 0, 0};
@@ -316,7 +316,7 @@ public final class TemplateEngine extends JxltEngine {
         /**
          * Adds an TemplateExpression to the list of expressions, maintain per-type counts.
          *
-         * @param expr the TemplateExpression to add
+         * @param expr The TemplateExpression to add
          */
         void add(final TemplateExpression expr) {
             counts[expr.getType().getIndex()] += 1;
@@ -326,8 +326,8 @@ public final class TemplateEngine extends JxltEngine {
         /**
          * Builds a TemplateExpression from a source, performs checks.
          *
-         * @param el     the unified el instance
-         * @param source the source TemplateExpression
+         * @param el     The unified el instance
+         * @param source The source TemplateExpression
          * @return An TemplateExpression
          */
         TemplateExpression build(final TemplateEngine el, final TemplateExpression source) {
@@ -354,7 +354,7 @@ public final class TemplateEngine extends JxltEngine {
         /**
          * Base for to-string.
          *
-         * @param error the builder to fill
+         * @param error The builder to fill
          * @return The builder
          */
         StringBuilder toString(final StringBuilder error) {
@@ -400,7 +400,7 @@ public final class TemplateEngine extends JxltEngine {
         /**
          * Creates an ExpressionType.
          *
-         * @param idx the index for this type in counters arrays.
+         * @param idx The index for this type in counters arrays.
          */
         ExpressionType(final int idx) {
             this.index = idx;
@@ -419,9 +419,9 @@ public final class TemplateEngine extends JxltEngine {
         /**
          * Creates an immediate unified expression.
          *
-         * @param expr   the unified expression as a string
-         * @param node   the unified expression as an AST
-         * @param source the source unified expression if any
+         * @param expr   The unified expression as a string
+         * @param node   The unified expression as an AST
+         * @param source The source unified expression if any
          */
         ImmediateExpression(final CharSequence expr, final JexlNode node, final TemplateExpression source) {
             super(expr, node, source);
@@ -451,9 +451,9 @@ public final class TemplateEngine extends JxltEngine {
         /**
          * Creates a JEXL interpretable unified expression.
          *
-         * @param theExpr   the unified expression as a string
-         * @param theNode   the unified expression as an AST
-         * @param theSource the source unified expression if any
+         * @param theExpr   The unified expression as a string
+         * @param theNode   The unified expression as an AST
+         * @param theSource The source unified expression if any
          */
         protected JexlBasedExpression(final CharSequence theExpr, final JexlNode theNode, final TemplateExpression theSource) {
             super(theSource);
@@ -508,8 +508,8 @@ public final class TemplateEngine extends JxltEngine {
         /**
          * Creates a nested unified expression.
          *
-         * @param expr   the unified expression as a string
-         * @param node   the unified expression as an AST
+         * @param expr   The unified expression as a string
+         * @param node   The unified expression as an AST
          */
         NestedExpression(final CharSequence expr, final JexlNode node, final Scope sc) {
             super(expr, node, null);
@@ -580,7 +580,7 @@ public final class TemplateEngine extends JxltEngine {
         /**
          * Creates an TemplateExpression.
          *
-         * @param src the source TemplateExpression if any
+         * @param src The source TemplateExpression if any
          */
         TemplateExpression(final TemplateExpression src) {
             this.source = src != null ? src : this;
@@ -596,7 +596,7 @@ public final class TemplateEngine extends JxltEngine {
         /**
          * Interprets a sub-expression.
          *
-         * @param interpreter a JEXL interpreter
+         * @param interpreter A JEXL interpreter
          * @return The result of interpretation
          * @throws JexlException (only for nested and composite)
          */
@@ -610,8 +610,8 @@ public final class TemplateEngine extends JxltEngine {
         /**
          * Evaluates this expression.
          *
-         * @param frame the frame storing parameters and local variables
-         * @param context the context storing global variables
+         * @param frame The frame storing parameters and local variables
+         * @param context The context storing global variables
          * @param options flags and properties that can alter the evaluation behavior.
          * @return The expression value
          * @throws JexlException if expression evaluation fails
@@ -659,7 +659,7 @@ public final class TemplateEngine extends JxltEngine {
         /**
          * Fills up the list of variables accessed by this unified expression.
          *
-         * @param collector the variable collector
+         * @param collector The variable collector
          */
         protected void getVariables(final Engine.VarCollector collector) {
             // nothing to do
@@ -678,7 +678,7 @@ public final class TemplateEngine extends JxltEngine {
         /**
          * The options to use during evaluation.
          *
-         * @param context the context
+         * @param context The context
          * @return The options
          */
         protected JexlOptions options(final JexlContext context) {
@@ -688,7 +688,7 @@ public final class TemplateEngine extends JxltEngine {
         /**
          * Prepares a sub-expression for interpretation.
          *
-         * @param interpreter a JEXL interpreter
+         * @param interpreter A JEXL interpreter
          * @return A prepared unified expression
          * @throws JexlException (only for nested and composite)
          */
@@ -704,8 +704,8 @@ public final class TemplateEngine extends JxltEngine {
         /**
          * Prepares this expression.
          *
-         * @param frame the frame storing parameters and local variables
-         * @param context the context storing global variables
+         * @param frame The frame storing parameters and local variables
+         * @param context The context storing global variables
          * @param options flags and properties that can alter the evaluation behavior.
          * @return The expression value
          * @throws JexlException if expression preparation fails
@@ -744,10 +744,10 @@ public final class TemplateEngine extends JxltEngine {
     /**
      * Helper for expression dealing with embedded strings.
      *
-     * @param strb the expression buffer to copy characters into
-     * @param expr the source
-     * @param position the offset into the source
-     * @param c the separator character
+     * @param strb The expression buffer to copy characters into
+     * @param expr The source
+     * @param position The offset into the source
+     * @param c The separator character
      * @return The new position to read the source from
      */
     private static int append(final StringBuilder strb, final CharSequence expr, final int position, final char c) {
@@ -776,10 +776,10 @@ public final class TemplateEngine extends JxltEngine {
     /**
      * Creates a JxltEngine.Exception from a JexlException.
      *
-     * @param info   the source info
+     * @param info   The source info
      * @param action createExpression, prepare, evaluate
-     * @param expr   the template expression
-     * @param xany   the exception
+     * @param expr   The template expression
+     * @param xany   The exception
      * @return An exception containing an explicit error message
      */
     static Exception createException(final JexlInfo info,
@@ -807,7 +807,7 @@ public final class TemplateEngine extends JxltEngine {
     /**
      * Reads lines from a (buffered / mark-able) reader keeping all new-lines and line-feeds.
      *
-     * @param reader the reader
+     * @param reader The reader
      * @return The line iterator
      */
     static Iterator<CharSequence> readLines(final Reader reader) {
@@ -876,11 +876,11 @@ public final class TemplateEngine extends JxltEngine {
     /**
      * Creates a new instance of {@link JxltEngine} creating a local cache.
      *
-     * @param jexl     the JexlEngine to use.
+     * @param jexl     The JexlEngine to use.
      * @param noScript  whether this engine only allows JEXL expressions or scripts
-     * @param cacheSize the number of expressions in this cache, default is 256
-     * @param immediate the immediate template expression character, default is '$'
-     * @param deferred  the deferred template expression character, default is '#'
+     * @param cacheSize The number of expressions in this cache, default is 256
+     * @param immediate The immediate template expression character, default is '$'
+     * @param deferred  The deferred template expression character, default is '#'
      */
     public TemplateEngine(final Engine jexl,
                           final boolean noScript,
@@ -977,9 +977,9 @@ public final class TemplateEngine extends JxltEngine {
     /**
      * Parses a unified expression.
      *
-     * @param info  the source info
-     * @param expr  the string expression
-     * @param scope the template scope
+     * @param info  The source info
+     * @param expr  The string expression
+     * @param scope The template scope
      * @return The unified expression instance
      * @throws JexlException if an error occurs during parsing
      */
@@ -1183,7 +1183,7 @@ public final class TemplateEngine extends JxltEngine {
      * influence parsing instead of being discarded.
      * </p>
      *
-     * @param c the character to test
+     * @param c The character to test
      * @return {@code true} if the character is ignorable, {@code false} otherwise
      */
     private static boolean isIgnorable(final char c) {
@@ -1193,8 +1193,8 @@ public final class TemplateEngine extends JxltEngine {
     /**
      * Reads lines of a template grouping them by typed blocks.
      *
-     * @param prefix the directive prefix
-     * @param source the source reader
+     * @param prefix The directive prefix
+     * @param source The source reader
      * @return The list of blocks
      */
      List<Block> readTemplate(final String prefix, final Reader source) {
@@ -1270,8 +1270,8 @@ public final class TemplateEngine extends JxltEngine {
      * Tests whether a sequence starts with a given set of characters (following spaces).
      * <p>Space characters at beginning of line before the pattern are discarded.</p>
      *
-     * @param sequence the sequence
-     * @param pattern  the pattern to match at start of sequence
+     * @param sequence The sequence
+     * @param pattern  The pattern to match at start of sequence
      * @return The first position after end of pattern if it matches, -1 otherwise
      */
     int startsWith(final CharSequence sequence, final CharSequence pattern) {

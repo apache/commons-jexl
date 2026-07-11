@@ -93,7 +93,7 @@ class VarTest extends JexlTestCase {
 
         /**
          * Gets a list of properties.
-         * @param keys the property names
+         * @param keys The property names
          * @return The property values
          */
         public List<String> get(final List<String> keys) {
@@ -111,7 +111,7 @@ class VarTest extends JexlTestCase {
          * Gets a map of properties.
          * <p>Uses each map key as a property name and each value as an alias
          * used to key the resulting property value.
-         * @param map a map of property name to alias
+         * @param map A map of property name to alias
          * @return The alia map
          */
         public Map<String,Object> get(final Map<String,String> map) {
@@ -146,7 +146,7 @@ class VarTest extends JexlTestCase {
 
         /**
          * Gets a list of properties.
-         * @param keys the property names
+         * @param keys The property names
          * @return The property values
          */
         public List<String> get(final String[] keys) {
@@ -164,7 +164,7 @@ class VarTest extends JexlTestCase {
 
     /**
      * Getting properties from an array, set or map.
-     * @param str the stringified source
+     * @param str The stringified source
      * @return The properties array
      */
     private static String[] readIdentifiers(final String str) {
@@ -210,8 +210,8 @@ class VarTest extends JexlTestCase {
 
     /**
      * Checks that two sets of variable references are equal
-     * @param lhs the left set
-     * @param rhs the right set
+     * @param lhs The left set
+     * @param rhs The right set
      * @return true if equal, false otherwise
      */
     boolean eq(final Set<List<String>> lhs, final Set<List<String>> rhs) {
@@ -232,7 +232,7 @@ class VarTest extends JexlTestCase {
 
     /**
      * Creates a variable reference set from an array of array of strings.
-     * @param refs the variable reference set
+     * @param refs The variable reference set
      * @return The set of variables
      */
     Set<List<String>> mkref(final String[][] refs) {
@@ -608,7 +608,7 @@ class VarTest extends JexlTestCase {
 
     /**
      * Generate a string representation of Set&lt;List&t;String>>, useful to dump script variables
-     * @param refs the variable reference set
+     * @param refs The variable reference set
      * @return  the string representation
      */
     String toString(final Set<List<String>> refs) {

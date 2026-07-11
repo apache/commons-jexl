@@ -37,7 +37,7 @@ public class SpreadCache<K, V> extends SoftCache<K, V> {
   /**
    * Creates a new instance of a Spread cache.
    *
-   * @param theSize the cache size
+   * @param theSize The cache size
    */
   public SpreadCache(final int theSize) {
     super(theSize);
@@ -79,7 +79,7 @@ class SpreadMap<K, V> extends AbstractMap<K, V> {
   /**
    * The unique simple constructor.
    *
-   * @param capacity the overall map capacity
+   * @param capacity The overall map capacity
    */
   SpreadMap(final int capacity) {
     final int spread = closestPowerOf2(Runtime.getRuntime().availableProcessors());
@@ -116,7 +116,7 @@ class SpreadMap<K, V> extends AbstractMap<K, V> {
   /**
    * Gets the map storing a given key.
    *
-   * @param key the key
+   * @param key The key
    * @return The map
    */
   private final Map<K, V> getMap(final Object key) {

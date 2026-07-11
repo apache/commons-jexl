@@ -54,9 +54,9 @@ public abstract class AbstractOutput {
 
     /**
      * Outputs the actual and value or checks the actual equals the expected value.
-     * @param expr the message to output
-     * @param actual the actual value to output
-     * @param expected the expected value
+     * @param expr The message to output
+     * @param actual The actual value to output
+     * @param expected The expected value
      */
     public abstract void print(String expr, Object actual, Object expected);
 }

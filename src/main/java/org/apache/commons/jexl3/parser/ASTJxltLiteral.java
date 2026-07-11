@@ -33,7 +33,7 @@ public final class ASTJxltLiteral extends JexlNode implements JexlNode.JxltHandl
     /**
      * Creates a Jxlt literal node.
      *
-     * @param id the node id
+     * @param id The node id
      */
     ASTJxltLiteral(final int id) {
         super(id);

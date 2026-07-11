@@ -84,9 +84,9 @@ class LexicalTest {
 
         /**
          * Allows calling a script and catching its raised exception.
-         * @param tryFn the lambda to call
-         * @param catchFn the lambda catching the exception
-         * @param args the arguments to the lambda
+         * @param tryFn The lambda to call
+         * @param catchFn The lambda catching the exception
+         * @param args The arguments to the lambda
          * @return The tryFn result or the catchFn if an exception was raised
          */
         public Object tryCatch(final JexlScript tryFn, final JexlScript catchFn, final Object... args) {

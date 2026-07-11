@@ -171,7 +171,7 @@ public final class JexlSandbox {
      *
      * @param ab  whether this sandbox is allow (true) or block (false)
      * @param inh whether permissions are inherited, default false
-     * @param map the permissions map
+     * @param map The permissions map
      * @since 3.2
      */
     private JexlSandbox(final boolean ab, final boolean inh, final Map<String, Permissions> map) {
@@ -183,7 +183,7 @@ public final class JexlSandbox {
     /**
      * Gets a class by name, crude mechanism for backwards (&lt;3.2 ) compatibility.
      *
-     * @param cname the class name
+     * @param cname The class name
      * @return The class
      */
     static Class<?> forName(final String cname) {
@@ -198,7 +198,7 @@ public final class JexlSandbox {
      * Creates a new set of permissions based on allow lists for methods and properties for a given class.
      * <p>The sandbox inheritance property will apply to the permissions created by this method
      *
-     * @param clazz the allowed class name
+     * @param clazz The allowed class name
      * @return The permissions instance
      */
     public Permissions allow(final String clazz) {
@@ -209,7 +209,7 @@ public final class JexlSandbox {
      * Creates a new set of permissions based on block lists for methods and properties for a given class.
      * <p>The sandbox inheritance property will apply to the permissions created by this method
      *
-     * @param clazz the blocked class name
+     * @param clazz The blocked class name
      * @return The permissions instance
      */
     public Permissions block(final String clazz) {
@@ -233,8 +233,8 @@ public final class JexlSandbox {
     /**
      * Gets the execute permission value for a given method of a class.
      *
-     * @param clazz the class
-     * @param name  the method name
+     * @param clazz The class
+     * @param name  The method name
      * @return null if not allowed, the name of the method to use otherwise
      */
     public String execute(final Class<?> clazz, final String name) {
@@ -245,8 +245,8 @@ public final class JexlSandbox {
     /**
      * Gets the execute permission value for a given method of a class.
      *
-     * @param clazz the class name
-     * @param name  the method name
+     * @param clazz The class name
+     * @param name  The method name
      * @return null if not allowed, the name of the method to use otherwise
      * @deprecated 3.3
      */
@@ -259,7 +259,7 @@ public final class JexlSandbox {
     /**
      * Gets the set of permissions associated to a class.
      *
-     * @param clazz the class name
+     * @param clazz The class name
      * @return The defined permissions or an all-allow permission instance if none were defined
      */
     public Permissions get(final String clazz) {
@@ -269,7 +269,7 @@ public final class JexlSandbox {
     /**
      * Gets the permissions associated to a class.
      *
-     * @param clazz the class
+     * @param clazz The class
      * @return The permissions
      */
     @SuppressWarnings("null")
@@ -286,7 +286,7 @@ public final class JexlSandbox {
     /**
      * Computes and optionally stores the permissions associated to a class.
      *
-     * @param clazz the class
+     * @param clazz The class
      * @param store whether the computed permissions should be stored in the sandbox
      * @return The permissions
      */
@@ -329,7 +329,7 @@ public final class JexlSandbox {
      * Creates the set of permissions for a given class.
      * <p>The sandbox inheritance property will apply to the permissions created by this method
      *
-     * @param clazz       the class for which these permissions apply
+     * @param clazz       The class for which these permissions apply
      * @param readFlag    whether the readable property list is allow - true - or block - false -
      * @param writeFlag   whether the writable property list is allow - true - or block - false -
      * @param executeFlag whether the executable method list is allow - true - or block - false -
@@ -345,7 +345,7 @@ public final class JexlSandbox {
     /**
      * Creates the set of permissions for a given class.
      *
-     * @param clazz  the class for which these permissions apply
+     * @param clazz  The class for which these permissions apply
      * @param inhf   whether these permissions are inheritable
      * @param readf  whether the readable property list is allow - true - or block - false -
      * @param writef whether the writable property list is allow - true - or block - false -
@@ -365,8 +365,8 @@ public final class JexlSandbox {
     /**
      * Gets the read permission value for a given property of a class.
      *
-     * @param clazz the class
-     * @param name  the property name
+     * @param clazz The class
+     * @param name  The property name
      * @return null (or NULL if name is null) if not allowed, the name of the property to use otherwise
      */
     public String read(final Class<?> clazz, final String name) {
@@ -376,8 +376,8 @@ public final class JexlSandbox {
     /**
      * Gets the write permission value for a given property of a class.
      *
-     * @param clazz the class
-     * @param name  the property name
+     * @param clazz The class
+     * @param name  The property name
      * @return null (or NULL if name is null) if not allowed, the name of the property to use otherwise
      */
     public String write(final Class<?> clazz, final String name) {
@@ -387,8 +387,8 @@ public final class JexlSandbox {
     /**
      * Gets the write permission value for a given property of a class.
      *
-     * @param clazz the class name
-     * @param name  the property name
+     * @param clazz The class name
+     * @param name  The property name
      * @return null if not allowed, the name of the property to use otherwise
      * @deprecated 3.3
      */
@@ -503,7 +503,7 @@ public final class JexlSandbox {
         /**
          * Adds a name to this set.
          *
-         * @param name the name to add
+         * @param name The name to add
          * @return true if the name was really added, false if not
          */
         public abstract boolean add(String name);
@@ -512,8 +512,8 @@ public final class JexlSandbox {
          * Adds an alias to a name to this set.
          * <p>This only has an effect on allow lists.</p>
          *
-         * @param name  the name to alias
-         * @param alias the alias
+         * @param name  The name to alias
+         * @param alias The alias
          * @return true if the alias was added, false if it was already present
          */
         public boolean alias(final String name, final String alias) {
@@ -532,7 +532,7 @@ public final class JexlSandbox {
         /**
          * Gets whether a given name is allowed or not.
          *
-         * @param name the method/property name to check
+         * @param name The method/property name to check
          * @return null (or NULL if name is null) if not allowed, the actual name to use otherwise
          */
         public String get(final String name) {
@@ -584,9 +584,9 @@ public final class JexlSandbox {
          * Creates a new permissions instance.
          *
          * @param inherit  whether these permissions are inheritable
-         * @param nread    the read set
-         * @param nwrite   the write set
-         * @param nexecute the method set
+         * @param nread    The read set
+         * @param nwrite   The write set
+         * @param nexecute The method set
          */
         Permissions(final boolean inherit, final Names nread, final Names nwrite, final Names nexecute) {
             this.read = nread != null ? nread : ALLOW_NAMES;
@@ -615,7 +615,7 @@ public final class JexlSandbox {
          * Adds a list of executable methods names to these permissions.
          * <p>The constructor is denoted as the empty-string, all other methods by their names.</p>
          *
-         * @param methodNames the method names
+         * @param methodNames The method names
          * @return {@code this} instance of permissions
          */
         public Permissions execute(final String... methodNames) {
@@ -646,7 +646,7 @@ public final class JexlSandbox {
         /**
          * Adds a list of readable property names to these permissions.
          *
-         * @param propertyNames the property names
+         * @param propertyNames The property names
          * @return {@code this} instance of permissions
          */
         public Permissions read(final String... propertyNames) {
@@ -668,7 +668,7 @@ public final class JexlSandbox {
         /**
          * Adds a list of writable property names to these permissions.
          *
-         * @param propertyNames the property names
+         * @param propertyNames The property names
          * @return {@code this} instance of permissions
          */
         public Permissions write(final String... propertyNames) {
@@ -702,7 +702,7 @@ public final class JexlSandbox {
     /**
      * Use block() instead.
      *
-     * @param clazz the blocked class name
+     * @param clazz The blocked class name
      * @return The permissions instance
      * @deprecated 3.3
      */
@@ -714,8 +714,8 @@ public final class JexlSandbox {
     /**
      * Gets the read permission value for a given property of a class.
      *
-     * @param clazz the class name
-     * @param name  the property name
+     * @param clazz The class name
+     * @param name  The property name
      * @return null if not allowed, the name of the property to use otherwise
      * @deprecated 3.3
      */
@@ -727,7 +727,7 @@ public final class JexlSandbox {
     /**
      * Use allow() instead.
      *
-     * @param clazz the allowed class name
+     * @param clazz The allowed class name
      * @return The permissions instance
      * @deprecated 3.3
      */

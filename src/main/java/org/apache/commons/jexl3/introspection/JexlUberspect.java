@@ -90,7 +90,7 @@ public interface JexlUberspect {
         /**
          * Resolves a class name.
          *
-         * @param name the simple class name
+         * @param name The simple class name
          * @return The fully qualified class name
          */
         String resolveClassName(String name);
@@ -107,7 +107,7 @@ public interface JexlUberspect {
         /**
          * Resolves a constant by its name.
          *
-         * @param name the constant name, a qualified name
+         * @param name The constant name, a qualified name
          * @return The constant value or TRY_FAILED if not found
          */
         Object resolveConstant(String name);
@@ -123,7 +123,7 @@ public interface JexlUberspect {
         /**
          * Creates a constant resolver.
          *
-         * @param imports the collection of imports (packages and classes) to use
+         * @param imports The collection of imports (packages and classes) to use
          * @return A constant resolver
          */
         ClassConstantResolver createConstantResolver(Collection<String> imports);
@@ -146,9 +146,9 @@ public interface JexlUberspect {
         /**
          * Gets a property getter.
          *
-         * @param uber       the uberspect
-         * @param obj        the object
-         * @param identifier the property identifier
+         * @param uber       The uberspect
+         * @param obj        The object
+         * @param identifier The property identifier
          * @return The property getter or null
          */
         JexlPropertyGet getPropertyGet(JexlUberspect uber, Object obj, Object identifier);
@@ -156,10 +156,10 @@ public interface JexlUberspect {
         /**
          * Gets a property setter.
          *
-         * @param uber       the uberspect
-         * @param obj        the object
-         * @param identifier the property identifier
-         * @param arg        the property value
+         * @param uber       The uberspect
+         * @param obj        The object
+         * @param identifier The property identifier
+         * @param arg        The property value
          * @return The property setter or null
          */
         JexlPropertySet getPropertySet(JexlUberspect uber, Object obj, Object identifier, Object arg);
@@ -181,8 +181,8 @@ public interface JexlUberspect {
         /**
          * Applies this strategy to a list of resolver types.
          *
-         * @param operator the property access operator, can be null
-         * @param obj      the instance we seek to obtain a property setter/getter from, cannot be null
+         * @param operator The property access operator, can be null
+         * @param obj      The instance we seek to obtain a property setter/getter from, cannot be null
          * @return The ordered list of resolver types, cannot be null
          */
         List<PropertyResolver> apply(JexlOperator operator, Object obj);
@@ -253,7 +253,7 @@ public interface JexlUberspect {
     /**
      * Gets an arithmetic operator resolver for a given arithmetic instance.
      *
-     * @param arithmetic the arithmetic instance
+     * @param arithmetic The arithmetic instance
      * @return The arithmetic uberspect or null if no operator method were overridden
      * @since 3.0
      * @see #getOperator(JexlArithmetic)
@@ -263,7 +263,7 @@ public interface JexlUberspect {
     /**
      * Gets an arithmetic operator executor for a given arithmetic instance.
      *
-     * @param arithmetic the arithmetic instance
+     * @param arithmetic The arithmetic instance
      * @return An operator uberspect instance
      * @since 3.5.0
      */
@@ -274,7 +274,7 @@ public interface JexlUberspect {
     /**
      * Seeks a class by name using this uberspect class-loader.
      *
-     * @param className the class name
+     * @param className The class name
      * @return The class instance or null if the class cannot be located by this uberspect class loader or if
      * permissions deny access to the class
      */
@@ -296,7 +296,7 @@ public interface JexlUberspect {
     /**
      * Returns a class constructor.
      *
-     * @param ctorHandle a class or class name
+     * @param ctorHandle A class or class name
      * @param args       constructor arguments
      * @return A {@link JexlMethod}
      * @since 3.0
@@ -314,8 +314,8 @@ public interface JexlUberspect {
     /**
      * Returns a JexlMethod.
      *
-     * @param obj    the object
-     * @param method the method name
+     * @param obj    The object
+     * @param method The method name
      * @param args   method arguments
      * @return A {@link JexlMethod}
      */
@@ -327,8 +327,8 @@ public interface JexlUberspect {
      * Seeks a JexlPropertyGet apropos to an expression like {@code bar.woogie}.</p>
      * See {@link ResolverStrategy#apply(JexlOperator, Object)}
      *
-     * @param resolvers  the list of property resolvers to try
-     * @param obj        the object to get the property from
+     * @param resolvers  The list of property resolvers to try
+     * @param obj        The object to get the property from
      * @param identifier property name
      * @return A {@link JexlPropertyGet} or null
      * @since 3.0
@@ -340,7 +340,7 @@ public interface JexlUberspect {
      *
      * <p>returns a JelPropertySet apropos to an expression like {@code bar.woogie}.</p>
      *
-     * @param obj        the object to get the property from
+     * @param obj        The object to get the property from
      * @param identifier property name
      * @return A {@link JexlPropertyGet} or null
      */
@@ -352,8 +352,8 @@ public interface JexlUberspect {
      * Seeks a JelPropertySet apropos to an expression like {@code foo.bar = "geir"}.</p>
      * See {@link ResolverStrategy#apply(JexlOperator, Object)}
      *
-     * @param resolvers  the list of property resolvers to try,
-     * @param obj        the object to get the property from
+     * @param resolvers  The list of property resolvers to try,
+     * @param obj        The object to get the property from
      * @param identifier property name
      * @param arg        value to set
      * @return A {@link JexlPropertySet} or null
@@ -366,7 +366,7 @@ public interface JexlUberspect {
      * <p>
      * Seeks a JelPropertySet apropos to an expression like  {@code foo.bar = "geir"}.</p>
      *
-     * @param obj        the object to get the property from.
+     * @param obj        The object to get the property from.
      * @param identifier property name
      * @param arg        value to set
      * @return A {@link JexlPropertySet} or null
@@ -376,8 +376,8 @@ public interface JexlUberspect {
     /**
      * Applies this uberspect property resolver strategy.
      *
-     * @param op the operator
-     * @param obj the object
+     * @param op The operator
+     * @param obj The object
      * @return The applied strategy resolver list
      */
     List<PropertyResolver> getResolvers(JexlOperator op, Object obj);
@@ -394,7 +394,7 @@ public interface JexlUberspect {
      *
      * <p>This increments the version.</p>
      *
-     * @param loader the class loader
+     * @param loader The class loader
      */
     void setClassLoader(ClassLoader loader);
 

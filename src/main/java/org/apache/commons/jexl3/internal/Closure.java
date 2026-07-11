@@ -37,8 +37,8 @@ public class Closure extends Script {
     /**
      * Creates a closure.
      *
-     * @param theCaller the calling interpreter
-     * @param lambda the lambda
+     * @param theCaller The calling interpreter
+     * @param lambda The lambda
      */
     protected Closure(final Interpreter theCaller, final ASTJexlLambda lambda) {
         super(theCaller.jexl, null, lambda);
@@ -50,8 +50,8 @@ public class Closure extends Script {
     /**
      * Creates a curried version of a script.
      *
-     * @param base the base script
-     * @param args the script arguments
+     * @param base The base script
+     * @param args The script arguments
      */
     protected Closure(final Script base, final Object[] args) {
         super(base.jexl, base.source, base.script);
@@ -85,8 +85,8 @@ public class Closure extends Script {
      * Typical case is: {@code const f = (x)->x <= 0? 1 : x*f(x-1)}. Since assignment of f occurs after
      * the lambda creation, we need to patch the lambda frame to expose itself through the captured symbol.
      *
-     * @param parentFrame the parent calling frame
-     * @param symbol the symbol index (in the caller of this closure)
+     * @param parentFrame The parent calling frame
+     * @param symbol The symbol index (in the caller of this closure)
      */
     void captureSelfIfRecursive(final Frame parentFrame, final int symbol) {
         if (script instanceof ASTJexlLambda) {

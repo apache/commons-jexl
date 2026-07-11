@@ -85,7 +85,7 @@ public class JexlScriptEngine extends AbstractScriptEngine implements Compilable
 
         /**
          * For specialization.
-         * @param permissions the permissions to use for the engine
+         * @param permissions The permissions to use for the engine
          */
         public Factory(final JexlPermissions permissions) {
             super(permissions);
@@ -107,7 +107,7 @@ public class JexlScriptEngine extends AbstractScriptEngine implements Compilable
 
         /**
          * Sets the shared engine instance.
-         * @param engine the engine
+         * @param engine The engine
          */
         void setEngine(final JexlEngine engine) {
             jexl = engine;
@@ -178,7 +178,7 @@ public class JexlScriptEngine extends AbstractScriptEngine implements Compilable
         /**
          * Creates a context wrapper.
          *
-         * @param theContext the engine context.
+         * @param theContext The engine context.
          */
         JexlContextWrapper (final ScriptContext theContext){
             scriptContext = theContext;
@@ -376,7 +376,7 @@ public class JexlScriptEngine extends AbstractScriptEngine implements Compilable
      *                 .create());
      * }
      *
-     * @param engine the JexlEngine instance to use
+     * @param engine The JexlEngine instance to use
      * @since 3.3
      */
     public static void setInstance(final JexlEngine engine) {
@@ -417,7 +417,7 @@ public class JexlScriptEngine extends AbstractScriptEngine implements Compilable
 
     /**
      * JSR-223 compatibility constructor.
-     * @param scriptEngineFactory the factory which must be a {@link JexlScriptEngineFactory}
+     * @param scriptEngineFactory The factory which must be a {@link JexlScriptEngineFactory}
      */
     public JexlScriptEngine(final ScriptEngineFactory scriptEngineFactory) {
         this((JexlScriptEngineFactory) scriptEngineFactory);
@@ -426,7 +426,7 @@ public class JexlScriptEngine extends AbstractScriptEngine implements Compilable
     /**
      * Create a scripting engine using the supplied factory.
      *
-     * @param scriptEngineFactory the factory which creates this instance.
+     * @param scriptEngineFactory The factory which creates this instance.
      * @throws NullPointerException if factory is null
      */
     public JexlScriptEngine(final JexlScriptEngineFactory scriptEngineFactory) {

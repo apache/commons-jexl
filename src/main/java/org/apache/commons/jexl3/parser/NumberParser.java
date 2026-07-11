@@ -70,7 +70,7 @@ public final class NumberParser implements Serializable {
      * Originally from OGNL.
      *
      * @param negative whether the natural should be negative
-     * @param natural the natural as string
+     * @param natural The natural as string
      * @return this parser instance
      */
     NumberParser assignNatural(final boolean negative, final String natural) {
@@ -132,7 +132,7 @@ public final class NumberParser implements Serializable {
      * Sets this node as an (optionally) signed natural literal.
      * Originally from OGNL.
      *
-     * @param str the natural as string
+     * @param str The natural as string
      * @return this parser instance
      */
     NumberParser assignNatural(final String str) {
@@ -160,7 +160,7 @@ public final class NumberParser implements Serializable {
      * Originally from OGNL.
      *
      * @param negative whether the real should be negative
-     * @param s the real as string
+     * @param s The real as string
      * @return this parser instance
      */
     NumberParser assignReal(final boolean negative, final String s) {
@@ -215,7 +215,7 @@ public final class NumberParser implements Serializable {
      * Sets this node as an (optionally) signed real literal.
      * Originally from OGNL.
      *
-     * @param str the real as string
+     * @param str The real as string
      * @return this parser instance
      */
     NumberParser assignReal(final String str) {

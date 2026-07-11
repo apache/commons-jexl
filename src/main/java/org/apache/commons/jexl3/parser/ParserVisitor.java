@@ -25,8 +25,8 @@ public abstract class ParserVisitor {
     /**
      * Unused, should throw in Parser.
      *
-     * @param node a node
-     * @param data the data
+     * @param node A node
+     * @param data The data
      * @return does not return
      */
     protected final Object visit(final ASTAmbiguous node, final Object data) {
@@ -226,8 +226,8 @@ public abstract class ParserVisitor {
     /**
      * Unused, satisfy ParserVisitor interface.
      *
-     * @param node a node
-     * @param data the data
+     * @param node A node
+     * @param data The data
      * @return does not return
      */
     protected final Object visit(final SimpleNode node, final Object data) {

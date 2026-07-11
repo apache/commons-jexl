@@ -223,7 +223,7 @@ public abstract class JexlEngine {
      * <p>This should only be used carefully, for instance when re-evaluating a "stored" script that requires a
      * given Namespace resolver. Remember to synchronize access if context is shared between threads.
      *
-     * @param tls the thread local context to set
+     * @param tls The thread local context to set
      */
     public static void setThreadContext(final JexlContext.ThreadLocal tls) {
         CONTEXT.set(tls);
@@ -319,9 +319,9 @@ public abstract class JexlEngine {
      * Creates a new instance of {@link JxltEngine} using this engine.
      *
      * @param noScript  whether the JxltEngine only allows JEXL expressions or scripts
-     * @param cacheSize the number of expressions in this cache, default is 256
-     * @param immediate the immediate template expression character, default is '$'
-     * @param deferred  the deferred template expression character, default is '#'
+     * @param cacheSize The number of expressions in this cache, default is 256
+     * @param immediate The immediate template expression character, default is '$'
+     * @param deferred  The deferred template expression character, default is '#'
      * @return A JEXL Template engine
      */
     public abstract JxltEngine createJxltEngine(boolean noScript, int cacheSize, char immediate, char deferred);
@@ -483,9 +483,9 @@ public abstract class JexlEngine {
      * If the JEXL engine is silent, errors will be logged through its logger as warning.
      * </p>
      *
-     * @param context the evaluation context
-     * @param bean    the bean to get properties from
-     * @param expr    the property expression
+     * @param context The evaluation context
+     * @param bean    The bean to get properties from
+     * @param expr    The property expression
      * @return The value of the property
      * @throws JexlException if there is an error parsing the expression or during evaluation
      */
@@ -501,8 +501,8 @@ public abstract class JexlEngine {
      * If the JEXL engine is silent, errors will be logged through its logger as warning.
      * </p>
      *
-     * @param bean the bean to get properties from
-     * @param expr the property expression
+     * @param bean The bean to get properties from
+     * @param expr The property expression
      * @return The value of the property
      * @throws JexlException if there is an error parsing the expression or during evaluation
      */
@@ -518,9 +518,9 @@ public abstract class JexlEngine {
     /**
      * Invokes an object's method by name and arguments.
      *
-     * @param obj  the method's invoker object
-     * @param meth the method's name
-     * @param args the method's arguments
+     * @param obj  The method's invoker object
+     * @param meth The method's name
+     * @param args The method's arguments
      * @return The method returned value or null if it failed and engine is silent
      * @throws JexlException if method could not be found or failed and engine is not silent
      */
@@ -567,8 +567,8 @@ public abstract class JexlEngine {
      * Creates a new instance of an object using the most appropriate constructor based on the arguments.
      *
      * @param <T>   the type of object
-     * @param clazz the class to instantiate
-     * @param args  the constructor arguments
+     * @param clazz The class to instantiate
+     * @param args  The constructor arguments
      * @return The created object instance or null on failure when silent
      */
     public abstract <T> T newInstance(Class<? extends T> clazz, Object... args);
@@ -576,8 +576,8 @@ public abstract class JexlEngine {
     /**
      * Creates a new instance of an object using the most appropriate constructor based on the arguments.
      *
-     * @param clazz the name of the class to instantiate resolved through this engine's class loader
-     * @param args  the constructor arguments
+     * @param clazz The name of the class to instantiate resolved through this engine's class loader
+     * @param args  The constructor arguments
      * @return The created object instance or null on failure when silent
      */
     public abstract Object newInstance(String clazz, Object... args);
@@ -585,7 +585,7 @@ public abstract class JexlEngine {
     /**
      * Reads a JEXL source from a File.
      *
-     * @param file the script file
+     * @param file The script file
      * @return The source
      */
     protected String readSource(final File file) {
@@ -600,7 +600,7 @@ public abstract class JexlEngine {
     /**
      * Reads a JEXL source from an URL.
      *
-     * @param url the script url
+     * @param url The script url
      * @return The source
      */
     protected String readSource(final URL url) {
@@ -617,7 +617,7 @@ public abstract class JexlEngine {
      * <p>This method is <em>not</em> thread safe; it may be called after JexlEngine
      * initialization and allow scripts to use new classes definitions.</p>
      *
-     * @param loader the class loader to use
+     * @param loader The class loader to use
      */
     public abstract void setClassLoader(ClassLoader loader);
 
@@ -628,10 +628,10 @@ public abstract class JexlEngine {
      * its logger as warning.
      * </p>
      *
-     * @param context the evaluation context
-     * @param bean    the bean to set properties in
-     * @param expr    the property expression
-     * @param value   the value of the property
+     * @param context The evaluation context
+     * @param bean    The bean to set properties in
+     * @param expr    The property expression
+     * @param value   The value of the property
      * @throws JexlException if there is an error parsing the expression or during evaluation
      */
     public abstract void setProperty(JexlContext context, Object bean, String expr, Object value);
@@ -646,9 +646,9 @@ public abstract class JexlEngine {
      * If the JEXL engine is silent, errors will be logged through its logger as warning.
      * </p>
      *
-     * @param bean  the bean to set properties in
-     * @param expr  the property expression
-     * @param value the value of the property
+     * @param bean  The bean to set properties in
+     * @param expr  The property expression
+     * @param value The value of the property
      * @throws JexlException if there is an error parsing the expression or during evaluation
      */
     public abstract void setProperty(Object bean, String expr, Object value);

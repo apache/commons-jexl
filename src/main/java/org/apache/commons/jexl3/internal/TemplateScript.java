@@ -49,8 +49,8 @@ public final class TemplateScript implements JxltEngine.Template {
      * <p>This allows parsing the blocks with the known symbols
      * in the frame visible to the parser.</p>
      *
-     * @param node the visited node
-     * @param callSites the map of printed expression number to node info
+     * @param node The visited node
+     * @param callSites The map of printed expression number to node info
      */
     private static void collectPrintScope(final JexlNode node, final JexlNode.Info[] callSites) {
         final int nc = node.jjtGetNumChildren();
@@ -79,8 +79,8 @@ public final class TemplateScript implements JxltEngine.Template {
     /**
      * Gets the scope from a node info.
      *
-     * @param info the node info
-     * @param scope the outer scope
+     * @param info The node info
+     * @param scope The outer scope
      * @return The scope
      */
     private static Scope scopeOf(final JexlNode.Info info, final Scope scope) {
@@ -99,8 +99,8 @@ public final class TemplateScript implements JxltEngine.Template {
     /**
      * Creates the expression array from the list of blocks.
      *
-     * @param scope the outer scope
-     * @param blocks the list of blocks
+     * @param scope The outer scope
+     * @param blocks The list of blocks
      * @return The array of expressions
      */
     private TemplateExpression[] calleeScripts(final Scope scope, final Block[] blocks, final JexlNode.Info[] callSites) {
@@ -127,7 +127,7 @@ public final class TemplateScript implements JxltEngine.Template {
      * <p>This is used to create a script from a list of blocks
      * that were parsed from a template.</p>
      *
-     * @param blocks the list of blocks
+     * @param blocks The list of blocks
      * @return The script source
      */
     private static String callerScript(final Block[] blocks) {
@@ -177,12 +177,12 @@ public final class TemplateScript implements JxltEngine.Template {
     /**
      * Creates a new template from an character input.
      *
-     * @param engine the template engine
-     * @param jexlInfo the source info
-     * @param directive the prefix for lines of code; cannot be "$", "${", "#" or "#{"
+     * @param engine The template engine
+     * @param jexlInfo The source info
+     * @param directive The prefix for lines of code; cannot be "$", "${", "#" or "#{"
                   since this would preclude being able to differentiate directives and jxlt expressions
-     * @param reader    the input reader
-     * @param parms     the parameter names
+     * @param reader    The input reader
+     * @param parms     The parameter names
      * @throws NullPointerException     if either the directive prefix or input is null
      * @throws IllegalArgumentException if the directive prefix is invalid
      */
@@ -234,11 +234,11 @@ public final class TemplateScript implements JxltEngine.Template {
     /**
      * Private ctor used to expand deferred expressions during prepare.
      *
-     * @param engine    the template engine
-     * @param thePrefix the directive prefix
-     * @param theSource the source
-     * @param theScript the script
-     * @param theExprs  the expressions
+     * @param engine    The template engine
+     * @param thePrefix The directive prefix
+     * @param theSource The source
+     * @param theScript The script
+     * @param theExprs  The expressions
      */
     TemplateScript(final TemplateEngine engine,
                    final String thePrefix,

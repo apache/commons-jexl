@@ -41,7 +41,7 @@ public class FeatureController extends ScriptVisitor {
      * Perform the control on a node.
      * <p>Note that controlNode() does *not* visit node children in this class.
      *
-     * @param node the node to controlNode
+     * @param node The node to controlNode
      * @throws JexlException.Feature if required feature is disabled
      */
     public void controlNode(final JexlNode node) {
@@ -72,7 +72,7 @@ public class FeatureController extends ScriptVisitor {
     /**
      * Checks whether a node is a string or an integer.
      *
-     * @param child the child node
+     * @param child The child node
      * @return true if string / integer, false otherwise
      */
     private boolean isArrayReferenceLiteral(final JexlNode child) {
@@ -88,7 +88,7 @@ public class FeatureController extends ScriptVisitor {
     /**
      * Sets the features to controlNode.
      *
-     * @param fdesc the features
+     * @param fdesc The features
      */
     public void setFeatures(final JexlFeatures fdesc) {
         this.features = fdesc;
@@ -97,8 +97,8 @@ public class FeatureController extends ScriptVisitor {
     /**
      * Throws a feature exception.
      *
-     * @param feature the feature code
-     * @param node    the node that caused it
+     * @param feature The feature code
+     * @param node    The node that caused it
      */
     public void throwFeatureException(final int feature, final JexlNode node) {
         final JexlInfo dbgInfo = node.jexlInfo();

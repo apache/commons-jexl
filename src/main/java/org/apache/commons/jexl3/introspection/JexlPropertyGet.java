@@ -33,7 +33,7 @@ public interface JexlPropertyGet {
     /**
      * Method used to get the property value of an object.
      *
-     * @param obj the object to get the property value from.
+     * @param obj The object to get the property value from.
      * @return The property value.
      * @throws Exception on any error.
      */
@@ -59,7 +59,7 @@ public interface JexlPropertyGet {
     /**
      * Checks whether a tryInvoke failed or not.
      *
-     * @param rval the value returned by tryInvoke
+     * @param rval The value returned by tryInvoke
      * @return true if tryInvoke failed, false otherwise
      */
     boolean tryFailed(Object rval);
@@ -68,8 +68,8 @@ public interface JexlPropertyGet {
      * Attempts to reuse this JexlPropertyGet, checking that it is compatible with
      * the actual set of arguments.
      *
-     * @param obj the object to invoke the property get upon
-     * @param key the property key to get
+     * @param obj The object to invoke the property get upon
+     * @param key The property key to get
      * @return The result of the method invocation that should be checked by tryFailed to determine if it succeeded
      * or failed.
      * @throws JexlException.TryFailed if the underlying method was invoked but threw an exception

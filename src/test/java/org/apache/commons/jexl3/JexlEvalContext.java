@@ -51,7 +51,7 @@ public class JexlEvalContext implements
 
     /**
      * Creates an evaluation environment from a context.
-     * @param context the context (may be null, implies readonly)
+     * @param context The context (may be null, implies readonly)
      */
     @NoJexl
     public JexlEvalContext(final JexlContext context) {
@@ -60,8 +60,8 @@ public class JexlEvalContext implements
 
     /**
      * Creates an evaluation environment from a context and a namespace.
-     * @param context the context (may be null, implies readonly)
-     * @param namespace the namespace (may be null, implies empty namespace)
+     * @param context The context (may be null, implies readonly)
+     * @param namespace The namespace (may be null, implies empty namespace)
      */
     @NoJexl
     public JexlEvalContext(final JexlContext context, final JexlContext.NamespaceResolver namespace) {
@@ -73,7 +73,7 @@ public class JexlEvalContext implements
      * Creates an evaluation environment wrapping an existing user provided vars.
      * <p>The supplied vars should be null only in derived classes that override the get/set/has methods.
      * For a default vars context with a code supplied vars, use the default no-parameter contructor.</p>
-     * @param map the variables map
+     * @param map The variables map
      */
     @NoJexl
     public JexlEvalContext(final Map<String, Object> map) {

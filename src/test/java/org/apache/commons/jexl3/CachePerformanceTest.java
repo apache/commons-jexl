@@ -129,7 +129,7 @@ class CachePerformanceTest {
     /**
      * Launches the tasks in parallel.
      *
-     * @param jexl the jexl engine
+     * @param jexl The jexl engine
      * @throws Exception if something goes wrong
      */
     protected void runTest(final String name, final JexlEngine jexl) throws Exception {

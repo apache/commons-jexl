@@ -61,8 +61,8 @@ public class StreamTest {
         /**
          * This allows using a JEXL lambda as a filter.
          *
-         * @param collection the collection
-         * @param filter the lambda to use as filter
+         * @param collection The collection
+         * @param filter The lambda to use as filter
          * @return The filtered result as a list
          */
         public List<?> filter(final Collection<?> collection, final JexlScript filter) {
@@ -74,8 +74,8 @@ public class StreamTest {
         /**
          * This allows using a JEXL lambda as a mapper.
          *
-         * @param collection the collection
-         * @param mapper the lambda to use as mapper
+         * @param collection The collection
+         * @param mapper The lambda to use as mapper
          * @return The mapped result as a list
          */
         public List<?> map(final Collection<?> collection, final JexlScript mapper) {
@@ -94,8 +94,8 @@ public class StreamTest {
         /**
          * This allows using a JEXL lambda as a filter.
          *
-         * @param stream the stream
-         * @param filter the lambda to use as filter
+         * @param stream The stream
+         * @param filter The lambda to use as filter
          * @return The filtered stream
          */
         public Stream<?> filter(final Stream<?> stream, final JexlScript filter) {
@@ -105,8 +105,8 @@ public class StreamTest {
         /**
          * This allows using a JEXL lambda as a mapper.
          *
-         * @param stream the stream
-         * @param mapper the lambda to use as mapper
+         * @param stream The stream
+         * @param mapper The lambda to use as mapper
          * @return The mapped stream
          */
         public Stream<?> map(final Stream<?> stream, final JexlScript mapper) {

@@ -67,7 +67,7 @@ final class ClassTool {
     /**
      * Gets the package name of a class (class.getPackage() may return null).
      *
-     * @param clz the class
+     * @param clz The class
      * @return The class package name
      */
     static String getPackageName(final Class<?> clz) {
@@ -129,7 +129,7 @@ final class ClassTool {
      * unqualified {@code opens}, in increasing order of privilege; the last two allow reflective
      * access to non-public members and are not recommended.
      *
-     * @param declarator the class
+     * @param declarator The class
      * @return true if class is exported (to JEXL) or no module support exists
      */
     static boolean isExported(final Class<?> declarator) {

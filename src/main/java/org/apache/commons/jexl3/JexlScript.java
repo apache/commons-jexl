@@ -45,7 +45,7 @@ public interface JexlScript {
      * <p>This allows to submit it to an executor pool and provides support for asynchronous calls.</p>
      * <p>The interpreter will handle interruption/cancellation gracefully if needed.</p>
      *
-     * @param context the context
+     * @param context The context
      * @return The callable
      * @since 2.1
      */
@@ -57,8 +57,8 @@ public interface JexlScript {
      * <p>This allows to submit it to an executor pool and provides support for asynchronous calls.</p>
      * <p>The interpreter will handle interruption/cancellation gracefully if needed.</p>
      *
-     * @param context the context
-     * @param args the script arguments
+     * @param context The context
+     * @param args The script arguments
      * @return The callable
      * @since 2.1
      */
@@ -70,7 +70,7 @@ public interface JexlScript {
      * <p>If this script does not declare parameters or if all of them are already bound,
      * no error is generated and this script is returned.</p>
      *
-     * @param args the arguments to bind
+     * @param args The arguments to bind
      * @return The curried script or this script if no binding can occur
      */
     JexlScript curry(Object... args);
@@ -91,7 +91,7 @@ public interface JexlScript {
      * parameters used during parsing.
      *
      * @param context A JexlContext containing variables.
-     * @param args the arguments
+     * @param args The arguments
      * @return The result of this script, usually the result of
      *         the last statement.
      * @since 2.1
@@ -124,7 +124,7 @@ public interface JexlScript {
     /**
      * Recreates the source text of this expression from the internal syntactic tree.
      *
-     * @param indent the number of spaces for indentation, 0 meaning no indentation
+     * @param indent The number of spaces for indentation, 0 meaning no indentation
      * @return The source text
      */
     String getParsedText(int indent);

@@ -55,7 +55,7 @@ public class Asserter {
     /**
      *
      * Create an asserter.
-     * @param jexl the JEXL engine to use
+     * @param jexl The JEXL engine to use
      */
     public Asserter(final JexlEngine jexl) {
         engine = jexl;
@@ -101,8 +101,8 @@ public class Asserter {
      * Performs an assertion that the expression fails throwing an exception.
      * If matchException is not null, the exception message is expected to match it as a regexp.
      * The engine is temporarily switched to strict * verbose to maximize error detection abilities.
-     * @param expression the expression that should fail
-     * @param matchException the exception message pattern
+     * @param expression The expression that should fail
+     * @param matchException The exception message pattern
      * @throws Exception if the expression did not fail or the exception did not match the expected pattern
      */
     public void failExpression(final String expression, final String matchException) throws Exception {

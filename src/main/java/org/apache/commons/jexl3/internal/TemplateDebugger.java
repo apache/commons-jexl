@@ -69,7 +69,7 @@ public class TemplateDebugger extends Debugger {
     /**
      * Position the debugger on the root of a template expression.
      *
-     * @param je the expression
+     * @param je The expression
      * @return true if the expression was a {@link TemplateExpression} instance, false otherwise
      */
     public boolean debug(final JxltEngine.Expression je) {
@@ -83,7 +83,7 @@ public class TemplateDebugger extends Debugger {
     /**
      * Position the debugger on the root of a template script.
      *
-     * @param jt the template
+     * @param jt The template
      * @return true if the template was a {@link TemplateScript} instance, false otherwise
      */
     public boolean debug(final JxltEngine.Template jt) {
@@ -115,7 +115,7 @@ public class TemplateDebugger extends Debugger {
     /**
      * In a template, any statement that is not 'jexl:print(n)' must be prefixed by "$$".
      *
-     * @param child the node to check
+     * @param child The node to check
      * @return The expression number or -1 if the node is not a jexl:print
      */
     private TemplateExpression getPrintStatement(final JexlNode child) {
@@ -227,8 +227,8 @@ public class TemplateDebugger extends Debugger {
     /**
      * Visit a composite expression.
      *
-     * @param expr the composite expression
-     * @param data the visitor argument
+     * @param expr The composite expression
+     * @param data The visitor argument
      * @return The visitor argument
      */
     private Object visit(final CompositeExpression expr, final Object data) {
@@ -241,8 +241,8 @@ public class TemplateDebugger extends Debugger {
     /**
      * Visit a constant expression.
      *
-     * @param expr the constant expression
-     * @param data the visitor argument
+     * @param expr The constant expression
+     * @param data The visitor argument
      * @return The visitor argument
      */
     private Object visit(final ConstantExpression expr, final Object data) {
@@ -253,8 +253,8 @@ public class TemplateDebugger extends Debugger {
     /**
      * Visit a deferred expression.
      *
-     * @param expr the deferred expression
-     * @param data the visitor argument
+     * @param expr The deferred expression
+     * @param data The visitor argument
      * @return The visitor argument
      */
     private Object visit(final DeferredExpression expr, final Object data) {
@@ -268,8 +268,8 @@ public class TemplateDebugger extends Debugger {
     /**
      * Visit an immediate expression.
      *
-     * @param expr the immediate expression
-     * @param data the visitor argument
+     * @param expr The immediate expression
+     * @param data The visitor argument
      * @return The visitor argument
      */
     private Object visit(final ImmediateExpression expr, final Object data) {
@@ -283,8 +283,8 @@ public class TemplateDebugger extends Debugger {
     /**
      * Visit a nested expression.
      *
-     * @param expr the nested expression
-     * @param data the visitor argument
+     * @param expr The nested expression
+     * @param data The visitor argument
      * @return The visitor argument
      */
     private Object visit(final NestedExpression expr, final Object data) {
@@ -295,8 +295,8 @@ public class TemplateDebugger extends Debugger {
     /**
      * Visit a template expression.
      *
-     * @param expr the constant expression
-     * @param data the visitor argument
+     * @param expr The constant expression
+     * @param data The visitor argument
      * @return The visitor argument
      */
     private Object visit(final TemplateExpression expr, final Object data) {

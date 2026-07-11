@@ -43,7 +43,7 @@ public interface JexlExpression {
      * <p>This allows to submit it to an executor pool and provides support for asynchronous calls.</p>
      * <p>The interpreter will handle interruption/cancellation gracefully if needed.</p>
      *
-     * @param context the context
+     * @param context The context
      * @return The callable
      * @since 3.1
      */

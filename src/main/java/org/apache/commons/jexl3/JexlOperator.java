@@ -512,9 +512,9 @@ public enum JexlOperator {
     /**
      * Creates a base operator.
      *
-     * @param o    the operator name
-     * @param m    the method name associated to this operator in a JexlArithmetic
-     * @param argc the number of parameters for the method
+     * @param o    The operator name
+     * @param m    The method name associated to this operator in a JexlArithmetic
+     * @param argc The number of parameters for the method
      */
     JexlOperator(final String o, final String m, final int argc) {
         this(o, m, null, argc);
@@ -523,9 +523,9 @@ public enum JexlOperator {
     /**
      * Creates a side effect operator with arity == 2.
      *
-     * @param o the operator name
-     * @param m the method name associated to this operator in a JexlArithmetic
-     * @param b the base operator, ie + for +=
+     * @param o The operator name
+     * @param m The method name associated to this operator in a JexlArithmetic
+     * @param b The base operator, ie + for +=
      */
     JexlOperator(final String o, final String m, final JexlOperator b) {
         this(o, m, b, 2);
@@ -534,10 +534,10 @@ public enum JexlOperator {
     /**
      * Creates a side effect operator.
      *
-     * @param o the operator name
-     * @param m the method name associated to this operator in a JexlArithmetic
-     * @param b the base operator, ie + for +=
-     * @param a the operator arity
+     * @param o The operator name
+     * @param m The method name associated to this operator in a JexlArithmetic
+     * @param b The base operator, ie + for +=
+     * @param a The operator arity
      */
     JexlOperator(final String o, final String m, final JexlOperator b, final int a) {
         this.operator = o;
@@ -600,9 +600,9 @@ public enum JexlOperator {
          * assignment operator; use {@link #tryAssignOverload(JexlCache.Reference, JexlOperator, Consumer, Object...)}
          * in that case.</p>
          *
-         * @param reference an optional reference caching resolved method or failing signature
-         * @param operator the operator
-         * @param args      the arguments
+         * @param reference An optional reference caching resolved method or failing signature
+         * @param operator The operator
+         * @param args      The arguments
          * @return TRY_FAILED if no specific method could be found, the evaluation result otherwise
          */
         Object tryOverload(JexlCache.Reference reference, JexlOperator operator, Object...args);
@@ -615,10 +615,10 @@ public enum JexlOperator {
          * Otherwise, {@code a += b <=> a = a + b}
          * </p>
          *
-         * @param node     an optional reference caching resolved method or failing signature
-         * @param operator the operator
-         * @param assign   the actual function that performs the side effect
-         * @param args     the arguments, the first one being the target of assignment
+         * @param node     An optional reference caching resolved method or failing signature
+         * @param operator The operator
+         * @param assign   The actual function that performs the side effect
+         * @param args     The arguments, the first one being the target of assignment
          * @return JexlEngine.TRY_FAILED if no operation was performed,
          *         the value to use as the side effect argument otherwise
          */
@@ -633,8 +633,8 @@ public enum JexlOperator {
          * <p>Seeks an overload or use the default arithmetic implementation.</p>
          * <p>Note that the result may not be an integer.
          *
-         * @param node   an optional reference caching resolved method or failing signature
-         * @param object the object to get the size of
+         * @param node   An optional reference caching resolved method or failing signature
+         * @param object The object to get the size of
          * @return The evaluation result
          */
         Object size(JexlCache.Reference node, Object object);
@@ -645,8 +645,8 @@ public enum JexlOperator {
          * <p>Seeks an overload or use the default arithmetic implementation.</p>
          * <p>Note that the result may not be a boolean.
          *
-         * @param node   the node holding the object
-         * @param object the object to check the emptiness of
+         * @param node   The node holding the object
+         * @param object The object to check the emptiness of
          * @return The evaluation result
          */
         Object empty(JexlCache.Reference node, Object object);
@@ -659,10 +659,10 @@ public enum JexlOperator {
          * the JEXL operator arguments order syntax is the reverse of this method call.
          * </p>
          *
-         * @param node  an optional reference caching resolved method or failing signature
-         * @param operator    the calling operator, =~ or !~
-         * @param right the left operand
-         * @param left  the right operand
+         * @param node  An optional reference caching resolved method or failing signature
+         * @param operator    The calling operator, =~ or !~
+         * @param right The left operand
+         * @param left  The right operand
          * @return true if left matches right, false otherwise
          */
         boolean contains(JexlCache.Reference node,
@@ -674,10 +674,10 @@ public enum JexlOperator {
          * The 'startsWith' operator implementation.
          * <p>Seeks an overload or use the default arithmetic implementation.</p>
          *
-         * @param node     an optional reference caching resolved method or failing signature
-         * @param operator the calling operator, $= or $!
-         * @param left     the left operand
-         * @param right    the right operand
+         * @param node     An optional reference caching resolved method or failing signature
+         * @param operator The calling operator, $= or $!
+         * @param left     The left operand
+         * @param right    The right operand
          * @return true if left starts with right, false otherwise
          */
         boolean startsWith(JexlCache.Reference node,
@@ -689,10 +689,10 @@ public enum JexlOperator {
          * The 'endsWith' operator implementation.
          * <p>Seeks an overload or use the default arithmetic implementation.</p>
          *
-         * @param node     an optional reference caching resolved method or failing signature
-         * @param operator the calling operator, ^= or ^!
-         * @param left     the left operand
-         * @param right    the right operand
+         * @param node     An optional reference caching resolved method or failing signature
+         * @param operator The calling operator, ^= or ^!
+         * @param left     The left operand
+         * @param right    The right operand
          * @return true if left ends with right, false otherwise
          */
         boolean endsWith(JexlCache.Reference node,

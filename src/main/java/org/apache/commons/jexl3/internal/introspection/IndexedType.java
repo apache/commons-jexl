@@ -46,8 +46,8 @@ public final class IndexedType implements JexlPropertyGet {
         /**
          * Creates a new duck container.
          *
-         * @param theType the container type
-         * @param theContainer the container instance
+         * @param theType The container type
+         * @param theContainer The container instance
          */
         IndexedContainer(final IndexedType theType, final Object theContainer) {
             this.type = theType;
@@ -57,7 +57,7 @@ public final class IndexedType implements JexlPropertyGet {
         /**
          * Gets a property from this indexed container.
          *
-         * @param key the property key
+         * @param key The property key
          * @return The property value
          * @throws Exception if inner invocation fails
          */
@@ -86,8 +86,8 @@ public final class IndexedType implements JexlPropertyGet {
         /**
          * Sets a property in this indexed container.
          *
-         * @param key the property key
-         * @param value the property value
+         * @param key The property key
+         * @param value The property value
          * @return The invocation result (frequently null)
          * @throws Exception if inner invocation fails
          */
@@ -102,9 +102,9 @@ public final class IndexedType implements JexlPropertyGet {
      * Note that this is not equivalent to the strict bean definition of indexed properties; the type of the key
      * is not necessarily an int and the set/get arrays are not resolved.
      *
-     * @param is the introspector
-     * @param object the object
-     * @param name the container name
+     * @param is The introspector
+     * @param object The object
+     * @param name The container name
      * @return A JexlPropertyGet is successful, null otherwise
      */
     public static JexlPropertyGet discover(final Introspector is, final Object object, final String name) {
@@ -141,10 +141,10 @@ public final class IndexedType implements JexlPropertyGet {
     /**
      * Creates a new indexed property container type.
      *
-     * @param name the container name
-     * @param c the owning class
-     * @param gets the array of getter methods
-     * @param sets the array of setter methods
+     * @param name The container name
+     * @param c The owning class
+     * @param gets The array of getter methods
+     * @param sets The array of setter methods
      */
     private IndexedType(final String name, final Class<?> c, final Method[] gets, final Method[] sets) {
         this.container = name;
@@ -164,8 +164,8 @@ public final class IndexedType implements JexlPropertyGet {
     /**
      * Gets the value of a property from a container.
      *
-     * @param object the container instance (not null)
-     * @param key the property key (not null)
+     * @param object The container instance (not null)
+     * @param key The property key (not null)
      * @return The property value
      * @throws Exception if invocation failed;
      *         IntrospectionException if a property getter could not be found
@@ -196,9 +196,9 @@ public final class IndexedType implements JexlPropertyGet {
     /**
      * Sets the value of a property in a container.
      *
-     * @param object the container instance (not null)
-     * @param key the property key (not null)
-     * @param value the property value (not null)
+     * @param object The container instance (not null)
+     * @param key The property key (not null)
+     * @param value The property value (not null)
      * @return The result of the method invocation (frequently null)
      * @throws Exception if invocation failed;
      *         IntrospectionException if a property setter could not be found

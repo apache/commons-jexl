@@ -128,7 +128,7 @@ public class JexlBuilder {
     /**
      * Sets the default permissions.
      *
-     * @param permissions the permissions
+     * @param permissions The permissions
      */
     public static void setDefaultPermissions(final JexlPermissions permissions) {
         PERMISSIONS = permissions == null ? JexlPermissions.SECURE : permissions;
@@ -139,7 +139,7 @@ public class JexlBuilder {
      * <p>Passing {@code null} restores the 3.7 hardened default (new-instance, global side-effects,
      * pragmas, and annotations disabled, lexical scoping enabled; see {@link #secureFeatures()}).</p>
      *
-     * @param features the features, or {@code null} to restore the hardened default
+     * @param features The features, or {@code null} to restore the hardened default
      * @since 3.7.0
      */
     public static void setDefaultFeatures(final JexlFeatures features) {
@@ -155,7 +155,7 @@ public class JexlBuilder {
      * <p>Example: restore safe/antish defaults before creating any engine:</p>
      * <pre>JexlBuilder.setDefaultOptions("+safe", "+antish");</pre>
      *
-     * @param flags the flags to set or clear
+     * @param flags The flags to set or clear
      * @since 3.7.0
      */
     public static void setDefaultOptions(final String... flags) {
@@ -303,7 +303,7 @@ public class JexlBuilder {
     /**
      * Sets the JexlArithmetic instance the engine will use.
      *
-     * @param a the arithmetic
+     * @param a The arithmetic
      * @return this builder
      */
     public JexlBuilder arithmetic(final JexlArithmetic a) {
@@ -359,7 +359,7 @@ public class JexlBuilder {
     /**
      * Sets the expression-cache factory the engine will use.
      *
-     * @param factory the function to produce a cache.
+     * @param factory The function to produce a cache.
      * @return this builder
      */
     public JexlBuilder cacheFactory(final IntFunction<JexlCache<?, ?>> factory) {
@@ -380,7 +380,7 @@ public class JexlBuilder {
   /**
    * Sets the Jexl script parser factory the engine will use.
    *
-   * @param factory the function to produce a cache.
+   * @param factory The function to produce a cache.
    * @return this builder
    * @since 3.5.0
    */
@@ -449,7 +449,7 @@ public class JexlBuilder {
     /**
      * Sets the charset to use.
      *
-     * @param arg the charset
+     * @param arg The charset
      * @return this builder
      * @since 3.1
      */
@@ -547,7 +547,7 @@ public class JexlBuilder {
      * <p>As a last remark, if lexical or lexicalShade are set as features, this
      * method will also set the corresponding options.
      *
-     * @param f the features
+     * @param f The features
      * @return this builder
      */
     public JexlBuilder features(final JexlFeatures f) {
@@ -575,7 +575,7 @@ public class JexlBuilder {
     /**
      * Sets the optional set of imports.
      *
-     * @param imports the imported packages
+     * @param imports The imported packages
      * @return this builder
      */
     public JexlBuilder imports(final Collection<String> imports) {
@@ -586,7 +586,7 @@ public class JexlBuilder {
     /**
      * Sets the optional set of imports.
      *
-     * @param imports the imported packages
+     * @param imports The imported packages
      * @return this builder
      */
     public JexlBuilder imports(final String... imports) {
@@ -653,7 +653,7 @@ public class JexlBuilder {
     /**
      * Sets the charset to use.
      *
-     * @param arg the charset
+     * @param arg The charset
      * @return this builder
      * @deprecated since 3.1 use {@link #charset(Charset)} instead
      */
@@ -665,7 +665,7 @@ public class JexlBuilder {
     /**
      * Sets the class loader to use.
      *
-     * @param l the class loader
+     * @param l The class loader
      * @return this builder
      */
     public JexlBuilder loader(final ClassLoader l) {
@@ -685,7 +685,7 @@ public class JexlBuilder {
     /**
      * Sets the o.a.c.Log instance to use.
      *
-     * @param log the logger
+     * @param log The logger
      * @return this builder
      */
     public JexlBuilder logger(final Log log) {
@@ -724,7 +724,7 @@ public class JexlBuilder {
      * <p>Note that the JexlContext is also used to try to solve top-level namespaces. This allows ObjectContext
      * derived instances to call methods on the wrapped object.</p>
      *
-     * @param ns the map of namespaces
+     * @param ns The map of namespaces
      * @return this builder
      */
     public JexlBuilder namespaces(final Map<String, Object> ns) {
@@ -753,7 +753,7 @@ public class JexlBuilder {
     /**
      * Sets the JexlPermissions instance the engine will use.
      *
-     * @param p the permissions
+     * @param p The permissions
      * @return this builder
      */
     public JexlBuilder permissions(final JexlPermissions p) {
@@ -797,7 +797,7 @@ public class JexlBuilder {
     /**
      * Sets the sandbox the engine will use.
      *
-     * @param box the sandbox
+     * @param box The sandbox
      * @return this builder
      */
     public JexlBuilder sandbox(final JexlSandbox box) {
@@ -860,7 +860,7 @@ public class JexlBuilder {
      * Sets the JexlUberspect strategy the engine will use.
      * <p>This is ignored if the uberspect has been set.
      *
-     * @param rs the strategy
+     * @param rs The strategy
      * @return this builder
      */
     public JexlBuilder strategy(final JexlUberspect.ResolverStrategy rs) {
@@ -914,7 +914,7 @@ public class JexlBuilder {
     /**
      * Sets the JexlUberspect instance the engine will use.
      *
-     * @param u the uberspect
+     * @param u The uberspect
      * @return this builder
      */
     public JexlBuilder uberspect(final JexlUberspect u) {

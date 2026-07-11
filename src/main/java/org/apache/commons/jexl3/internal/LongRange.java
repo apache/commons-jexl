@@ -153,8 +153,8 @@ public abstract class LongRange implements Collection<Long> {
     /**
      * Creates a range, ascending or descending depending on boundaries order.
      *
-     * @param from the lower inclusive boundary
-     * @param to   the higher inclusive boundary
+     * @param from The lower inclusive boundary
+     * @param to   The higher inclusive boundary
      * @return A range
      */
     public static LongRange create(final long from, final long to) {
@@ -173,8 +173,8 @@ public abstract class LongRange implements Collection<Long> {
     /**
      * Creates a new range.
      *
-     * @param from the lower inclusive boundary
-     * @param to   the higher inclusive boundary
+     * @param from The lower inclusive boundary
+     * @param to   The higher inclusive boundary
      */
     protected LongRange(final long from, final long to) {
         min = from;

@@ -38,9 +38,9 @@ public class Frame {
     /**
      * Creates a new frame.
      *
-     * @param s the scope
-     * @param r the stack frame
-     * @param c the number of curried parameters
+     * @param s The scope
+     * @param r The stack frame
+     * @param c The number of curried parameters
      */
     protected Frame(final Scope s, final Object[] r, final int c) {
         final String[] symbols = s.getSymbols();
@@ -56,7 +56,7 @@ public class Frame {
     /**
      * Assign values to this frame.
      *
-     * @param values the values
+     * @param values The values
      * @return this frame
      */
     Frame assign(final Object... values) {
@@ -78,9 +78,9 @@ public class Frame {
     /**
      * Creates a new from of this frame&quot;s class.
      *
-     * @param s the scope
-     * @param r the arguments
-     * @param c the number of curried parameters
+     * @param s The scope
+     * @param r The arguments
+     * @param c The number of curried parameters
      * @return A new instance of frame
      */
     Frame newFrame(final Scope s, final Object[] r, final int c) {
@@ -90,7 +90,7 @@ public class Frame {
     /**
      * Captures a value.
      *
-     * @param s the offset in this frame
+     * @param s The offset in this frame
      * @param lexical true if this captured symbol is redefined locally
      * @return The stacked value
      */
@@ -101,7 +101,7 @@ public class Frame {
     /**
      * Gets a value.
      *
-     * @param s the offset in this frame
+     * @param s The offset in this frame
      * @return The stacked value
      */
     Object get(final int s) {
@@ -111,8 +111,8 @@ public class Frame {
     /**
      * Sets a value.
      *
-     * @param r the offset in this frame
-     * @param value the value to set in this frame
+     * @param r The offset in this frame
+     * @param value The value to set in this frame
      */
     void set(final int r, final Object value) {
         stack[r] = value;
@@ -139,7 +139,7 @@ public class Frame {
     /**
      * Tests whether this frame defines a symbol, ie declared it and assigned it a value.
      *
-     * @param s the offset in this frame
+     * @param s The offset in this frame
      * @return true if this symbol has been assigned a value, false otherwise
      */
     boolean has(final int s) {
@@ -151,7 +151,7 @@ public class Frame {
      * <p>This is to avoid the cyclic dependency between the closure and its frame stack that
      * may point back to it that occur with recursive function definitions.</p>
      *
-     * @param closure the owning closure
+     * @param closure The owning closure
      * @return The cleaned-up stack or the stack itself (most of the time)
      */
     Object[] nocycleStack(final Closure closure) {

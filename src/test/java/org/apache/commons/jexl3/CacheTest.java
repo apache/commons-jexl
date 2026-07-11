@@ -462,7 +462,7 @@ class CacheTest extends JexlTestCase {
          * By moving the expression creations out of the main loop, it also shows that the volatile cache speeds
          * things up around 2x.
          * </p>
-         * @param value the argument value to control
+         * @param value The argument value to control
          * @return The number of loops performed
          */
         public Integer runAssign(final Object value) {
@@ -595,7 +595,7 @@ class CacheTest extends JexlTestCase {
 
     /**
      * Run same test function in NTHREADS in parallel.
-     * @param ctask the task / test
+     * @param ctask The task / test
      * @param loops number of loops to perform
      * @param cache whether jexl cache is used or not
      * @throws Exception if anything goes wrong

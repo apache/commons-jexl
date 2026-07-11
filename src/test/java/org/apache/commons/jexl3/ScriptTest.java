@@ -112,7 +112,7 @@ class ScriptTest extends JexlTestCase {
 
     /**
      *  HTTP post.
-     * @param sURL the url
+     * @param sURL The url
      * @param jsonData some json data
      * @return The result
      * @throws IOException

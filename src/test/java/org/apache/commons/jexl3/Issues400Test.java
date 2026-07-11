@@ -681,7 +681,7 @@ public class Issues400Test {
     /**
      * Transcodes a SQL-inspired expression to a JEXL expression.
      *
-     * @param expr the expression to transcode
+     * @param expr The expression to transcode
      * @return The resulting expression
      */
     private static String transcodeSQLExpr(final CharSequence expr) {

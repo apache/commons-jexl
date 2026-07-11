@@ -38,8 +38,8 @@ abstract class AbstractExecutor {
         /**
          * Default and sole constructor.
          *
-         * @param theClass the class this executor applies to
-         * @param theMethod the method held by this executor
+         * @param theClass The class this executor applies to
+         * @param theMethod The method held by this executor
          */
         protected Get(final Class<?> theClass, final java.lang.reflect.Method theMethod) {
             super(theClass, theMethod);
@@ -57,9 +57,9 @@ abstract class AbstractExecutor {
         /**
          * Creates a new instance.
          *
-         * @param c the class this executor applies to
-         * @param m the method
-         * @param k the MethodKey
+         * @param c The class this executor applies to
+         * @param m The method
+         * @param k The MethodKey
          */
         protected Method(final Class<?> c, final java.lang.reflect.Method m, final MethodKey k) {
             super(c, m);
@@ -85,8 +85,8 @@ abstract class AbstractExecutor {
         /**
          * Default and sole constructor.
          *
-         * @param theClass the class this executor applies to
-         * @param theMethod the method held by this executor
+         * @param theClass The class this executor applies to
+         * @param theMethod The method held by this executor
          */
         protected Set(final Class<?> theClass, final java.lang.reflect.Method theMethod) {
             super(theClass, theMethod);
@@ -99,7 +99,7 @@ abstract class AbstractExecutor {
     /**
      * Coerce an Object which must be a number to an Integer.
      *
-     * @param arg the Object to coerce
+     * @param arg The Object to coerce
      * @return An Integer if it can be converted, null otherwise
      */
     static Integer castInteger(final Object arg) {
@@ -109,7 +109,7 @@ abstract class AbstractExecutor {
     /**
      * Coerce an Object to a String.
      *
-     * @param arg the Object to coerce
+     * @param arg The Object to coerce
      * @return A String if it can be converted, null otherwise
      */
     static String castString(final Object arg) {
@@ -119,7 +119,7 @@ abstract class AbstractExecutor {
     /**
      * Gets the class of an object or Object if null.
      *
-     * @param instance the instance
+     * @param instance The instance
      * @return The class
      */
     static Class<?> classOf(final Object instance) {
@@ -129,9 +129,9 @@ abstract class AbstractExecutor {
     /**
      * A helper to initialize the marker methods (array.get, list.get, etc...).
      *
-     * @param clazz the class to introspect
-     * @param name the name of the method
-     * @param parms the parameters
+     * @param clazz The class to introspect
+     * @param name The name of the method
+     * @param parms The parameters
      * @return The method
      */
     static java.lang.reflect.Method initMarker(final Class<?> clazz, final String name, final Class<?>... parms) {
@@ -145,7 +145,7 @@ abstract class AbstractExecutor {
     /**
      * Creates an arguments array.
      *
-     * @param args the list of arguments
+     * @param args The list of arguments
      * @return The arguments array
      */
     static Object[] makeArgs(final Object... args) {
@@ -161,8 +161,8 @@ abstract class AbstractExecutor {
     /**
      * Default and sole constructor.
      *
-     * @param theClass the class this executor applies to
-     * @param theMethod the method held by this executor
+     * @param theClass The class this executor applies to
+     * @param theMethod The method held by this executor
      */
     protected AbstractExecutor(final Class<?> theClass, final java.lang.reflect.Method theMethod) {
         objectClass = theClass;
@@ -172,7 +172,7 @@ abstract class AbstractExecutor {
     /**
      * Indicates whether some other executor is equivalent to this one.
      *
-     * @param arg the other executor to check
+     * @param arg The other executor to check
      * @return true if both executors are equivalent, false otherwise
      */
     public boolean equals(final AbstractExecutor arg) {
@@ -267,7 +267,7 @@ abstract class AbstractExecutor {
     /**
      * Checks whether a tryExecute failed or not.
      *
-     * @param exec the value returned by tryExecute
+     * @param exec The value returned by tryExecute
      * @return true if tryExecute failed, false otherwise
      */
     public final boolean tryFailed(final Object exec) {

@@ -34,9 +34,9 @@ public final class PropertyGetExecutor extends AbstractExecutor.Get {
      * Discovers a PropertyGetExecutor.
      * <p>The method to be found should be named "get{P,p}property.</p>
      *
-     * @param is the introspector
-     * @param clazz the class to find the get method from
-     * @param property the property name to find
+     * @param is The introspector
+     * @param clazz The class to find the get method from
+     * @param property The property name to find
      * @return The executor if found, null otherwise
      */
     public static PropertyGetExecutor discover(final Introspector is, final Class<?> clazz, final String property) {
@@ -47,7 +47,7 @@ public final class PropertyGetExecutor extends AbstractExecutor.Get {
     /**
      * Base method for boolean and object property get.
      *
-     * @param is the introspector
+     * @param is The introspector
      * @param which "is" or "get" for boolean or object
      * @param clazz The class being examined.
      * @param property The property being addressed.
@@ -85,8 +85,8 @@ public final class PropertyGetExecutor extends AbstractExecutor.Get {
      * Creates an instance.
      *
      * @param clazz he class the get method applies to
-     * @param method the method held by this executor
-     * @param identifier the property to get
+     * @param method The method held by this executor
+     * @param identifier The property to get
      */
     private PropertyGetExecutor(final Class<?> clazz, final java.lang.reflect.Method method, final String identifier) {
         super(clazz, method);

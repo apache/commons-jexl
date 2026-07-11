@@ -53,7 +53,7 @@ public class SoftCache<K, V> implements JexlCache<K, V> {
     /**
      * Creates a synchronized LinkedHashMap.
      *
-     * @param capacity the map capacity
+     * @param capacity The map capacity
      * @return The map instance
      * @param <K> key type
      * @param <V> value type
@@ -86,7 +86,7 @@ public class SoftCache<K, V> implements JexlCache<K, V> {
     /**
      * Creates a new instance of a soft cache.
      *
-     * @param theSize the cache size
+     * @param theSize The cache size
      */
     public SoftCache(final int theSize) {
         capacity = theSize;
@@ -120,7 +120,7 @@ public class SoftCache<K, V> implements JexlCache<K, V> {
      *
      * @param <KT> the key type
      * @param <VT> the value type
-     * @param cacheSize the cache size, must be &gt; 0
+     * @param cacheSize The cache size, must be &gt; 0
      * @return A Map usable as a cache bounded to the given size
      */
     protected <KT, VT> Map<KT, VT> createMap(final int cacheSize) {

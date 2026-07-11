@@ -51,7 +51,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     /**
      * Tests whether a node is a statement (vs an expression).
      *
-     * @param child the node
+     * @param child The node
      * @return true if node is a statement
      */
     private static boolean isStatement(final JexlNode child) {
@@ -73,7 +73,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     /**
      * Tests whether a script or expression ends with a semicolumn.
      *
-     * @param cs the string
+     * @param cs The string
      * @return true if a semicolumn is the last non-whitespace character
      */
     private static boolean semicolTerminated(final CharSequence cs) {
@@ -93,7 +93,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
      * Stringifies the pragmas.
      *
      * @param builder where to stringify
-     * @param pragmas the pragmas, may be null
+     * @param pragmas The pragmas, may be null
      */
     private static void writePragmas(final StringBuilder builder, final Map<String, Object> pragmas) {
         if (pragmas != null) {
@@ -155,7 +155,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     /**
      * Checks if a child node is the cause to debug &amp; adds its representation to the rebuilt expression.
      *
-     * @param node the child node
+     * @param node The child node
      * @param data visitor pattern argument
      * @return visitor pattern value
      */
@@ -179,7 +179,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     /**
      * Adds a statement node to the rebuilt expression.
      *
-     * @param child the child node
+     * @param child The child node
      * @param data  visitor pattern argument
      * @return visitor pattern value
      */
@@ -210,8 +210,8 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     /**
      * Rebuilds an additive expression.
      *
-     * @param node the node
-     * @param op   the operator
+     * @param node The node
+     * @param op   The operator
      * @param data visitor pattern argument
      * @return visitor pattern value
      */
@@ -238,8 +238,8 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     /**
      * Checks if a terminal node is the cause to debug &amp; adds its representation to the rebuilt expression.
      *
-     * @param node  the child node
-     * @param image the child node token image (optionally null)
+     * @param node  The child node
+     * @param image The child node token image (optionally null)
      * @param data  visitor pattern argument
      * @return visitor pattern value
      */
@@ -261,7 +261,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     /**
      * Rebuilds an expression from a JEXL node.
      *
-     * @param node the node to rebuilt from
+     * @param node The node to rebuilt from
      * @return The rebuilt expression
      * @since 3.0
      */
@@ -281,7 +281,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     /**
      * Position the debugger on the root of an expression.
      *
-     * @param jscript the expression
+     * @param jscript The expression
      * @return true if the expression was a {@link Script} instance, false otherwise
      */
     public boolean debug(final JexlExpression jscript) {
@@ -295,7 +295,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     /**
      * Seeks the location of an error cause (a node) in an expression.
      *
-     * @param node the node to debug
+     * @param node The node to debug
      * @return true if the cause was located, false otherwise
      */
     public boolean debug(final JexlNode node) {
@@ -305,7 +305,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     /**
      * Seeks the location of an error cause (a node) in an expression.
      *
-     * @param node the node to debug
+     * @param node The node to debug
      * @param r whether we should actively find the root node of the debugged node
      * @return true if the cause was located, false otherwise
      */
@@ -332,7 +332,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     /**
      * Position the debugger on the root of a script.
      *
-     * @param jscript the script
+     * @param jscript The script
      * @return true if the script was a {@link Script} instance, false otherwise
      */
     public boolean debug(final JexlScript jscript) {
@@ -346,7 +346,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     /**
      * Sets this debugger relative maximum depth.
      *
-     * @param rdepth the maximum relative depth from the debugged node
+     * @param rdepth The maximum relative depth from the debugged node
      * @return this debugger instance
      */
     public Debugger depth(final int rdepth) {
@@ -365,7 +365,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     /**
      * Tries (hard) to find the features used to parse a node.
      *
-     * @param node the node
+     * @param node The node
      * @return The features or null
      */
     protected JexlFeatures getFeatures(final JexlNode node) {
@@ -383,7 +383,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     /**
      * Sets the indentation level.
      *
-     * @param level the number of spaces for indentation, none if less or equal to zero
+     * @param level The number of spaces for indentation, none if less or equal to zero
      * @return this debugger instance
      */
     public Debugger indentation(final int level) {
@@ -396,8 +396,8 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
      * Checks if the children of a node using infix notation is the cause to debug, adds their representation to the
      * rebuilt expression.
      *
-     * @param node  the child node
-     * @param infix the child node token
+     * @param node  The child node
+     * @param infix The child node token
      * @param paren whether the child should be parenthesized
      * @param data  visitor pattern argument
      * @return visitor pattern value
@@ -422,7 +422,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     /**
      * Sets this debugger line-feed string.
      *
-     * @param lf the string used to delineate lines (usually "\" or "")
+     * @param lf The string used to delineate lines (usually "\" or "")
      * @return this debugger instance
      */
     public Debugger lineFeed(final String lf) {
@@ -433,7 +433,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     /**
      * Checks whether an identifier should be quoted or not.
      *
-     * @param str the identifier
+     * @param str The identifier
      * @return true if needing quotes, false otherwise
      */
     protected boolean needQuotes(final String str) {
@@ -456,8 +456,8 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     /**
      * Postfix operators.
      *
-     * @param node a postfix operator
-     * @param prefix the postfix
+     * @param node A postfix operator
+     * @param prefix The postfix
      * @param data visitor pattern argument
      * @return visitor pattern value
      */
@@ -478,8 +478,8 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
      * Checks if the child of a node using prefix notation is the cause to debug, adds their representation to the
      * rebuilt expression.
      *
-     * @param node   the node
-     * @param prefix the node token
+     * @param node   The node
+     * @param prefix The node token
      * @param data   visitor pattern argument
      * @return visitor pattern value
      */
@@ -500,7 +500,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
      * Accepts a (simple) value and appends its representation to the builder.
      *
      * @param builder where to append
-     * @param value   the value to append
+     * @param value   The value to append
      */
     static void acceptValue(final StringBuilder builder, final Object value, final boolean quotedStrings) {
         if (value == null) {
@@ -532,7 +532,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     /**
      * Sets the arrow style (fat or thin) depending on features.
      *
-     * @param node the node to start seeking features from.
+     * @param node The node to start seeking features from.
      */
     protected void setArrowSymbol(final JexlNode node) {
         final JexlFeatures features = getFeatures(node);
@@ -546,7 +546,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     /**
      * Sets the indentation level.
      *
-     * @param level the number of spaces for indentation, none if less or equal to zero
+     * @param level The number of spaces for indentation, none if less or equal to zero
      */
     public void setIndentation(final int level) {
         indentation(level);
@@ -1524,8 +1524,8 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     /**
      * A pseudo visitor for parameters.
      *
-     * @param p the parameter name
-     * @param data the visitor argument
+     * @param p The parameter name
+     * @param data The visitor argument
      * @return The parameter name to use
      */
     protected String visitParameter(final String p, final Object data) {

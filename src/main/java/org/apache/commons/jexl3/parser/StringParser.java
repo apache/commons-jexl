@@ -55,7 +55,7 @@ public class StringParser {
     /**
      * Builds a regex pattern string, handles escaping '/' through '\/' syntax.
      *
-     * @param str the string to build from
+     * @param str The string to build from
      * @return The built string
      */
     public static String buildRegex(final CharSequence str) {
@@ -65,7 +65,7 @@ public class StringParser {
     /**
      * Builds a string, handles escaping through '\' syntax.
      *
-     * @param str the string to build from
+     * @param str The string to build from
      * @param eatsep whether the separator, the first character, should be considered
      * @return The built string
      */
@@ -76,7 +76,7 @@ public class StringParser {
     /**
      * Builds a string, handles escaping through '\' syntax.
      *
-     * @param str the string to build from
+     * @param str The string to build from
      * @param eatsep whether the separator, the first character, should be considered
      * @param esc whether escape characters are interpreted or escaped
      * @return The built string
@@ -93,7 +93,7 @@ public class StringParser {
     /**
      * Builds a template, does not escape characters.
      *
-     * @param str the string to build from
+     * @param str The string to build from
      * @param eatsep whether the separator, the first character, should be considered
      * @return The built string
      */
@@ -104,7 +104,7 @@ public class StringParser {
     /**
      * Adds a escape char ('\') where needed in a string form of an ide
      *
-     * @param str the identifier un-escaped string
+     * @param str The identifier un-escaped string
      * @return The string with added  backslash character before space, quote, double-quote and backslash
      */
     public static String escapeIdentifier(final String str) {
@@ -141,8 +141,8 @@ public class StringParser {
     /**
      * Escapes a String representation, expand non-ASCII characters as Unicode escape sequence.
      *
-     * @param delim the delimiter character (if 0, no delimiter is added)
-     * @param str the string to escape
+     * @param delim The delimiter character (if 0, no delimiter is added)
+     * @param str The string to escape
      * @return The escaped representation
      */
     public static String escapeString(final CharSequence str, final char delim) {
@@ -214,11 +214,11 @@ public class StringParser {
      * Reads the remainder of a string till a given separator,
      * handles escaping through '\' syntax.
      *
-     * @param strb the destination buffer to copy characters into
-     * @param str the origin
-     * @param begin the relative offset in str to begin reading
-     * @param end the relative offset in str to end reading
-     * @param sep the separator, single or double quote, marking end of string
+     * @param strb The destination buffer to copy characters into
+     * @param str The origin
+     * @param begin The relative offset in str to begin reading
+     * @param end The relative offset in str to end reading
+     * @param sep The separator, single or double quote, marking end of string
      * @param esc whether escape characters are interpreted or escaped
      * @return The last character offset handled in origin
      */
@@ -282,10 +282,10 @@ public class StringParser {
      * Reads the remainder of a string till a given separator,
      * handles escaping through '\' syntax.
      *
-     * @param strb the destination buffer to copy characters into
-     * @param str the origin
-     * @param index the offset into the origin
-     * @param sep the separator, single or double quote, marking end of string
+     * @param strb The destination buffer to copy characters into
+     * @param str The origin
+     * @param index The offset into the origin
+     * @param sep The separator, single or double quote, marking end of string
      * @return The offset in origin
      */
     public static int readString(final StringBuilder strb, final CharSequence str, final int index, final char sep) {
@@ -295,9 +295,9 @@ public class StringParser {
     /**
      * Reads a Unicode escape character.
      *
-     * @param strb the builder to write the character to
-     * @param str the sequence
-     * @param begin the begin offset in sequence (after the '\\u')
+     * @param strb The builder to write the character to
+     * @param str The sequence
+     * @param begin The begin offset in sequence (after the '\\u')
      * @return 0 if char could not be read, 4 otherwise
      */
     private static int readUnicodeChar(final StringBuilder strb, final CharSequence str, final int begin) {
@@ -325,7 +325,7 @@ public class StringParser {
     /**
      * Remove escape char ('\') from an identifier.
      *
-     * @param str the identifier escaped string, ie with a backslash before space, quote, double-quote and backslash
+     * @param str The identifier escaped string, ie with a backslash before space, quote, double-quote and backslash
      * @return The string with no '\\' character
      */
     public static String unescapeIdentifier(final String str) {

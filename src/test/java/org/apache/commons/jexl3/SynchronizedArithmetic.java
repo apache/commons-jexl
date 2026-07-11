@@ -59,7 +59,7 @@ public class SynchronizedArithmetic extends JexlArithmetic {
 
         /**
          * Enter an object monitor.
-         * @param o the monitored object
+         * @param o The monitored object
          */
         protected void monitorEnter(final Object o) {
             enters.incrementAndGet();
@@ -67,7 +67,7 @@ public class SynchronizedArithmetic extends JexlArithmetic {
 
         /**
          * Exits an object monitor.
-         * @param o the monitored object
+         * @param o The monitored object
          */
         protected void monitorExit(final Object o) {
             exits.incrementAndGet();
@@ -216,7 +216,7 @@ public class SynchronizedArithmetic extends JexlArithmetic {
 
     /**
      * A base synchronized arithmetic.
-     * @param abstractMonitor the synchronization monitor
+     * @param abstractMonitor The synchronization monitor
      * @param strict  whether the arithmetic is strict or not
      */
     protected SynchronizedArithmetic(final AbstractMonitor abstractMonitor, final boolean strict) {
@@ -227,8 +227,8 @@ public class SynchronizedArithmetic extends JexlArithmetic {
     /**
      * Jexl pseudo-overload for array-like access get operator (map[key]) for maps.
      * <p>synchronized(map) { return map.get(key); }
-     * @param map the map
-     * @param key the key
+     * @param map The map
+     * @param key The key
      * @return The value associated to the key in the map
      */
     public Object arrayGet(final Map<?, ?> map, final Object key) {
@@ -243,9 +243,9 @@ public class SynchronizedArithmetic extends JexlArithmetic {
     /**
      * Jexl pseudo-overload for array-like access set operator (map[key] = value) for maps.
      * <p>synchronized(map) { map.put(key, value); }
-     * @param map the map
-     * @param key the key
-     * @param value the value
+     * @param map The map
+     * @param key The key
+     * @param value The value
      */
     public void arraySet(final Map<Object, Object> map, final Object key, final Object value) {
         abstractMonitor.monitorEnter(map);
@@ -258,7 +258,7 @@ public class SynchronizedArithmetic extends JexlArithmetic {
 
     /**
      * Creates an iterator on the map values that executes under the map monitor.
-     * @param map the map
+     * @param map The map
      * @return The iterator
      */
     public Iterator<Object> forEach(final Map<Object, Object> map) {
@@ -269,8 +269,8 @@ public class SynchronizedArithmetic extends JexlArithmetic {
  * Jexl pseudo-overload for property access get operator (map.key) for maps.
  * <p>synchronized(map) { return map.get(key); }
  *
- * @param map the map
- * @param key the key
+ * @param map The map
+ * @param key The key
  * @return The value associated to the key in the map
  */
 public Object propertyGet(final Map<?, ?> map, final Object key) {
@@ -285,9 +285,9 @@ public Object propertyGet(final Map<?, ?> map, final Object key) {
     /**
          * Jexl pseudo-overload for array-like access set operator (map.key = value) for maps.
          * <p>synchronized(map) { map.put(key, value); }
-         * @param map the map
-         * @param key the key
-         * @param value the value
+         * @param map The map
+         * @param key The key
+         * @param value The value
          */
         public void propertySet(final Map<Object, Object> map, final Object key, final Object value) {
             abstractMonitor.monitorEnter(map);

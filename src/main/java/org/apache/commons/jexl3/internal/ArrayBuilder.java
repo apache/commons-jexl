@@ -51,7 +51,7 @@ public class ArrayBuilder implements JexlArithmetic.ArrayBuilder {
     /**
      * Gets the primitive type of given class (when it exists).
      *
-     * @param parm a class
+     * @param parm A class
      * @return The primitive type or null it the argument is not unboxable
      */
     protected static Class<?> unboxingClass(final Class<?> parm) {
@@ -79,7 +79,7 @@ public class ArrayBuilder implements JexlArithmetic.ArrayBuilder {
     /**
      * Creates a new builder.
      *
-     * @param size the exact array size
+     * @param size The exact array size
      */
     public ArrayBuilder(final int size) {
         this(size, false);
@@ -88,7 +88,7 @@ public class ArrayBuilder implements JexlArithmetic.ArrayBuilder {
     /**
      * Creates a new builder.
      *
-     * @param size the exact array size
+     * @param size The exact array size
      * @param extended whether the array is extended
      */
     public ArrayBuilder(final int size, final boolean extended) {
@@ -156,7 +156,7 @@ public class ArrayBuilder implements JexlArithmetic.ArrayBuilder {
      * Computes the best super class/super interface.
      * <p>Used to try and maintain type safe arrays.</p>
      *
-     * @param baseClass the baseClass
+     * @param baseClass The baseClass
      * @param other another class
      * @return A common ancestor, class or interface, worst case being class Object
      */
@@ -167,8 +167,8 @@ public class ArrayBuilder implements JexlArithmetic.ArrayBuilder {
     /**
      * Creates a new list (aka extended array)/
      *
-     * @param clazz the class
-     * @param size the size
+     * @param clazz The class
+     * @param size The size
      * @return The instance
      * @param <T> The type
      */

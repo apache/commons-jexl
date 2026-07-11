@@ -33,7 +33,7 @@ public class SetBuilder implements JexlArithmetic.SetBuilder {
     /**
      * Creates a new builder.
      *
-     * @param size the expected set size
+     * @param size The expected set size
      */
     public SetBuilder(final int size) {
         this(size, false);
@@ -42,7 +42,7 @@ public class SetBuilder implements JexlArithmetic.SetBuilder {
     /**
      * Creates a new builder.
      *
-     * @param size the expected set size
+     * @param size The expected set size
      * @param extended whether the set is extended
      */
     public SetBuilder(final int size, final boolean extended) {

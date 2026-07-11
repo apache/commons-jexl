@@ -31,9 +31,9 @@ public final class BooleanGetExecutor extends AbstractExecutor.Get {
      * Discovers a BooleanGetExecutor.
      * <p>The method to be found should be named "is{P,p}property and return a boolean.</p>
      *
-     * @param is the introspector
-     * @param clazz the class to find the get method from
-     * @param property the property name
+     * @param is The introspector
+     * @param clazz The class to find the get method from
+     * @param property The property name
      * @return The executor if found, null otherwise
      */
     public static BooleanGetExecutor discover(final Introspector is, final Class<?> clazz, final String property) {
@@ -52,9 +52,9 @@ public final class BooleanGetExecutor extends AbstractExecutor.Get {
     /**
      * Creates an instance by attempting discovery of the get method.
      *
-     * @param clazz the class to introspect
-     * @param method the method held by this executor
-     * @param key the property to get
+     * @param clazz The class to introspect
+     * @param method The method held by this executor
+     * @param key The property to get
      */
     private BooleanGetExecutor(final Class<?> clazz, final java.lang.reflect.Method method, final String key) {
         super(clazz, method);

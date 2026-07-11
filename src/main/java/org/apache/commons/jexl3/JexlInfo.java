@@ -56,7 +56,7 @@ public class JexlInfo {
     /**
      * Gets the info from a script.
      *
-     * @param script the script
+     * @param script The script
      * @return The info
      */
     public static JexlInfo from(final JexlScript script) {
@@ -104,7 +104,7 @@ public class JexlInfo {
     /**
      * The copy constructor.
      *
-     * @param copy the instance to copy
+     * @param copy The instance to copy
      */
     protected JexlInfo(final JexlInfo copy) {
         this(copy.getName(), copy.getLine(), copy.getColumn());
@@ -126,8 +126,8 @@ public class JexlInfo {
     /**
      * Creates info reusing the name.
      *
-     * @param l the line
-     * @param c the column
+     * @param l The line
+     * @param c The column
      * @return A new info instance
      */
     public JexlInfo at(final int l, final int c) {

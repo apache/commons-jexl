@@ -38,8 +38,8 @@ public class ASTNamespaceIdentifier extends ASTIdentifier {
     /**
      * Sets the namespace:identifier.
      *
-     * @param ns the namespace
-     * @param id the names
+     * @param ns The namespace
+     * @param id The names
      */
     public void setNamespace(final String ns, final String id) {
         this.namespace = ns;

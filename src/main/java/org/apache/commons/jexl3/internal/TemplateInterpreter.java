@@ -65,7 +65,7 @@ public class TemplateInterpreter extends Interpreter {
         /**
          * Sole ctor.
          *
-         * @param e the JEXL engine
+         * @param e The JEXL engine
          */
         Arguments(final Engine e) {
             this.jexl = e;
@@ -74,7 +74,7 @@ public class TemplateInterpreter extends Interpreter {
         /**
          * Sets the context.
          *
-         * @param j the context
+         * @param j The context
          * @return {@code this} instance
          */
         Arguments context(final JexlContext j) {
@@ -85,7 +85,7 @@ public class TemplateInterpreter extends Interpreter {
         /**
          * Sets the expressions.
          *
-         * @param e the expressions
+         * @param e The expressions
          * @return {@code this} instance
          */
         Arguments expressions(final TemplateExpression[] e) {
@@ -96,7 +96,7 @@ public class TemplateInterpreter extends Interpreter {
         /**
          * Sets the frame.
          *
-         * @param f the frame
+         * @param f The frame
          * @return {@code this} instance
          */
         Arguments frame(final Frame f) {
@@ -107,7 +107,7 @@ public class TemplateInterpreter extends Interpreter {
         /**
          * Sets the options.
          *
-         * @param o the options
+         * @param o The options
          * @return {@code this} instance
          */
         Arguments options(final JexlOptions o) {
@@ -118,7 +118,7 @@ public class TemplateInterpreter extends Interpreter {
         /**
          * Sets the writer.
          *
-         * @param o the writer
+         * @param o The writer
          * @return {@code this} instance
          */
         Arguments writer(final Writer o) {
@@ -136,7 +136,7 @@ public class TemplateInterpreter extends Interpreter {
     /**
      * Creates a template interpreter instance.
      *
-     * @param args the template interpreter arguments
+     * @param args The template interpreter arguments
      */
     protected TemplateInterpreter(final Arguments args) {
         super(args.jexl, args.options, args.jcontext, args.jframe);
@@ -152,8 +152,8 @@ public class TemplateInterpreter extends Interpreter {
      * Subclassing Writer by adding 'print' methods should be the preferred way to specialize output.
      * </p>
      *
-     * @param info the source info
-     * @param arg  the argument to print out
+     * @param info The source info
+     * @param arg  The argument to print out
      */
     private void doPrint(final JexlInfo info, final Object arg) {
         try {
@@ -183,8 +183,8 @@ public class TemplateInterpreter extends Interpreter {
      * <p>
      * Includes another template using this template initial context and writer.</p>
      *
-     * @param script the TemplateScript to evaluate
-     * @param args   the arguments
+     * @param script The TemplateScript to evaluate
+     * @param args   The arguments
      */
     public void include(final JxltEngine.Template script, final Object... args) {
         script.evaluate(context, writer, args);
@@ -193,7 +193,7 @@ public class TemplateInterpreter extends Interpreter {
     /**
      * Prints a unified expression evaluation result.
      *
-     * @param e the expression number
+     * @param e The expression number
      */
     public void print(final int e) {
         if (e < 0 || e >= exprs.length) {
@@ -213,7 +213,7 @@ public class TemplateInterpreter extends Interpreter {
     /**
      * Prints a composite expression.
      *
-     * @param composite the composite expression
+     * @param composite The composite expression
      */
     private void printComposite(final TemplateEngine.CompositeExpression composite) {
         final TemplateEngine.TemplateExpression[] composites = composite.exprs;
@@ -234,8 +234,8 @@ public class TemplateInterpreter extends Interpreter {
      * print() and include() must be decoded by this interpreter since delegating to the Uberspect
      * may be sandboxing the interpreter itself making it unable to call the function.
      *
-     * @param node the function node
-     * @param data the data
+     * @param node The function node
+     * @param data The data
      * @return The function evaluation result.
      */
     @Override

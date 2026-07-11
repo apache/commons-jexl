@@ -229,7 +229,7 @@ class ExceptionTest extends JexlTestCase {
      * Calls a NPE throwing call wrapped in JexlException and checks the outcome.
      * @param debug if true/false, debug mode is on/off
      * @param silent if true/false, silent mode is on/off
-     * @param npeCall the NPE throwing call
+     * @param npeCall The NPE throwing call
      */
     private static void callWrappedEx(final boolean debug, final boolean silent, final CaptureLog log, final Supplier<Object> npeCall) {
         try {

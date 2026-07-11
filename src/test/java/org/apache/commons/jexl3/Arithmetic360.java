@@ -35,8 +35,8 @@ public class Arithmetic360 extends JexlArithmetic {
     /**
      * Performs a bitwise and.
      *
-     * @param left  the left operand
-     * @param right the right operator
+     * @param left  The left operand
+     * @param right The right operator
      * @return left &amp; right
      */
     @Override
@@ -65,7 +65,7 @@ public class Arithmetic360 extends JexlArithmetic {
 
     /**
      * Casts to Long if possible.
-     * @param value the Long or else
+     * @param value The Long or else
      * @return The Long or null
      */
     protected Long castLongNumber(final Object value) {
@@ -75,7 +75,7 @@ public class Arithmetic360 extends JexlArithmetic {
     /**
      * Performs a bitwise complement.
      *
-     * @param val the operand
+     * @param val The operand
      * @return ~val
      */
     @Override
@@ -87,8 +87,8 @@ public class Arithmetic360 extends JexlArithmetic {
     /**
      * Given a long, attempt to narrow it to an int.
      * <p>Narrowing will only occur if the initial operand is not a Long.
-     * @param operand  the operand that lead to the long result
-     * @param result the long result to narrow
+     * @param operand  The operand that lead to the long result
+     * @param result The long result to narrow
      * @return An Integer if narrowing is possible, the original Long otherwise
      */
     protected Number narrowLong(final Object operand, final long result) {
@@ -104,9 +104,9 @@ public class Arithmetic360 extends JexlArithmetic {
     /**
      * Given a long, attempt to narrow it to an int.
      * <p>Narrowing will only occur if no operand is a Long.
-     * @param lhs  the left-hand side operand that lead to the long result
-     * @param rhs  the right-hand side operand that lead to the long result
-     * @param result the long to narrow
+     * @param lhs  The left-hand side operand that lead to the long result
+     * @param rhs  The right-hand side operand that lead to the long result
+     * @param result The long to narrow
      * @return An Integer if narrowing is possible, the original Long otherwise
      */
     @Override
@@ -123,8 +123,8 @@ public class Arithmetic360 extends JexlArithmetic {
     /**
      * Performs a bitwise or.
      *
-     * @param left  the left operand
-     * @param right the right operator
+     * @param left  The left operand
+     * @param right The right operator
      * @return left | right
      */
     @Override
@@ -213,8 +213,8 @@ public class Arithmetic360 extends JexlArithmetic {
     /**
      * Performs a bitwise xor.
      *
-     * @param left  the left operand
-     * @param right the right operator
+     * @param left  The left operand
+     * @param right The right operator
      * @return left ^ right
      */
     @Override

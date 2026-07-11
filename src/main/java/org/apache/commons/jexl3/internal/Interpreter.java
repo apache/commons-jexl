@@ -64,9 +64,9 @@ public class Interpreter extends InterpreterBase {
         /**
          * Simple ctor.
          *
-         * @param astmt the statement
-         * @param aindex the index
-         * @param adata the data
+         * @param astmt The statement
+         * @param aindex The index
+         * @param adata The data
          */
         AnnotatedCall(final ASTAnnotatedStatement astmt, final int aindex, final Object adata) {
             stmt = astmt;
@@ -117,10 +117,10 @@ public class Interpreter extends InterpreterBase {
     /**
      * Creates an interpreter.
      *
-     * @param engine   the engine creating this interpreter
-     * @param aContext the evaluation context, global variables, methods and functions
-     * @param opts     the evaluation options, flags modifying evaluation behavior
-     * @param eFrame   the evaluation frame, arguments and local variables
+     * @param engine   The engine creating this interpreter
+     * @param aContext The evaluation context, global variables, methods and functions
+     * @param opts     The evaluation options, flags modifying evaluation behavior
+     * @param eFrame   The evaluation frame, arguments and local variables
      */
     protected Interpreter(final Engine engine, final JexlOptions opts, final JexlContext aContext, final Frame eFrame) {
         super(engine, opts, aContext);
@@ -130,8 +130,8 @@ public class Interpreter extends InterpreterBase {
     /**
      * Copy constructor.
      *
-     * @param ii  the interpreter to copy
-     * @param jexla the arithmetic instance to use (or null)
+     * @param ii  The interpreter to copy
+     * @param jexla The arithmetic instance to use (or null)
      */
     protected Interpreter(final Interpreter ii, final JexlArithmetic jexla) {
         super(ii, jexla);
@@ -150,10 +150,10 @@ public class Interpreter extends InterpreterBase {
      * </p>
      * *duck-callable: an object where a "call" function exists
      *
-     * @param node    the method node
-     * @param target  the target of the method, what it should be invoked upon
-     * @param funcNode the object carrying the method or function or the method identifier
-     * @param argNode the node carrying the arguments
+     * @param node    The method node
+     * @param target  The target of the method, what it should be invoked upon
+     * @param funcNode The object carrying the method or function or the method identifier
+     * @param argNode The node carrying the arguments
      * @return The result of the method invocation
      */
     protected Object call(final JexlNode node, final Object target, final Object funcNode, final ASTArguments argNode) {
@@ -316,10 +316,10 @@ public class Interpreter extends InterpreterBase {
     /**
      * Evaluate the catch in a try/catch/finally.
      *
-     * @param catchVar the variable containing the exception
-     * @param catchBody the body
-     * @param caught the caught exception
-     * @param data the data
+     * @param catchVar The variable containing the exception
+     * @param catchBody The body
+     * @param caught The caught exception
+     * @param data The data
      * @return The result of body evaluation
      */
     private Object evalCatch(final ASTReference catchVar, final JexlNode catchBody,
@@ -364,7 +364,7 @@ public class Interpreter extends InterpreterBase {
      * Evaluates an access identifier based on the 2 main implementations;
      * static (name or numbered identifier) or dynamic (jxlt).
      *
-     * @param node the identifier access node
+     * @param node The identifier access node
      * @return The evaluated identifier
      */
     private Object evalIdentifier(final ASTIdentifierAccess node) {
@@ -388,7 +388,7 @@ public class Interpreter extends InterpreterBase {
      * Evaluates a JxltHandle node.
      * <p>This parses and stores the JXLT template if necessary (upon first execution)</p>
      *
-     * @param node the node
+     * @param node The node
      * @return The JXLT template evaluation.
      * @param <NODE> the node type
      */
@@ -412,9 +412,9 @@ public class Interpreter extends InterpreterBase {
     /**
      * Executes an assignment with an optional side effect operator.
      *
-     * @param node     the node
-     * @param assignop the assignment operator or null if simply assignment
-     * @param data     the data
+     * @param node     The node
+     * @param assignop The assignment operator or null if simply assignment
+     * @param data     The data
      * @return The left hand side
      */
     protected Object executeAssign(final JexlNode node, final JexlOperator assignop, final Object data) { // CSOFF: MethodLength
@@ -758,7 +758,7 @@ public class Interpreter extends InterpreterBase {
      * If the underlying JEXL engine is silent, errors will be logged through
      * its logger as warning.
      *
-     * @param node the script or expression to interpret.
+     * @param node The script or expression to interpret.
      * @return The result of the interpretation.
      * @throws JexlException if any error occurs during interpretation.
      */
@@ -831,8 +831,8 @@ public class Interpreter extends InterpreterBase {
     /**
      * Determines if the specified Object is assignment-compatible with the object represented by the Class.
      *
-     * @param object the Object
-     * @param clazz the Class
+     * @param object The Object
+     * @param clazz The Class
      * @return The result of isInstance call
      */
     private boolean isInstance(final Object object, final Object clazz) {
@@ -848,9 +848,9 @@ public class Interpreter extends InterpreterBase {
     /**
      * Processes an annotated statement.
      *
-     * @param stmt the statement
-     * @param index the index of the current annotation being processed
-     * @param data the contextual data
+     * @param stmt The statement
+     * @param index The index of the current annotation being processed
+     * @param data The contextual data
      * @return  the result of the statement block evaluation
      */
     protected Object processAnnotation(final ASTAnnotatedStatement stmt, final int index, final Object data) {
@@ -906,9 +906,9 @@ public class Interpreter extends InterpreterBase {
     /**
      * Delegates the annotation processing to the JexlContext if it is an AnnotationProcessor.
      *
-     * @param annotation    the annotation name
-     * @param args          the annotation arguments
-     * @param stmt          the statement / block that was annotated
+     * @param annotation    The annotation name
+     * @param args          The annotation arguments
+     * @param stmt          The statement / block that was annotated
      * @return The result of statement.call()
      * @throws Exception if anything goes wrong
      */
@@ -921,7 +921,7 @@ public class Interpreter extends InterpreterBase {
     /**
      * Swaps the current thread local interpreter.
      *
-     * @param inter the interpreter or null
+     * @param inter The interpreter or null
      * @return The previous thread local interpreter
      */
     protected Interpreter putThreadInterpreter(final Interpreter inter) {
@@ -933,7 +933,7 @@ public class Interpreter extends InterpreterBase {
     /**
      * Resolves a class name.
      *
-     * @param name the simple class name
+     * @param name The simple class name
      * @return The fully qualified class name or the name
      */
     private String resolveClassName(final String name) {
@@ -956,7 +956,7 @@ public class Interpreter extends InterpreterBase {
     /**
      * Runs a closure.
      *
-     * @param closure the closure
+     * @param closure The closure
      * @return The closure return value
      */
     protected Object runClosure(final Closure closure) {
@@ -997,9 +997,9 @@ public class Interpreter extends InterpreterBase {
     /**
      * Short-circuit evaluation of logical expression.
      *
-     * @param check the fuse value that will stop evaluation, true for OR, false for AND
-     * @param node a ASTAndNode or a ASTOrNode
-     * @param data the data, usually null and unused
+     * @param check The fuse value that will stop evaluation, true for OR, false for AND
+     * @param node A ASTAndNode or a ASTOrNode
+     * @param data The data, usually null and unused
      * @return true or false if boolean logical option is true, the last evaluated argument otherwise
      */
     private Object shortCircuit(final boolean check, final JexlNode node, final Object data) {
@@ -1572,9 +1572,9 @@ public class Interpreter extends InterpreterBase {
     /**
      * Execute a method call, ie syntactically written as name.call(...).
      *
-     * @param node the actual method call node
+     * @param node The actual method call node
      * @param antish non-null when name.call is an antish variable
-     * @param data the context
+     * @param data The context
      * @return The method call result
      */
     private Object visit(final ASTMethodNode node, final Object antish, final Object data) {
@@ -2313,8 +2313,8 @@ public class Interpreter extends InterpreterBase {
     /**
      * Base visitation for blocks.
      *
-     * @param node the block
-     * @param data the usual data
+     * @param node The block
+     * @param data The usual data
      * @return The result of the last expression evaluation
      */
     private Object visitBlock(final ASTBlock node, final Object data) {
@@ -2330,8 +2330,8 @@ public class Interpreter extends InterpreterBase {
     /**
      * Runs a node.
      *
-     * @param node the node
-     * @param data the usual data, always null
+     * @param node The node
+     * @param data The usual data, always null
      * @return The return value
      */
     protected Object visitLexicalNode(final JexlNode node, final Object data) {
