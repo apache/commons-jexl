@@ -110,7 +110,7 @@ public final class Scope {
      * Gets an unmodifiable view of a scope&quote;s symbols map.
      *
      * @param scope the scope
-     * @return the symbols map
+     * @return The symbols map
      */
      static Map<String, Integer> getSymbolsMap(final Scope scope) {
         if (scope != null && scope.namedVariables != null) {
@@ -138,7 +138,7 @@ public final class Scope {
      *
      * @param frame the caller frame
      * @param args the arguments
-     * @return the arguments array
+     * @return The arguments array
      */
     public Frame createFrame(final boolean ref, final Frame frame, final Object...args) {
         if (namedVariables == null) {
@@ -171,7 +171,7 @@ public final class Scope {
      * </p>
      *
      * @param param the parameter name
-     * @return the register index storing this variable
+     * @return The register index storing this variable
      */
     public int declareParameter(final String param) {
         if (namedVariables == null) {
@@ -193,7 +193,7 @@ public final class Scope {
      * </p>
      *
      * @param varName the variable name
-     * @return the register index storing this variable
+     * @return The register index storing this variable
      */
     public int declareVariable(final String varName) {
         if (namedVariables == null) {
@@ -219,7 +219,7 @@ public final class Scope {
     /**
      * Gets the (maximum) number of arguments this script expects.
      *
-     * @return the number of parameters
+     * @return The number of parameters
      */
     public int getArgCount() {
         return parms;
@@ -229,7 +229,7 @@ public final class Scope {
      * Gets the captured index of a given symbol, i.e., the target index of a symbol in a child scope.
      *
      * @param symbol the symbol index
-     * @return the target symbol index or null if the symbol is not captured
+     * @return The target symbol index or null if the symbol is not captured
      */
     public Integer getCaptured(final int symbol) {
         if (capturedVariables != null) {
@@ -247,7 +247,7 @@ public final class Scope {
      * Gets the index of a captured symbol, i.e., the source index of a symbol in a parent scope.
      *
      * @param symbol the symbol index
-     * @return the source symbol index or -1 if the symbol is not captured
+     * @return The source symbol index or -1 if the symbol is not captured
      */
     public int getCaptureDeclaration(final int symbol) {
         final Integer declared = capturedVariables != null ? capturedVariables.get(symbol)  : null;
@@ -258,7 +258,7 @@ public final class Scope {
      * Gets this script captured symbols names, i.e., local variables defined in outer scopes and used
      * by this scope.
      *
-     * @return the captured names
+     * @return The captured names
      */
     public String[] getCapturedVariables() {
         if (capturedVariables != null) {
@@ -279,7 +279,7 @@ public final class Scope {
     /**
      * Gets this script local variable, i.e. symbols assigned to local variables excluding captured variables.
      *
-     * @return the local variable names
+     * @return The local variable names
      */
     public String[] getLocalVariables() {
         if (namedVariables == null || vars <= 0) {
@@ -298,7 +298,7 @@ public final class Scope {
     /**
      * Gets this script parameters, i.e., symbols assigned before creating local variables.
      *
-     * @return the parameter names
+     * @return The parameter names
      */
     public String[] getParameters() {
         return getParameters(0);
@@ -308,7 +308,7 @@ public final class Scope {
      * Gets this script parameters.
      *
      * @param bound number of known bound parameters (curry)
-     * @return the parameter names
+     * @return The parameter names
      */
      String[] getParameters(final int bound) {
         final int unbound = parms - bound;
@@ -335,7 +335,7 @@ public final class Scope {
      * If this fails, look within parents for a symbol that can be captured.
      *
      * @param name the symbol name
-     * @return the symbol index
+     * @return The symbol index
      */
     public Integer getSymbol(final String name) {
         return getSymbol(name, true);
@@ -346,7 +346,7 @@ public final class Scope {
      *
      * @param name the symbol name
      * @param capture whether solving by capturing a parent symbol is allowed
-     * @return the symbol index
+     * @return The symbol index
      */
     private Integer getSymbol(final String name, final boolean capture) {
         Integer register = namedVariables != null ? namedVariables.get(name) : null;
@@ -370,7 +370,7 @@ public final class Scope {
     /**
      * Gets this script symbols names, i.e., parameters and local variables.
      *
-     * @return the symbol names
+     * @return The symbol names
      */
     public String[] getSymbols() {
         return namedVariables != null ? namedVariables.keySet().toArray(new String[0]) : EMPTY_STRS;

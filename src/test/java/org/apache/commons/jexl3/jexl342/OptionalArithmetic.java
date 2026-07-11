@@ -197,7 +197,7 @@ public class OptionalArithmetic extends JexlArithmetic {
     /**
      * Dereferences an Optional, a Reference or an AtomicReference, leave other as is.
      * @param ref the reference
-     * @return the referenced object
+     * @return The referenced object
      */
     protected Object star(final Object ref) {
         if (ref instanceof Optional<?>) {

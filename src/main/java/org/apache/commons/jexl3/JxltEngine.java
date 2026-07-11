@@ -115,7 +115,7 @@ public abstract class JxltEngine {
         /**
          * Generates this expression's string representation.
          *
-         * @return the string representation
+         * @return The string representation
          */
         String asString();
 
@@ -123,7 +123,7 @@ public abstract class JxltEngine {
          * Adds this expression's string representation to a StringBuilder.
          *
          * @param strb the builder to fill
-         * @return the builder argument
+         * @return The builder argument
          */
         StringBuilder asString(StringBuilder strb);
 
@@ -133,7 +133,7 @@ public abstract class JxltEngine {
          * <p>If the underlying JEXL engine is silent, errors will be logged through its logger as warning.</p>
          *
          * @param context the variable context
-         * @return the result of this expression evaluation or null if an error occurs and the {@link JexlEngine} is
+         * @return The result of this expression evaluation or null if an error occurs and the {@link JexlEngine} is
          * running in silent mode
          * @throws Exception if an error occurs and the {@link JexlEngine}
          * is not silent
@@ -147,7 +147,7 @@ public abstract class JxltEngine {
          * original expression that lead to it.</p>
          * <p>Other expressions return themselves.</p>
          *
-         * @return the source expression
+         * @return The source expression
          */
         Expression getSource();
 
@@ -156,7 +156,7 @@ public abstract class JxltEngine {
          * <p>This method will visit all nodes of the sub-expressions and extract all variables whether they
          * are written in 'dot' or 'bracketed' notation. (a.b is equivalent to a['b']).</p>
          *
-         * @return the set of variables, each as a list of strings (ant-ish variables use more than 1 string)
+         * @return The set of variables, each as a list of strings (ant-ish variables use more than 1 string)
          * or the empty set if no variables are used
          */
         Set<List<String>> getVariables();
@@ -200,7 +200,7 @@ public abstract class JxltEngine {
          * Formats this expression, adding its source string representation in
          * comments if available: 'expression /*= source *\/'' .
          *
-         * @return the formatted expression string
+         * @return The formatted expression string
          */
         @Override
         String toString();
@@ -257,7 +257,7 @@ public abstract class JxltEngine {
         /**
          * Recreate the template source from its inner components.
          *
-         * @return the template source rewritten
+         * @return The template source rewritten
          */
         String asString();
 
@@ -281,14 +281,14 @@ public abstract class JxltEngine {
         /**
          * Gets the list of parameters expected by this template.
          *
-         * @return the parameter names array
+         * @return The parameter names array
          */
         String[] getParameters();
 
         /**
          * Gets this script pragmas.
          *
-         * @return the (non-null, possibly empty) pragmas map
+         * @return The (non-null, possibly empty) pragmas map
          * @since 3.1
          */
         Map<String, Object> getPragmas();
@@ -298,7 +298,7 @@ public abstract class JxltEngine {
          * <p>This method will visit all nodes of the sub-expressions and extract all variables whether they
          * are written in 'dot' or 'bracketed' notation. (a.b is equivalent to a['b']).</p>
          *
-         * @return the set of variables, each as a list of strings (ant-ish variables use more than 1 string)
+         * @return The set of variables, each as a list of strings (ant-ish variables use more than 1 string)
          * or the empty set if no variables are used
          */
         Set<List<String>> getVariables();
@@ -307,7 +307,7 @@ public abstract class JxltEngine {
          * Prepares this template by expanding any contained deferred TemplateExpression.
          *
          * @param context the context to prepare against
-         * @return the prepared version of the template
+         * @return The prepared version of the template
          */
         Template prepare(JexlContext context);
 
@@ -318,7 +318,7 @@ public abstract class JxltEngine {
          *
          * @param context the context to prepare against
          * @param args the arguments to bind (optional)
-         * @return the prepared version of the template
+         * @return The prepared version of the template
          * @since 3.6.2
          */
         default Template prepare(final JexlContext context, final Object... args) {
@@ -341,7 +341,7 @@ public abstract class JxltEngine {
      *
      * @param info the {@link JexlInfo} source information
      * @param expression the {@link Template} string expression
-     * @return the {@link Expression}, null if silent and an error occurred
+     * @return The {@link Expression}, null if silent and an error occurred
      * @throws Exception if an error occurs and the {@link JexlEngine} is not silent
      */
     public abstract Expression createExpression(JexlInfo info, String expression);
@@ -353,7 +353,7 @@ public abstract class JxltEngine {
      * <p>If the underlying JEXL engine is silent, errors will be logged through its logger as warnings.</p>
      *
      * @param expression the {@link Template} string expression
-     * @return the {@link Expression}, null if silent and an error occurred
+     * @return The {@link Expression}, null if silent and an error occurred
      * @throws Exception if an error occurs and the {@link JexlEngine} is not silent
      */
     public Expression createExpression(final String expression) {
@@ -365,7 +365,7 @@ public abstract class JxltEngine {
      *
      * @param info the source info
      * @param source the source
-     * @return the template
+     * @return The template
      */
     public Template createTemplate(final JexlInfo info, final String source) {
         return createTemplate(info, "$$", new StringReader(source), (String[]) null);
@@ -378,7 +378,7 @@ public abstract class JxltEngine {
      * @param prefix the directive prefix
      * @param source the source
      * @param parms the parameter names
-     * @return the template
+     * @return The template
      */
     public abstract Template createTemplate(JexlInfo info, String prefix, Reader source, String... parms);
 
@@ -388,7 +388,7 @@ public abstract class JxltEngine {
      * @param info the source info
      * @param parms the parameter names
      * @param source the source
-     * @return the template
+     * @return The template
      */
     public Template createTemplate(final JexlInfo info, final String source, final String... parms) {
         return createTemplate(info, "$$", new StringReader(source), parms);
@@ -398,7 +398,7 @@ public abstract class JxltEngine {
      * Creates a new template.
      *
      * @param source the source
-     * @return the template
+     * @return The template
      */
     public Template createTemplate(final String source) {
         return createTemplate(null, source);
@@ -410,7 +410,7 @@ public abstract class JxltEngine {
      * @param prefix the directive prefix
      * @param source the source
      * @param parms the parameter names
-     * @return the template
+     * @return The template
      */
     public Template createTemplate(final String prefix, final Reader source, final String... parms) {
         return createTemplate(null, prefix, source, parms);
@@ -421,7 +421,7 @@ public abstract class JxltEngine {
      *
      * @param source the source
      * @param parms the parameter names
-     * @return the template
+     * @return The template
      */
     public Template createTemplate(final String source, final String... parms) {
         return createTemplate(null, source, parms);
@@ -430,7 +430,7 @@ public abstract class JxltEngine {
     /**
      * Gets the {@link JexlEngine} underlying this template engine.
      *
-     * @return the JexlEngine
+     * @return The JexlEngine
      */
     public abstract JexlEngine getEngine();
 }

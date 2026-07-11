@@ -34,7 +34,7 @@ public final class FieldSetExecutor implements JexlPropertySet {
      * @param clazz the class to find the get method from
      * @param identifier the key to use as an argument to the get method
      * @param value the value to set the field to
-     * @return the executor if found, null otherwise
+     * @return The executor if found, null otherwise
      */
     public static JexlPropertySet discover(final Introspector is,
                                            final Class<?> clazz,

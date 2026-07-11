@@ -33,21 +33,21 @@ public class JexlInfo {
         /**
          * Gets the end column on the line that triggered the error
          *
-         * @return the end column on the line that triggered the error
+         * @return The end column on the line that triggered the error
          */
         int end();
 
         /**
          * Gets the start column on the line that triggered the error
          *
-         * @return the start column on the line that triggered the error
+         * @return The start column on the line that triggered the error
          */
         int start();
 
         /**
          * Gets the code that triggered the error
          *
-         * @return the actual part of code that triggered the error
+         * @return The actual part of code that triggered the error
          */
         @Override
         String toString();
@@ -57,7 +57,7 @@ public class JexlInfo {
      * Gets the info from a script.
      *
      * @param script the script
-     * @return the info
+     * @return The info
      */
     public static JexlInfo from(final JexlScript script) {
         return script instanceof Script? ((Script) script).getInfo() :  null;
@@ -146,7 +146,7 @@ public class JexlInfo {
     /**
      * Gets the column number.
      *
-     * @return the column.
+     * @return The column.
      */
     public final int getColumn() {
         return column;
@@ -155,7 +155,7 @@ public class JexlInfo {
     /**
      * Gets error detail
      *
-     * @return the detailed information in case of an error
+     * @return The detailed information in case of an error
      */
     public Detail getDetail() {
         return null;
@@ -182,7 +182,7 @@ public class JexlInfo {
     /**
      * Formats this info in the form 'name&#064;line:column'.
      *
-     * @return the formatted info
+     * @return The formatted info
      */
     @Override
     public String toString() {

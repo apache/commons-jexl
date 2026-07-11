@@ -36,7 +36,7 @@ public final class ASTRegexLiteral extends JexlNode implements JexlNode.Constant
     /**
      * Gets the literal value.
      *
-     * @return the Pattern literal
+     * @return The Pattern literal
      */
     @Override
     public Pattern getLiteral() {

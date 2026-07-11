@@ -236,7 +236,7 @@ public class TemplateInterpreter extends Interpreter {
      *
      * @param node the function node
      * @param data the data
-     * @return the function evaluation result.
+     * @return The function evaluation result.
      */
     @Override
     protected Object visit(final ASTFunctionNode node, final Object data) {

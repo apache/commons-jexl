@@ -37,7 +37,7 @@ public final class PropertyGetExecutor extends AbstractExecutor.Get {
      * @param is the introspector
      * @param clazz the class to find the get method from
      * @param property the property name to find
-     * @return the executor if found, null otherwise
+     * @return The executor if found, null otherwise
      */
     public static PropertyGetExecutor discover(final Introspector is, final Class<?> clazz, final String property) {
         final java.lang.reflect.Method method = discoverGet(is, "get", clazz, property);

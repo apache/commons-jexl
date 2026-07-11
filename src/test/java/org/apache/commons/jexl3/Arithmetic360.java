@@ -66,7 +66,7 @@ public class Arithmetic360 extends JexlArithmetic {
     /**
      * Casts to Long if possible.
      * @param value the Long or else
-     * @return the Long or null
+     * @return The Long or null
      */
     protected Long castLongNumber(final Object value) {
         return value instanceof Long ? (Long) value : null;

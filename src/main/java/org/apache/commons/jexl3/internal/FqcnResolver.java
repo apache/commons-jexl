@@ -83,7 +83,7 @@ public class FqcnResolver implements JexlUberspect.ClassConstantResolver {
      * Gets a fully qualified class name from a simple class name and imports.
      *
      * @param name the simple name
-     * @return the fqcn
+     * @return The fqcn
      */
     String getQualifiedName(final String name) {
         String fqcn;
@@ -98,7 +98,7 @@ public class FqcnResolver implements JexlUberspect.ClassConstantResolver {
      * <p>It tries to solve the class name as package.classname or package$classname (inner class).</p>
      *
      * @param name the simple class name
-     * @return the fully qualified class name or null if not found
+     * @return The fully qualified class name or null if not found
      */
     private String solveClassName(final String name) {
         for (final String pkg : imports) {

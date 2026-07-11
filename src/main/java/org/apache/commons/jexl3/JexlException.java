@@ -83,7 +83,7 @@ public class JexlException extends RuntimeException {
          * Tries to remove this ambiguity in the source.
          *
          * @param src the source that triggered this exception
-         * @return the source with the ambiguous statement removed
+         * @return The source with the ambiguous statement removed
          *         or null if no recovery was possible
          */
         public String tryCleanSource(final String src) {
@@ -121,7 +121,7 @@ public class JexlException extends RuntimeException {
         /**
          * Gets the annotation name
          *
-         * @return the annotation name
+         * @return The annotation name
          */
         public String getAnnotation() {
             return getDetail();
@@ -313,7 +313,7 @@ public class JexlException extends RuntimeException {
         /**
          * Gets the method name
          *
-         * @return the method name
+         * @return The method name
          */
         public String getMethod() {
             final String signature = getMethodSignature();
@@ -324,7 +324,7 @@ public class JexlException extends RuntimeException {
         /**
          * Gets the method signature.
          *
-         * @return the method signature
+         * @return The method signature
          * @since 3.2
          */
         public String getMethodSignature() {
@@ -359,7 +359,7 @@ public class JexlException extends RuntimeException {
         /**
          * Gets the method name
          *
-         * @return the method name
+         * @return The method name
          */
         public String getSymbol() {
             return getDetail();
@@ -459,7 +459,7 @@ public class JexlException extends RuntimeException {
         /**
          * Gets the property name
          *
-         * @return the property name
+         * @return The property name
          */
         public String getProperty() {
             return getDetail();
@@ -501,7 +501,7 @@ public class JexlException extends RuntimeException {
         /**
          * Gets the returned value
          *
-         * @return the returned value
+         * @return The returned value
          */
         public Object getValue() {
             return result;
@@ -558,7 +558,7 @@ public class JexlException extends RuntimeException {
         /**
          * Gets the thrown value
          *
-         * @return the thrown value
+         * @return The thrown value
          */
         public Object getValue() {
             return result;
@@ -653,7 +653,7 @@ public class JexlException extends RuntimeException {
         /**
          * Gets the variable name
          *
-         * @return the variable name
+         * @return The variable name
          */
         public String getVariable() {
             return getDetail();
@@ -690,7 +690,7 @@ public class JexlException extends RuntimeException {
          * Stringifies the variable issue.
          *
          * @param var the variable name
-         * @return the issue message
+         * @return The issue message
          */
         public String message(final String var) {
             switch(this) {
@@ -716,7 +716,7 @@ public class JexlException extends RuntimeException {
      *
      * @param node the node where the error occurred
      * @param annotation the annotation name
-     * @return the error message
+     * @return The error message
      * @since 3.1
      */
     public static String annotationError(final JexlNode node, final String annotation) {
@@ -732,7 +732,7 @@ public class JexlException extends RuntimeException {
      *
      * @param <X>    the throwable type
      * @param xthrow the throwable
-     * @return the throwable
+     * @return The throwable
      */
      static <X extends Throwable> X clean(final X xthrow) {
         if (xthrow != null) {
@@ -792,7 +792,7 @@ public class JexlException extends RuntimeException {
      *
      * @param node the node
      * @param info the information
-     * @return the information or null
+     * @return The information or null
      */
      static JexlInfo detailedInfo(final JexlNode node, final JexlInfo info) {
         if (info != null && node != null) {
@@ -832,7 +832,7 @@ public class JexlException extends RuntimeException {
      *
      * @param node the node
      * @param info the information
-     * @return the information or null
+     * @return The information or null
      * @deprecated 3.2
      */
     @Deprecated
@@ -845,7 +845,7 @@ public class JexlException extends RuntimeException {
      *
      * @param info  the node
      * @param cause the cause
-     * @return the info to use
+     * @return The info to use
      */
     static JexlInfo merge(final JexlInfo info, final JavaccError cause) {
         if (cause == null || cause.getLine() < 0) {
@@ -862,7 +862,7 @@ public class JexlException extends RuntimeException {
      *
      * @param node the node where the error occurred
      * @param method the method name
-     * @return the error message
+     * @return The error message
      * @deprecated 3.2
      */
     @Deprecated
@@ -876,7 +876,7 @@ public class JexlException extends RuntimeException {
      * @param node the node where the error occurred
      * @param method the method name
      * @param args the method arguments
-     * @return the error message
+     * @return The error message
      */
     public static String methodError(final JexlNode node, final String method, final Object[] args) {
         final StringBuilder msg = errorAt(node);
@@ -915,7 +915,7 @@ public class JexlException extends RuntimeException {
      *
      * @param node the node where the error occurred
      * @param symbol the operator name
-     * @return the error message
+     * @return The error message
      */
     public static String operatorError(final JexlNode node, final String symbol) {
         final StringBuilder msg = errorAt(node);
@@ -930,7 +930,7 @@ public class JexlException extends RuntimeException {
      *
      * @param node the node where the error occurred
      * @param var the variable
-     * @return the error message
+     * @return The error message
      * @deprecated 3.2
      */
     @Deprecated
@@ -944,7 +944,7 @@ public class JexlException extends RuntimeException {
      * @param node the node where the error occurred
      * @param pty the property
      * @param undef whether the property is null or undefined
-     * @return the error message
+     * @return The error message
      */
     public static String propertyError(final JexlNode node, final String pty, final boolean undef) {
         final StringBuilder msg = errorAt(node);
@@ -967,7 +967,7 @@ public class JexlException extends RuntimeException {
      * @param fromc the beginning column
      * @param tol the ending line
      * @param toc the ending column
-     * @return the source with the zone from (from) to (to) removed
+     * @return The source with the zone from (from) to (to) removed
      */
     public static String sliceSource(final String src, final int froml, final int fromc, final int tol, final int toc) {
         final BufferedReader reader = new BufferedReader(new StringReader(src));
@@ -1012,7 +1012,7 @@ public class JexlException extends RuntimeException {
      * Unwraps the cause of a throwable due to reflection.
      *
      * @param xthrow the throwable
-     * @return the cause
+     * @return The cause
      */
     static Throwable unwrap(final Throwable xthrow) {
         if (xthrow instanceof TryFailed
@@ -1029,7 +1029,7 @@ public class JexlException extends RuntimeException {
      * @param node the node where the error occurred
      * @param variable the variable
      * @param undef whether the variable is null or undefined
-     * @return the error message
+     * @return The error message
      * @deprecated 3.2
      */
     @Deprecated
@@ -1043,7 +1043,7 @@ public class JexlException extends RuntimeException {
      * @param node the node where the error occurred
      * @param variable the variable
      * @param issue  the variable kind of issue
-     * @return the error message
+     * @return The error message
      */
     public static String variableError(final JexlNode node, final String variable, final VariableIssue issue) {
         final StringBuilder msg = errorAt(node);
@@ -1122,7 +1122,7 @@ public class JexlException extends RuntimeException {
     /**
      * Accesses the detailed message.
      *
-     * @return the message
+     * @return The message
      */
     protected String detailedMessage() {
         final Class<? extends JexlException> clazz = getClass();
@@ -1143,7 +1143,7 @@ public class JexlException extends RuntimeException {
     /**
      * Gets the specific information for this exception.
      *
-     * @return the information
+     * @return The information
      */
     public JexlInfo getInfo() {
         return detailedInfo(mark, info);
@@ -1184,7 +1184,7 @@ public class JexlException extends RuntimeException {
     /**
      * Pleasing checkstyle.
      *
-     * @return the info
+     * @return The info
      */
     protected JexlInfo info() {
         return info;
@@ -1195,7 +1195,7 @@ public class JexlException extends RuntimeException {
      *
      * @param prefix the prefix to the message
      * @param expr   the expression in error
-     * @return the formatted message
+     * @return The formatted message
      */
     protected String parserError(final String prefix, final String expr) {
         final int length = expr.length();

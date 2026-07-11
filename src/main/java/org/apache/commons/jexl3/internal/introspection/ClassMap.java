@@ -122,7 +122,7 @@ final class ClassMap {
     }
 
     /**
-     * @return the empty classmap instance
+     * @return The empty classmap instance
      */
     static ClassMap empty() {
         return EMPTY;
@@ -272,7 +272,7 @@ final class ClassMap {
     /**
      * Gets the field names cached by this map.
      *
-     * @return the array of field names
+     * @return The array of field names
      */
     String[] getFieldNames() {
         return fieldCache.keySet().toArray(new String[0]);
@@ -324,7 +324,7 @@ final class ClassMap {
     /**
      * Gets the methods names cached by this map.
      *
-     * @return the array of method names
+     * @return The array of method names
      */
     String[] getMethodNames() {
         return byName.keySet().toArray(new String[0]);
@@ -334,7 +334,7 @@ final class ClassMap {
      * Gets all the methods with a given name from this map.
      *
      * @param methodName the seeked methods name
-     * @return the array of methods (null or non-empty)
+     * @return The array of methods (null or non-empty)
      */
     Method[] getMethods(final String methodName) {
         final Method[] lm = byName.get(methodName);

@@ -242,7 +242,7 @@ public class JexlScriptEngine extends AbstractScriptEngine implements Compilable
          * for <strong>all</strong> JexlScriptEngine instances, you probably should only do so
          * if you are in strict control and sole user of the JEXL scripting feature.</p>
          *
-         * @return the shared underlying JEXL engine
+         * @return The shared underlying JEXL engine
          */
         public JexlEngine getEngine() {
             return jexlEngine;
@@ -251,7 +251,7 @@ public class JexlScriptEngine extends AbstractScriptEngine implements Compilable
         /**
          * Gives access to the engine scope error writer (defaults to System.err).
          *
-         * @return the engine error writer
+         * @return The engine error writer
          */
         public PrintWriter getErr() {
             final Writer error = context.getErrorWriter();
@@ -267,7 +267,7 @@ public class JexlScriptEngine extends AbstractScriptEngine implements Compilable
         /**
          * Gives access to the engine scope input reader (defaults to System.in).
          *
-         * @return the engine input reader
+         * @return The engine input reader
          */
         public Reader getIn() {
             return context.getReader();
@@ -276,7 +276,7 @@ public class JexlScriptEngine extends AbstractScriptEngine implements Compilable
         /**
          * Gives access to the engine logger.
          *
-         * @return the JexlScriptEngine logger
+         * @return The JexlScriptEngine logger
          */
         public Log getLogger() {
             return LOG;
@@ -285,7 +285,7 @@ public class JexlScriptEngine extends AbstractScriptEngine implements Compilable
         /**
          * Gives access to the engine scope output writer (defaults to System.out).
          *
-         * @return the engine output writer
+         * @return The engine output writer
          */
         public PrintWriter getOut() {
             final Writer out = context.getWriter();
@@ -329,7 +329,7 @@ public class JexlScriptEngine extends AbstractScriptEngine implements Compilable
      * the contents of the reader.
      *
      * @param scriptReader to be read.
-     * @return the contents of the reader as a String.
+     * @return The contents of the reader as a String.
      * @throws ScriptException on any error reading the reader.
      */
     private static String readerToString(final Reader scriptReader) throws ScriptException {

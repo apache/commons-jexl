@@ -118,21 +118,21 @@ public abstract class JexlEngine {
         /**
          * The MathContext instance used for +,-,/,*,% operations on big decimals.
          *
-         * @return the math context
+         * @return The math context
          */
         MathContext getArithmeticMathContext();
 
         /**
          * The BigDecimal scale used for comparison and coercion operations.
          *
-         * @return the scale
+         * @return The scale
          */
         int getArithmeticMathScale();
 
         /**
          * The charset used for parsing.
          *
-         * @return the charset
+         * @return The charset
          */
         Charset getCharset();
 
@@ -201,7 +201,7 @@ public abstract class JexlEngine {
     /**
      * Accesses the current thread local context.
      *
-     * @return the context or null
+     * @return The context or null
      */
     public static JexlContext.ThreadLocal getThreadContext() {
         return CONTEXT.get();
@@ -212,7 +212,7 @@ public abstract class JexlEngine {
      * <p>Advanced: you should only use this to retrieve the engine within a method/ctor called through the evaluation
      * of a script/expression.</p>
      *
-     * @return the engine or null
+     * @return The engine or null
      */
     public static JexlEngine getThreadEngine() {
         return ENGINE.get();
@@ -233,7 +233,7 @@ public abstract class JexlEngine {
      * Creates a string from a reader.
      *
      * @param reader to be read.
-     * @return the contents of the reader as a String.
+     * @return The contents of the reader as a String.
      * @throws IOException on any error reading the reader.
      */
     protected static String toString(final BufferedReader reader) throws IOException {
@@ -466,14 +466,14 @@ public abstract class JexlEngine {
     /**
      * Gets this engine underlying {@link JexlArithmetic}.
      *
-     * @return the arithmetic
+     * @return The arithmetic
      */
     public abstract JexlArithmetic getArithmetic();
 
     /**
      * Gets the charset used for parsing.
      *
-     * @return the charset
+     * @return The charset
      */
     public abstract Charset getCharset();
 
@@ -486,7 +486,7 @@ public abstract class JexlEngine {
      * @param context the evaluation context
      * @param bean    the bean to get properties from
      * @param expr    the property expression
-     * @return the value of the property
+     * @return The value of the property
      * @throws JexlException if there is an error parsing the expression or during evaluation
      */
     public abstract Object getProperty(JexlContext context, Object bean, String expr);
@@ -503,7 +503,7 @@ public abstract class JexlEngine {
      *
      * @param bean the bean to get properties from
      * @param expr the property expression
-     * @return the value of the property
+     * @return The value of the property
      * @throws JexlException if there is an error parsing the expression or during evaluation
      */
     public abstract Object getProperty(Object bean, String expr);
@@ -511,7 +511,7 @@ public abstract class JexlEngine {
     /**
      * Gets this engine underlying {@link JexlUberspect}.
      *
-     * @return the uberspect
+     * @return The uberspect
      */
     public abstract JexlUberspect getUberspect();
 
@@ -521,7 +521,7 @@ public abstract class JexlEngine {
      * @param obj  the method's invoker object
      * @param meth the method's name
      * @param args the method's arguments
-     * @return the method returned value or null if it failed and engine is silent
+     * @return The method returned value or null if it failed and engine is silent
      * @throws JexlException if method could not be found or failed and engine is not silent
      */
     public abstract Object invokeMethod(Object obj, String meth, Object... args);
@@ -569,7 +569,7 @@ public abstract class JexlEngine {
      * @param <T>   the type of object
      * @param clazz the class to instantiate
      * @param args  the constructor arguments
-     * @return the created object instance or null on failure when silent
+     * @return The created object instance or null on failure when silent
      */
     public abstract <T> T newInstance(Class<? extends T> clazz, Object... args);
 
@@ -578,7 +578,7 @@ public abstract class JexlEngine {
      *
      * @param clazz the name of the class to instantiate resolved through this engine's class loader
      * @param args  the constructor arguments
-     * @return the created object instance or null on failure when silent
+     * @return The created object instance or null on failure when silent
      */
     public abstract Object newInstance(String clazz, Object... args);
 
@@ -586,7 +586,7 @@ public abstract class JexlEngine {
      * Reads a JEXL source from a File.
      *
      * @param file the script file
-     * @return the source
+     * @return The source
      */
     protected String readSource(final File file) {
         Objects.requireNonNull(file, "file");
@@ -601,7 +601,7 @@ public abstract class JexlEngine {
      * Reads a JEXL source from an URL.
      *
      * @param url the script url
-     * @return the source
+     * @return The source
      */
     protected String readSource(final URL url) {
         Objects.requireNonNull(url, "url");

@@ -95,7 +95,7 @@ public final class JexlOptions {
      *
      * @param ordinal the flag ordinal
      * @param mask the flags mask
-     * @return the mask value with this flag or-ed in
+     * @return The mask value with this flag or-ed in
      */
     private static boolean isSet(final int ordinal, final int mask) {
         return (mask & 1 << ordinal) != 0;
@@ -109,7 +109,7 @@ public final class JexlOptions {
      *
      * @param initial the initial mask state
      * @param flags the flags to set
-     * @return the flag mask updated
+     * @return The flag mask updated
      */
     public static int parseFlags(final int initial, final String... flags) {
         int mask = initial;
@@ -144,7 +144,7 @@ public final class JexlOptions {
      * @param ordinal the flag ordinal
      * @param mask the flags mask
      * @param value true or false
-     * @return the new flags mask value
+     * @return The new flags mask value
      */
     private static int set(final int ordinal, final int mask, final boolean value) {
         return value? mask | 1 << ordinal : mask & ~(1 << ordinal);
@@ -204,7 +204,7 @@ public final class JexlOptions {
     /**
      * Gets the optional set of imported packages.
      *
-     * @return the set of imports, may be empty, not null
+     * @return The set of imports, may be empty, not null
      */
     public Collection<String> getImports() {
         return imports;
@@ -213,7 +213,7 @@ public final class JexlOptions {
     /**
      * The MathContext instance used for +,-,/,*,% operations on big decimals.
      *
-     * @return the math context
+     * @return The math context
      */
     public MathContext getMathContext() {
         return mathContext;
@@ -222,7 +222,7 @@ public final class JexlOptions {
     /**
      * The BigDecimal scale used for comparison and coercion operations.
      *
-     * @return the scale
+     * @return The scale
      */
     public int getMathScale() {
         return mathScale;
@@ -231,7 +231,7 @@ public final class JexlOptions {
     /**
      * Gets the optional map of namespaces.
      *
-     * @return the map of namespaces, may be empty, not null
+     * @return The map of namespaces, may be empty, not null
      */
     public Map<String, Object> getNamespaces() {
         return namespaces;

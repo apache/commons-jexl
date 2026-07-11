@@ -35,7 +35,7 @@ public interface JexlScriptParser {
    * @param features  the set of parsing features
    * @param src      the expression to parse
    * @param scope     the script frame
-   * @return the parsed tree
+   * @return The parsed tree
    * @throws JexlException if any error occurred during parsing
    */
   ASTJexlScript parse(final JexlInfo info, final JexlFeatures features, final String src, final Scope scope);
@@ -47,7 +47,7 @@ public interface JexlScriptParser {
    * @param features  the set of parsing features
    * @param src      the expression to parse
    * @param scope     the script frame
-   * @return the parsed tree
+   * @return The parsed tree
    * @throws JexlException if any error occurred during parsing
    */
   default ASTJexlScript jxltParse(final JexlInfo info, final JexlFeatures features, final String src, final Scope scope) {

@@ -67,7 +67,7 @@ public interface JexlContext {
          * @param name the annotation name
          * @param args the arguments of the annotation, evaluated as arguments of this call
          * @param statement the statement that was annotated; the processor should invoke this statement 'call' method
-         * @return the result of statement.call()
+         * @return The result of statement.call()
          * @throws Exception if annotation processing fails
          */
         Object processAnnotation(String name, Object[] args, Callable<Object> statement) throws Exception;
@@ -120,7 +120,7 @@ public interface JexlContext {
          * @param info the info at the pragma location.
          * @param name the module name.
          * @param body the module definition which can be its location or source.
-         * @return the module object.
+         * @return The module object.
          */
         Object processModule(JexlEngine engine, JexlInfo info, String name, String body);
     }
@@ -137,7 +137,7 @@ public interface JexlContext {
          * Creates the functor object that will be used instead of the namespace.
          *
          * @param context the context.
-         * @return the namespace functor instance.
+         * @return The namespace functor instance.
          */
         Object createFunctor(JexlContext context);
     }
@@ -162,7 +162,7 @@ public interface JexlContext {
          * Resolves a namespace by its name.
          *
          * @param name the name.
-         * @return the namespace object.
+         * @return The namespace object.
          */
         Object resolveNamespace(String name);
     }
@@ -183,7 +183,7 @@ public interface JexlContext {
          * it can safely alter its boolean flags during execution with no effect, avoiding any behavior ambiguity.
          * </p>
          *
-         * @return the engine options.
+         * @return The engine options.
          */
         JexlOptions getEngineOptions();
     }
@@ -252,7 +252,7 @@ public interface JexlContext {
      * Gets the value of a variable.
      *
      * @param name the variable's name.
-     * @return the value.
+     * @return The value.
      */
     Object get(String name);
 

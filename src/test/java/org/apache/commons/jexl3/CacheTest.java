@@ -463,7 +463,7 @@ class CacheTest extends JexlTestCase {
          * things up around 2x.
          * </p>
          * @param value the argument value to control
-         * @return the number of loops performed
+         * @return The number of loops performed
          */
         public Integer runAssign(final Object value) {
             args.value = new Object[]{value};

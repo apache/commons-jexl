@@ -63,7 +63,7 @@ public class StreamTest {
          *
          * @param collection the collection
          * @param filter the lambda to use as filter
-         * @return the filtered result as a list
+         * @return The filtered result as a list
          */
         public List<?> filter(final Collection<?> collection, final JexlScript filter) {
             return collection.stream()
@@ -76,7 +76,7 @@ public class StreamTest {
          *
          * @param collection the collection
          * @param mapper the lambda to use as mapper
-         * @return the mapped result as a list
+         * @return The mapped result as a list
          */
         public List<?> map(final Collection<?> collection, final JexlScript mapper) {
             return collection.stream()
@@ -96,7 +96,7 @@ public class StreamTest {
          *
          * @param stream the stream
          * @param filter the lambda to use as filter
-         * @return the filtered stream
+         * @return The filtered stream
          */
         public Stream<?> filter(final Stream<?> stream, final JexlScript filter) {
             return stream.filter(x -> x != null && TRUE.equals(filter.execute(this, x)));
@@ -107,7 +107,7 @@ public class StreamTest {
          *
          * @param stream the stream
          * @param mapper the lambda to use as mapper
-         * @return the mapped stream
+         * @return The mapped stream
          */
         public Stream<?> map(final Stream<?> stream, final JexlScript mapper) {
             return stream.map(x -> mapper.execute(this, x));

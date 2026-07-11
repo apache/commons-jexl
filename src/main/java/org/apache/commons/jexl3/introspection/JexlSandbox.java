@@ -184,7 +184,7 @@ public final class JexlSandbox {
      * Gets a class by name, crude mechanism for backwards (&lt;3.2 ) compatibility.
      *
      * @param cname the class name
-     * @return the class
+     * @return The class
      */
     static Class<?> forName(final String cname) {
         try {
@@ -199,7 +199,7 @@ public final class JexlSandbox {
      * <p>The sandbox inheritance property will apply to the permissions created by this method
      *
      * @param clazz the allowed class name
-     * @return the permissions instance
+     * @return The permissions instance
      */
     public Permissions allow(final String clazz) {
         return permissions(clazz, true, true, true);
@@ -210,7 +210,7 @@ public final class JexlSandbox {
      * <p>The sandbox inheritance property will apply to the permissions created by this method
      *
      * @param clazz the blocked class name
-     * @return the permissions instance
+     * @return The permissions instance
      */
     public Permissions block(final String clazz) {
         return permissions(clazz, false, false, false);
@@ -260,7 +260,7 @@ public final class JexlSandbox {
      * Gets the set of permissions associated to a class.
      *
      * @param clazz the class name
-     * @return the defined permissions or an all-allow permission instance if none were defined
+     * @return The defined permissions or an all-allow permission instance if none were defined
      */
     public Permissions get(final String clazz) {
         return get(forName(clazz));
@@ -270,7 +270,7 @@ public final class JexlSandbox {
      * Gets the permissions associated to a class.
      *
      * @param clazz the class
-     * @return the permissions
+     * @return The permissions
      */
     @SuppressWarnings("null")
     public Permissions get(final Class<?> clazz) {
@@ -288,7 +288,7 @@ public final class JexlSandbox {
      *
      * @param clazz the class
      * @param store whether the computed permissions should be stored in the sandbox
-     * @return the permissions
+     * @return The permissions
      */
     private Permissions compute(final Class<?> clazz, final boolean store) {
         // belt and suspender; recursion should not lead here
@@ -333,7 +333,7 @@ public final class JexlSandbox {
      * @param readFlag    whether the readable property list is allow - true - or block - false -
      * @param writeFlag   whether the writable property list is allow - true - or block - false -
      * @param executeFlag whether the executable method list is allow - true - or block - false -
-     * @return the set of permissions
+     * @return The set of permissions
      */
     public Permissions permissions(final String clazz,
                                    final boolean readFlag,
@@ -350,7 +350,7 @@ public final class JexlSandbox {
      * @param readf  whether the readable property list is allow - true - or block - false -
      * @param writef whether the writable property list is allow - true - or block - false -
      * @param execf  whether the executable method list is allow - true - or block - false -
-     * @return the set of permissions
+     * @return The set of permissions
      */
     public Permissions permissions(final String clazz,
                                    final boolean inhf,
@@ -605,7 +605,7 @@ public final class JexlSandbox {
         /**
          * Gets the set of method names in these permissions.
          *
-         * @return the set of method names
+         * @return The set of method names
          */
         public Names execute() {
             return execute;
@@ -637,7 +637,7 @@ public final class JexlSandbox {
         /**
          * Gets the set of readable property names in these permissions.
          *
-         * @return the set of property names
+         * @return The set of property names
          */
         public Names read() {
             return read;
@@ -659,7 +659,7 @@ public final class JexlSandbox {
         /**
          * Gets the set of writable property names in these permissions.
          *
-         * @return the set of property names
+         * @return The set of property names
          */
         public Names write() {
             return write;
@@ -703,7 +703,7 @@ public final class JexlSandbox {
      * Use block() instead.
      *
      * @param clazz the blocked class name
-     * @return the permissions instance
+     * @return The permissions instance
      * @deprecated 3.3
      */
     @Deprecated
@@ -728,7 +728,7 @@ public final class JexlSandbox {
      * Use allow() instead.
      *
      * @param clazz the allowed class name
-     * @return the permissions instance
+     * @return The permissions instance
      * @deprecated 3.3
      */
     @Deprecated

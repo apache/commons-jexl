@@ -116,7 +116,7 @@ public class Uberspect implements JexlUberspect {
      * <p>
      * If the reference has been collected, this method will recreate the underlying introspector.</p>
      *
-     * @return the introspector
+     * @return The introspector
      */
     protected final Introspector base() {
         Introspector intro = ref.get();
@@ -140,7 +140,7 @@ public class Uberspect implements JexlUberspect {
      * <p>This is used to speed up resolution and avoid introspection when possible.</p>
      *
      * @param arithmetic the arithmetic instance
-     * @return the set of overloaded operators
+     * @return The set of overloaded operators
      */
     Set<JexlOperator> getOverloads(final JexlArithmetic arithmetic) {
         final Class<? extends JexlArithmetic> aclass = arithmetic.getClass();
@@ -191,7 +191,7 @@ public class Uberspect implements JexlUberspect {
      * Gets a class by name through this introspector class loader.
      *
      * @param className the class name
-     * @return the class instance or null if it could not be found
+     * @return The class instance or null if it could not be found
      */
     @Override
     public final Class<?> getClassByName(final String className) {
@@ -227,7 +227,7 @@ public class Uberspect implements JexlUberspect {
      * Gets the accessible field names known for a given class.
      *
      * @param c the class
-     * @return the class field names
+     * @return The class field names
      */
     public final String[] getFieldNames(final Class<?> c) {
         return base().getFieldNames(c);
@@ -312,7 +312,7 @@ public class Uberspect implements JexlUberspect {
      * Gets the accessible methods names known for a given class.
      *
      * @param c the class
-     * @return the class method names
+     * @return The class method names
      */
     public final String[] getMethodNames(final Class<?> c) {
         return base().getMethodNames(c);
@@ -323,7 +323,7 @@ public class Uberspect implements JexlUberspect {
      *
      * @param c          the class
      * @param methodName the seeked methods name
-     * @return the array of methods
+     * @return The array of methods
      */
     public final Method[] getMethods(final Class<?> c, final String methodName) {
         return base().getMethods(c, methodName);

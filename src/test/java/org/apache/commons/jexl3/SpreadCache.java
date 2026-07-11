@@ -30,7 +30,7 @@ import org.apache.commons.jexl3.internal.SoftCache;
  *
  * @param <K> The cached element&quot;s key
  * @param <V> The cached element&quot;s value
- * @return the cache instance
+ * @return The cache instance
  */
 public class SpreadCache<K, V> extends SoftCache<K, V> {
 
@@ -65,7 +65,7 @@ class SpreadMap<K, V> extends AbstractMap<K, V> {
    * Returns a power of two for the given target capacity.
    *
    * @param cap capacity
-   * @return the smallest power of 2 greater or equal to argument
+   * @return The smallest power of 2 greater or equal to argument
    */
   private static int closestPowerOf2(final int cap) {
     return cap > 1 ? Integer.highestOneBit(cap - 1) << 1 : 1;
@@ -117,7 +117,7 @@ class SpreadMap<K, V> extends AbstractMap<K, V> {
    * Gets the map storing a given key.
    *
    * @param key the key
-   * @return the map
+   * @return The map
    */
   private final Map<K, V> getMap(final Object key) {
     int h = key.hashCode();

@@ -202,7 +202,7 @@ public final class MethodKey {
      * Helper to build class arrays.
      *
      * @param args the classes
-     * @return the array
+     * @return The array
      */
     private static Class<?>[] asArray(final Class<?>... args) {
         return args;
@@ -552,7 +552,7 @@ public final class MethodKey {
      * </p>
      *
      * @param parm a may-be primitive type class
-     * @return the equivalent object class
+     * @return The equivalent object class
      */
     static Class<?> primitiveClass(final Class<?> parm) {
         // it was marginally faster to get from the map than call isPrimitive...
@@ -661,7 +661,7 @@ public final class MethodKey {
     /**
      * Gets this key's method name.
      *
-     * @return the method name
+     * @return The method name
      */
     String getMethod() {
         return method;
@@ -682,7 +682,7 @@ public final class MethodKey {
      * </p>
      *
      * @param methods a list of methods
-     * @return the most specific method.
+     * @return The most specific method.
      * @throws MethodKey.AmbiguousException if there is more than one.
      */
     private <T extends Executable> T getMostSpecific(final T[] methods) {
@@ -742,7 +742,7 @@ public final class MethodKey {
      * Gets the most specific constructor that is applicable to the parameters of this key.
      *
      * @param methods a list of constructors.
-     * @return the most specific constructor.
+     * @return The most specific constructor.
      * @throws MethodKey.AmbiguousException if there is more than one.
      */
     public Constructor<?> getMostSpecificConstructor(final Constructor<?>[] methods) {
@@ -753,7 +753,7 @@ public final class MethodKey {
      * Gets the most specific method that is applicable to the parameters of this key.
      *
      * @param methods a list of methods.
-     * @return the most specific method.
+     * @return The most specific method.
      * @throws MethodKey.AmbiguousException if there is more than one.
      */
     public Method getMostSpecificMethod(final Method[] methods) {
@@ -763,7 +763,7 @@ public final class MethodKey {
     /**
      * Gets this key's method parameter classes.
      *
-     * @return the parameters
+     * @return The parameters
      */
     Class<?>[] getParameters() {
         return params;

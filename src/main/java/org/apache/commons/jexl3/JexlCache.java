@@ -31,7 +31,7 @@ public interface JexlCache<K, V> {
     /**
      * Returns the cache capacity, the maximum number of elements it can contain.
      *
-     * @return the cache capacity
+     * @return The cache capacity
      */
     int capacity();
 
@@ -47,7 +47,7 @@ public interface JexlCache<K, V> {
      * For implementations testing only
      * </p>
      *
-     * @return the cache entry list
+     * @return The cache entry list
      */
     default Collection<Map.Entry<K, V>> entries() {
         return Collections.emptyList();
@@ -57,7 +57,7 @@ public interface JexlCache<K, V> {
      * Gets a value from this cache.
      *
      * @param key the cache entry key
-     * @return the cache entry value
+     * @return The cache entry value
      */
     V get(K key);
 
@@ -66,14 +66,14 @@ public interface JexlCache<K, V> {
      *
      * @param key    the cache entry key
      * @param script the cache entry value
-     * @return the previously associated value if any
+     * @return The previously associated value if any
      */
     V put(K key, V script);
 
     /**
      * Returns the cache size, the actual number of elements it contains.
      *
-     * @return the cache size
+     * @return The cache size
      */
     int size();
 
@@ -85,7 +85,7 @@ public interface JexlCache<K, V> {
         /**
          * Gets the referenced object.
          *
-         * @return the referenced object
+         * @return The referenced object
          */
         Object getCache();
 

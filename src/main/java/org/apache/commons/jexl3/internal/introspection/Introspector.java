@@ -147,7 +147,7 @@ public final class Introspector {
      * Gets a class by name through this introspector class loader.
      *
      * @param className the class name
-     * @return the class instance or null if it could not be found
+     * @return The class instance or null if it could not be found
      */
     public Class<?> getClassByName(final String className) {
         try {
@@ -252,7 +252,7 @@ public final class Introspector {
      *
      * @param c   Class in which the field search is taking place
      * @param key Name of the field being searched for
-     * @return the desired field or null if it does not exist or is not accessible
+     * @return The desired field or null if it does not exist or is not accessible
      */
     public Field getField(final Class<?> c, final String key) {
         return getMap(c).getField(key);
@@ -262,7 +262,7 @@ public final class Introspector {
      * Gets the array of accessible field names known for a given class.
      *
      * @param c the class
-     * @return the class field names
+     * @return The class field names
      */
     public String[] getFieldNames(final Class<?> c) {
         if (c == null) {
@@ -275,7 +275,7 @@ public final class Introspector {
     /**
      * Gets the class loader used by this introspector.
      *
-     * @return the class loader
+     * @return The class loader
      */
     public ClassLoader getLoader() {
         return loader;
@@ -285,7 +285,7 @@ public final class Introspector {
      * Gets the ClassMap for a given class.
      *
      * @param c the class
-     * @return the class map
+     * @return The class map
      */
     private ClassMap getMap(final Class<?> c) {
         ClassMap classMap;
@@ -342,7 +342,7 @@ public final class Introspector {
      * @param c      the class
      * @param name   the method name
      * @param params the method parameters
-     * @return the desired method object
+     * @return The desired method object
      * @throws MethodKey.AmbiguousException if no unambiguous method could be found through introspection
      */
     public Method getMethod(final Class<?> c, final String name, final Object... params) {
@@ -353,7 +353,7 @@ public final class Introspector {
      * Gets the array of accessible methods names known for a given class.
      *
      * @param c the class
-     * @return the class method names
+     * @return The class method names
      */
     public String[] getMethodNames(final Class<?> c) {
         if (c == null) {
@@ -368,7 +368,7 @@ public final class Introspector {
      *
      * @param c          the class
      * @param methodName the method name
-     * @return the array of methods (null or not empty)
+     * @return The array of methods (null or not empty)
      */
     public Method[] getMethods(final Class<?> c, final String methodName) {
         if (c == null) {

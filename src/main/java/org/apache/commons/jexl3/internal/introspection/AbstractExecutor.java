@@ -120,7 +120,7 @@ abstract class AbstractExecutor {
      * Gets the class of an object or Object if null.
      *
      * @param instance the instance
-     * @return the class
+     * @return The class
      */
     static Class<?> classOf(final Object instance) {
         return instance == null ? Object.class : instance.getClass();
@@ -132,7 +132,7 @@ abstract class AbstractExecutor {
      * @param clazz the class to introspect
      * @param name the name of the method
      * @param parms the parameters
-     * @return the method
+     * @return The method
      */
     static java.lang.reflect.Method initMarker(final Class<?> clazz, final String name, final Class<?>... parms) {
         try {
@@ -146,7 +146,7 @@ abstract class AbstractExecutor {
      * Creates an arguments array.
      *
      * @param args the list of arguments
-     * @return the arguments array
+     * @return The arguments array
      */
     static Object[] makeArgs(final Object... args) {
         return args;
@@ -224,7 +224,7 @@ abstract class AbstractExecutor {
     /**
      * Gets the object class targeted by this executor.
      *
-     * @return the target object class
+     * @return The target object class
      */
     public final Class<?> getTargetClass() {
         return objectClass;
@@ -233,7 +233,7 @@ abstract class AbstractExecutor {
     /**
      * Gets the property targeted by this executor.
      *
-     * @return the target property
+     * @return The target property
      */
     public Object getTargetProperty() {
         return null;

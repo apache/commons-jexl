@@ -44,7 +44,7 @@ public class Engine32 extends Engine {
      * @param frame the frame
      * @param block the scope
      * @param identifier the variable identifier
-     * @return the variable value
+     * @return The variable value
      */
     static Object getVariable(final Interpreter ii, final Frame frame, final LexicalScope block, final ASTIdentifier identifier) {
         final int symbol = identifier.getSymbol();

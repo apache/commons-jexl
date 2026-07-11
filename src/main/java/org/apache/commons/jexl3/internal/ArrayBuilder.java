@@ -52,7 +52,7 @@ public class ArrayBuilder implements JexlArithmetic.ArrayBuilder {
      * Gets the primitive type of given class (when it exists).
      *
      * @param parm a class
-     * @return the primitive type or null it the argument is not unboxable
+     * @return The primitive type or null it the argument is not unboxable
      */
     protected static Class<?> unboxingClass(final Class<?> parm) {
         return BOXING_CLASSES.getOrDefault(parm, parm);
@@ -169,7 +169,7 @@ public class ArrayBuilder implements JexlArithmetic.ArrayBuilder {
      *
      * @param clazz the class
      * @param size the size
-     * @return the instance
+     * @return The instance
      * @param <T> The type
      */
     protected <T> List<T> newList(final Class<? extends T> clazz, final int size) {

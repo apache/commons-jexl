@@ -229,7 +229,7 @@ public class SynchronizedArithmetic extends JexlArithmetic {
      * <p>synchronized(map) { return map.get(key); }
      * @param map the map
      * @param key the key
-     * @return the value associated to the key in the map
+     * @return The value associated to the key in the map
      */
     public Object arrayGet(final Map<?, ?> map, final Object key) {
         abstractMonitor.monitorEnter(map);
@@ -259,7 +259,7 @@ public class SynchronizedArithmetic extends JexlArithmetic {
     /**
      * Creates an iterator on the map values that executes under the map monitor.
      * @param map the map
-     * @return the iterator
+     * @return The iterator
      */
     public Iterator<Object> forEach(final Map<Object, Object> map) {
         return new SynchronizedIterator(map, map.values().iterator());
@@ -271,7 +271,7 @@ public class SynchronizedArithmetic extends JexlArithmetic {
  *
  * @param map the map
  * @param key the key
- * @return the value associated to the key in the map
+ * @return The value associated to the key in the map
  */
 public Object propertyGet(final Map<?, ?> map, final Object key) {
     abstractMonitor.monitorEnter(map);

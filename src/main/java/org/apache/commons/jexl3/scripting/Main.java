@@ -91,7 +91,7 @@ public class Main {
      * Reads an input.
      *
      * @param path the file path or null for stdin
-     * @return the reader
+     * @return The reader
      * @throws IOException if anything goes wrong
      */
     static BufferedReader read(final Path path) throws IOException {

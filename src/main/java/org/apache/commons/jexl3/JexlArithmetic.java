@@ -88,7 +88,7 @@ public class JexlArithmetic {
          * Creates the actual "array" instance.
          *
          * @param extended true when the last argument is ', ...'
-         * @return the array
+         * @return The array
          */
         Object create(boolean extended);
     }
@@ -128,7 +128,7 @@ public class JexlArithmetic {
         /**
          * Creates the actual "map" instance.
          *
-         * @return the map
+         * @return The map
          */
         Object create();
 
@@ -166,7 +166,7 @@ public class JexlArithmetic {
         /**
          * Creates the actual "set" instance.
          *
-         * @return the set
+         * @return The set
          */
         Object create();
     }
@@ -182,7 +182,7 @@ public class JexlArithmetic {
          *
          * @param operator the operator
          * @param args     the arguments
-         * @return the most specific method or null if no specific override could be found
+         * @return The most specific method or null if no specific override could be found
          */
         JexlMethod getOperator(JexlOperator operator, Object... args);
 
@@ -409,7 +409,7 @@ public class JexlArithmetic {
      *
      * @param size the number of elements in the array
      * @param extended whether the map is extended or not
-     * @return the array builder
+     * @return The array builder
      */
     public ArrayBuilder arrayBuilder(final int size, final boolean extended) {
         return new org.apache.commons.jexl3.internal.ArrayBuilder(size, extended);
@@ -660,7 +660,7 @@ public class JexlArithmetic {
      * @param strictCast whether strict cast is required
      * @param defaultValue the default value to return, if not strict
      * @param <T> The value type
-     * @return the default value is strict is false
+     * @return The default value is strict is false
      * @throws JexlArithmetic.NullOperand if strict-cast
      * @since 3.3
      */
@@ -675,7 +675,7 @@ public class JexlArithmetic {
      * The last method called before returning a result from a script execution.
      *
      * @param returned the returned value
-     * @return the controlled returned value
+     * @return The controlled returned value
      */
     public Object controlReturn(final Object returned) {
         return returned;
@@ -687,7 +687,7 @@ public class JexlArithmetic {
      *
      * @param from the included lower bound value (null if none)
      * @param to   the included upper bound value (null if none)
-     * @return the range as an iterable
+     * @return The range as an iterable
      * @throws ArithmeticException as an option if creation fails
      */
     public Iterable<?> createRange(final Object from, final Object to) throws ArithmeticException {
@@ -858,7 +858,7 @@ public class JexlArithmetic {
      * <p>Override or overload this method to add new signatures to the size operators.
      *
      * @param object the object to check the emptiness of
-     * @return the boolean or false if object is not null
+     * @return The boolean or false if object is not null
      * @since 3.2
      */
     public Boolean empty(final Object object) {
@@ -892,7 +892,7 @@ public class JexlArithmetic {
      *
      * @param left  left argument
      * @param right right argument
-     * @return the test result
+     * @return The test result
      */
     public boolean equals(final Object left, final Object right) {
         if (left == right) {
@@ -911,7 +911,7 @@ public class JexlArithmetic {
     /**
      * The MathContext instance used for +,-,/,*,% operations on big decimals.
      *
-     * @return the math context
+     * @return The math context
      */
     public MathContext getMathContext() {
         return mathContext;
@@ -920,7 +920,7 @@ public class JexlArithmetic {
     /**
      * The BigDecimal scale used for comparison and coercion operations.
      *
-     * @return the scale
+     * @return The scale
      */
     public int getMathScale() {
         return mathScale;
@@ -931,7 +931,7 @@ public class JexlArithmetic {
      *
      * @param left  left argument
      * @param right right argument
-     * @return the test result
+     * @return The test result
      */
     public boolean greaterThan(final Object left, final Object right) {
         if (left == right || left == null || right == null) {
@@ -945,7 +945,7 @@ public class JexlArithmetic {
      *
      * @param left  left argument
      * @param right right argument
-     * @return the test result
+     * @return The test result
      */
     public boolean greaterThanOrEqual(final Object left, final Object right) {
         if (left == right) {
@@ -1018,7 +1018,7 @@ public class JexlArithmetic {
      *
      * @param logger the logger for warning messages; may be null
      * @param arg the supplier providing the argument to evaluate
-     * @return the evaluated result on success or {@link JexlEngine#TRY_FAILED} on failure
+     * @return The evaluated result on success or {@link JexlEngine#TRY_FAILED} on failure
      * @since 3.6.3
      */
     public Object evaluate(final Log logger, final Supplier<Object> arg) {
@@ -1044,7 +1044,7 @@ public class JexlArithmetic {
      * Check for emptiness of various types: Number, Collection, Array, Map, String.
      *
      * @param object the object to check the emptiness of
-     * @return the boolean or null if there is no arithmetic solution
+     * @return The boolean or null if there is no arithmetic solution
      */
     public Boolean isEmpty(final Object object) {
         return isEmpty(object, object == null);
@@ -1055,7 +1055,7 @@ public class JexlArithmetic {
      *
      * @param object the object to check the emptiness of
      * @param def the default value if object emptiness cannot be determined
-     * @return the boolean or null if there is no arithmetic solution
+     * @return The boolean or null if there is no arithmetic solution
      */
     public Boolean isEmpty(final Object object, final Boolean def) {
         if (object != null) {
@@ -1207,7 +1207,7 @@ public class JexlArithmetic {
      *
      * @param left  left argument
      * @param right right argument
-     * @return the test result
+     * @return The test result
      */
     public boolean lessThan(final Object left, final Object right) {
         if (left == right || left == null || right == null) {
@@ -1222,7 +1222,7 @@ public class JexlArithmetic {
      *
      * @param left  left argument
      * @param right right argument
-     * @return the test result
+     * @return The test result
      */
     public boolean lessThanOrEqual(final Object left, final Object right) {
         if (left == right) {
@@ -1264,7 +1264,7 @@ public class JexlArithmetic {
      *
      * @param size the number of elements in the map
      * @param extended whether the map is extended or not
-     * @return the map builder
+     * @return The map builder
      */
     public MapBuilder mapBuilder(final int size, final boolean extended) {
         return new org.apache.commons.jexl3.internal.MapBuilder(size, extended);
@@ -1386,7 +1386,7 @@ public class JexlArithmetic {
      *
      * @param value the double value
      * @param narrow the target narrow class
-     * @return the narrowed or initial number
+     * @return The narrowed or initial number
      */
     private Number narrow(final Class<?> narrow, final double value) {
         return narrowAccept(narrow, Float.class) && (float) value == value
@@ -1524,7 +1524,7 @@ public class JexlArithmetic {
      *
      * @param original the original number
      * @param narrow   the attempted target class
-     * @return the narrowed number or the source if no narrowing was possible
+     * @return The narrowed number or the source if no narrowing was possible
      */
     public Number narrowNumber(final Number original, final Class<?> narrow) {
         if (original != null) {
@@ -1583,7 +1583,7 @@ public class JexlArithmetic {
      *
      * @see #isNegateStable()
      * @param val the value to negate
-     * @return the negated value
+     * @return The negated value
      */
     public Object negate(final Object val) {
         if (val == null) {
@@ -1845,7 +1845,7 @@ public class JexlArithmetic {
      *
      * @see #isPositivizeStable()
      * @param val the value to positivize
-     * @return the positive value
+     * @return The positive value
      */
     public Object positivize(final Object val) {
         if (val == null) {
@@ -1876,7 +1876,7 @@ public class JexlArithmetic {
      * Ensure a big decimal is rounded by this arithmetic scale and rounding mode.
      *
      * @param number the big decimal to round
-     * @return the rounded big decimal
+     * @return The rounded big decimal
      */
     protected BigDecimal roundBigDecimal(final BigDecimal number) {
         final int mscale = getMathScale();
@@ -1903,7 +1903,7 @@ public class JexlArithmetic {
      *
      * @param size the number of elements in the set
      * @param extended whether the set is extended or not
-     * @return the array builder
+     * @return The array builder
      */
     public SetBuilder setBuilder(final int size, final boolean extended) {
         return new org.apache.commons.jexl3.internal.SetBuilder(size, extended);
@@ -1952,7 +1952,7 @@ public class JexlArithmetic {
      * Calculate the {@code size} of various types: Collection, Array, Map, String.
      *
      * @param object the object to get the size of
-     * @return the <em>size</em> of object, 0 if null, 1 if there is no <em>better</em> solution
+     * @return The <em>size</em> of object, 0 if null, 1 if there is no <em>better</em> solution
      */
     public Integer size(final Object object) {
         return size(object, object == null ? 0 : 1);
@@ -1963,7 +1963,7 @@ public class JexlArithmetic {
      *
      * @param object the object to get the size of
      * @param def the default value if object size cannot be determined
-     * @return the size of object or null if there is no arithmetic solution
+     * @return The size of object or null if there is no arithmetic solution
      */
     public Integer size(final Object object, final Integer def) {
         if (object instanceof CharSequence) {
@@ -2009,7 +2009,7 @@ public class JexlArithmetic {
      *
      * @param left  left argument
      * @param right right argument
-     * @return the test result
+     * @return The test result
      */
     public boolean strictEquals(final Object left, final Object right) {
         if (left == right) {
@@ -2203,7 +2203,7 @@ public class JexlArithmetic {
      *
      * @param val value to coerce
      * @param strict true if the calling operator or casting is strict, false otherwise
-     * @return the boolean value if coercion is possible, true if value was not null.
+     * @return The boolean value if coercion is possible, true if value was not null.
      */
     protected boolean toBoolean(final boolean strict, final Object val) {
         return isNullOperand(val)? controlNullOperand(strict, false) : toBoolean(val);
@@ -2214,7 +2214,7 @@ public class JexlArithmetic {
      * <p>Double.NaN, null, "false" and empty string coerce to false.</p>
      *
      * @param val value to coerce
-     * @return the boolean value if coercion is possible, true if value was not null.
+     * @return The boolean value if coercion is possible, true if value was not null.
      */
     public boolean toBoolean(final Object val) {
         if (val instanceof Boolean) {
@@ -2295,7 +2295,7 @@ public class JexlArithmetic {
      *
      * @param strict true if the calling operator or casting is strict, false otherwise
      * @param val value to coerce
-     * @return the value coerced to int
+     * @return The value coerced to int
      * @throws ArithmeticException if val is null and mode is strict or if coercion is not possible
      * @since 3.3
      */
@@ -2309,7 +2309,7 @@ public class JexlArithmetic {
      * <p>Boolean false is 0, true is 1.</p>
      *
      * @param val value to coerce
-     * @return the value coerced to int
+     * @return The value coerced to int
      * @throws ArithmeticException if val is null and mode is strict or if coercion is not possible
      */
     public int toInteger(final Object val) {
@@ -2346,7 +2346,7 @@ public class JexlArithmetic {
      *
      * @param strict true if the calling operator or casting is strict, false otherwise
      * @param val value to coerce
-     * @return the value coerced to long
+     * @return The value coerced to long
      * @throws ArithmeticException if value is null and mode is strict or if coercion is not possible
      * @since 3.3
      */
@@ -2360,7 +2360,7 @@ public class JexlArithmetic {
      * <p>Boolean false is 0, true is 1.</p>
      *
      * @param val value to coerce
-     * @return the value coerced to long
+     * @return The value coerced to long
      * @throws ArithmeticException if value is null and mode is strict or if coercion is not possible
      */
     public long toLong(final Object val) {

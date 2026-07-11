@@ -116,7 +116,7 @@ public class TemplateDebugger extends Debugger {
      * In a template, any statement that is not 'jexl:print(n)' must be prefixed by "$$".
      *
      * @param child the node to check
-     * @return the expression number or -1 if the node is not a jexl:print
+     * @return The expression number or -1 if the node is not a jexl:print
      */
     private TemplateExpression getPrintStatement(final JexlNode child) {
         if (exprs != null && child instanceof ASTFunctionNode) {
@@ -229,7 +229,7 @@ public class TemplateDebugger extends Debugger {
      *
      * @param expr the composite expression
      * @param data the visitor argument
-     * @return the visitor argument
+     * @return The visitor argument
      */
     private Object visit(final CompositeExpression expr, final Object data) {
         for (final TemplateExpression ce : expr.exprs) {
@@ -243,7 +243,7 @@ public class TemplateDebugger extends Debugger {
      *
      * @param expr the constant expression
      * @param data the visitor argument
-     * @return the visitor argument
+     * @return The visitor argument
      */
     private Object visit(final ConstantExpression expr, final Object data) {
         expr.asString(builder);
@@ -255,7 +255,7 @@ public class TemplateDebugger extends Debugger {
      *
      * @param expr the deferred expression
      * @param data the visitor argument
-     * @return the visitor argument
+     * @return The visitor argument
      */
     private Object visit(final DeferredExpression expr, final Object data) {
         builder.append(expr.isImmediate() ? '$' : '#');
@@ -270,7 +270,7 @@ public class TemplateDebugger extends Debugger {
      *
      * @param expr the immediate expression
      * @param data the visitor argument
-     * @return the visitor argument
+     * @return The visitor argument
      */
     private Object visit(final ImmediateExpression expr, final Object data) {
         builder.append(expr.isImmediate() ? '$' : '#');
@@ -285,7 +285,7 @@ public class TemplateDebugger extends Debugger {
      *
      * @param expr the nested expression
      * @param data the visitor argument
-     * @return the visitor argument
+     * @return The visitor argument
      */
     private Object visit(final NestedExpression expr, final Object data) {
         super.accept(expr.node, data);
@@ -297,7 +297,7 @@ public class TemplateDebugger extends Debugger {
      *
      * @param expr the constant expression
      * @param data the visitor argument
-     * @return the visitor argument
+     * @return The visitor argument
      */
     private Object visit(final TemplateExpression expr, final Object data) {
         Object r;

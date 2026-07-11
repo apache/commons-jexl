@@ -92,7 +92,7 @@ public class Frame {
      *
      * @param s the offset in this frame
      * @param lexical true if this captured symbol is redefined locally
-     * @return the stacked value
+     * @return The stacked value
      */
     Object capture(final int s, final boolean lexical) {
         return stack[s];
@@ -102,7 +102,7 @@ public class Frame {
      * Gets a value.
      *
      * @param s the offset in this frame
-     * @return the stacked value
+     * @return The stacked value
      */
     Object get(final int s) {
         return stack[s];
@@ -130,7 +130,7 @@ public class Frame {
     /**
      * Gets this script unbound parameters, i.e. parameters not bound through curry().
      *
-     * @return the parameter names
+     * @return The parameter names
      */
     public String[] getUnboundParameters() {
         return scope.getParameters(curried);
@@ -152,7 +152,7 @@ public class Frame {
      * may point back to it that occur with recursive function definitions.</p>
      *
      * @param closure the owning closure
-     * @return the cleaned-up stack or the stack itself (most of the time)
+     * @return The cleaned-up stack or the stack itself (most of the time)
      */
     Object[] nocycleStack(final Closure closure) {
         Object[] ns = stack;

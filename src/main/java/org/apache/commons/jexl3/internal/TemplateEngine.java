@@ -355,7 +355,7 @@ public final class TemplateEngine extends JxltEngine {
          * Base for to-string.
          *
          * @param error the builder to fill
-         * @return the builder
+         * @return The builder
          */
         StringBuilder toString(final StringBuilder error) {
             error.append("exprs{");
@@ -407,7 +407,7 @@ public final class TemplateEngine extends JxltEngine {
         }
 
         /**
-         * @return the index member
+         * @return The index member
          */
         int getIndex() {
             return index;
@@ -597,7 +597,7 @@ public final class TemplateEngine extends JxltEngine {
          * Interprets a sub-expression.
          *
          * @param interpreter a JEXL interpreter
-         * @return the result of interpretation
+         * @return The result of interpretation
          * @throws JexlException (only for nested and composite)
          */
         protected abstract Object evaluate(Interpreter interpreter);
@@ -613,7 +613,7 @@ public final class TemplateEngine extends JxltEngine {
          * @param frame the frame storing parameters and local variables
          * @param context the context storing global variables
          * @param options flags and properties that can alter the evaluation behavior.
-         * @return the expression value
+         * @return The expression value
          * @throws JexlException if expression evaluation fails
          */
         protected final Object evaluate(final JexlContext context, final Frame frame, final JexlOptions options) {
@@ -634,7 +634,7 @@ public final class TemplateEngine extends JxltEngine {
             }
         }
 
-        /** @return the info */
+        /** @return The info */
         JexlInfo getInfo() {
             return null;
         }
@@ -679,7 +679,7 @@ public final class TemplateEngine extends JxltEngine {
          * The options to use during evaluation.
          *
          * @param context the context
-         * @return the options
+         * @return The options
          */
         protected JexlOptions options(final JexlContext context) {
             return jexl.evalOptions(null, context);
@@ -707,7 +707,7 @@ public final class TemplateEngine extends JxltEngine {
          * @param frame the frame storing parameters and local variables
          * @param context the context storing global variables
          * @param options flags and properties that can alter the evaluation behavior.
-         * @return the expression value
+         * @return The expression value
          * @throws JexlException if expression preparation fails
          */
         protected final TemplateExpression prepare(final JexlContext context, final Frame frame, final JexlOptions options) {
@@ -748,7 +748,7 @@ public final class TemplateEngine extends JxltEngine {
      * @param expr the source
      * @param position the offset into the source
      * @param c the separator character
-     * @return the new position to read the source from
+     * @return The new position to read the source from
      */
     private static int append(final StringBuilder strb, final CharSequence expr, final int position, final char c) {
         strb.append(c);
@@ -808,7 +808,7 @@ public final class TemplateEngine extends JxltEngine {
      * Reads lines from a (buffered / mark-able) reader keeping all new-lines and line-feeds.
      *
      * @param reader the reader
-     * @return the line iterator
+     * @return The line iterator
      */
     static Iterator<CharSequence> readLines(final Reader reader) {
         if (!reader.markSupported()) {
@@ -951,7 +951,7 @@ public final class TemplateEngine extends JxltEngine {
     }
 
     /**
-     * @return the deferred character
+     * @return The deferred character
      */
     char getDeferredChar() {
         return deferredChar;
@@ -960,7 +960,7 @@ public final class TemplateEngine extends JxltEngine {
     /**
      * Gets the JexlEngine underlying this JxltEngine.
      *
-     * @return the JexlEngine
+     * @return The JexlEngine
      */
     @Override
     public Engine getEngine() {
@@ -968,7 +968,7 @@ public final class TemplateEngine extends JxltEngine {
     }
 
     /**
-     * @return the immediate character
+     * @return The immediate character
      */
     char getImmediateChar() {
         return immediateChar;
@@ -980,7 +980,7 @@ public final class TemplateEngine extends JxltEngine {
      * @param info  the source info
      * @param expr  the string expression
      * @param scope the template scope
-     * @return the unified expression instance
+     * @return The unified expression instance
      * @throws JexlException if an error occurs during parsing
      */
     TemplateExpression parseExpression(final JexlInfo info, final String expr, final Scope scope) {  // CSOFF: MethodLength
@@ -1195,7 +1195,7 @@ public final class TemplateEngine extends JxltEngine {
      *
      * @param prefix the directive prefix
      * @param source the source reader
-     * @return the list of blocks
+     * @return The list of blocks
      */
      List<Block> readTemplate(final String prefix, final Reader source) {
         final ArrayList<Block> blocks = new ArrayList<>();
@@ -1272,7 +1272,7 @@ public final class TemplateEngine extends JxltEngine {
      *
      * @param sequence the sequence
      * @param pattern  the pattern to match at start of sequence
-     * @return the first position after end of pattern if it matches, -1 otherwise
+     * @return The first position after end of pattern if it matches, -1 otherwise
      */
     int startsWith(final CharSequence sequence, final CharSequence pattern) {
         final int length = sequence.length();

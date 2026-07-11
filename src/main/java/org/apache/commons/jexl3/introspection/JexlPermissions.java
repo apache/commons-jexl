@@ -320,7 +320,7 @@ public interface JexlPermissions {
          *
          * @param allowed the decision to return
          * @param message the message to log
-         * @return the decision
+         * @return The decision
          */
         private boolean log(final boolean allowed, final String message) {
             if (logged.add(message)) {
@@ -643,7 +643,7 @@ public interface JexlPermissions {
      * </pre>
      *
      * @param src the permissions source, the default (NoJexl aware) permissions if null
-     * @return the permissions instance
+     * @return The permissions instance
      * @since 3.3
      */
     static JexlPermissions parse(final String... src) {
@@ -658,7 +658,7 @@ public interface JexlPermissions {
      * ({@link #UNRESTRICTED}) allows everything.</p>
      *
      * @param rules the permission DSL declarations
-     * @return the closed-world permission set
+     * @return The closed-world permission set
      * @since 3.7.0
      */
     static JexlPermissions create(final String... rules) {
@@ -791,7 +791,7 @@ public interface JexlPermissions {
      * would extend the restricted set of permissions by allowing the com.my.app package.</p>
      *
      * @param src the new constraints
-     * @return the new permissions
+     * @return The new permissions
      */
     JexlPermissions compose(String... src);
 

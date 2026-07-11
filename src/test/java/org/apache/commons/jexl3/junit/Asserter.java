@@ -118,7 +118,7 @@ public class Asserter {
 
     /**
      * Gets the underlying JEXL context.
-     * @return the JEXL context
+     * @return The JEXL context
      */
     public JexlContext getContext() {
         return context;
@@ -126,7 +126,7 @@ public class Asserter {
 
     /**
      * Gets the underlying JEXL engine.
-     * @return the JEXL engine
+     * @return The JEXL engine
      */
     public JexlEngine getEngine() {
         return engine;
@@ -143,7 +143,7 @@ public class Asserter {
     }
 
     /**
-     * @return the variables map
+     * @return The variables map
      */
     public Map<String, Object> getVariables() {
         return variables;

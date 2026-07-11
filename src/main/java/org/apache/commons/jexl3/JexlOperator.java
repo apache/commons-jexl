@@ -549,7 +549,7 @@ public enum JexlOperator {
     /**
      * Gets this operator number of parameters.
      *
-     * @return the method arity
+     * @return The method arity
      */
     public int getArity() {
         return arity;
@@ -558,7 +558,7 @@ public enum JexlOperator {
     /**
      * Gets the base operator.
      *
-     * @return the base operator
+     * @return The base operator
      */
     public final JexlOperator getBaseOperator() {
         return base;
@@ -567,7 +567,7 @@ public enum JexlOperator {
     /**
      * Gets this operator method name in a JexlArithmetic.
      *
-     * @return the method name
+     * @return The method name
      */
     public final String getMethodName() {
         return methodName;
@@ -576,7 +576,7 @@ public enum JexlOperator {
     /**
      * Gets this operator symbol.
      *
-     * @return the symbol
+     * @return The symbol
      */
     public final String getOperatorSymbol() {
         return operator;
@@ -635,7 +635,7 @@ public enum JexlOperator {
          *
          * @param node   an optional reference caching resolved method or failing signature
          * @param object the object to get the size of
-         * @return the evaluation result
+         * @return The evaluation result
          */
         Object size(JexlCache.Reference node, Object object);
 
@@ -647,7 +647,7 @@ public enum JexlOperator {
          *
          * @param node   the node holding the object
          * @param object the object to check the emptiness of
-         * @return the evaluation result
+         * @return The evaluation result
          */
         Object empty(JexlCache.Reference node, Object object);
 

@@ -52,7 +52,7 @@ public class ASTJexlScript extends JexlLexicalNode  {
      *
      * @param caller the calling frame
      * @param values the argument values
-     * @return the arguments array
+     * @return The arguments array
      */
     public Frame createFrame(final Frame caller, final Object... values) {
         return scope != null ? scope.createFrame(features.supportsReferenceCapture(), caller, values) : null;
@@ -62,7 +62,7 @@ public class ASTJexlScript extends JexlLexicalNode  {
      * Creates an array of arguments by copying values up to the number of parameters.
      *
      * @param values the argument values
-     * @return the arguments array
+     * @return The arguments array
      */
     public Frame createFrame(final Object... values) {
         return createFrame(null, values);
@@ -71,7 +71,7 @@ public class ASTJexlScript extends JexlLexicalNode  {
     /**
      * Gets the (maximum) number of arguments this script expects.
      *
-     * @return the number of parameters
+     * @return The number of parameters
      */
     public int getArgCount() {
         return scope != null ? scope.getArgCount() : 0;
@@ -80,7 +80,7 @@ public class ASTJexlScript extends JexlLexicalNode  {
     /**
      * Gets this script captured variable, i.e. symbols captured from outer scopes.
      *
-     * @return the captured variable names
+     * @return The captured variable names
      */
     public String[] getCapturedVariables() {
         return scope != null ? scope.getCapturedVariables() : new String[0];
@@ -96,7 +96,7 @@ public class ASTJexlScript extends JexlLexicalNode  {
     /**
      * Gets this script local variable, i.e. symbols assigned to local variables.
      *
-     * @return the local variable names
+     * @return The local variable names
      */
     public String[] getLocalVariables() {
         return scope != null ? scope.getLocalVariables() : new String[0];
@@ -105,7 +105,7 @@ public class ASTJexlScript extends JexlLexicalNode  {
     /**
      * Gets this script parameters, i.e. symbols assigned before creating local variables.
      *
-     * @return the parameter names
+     * @return The parameter names
      */
     public String[] getParameters() {
         return scope != null ? scope.getParameters() : new String[0];
@@ -128,7 +128,7 @@ public class ASTJexlScript extends JexlLexicalNode  {
     /**
      * Gets this script symbols, i.e. parameters and local variables.
      *
-     * @return the symbol names
+     * @return The symbol names
      */
     public String[] getSymbols() {
         return scope != null ? scope.getSymbols() : null;
@@ -152,7 +152,7 @@ public class ASTJexlScript extends JexlLexicalNode  {
     /**
      * Consider script with no parameters that return lambda as parametric-scripts.
      *
-     * @return the script
+     * @return The script
      */
     public ASTJexlScript script() {
         if (scope == null && jjtGetNumChildren() == 1 && jjtGetChild(0) instanceof ASTJexlLambda) {

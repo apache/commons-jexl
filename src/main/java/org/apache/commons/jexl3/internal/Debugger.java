@@ -262,7 +262,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
      * Rebuilds an expression from a JEXL node.
      *
      * @param node the node to rebuilt from
-     * @return the rebuilt expression
+     * @return The rebuilt expression
      * @since 3.0
      */
     public String data(final JexlNode node) {
@@ -366,7 +366,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
      * Tries (hard) to find the features used to parse a node.
      *
      * @param node the node
-     * @return the features or null
+     * @return The features or null
      */
     protected JexlFeatures getFeatures(final JexlNode node) {
         JexlNode walk = node;
@@ -1526,7 +1526,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
      *
      * @param p the parameter name
      * @param data the visitor argument
-     * @return the parameter name to use
+     * @return The parameter name to use
      */
     protected String visitParameter(final String p, final Object data) {
         return p;

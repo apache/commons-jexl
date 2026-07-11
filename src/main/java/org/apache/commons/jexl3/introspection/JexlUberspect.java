@@ -91,7 +91,7 @@ public interface JexlUberspect {
          * Resolves a class name.
          *
          * @param name the simple class name
-         * @return the fully qualified class name
+         * @return The fully qualified class name
          */
         String resolveClassName(String name);
     }
@@ -108,7 +108,7 @@ public interface JexlUberspect {
          * Resolves a constant by its name.
          *
          * @param name the constant name, a qualified name
-         * @return the constant value or TRY_FAILED if not found
+         * @return The constant value or TRY_FAILED if not found
          */
         Object resolveConstant(String name);
     }
@@ -149,7 +149,7 @@ public interface JexlUberspect {
          * @param uber       the uberspect
          * @param obj        the object
          * @param identifier the property identifier
-         * @return the property getter or null
+         * @return The property getter or null
          */
         JexlPropertyGet getPropertyGet(JexlUberspect uber, Object obj, Object identifier);
 
@@ -160,7 +160,7 @@ public interface JexlUberspect {
          * @param obj        the object
          * @param identifier the property identifier
          * @param arg        the property value
-         * @return the property setter or null
+         * @return The property setter or null
          */
         JexlPropertySet getPropertySet(JexlUberspect uber, Object obj, Object identifier, Object arg);
     }
@@ -183,7 +183,7 @@ public interface JexlUberspect {
          *
          * @param operator the property access operator, can be null
          * @param obj      the instance we seek to obtain a property setter/getter from, cannot be null
-         * @return the ordered list of resolver types, cannot be null
+         * @return The ordered list of resolver types, cannot be null
          */
         List<PropertyResolver> apply(JexlOperator operator, Object obj);
     }
@@ -254,7 +254,7 @@ public interface JexlUberspect {
      * Gets an arithmetic operator resolver for a given arithmetic instance.
      *
      * @param arithmetic the arithmetic instance
-     * @return the arithmetic uberspect or null if no operator method were overridden
+     * @return The arithmetic uberspect or null if no operator method were overridden
      * @since 3.0
      * @see #getOperator(JexlArithmetic)
      */
@@ -275,7 +275,7 @@ public interface JexlUberspect {
      * Seeks a class by name using this uberspect class-loader.
      *
      * @param className the class name
-     * @return the class instance or null if the class cannot be located by this uberspect class loader or if
+     * @return The class instance or null if the class cannot be located by this uberspect class loader or if
      * permissions deny access to the class
      */
     default Class<?> getClassByName(final String className) {
@@ -289,7 +289,7 @@ public interface JexlUberspect {
     /**
      * Gets the current class loader.
      *
-     * @return the class loader
+     * @return The class loader
      */
     ClassLoader getClassLoader();
 
@@ -378,14 +378,14 @@ public interface JexlUberspect {
      *
      * @param op the operator
      * @param obj the object
-     * @return the applied strategy resolver list
+     * @return The applied strategy resolver list
      */
     List<PropertyResolver> getResolvers(JexlOperator op, Object obj);
 
     /**
      * Gets this uberspect version.
      *
-     * @return the class loader modification count
+     * @return The class loader modification count
      */
     int getVersion();
 

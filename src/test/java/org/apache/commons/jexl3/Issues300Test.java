@@ -131,7 +131,7 @@ class Issues300Test {
          *
          * @param stream the stream
          * @param filter the lambda to use as filter
-         * @return the filtered stream
+         * @return The filtered stream
          */
         public Stream<?> filter(final Stream<?> stream, final JexlScript filter) {
             return stream.filter(x -> Boolean.TRUE.equals(filter.execute(this, x)));

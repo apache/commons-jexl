@@ -32,7 +32,7 @@ public class SynchronizedContext extends MapContext implements JexlContext.Annot
      * Calls a script synchronized by an object monitor.
      * @param var the object used for sync
      * @param script the script
-     * @return the script value
+     * @return The script value
      */
     public Object call(final Object var, final JexlScript script) {
         final String[] parms = script.getParameters();

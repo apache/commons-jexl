@@ -63,7 +63,7 @@ public class FeatureController extends ScriptVisitor {
     }
 
     /**
-     * @return the controlled features
+     * @return The controlled features
      */
     public JexlFeatures getFeatures() {
         return features;

@@ -44,7 +44,7 @@ public interface JexlExpression {
      * <p>The interpreter will handle interruption/cancellation gracefully if needed.</p>
      *
      * @param context the context
-     * @return the callable
+     * @return The callable
      * @since 3.1
      */
     Callable<Object> callable(JexlContext context);
@@ -62,14 +62,14 @@ public interface JexlExpression {
     /**
      * Recreates the source text of this expression from the internal syntactic tree.
      *
-     * @return the source text
+     * @return The source text
      */
     String getParsedText();
 
     /**
      * Returns the source text of this expression.
      *
-     * @return the source text
+     * @return The source text
      */
     String getSourceText();
 }

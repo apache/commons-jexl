@@ -52,7 +52,7 @@ public final class ASTJxltLiteral extends JexlNode implements JexlNode.JxltHandl
     /**
      * Gets the literal value.
      *
-     * @return the string literal
+     * @return The string literal
      */
     public String getLiteral() {
         return this.literal;

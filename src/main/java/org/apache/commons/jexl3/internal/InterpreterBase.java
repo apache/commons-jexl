@@ -97,7 +97,7 @@ public abstract class InterpreterBase extends ParserVisitor {
          * Evaluates the method previously dispatched.
          *
          * @param methodName the method name
-         * @return the method invocation result
+         * @return The method invocation result
          * @throws Exception when invocation fails
          */
         protected Object eval(final String methodName) throws Exception {
@@ -291,7 +291,7 @@ public abstract class InterpreterBase extends ParserVisitor {
          * @param name   the method name
          * @param target the method target
          * @param args   the method arguments
-         * @return the method invocation result (or JexlEngine.TRY_FAILED)
+         * @return The method invocation result (or JexlEngine.TRY_FAILED)
          */
         protected Object tryInvoke(final InterpreterBase ii, final String name, final Object target, final Object[] args) {
             return me.tryInvoke(name, target, ii.functionArguments(null, narrow, args));
@@ -306,7 +306,7 @@ public abstract class InterpreterBase extends ParserVisitor {
      * <p>Used by calls to unsolvableProperty(...).</p>
      *
      * @param node the property node
-     * @return the (pretty) string value
+     * @return The (pretty) string value
      */
     protected static String stringifyPropertyValue(final JexlNode node) {
         return node != null ? new Debugger().depth(1).data(node) : "???";
@@ -439,7 +439,7 @@ public abstract class InterpreterBase extends ParserVisitor {
      * @param target the pseudo-method owner, first to-be argument
      * @param narrow whether we should attempt to narrow number arguments
      * @param args   the other (non-null) arguments
-     * @return the arguments array
+     * @return The arguments array
      */
     protected Object[] callArguments(final Object target, final boolean narrow, final Object[] args) {
         // makes target 1st args, copy others - optionally narrow numbers
@@ -542,7 +542,7 @@ public abstract class InterpreterBase extends ParserVisitor {
      * @param node  the parent node
      * @param left  the left argument
      * @param right the right argument
-     * @return the left, right or parent node
+     * @return The left, right or parent node
      */
     protected JexlNode findNullOperand(final JexlNode node, final Object left, final Object right) {
         if (left == null) {
@@ -567,7 +567,7 @@ public abstract class InterpreterBase extends ParserVisitor {
      *
      * @param narrow whether narrowing should occur
      * @param arg    the argument
-     * @return the narrowed argument
+     * @return The narrowed argument
      */
     protected Object functionArgument(final boolean narrow, final Object arg) {
         return narrow && arg instanceof Number ? arithmetic.narrow((Number) arg) : arg;
@@ -580,7 +580,7 @@ public abstract class InterpreterBase extends ParserVisitor {
      * @param target the pseudo-method owner, first to-be argument
      * @param narrow whether we should attempt to narrow number arguments
      * @param args   the other (non-null) arguments
-     * @return the arguments array
+     * @return The arguments array
      */
     protected Object[] functionArguments(final Object target, final boolean narrow, final Object[] args) {
         // when target == context, we are dealing with the null namespace
@@ -610,7 +610,7 @@ public abstract class InterpreterBase extends ParserVisitor {
      * @param object    to retrieve value from
      * @param attribute the attribute of the object, e.g. an index (1, 0, 2) or key for a map
      * @param node      the node that evaluated as the object
-     * @return the attribute value
+     * @return The attribute value
      */
     protected Object getAttribute(final Object object, final Object attribute, final JexlNode node) {
         if (object == null) {
@@ -677,7 +677,7 @@ public abstract class InterpreterBase extends ParserVisitor {
      * @param frame the local frame
      * @param block the lexical block if any
      * @param identifier the variable node
-     * @return the value
+     * @return The value
      */
     protected Object getVariable(final Frame frame, final LexicalScope block, final ASTIdentifier identifier) {
         final int symbol = identifier.getSymbol();
@@ -871,7 +871,7 @@ public abstract class InterpreterBase extends ParserVisitor {
      *
      * @param prefix the prefix name (can be null for global namespace)
      * @param node   the AST node
-     * @return the namespace instance
+     * @return The namespace instance
      */
     protected Object resolveNamespace(final String prefix, final JexlNode node) {
         Object namespace;
@@ -1078,7 +1078,7 @@ public abstract class InterpreterBase extends ParserVisitor {
      * <p>Used by calls to unsolvableProperty(...).</p>
      *
      * @param node the property node
-     * @return the (pretty) string
+     * @return The (pretty) string
      */
     protected String stringifyProperty(final JexlNode node) {
         if (node instanceof ASTArrayAccess) {

@@ -42,7 +42,7 @@ public interface JexlMethod {
 
      * @param obj the object
      * @param params method parameters.
-     * @return the result
+     * @return The result
      * @throws Exception on any error.
      */
     Object invoke(Object obj, Object... params) throws Exception;
@@ -72,7 +72,7 @@ public interface JexlMethod {
      * @param name the method name
      * @param obj the object to invoke the method upon
      * @param params the method arguments
-     * @return the result of the method invocation that should be checked by tryFailed to determine if it succeeded
+     * @return The result of the method invocation that should be checked by tryFailed to determine if it succeeded
      * or failed.
      * @throws JexlException.TryFailed if the underlying method was invoked but threw an exception
      * ({@link java.lang.reflect.InvocationTargetException})

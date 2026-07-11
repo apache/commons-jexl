@@ -294,7 +294,7 @@ public class JexlBuilder {
     /**
      * Gets the JexlArithmetic instance the engine will use.
      *
-     * @return the arithmetic
+     * @return The arithmetic
      */
     public JexlArithmetic arithmetic() {
         return this.arithmetic;
@@ -328,7 +328,7 @@ public class JexlBuilder {
     /**
      * Gets the expression cache size the engine will use.
      *
-     * @return the cache size
+     * @return The cache size
      */
     public int cache() {
       return cache;
@@ -350,7 +350,7 @@ public class JexlBuilder {
     /**
      * Gets the expression-cache factory the engine will use.
      *
-     * @return the cache factory
+     * @return The cache factory
      */
     public IntFunction<JexlCache<?, ?>> cacheFactory() {
       return this.cacheFactory;
@@ -370,7 +370,7 @@ public class JexlBuilder {
   /**
    * Gets the Jexl script parser factory the engine will use.
    *
-   * @return the cache factory
+   * @return The cache factory
    * @since 3.5.0
    */
   public Supplier<JexlScriptParser> parserFactory() {
@@ -392,7 +392,7 @@ public class JexlBuilder {
     /**
      * Gets the maximum length for an expression to be cached.
      *
-     * @return the cache threshold
+     * @return The cache threshold
      */
     public int cacheThreshold() {
         return cacheThreshold;
@@ -416,7 +416,7 @@ public class JexlBuilder {
     /**
      * Gets the cancellable information flag
      *
-     * @return the cancellable information flag
+     * @return The cancellable information flag
      * @since 3.1
      */
     public Boolean cancellable() {
@@ -440,7 +440,7 @@ public class JexlBuilder {
     /**
      * Gets the charset
      *
-     * @return the charset
+     * @return The charset
      */
     public Charset charset() {
         return charset;
@@ -513,7 +513,7 @@ public class JexlBuilder {
     /**
      * Gets the debug flag.
      *
-     * @return the debugging information flag
+     * @return The debugging information flag
      */
     public Boolean debug() {
         return this.debug;
@@ -534,7 +534,7 @@ public class JexlBuilder {
     /**
      * Gets the features the engine will use as a base by default.
      *
-     * @return the features
+     * @return The features
      */
     public JexlFeatures features() {
         return this.features;
@@ -566,7 +566,7 @@ public class JexlBuilder {
     /**
      * Gets the optional set of imported packages.
      *
-     * @return the set of imports, may be empty, not null
+     * @return The set of imports, may be empty, not null
      */
     public Collection<String> imports() {
         return options.getImports();
@@ -644,7 +644,7 @@ public class JexlBuilder {
     /**
      * Gets the classloader
      *
-     * @return the class loader
+     * @return The class loader
      */
     public ClassLoader loader() {
         return loader;
@@ -676,7 +676,7 @@ public class JexlBuilder {
     /**
      * Gets the logger
      *
-     * @return the logger
+     * @return The logger
      */
     public Log logger() {
         return this.logger;
@@ -696,7 +696,7 @@ public class JexlBuilder {
     /**
      * Gets the map of namespaces.
      *
-     * @return the map of namespaces.
+     * @return The map of namespaces.
      */
     public Map<String, Object> namespaces() {
         return options.getNamespaces();
@@ -735,7 +735,7 @@ public class JexlBuilder {
     /**
      * Gets the current set of options
      *
-     * @return the current set of options
+     * @return The current set of options
      */
     public JexlOptions options() {
       return options;
@@ -744,7 +744,7 @@ public class JexlBuilder {
     /**
      * Gets the permissions
      *
-     * @return the permissions
+     * @return The permissions
      */
     public JexlPermissions permissions() {
         return this.permissions;
@@ -788,7 +788,7 @@ public class JexlBuilder {
     /**
      * Gets the sandbox
      *
-     * @return the sandbox
+     * @return The sandbox
      */
     public JexlSandbox sandbox() {
         return this.sandbox;
@@ -808,7 +808,7 @@ public class JexlBuilder {
     /**
      * Is error handling silent?
      *
-     * @return the silent error handling flag
+     * @return The silent error handling flag
      */
     public Boolean silent() {
         return options.isSilent();
@@ -831,7 +831,7 @@ public class JexlBuilder {
     /**
      * Gets the cache size
      *
-     * @return the cache size
+     * @return The cache size
      */
     public int stackOverflow() {
         return stackOverflow;
@@ -851,7 +851,7 @@ public class JexlBuilder {
     /**
      * Gets the JexlUberspect strategy
      *
-     * @return the JexlUberspect strategy */
+     * @return The JexlUberspect strategy */
     public JexlUberspect.ResolverStrategy strategy() {
         return this.strategy;
     }
@@ -906,7 +906,7 @@ public class JexlBuilder {
     /**
      * Gets the uberspect
      *
-     * @return the uberspect */
+     * @return The uberspect */
     public JexlUberspect uberspect() {
         return this.uberspect;
     }

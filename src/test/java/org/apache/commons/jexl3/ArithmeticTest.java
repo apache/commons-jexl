@@ -505,7 +505,7 @@ class ArithmeticTest extends JexlTestCase {
 
     /**
      * Returns the Java version as an int value.
-     * @return the Java version as an int value (8, 9, etc.)
+     * @return The Java version as an int value (8, 9, etc.)
      */
     private static int getJavaVersion() {
         String version = SystemProperties.getJavaVersion();

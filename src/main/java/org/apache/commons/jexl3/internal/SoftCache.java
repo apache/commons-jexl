@@ -54,7 +54,7 @@ public class SoftCache<K, V> implements JexlCache<K, V> {
      * Creates a synchronized LinkedHashMap.
      *
      * @param capacity the map capacity
-     * @return the map instance
+     * @return The map instance
      * @param <K> key type
      * @param <V> value type
      */

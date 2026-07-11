@@ -75,7 +75,7 @@ class ScriptTest extends JexlTestCase {
     /**
      * Creates a simple local http server.
      * <p>Only handles POST request on /test</p>
-     * @return the server
+     * @return The server
      * @throws IOException
      */
     static HttpServer createJsonServer(final Function<HttpExchange, String> responder) throws IOException {
@@ -114,7 +114,7 @@ class ScriptTest extends JexlTestCase {
      *  HTTP post.
      * @param sURL the url
      * @param jsonData some json data
-     * @return the result
+     * @return The result
      * @throws IOException
      */
     private static String httpPostRequest(final String sURL, final String jsonData) throws IOException {

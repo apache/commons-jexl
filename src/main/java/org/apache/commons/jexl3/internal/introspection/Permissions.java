@@ -67,7 +67,7 @@ public class Permissions implements JexlPermissions {
     /**
      * Creates a copy of a map containing copyable values.
      * @param map the map to copy
-     * @return the copy of the map
+     * @return The copy of the map
      * @param <T> The type of Copyable values
      */
     static <T extends Copyable<T>> Map<String, T> copyMap(final Map<String, T> map) {
@@ -341,7 +341,7 @@ public class Permissions implements JexlPermissions {
      * Creates a new set of permissions by composing these permissions with a new set of rules.
      *
      * @param src the rules
-     * @return the new permissions
+     * @return The new permissions
      */
     @Override
     public Permissions compose(final String... src) {
@@ -353,7 +353,7 @@ public class Permissions implements JexlPermissions {
      * <p>As in {@code outer$inner} for <code>class outer { class inner...</code>.</p>
      *
      * @param clazz the clazz
-     * @return the clazz key
+     * @return The clazz key
      */
     static String classKey(final Class<?> clazz) {
         return classKey(clazz, null);
@@ -365,7 +365,7 @@ public class Permissions implements JexlPermissions {
      *
      * @param clazz the clazz
      * @param strb the buffer to compose the key
-     * @return the clazz key
+     * @return The clazz key
      */
     static String classKey(final Class<?> clazz, final StringBuilder strb) {
         StringBuilder keyb = strb;
@@ -408,21 +408,21 @@ public class Permissions implements JexlPermissions {
      * Gets the package constraints.
      *
      * @param packageName the package name
-     * @return the package constraints instance, not-null.
+     * @return The package constraints instance, not-null.
      */
     private NoJexlPackage getNoJexlPackage(final String packageName) {
         return packages.getOrDefault(packageName, JEXL_PACKAGE);
     }
 
     /**
-     * @return the packages
+     * @return The packages
      */
     Map<String, NoJexlPackage> getPackages() {
         return packages == null ? Collections.emptyMap() : Collections.unmodifiableMap(packages);
     }
 
     /**
-     * @return the wildcards
+     * @return The wildcards
      */
     Set<String> getWildcards() {
         return allowed == null ? Collections.emptySet() : Collections.unmodifiableSet(allowed);
@@ -794,7 +794,7 @@ public class Permissions implements JexlPermissions {
      * <p>If nothing was explicitly forbidden, everything is allowed.</p>
      *
      * @param clazz the class
-     * @return the class constraints instance, not-null.
+     * @return The class constraints instance, not-null.
      */
     private NoJexlClass getNoJexl(final Class<?> clazz) {
         return getNoJexl(clazz, JEXL_CLASS);

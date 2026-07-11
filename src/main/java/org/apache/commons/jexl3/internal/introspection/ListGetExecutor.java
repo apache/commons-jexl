@@ -40,7 +40,7 @@ public final class ListGetExecutor extends AbstractExecutor.Get {
      * @param is the introspector
      * @param clazz the class to find the get method from
      * @param index the index to use as an argument to the get method
-     * @return the executor if found, null otherwise
+     * @return The executor if found, null otherwise
      */
     public static ListGetExecutor discover(final Introspector is, final Class<?> clazz, final Integer index) {
         if (index != null) {

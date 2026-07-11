@@ -47,7 +47,7 @@ public final class DuckSetExecutor extends AbstractExecutor.Set {
      * @param clazz the class to find the set method from
      * @param key the key to use as 1st argument to the set method
      * @param value the value to use as 2nd argument to the set method
-     * @return the executor if found, null otherwise
+     * @return The executor if found, null otherwise
      */
     public static DuckSetExecutor discover(final Introspector is, final Class<?> clazz, final Object key, final Object value) {
         java.lang.reflect.Method method = is.getMethod(clazz, "set", key, value);

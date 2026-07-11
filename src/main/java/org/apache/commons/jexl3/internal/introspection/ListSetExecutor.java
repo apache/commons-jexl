@@ -41,7 +41,7 @@ public final class ListSetExecutor extends AbstractExecutor.Set {
      * @param clazz the class to find the get method from
      * @param identifier the key to use as an argument to the get method
      * @param value the value to use as argument in list.put(key, value)
-     * @return the executor if found, null otherwise
+     * @return The executor if found, null otherwise
      */
     public static ListSetExecutor discover(final Introspector is,
                                            final Class<?> clazz,

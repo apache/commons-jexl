@@ -94,7 +94,7 @@ class VarTest extends JexlTestCase {
         /**
          * Gets a list of properties.
          * @param keys the property names
-         * @return the property values
+         * @return The property values
          */
         public List<String> get(final List<String> keys) {
             final List<String> values = new ArrayList<>();
@@ -112,7 +112,7 @@ class VarTest extends JexlTestCase {
          * <p>Uses each map key as a property name and each value as an alias
          * used to key the resulting property value.
          * @param map a map of property name to alias
-         * @return the alia map
+         * @return The alia map
          */
         public Map<String,Object> get(final Map<String,String> map) {
             final Map<String,Object> values = new LinkedHashMap<>();
@@ -128,7 +128,7 @@ class VarTest extends JexlTestCase {
         /**
          * Gets a date property
          * @param property yyyy or MM or dd
-         * @return the string representation of year, month or day
+         * @return The string representation of year, month or day
          */
         public String get(final String property) {
             switch (property) {
@@ -147,7 +147,7 @@ class VarTest extends JexlTestCase {
         /**
          * Gets a list of properties.
          * @param keys the property names
-         * @return the property values
+         * @return The property values
          */
         public List<String> get(final String[] keys) {
             return get(Arrays.asList(keys));
@@ -165,7 +165,7 @@ class VarTest extends JexlTestCase {
     /**
      * Getting properties from an array, set or map.
      * @param str the stringified source
-     * @return the properties array
+     * @return The properties array
      */
     private static String[] readIdentifiers(final String str) {
         final List<String> ids = new ArrayList<>();
@@ -233,7 +233,7 @@ class VarTest extends JexlTestCase {
     /**
      * Creates a variable reference set from an array of array of strings.
      * @param refs the variable reference set
-     * @return the set of variables
+     * @return The set of variables
      */
     Set<List<String>> mkref(final String[][] refs) {
         final Set<List<String>> set = new HashSet<>();

@@ -186,7 +186,7 @@ public class TokenMgrException extends RuntimeException implements JavaccError {
      * Returns a detailed message for the Error when it is thrown by the
      * token manager to indicate a lexical error.
      *
-     * @return the message
+     * @return The message
      */
     @Override
     public String getMessage() {

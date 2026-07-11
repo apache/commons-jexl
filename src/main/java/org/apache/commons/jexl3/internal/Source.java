@@ -101,7 +101,7 @@ public final class Source implements Comparable<Source> {
     }
 
     /**
-     * @return the features associated with the source
+     * @return The features associated with the source
      */
     public JexlFeatures getFeatures() {
         return features;
@@ -113,7 +113,7 @@ public final class Source implements Comparable<Source> {
     }
 
     /**
-     * @return the length of the script source
+     * @return The length of the script source
      */
     int length() {
         return str.length();

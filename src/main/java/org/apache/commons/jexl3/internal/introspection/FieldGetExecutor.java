@@ -35,7 +35,7 @@ public final class FieldGetExecutor implements JexlPropertyGet {
      * @param is the introspector
      * @param clazz the class to find the get method from
      * @param identifier the key to use as an argument to the get method
-     * @return the executor if found, null otherwise
+     * @return The executor if found, null otherwise
      */
     public static JexlPropertyGet discover(final Introspector is, final Class<?> clazz, final String identifier) {
         if (identifier != null) {

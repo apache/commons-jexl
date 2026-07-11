@@ -63,12 +63,12 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
         boolean declareSymbol(int symbol);
 
         /**
-         * @return the set of symbols identifiers declared in this unit
+         * @return The set of symbols identifiers declared in this unit
          */
         LexicalScope getLexicalScope();
 
         /**
-         * @return the number of local variables declared in this unit
+         * @return The number of local variables declared in this unit
          */
         int getSymbolCount();
 
@@ -133,7 +133,7 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
      * Pick the most significant token for error reporting.
      *
      * @param tokens the tokens to choose from
-     * @return the token
+     * @return The token
      */
     protected static Token errorToken(final Token... tokens) {
         for (final Token token : tokens) {
@@ -149,7 +149,7 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
      *
      * @param src the source token, if null, the destination token is returned
      * @param dest the destination token, if null, the source token is returned
-     * @return the destination token with the content of the source token
+     * @return The destination token with the content of the source token
      */
     static Token assignToken(final Token src, final Token dest) {
         if (dest == null) {
@@ -173,7 +173,7 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
      *
      * @param src the source
      * @param lineno the line number
-     * @return the line
+     * @return The line
      */
     protected static String readSourceLine(final String src, final int lineno) {
         String msg = "";
@@ -194,7 +194,7 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
      * Utility function to create '.' separated string from a list of string.
      *
      * @param lstr the list of strings
-     * @return the dotted version
+     * @return The dotted version
      */
     protected static String stringify(final Iterable<String> lstr) {
         return String.join(".", lstr);
@@ -387,7 +387,7 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
      * Encode a value to a switch predicate.
      *
      * @param value the value.
-     * @return the encoded value, which is either the value itself, or NAN (for NaN) or NIL (for null).
+     * @return The encoded value, which is either the value itself, or NAN (for NaN) or NIL (for null).
      */
     static Object switchCode(final Object value) {
         if (value == null) {
@@ -466,7 +466,7 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
      *
      * @param identifier the identifier.
      * @param name      the identifier name.
-     * @return the image.
+     * @return The image.
      */
     protected String checkVariable(final ASTIdentifier identifier, final String name) {
         final Scope scope = scopeReference.get();
@@ -736,7 +736,7 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
     /**
      * Gets the current set of features active during parsing.
      *
-     * @return the current set of features active during parsing.
+     * @return The current set of features active during parsing.
      */
     protected JexlFeatures getFeatures() {
         return featureController.getFeatures();
@@ -749,7 +749,7 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
      * regain access after parsing to known which / how-many registers are needed.
      * </p>
      *
-     * @return the named register map
+     * @return The named register map
      */
     protected Scope getScope() {
         return scopeReference.get();
@@ -759,14 +759,14 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
      * Overridden in actual parser to access tokens stack.
      *
      * @param index 0 to get current token.
-     * @return the token on the stack.
+     * @return The token on the stack.
      */
     protected abstract Token getToken(int index);
 
     /**
      * Gets the lexical unit used by this parser.
      *
-     * @return the named register map.
+     * @return The named register map.
      */
     protected LexicalUnit getUnit() {
         return blockReference.get();
@@ -981,7 +981,7 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
      *
      * @param info the JexlInfo
      * @param src the source to parse
-     * @return the parsed tree
+     * @return The parsed tree
      */
     @Override
     public ASTJexlScript jxltParse(final JexlInfo info, final JexlFeatures features, final String src, final Scope scope) {
@@ -1001,7 +1001,7 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
      * @param info the JexlInfo
      * @param src the source to parse
      * @param scope the scope
-     * @return the expression
+     * @return The expression
      */
     static JxltEngine.Expression parseInterpolation(final JexlInfo info, final String src, final Scope scope) {
         final JexlEngine jexl = JexlEngine.getThreadEngine();

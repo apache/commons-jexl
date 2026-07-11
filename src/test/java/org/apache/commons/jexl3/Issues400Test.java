@@ -682,7 +682,7 @@ public class Issues400Test {
      * Transcodes a SQL-inspired expression to a JEXL expression.
      *
      * @param expr the expression to transcode
-     * @return the resulting expression
+     * @return The resulting expression
      */
     private static String transcodeSQLExpr(final CharSequence expr) {
         final StringBuilder strb = new StringBuilder(expr.length());

@@ -51,10 +51,10 @@ public abstract class JexlNode extends SimpleNode implements JexlCache.Reference
      */
     public interface JxltHandle {
 
-        /** @return the expression source. */
+        /** @return The expression source. */
         String getExpressionSource();
 
-        /**@return the expression instance, should be a TemplateEngine.TemplateExpression. */
+        /**@return The expression instance, should be a TemplateEngine.TemplateExpression. */
         JxltEngine.Expression getExpression();
 
         /**
@@ -126,7 +126,7 @@ public abstract class JexlNode extends SimpleNode implements JexlCache.Reference
         }
 
         /**
-         * @return the node this info is bound to
+         * @return The node this info is bound to
          */
         public JexlNode getNode() {
             return node;
@@ -322,7 +322,7 @@ public abstract class JexlNode extends SimpleNode implements JexlCache.Reference
     /**
      * Gets the associated JexlInfo instance.
      *
-     * @return the info
+     * @return The info
      */
     public JexlInfo jexlInfo() {
         return jexlInfo(null);
@@ -332,7 +332,7 @@ public abstract class JexlNode extends SimpleNode implements JexlCache.Reference
      * Gets the associated JexlInfo instance.
      *
      * @param name the source name
-     * @return the info
+     * @return The info
      */
     public JexlInfo jexlInfo(final String name) {
         JexlInfo info = null;

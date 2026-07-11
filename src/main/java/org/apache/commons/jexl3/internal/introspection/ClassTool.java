@@ -68,7 +68,7 @@ final class ClassTool {
      * Gets the package name of a class (class.getPackage() may return null).
      *
      * @param clz the class
-     * @return the class package name
+     * @return The class package name
      */
     static String getPackageName(final Class<?> clz) {
         String pkgName = "";

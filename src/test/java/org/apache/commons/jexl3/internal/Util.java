@@ -129,7 +129,7 @@ public class Util {
     /**
      * Creates a list of all descendants of a script including itself.
      * @param node the script to flatten
-     * @return the descendants-and-self list
+     * @return The descendants-and-self list
      */
     protected static ArrayList<JexlNode> flatten(final JexlNode node) {
         final ArrayList<JexlNode> list = new ArrayList<>();

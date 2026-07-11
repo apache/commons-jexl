@@ -141,7 +141,7 @@ public class LexicalScope {
     }
 
     /**
-     * @return the number of symbols defined in this scope.
+     * @return The number of symbols defined in this scope.
      */
     public int getSymbolCount() {
         return count;
@@ -185,7 +185,7 @@ public class LexicalScope {
     /**
      * Ensures more symbols can be stored.
      *
-     * @return the set of more symbols
+     * @return The set of more symbols
      */
     private BitSet moreBits() {
         if (moreSymbols == null) {

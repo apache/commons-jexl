@@ -236,7 +236,7 @@ public abstract class LongRange implements Collection<Long> {
     /**
      * Gets the interval maximum value.
      *
-     * @return the high boundary
+     * @return The high boundary
      */
     public long getMax() {
         return max;
@@ -245,7 +245,7 @@ public abstract class LongRange implements Collection<Long> {
     /**
      * Gets the interval minimum value.
      *
-     * @return the low boundary
+     * @return The low boundary
      */
     public long getMin() {
         return min;

@@ -58,7 +58,7 @@ public final class IndexedType implements JexlPropertyGet {
          * Gets a property from this indexed container.
          *
          * @param key the property key
-         * @return the property value
+         * @return The property value
          * @throws Exception if inner invocation fails
          */
         public Object get(final Object key) throws Exception {
@@ -68,7 +68,7 @@ public final class IndexedType implements JexlPropertyGet {
         /**
          * Gets the property container class.
          *
-         * @return the container class
+         * @return The container class
          */
         public Class<?> getContainerClass() {
             return type.clazz;
@@ -77,7 +77,7 @@ public final class IndexedType implements JexlPropertyGet {
         /**
          * Gets the property container name.
          *
-         * @return the container name
+         * @return The container name
          */
         public String getContainerName() {
             return type.container;
@@ -88,7 +88,7 @@ public final class IndexedType implements JexlPropertyGet {
          *
          * @param key the property key
          * @param value the property value
-         * @return the invocation result (frequently null)
+         * @return The invocation result (frequently null)
          * @throws Exception if inner invocation fails
          */
         public Object set(final Object key, final Object value) throws Exception {
@@ -166,7 +166,7 @@ public final class IndexedType implements JexlPropertyGet {
      *
      * @param object the container instance (not null)
      * @param key the property key (not null)
-     * @return the property value
+     * @return The property value
      * @throws Exception if invocation failed;
      *         IntrospectionException if a property getter could not be found
      */
@@ -199,7 +199,7 @@ public final class IndexedType implements JexlPropertyGet {
      * @param object the container instance (not null)
      * @param key the property key (not null)
      * @param value the property value (not null)
-     * @return the result of the method invocation (frequently null)
+     * @return The result of the method invocation (frequently null)
      * @throws Exception if invocation failed;
      *         IntrospectionException if a property setter could not be found
      */

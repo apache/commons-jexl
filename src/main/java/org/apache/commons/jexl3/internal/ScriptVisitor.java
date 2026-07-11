@@ -592,7 +592,7 @@ public class ScriptVisitor extends ParserVisitor {
      *
      * @param jscript the expression
      * @param data some data context
-     * @return the visit result or null if jscript was not a Script implementation
+     * @return The visit result or null if jscript was not a Script implementation
      */
     public Object visitExpression (final JexlExpression jscript, final Object data) {
         if (jscript instanceof Script) {
@@ -618,7 +618,7 @@ public class ScriptVisitor extends ParserVisitor {
      *
      * @param jscript the expression
      * @param data some data context
-     * @return the visit result or null if jscript was not a Script implementation
+     * @return The visit result or null if jscript was not a Script implementation
      */
     public Object visitScript(final JexlScript jscript, final Object data) {
         if (jscript instanceof Script) {

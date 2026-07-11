@@ -49,7 +49,7 @@ public class ReferenceMethodExecutor implements JexlMethod {
      * Dereference an expected optional or reference.
      *
      * @param opt the reference
-     * @return the reference value
+     * @return The reference value
      */
     protected Object getReference(final Object opt) {
         return handler.callGet(opt);

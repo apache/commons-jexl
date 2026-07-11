@@ -82,7 +82,7 @@ public class JexlScriptEngineFactory implements ScriptEngineFactory {
 
     /**
      * Creates an engine.
-     * @return the JexlEngine instance, create it if necessary
+     * @return The JexlEngine instance, create it if necessary
      */
     protected JexlEngine getEngine() {
         return createJexlEngine();

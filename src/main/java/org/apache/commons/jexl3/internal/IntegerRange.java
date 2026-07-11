@@ -234,7 +234,7 @@ public abstract class IntegerRange implements Collection<Integer> {
     /**
      * Gets the interval maximum value.
      *
-     * @return the high boundary
+     * @return The high boundary
      */
     public int getMax() {
         return max;
@@ -243,7 +243,7 @@ public abstract class IntegerRange implements Collection<Integer> {
     /**
      * Gets the interval minimum value.
      *
-     * @return the low boundary
+     * @return The low boundary
      */
     public int getMin() {
         return min;

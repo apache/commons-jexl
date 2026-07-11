@@ -107,7 +107,7 @@ public class LexicalFrame extends LexicalScope {
     /**
      * Pops back values and lexical frame.
      *
-     * @return the previous frame
+     * @return The previous frame
      */
     public LexicalFrame pop() {
         // undefine all symbols

@@ -45,7 +45,7 @@ public class ASTIdentifier extends JexlNode {
      *
      * @param ordinal the flag ordinal
      * @param mask the flags mask
-     * @return the mask value with this flag or-ed in
+     * @return The mask value with this flag or-ed in
      */
     private static boolean isSet(final int ordinal, final int mask) {
         return (mask & 1 << ordinal) != 0;
@@ -57,7 +57,7 @@ public class ASTIdentifier extends JexlNode {
      * @param ordinal the flag ordinal
      * @param mask the flags mask
      * @param value true or false
-     * @return the new flags mask value
+     * @return The new flags mask value
      */
     private static int set(final int ordinal, final int mask, final boolean value) {
         return value? mask | 1 << ordinal : mask & ~(1 << ordinal);

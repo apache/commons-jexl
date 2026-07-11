@@ -56,7 +56,7 @@ public class StringParser {
      * Builds a regex pattern string, handles escaping '/' through '\/' syntax.
      *
      * @param str the string to build from
-     * @return the built string
+     * @return The built string
      */
     public static String buildRegex(final CharSequence str) {
         return buildString(str.subSequence(1, str.length()), true);
@@ -67,7 +67,7 @@ public class StringParser {
      *
      * @param str the string to build from
      * @param eatsep whether the separator, the first character, should be considered
-     * @return the built string
+     * @return The built string
      */
     public static String buildString(final CharSequence str, final boolean eatsep) {
         return buildString(str, eatsep, true);
@@ -79,7 +79,7 @@ public class StringParser {
      * @param str the string to build from
      * @param eatsep whether the separator, the first character, should be considered
      * @param esc whether escape characters are interpreted or escaped
-     * @return the built string
+     * @return The built string
      */
     private static String buildString(final CharSequence str, final boolean eatsep, final boolean esc) {
         final StringBuilder strb = new StringBuilder(str.length());
@@ -95,7 +95,7 @@ public class StringParser {
      *
      * @param str the string to build from
      * @param eatsep whether the separator, the first character, should be considered
-     * @return the built string
+     * @return The built string
      */
     public static String buildTemplate(final CharSequence str, final boolean eatsep) {
         return buildString(str, eatsep, false);
@@ -105,7 +105,7 @@ public class StringParser {
      * Adds a escape char ('\') where needed in a string form of an ide
      *
      * @param str the identifier un-escaped string
-     * @return the string with added  backslash character before space, quote, double-quote and backslash
+     * @return The string with added  backslash character before space, quote, double-quote and backslash
      */
     public static String escapeIdentifier(final String str) {
         StringBuilder strb = null;
@@ -143,7 +143,7 @@ public class StringParser {
      *
      * @param delim the delimiter character (if 0, no delimiter is added)
      * @param str the string to escape
-     * @return the escaped representation
+     * @return The escaped representation
      */
     public static String escapeString(final CharSequence str, final char delim) {
         if (str == null) {
@@ -220,7 +220,7 @@ public class StringParser {
      * @param end the relative offset in str to end reading
      * @param sep the separator, single or double quote, marking end of string
      * @param esc whether escape characters are interpreted or escaped
-     * @return the last character offset handled in origin
+     * @return The last character offset handled in origin
      */
     private static int read(final StringBuilder strb, final CharSequence str, final int begin, final int end, final char sep, final boolean esc) {
         boolean escape = false;
@@ -286,7 +286,7 @@ public class StringParser {
      * @param str the origin
      * @param index the offset into the origin
      * @param sep the separator, single or double quote, marking end of string
-     * @return the offset in origin
+     * @return The offset in origin
      */
     public static int readString(final StringBuilder strb, final CharSequence str, final int index, final char sep) {
         return read(strb, str, index, str.length(), sep, true);
@@ -326,7 +326,7 @@ public class StringParser {
      * Remove escape char ('\') from an identifier.
      *
      * @param str the identifier escaped string, ie with a backslash before space, quote, double-quote and backslash
-     * @return the string with no '\\' character
+     * @return The string with no '\\' character
      */
     public static String unescapeIdentifier(final String str) {
         StringBuilder strb = null;

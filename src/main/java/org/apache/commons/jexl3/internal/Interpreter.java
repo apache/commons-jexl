@@ -85,7 +85,7 @@ public class Interpreter extends InterpreterBase {
         }
 
         /**
-         * @return the actual statement.
+         * @return The actual statement.
          */
         public Object getStatement() {
             return stmt;
@@ -154,7 +154,7 @@ public class Interpreter extends InterpreterBase {
      * @param target  the target of the method, what it should be invoked upon
      * @param funcNode the object carrying the method or function or the method identifier
      * @param argNode the node carrying the arguments
-     * @return the result of the method invocation
+     * @return The result of the method invocation
      */
     protected Object call(final JexlNode node, final Object target, final Object funcNode, final ASTArguments argNode) {
         cancelCheck(node);
@@ -320,7 +320,7 @@ public class Interpreter extends InterpreterBase {
      * @param catchBody the body
      * @param caught the caught exception
      * @param data the data
-     * @return the result of body evaluation
+     * @return The result of body evaluation
      */
     private Object evalCatch(final ASTReference catchVar, final JexlNode catchBody,
                              final JexlException caught, final Object data) {
@@ -365,7 +365,7 @@ public class Interpreter extends InterpreterBase {
      * static (name or numbered identifier) or dynamic (jxlt).
      *
      * @param node the identifier access node
-     * @return the evaluated identifier
+     * @return The evaluated identifier
      */
     private Object evalIdentifier(final ASTIdentifierAccess node) {
         if (!(node instanceof ASTIdentifierAccessJxlt)) {
@@ -389,7 +389,7 @@ public class Interpreter extends InterpreterBase {
      * <p>This parses and stores the JXLT template if necessary (upon first execution)</p>
      *
      * @param node the node
-     * @return the JXLT template evaluation.
+     * @return The JXLT template evaluation.
      * @param <NODE> the node type
      */
     private <NODE extends JexlNode & JexlNode.JxltHandle> Object evalJxltHandle(final NODE node) {
@@ -415,7 +415,7 @@ public class Interpreter extends InterpreterBase {
      * @param node     the node
      * @param assignop the assignment operator or null if simply assignment
      * @param data     the data
-     * @return the left hand side
+     * @return The left hand side
      */
     protected Object executeAssign(final JexlNode node, final JexlOperator assignop, final Object data) { // CSOFF: MethodLength
         cancelCheck(node);
@@ -759,7 +759,7 @@ public class Interpreter extends InterpreterBase {
      * its logger as warning.
      *
      * @param node the script or expression to interpret.
-     * @return the result of the interpretation.
+     * @return The result of the interpretation.
      * @throws JexlException if any error occurs during interpretation.
      */
     public Object interpret(final JexlNode node) {
@@ -833,7 +833,7 @@ public class Interpreter extends InterpreterBase {
      *
      * @param object the Object
      * @param clazz the Class
-     * @return the result of isInstance call
+     * @return The result of isInstance call
      */
     private boolean isInstance(final Object object, final Object clazz) {
         if (object == null || clazz == null) {
@@ -909,7 +909,7 @@ public class Interpreter extends InterpreterBase {
      * @param annotation    the annotation name
      * @param args          the annotation arguments
      * @param stmt          the statement / block that was annotated
-     * @return the result of statement.call()
+     * @return The result of statement.call()
      * @throws Exception if anything goes wrong
      */
     protected Object processAnnotation(final String annotation, final Object[] args, final Callable<Object> stmt) throws Exception {
@@ -922,7 +922,7 @@ public class Interpreter extends InterpreterBase {
      * Swaps the current thread local interpreter.
      *
      * @param inter the interpreter or null
-     * @return the previous thread local interpreter
+     * @return The previous thread local interpreter
      */
     protected Interpreter putThreadInterpreter(final Interpreter inter) {
         final Interpreter pinter = INTER.get();
@@ -934,7 +934,7 @@ public class Interpreter extends InterpreterBase {
      * Resolves a class name.
      *
      * @param name the simple class name
-     * @return the fully qualified class name or the name
+     * @return The fully qualified class name or the name
      */
     private String resolveClassName(final String name) {
         // try with local solver
@@ -957,7 +957,7 @@ public class Interpreter extends InterpreterBase {
      * Runs a closure.
      *
      * @param closure the closure
-     * @return the closure return value
+     * @return The closure return value
      */
     protected Object runClosure(final Closure closure) {
         final ASTJexlScript script = closure.getScript();
@@ -1575,7 +1575,7 @@ public class Interpreter extends InterpreterBase {
      * @param node the actual method call node
      * @param antish non-null when name.call is an antish variable
      * @param data the context
-     * @return the method call result
+     * @return The method call result
      */
     private Object visit(final ASTMethodNode node, final Object antish, final Object data) {
         Object object = antish;
@@ -2315,7 +2315,7 @@ public class Interpreter extends InterpreterBase {
      *
      * @param node the block
      * @param data the usual data
-     * @return the result of the last expression evaluation
+     * @return The result of the last expression evaluation
      */
     private Object visitBlock(final ASTBlock node, final Object data) {
         final int numChildren = node.jjtGetNumChildren();
@@ -2332,7 +2332,7 @@ public class Interpreter extends InterpreterBase {
      *
      * @param node the node
      * @param data the usual data, always null
-     * @return the return value
+     * @return The return value
      */
     protected Object visitLexicalNode(final JexlNode node, final Object data) {
         block = new LexicalFrame(frame, null);

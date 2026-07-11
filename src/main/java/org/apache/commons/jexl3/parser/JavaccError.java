@@ -24,14 +24,14 @@ public interface JavaccError {
     /**
      * Gets the last correct input.
      *
-     * @return the string after which the error occurred
+     * @return The string after which the error occurred
      */
     String getAfter();
 
     /**
      * Gets the column number.
      *
-     * @return the column.
+     * @return The column.
      */
     int getColumn();
 

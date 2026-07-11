@@ -88,7 +88,7 @@ public class PermissionsParser {
      * @param wildcards the set of allowed packages
      * @param packages the map of restricted elements
      * @param srcs the sources
-     * @return the permissions map
+     * @return The permissions map
      */
     synchronized Permissions parse(final Set<String> wildcards, final Map<String, Permissions.NoJexlPackage> packages,
             final String... srcs) {
@@ -113,7 +113,7 @@ public class PermissionsParser {
      * Parses permissions from a source.
      *
      * @param srcs the sources
-     * @return the permissions map
+     * @return The permissions map
      */
     public Permissions parse(final String... srcs) {
         return parse(new LinkedHashSet<>(), new ConcurrentHashMap<>(), srcs);
@@ -127,7 +127,7 @@ public class PermissionsParser {
      * @param outer the outer class (if any)
      * @param inner the inner class name (if any)
      * @param offset the initial parsing position in the source
-     * @return the new parsing position
+     * @return The new parsing position
      */
     private int readClass(final Permissions.NoJexlPackage njpackage, final boolean nojexl, final String outer, final String inner, final int offset) {
         final StringBuilder temp = new StringBuilder();
@@ -267,7 +267,7 @@ public class PermissionsParser {
      *
      * @param id the builder to fill the identifier character with
      * @param offset the initial reading position
-     * @return the position after the identifier
+     * @return The position after the identifier
      */
     private int readIdentifier(final StringBuilder id, final int offset) {
         return readIdentifier(id, offset, false, false);
@@ -280,7 +280,7 @@ public class PermissionsParser {
      * @param offset the initial reading position
      * @param dot whether dots (.) are allowed
      * @param star whether stars (*) are allowed
-     * @return the position after the identifier
+     * @return The position after the identifier
      */
     private int readIdentifier(final StringBuilder id, final int offset, final boolean dot, final boolean star) {
         int begin = -1;
@@ -433,7 +433,7 @@ public class PermissionsParser {
      *
      * @param c the offending character
      * @param i the offset position
-     * @return the error message
+     * @return The error message
      */
     private String unexpected(final char c, final int i) {
         return "unexpected '" + c + "'@" + i;

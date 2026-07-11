@@ -49,7 +49,7 @@ public class ReferenceSetExecutor implements JexlPropertySet {
      * Dereference an expected optional or reference.
      *
      * @param opt the reference
-     * @return the reference value, TRY_FAILED if null
+     * @return The reference value, TRY_FAILED if null
      */
     protected Object getReference(final Object opt) {
         return handler.callGet(opt);

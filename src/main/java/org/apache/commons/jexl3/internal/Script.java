@@ -81,7 +81,7 @@ public class Script implements JexlScript, JexlExpression {
         /**
          * Run the interpreter.
          *
-         * @return the evaluation result
+         * @return The evaluation result
          */
         protected Object interpret() {
             return interpreter.interpret(script);
@@ -142,7 +142,7 @@ public class Script implements JexlScript, JexlExpression {
      * <p>The interpreter will handle interruption/cancellation gracefully if needed.</p>
      *
      * @param context the context
-     * @return the callable
+     * @return The callable
      */
     @Override
     public Callable callable(final JexlContext context) {
@@ -156,7 +156,7 @@ public class Script implements JexlScript, JexlExpression {
      *
      * @param context the context
      * @param args    the script arguments
-     * @return the callable
+     * @return The callable
      */
     @Override
     public Callable callable(final JexlContext context, final Object... args) {
@@ -186,7 +186,7 @@ public class Script implements JexlScript, JexlExpression {
      * Creates this script frame for evaluation.
      *
      * @param args the arguments to bind to parameters
-     * @return the frame (may be null)
+     * @return The frame (may be null)
      */
     protected Frame createFrame(final Object[] args) {
         return script.createFrame(args);
@@ -266,28 +266,28 @@ public class Script implements JexlScript, JexlExpression {
     /**
      * Gets this script captured variable, i.e. symbols captured from outer scopes.
      *
-     * @return the captured variable names
+     * @return The captured variable names
      */
     public String[] getCapturedVariables() {
         return script.getCapturedVariables();
     }
 
     /**
-     * @return the engine that created this script
+     * @return The engine that created this script
      */
     public JexlEngine getEngine() {
         return jexl;
     }
 
     /**
-     * @return the script features
+     * @return The script features
      */
     public JexlFeatures getFeatures() {
         return script.getFeatures();
     }
 
     /**
-     * @return the info
+     * @return The info
      */
     public JexlInfo getInfo() {
         return script.jexlInfo();
@@ -319,7 +319,7 @@ public class Script implements JexlScript, JexlExpression {
      * Gets this script pragmas
      * <p>Pragma keys are ant-ish variables, their values are scalar literals.
      *
-     * @return the pragmas
+     * @return The pragmas
      */
     @Override
     public Map<String, Object> getPragmas() {
@@ -327,7 +327,7 @@ public class Script implements JexlScript, JexlExpression {
     }
 
     /**
-     * @return the script AST
+     * @return The script AST
      */
     protected ASTJexlScript getScript() {
         return script;
@@ -348,7 +348,7 @@ public class Script implements JexlScript, JexlExpression {
      * <p>Note that since variables can be in an ant-ish form (ie foo.bar.quux), each variable is returned as
      * a list of strings where each entry is a fragment of the variable ({"foo", "bar", "quux"} in the example.</p>
      *
-     * @return the variables or null
+     * @return The variables or null
      */
     @Override
     public Set<List<String>> getVariables() {

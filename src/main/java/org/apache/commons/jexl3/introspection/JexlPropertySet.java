@@ -35,7 +35,7 @@ public interface JexlPropertySet {
      *
      * @param obj Object on which the property setter will be called with the value
      * @param arg value to be set
-     * @return the value returned from the set operation (impl specific)
+     * @return The value returned from the set operation (impl specific)
      * @throws Exception on any error.
      */
     Object invoke(Object obj, Object arg) throws Exception;
@@ -63,7 +63,7 @@ public interface JexlPropertySet {
      * @param obj the object to invoke the get upon
      * @param key the property key to get
      * @param value the property value to set
-     * @return the result of the method invocation that should be checked by tryFailed to determine if it succeeded
+     * @return The result of the method invocation that should be checked by tryFailed to determine if it succeeded
      * or failed.
      * @throws JexlException.TryFailed if the underlying method was invoked but threw an exception
      * ({@link java.lang.reflect.InvocationTargetException})

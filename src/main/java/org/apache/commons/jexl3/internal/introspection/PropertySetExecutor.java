@@ -39,7 +39,7 @@ public class PropertySetExecutor extends AbstractExecutor.Set {
      * @param clazz    the class to find the get method from
      * @param property the property name to find
      * @param value      the value to assign to the property
-     * @return the executor if found, null otherwise
+     * @return The executor if found, null otherwise
      */
     public static PropertySetExecutor discover(final Introspector is,
                                                final Class<?> clazz,
@@ -61,7 +61,7 @@ public class PropertySetExecutor extends AbstractExecutor.Set {
      * @param clazz    the class to find the get method from
      * @param property the name of the property to set
      * @param arg      the value to assign to the property
-     * @return the method if found, null otherwise
+     * @return The method if found, null otherwise
      */
     private static java.lang.reflect.Method discoverSet(final Introspector is,
                                                         final Class<?> clazz,

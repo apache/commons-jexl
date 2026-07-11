@@ -154,7 +154,7 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
         }
 
         /**
-         *@return the collected variables
+         *@return The collected variables
          */
         public Set<List<String>> collected() {
             return refs;
@@ -474,7 +474,7 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
      *
      * @param clazz the class to instantiate
      * @param args  the constructor arguments
-     * @return the created object instance or null on failure when silent
+     * @return The created object instance or null on failure when silent
      */
     protected Object doCreateInstance(final Object clazz, final Object... args) {
         JexlException xjexl = null;
@@ -513,7 +513,7 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
      *
      * @param script the script
      * @param context the context
-     * @return the options
+     * @return The options
      */
     protected JexlOptions evalOptions(final ASTJexlScript script, final JexlContext context) {
         final JexlOptions opts = evalOptions(context);
@@ -543,7 +543,7 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
      * is false, this method creates a copy of the options making them immutable during execution.
      *
      * @param context the context
-     * @return the options if any
+     * @return The options if any
      */
     protected JexlOptions evalOptions(final JexlContext context) {
         // Make a copy of the handled options if any
@@ -562,7 +562,7 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
      * Obsolete version of options evaluation.
      *
      * @param opts the obsolete instance of options
-     * @return the newer class of options
+     * @return The newer class of options
      */
     private JexlOptions evalOptions(final JexlEngine.Options opts) {
         // This condition and block for compatibility between 3.1 and 3.2
@@ -592,7 +592,7 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
      * Gets the array of local variable from a script.
      *
      * @param script the script
-     * @return the local variables array which may be empty (but not null) if no local variables were defined
+     * @return The local variables array which may be empty (but not null) if no local variables were defined
      * @since 3.0
      * @deprecated 3.6.1
      */
@@ -605,7 +605,7 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
      * Solves a namespace using this engine map of functions.
      *
      * @param name the namespoce name
-     * @return the object associated
+     * @return The object associated
      */
     final Object getNamespace(final String name) {
         return functions.get(name);
@@ -615,7 +615,7 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
      * Gets the array of parameters from a script.
      *
      * @param script the script
-     * @return the parameters which may be empty (but not null) if no parameters were defined
+     * @return The parameters which may be empty (but not null) if no parameters were defined
      * @since 3.0
      * @deprecated 3.6.1
      */
@@ -663,7 +663,7 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
      * are written in 'dot' or 'bracketed' notation. (a.b is equivalent to a['b']).</p>
      *
      * @param script the script
-     * @return the set of variables, each as a list of strings (ant-ish variables use more than 1 string)
+     * @return The set of variables, each as a list of strings (ant-ish variables use more than 1 string)
      *         or the empty set if no variables are used
      */
     protected Set<List<String>> getVariables(final ASTJexlScript script) {
@@ -810,7 +810,7 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
      * Sets options from this engine options.
      *
      * @param opts the options to set
-     * @return the options
+     * @return The options
      */
     public JexlOptions optionsSet(final JexlOptions opts) {
         if (opts != null) {
@@ -826,7 +826,7 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
      * @param parsingf  the set of parsing features
      * @param src      the expression to parse
      * @param scope     the script frame
-     * @return the parsed tree
+     * @return The parsed tree
      * @throws JexlException if any error occurred during parsing
      */
     protected ASTJexlScript parse(final JexlInfo info, final JexlFeatures parsingf, final String src, final Scope scope) {
@@ -875,7 +875,7 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
      * @param expr whether to parse an expression or a script
      * @param src the source to parse
      * @param scope the scope, maybe null
-     * @return the parsed tree
+     * @return The parsed tree
      */
     protected ASTJexlScript jxltParse(final JexlInfo info, final boolean expr, final String src, final Scope scope) {
         synchronized(parsing) {
@@ -1021,7 +1021,7 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
      * Swaps the current thread local engine.
      *
      * @param jexl the engine or null
-     * @return the previous thread local engine
+     * @return The previous thread local engine
      */
     protected JexlEngine putThreadEngine(final JexlEngine jexl) {
         final JexlEngine pjexl = ENGINE.get();
@@ -1033,7 +1033,7 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
      * Swaps the current thread local context.
      *
      * @param tls the context or null
-     * @return the previous thread local context
+     * @return The previous thread local context
      */
     protected JexlContext.ThreadLocal putThreadLocal(final JexlContext.ThreadLocal tls) {
         final JexlContext.ThreadLocal local = CONTEXT.get();

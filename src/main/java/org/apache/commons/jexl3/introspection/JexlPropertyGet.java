@@ -34,7 +34,7 @@ public interface JexlPropertyGet {
      * Method used to get the property value of an object.
      *
      * @param obj the object to get the property value from.
-     * @return the property value.
+     * @return The property value.
      * @throws Exception on any error.
      */
     Object invoke(Object obj) throws Exception;
@@ -70,7 +70,7 @@ public interface JexlPropertyGet {
      *
      * @param obj the object to invoke the property get upon
      * @param key the property key to get
-     * @return the result of the method invocation that should be checked by tryFailed to determine if it succeeded
+     * @return The result of the method invocation that should be checked by tryFailed to determine if it succeeded
      * or failed.
      * @throws JexlException.TryFailed if the underlying method was invoked but threw an exception
      * ({@link java.lang.reflect.InvocationTargetException})

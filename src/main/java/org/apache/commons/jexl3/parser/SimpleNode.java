@@ -151,7 +151,7 @@ public class SimpleNode implements Node {
      * Gets a child of this node.
      *
      * @param i the child offset
-     * @return the child node
+     * @return The child node
      */
     @Override
     public JexlNode jjtGetChild(final int i) {
@@ -161,7 +161,7 @@ public class SimpleNode implements Node {
     /**
      * Gets this node number of children.
      *
-     * @return the number of children
+     * @return The number of children
      */
     @Override
     public int jjtGetNumChildren() {
@@ -171,7 +171,7 @@ public class SimpleNode implements Node {
     /**
      * Gets this node's parent.
      *
-     * @return the parent node
+     * @return The parent node
      */
     @Override
     public JexlNode jjtGetParent() {

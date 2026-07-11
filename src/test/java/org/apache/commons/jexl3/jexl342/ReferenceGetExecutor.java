@@ -48,7 +48,7 @@ public class ReferenceGetExecutor implements JexlPropertyGet {
      * Dereference an expected optional or reference.
      *
      * @param ref the reference
-     * @return the reference value or the reference
+     * @return The reference value or the reference
      */
     protected Object getReference(final Object ref) {
         return handler.callGet(ref);

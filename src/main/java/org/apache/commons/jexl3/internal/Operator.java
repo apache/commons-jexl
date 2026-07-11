@@ -160,7 +160,7 @@ public final class Operator implements JexlOperator.Uberspect {
      *
      * @param operator the operator
      * @param args the arguments (as seen by the interpreter)
-     * @return the tidied arguments
+     * @return The tidied arguments
      */
     private Object[] arguments(final JexlOperator operator, final Object...args) {
         return operator.getArity() == 1 && args.length > 1 ? new Object[]{args[0]} : args;
@@ -480,7 +480,7 @@ public final class Operator implements JexlOperator.Uberspect {
      *
      * @param operator the operator
      * @param args the arguments
-     * @return the result
+     * @return The result
      */
     private Object performBaseOperation(final JexlOperator operator, final Object... args) {
         switch (operator) {
@@ -523,7 +523,7 @@ public final class Operator implements JexlOperator.Uberspect {
      * @param node the node
      * @param operator the operator
      * @param args the operator arguments
-     * @return the operator evaluation result or TRY_FAILED
+     * @return The operator evaluation result or TRY_FAILED
      */
     private Object tryEval(final JexlCache.Reference node, final JexlOperator operator, final Object...args) {
         if (node != null) {
@@ -633,7 +633,7 @@ public final class Operator implements JexlOperator.Uberspect {
          * From compare() int result to operator boolean result.
          *
          * @param cmp the compare result
-         * @return the operator applied
+         * @return The operator applied
          */
         protected boolean operate(final int cmp) {
             switch(operator) {

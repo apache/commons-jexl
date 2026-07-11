@@ -303,7 +303,7 @@ public final class JexlFeatures {
      * The text corresponding to a feature code.
      *
      * @param feature the feature number
-     * @return the feature name
+     * @return The feature name
      */
     public static String stringify(final int feature) {
         return feature >= 0 && feature < F_NAMES.length ? F_NAMES[feature] : "unsupported feature";
@@ -490,7 +490,7 @@ public final class JexlFeatures {
     /**
      * Gets the immutable set of reserved names.
      *
-     * @return the (unmodifiable) set of reserved names.
+     * @return The (unmodifiable) set of reserved names.
      */
     public Set<String> getReservedNames() {
         return reservedNames;
@@ -692,7 +692,7 @@ public final class JexlFeatures {
     /**
      * Gets the declared namespaces test.
      *
-     * @return the declared namespaces test.
+     * @return The declared namespaces test.
      */
     public Predicate<String> namespaceTest() {
         return nameSpaces;

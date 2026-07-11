@@ -81,7 +81,7 @@ public final class TemplateScript implements JxltEngine.Template {
      *
      * @param info the node info
      * @param scope the outer scope
-     * @return the scope
+     * @return The scope
      */
     private static Scope scopeOf(final JexlNode.Info info, final Scope scope) {
         Scope found = null;
@@ -101,7 +101,7 @@ public final class TemplateScript implements JxltEngine.Template {
      *
      * @param scope the outer scope
      * @param blocks the list of blocks
-     * @return the array of expressions
+     * @return The array of expressions
      */
     private TemplateExpression[] calleeScripts(final Scope scope, final Block[] blocks, final JexlNode.Info[] callSites) {
         final TemplateExpression[] expressions = new TemplateExpression[callSites.length];
@@ -128,7 +128,7 @@ public final class TemplateScript implements JxltEngine.Template {
      * that were parsed from a template.</p>
      *
      * @param blocks the list of blocks
-     * @return the script source
+     * @return The script source
      */
     private static String callerScript(final Block[] blocks) {
         final StringBuilder strb = new StringBuilder();
