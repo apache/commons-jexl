@@ -139,7 +139,7 @@ public interface JexlPermissions {
        */
       public ClassPermissions(final JexlPermissions delegate, final Collection<String> allow) {
         super(Objects.requireNonNull(delegate, "delegate"));
-        allowedClasses = new HashSet<>(Objects.requireNonNull(allow));
+        allowedClasses = new HashSet<>(Objects.requireNonNull(allow, "allow"));
       }
 
       @Override
