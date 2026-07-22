@@ -128,7 +128,7 @@ public interface JexlPermissions {
        * @param allow The set of allowed classes
        */
       public ClassPermissions(final JexlPermissions permissions, final Class<?>... allow) {
-        this(permissions, Arrays.stream(Objects.requireNonNull(allow)).map(Class::getCanonicalName).collect(Collectors.toList()));
+          this(permissions, Arrays.stream(Objects.requireNonNull(allow, "allow")).map(Class::getCanonicalName).collect(Collectors.toList()));
       }
 
       /**
@@ -138,7 +138,7 @@ public interface JexlPermissions {
        * @param allow    The list of class canonical names
        */
       public ClassPermissions(final JexlPermissions delegate, final Collection<String> allow) {
-        super(Objects.requireNonNull(delegate));
+        super(Objects.requireNonNull(delegate, "delegate"));
         allowedClasses = new HashSet<>(Objects.requireNonNull(allow));
       }
 

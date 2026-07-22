@@ -381,7 +381,7 @@ public class JexlException extends RuntimeException {
          * @param cause The javacc cause
          */
         public Parsing(final JexlInfo info, final ParseException cause) {
-            super(merge(info, cause), Objects.requireNonNull(cause).getAfter(), null);
+            super(merge(info, cause), Objects.requireNonNull(cause, "cause").getAfter(), null);
         }
 
         /**
@@ -580,7 +580,7 @@ public class JexlException extends RuntimeException {
          * @param cause The javacc cause
          */
         public Tokenization(final JexlInfo info, final TokenMgrException cause) {
-            super(merge(info, cause), Objects.requireNonNull(cause).getAfter(), null);
+            super(merge(info, cause), Objects.requireNonNull(cause, "cause").getAfter(), null);
         }
 
         @Override

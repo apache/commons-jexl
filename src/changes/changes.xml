@@ -30,7 +30,8 @@
         <release version="3.7.1" date="YYYY-MM-DD" description="This is a feature and maintenance release. Java 8 or later is required.">
             <!-- ADD -->
             <!-- FIX -->
-            <action dev="ggregory" type="fix">Pick up commons.jacoco.version from the parent POM.</action>
+            <action dev="ggregory" type="fix" due-to="Gary Gregory">Pick up commons.jacoco.version from the parent POM.</action>
+            <action dev="ggregory" type="fix" due-to="Gary Gregory">Add messages when throwing NullPointerException.</action>
             <!-- UPDATE -->
             <action type="update" dev="ggregory" due-to="Gary Gregory">Bump org.apache.commons:commons-parent from 102 to 103.</action>
         </release>
