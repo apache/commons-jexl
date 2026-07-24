@@ -345,7 +345,7 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
      * The set of caches created by this engine.
      * <p>Caches are soft-referenced by the engine so they can be cleaned on class loader change.</p>
      */
-    protected final MetaCache metaCache;
+    final MetaCache metaCache;
 
     /**
      * Creates an engine with default arguments.
@@ -847,7 +847,7 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
             if (parsing.compareAndSet(false, true)) {
                 synchronized (parsing) {
                     try {
-                        // lets parse
+                        // let's parse
                         script = parser.parse(ninfo, features, src, scope);
                     } finally {
                         // no longer in use
@@ -862,7 +862,7 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
                 cache.put(source, script);
             }
         } finally {
-            // restore thread local engine
+            // restore thread local engine (most likely null)
             putThreadEngine(se);
         }
         return script;
@@ -1018,15 +1018,18 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
     }
 
     /**
-     * Swaps the current thread local engine.
+     * Swaps the current thread local engine if it differs from argument.
      *
      * @param jexl The engine or null
      * @return The previous thread local engine
      */
-    protected JexlEngine putThreadEngine(final JexlEngine jexl) {
-        final JexlEngine pjexl = ENGINE.get();
-        ENGINE.set(jexl);
-        return pjexl;
+    protected static JexlEngine putThreadEngine(final JexlEngine jexl) {
+        final JexlEngine engine = ENGINE.get();
+        if (engine != jexl) {
+            ENGINE.set(jexl);
+            return engine;
+        }
+        return jexl;
     }
 
     /**

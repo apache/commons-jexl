@@ -1258,5 +1258,82 @@ public class Issues400Test {
         pw.flush();
         assertTrue(sw.toString().contains("hello"));
     }
+
+    @Test
+    void test462a() {
+        // JEXL-462: under RESTRICTED, java.io.PrintWriter and java.util.Formatter are reachable and their methods are allowed,
+        // but their constructors are denied - they cannot be instantiated from a script.
+        final JexlEngine jexl = new JexlBuilder().silent(false).permissions(RESTRICTED).create();
+        for (final String src : new String[] {
+            "new('java.io.PrintWriter', '/tmp/pwn0.php')",
+            "import java.io.PrintWriter; new PrintWriter('/tmp/pwn1.php')"}) {
+            final JexlScript script = jexl.createScript(src);
+            final JexlException.Method xctor = assertThrows(JexlException.Method.class,
+                () -> script.execute(null), () -> "PrintWriter::new should be denied: " + src);
+            assertTrue(xctor.getMethod().contains("PrintWriter"));
+        }
+        // a PrintWriter method (println) is allowed on a provided instance
+        StringWriter sw = new StringWriter();
+        final java.io.PrintWriter pw = new java.io.PrintWriter(sw);
+        jexl.createScript("p.println('hello')", "p").execute(null, pw);
+        pw.flush();
+        assertTrue(sw.toString().contains("hello"));
+        for (final String src : new String[] {
+          "new('java.util.Formatter', '/tmp/pwn2.php')",
+          "import java.util.Formatter; new Formatter('/tmp/pwn3.php')" }) {
+            final JexlScript script = jexl.createScript(src);
+            final JexlException.Method xctor = assertThrows(JexlException.Method.class,
+              () -> script.execute(null), () -> "Formatter::new should be denied: " + src);
+            assertTrue(xctor.getMethod().contains("Formatter"));
+        }
+
+        // a PrintWriter method (println) is allowed on a provided instance
+        sw = new StringWriter();
+        final java.util.Formatter pf = new java.util.Formatter(sw);
+        jexl.createScript("pf.format('%s', 'bonjour')", "pf").execute(null, pf);
+        assertTrue(sw.toString().contains("bonjour"));
+    }
+
+    @Test
+    void test463() {
+        final JexlEngine jexl = new JexlBuilder()
+          .silent(false)
+          .features(JexlFeatures.createDefault())
+          .permissions(RESTRICTED)
+          .create();
+        String src = "addOne  = (f) -> {\n return f + 1;\n}";
+        JexlScript script = jexl.createScript(src);
+        assertNotNull(script);
+        JexlContext ctxt = new MapContext();
+        Object result = script.execute(ctxt);
+        assertNotNull(result);
+        JexlScript rs = (JexlScript) result;
+        result = rs.execute(ctxt, 1);
+        assertEquals(2, result);
+    }
+
+    @Test
+    void test466() {
+        final JexlEngine jexl = new JexlBuilder()
+          .silent(false)
+          .features(JexlFeatures.createDefault())
+          .permissions(RESTRICTED)
+          .create();
+        JxltEngine jxlt = jexl.createJxltEngine();
+
+        String src = "$$ const a = 'a';\n" + "$$ const b = `${a}` \n" + "b:${b}";
+        JxltEngine.Template template = jxlt.createTemplate(src);
+        StringWriter writer = new StringWriter();
+        template.evaluate(null, writer);
+        assertEquals("b:a", writer.toString());
+
+        String expr = "forty-two: ${b + a}";
+        JexlContext ctxt = new MapContext();
+        ctxt.set("b", 20);
+        ctxt.set("a", 22);
+        JxltEngine.Expression expression = jxlt.createExpression(expr);
+        Object value = expression.evaluate(ctxt);
+        assertEquals("forty-two: 42", value.toString());
+    }
 }
 

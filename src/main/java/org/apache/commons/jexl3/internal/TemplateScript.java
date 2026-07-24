@@ -25,6 +25,7 @@ import java.util.Objects;
 import java.util.Set;
 
 import org.apache.commons.jexl3.JexlContext;
+import org.apache.commons.jexl3.JexlEngine;
 import org.apache.commons.jexl3.JexlException;
 import org.apache.commons.jexl3.JexlInfo;
 import org.apache.commons.jexl3.JexlOptions;
@@ -213,22 +214,27 @@ public final class TemplateScript implements JxltEngine.Template {
                 verbatims += 1;
             }
         }
-        final String scriptSource = callerScript(blocks);
-        // allow lambda defining params
-        final JexlInfo info = jexlInfo == null ? jexl.createInfo() : jexlInfo;
-        final Scope scope = parms == null ? null : new Scope(null, parms);
-        final JexlInfo templateInfo = jexl.scriptFeatures.isIgnoreTemplatePrefix()
-            ? new TemplateInfo(info.at(1, 1), Collections.singleton(prefix))
-            : info.at(1, 1);
-        final ASTJexlScript callerScript = jexl.jxltParse(templateInfo, false, scriptSource, scope).script();
-        // seek the map of expression number to scope so we can parse Unified
-        // expression blocks with the appropriate symbols
-        final JexlNode.Info[] callSites = new JexlNode.Info[verbatims];
-        collectPrintScope(callerScript.script(), callSites);
-        // create the expressions from the blocks
-        this.exprs = calleeScripts(scope, blocks, callSites);
-        this.script = callerScript;
-        this.source = blocks;
+        final JexlEngine je = Engine.putThreadEngine(jexl);
+        try {
+            final String scriptSource = callerScript(blocks);
+            // allow lambda defining params
+            final JexlInfo info = jexlInfo == null ? jexl.createInfo() : jexlInfo;
+            final Scope scope = parms == null ? null : new Scope(null, parms);
+            final JexlInfo templateInfo = jexl.scriptFeatures.isIgnoreTemplatePrefix()
+                ? new TemplateInfo(info.at(1, 1), Collections.singleton(prefix))
+                : info.at(1, 1);
+            final ASTJexlScript callerScript = jexl.jxltParse(templateInfo, false, scriptSource, scope).script();
+            // seek the map of expression number to scope so we can parse Unified
+            // expression blocks with the appropriate symbols
+            final JexlNode.Info[] callSites = new JexlNode.Info[verbatims];
+            collectPrintScope(callerScript.script(), callSites);
+            // create the expressions from the blocks
+            this.exprs = calleeScripts(scope, blocks, callSites);
+            this.script = callerScript;
+            this.source = blocks;
+        } finally {
+            Engine.putThreadEngine(je);
+        }
     }
 
     /**

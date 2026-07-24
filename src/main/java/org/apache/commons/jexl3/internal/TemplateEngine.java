@@ -29,6 +29,7 @@ import java.util.Set;
 
 import org.apache.commons.jexl3.JexlCache;
 import org.apache.commons.jexl3.JexlContext;
+import org.apache.commons.jexl3.JexlEngine;
 import org.apache.commons.jexl3.JexlException;
 import org.apache.commons.jexl3.JexlFeatures;
 import org.apache.commons.jexl3.JexlInfo;
@@ -917,6 +918,7 @@ public final class TemplateEngine extends JxltEngine {
         final JexlFeatures features = noscript ? jexl.expressionFeatures : jexl.scriptFeatures;
         // do not cache interpolation expression, they are stored in AST node
         final boolean cached = cache != null && expression.length() < jexl.cacheThreshold;
+        final JexlEngine je = Engine.putThreadEngine(jexl);
         try {
             if (!cached) {
                 stmt = parseExpression(info, expression, scope);
@@ -932,6 +934,8 @@ public final class TemplateEngine extends JxltEngine {
             }
         } catch (final JexlException xjexl) {
             xuel = new Exception(xjexl.getInfo(), "failed to parse '" + expression + "'", xjexl);
+        } finally {
+            Engine.putThreadEngine(je);
         }
         if (xuel != null) {
             if (!jexl.isSilent()) {
