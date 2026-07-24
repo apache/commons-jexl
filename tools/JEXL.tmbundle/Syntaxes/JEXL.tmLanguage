@@ -1,0 +1,383 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>fileTypes</key>
+    <array>
+        <string>jexl</string>
+    </array>
+    <key>name</key>
+    <string>JEXL</string>
+    <key>scopeName</key>
+    <string>source.jexl</string>
+    <key>uuid</key>
+    <string>3C5D7E9F-A1B2-4C6D-8E0F-123456789ABC</string>
+    <key>patterns</key>
+    <array>
+        <dict><key>include</key><string>#comments</string></dict>
+        <dict><key>include</key><string>#pragma</string></dict>
+        <dict><key>include</key><string>#annotations</string></dict>
+        <dict><key>include</key><string>#template-string</string></dict>
+        <dict><key>include</key><string>#regexp</string></dict>
+        <dict><key>include</key><string>#strings</string></dict>
+        <dict><key>include</key><string>#numbers</string></dict>
+        <dict><key>include</key><string>#constants</string></dict>
+        <dict><key>include</key><string>#keywords-control</string></dict>
+        <dict><key>include</key><string>#keywords-declaration</string></dict>
+        <dict><key>include</key><string>#keywords-operators-word</string></dict>
+        <dict><key>include</key><string>#builtins</string></dict>
+        <dict><key>include</key><string>#operators</string></dict>
+        <dict><key>include</key><string>#spread</string></dict>
+        <dict><key>include</key><string>#collection-punctuation</string></dict>
+        <dict><key>include</key><string>#namespace-call</string></dict>
+        <dict><key>include</key><string>#function-definition-name</string></dict>
+        <dict><key>include</key><string>#function-call</string></dict>
+        <dict><key>include</key><string>#variable</string></dict>
+    </array>
+    <key>repository</key>
+    <dict>
+
+        <!-- ═══ Comments ═══════════════════════════════════════════════════════ -->
+        <key>comments</key>
+        <dict>
+            <key>patterns</key>
+            <array>
+                <dict>
+                    <key>name</key><string>comment.block.jexl</string>
+                    <key>begin</key><string>/\*</string>
+                    <key>end</key><string>\*/</string>
+                    <key>beginCaptures</key>
+                    <dict>
+                        <key>0</key><dict><key>name</key><string>punctuation.definition.comment.begin.jexl</string></dict>
+                    </dict>
+                    <key>endCaptures</key>
+                    <dict>
+                        <key>0</key><dict><key>name</key><string>punctuation.definition.comment.end.jexl</string></dict>
+                    </dict>
+                </dict>
+                <dict>
+                    <key>name</key><string>comment.line.number-sign.jexl</string>
+                    <key>match</key><string>##.*$</string>
+                </dict>
+                <dict>
+                    <key>name</key><string>comment.line.double-slash.jexl</string>
+                    <key>match</key><string>//.*$</string>
+                </dict>
+            </array>
+        </dict>
+
+        <!-- ═══ Pragma ══════════════════════════════════════════════════════════ -->
+        <!-- #pragma key value   (## comment would already have consumed ##, so a
+             single # here is safe; only #pragma lines start with one #)          -->
+        <key>pragma</key>
+        <dict>
+            <key>name</key><string>meta.pragma.jexl</string>
+            <key>match</key><string>(#pragma)\s+([a-zA-Z_$][a-zA-Z0-9_$.]*)(?:\s+(.+))?$</string>
+            <key>captures</key>
+            <dict>
+                <key>1</key><dict><key>name</key><string>keyword.control.pragma.jexl</string></dict>
+                <key>2</key><dict><key>name</key><string>entity.name.tag.jexl</string></dict>
+                <key>3</key><dict><key>name</key><string>string.unquoted.jexl</string></dict>
+            </dict>
+        </dict>
+
+        <!-- ═══ Annotations ═════════════════════════════════════════════════════ -->
+        <!-- @lenient  @synchronized(x)  etc.                                     -->
+        <key>annotations</key>
+        <dict>
+            <key>name</key><string>entity.name.decorator.jexl</string>
+            <key>match</key><string>@[a-zA-Z_$][a-zA-Z0-9_$]*</string>
+        </dict>
+
+        <!-- ═══ Template / backtick string ─ with ${…} and #{…} interpolation ══ -->
+        <key>template-string</key>
+        <dict>
+            <key>name</key><string>string.template.jexl</string>
+            <key>begin</key><string>`</string>
+            <key>end</key><string>`</string>
+            <key>beginCaptures</key>
+            <dict>
+                <key>0</key><dict><key>name</key><string>punctuation.definition.string.begin.jexl</string></dict>
+            </dict>
+            <key>endCaptures</key>
+            <dict>
+                <key>0</key><dict><key>name</key><string>punctuation.definition.string.end.jexl</string></dict>
+            </dict>
+            <key>patterns</key>
+            <array>
+                <!-- immediate interpolation:  ${expr}  -->
+                <dict>
+                    <key>name</key><string>meta.interpolation.immediate.jexl</string>
+                    <key>begin</key><string>\$\{</string>
+                    <key>end</key><string>\}</string>
+                    <key>beginCaptures</key>
+                    <dict>
+                        <key>0</key><dict><key>name</key><string>punctuation.section.interpolation.begin.jexl</string></dict>
+                    </dict>
+                    <key>endCaptures</key>
+                    <dict>
+                        <key>0</key><dict><key>name</key><string>punctuation.section.interpolation.end.jexl</string></dict>
+                    </dict>
+                    <key>patterns</key>
+                    <array>
+                        <dict><key>include</key><string>$self</string></dict>
+                    </array>
+                </dict>
+                <!-- deferred interpolation:  #{expr}  -->
+                <dict>
+                    <key>name</key><string>meta.interpolation.deferred.jexl</string>
+                    <key>begin</key><string>#\{</string>
+                    <key>end</key><string>\}</string>
+                    <key>beginCaptures</key>
+                    <dict>
+                        <key>0</key><dict><key>name</key><string>punctuation.section.interpolation.begin.jexl</string></dict>
+                    </dict>
+                    <key>endCaptures</key>
+                    <dict>
+                        <key>0</key><dict><key>name</key><string>punctuation.section.interpolation.end.jexl</string></dict>
+                    </dict>
+                    <key>patterns</key>
+                    <array>
+                        <dict><key>include</key><string>$self</string></dict>
+                    </array>
+                </dict>
+                <!-- escape sequences  \n  \t  \uXXXX  \`  etc. -->
+                <dict>
+                    <key>name</key><string>constant.character.escape.jexl</string>
+                    <key>match</key><string>\\(u[0-9A-Fa-f]{4}|[nrtfb\\`])</string>
+                </dict>
+            </array>
+        </dict>
+
+        <!-- ═══ Regex literal  ~/pattern/  ════════════════════════════════════ -->
+        <key>regexp</key>
+        <dict>
+            <key>name</key><string>string.regexp.jexl</string>
+            <key>begin</key><string>~/</string>
+            <key>end</key><string>/</string>
+            <key>beginCaptures</key>
+            <dict>
+                <key>0</key><dict><key>name</key><string>punctuation.definition.string.begin.jexl</string></dict>
+            </dict>
+            <key>endCaptures</key>
+            <dict>
+                <key>0</key><dict><key>name</key><string>punctuation.definition.string.end.jexl</string></dict>
+            </dict>
+            <key>patterns</key>
+            <array>
+                <dict>
+                    <key>name</key><string>constant.character.escape.jexl</string>
+                    <key>match</key><string>\\/</string>
+                </dict>
+            </array>
+        </dict>
+
+        <!-- ═══ String literals  '…'  "…"  ════════════════════════════════════ -->
+        <key>strings</key>
+        <dict>
+            <key>patterns</key>
+            <array>
+                <dict>
+                    <key>name</key><string>string.quoted.single.jexl</string>
+                    <key>begin</key><string>'</string>
+                    <key>end</key><string>'</string>
+                    <key>beginCaptures</key>
+                    <dict>
+                        <key>0</key><dict><key>name</key><string>punctuation.definition.string.begin.jexl</string></dict>
+                    </dict>
+                    <key>endCaptures</key>
+                    <dict>
+                        <key>0</key><dict><key>name</key><string>punctuation.definition.string.end.jexl</string></dict>
+                    </dict>
+                    <key>patterns</key>
+                    <array>
+                        <dict>
+                            <key>name</key><string>constant.character.escape.jexl</string>
+                            <key>match</key><string>\\(u[0-9A-Fa-f]{4}|[nrtfb\\'])</string>
+                        </dict>
+                    </array>
+                </dict>
+                <dict>
+                    <key>name</key><string>string.quoted.double.jexl</string>
+                    <key>begin</key><string>"</string>
+                    <key>end</key><string>"</string>
+                    <key>beginCaptures</key>
+                    <dict>
+                        <key>0</key><dict><key>name</key><string>punctuation.definition.string.begin.jexl</string></dict>
+                    </dict>
+                    <key>endCaptures</key>
+                    <dict>
+                        <key>0</key><dict><key>name</key><string>punctuation.definition.string.end.jexl</string></dict>
+                    </dict>
+                    <key>patterns</key>
+                    <array>
+                        <dict>
+                            <key>name</key><string>constant.character.escape.jexl</string>
+                            <key>match</key><string>\\(u[0-9A-Fa-f]{4}|[nrtfb\\"])</string>
+                        </dict>
+                    </array>
+                </dict>
+            </array>
+        </dict>
+
+        <!-- ═══ Numeric literals ════════════════════════════════════════════════ -->
+        <!-- Order matters: hex before octal before float before int             -->
+        <key>numbers</key>
+        <dict>
+            <key>patterns</key>
+            <array>
+                <!-- Hexadecimal:  0xFF  0xABh  etc. -->
+                <dict>
+                    <key>name</key><string>constant.numeric.hex.jexl</string>
+                    <key>match</key><string>\b0[xX][0-9A-Fa-f]+[lLhH]?\b</string>
+                </dict>
+                <!-- Float / Double / BigDecimal:  3.14  1.0f  42.0d  1e-3B  etc. -->
+                <dict>
+                    <key>name</key><string>constant.numeric.float.jexl</string>
+                    <key>match</key><string>\b\d+\.\d+(?:[eE][+-]?\d+)?[fFdDbB]?\b</string>
+                </dict>
+                <!-- Octal:  010  0777  etc. -->
+                <dict>
+                    <key>name</key><string>constant.numeric.octal.jexl</string>
+                    <key>match</key><string>\b0[0-7]+[lLhH]?\b</string>
+                </dict>
+                <!-- Integer / Long / BigInteger:  42  100l  7h  etc. -->
+                <dict>
+                    <key>name</key><string>constant.numeric.integer.jexl</string>
+                    <key>match</key><string>\b\d+[lLhH]?\b</string>
+                </dict>
+            </array>
+        </dict>
+
+        <!-- ═══ Language constants ══════════════════════════════════════════════ -->
+        <key>constants</key>
+        <dict>
+            <key>name</key><string>constant.language.jexl</string>
+            <key>match</key><string>\b(true|false|null|NaN)\b</string>
+        </dict>
+
+        <!-- ═══ Control-flow keywords ════════════════════════════════════════════ -->
+        <key>keywords-control</key>
+        <dict>
+            <key>name</key><string>keyword.control.jexl</string>
+            <key>match</key><string>\b(if|else|for|do|while|break|continue|return|switch|case|default|throw|try|catch|finally)\b</string>
+        </dict>
+
+        <!-- ═══ Declaration keywords ════════════════════════════════════════════ -->
+        <key>keywords-declaration</key>
+        <dict>
+            <key>name</key><string>keyword.declaration.jexl</string>
+            <key>match</key><string>\b(var|let|const|function|import)\b</string>
+        </dict>
+
+        <!-- ═══ Word-form operators ══════════════════════════════════════════════ -->
+        <key>keywords-operators-word</key>
+        <dict>
+            <key>name</key><string>keyword.operator.word.jexl</string>
+            <key>match</key><string>\b(and|or|not|eq|ne|lt|gt|le|ge|div|mod|instanceof)\b</string>
+        </dict>
+
+        <!-- ═══ Built-in functions / special forms ══════════════════════════════ -->
+        <key>builtins</key>
+        <dict>
+            <key>name</key><string>support.function.builtin.jexl</string>
+            <key>match</key><string>\b(empty|size|new)\b</string>
+        </dict>
+
+        <!-- ═══ Symbolic operators (longest-match first) ════════════════════════ -->
+        <!--   XML-encoded: &lt; for <,  &amp; for &                              -->
+        <key>operators</key>
+        <dict>
+            <key>name</key><string>keyword.operator.jexl</string>
+            <key>match</key><string>>>>=|===|!==|=~|!~|=\^|!\^|=\$|!\$|&lt;&lt;=|>>=|&amp;&amp;|\|\||>>>|&lt;&lt;|>>|\+\+|--|&amp;=|\|=|\^=|\+=|-=|\*=|/=|%=|==|!=|&lt;=|>=|\?\?|\?:|\?\.|\.\.\.|\.\.|-&gt;|\*|/|%|&amp;|\||\^|~|\+|-|!|=|&lt;|&gt;|\?</string>
+        </dict>
+
+        <!-- ═══ Spread  ...  (list literal marker)  ═══════════════════════════════ -->
+        <!-- [1, 2, 3, ...]  or  [...]  – three dots create an ArrayList          -->
+        <key>spread</key>
+        <dict>
+            <key>name</key><string>keyword.operator.spread.jexl</string>
+            <key>match</key><string>\.\.\.</string>
+        </dict>
+
+        <!-- ═══ Collection punctuation  [ ] { } ,  ══════════════════════════════ -->
+        <!--   [1,2,3]  [...]  {a,b}  {k:v}  {k:v,...}  {;}  {:}                 -->
+        <key>collection-punctuation</key>
+        <dict>
+            <key>patterns</key>
+            <array>
+                <dict>
+                    <key>name</key><string>punctuation.definition.array.begin.jexl</string>
+                    <key>match</key><string>\[</string>
+                </dict>
+                <dict>
+                    <key>name</key><string>punctuation.definition.array.end.jexl</string>
+                    <key>match</key><string>\]</string>
+                </dict>
+                <!-- empty map literal  {:}  — must precede the generic { rule -->
+                <dict>
+                    <key>name</key><string>meta.literal.map.empty.jexl</string>
+                    <key>match</key><string>\{:\}</string>
+                </dict>
+                <dict>
+                    <key>name</key><string>punctuation.definition.block.begin.jexl</string>
+                    <key>match</key><string>\{</string>
+                </dict>
+                <dict>
+                    <key>name</key><string>punctuation.definition.block.end.jexl</string>
+                    <key>match</key><string>\}</string>
+                </dict>
+                <dict>
+                    <key>name</key><string>punctuation.separator.jexl</string>
+                    <key>match</key><string>,</string>
+                </dict>
+                <!-- map key-value separator  :  (Elvis ?: and ns:func already consumed upstream) -->
+                <dict>
+                    <key>name</key><string>punctuation.separator.key-value.jexl</string>
+                    <key>match</key><string>:</string>
+                </dict>
+            </array>
+        </dict>
+
+        <!-- ═══ Namespace-qualified function call  ns:func(  ════════════════════ -->
+        <!-- Matches the namespace prefix and function name in  math:cos(x)       -->
+        <key>namespace-call</key>
+        <dict>
+            <key>match</key><string>(?&lt;![a-zA-Z0-9_$])([a-zA-Z_$][a-zA-Z0-9_$]*):([a-zA-Z_$][a-zA-Z0-9_$]*)(?=\s*\()</string>
+            <key>captures</key>
+            <dict>
+                <key>1</key><dict><key>name</key><string>entity.name.namespace.jexl</string></dict>
+                <key>2</key><dict><key>name</key><string>entity.name.function.jexl</string></dict>
+            </dict>
+        </dict>
+
+        <!-- ═══ Named function declaration  function foo(  ═════════════════════ -->
+        <!-- Must precede function-call so the declared name gets the richer scope -->
+        <key>function-definition-name</key>
+        <dict>
+            <key>match</key><string>\bfunction\b\s+([a-zA-Z_$][a-zA-Z0-9_$]*)</string>
+            <key>captures</key>
+            <dict>
+                <key>1</key><dict><key>name</key><string>entity.name.function.definition.jexl</string></dict>
+            </dict>
+        </dict>
+
+        <!-- ═══ Function / method call  foo(  ══════════════════════════════════ -->
+        <!-- identifier immediately before ( — covers calls, constructors, methods -->
+        <key>function-call</key>
+        <dict>
+            <key>name</key><string>entity.name.function.jexl</string>
+            <key>match</key><string>(?&lt;![a-zA-Z0-9_$])[a-zA-Z_$][a-zA-Z0-9_$]*(?=\s*\()</string>
+        </dict>
+
+        <!-- ═══ Variables — catch-all for remaining identifiers ═════════════════ -->
+        <!-- Keywords, constants, builtins, and function names are consumed above  -->
+        <key>variable</key>
+        <dict>
+            <key>name</key><string>variable.other.jexl</string>
+            <key>match</key><string>(?&lt;![a-zA-Z0-9_$])[a-zA-Z_$][a-zA-Z0-9_$]*(?![a-zA-Z0-9_$])</string>
+        </dict>
+
+    </dict>
+</dict>
+</plist>

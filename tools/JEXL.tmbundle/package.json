@@ -1,0 +1,30 @@
+{
+    "name": "jexl",
+    "displayName": "JEXL",
+    "description": "Syntax highlighting for JEXL (Apache Commons JEXL) files",
+    "version": "1.0.0",
+    "publisher": "apache-commons",
+    "engines": {
+        "vscode": "^1.50.0"
+    },
+    "categories": [
+        "Programming Languages"
+    ],
+    "contributes": {
+        "languages": [
+            {
+                "id": "jexl",
+                "aliases": ["JEXL", "jexl"],
+                "extensions": [".jexl"],
+                "configuration": "./language-configuration.json"
+            }
+        ],
+        "grammars": [
+            {
+                "language": "jexl",
+                "scopeName": "source.jexl",
+                "path": "./Syntaxes/JEXL.tmLanguage"
+            }
+        ]
+    }
+}
