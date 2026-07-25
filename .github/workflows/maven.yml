@@ -39,7 +39,7 @@ jobs:
           - java: 27-ea
             os: windows-latest
             experimental: true
-          - java: 27-ea
+          - java: 28-ea
             os: windows-latest
             experimental: true
       fail-fast: false
