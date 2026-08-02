@@ -59,7 +59,7 @@ public final class IndexedType implements JexlPropertyGet {
          *
          * @param key The property key
          * @return The property value
-         * @throws Exception if inner invocation fails
+         * @throws Exception Thrown if inner invocation fails
          */
         public Object get(final Object key) throws Exception {
             return type.invokeGet(container, key);
@@ -89,7 +89,7 @@ public final class IndexedType implements JexlPropertyGet {
          * @param key The property key
          * @param value The property value
          * @return The invocation result (frequently null)
-         * @throws Exception if inner invocation fails
+         * @throws Exception Thrown if inner invocation fails
          */
         public Object set(final Object key, final Object value) throws Exception {
             return type.invokeSet(container, key, value);
@@ -167,7 +167,7 @@ public final class IndexedType implements JexlPropertyGet {
      * @param object The container instance (not null)
      * @param key The property key (not null)
      * @return The property value
-     * @throws Exception if invocation failed;
+     * @throws Exception Thrown if invocation failed;
      *         IntrospectionException if a property getter could not be found
      */
     Object invokeGet(final Object object, final Object key) throws Exception {
@@ -200,7 +200,7 @@ public final class IndexedType implements JexlPropertyGet {
      * @param key The property key (not null)
      * @param value The property value (not null)
      * @return The result of the method invocation (frequently null)
-     * @throws Exception if invocation failed;
+     * @throws Exception Thrown if invocation failed;
      *         IntrospectionException if a property setter could not be found
      */
     Object invokeSet(final Object object, final Object key, final Object value) throws Exception {

@@ -68,7 +68,7 @@ public interface JexlContext {
          * @param args The arguments of the annotation, evaluated as arguments of this call
          * @param statement The statement that was annotated; the processor should invoke this statement 'call' method
          * @return The result of statement.call()
-         * @throws Exception if annotation processing fails
+         * @throws Exception Thrown if annotation processing fails
          */
         Object processAnnotation(String name, Object[] args, Callable<Object> statement) throws Exception;
     }

@@ -135,7 +135,7 @@ public abstract class JxltEngine {
          * @param context The variable context
          * @return The result of this expression evaluation or null if an error occurs and the {@link JexlEngine} is
          * running in silent mode
-         * @throws Exception if an error occurs and the {@link JexlEngine}
+         * @throws Exception Thrown if an error occurs and the {@link JexlEngine}
          * is not silent
          */
         Object evaluate(JexlContext context);
@@ -192,7 +192,7 @@ public abstract class JxltEngine {
          * @param context The context to use for immediate expression evaluations
          * @return An {@link Expression} or null if an error occurs and the {@link JexlEngine} is running
          * in silent mode
-         * @throws Exception if an error occurs and the {@link JexlEngine} is not in silent mode
+         * @throws Exception Thrown if an error occurs and the {@link JexlEngine} is not in silent mode
          */
         Expression prepare(JexlContext context);
 
@@ -342,7 +342,7 @@ public abstract class JxltEngine {
      * @param info The {@link JexlInfo} source information
      * @param expression The {@link Template} string expression
      * @return The {@link Expression}, null if silent and an error occurred
-     * @throws Exception if an error occurs and the {@link JexlEngine} is not silent
+     * @throws Exception Thrown if an error occurs and the {@link JexlEngine} is not silent
      */
     public abstract Expression createExpression(JexlInfo info, String expression);
 
@@ -354,7 +354,7 @@ public abstract class JxltEngine {
      *
      * @param expression The {@link Template} string expression
      * @return The {@link Expression}, null if silent and an error occurred
-     * @throws Exception if an error occurs and the {@link JexlEngine} is not silent
+     * @throws Exception Thrown if an error occurs and the {@link JexlEngine} is not silent
      */
     public Expression createExpression(final String expression) {
         return createExpression(null, expression);

@@ -140,7 +140,7 @@ class ScriptCallableTest extends JexlTestCase {
     /**
      * Redundant test with previous ones but impervious to JEXL engine configuration.
      *
-     * @throws Exception if there is a regression
+     * @throws Exception Thrown if there is a regression
      */
     private void runInterrupt(final JexlEngine jexl) throws Exception {
         List<Runnable> lr = null;

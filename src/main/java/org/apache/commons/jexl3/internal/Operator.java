@@ -173,7 +173,7 @@ public final class Operator implements JexlOperator.Uberspect {
      * @param right The left argument in the operator
      * @param left The right argument in the operator
      * @return A boolean is call was possible, null otherwise
-     * @throws Exception if invocation fails
+     * @throws Exception Thrown if invocation fails
      */
     private Boolean booleanDuckCall(final String methodName, final Object left, final Object right) throws Exception {
         JexlMethod vm = uberspect.getMethod(left, methodName, right);

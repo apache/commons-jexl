@@ -910,7 +910,7 @@ public class Interpreter extends InterpreterBase {
      * @param args          The annotation arguments
      * @param stmt          The statement / block that was annotated
      * @return The result of statement.call()
-     * @throws Exception if anything goes wrong
+     * @throws Exception Thrown if anything goes wrong
      */
     protected Object processAnnotation(final String annotation, final Object[] args, final Callable<Object> stmt) throws Exception {
                 return context instanceof JexlContext.AnnotationProcessor

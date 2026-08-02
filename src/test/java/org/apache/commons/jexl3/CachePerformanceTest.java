@@ -130,7 +130,7 @@ class CachePerformanceTest {
      * Launches the tasks in parallel.
      *
      * @param jexl The jexl engine
-     * @throws Exception if something goes wrong
+     * @throws Exception Thrown if something goes wrong
      */
     protected void runTest(final String name, final JexlEngine jexl) throws Exception {
         final ExecutorService exec = Executors.newFixedThreadPool(THREADS);

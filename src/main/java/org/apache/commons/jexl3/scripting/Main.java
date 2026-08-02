@@ -52,7 +52,7 @@ public class Main {
      * The line //q! ends the loop.
      *
      * @param args (optional) file name to evaluate. Stored in the args variable.
-     * @throws Exception if parsing or IO fail
+     * @throws Exception Thrown if parsing or IO fail
      */
     public static void main(final String[] args) throws Exception {
         try(BufferedReader in = args.length == 1? read(Paths.get(args[0])) : read(null);
@@ -92,7 +92,7 @@ public class Main {
      *
      * @param path The file path or null for stdin
      * @return The reader
-     * @throws IOException if anything goes wrong
+     * @throws IOException Thrown if anything goes wrong
      */
     static BufferedReader read(final Path path) throws IOException {
         return new BufferedReader(new InputStreamReader(path == null

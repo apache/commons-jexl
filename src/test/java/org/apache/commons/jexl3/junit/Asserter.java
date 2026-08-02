@@ -67,7 +67,7 @@ public class Asserter {
      *
      * @param expression is the JEXL expression to evaluate
      * @param expected is the expected value of the expression
-     * @throws Exception if the expression could not be evaluationed or an assertion
+     * @throws Exception Thrown if the expression could not be evaluationed or an assertion
      * fails
      */
     public void assertExpression(final String expression, final Object expected, final Object... args) throws Exception {
@@ -103,7 +103,7 @@ public class Asserter {
      * The engine is temporarily switched to strict * verbose to maximize error detection abilities.
      * @param expression The expression that should fail
      * @param matchException The exception message pattern
-     * @throws Exception if the expression did not fail or the exception did not match the expected pattern
+     * @throws Exception Thrown if the expression did not fail or the exception did not match the expected pattern
      */
     public void failExpression(final String expression, final String matchException) throws Exception {
          failExpression(expression, matchException, String::matches);

@@ -598,7 +598,7 @@ class CacheTest extends JexlTestCase {
      * @param ctask The task / test
      * @param loops number of loops to perform
      * @param cache whether jexl cache is used or not
-     * @throws Exception if anything goes wrong
+     * @throws Exception Thrown if anything goes wrong
      */
     @SuppressWarnings("boxing")
     void runThreaded(final Class<? extends Task> ctask, int loops, final boolean cache) throws Exception {
