@@ -316,6 +316,7 @@
             </activation>
             <properties>
                 <jacoco.skip>true</jacoco.skip>
+                <spotbugs.skip>true</spotbugs.skip>
             </properties>
         </profile>
     </profiles>
