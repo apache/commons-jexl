@@ -932,6 +932,29 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
         return !getFeatures().supportsAmbiguousStatement();
     }
 
+
+    /**
+     * Checks whether a token image is composed only of decimal digits.
+     * <p>Used to recognize a floating point literal with an omitted leading
+     * zero (e.g. {@code .1}) that is tokenized as {@code DOT DOT_IDENTIFIER}.</p>
+     *
+     * @param image the token image
+     * @return true if every character is a decimal digit
+     */
+    protected boolean isAllDigits(final String image) {
+        int len = image != null ? image.length() : 0;
+        if (len == 0) {
+            return false;
+        }
+        for (int i = 0; i < len; ++i) {
+            final char c = image.charAt(i);
+            if (c < '0' || c > '9') {
+                return false;
+            }
+        }
+        return true;
+    }
+
     /**
      * Called by parser at end of node construction.
      * <p>

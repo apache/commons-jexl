@@ -2362,11 +2362,13 @@ class ArithmeticTest extends JexlTestCase {
         assertEquals(-1.4d, jexl.createExpression("-.5+-.9").evaluate(jc));
         // unary handling
         assertEquals(-0.1d, jexl.createExpression("-.1").evaluate(jc));
+        assertEquals(0.1d, jexl.createExpression("+.1").evaluate(jc));
         // property / index access via a dot must keep working (not parsed as a float)
         final List<Object> array = new java.util.ArrayList<>();
         array.add("zero");
         array.add("one");
         jc.set("array", array);
+        assertEquals("zero", jexl.createExpression("array.0").evaluate(jc));
         assertEquals("one", jexl.createExpression("array.1").evaluate(jc));
     }
 }
