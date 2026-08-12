@@ -307,6 +307,18 @@
             </plugin>
         </plugins>
     </build>
+    <profiles>
+        <profile>
+            <!-- Skip coverage instrumentation on early-access builds -->
+            <id>java28plus</id>
+            <activation>
+                <jdk>[28,)</jdk>
+            </activation>
+            <properties>
+                <jacoco.skip>true</jacoco.skip>
+            </properties>
+        </profile>
+    </profiles>
     <reporting>
         <plugins>
             <plugin>
