@@ -2341,4 +2341,34 @@ class ArithmeticTest extends JexlTestCase {
             this.options = options;
         }
     }
+
+    @Test void testLeadingDotFloatLiteral() {
+        final JexlEngine jexl = new JexlBuilder().create();
+        final JexlContext jc = new MapContext();
+        // the exact case from JEXL-411
+        assertEquals(2.2d, jexl.createExpression("(1+.1)*2").evaluate(jc));
+        // the regression case that already worked
+        assertEquals(2.2d, jexl.createExpression("(1+0.1)*2").evaluate(jc));
+        // standalone and compound leading-dot literals
+        assertEquals(0.1d, jexl.createExpression(".1").evaluate(jc));
+        assertEquals(1.0d, jexl.createExpression(".5 + .5").evaluate(jc));
+        assertEquals(0.55d, jexl.createExpression(".55").evaluate(jc));
+        assertEquals(0.1d, jexl.createExpression("-.1 + .2").evaluate(jc));
+        assertEquals(-0.1d, jexl.createExpression(".1 + -.2").evaluate(jc));
+        assertEquals(0.1d, jexl.createExpression("-.1+.2").evaluate(jc));
+        assertEquals(-0.1d, jexl.createExpression(".1+-.2").evaluate(jc));
+        assertEquals(1.4d, jexl.createExpression(".5 - -.9").evaluate(jc));
+        assertEquals(0.4d, jexl.createExpression("-.5 - -.9").evaluate(jc));
+        assertEquals(-1.4d, jexl.createExpression("-.5+-.9").evaluate(jc));
+        // unary handling
+        assertEquals(-0.1d, jexl.createExpression("-.1").evaluate(jc));
+        assertEquals(0.1d, jexl.createExpression("+.1").evaluate(jc));
+        // property / index access via a dot must keep working (not parsed as a float)
+        final List<Object> array = new java.util.ArrayList<>();
+        array.add("zero");
+        array.add("one");
+        jc.set("array", array);
+        assertEquals("zero", jexl.createExpression("array.0").evaluate(jc));
+        assertEquals("one", jexl.createExpression("array.1").evaluate(jc));
+    }
 }

@@ -29,7 +29,10 @@
     <body>
         <release version="3.7.1" date="YYYY-MM-DD" description="This is a feature and maintenance release. Java 8 or later is required.">
             <!-- ADD -->
+            <action dev="henrib" type="add" issue="JEXL-467">IntelliJ and VSCode editors (TextMate bundle) support for JEXL.</action>
             <!-- FIX -->
+            <action dev="henrib" type="fix" issue="JEXL-466">IllegalStateException parsing a template with string interpolation.</action>
+            <action dev="NikRom5531" due-to="Felix Rudolphi" type="fix" issue="JEXL-411">Leading zeroes in floating point numbers should be optional.</action>
             <action dev="ggregory" type="fix" due-to="Gary Gregory">Pick up commons.jacoco.version from the parent POM.</action>
             <action dev="ggregory" type="fix" due-to="Gary Gregory">Add messages when throwing NullPointerException.</action>
             <!-- UPDATE -->

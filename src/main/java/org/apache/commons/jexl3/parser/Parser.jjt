@@ -1064,6 +1064,9 @@ void FloatLiteral() #NumberLiteral:
 {
   t=<FLOAT_LITERAL>
   { jjtThis.setReal(t.image); }
+  |
+  <DOT> t=<DOT_IDENTIFIER>
+  { if (!isAllDigits(t.image)) { throwParsingException(t); } jjtThis.setReal("." + t.image); }
 }
 
 void StringLiteral() :
