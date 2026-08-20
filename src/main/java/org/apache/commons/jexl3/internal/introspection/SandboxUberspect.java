@@ -96,7 +96,16 @@ public final class SandboxUberspect implements JexlUberspect {
 
     @Override
     public Iterator<?> getIterator(final Object obj) {
-        return uberspect.getIterator(obj);
+        if (obj != null) {
+            // route iteration through the sandbox: consult the "iterator" method permission for the
+            // object's class so an explicitly restricted class cannot be iterated over (f006).
+            final Class<?> clazz = obj instanceof Class<?> ? (Class<?>) obj : obj.getClass();
+            final String actual = sandbox.execute(clazz, "iterator");
+            if (actual != null && actual != JexlSandbox.NULL) {
+                return uberspect.getIterator(obj);
+            }
+        }
+        return null;
     }
 
     @Override

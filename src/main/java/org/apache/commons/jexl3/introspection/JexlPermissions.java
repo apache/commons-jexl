@@ -41,12 +41,28 @@ import org.apache.commons.logging.LogFactory;
  * access a constructor, method or field before exposition to the {@link JexlUberspect}. The restrictions
  * are applied in all cases, for any {@link org.apache.commons.jexl3.introspection.JexlUberspect.ResolverStrategy}.
  * </p>
+ * <p><strong>Arithmetic exemptions.</strong> Permissions gate <em>reflective</em> access performed through the
+ * {@link JexlUberspect}. They do not gate the handful of {@link java.lang.Object} / collection methods that
+ * {@link org.apache.commons.jexl3.JexlArithmetic} invokes directly (without reflection) as operator fast-paths -
+ * namely {@code equals} and {@code compareTo} (comparison operators), {@code toString} (string coercion and
+ * concatenation), and {@code isEmpty}/{@code size}/{@code contains} (the {@code empty}, {@code size} and
+ * {@code =~} operators on collections and maps). These are language-level operations analogous to arithmetic on
+ * numbers and are always available; a permission entry denying, say, {@code equals} does not disable the
+ * {@code ==} operator. To constrain those, derive {@link org.apache.commons.jexl3.JexlArithmetic}.</p>
  * <p><strong>Security disclaimer.</strong> Neither {@link #RESTRICTED} nor {@link #SECURE} is exhaustive, and neither
  * must be considered completely safe or sufficient on its own for executing untrusted user input. They are hardened
  * baselines, not guarantees. Any application that evaluates untrusted scripts <em>must</em> define its own tailored,
  * strict whitelist of exactly the classes, methods and fields its scripts legitimately need - ideally by composing on
  * top of {@link #NONE} (which denies everything) via {@link #create(String...)} / {@link #compose(String...)} - and
  * audit the result with {@link #logging()}.</p>
+ * <p><strong>Compiler surface.</strong> Permissions gate reflective access; they do not gate JEXL's own compiler.
+ * {@link #RESTRICTED} denies the second-stage compiler surface reachable through reflection - {@code JexlBuilder},
+ * and the {@code createScript}/{@code createExpression}/{@code createJxltEngine} methods on
+ * {@link org.apache.commons.jexl3.JexlEngine} as well as {@code createExpression}/{@code createTemplate} on
+ * {@link org.apache.commons.jexl3.JxltEngine} - so a script that gets hold of a live engine cannot compile and run
+ * further scripts. Note, however, that a {@link org.apache.commons.jexl3.JexlScript} value passed into a script and
+ * invoked as a lambda (e.g. {@code fn(args)}) executes <em>by design</em> without a reflective call and is therefore
+ * not mediated by these permissions; only pass already-compiled scripts a caller trusts.</p>
  * <p>This complements using a dedicated {@link ClassLoader} and/or {@link SecurityManager} - being deprecated -
  * and possibly {@link JexlSandbox} with a simpler mechanism. The {@link org.apache.commons.jexl3.annotations.NoJexl}
  * annotation processing is actually performed using the result of calling {@link #parse(String...)} with no arguments;
@@ -526,7 +542,11 @@ public interface JexlPermissions {
         "java.io -{ +PrintWriter{ -PrintWriter(); } +Writer{} +StringWriter{} +Reader{} +InputStream{} +OutputStream{} }",
         "java.nio +{ -ByteBuffer { allocateDirect(); } }",
         "java.nio.charset +{}",
-        "org.apache.commons.jexl3 +{ -JexlBuilder{} -JexlConfigLoader{} }"
+        // deny the second-stage compiler surface: a script that gets hold of a live engine (via the
+        // context or the thread-local) must not be able to compile and run further scripts (f009/f036)
+        "org.apache.commons.jexl3 +{ -JexlBuilder{} -JexlConfigLoader{}" +
+            " -JexlEngine { getThreadEngine(); setThreadContext(); createExpression(); createScript(); createJxltEngine(); }" +
+            " -JxltEngine { createExpression(); createTemplate(); } }"
     );
 
     /**
