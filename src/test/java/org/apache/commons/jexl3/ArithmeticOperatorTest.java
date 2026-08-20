@@ -587,6 +587,34 @@ class ArithmeticOperatorTest extends JexlTestCase {
         asserter.setVariable("str", "4/6");
         asserter.assertExpression("str =~ ~/\\d\\/\\d/", Boolean.TRUE);
     }
+
+    /**
+     * Regex escapes such as {@code \b} (word boundary) must be passed through verbatim to
+     * {@link Pattern}, not interpreted as string-literal escapes that would corrupt them into a
+     * backspace character (JEXL-security f019).
+     */
+    @Test
+    void testRegexEscapesPassThrough() throws Exception {
+        asserter.setVariable("str", "a cat b");
+        asserter.assertExpression("str =~ ~/.*\\bcat\\b.*/", Boolean.TRUE);
+        asserter.setVariable("str", "category");
+        asserter.assertExpression("str =~ ~/.*\\bcat\\b.*/", Boolean.FALSE);
+        // \d (digit) and \/ (literal slash) still behave as before
+        asserter.setVariable("str", "4/6");
+        asserter.assertExpression("str =~ ~/\\d\\/\\d/", Boolean.TRUE);
+    }
+
+    /**
+     * A malformed regex literal must surface as a parse error rather than leaking a raw
+     * {@link java.util.regex.PatternSyntaxException} (JEXL-security f019).
+     */
+    @Test
+    void testRegexInvalidPattern() {
+        final JexlEngine jexl = new JexlBuilder().create();
+        final JexlException.Parsing xparse = assertThrows(JexlException.Parsing.class,
+            () -> jexl.createScript("x =~ ~/(unbalanced/"));
+        assertNotNull(xparse.getMessage());
+    }
     void testSelfAssignOperators(final String text, final int x, final int y0, final int x0) {
         //String text = "y.add(x++)";
         final JexlEngine jexl = new JexlBuilder().safe(true).create();

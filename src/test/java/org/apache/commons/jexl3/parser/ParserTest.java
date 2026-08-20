@@ -53,6 +53,24 @@ class ParserTest {
         }
     }
 
+    /**
+     * Test unicode escape sequences: only 4 hex digits (0-9, a-f, A-F) form a unicode char;
+     * an out-of-range digit (g/h/...) is not a valid escape and passes through literally.
+     */
+    @Test
+    void testUnicodeEscape() {
+        // valid unicode escapes decode to the expected character
+        assertEquals("A", StringParser.buildString("'\\u0041'", true));
+        assertEquals(String.valueOf((char) 0x00ff), StringParser.buildString("'\\u00ff'", true));
+        assertEquals(String.valueOf((char) 0x00ff), StringParser.buildString("'\\u00FF'", true));
+        assertEquals("Z9", StringParser.buildString("'\\u005a\\u0039'", true));
+        // out-of-range hex digits ('g'/'h'/'G'/'H') are NOT consumed as a unicode escape:
+        // the escape is not recognized, so the '\\u' is re-emitted followed by the raw characters.
+        assertEquals("\\ug000", StringParser.buildString("'\\ug000'", true));
+        assertEquals("\\u00fh", StringParser.buildString("'\\u00fh'", true));
+        assertEquals("\\uH000", StringParser.buildString("'\\uH000'", true));
+    }
+
     @Test
     void testErrorAmbiguous() throws Exception {
         final Parser parser = new Parser(";");

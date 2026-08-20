@@ -53,13 +53,35 @@ public class StringParser {
     private static final char FIRST_ASCII = 32;
 
     /**
-     * Builds a regex pattern string, handles escaping '/' through '\/' syntax.
+     * Builds a regex pattern string from a {@code ~/.../} literal image.
+     * <p>
+     * The regex body is passed through <em>verbatim</em> to preserve regex escape sequences
+     * ({@code \b}, {@code \d}, {@code \w}, {@code \s}, ...); the only translation performed is the
+     * documented {@code \/} unescape, which lets a literal slash appear inside the delimiters
+     * (JEXL-security f019). Applying string-literal escaping here would corrupt regex escapes
+     * (e.g. turning {@code \b} into a backspace character).
+     * </p>
      *
-     * @param str The string to build from
-     * @return The built string
+     * @param str The raw {@code ~/.../} token image to build from
+     * @return The regex source string (delimiters removed, {@code \/} collapsed to {@code /})
      */
     public static String buildRegex(final CharSequence str) {
-        return buildString(str.subSequence(1, str.length()), true);
+        final int last = str.length() - 1; // the closing '/'
+        final StringBuilder strb = new StringBuilder(str.length());
+        // image is '~' '/' body '/'; body starts after the leading '~/'
+        int i = 2;
+        while (i < last) {
+            final char c = str.charAt(i);
+            if (c == '\\' && i + 1 < last && str.charAt(i + 1) == '/') {
+                // the only recognized escape: '\/' yields a literal '/'
+                strb.append('/');
+                i += 2;
+            } else {
+                strb.append(c);
+                i += 1;
+            }
+        }
+        return strb.toString();
     }
 
     /**
@@ -136,6 +158,35 @@ public class StringParser {
             }
         }
         return Objects.toString(strb, str);
+    }
+
+    /**
+     * Escapes a regex source back into a {@code /.../} literal body.
+     * <p>
+     * This is the inverse of {@link #buildRegex(CharSequence)}: the body is emitted verbatim, escaping
+     * only embedded slashes as {@code \/} (backslashes are <em>not</em> doubled, so regex escapes such as
+     * {@code \b} or {@code \d} round-trip unchanged — JEXL-security f019).
+     * </p>
+     *
+     * @param str The regex source (without delimiters)
+     * @return The delimited {@code /.../} representation, or null if the input is null
+     */
+    public static String escapeRegex(final CharSequence str) {
+        if (str == null) {
+            return null;
+        }
+        final int length = str.length();
+        final StringBuilder strb = new StringBuilder(length + 2);
+        strb.append('/');
+        for (int i = 0; i < length; ++i) {
+            final char c = str.charAt(i);
+            if (c == '/') {
+                strb.append('\\');
+            }
+            strb.append(c);
+        }
+        strb.append('/');
+        return strb.toString();
     }
 
     /**
@@ -308,9 +359,9 @@ public class StringParser {
             final char c = str.charAt(begin + offset);
             if (c >= '0' && c <= '9') {
                 value = c - '0';
-            } else if (c >= 'a' && c <= 'h') {
+            } else if (c >= 'a' && c <= 'f') {
                 value = c - 'a' + BASE10;
-            } else if (c >= 'A' && c <= 'H') {
+            } else if (c >= 'A' && c <= 'F') {
                 value = c - 'A' + BASE10;
             } else {
                 return 0;

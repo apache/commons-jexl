@@ -1263,7 +1263,9 @@ void ArrayAccess() : {
  int s = 0;
  }
 {
-    (LOOKAHEAD(2) (<LBRACKET>|<QLBRACKET> { safe |= (1L << s++); }) Expression() <RBRACKET>)+ { jjtThis.setSafe(safe); }
+    // advance the bracket index 's' for *every* bracket so the safe-navigation bit is keyed to the
+    // child (bracket) position, not to the count of '?[' seen (JEXL-security f020); saturate past 64.
+    (LOOKAHEAD(2) (<LBRACKET> { s++; } | <QLBRACKET> { if (s < Long.SIZE) { safe |= (1L << s); } s++; }) Expression() <RBRACKET>)+ { jjtThis.setSafe(safe); }
 }
 
 void MemberAccess() #void : {}

@@ -1449,6 +1449,44 @@ class ArithmeticTest extends JexlTestCase {
         }
     }
 
+    /**
+     * A strict engine must surface argument-evaluation errors from {@code empty()}/{@code size()}
+     * instead of masking them as {@code true}/{@code 0} (JEXL-security f028); a lenient engine keeps
+     * the historical empty/0 fallback.
+     */
+    @Test
+    void testEmptySizeStrictPropagatesError() {
+        final JexlEngine strict = new JexlBuilder().strict(true).safe(false).create();
+        assertThrows(JexlException.class, () -> strict.createScript("empty(x.y)", "x").execute(null, (Object) null));
+        assertThrows(JexlException.class, () -> strict.createScript("size(x.y)", "x").execute(null, (Object) null));
+        final JexlEngine lenient = new JexlBuilder().strict(false).safe(true).create();
+        assertEquals(Boolean.TRUE, lenient.createScript("empty(x.y)", "x").execute(null, (Object) null));
+        assertEquals(0, lenient.createScript("size(x.y)", "x").execute(null, (Object) null));
+    }
+
+    /**
+     * Cancellation during {@code empty()}/{@code size()} argument evaluation must never be masked
+     * as empty/0, even in a lenient engine (JEXL-security f028).
+     */
+    @Test
+    void testEmptySizeDoNotSwallowCancel() {
+        final JexlEngine jexl = new JexlBuilder().strict(false).cancellable(true).create();
+        final JexlScript empty = jexl.createScript("empty(x)", "x");
+        final JexlScript size = jexl.createScript("size(x)", "x");
+        try {
+            Thread.currentThread().interrupt();
+            assertThrows(JexlException.Cancel.class, () -> empty.execute(null, "abc"));
+        } finally {
+            Thread.interrupted(); // clear the interrupted status so it does not leak into other tests
+        }
+        try {
+            Thread.currentThread().interrupt();
+            assertThrows(JexlException.Cancel.class, () -> size.execute(null, "abc"));
+        } finally {
+            Thread.interrupted();
+        }
+    }
+
     @Test
     void testEmptyDouble()  {
         Object x;
