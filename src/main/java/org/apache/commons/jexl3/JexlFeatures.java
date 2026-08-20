@@ -76,7 +76,7 @@ public final class JexlFeatures {
         "global assign/modify", "array reference", "create instance", "loop", "function",
         "method call", "set/map/array literal", "pragma", "annotation", "script", "lexical", "lexicalShade",
         "thin-arrow", "fat-arrow", "namespace pragma", "namespace identifier", "import pragma", "comparator names", "pragma anywhere",
-        "const capture", "ref capture", "ambiguous statement", "ignore template prefix"
+        "const capture", "ref capture", "ambiguous statement", "ignore template prefix", "namespace instantiation"
     };
 
     /** Registers feature ordinal. */
@@ -166,11 +166,14 @@ public final class JexlFeatures {
     @Deprecated
     public static final int STRICT_STATEMENT = 25;
 
+    /** Allow reflective auto-instantiation of a namespace functor from a class/FQCN binding. */
+    public static final int NAMESPACE_INSTANTIATE = 27;
+
     /**
      * All features.
      * Ensure this is updated if additional features are added.
      */
-    private static final long ALL_FEATURES = (1L << IGNORE_TEMPLATE_PREFIX + 1) - 1L; // MUST REMAIN PRIVATE
+    private static final long ALL_FEATURES = (1L << NAMESPACE_INSTANTIATE + 1) - 1L; // MUST REMAIN PRIVATE
 
     /**
      * The default features flag mask.
@@ -193,7 +196,8 @@ public final class JexlFeatures {
         | 1L << NS_PRAGMA
         | 1L << IMPORT_PRAGMA
         | 1L << COMPARATOR_NAMES
-        | 1L << PRAGMA_ANYWHERE;
+        | 1L << PRAGMA_ANYWHERE
+        | 1L << NAMESPACE_INSTANTIATE;
 
     /**
      * The canonical scripting (since 3.3.1) features flag mask based on the original default.
@@ -425,6 +429,26 @@ public final class JexlFeatures {
      */
     public JexlFeatures referenceCapture(final boolean flag) {
         setFeature(REF_CAPTURE, flag);
+        return this;
+    }
+
+    /**
+     * Sets whether a namespace bound to a class or fully-qualified class name may be
+     * reflectively auto-instantiated into a functor.
+     * <p>
+     * When enabled (the default), a namespace declared as a {@link Class} or class-name
+     * {@link String} is instantiated - through a constructor, optionally receiving the
+     * context - the first time it is used, allowing instance (non-static) namespace methods.
+     * When disabled, no constructor is invoked: only static methods of the bound class are
+     * reachable and explicit host-supplied functors are still honored.
+     * </p>
+     *
+     * @param flag true to enable, false to disable
+     * @return this features instance
+     * @since 3.6
+     */
+    public JexlFeatures namespaceInstantiation(final boolean flag) {
+        setFeature(NAMESPACE_INSTANTIATE, flag);
         return this;
     }
 
@@ -935,6 +959,17 @@ public final class JexlFeatures {
      */
     public boolean supportsReferenceCapture() {
         return getFeature(REF_CAPTURE);
+    }
+
+    /**
+     * Does the engine allow reflective auto-instantiation of a namespace functor
+     * from a class or class-name binding?
+     *
+     * @return true if namespace auto-instantiation is allowed, false otherwise
+     * @since 3.6
+     */
+    public boolean supportsNamespaceInstantiation() {
+        return getFeature(NAMESPACE_INSTANTIATE);
     }
 
     /**

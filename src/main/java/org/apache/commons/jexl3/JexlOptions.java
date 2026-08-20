@@ -47,6 +47,9 @@ import org.apache.commons.jexl3.internal.Engine;
  */
 public final class JexlOptions {
 
+    /** The namespace auto-instantiation flag. */
+    private static final int NAMESPACE_INSTANTIATE = 11;
+
     /** The boolean logical flag. */
     private static final int BOOLEAN_LOGICAL = 10;
 
@@ -84,11 +87,12 @@ public final class JexlOptions {
     private static final String[] NAMES = {
         "cancellable", "strict", "silent", "safe", "lexical", "antish",
         "lexicalShade", "sharedInstance", "constCapture", "strictInterpolation",
-        "booleanShortCircuit"
+        "booleanShortCircuit", "namespaceInstantiation"
     };
 
     /** Default mask .*/
-    private static int DEFAULT = 1 /*<< CANCELLABLE*/ | 1 << STRICT | 1 << ANTISH | 1 << SAFE;
+    private static int DEFAULT = 1 /*<< CANCELLABLE*/ | 1 << STRICT | 1 << ANTISH | 1 << SAFE
+        | 1 << NAMESPACE_INSTANTIATE;
 
     /**
      * Checks the value of a flag in the mask.
@@ -278,6 +282,17 @@ public final class JexlOptions {
     }
 
     /**
+     * Is reflective auto-instantiation of a namespace functor from a class/class-name
+     * binding allowed?
+     *
+     * @return true if namespace auto-instantiation is allowed, false otherwise
+     * @since 3.6
+     */
+    public boolean isNamespaceInstantiation() {
+        return isSet(NAMESPACE_INSTANTIATE, flags);
+    }
+
+    /**
      * Checks whether runtime variable scope is lexical.
      * <p>If true, lexical scope applies to local variables and parameters.
      * Redefining a variable in the same lexical unit will generate errors.
@@ -431,6 +446,17 @@ public final class JexlOptions {
      */
     public void setConstCapture(final boolean flag) {
         flags = set(CONST_CAPTURE, flags, flag);
+    }
+
+    /**
+     * Sets whether a namespace bound to a class or class-name may be reflectively
+     * auto-instantiated into a functor.
+     *
+     * @param flag true to enable, false to disable
+     * @since 3.6
+     */
+    public void setNamespaceInstantiation(final boolean flag) {
+        flags = set(NAMESPACE_INSTANTIATE, flags, flag);
     }
 
     /**

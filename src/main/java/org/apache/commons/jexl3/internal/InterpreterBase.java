@@ -906,8 +906,10 @@ public abstract class InterpreterBase extends ParserVisitor {
             if (cached instanceof Class<?>) {
                 return cached;
             }
+            // whether reflective auto-instantiation of a functor is allowed for this namespace
+            final boolean instantiate = options.isNamespaceInstantiation();
             // attempt to reuse last cached constructor
-            if (cached instanceof JexlContext.NamespaceFunctor) {
+            if (instantiate && cached instanceof JexlContext.NamespaceFunctor) {
                 final Object eval = ((JexlContext.NamespaceFunctor) cached).createFunctor(context);
                 if (JexlEngine.TRY_FAILED != eval) {
                     functor = eval;
@@ -916,7 +918,7 @@ public abstract class InterpreterBase extends ParserVisitor {
             }
             if (functor == null) {
                 // find a constructor with that context as argument or without
-                for (int tried = 0; tried < 2; ++tried) {
+                for (int tried = 0; instantiate && tried < 2; ++tried) {
                     final boolean withContext = tried == 0;
                     final JexlMethod ctor = withContext
                             ? uberspect.getConstructor(namespace, context)
@@ -947,18 +949,21 @@ public abstract class InterpreterBase extends ParserVisitor {
                 }
                 // did not, will not create a functor instance; use a class, namespace of static methods
                 if (functor == null) {
-                    try {
-                        // try to find a class with that name
-                        if (namespace instanceof String) {
-                            namespace = uberspect.getClassLoader().loadClass((String) namespace);
+                    // try to find a class with that name; getClassByName is permission-aware and returns
+                    // null when the class is denied by permissions or cannot be located (f047).
+                    if (namespace instanceof String) {
+                        final Class<?> clazz = uberspect.getClassByName((String) namespace);
+                        if (clazz == null) {
+                            throw new JexlException(node, "no such class namespace " + prefix, null);
                         }
-                        // we know it's a class in all cases (see *1)
-                        if (cacheable) {
-                            nsNode.jjtSetValue(namespace);
-                        }
-                    } catch (final ClassNotFoundException e) {
-                        // not a class
-                        throw new JexlException(node, "no such class namespace " + prefix, e);
+                        namespace = clazz;
+                    }
+                    // only cache the Class<?> when instantiation was attempted (and no ctor was found);
+                    // when instantiation is disabled we skip the ctor search, so the cache entry would be
+                    // ambiguous: a later execution with instantiation enabled would hit the Class<?> fast-path
+                    // and never try the constructor.
+                    if (cacheable && instantiate) {
+                        nsNode.jjtSetValue(namespace);
                     }
                 }
             }
