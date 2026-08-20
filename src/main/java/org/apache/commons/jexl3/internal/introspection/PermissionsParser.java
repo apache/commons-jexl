@@ -94,7 +94,7 @@ public class PermissionsParser {
             final String... srcs) {
         try {
             if (srcs == null || srcs.length == 0) {
-                return Permissions.UNRESTRICTED;
+                return Permissions.Markers.UNRESTRICTED;
             }
             this.packages = packages;
             this.wildcards = wildcards;
@@ -137,6 +137,7 @@ public class PermissionsParser {
         boolean deny = nojexl;
         boolean classPositive = false; // the class's own polarity (set at creation, never mutated)
         boolean memberNegative = false; // whether the pending member is prefixed with '-'
+        boolean hasNested = false; // whether this (otherwise empty) class only encloses nested classes
         int i = offset;
         int j = -1;
         boolean isMethod = false;
@@ -201,6 +202,7 @@ public class PermissionsParser {
                     i = readClass(njpackage, deny, njname, identifier, i - 1);
                     identifier = null;
                     memberNegative = false; // an inner-class sign does not change the outer class
+                    hasNested = true; // this class encloses at least one nested class declaration
                     continue;
                 }
                 if (c == ';') {
@@ -235,8 +237,10 @@ public class PermissionsParser {
             if (njclass.isEmpty()) {
                 njpackage.addNoJexl(njname,
                     njclass.isPositive()
-                        ? Permissions.JEXL_CLASS
-                        : Permissions.NOJEXL_CLASS);
+                        ? Permissions.Markers.JEXL_CLASS
+                        : hasNested
+                            ? Permissions.Markers.NOJEXL_CONTAINER
+                            : Permissions.Markers.NOJEXL_CLASS);
             } else {
                 njpackage.addNoJexl(njname, njclass);
             }
@@ -395,8 +399,8 @@ public class PermissionsParser {
                 // type in the map (it allows itself and anchors reach-through), so nothing is added to wildcards.
                 if (njpackage.isEmpty()) {
                     packages.put(pname, negative == null || negative
-                        ? Permissions.NOJEXL_PACKAGE
-                        : Permissions.JEXL_PACKAGE);
+                        ? Permissions.Markers.NOJEXL_PACKAGE
+                        : Permissions.Markers.JEXL_PACKAGE);
                 } else {
                     packages.put(pname, njpackage);
                 }

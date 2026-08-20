@@ -451,15 +451,23 @@ public interface JexlPermissions {
      * </ul>
      * <p>Denied classes / members (carved out of otherwise-allowed packages):</p>
      * <ul>
-     * <li>java.lang { Runtime, System, ProcessBuilder, Process, RuntimePermission, SecurityManager, Thread, ThreadGroup, Class, ClassLoader }
-     * and the system-property readers Integer.getInteger, Long.getLong, Boolean.getBoolean</li>
+     * <li>java.lang { Runtime, System, ProcessBuilder, Process, ProcessHandle (and ProcessHandle.Info),
+     * RuntimePermission, SecurityManager, Thread, ThreadGroup, Class, ClassLoader, Module, ModuleLayer }
+     * and the system-property readers Integer.getInteger, Long.getLong, Boolean.getBoolean.
+     * A whole-class denial also denies the class's nested classes (e.g. System.LoggerFinder).</li>
      * <li>java.io { everything except PrintWriter, Writer, StringWriter, Reader, InputStream, OutputStream }</li>
-     * <li>java.util: the classes stay visible but their file/loader members are carved out -
+     * <li>java.util: the classes stay visible but their file/loader/thread/global-state members are carved out -
      * Formatter and Scanner constructors (file I/O), Properties.load/store/loadFromXML/storeToXML/save (file I/O),
-     * ResourceBundle.getBundle/clearCache and PropertyResourceBundle constructors (property-file/class loading),
-     * ServiceLoader.load/loadInstalled (service/class loading). No file can be read or written and no class or
+     * ResourceBundle.getBundle/clearCache, ResourceBundle.Control, PropertyResourceBundle constructors and
+     * ListResourceBundle (property-file/class loading), ServiceLoader.load/loadInstalled (service/class loading),
+     * Timer/TimerTask (threads), Locale.setDefault/TimeZone.setDefault (JVM-global mutation),
+     * Collection.parallelStream (common fork-join pool). No file can be read or written and no class or
      * service loaded through java.util.</li>
-     * <li>java.util.concurrent { Executors and the thread-pool / fork-join executor classes }</li>
+     * <li>java.util.concurrent { Executors and the thread-pool / fork-join executor classes, plus the
+     * uninterruptible blockers CompletableFuture.join, Semaphore.acquireUninterruptibly and
+     * Phaser.awaitAdvance/arriveAndAwaitAdvance }</li>
+     * <li>java.util.stream { BaseStream.parallel } (common fork-join pool)</li>
+     * <li>java.nio { ByteBuffer.allocateDirect } (off-heap allocation)</li>
      * <li>java.time.zone { ZoneRulesProvider } (prevents JVM-wide time-zone provider registration)</li>
      * <li>org.apache.commons.jexl3 { JexlBuilder }</li>
      * </ul>
@@ -487,28 +495,36 @@ public interface JexlPermissions {
             " -Formatter { Formatter(); }" +
             " -Scanner { Scanner(); }" +
             " -Properties { load(); store(); loadFromXML(); storeToXML(); save(); }" +
-            " -ResourceBundle { getBundle(); clearCache(); }" +
+            " -ResourceBundle { getBundle(); clearCache(); Control {} }" +
             " -PropertyResourceBundle { PropertyResourceBundle(); }" +
+            " -ListResourceBundle{}" +
             " -ServiceLoader { load(); loadInstalled(); }" +
+            " -Timer{} -TimerTask{}" +
+            " -Locale { setDefault(); }" +
+            " -TimeZone { setDefault(); }" +
+            " -Collection { parallelStream(); }" +
             " }",
         "java.util.concurrent +{" +
             "-Executors{} -ExecutorService{} -AbstractExecutorService{}" +
             "-ThreadPoolExecutor{} -ScheduledThreadPoolExecutor{} -ScheduledExecutorService{}" +
             "-ForkJoinPool{} -ForkJoinTask{} -ForkJoinWorkerThread{}" +
+            "-CompletableFuture { join(); }" +
+            "-Semaphore { acquireUninterruptibly(); }" +
+            "-Phaser { awaitAdvance(); arriveAndAwaitAdvance(); }" +
             "}",
         "java.util.concurrent.atomic +{}",
         "java.util.function +{}",
-        "java.util.stream +{}",
+        "java.util.stream +{ -BaseStream { parallel(); } }",
         "java.util.regex +{}",
         "org.w3c.dom +{}",
         "java.lang +{" +
-            "-Runtime{} -System{} -ProcessBuilder{} -Process{}" +
+            "-Runtime{} -System{} -ProcessBuilder{} -Process{} -ProcessHandle { Info {} }" +
             "-RuntimePermission{} -SecurityManager{}" +
-            "-Thread{} -ThreadGroup{} -Class{} -ClassLoader{}" +
+            "-Thread{} -ThreadGroup{} -Class{} -ClassLoader{} -Module{} -ModuleLayer{}" +
             "-Integer { getInteger(); } -Long { getLong(); } -Boolean { getBoolean(); }" +
             "}",
         "java.io -{ +PrintWriter{ -PrintWriter(); } +Writer{} +StringWriter{} +Reader{} +InputStream{} +OutputStream{} }",
-        "java.nio +{}",
+        "java.nio +{ -ByteBuffer { allocateDirect(); } }",
         "java.nio.charset +{}",
         "org.apache.commons.jexl3 +{ -JexlBuilder{} -JexlConfigLoader{} }"
     );
@@ -528,7 +544,8 @@ public interface JexlPermissions {
      * <li>{@code java.util} - the collection types produced by list/map/set literals (and their iterators, views
      * and entries), <em>minus</em> the file/loader/thread-bearing classes which are denied: {@code Formatter} and
      * {@code Scanner} (file I/O), {@code ServiceLoader} and the {@code ResourceBundle} family (class/resource
-     * loading), {@code Properties} (file {@code load}/{@code store}) and {@code Timer}/{@code TimerTask} (threads).
+     * loading), {@code Properties} (file {@code load}/{@code store}) and {@code Timer}/{@code TimerTask} (threads);
+     * the JVM-global mutators {@code Locale.setDefault} and {@code TimeZone.setDefault} are denied as well.
      * Because a positive package does not cover sub-packages, {@code java.util.zip}/{@code concurrent}/{@code jar}/…
      * stay denied as well.</li>
      * </ul>
@@ -558,6 +575,8 @@ public interface JexlPermissions {
             + " -Formatter{} -Scanner{} -ServiceLoader{}"
             + " -ResourceBundle{} -PropertyResourceBundle{} -ListResourceBundle{}"
             + " -Properties{} -Timer{} -TimerTask{}"
+            + " -Locale { setDefault(); }"
+            + " -TimeZone { setDefault(); }"
             + " }"
     );
 

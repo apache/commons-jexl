@@ -955,11 +955,18 @@ public class Issues400Test {
         static JexlPermissions createPermissions() {
             // Need a lot of things on top of JEXL37 to allow execution
             return new JexlPermissions.ClassPermissions(JexlTestCase.TEST_PERMS,
-                Engine33.class.getClassLoader().getClass(),
-                Engine33.class,
-                JexlPermissions.ClassPermissions.class,
-                org.apache.commons.jexl3.internal.TemplateEngine.class,
-                org.apache.commons.jexl3.internal.introspection.Uberspect.class);
+                java.util.Arrays.asList(
+                    Engine33.class.getClassLoader().getClass().getCanonicalName(),
+                    Engine33.class.getCanonicalName(),
+                    JexlPermissions.ClassPermissions.class.getCanonicalName(),
+                    org.apache.commons.jexl3.internal.TemplateEngine.class.getCanonicalName(),
+                    // the whole-class denial of TemplateEngine (TEST_PERMS) now covers its nested
+                    // classes: the expression classes the script evaluates need an explicit allow
+                    // (ClassPermissions matches exact canonical names at the class level)
+                    org.apache.commons.jexl3.internal.TemplateEngine.class.getCanonicalName() + ".TemplateExpression",
+                    org.apache.commons.jexl3.internal.TemplateEngine.class.getCanonicalName() + ".JexlBasedExpression",
+                    org.apache.commons.jexl3.internal.TemplateEngine.class.getCanonicalName() + ".DeferredExpression",
+                    org.apache.commons.jexl3.internal.introspection.Uberspect.class.getCanonicalName()));
         }
 
         static JexlBuilder createBuilder() {

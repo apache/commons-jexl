@@ -251,61 +251,137 @@ public class Permissions implements JexlPermissions {
         }
     }
 
+    /**
+     * Holder for the singleton allow/deny markers and the {@code UNRESTRICTED} permission.
+     * <p>These live in their own class rather than directly in {@link Permissions} to break a
+     * class-initialization cycle: {@code Permissions implements JexlPermissions}, and
+     * {@link JexlPermissions} carries default methods, so initializing {@code Permissions} forces
+     * {@code JexlPermissions.<clinit>} to run first (JLS 12.4.2) — that computes {@code RESTRICTED}
+     * / {@code SECURE} via {@link PermissionsParser}, which reads these markers. Were they static
+     * fields of {@code Permissions}, they would still be {@code null} at that point (assigned only
+     * after superinterface initialization), yielding an NPE when {@code Permissions} happens to be
+     * the first permissions class touched. A dedicated holder initializes independently of that
+     * cycle, so the markers are always available whichever class is loaded first.</p>
+     */
+    static final class Markers {
+        private Markers() {}
+
+        /** Marker for whole NoJexl class. */
+        static final NoJexlClass NOJEXL_CLASS = new NoJexlClass(Collections.emptySet(), Collections.emptySet()) {
+            @Override boolean deny(final Constructor<?> method) {
+                return true;
+            }
+
+            @Override boolean deny(final Field field) {
+                return true;
+            }
+
+            @Override boolean deny(final Method method) {
+                return true;
+            }
+
+            // a constant singleton survives copy as itself, preserving its deny-all nature through compose()
+            @Override public NoJexlClass copy() {
+                return this;
+            }
+        };
+
+        /**
+         * Marker for a whole NoJexl class whose block only scopes nested-class declarations.
+         * <p>Behaves exactly like {@link #NOJEXL_CLASS} for the class itself but is distinct, so that
+         * the nested-class denial inheritance applied to {@code -X{}} does not deny the unlisted
+         * nested classes of a block that is a mere container (as in {@code Outer { Inner {...} }}).</p>
+         */
+        static final NoJexlClass NOJEXL_CONTAINER = new NoJexlClass(Collections.emptySet(), Collections.emptySet()) {
+            @Override boolean deny(final Constructor<?> method) {
+                return true;
+            }
+
+            @Override boolean deny(final Field field) {
+                return true;
+            }
+
+            @Override boolean deny(final Method method) {
+                return true;
+            }
+
+            // a constant singleton survives copy as itself, preserving its semantics through compose()
+            @Override public NoJexlClass copy() {
+                return this;
+            }
+        };
+
+        /** Marker for allowed class. */
+        static final NoJexlClass JEXL_CLASS = new JexlClass(Collections.emptySet(), Collections.emptySet()) {
+            @Override boolean deny(final Constructor<?> method) {
+                return false;
+            }
+
+            @Override boolean deny(final Field field) {
+                return false;
+            }
+
+            @Override  boolean deny(final Method method) {
+                return false;
+            }
+
+            // a constant singleton survives copy as itself, preserving its allow-all nature through compose()
+            @Override public JexlClass copy() {
+                return this;
+            }
+        };
+
+        /** Marker for @NoJexl package. */
+        static final NoJexlPackage NOJEXL_PACKAGE = new NoJexlPackage(Collections.emptyMap()) {
+            @Override NoJexlClass getNoJexl(final Class<?> clazz) {
+                return NOJEXL_CLASS;
+            }
+
+            // a constant singleton survives copy as itself, preserving its deny-all nature through compose()
+            @Override public NoJexlPackage copy() {
+                return this;
+            }
+        };
+
+        /** Marker for fully allowed package. */
+        static final NoJexlPackage JEXL_PACKAGE = new NoJexlPackage(Collections.emptyMap()) {
+            @Override NoJexlClass getNoJexl(final Class<?> clazz) {
+                return JEXL_CLASS;
+            }
+            @Override boolean isPositive() {
+                return true;
+            }
+            // a constant singleton survives copy as itself, preserving its positive nature through compose()
+            @Override public NoJexlPackage copy() {
+                return this;
+            }
+        };
+
+        /**
+         * The no-restriction permission singleton (empty {@link PermissionsParser#parse}).
+         * <p>Lives here rather than as a {@code Permissions} static field for the same reason as the
+         * markers: an empty {@code parse()} returns this instance while computing {@code JexlPermissions}
+         * constants, which can happen before {@code Permissions}' own static fields are assigned.
+         * Constructing it last (after the markers) is safe: the {@code new Permissions()} triggers
+         * {@code Permissions.<clinit>}, whose only holder dependency is the already-assigned markers.</p>
+         */
+        static final Permissions UNRESTRICTED = new Permissions();
+    }
+
     /** Marker for whole NoJexl class. */
-    static final NoJexlClass NOJEXL_CLASS = new NoJexlClass(Collections.emptySet(), Collections.emptySet()) {
-        @Override boolean deny(final Constructor<?> method) {
-            return true;
-        }
+    static final NoJexlClass NOJEXL_CLASS = Markers.NOJEXL_CLASS;
 
-        @Override boolean deny(final Field field) {
-            return true;
-        }
-
-        @Override boolean deny(final Method method) {
-            return true;
-        }
-    };
+    /** Marker for a NoJexl class that only scopes nested-class declarations. */
+    static final NoJexlClass NOJEXL_CONTAINER = Markers.NOJEXL_CONTAINER;
 
     /** Marker for allowed class. */
-    static final NoJexlClass JEXL_CLASS = new JexlClass(Collections.emptySet(), Collections.emptySet()) {
-        @Override boolean deny(final Constructor<?> method) {
-            return false;
-        }
-
-        @Override boolean deny(final Field field) {
-            return false;
-        }
-
-        @Override  boolean deny(final Method method) {
-            return false;
-        }
-    };
+    static final NoJexlClass JEXL_CLASS = Markers.JEXL_CLASS;
 
     /** Marker for @NoJexl package. */
-    static final NoJexlPackage NOJEXL_PACKAGE = new NoJexlPackage(Collections.emptyMap()) {
-        @Override NoJexlClass getNoJexl(final Class<?> clazz) {
-            return NOJEXL_CLASS;
-        }
-    };
+    static final NoJexlPackage NOJEXL_PACKAGE = Markers.NOJEXL_PACKAGE;
 
     /** Marker for fully allowed package. */
-    static final NoJexlPackage JEXL_PACKAGE = new NoJexlPackage(Collections.emptyMap()) {
-        @Override NoJexlClass getNoJexl(final Class<?> clazz) {
-            return JEXL_CLASS;
-        }
-        @Override boolean isPositive() {
-            return true;
-        }
-        // a constant singleton survives copy as itself, preserving its positive nature through compose()
-        @Override public NoJexlPackage copy() {
-            return this;
-        }
-    };
-
-    /**
-     * The no-restriction introspection permission singleton.
-     */
-    static final Permissions UNRESTRICTED = new Permissions();
+    static final NoJexlPackage JEXL_PACKAGE = Markers.JEXL_PACKAGE;
 
     /**
      * The @NoJexl execution-time map.
@@ -314,7 +390,7 @@ public class Permissions implements JexlPermissions {
     /**
      * The allowed package patterns (wildcards or exact package names).
      * <p>Empty together with an empty {@link #packages} map means open-world: every package is accessible
-     * and only explicitly denied elements are carved out — the behavior of {@link #UNRESTRICTED}.
+     * and only explicitly denied elements are carved out — the behavior of {@link Markers#UNRESTRICTED}.
      * Empty with a non-empty {@link #packages} map, or non-empty, means closed-world: only declared
      * packages are accessible.</p>
      */
@@ -430,7 +506,7 @@ public class Permissions implements JexlPermissions {
 
     /**
      * Whether a package belongs to the allowed perimeter.
-     * <p>Open-world ({@link #UNRESTRICTED}: no rules at all) allows every package. Closed-world requires the
+     * <p>Open-world ({@link Markers#UNRESTRICTED}: no rules at all) allows every package. Closed-world requires the
      * package to match an entry in {@link #allowed}; an empty perimeter in closed-world matches nothing.</p>
      *
      * @param packageName The package name (not null)
@@ -541,14 +617,19 @@ public class Permissions implements JexlPermissions {
                     explicit[0] = specifiedAllow(clazz, override, (njc, m) -> !njc.deny(m));
                 }
             }
-            return true;
         } catch (final NoSuchMethodException ex) {
-            // will happen if not overriding method in clazz
-            return true;
+            // will happen if not overriding method in clazz; still need to check parent interfaces
         } catch (final SecurityException ex) {
             // unexpected, can't do much
             return false;
         }
+        // recursively check parent interfaces
+        for (final Class<?> inter : clazz.getInterfaces()) {
+            if (!allow(inter, method, explicit)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
@@ -715,7 +796,24 @@ public class Permissions implements JexlPermissions {
             return true;
         }
         final NoJexlPackage njp = packages.get(ClassTool.getPackageName(clazz));
-        return njp != null && Objects.equals(NOJEXL_CLASS, njp.getNoJexl(clazz));
+        if (njp == null) {
+            return false;
+        }
+        final NoJexlClass njc = njp.getNoJexl(clazz);
+        if (Objects.equals(NOJEXL_CLASS, njc) || Objects.equals(NOJEXL_CONTAINER, njc)) {
+            return true;
+        }
+        // a nested class without an explicit declaration of its own inherits a whole-class
+        // denial from any of its enclosing classes: -Outer{} also denies Outer$Nested
+        // (container blocks - Outer { Inner {...} } - deliberately do not propagate)
+        if (njp.nojexl.get(classKey(clazz)) == null) {
+            for (Class<?> outer = clazz.getEnclosingClass(); outer != null; outer = outer.getEnclosingClass()) {
+                if (Objects.equals(NOJEXL_CLASS, njp.getNoJexl(outer))) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /**

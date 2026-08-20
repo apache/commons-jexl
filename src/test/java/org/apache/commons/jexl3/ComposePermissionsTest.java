@@ -17,11 +17,14 @@
 package org.apache.commons.jexl3;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
 import java.io.FileReader;
+import java.lang.reflect.Constructor;
 import java.util.Collections;
 
 import org.apache.commons.jexl3.introspection.JexlPermissions;
@@ -80,6 +83,36 @@ class ComposePermissionsTest extends JexlTestCase {
     @Test
     void testComposePermissions() throws Exception {
         runComposePermissions(JexlPermissions.UNRESTRICTED);
+    }
+
+    @Test
+    void testComposePreservesBaseDenials() throws Exception {
+        // deny markers must survive the copy performed by compose(): a whole-class denial in the
+        // base must still deny class and constructor visibility after composing unrelated rules
+        final Constructor<?> pbCtor = ProcessBuilder.class.getConstructor(String[].class);
+        assertFalse(JexlPermissions.RESTRICTED.allow(pbCtor));
+        assertFalse(JexlPermissions.RESTRICTED.allow(ProcessBuilder.class));
+        final JexlPermissions composed = JexlPermissions.RESTRICTED.compose("java.math +{}");
+        assertFalse(composed.allow(pbCtor));
+        assertFalse(composed.allow(ProcessBuilder.class));
+        assertFalse(composed.allow(Runtime.class));
+        // a whole-package denial in the base must survive composition as well
+        final JexlPermissions pkgDeny = JexlPermissions.parse("java.lang.*", "java.net {}");
+        assertFalse(pkgDeny.allow(java.net.URI.class));
+        final JexlPermissions pkgDenyComposed = pkgDeny.compose("java.math +{}");
+        assertFalse(pkgDenyComposed.allow(java.net.URI.class));
+    }
+
+    @Test
+    void testComposePreservesBaseAllows() throws Exception {
+        // the allow marker must survive the copy performed by compose(): a whole-class allowance
+        // in the base must not (fail-closed) revoke constructor visibility after composition
+        final Constructor<?> swCtor = java.io.StringWriter.class.getConstructor();
+        assertTrue(JexlPermissions.RESTRICTED.allow(swCtor));
+        assertTrue(JexlPermissions.RESTRICTED.allow(java.io.StringWriter.class));
+        final JexlPermissions composed = JexlPermissions.RESTRICTED.compose("java.math +{}");
+        assertTrue(composed.allow(swCtor));
+        assertTrue(composed.allow(java.io.StringWriter.class));
     }
 
     @Test

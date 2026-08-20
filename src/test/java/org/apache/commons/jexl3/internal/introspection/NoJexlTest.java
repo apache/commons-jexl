@@ -25,6 +25,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
 import org.apache.commons.jexl3.annotations.NoJexl;
+import org.apache.commons.jexl3.introspection.JexlPermissions;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -85,7 +86,7 @@ class NoJexlTest {
 
     @Test
     void testNoJexlPermissions() throws Exception {
-        final Permissions p = Permissions.UNRESTRICTED;
+        final Permissions p = Permissions.Markers.UNRESTRICTED;
         assertFalse(p.allow((Field) null));
         assertFalse(p.allow((Package) null));
         assertFalse(p.allow((Method) null));
@@ -137,4 +138,31 @@ class NoJexlTest {
         assertFalse(p.allow(cA3));
     }
 
+    @NoJexl
+    interface ProtectedInterface {
+        String protectedOperation();
+    }
+
+    interface IntermediateInterface extends ProtectedInterface {
+    }
+
+   public static class HostObject implements IntermediateInterface {
+        public String protectedOperation() {
+            return "protected";
+        }
+        public String unprotectedOperation() {
+            return "unprotected";
+        }
+    }
+
+    @Test
+    void testNoJexlIntermediate() throws Exception {
+        final JexlPermissions p = Permissions.RESTRICTED.compose("org.apache.commons.jexl3.internal.introspection { +NoJexlTest$HostObject {} }");
+        final Method m0 = HostObject.class.getMethod("unprotectedOperation");
+        assertNotNull(m0);
+        assertTrue(p.allow(m0));
+        final Method m1 = HostObject.class.getMethod("protectedOperation");
+        assertNotNull(m1);
+        assertFalse(p.allow(m1));
+    }
 }
