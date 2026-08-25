@@ -338,6 +338,25 @@ public class PermissionsParser {
     }
 
     /**
+     * Creates or merges a package entry when a '{' block is opened.
+     *
+     * @param existing the current value in the packages map, or {@code null} if absent
+     * @param deny     whether the new entry is deny-oriented
+     * @param denyAll  whether unlisted classes should be denied (preserve deny-all-unlisted semantics)
+     * @return the package instance to store
+     */
+    private static Permissions.NoJexlPackage mergePackage(
+            final Permissions.NoJexlPackage existing, final boolean deny, final boolean denyAll) {
+        final Map<String, Permissions.NoJexlClass> pkgMap = existing == null ? null : existing.nojexl;
+        if (deny) {
+            return denyAll
+                ? new Permissions.DenyAllPackage(pkgMap)
+                : new Permissions.NoJexlPackage(pkgMap);
+        }
+        return new Permissions.JexlPackage(pkgMap);
+    }
+
+    /**
      * Reads a package permission.
      */
     private void readPackages() {
@@ -397,27 +416,12 @@ public class PermissionsParser {
                     //negative = true;
                 }
                 if (c == '{') {
-                    final Boolean specified = negative;
-                    njpackage = packages.compute(pname,
-                        (n, p) -> {
-                            // if we haven't specified allow/deny,
-                            // keep the existing specification if any, otherwise default to deny
-                            final boolean deny = specified == null ? !(p instanceof Permissions.JexlPackage) : specified;
-                            final Map<String, Permissions.NoJexlClass> pkgMap = p == null ? null : p.nojexl;
-                            if (deny) {
-                                // when no explicit sign was given and the existing entry denies all
-                                // unlisted classes (NOJEXL_PACKAGE or DenyAllPackage), preserve that
-                                // deny-all-unlisted semantics for classes not covered by the new rules
-                                final boolean denyAll = specified == null
-                                    && (p == Permissions.Markers.NOJEXL_PACKAGE
-                                        || p instanceof Permissions.DenyAllPackage);
-                                return denyAll
-                                    ? new Permissions.DenyAllPackage(pkgMap)
-                                    : new Permissions.NoJexlPackage(pkgMap);
-                            }
-                            return new Permissions.JexlPackage(pkgMap);
-                        }
-                    );
+                    final Boolean sign = negative;
+                    njpackage = packages.compute(pname, (n, p) -> {
+                        final boolean deny = sign == null ? (p == null || !p.isPositive()) : sign;
+                        final boolean denyAll = sign == null && p != null && p.isDenyAll();
+                        return mergePackage(p, deny, denyAll);
+                    });
                     i += 1;
                 }
             } else if (c == '}') {
@@ -455,7 +459,7 @@ public class PermissionsParser {
             }
             i += 1;
         }
-        return offset;
+        return i;
     }
 
     /**
