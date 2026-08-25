@@ -225,6 +225,15 @@ public class Permissions implements JexlPermissions {
          */
         boolean isPositive() { return false; }
 
+        /**
+         * Whether this package denies all unlisted classes (deny-all-unlisted semantics).
+         * <p>Returns {@code true} for the {@link Markers#NOJEXL_PACKAGE} sentinel and
+         * {@link DenyAllPackage} instances; {@code false} for all other package types.</p>
+         *
+         * @return true if unlisted classes are denied by default
+         */
+        boolean isDenyAll() { return false; }
+
         @Override public NoJexlPackage copy() {
             return new NoJexlPackage(copyMap(nojexl));
         }
@@ -248,6 +257,30 @@ public class Permissions implements JexlPermissions {
 
         @Override public JexlPackage copy() {
             return new JexlPackage(copyMap(nojexl));
+        }
+    }
+
+    /**
+     * A package where ALL unlisted classes are denied.
+     * <p>The symmetric counterpart of {@link JexlPackage}: created by {@code compose()} when class-specific
+     * exceptions are added to a package previously marked as {@link Markers#NOJEXL_PACKAGE}.
+     * The deny-all-unlisted semantics of the base are preserved while allowing individually declared classes.</p>
+     */
+    static class DenyAllPackage extends NoJexlPackage {
+        DenyAllPackage(final Map<String, NoJexlClass> map) {
+            super(map);
+        }
+
+        @Override
+        NoJexlClass getNoJexl(final Class<?> clazz) {
+            final NoJexlClass njc = nojexl.get(classKey(clazz));
+            return njc != null ? njc : NOJEXL_CLASS;
+        }
+
+        @Override boolean isDenyAll() { return true; }
+
+        @Override public NoJexlPackage copy() {
+            return new DenyAllPackage(copyMap(nojexl));
         }
     }
 
@@ -336,6 +369,8 @@ public class Permissions implements JexlPermissions {
             @Override NoJexlClass getNoJexl(final Class<?> clazz) {
                 return NOJEXL_CLASS;
             }
+
+            @Override boolean isDenyAll() { return true; }
 
             // a constant singleton survives copy as itself, preserving its deny-all nature through compose()
             @Override public NoJexlPackage copy() {
