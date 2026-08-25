@@ -37,6 +37,40 @@ public class SwitchTest extends JexlTestCase {
         super("SwitchTest");
     }
 
+    /**
+     * 'continue' inside a switch statement must target the enclosing loop (as in Java), not be
+     * swallowed and fall through into the following cases (JEXL-security f029). 'break' by contrast
+     * only breaks out of the switch, leaving the rest of the loop body to run.
+     */
+    @Test
+    void testContinueInSwitchStatement() {
+        final JexlEngine jexl = new JexlBuilder().create();
+        // continue skips the remainder of the loop iteration -> the append is not reached for i == 2
+        final String continueSrc =
+            "var r = '';\n" +
+            "for (var i : [1, 2, 3]) {\n" +
+            "  switch (i) {\n" +
+            "    case 2 : continue;\n" +
+            "    default : {}\n" +
+            "  }\n" +
+            "  r += i;\n" +
+            "}\n" +
+            "r";
+        assertEquals("13", jexl.createScript(continueSrc).execute(null));
+        // break only leaves the switch -> the append still runs for every i
+        final String breakSrc =
+            "var r = '';\n" +
+            "for (var i : [1, 2, 3]) {\n" +
+            "  switch (i) {\n" +
+            "    case 2 : break;\n" +
+            "    default : {}\n" +
+            "  }\n" +
+            "  r += i;\n" +
+            "}\n" +
+            "r";
+        assertEquals("123", jexl.createScript(breakSrc).execute(null));
+    }
+
     @Test
     void testSwitchExpression() {
         final JexlEngine jexl = new JexlBuilder().safe(false).strict(true).create();

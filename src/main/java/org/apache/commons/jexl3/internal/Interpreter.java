@@ -1313,11 +1313,40 @@ public class Interpreter extends InterpreterBase {
         return result;
     }
 
+    /**
+     * Evaluates the argument of {@code empty()}/{@code size()} while preserving cancellation and
+     * strict-mode error propagation (JEXL-security f028).
+     * <p>
+     * {@link JexlArithmetic#evaluate(Log, Supplier)} logs and swallows <em>every</em> {@link JexlException}
+     * (including {@link JexlException.Cancel}), masking the failure as the empty/0 result even in a strict
+     * engine. Here cancellation is always rethrown and, in a strict engine, so is any other error; only a
+     * lenient engine maps a failed argument evaluation to the {@link JexlEngine#TRY_FAILED} sentinel.
+     * </p>
+     *
+     * @param arg the argument supplier
+     * @return the evaluated value, or {@link JexlEngine#TRY_FAILED} on a swallowed lenient failure
+     */
+    private Object evaluateArgument(final Supplier<Object> arg) {
+        try {
+            return arg.get();
+        } catch (final JexlException.Cancel xcancel) {
+            // cancellation (and timeouts) must never be masked as an empty/0 result
+            throw xcancel;
+        } catch (final JexlException xjexl) {
+            if (isStrictEngine()) {
+                // a strict engine surfaces the underlying error instead of masking it
+                throw xjexl;
+            }
+            // lenient: delegate to the arithmetic hook so subclasses can override fallback/logging
+            return arithmetic.evaluate(logger, () -> { throw xjexl; });
+        }
+    }
+
     @Override
     protected Object visit(final ASTEmptyFunction node, final Object data) {
         final JexlNode arg = node.jjtGetChild(0);
         final Supplier<Object> eval = () -> arg.jjtAccept(this, data);
-        Object value = arithmetic.evaluate(logger, eval);
+        Object value = evaluateArgument(eval);
         return value == JexlEngine.TRY_FAILED ? true : operators.empty(node, value);
     }
 
@@ -2009,7 +2038,7 @@ public class Interpreter extends InterpreterBase {
     protected Object visit(final ASTSizeFunction node, final Object data) {
         final JexlNode arg = node.jjtGetChild(0);
         final Supplier<Object> eval = () -> arg.jjtAccept(this, data);
-        Object value = arithmetic.evaluate(logger, eval);
+        Object value = evaluateArgument(eval);
         return value == JexlEngine.TRY_FAILED ? 0 : operators.size(node, value);
     }
 
@@ -2069,9 +2098,10 @@ public class Interpreter extends InterpreterBase {
                     value = node.jjtGetChild(i).jjtAccept(this, data);
                 } catch (final JexlException.Break xbreak) {
                    break; // break out of the switch
-                } catch (final JexlException.Continue xcontinue) {
-                    // continue to next case
                 }
+                // NOTE: JexlException.Continue is intentionally NOT caught here. Like Java, 'continue'
+                // targets the enclosing loop, not the switch, so it must propagate out of the switch
+                // rather than fall through into the following cases (JEXL-security f029).
             }
             return value;
         }

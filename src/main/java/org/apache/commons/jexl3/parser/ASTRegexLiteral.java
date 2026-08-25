@@ -18,6 +18,9 @@ package org.apache.commons.jexl3.parser;
 
 import java.util.Objects;
 import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
+
+import org.apache.commons.jexl3.JexlException;
 
 public final class ASTRegexLiteral extends JexlNode implements JexlNode.Constant<Pattern> {
 
@@ -54,7 +57,13 @@ public final class ASTRegexLiteral extends JexlNode implements JexlNode.Constant
     }
 
     void setLiteral(final String literal) {
-        this.literal = Pattern.compile(literal);
+        try {
+            // report a malformed pattern as a parse error rather than leaking PatternSyntaxException (JEXL-security f019)
+            this.literal = Pattern.compile(literal);
+        } catch (final PatternSyntaxException xpattern) {
+            throw new JexlException.Parsing(jexlInfo(),
+                "invalid regular expression at " + xpattern.getIndex() + ": " + xpattern.getDescription()).clean();
+        }
     }
 
     @Override

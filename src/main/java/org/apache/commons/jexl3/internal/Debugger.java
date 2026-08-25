@@ -1294,7 +1294,8 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
 
     @Override
     protected Object visit(final ASTRegexLiteral node, final Object data) {
-        final String img = StringParser.escapeString(node.toString(), '/');
+        // emit the regex verbatim (only '/' is escaped), mirroring the verbatim buildRegex (JEXL-security f019)
+        final String img = StringParser.escapeRegex(node.toString());
         return check(node, "~" + img, data);
     }
 

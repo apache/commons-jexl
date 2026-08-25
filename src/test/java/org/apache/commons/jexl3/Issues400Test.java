@@ -233,6 +233,43 @@ public class Issues400Test {
         assertArrayEquals(new String[]{"C"}, (String[]) result);
     }
 
+    /**
+     * The safe-navigation bit of an array access must be keyed to the bracket (child) position,
+     * not to the count of '?[' seen (JEXL-security f020). A mixed chain like 'a[b]?[c]' must mark
+     * only the second child as safe; round-tripping through the Debugger proves the right child
+     * carries the '?'.
+     */
+    @Test
+    void testSafeNavBitIndexing() {
+        // @formatter:off
+        final JexlEngine jexl = new JexlBuilder()
+            .cache(64)
+            .strict(true)
+            .safe(false)
+            .create();
+        // @formatter:on
+        // Debugger reconstructs '?[' from isSafeChild(i); mixed chains must round-trip verbatim.
+        final String[] sources = {
+            "a[b]?[c]",
+            "a?[b][c]",
+            "a[b][c]?[d]",
+            "a?[b]?[c]",
+            "a[b][c]"
+        };
+        for (final String src : sources) {
+            final JexlScript script = jexl.createScript(src, "a", "b", "c", "d");
+            assertEquals(src, script.getParsedText(), src);
+        }
+        // and the leading-non-safe / trailing-safe split behaves at evaluation time:
+        // a is present, a[b] is null -> the trailing ?[c] shields the null, yielding null (not a throw).
+        final Map<String, Object> a = Collections.singletonMap("x", 42);
+        final JexlScript shielded = jexl.createScript("a[b]?[c]", "a", "b", "c");
+        assertNull(shielded.execute(null, a, "missing", "c"));
+        // whereas the leading, non-safe [b] on a null base still throws.
+        final JexlScript unshielded = jexl.createScript("a[b]?[c]", "a", "b", "c");
+        assertThrows(JexlException.class, () -> unshielded.execute(null, null, "b", "c"));
+    }
+
     @Test
     void test406a() {
         // @formatter:off
