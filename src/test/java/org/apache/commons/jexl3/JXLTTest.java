@@ -151,10 +151,10 @@ class JXLTTest extends JexlTestCase {
        // deny the test class itself but explicitly allow the nested fixture classes: a whole-class
        // denial now propagates to nested classes (the -X{} keying gap is closed), so the fixtures
        // the scripts touch must be positively declared inside the (container) block
-       final JexlPermissions permissions = JexlPermissions.RESTRICTED.compose(
-           "org.apache.commons.jexl3 +{ JXLTTest {"
-               + " +Context311 {} +Executor311 {} +Froboz {} +FrobozWriter {} +Arithmetic425 {}"
-               + " } }");
+        final JexlPermissions permissions = JexlPermissions.RESTRICTED.compose(
+            "org.apache.commons.jexl3 +{ -JXLTTest {"
+                + " +Context311 {} +Executor311 {} +Froboz {} +FrobozWriter {} +Arithmetic425 {}"
+                + " } }");
       return Arrays.asList(
               new JexlBuilder().permissions(permissions).silent(false).lexical(true).lexicalShade(true).cache(128).strict(true),
               new JexlBuilder().permissions(permissions).features(f).silent(false).cache(128).strict(true),

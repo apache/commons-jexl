@@ -54,7 +54,7 @@ class PermissionsRestrictedSweepTest {
                 return method;
             }
         }
-        return null;
+        throw new AssertionError("Missing method: " + clazz.getName() + "#" + name);
     }
 
     /** The build targets Java 8: Java 9+ classes must be referenced reflectively. */
