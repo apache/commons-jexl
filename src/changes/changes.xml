@@ -30,11 +30,14 @@
         <release version="3.7.1" date="YYYY-MM-DD" description="This is a feature and maintenance release. Java 8 or later is required.">
             <!-- ADD -->
             <action dev="henrib" type="add" issue="JEXL-467">IntelliJ and VSCode editors (TextMate bundle) support for JEXL.</action>
+            <action dev="henrib" due-to="Claude" type="add" issue="JEXL-469">Add JexlFeatures.namespaceInstantiation(boolean) to control whether a namespace bound to a Class or class-name string is reflectively auto-instantiated into a functor; string namespaces now resolve through the permission-aware uberspect.</action>
             <!-- FIX -->
             <action dev="henrib" type="fix" issue="JEXL-466">IllegalStateException parsing a template with string interpolation.</action>
             <action dev="NikRom5531" due-to="Felix Rudolphi" type="fix" issue="JEXL-411">Leading zeroes in floating point numbers should be optional.</action>
             <action dev="ggregory" type="fix" due-to="Gary Gregory">Pick up commons.jacoco.version from the parent POM.</action>
             <action dev="ggregory" type="fix" due-to="Gary Gregory">Add messages when throwing NullPointerException.</action>
+            <action dev="henrib" due-to="Claude" type="fix" issue="JEXL-468">Improve robustness of introspection permissions and sandbox delegation: close nested-class and interface-method denial gaps, fix class-initialization ordering, gate sandbox iteration, fix permission-parser polarity, deny second-stage compiler surface under RESTRICTED, and enforce parser feature restrictions in sub-parsers.</action>
+            <action dev="henrib" due-to="Claude" type="fix" issue="JEXL-470">Fix several parser and interpreter correctness issues: Unicode escape hex-digit validation, safe-navigation array-access child indexing, regex escape preservation, empty()/size() error and cancellation propagation, and switch+continue semantics.</action>
             <!-- UPDATE -->
             <action type="update" dev="ggregory" due-to="Gary Gregory">Bump org.apache.commons:commons-parent from 102 to 104.</action>
         </release>
