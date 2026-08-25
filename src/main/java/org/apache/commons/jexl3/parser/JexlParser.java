@@ -521,6 +521,9 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
     protected void cleanup(final JexlFeatures features) {
         info = null;
         source = null;
+        // always restore features, symmetric with the set in parse(); a sub-parser (parent != null)
+        // shares the controller and must hand it back the way it found it
+        setFeatures(features);
         if (parent == null) {
             scopeReference.set(null);
             scopes.clear();
@@ -533,7 +536,6 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
             blocks.clear();
             blockReference.set(null);
             blockScopes.clear();
-            setFeatures(features);
         }
     }
 
@@ -1008,10 +1010,12 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
      */
     @Override
     public ASTJexlScript jxltParse(final JexlInfo info, final JexlFeatures features, final String src, final Scope scope) {
-        JexlFeatures previous = getFeatures();
+        // the sub-parser brackets its own features (parse() sets them, cleanup() restores them);
+        // this parser only has to roll back its shared scope state if the sub-parse fails
+        final JexlFeatures previous = getFeatures();
         try {
             return new Parser(this).parse(info, features, src, scope);
-        } catch (JexlException ex) {
+        } catch (final JexlException ex) {
             cleanup(previous);
             throw ex;
         }

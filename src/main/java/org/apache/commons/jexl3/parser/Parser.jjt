@@ -75,8 +75,11 @@ public final class Parser extends JexlParser
             // lets do the 'Unique Init' in here to be safe - it's a pain to remember
             this.info = jexlInfo != null? jexlInfo : new JexlInfo();
             this.source = jexlSrc;
+            // features are always bracketed by whoever parses (set here, restored in cleanup);
+            // sub-parsers (parent != null, JXLT/template content) need this too or they would
+            // parse under whatever the shared controller last held instead of the requested set.
+            setFeatures(jexlFeatures);
             if (this.parent == null) {
-                setFeatures(jexlFeatures);
                 this.pragmas = null;
             }
             this.scopeReference.set(jexlScope);

@@ -24,6 +24,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -206,10 +207,37 @@ class SandboxTest extends JexlTestCase {
         void tryMeARiver();
     }
 
+    /** A simple iterable used to verify sandboxed iteration (f006). */
+    public static class Iterable386 implements Iterable<Integer> {
+        private final List<Integer> values = Arrays.asList(1, 2, 3);
+        @Override
+        public Iterator<Integer> iterator() {
+            return values.iterator();
+        }
+    }
+
     static final Log LOGGER = LogFactory.getLog(SandboxTest.class.getName());
 
     public SandboxTest() {
         super("SandboxTest");
+    }
+
+    @Test
+    void testIteratorBlock() {
+        // f006: the sandbox must gate iteration; blocking the "iterator" method denies foreach
+        final String src = "var sum = 0; for (var i : it) { sum += i; } sum";
+        final Iterable386 it = new Iterable386();
+
+        // allow-by-default sandbox: iteration works and sums 1 + 2 + 3
+        final JexlSandbox open = new JexlSandbox();
+        final JexlEngine ojexl = new JexlBuilder().sandbox(open).strict(true).safe(false).create();
+        assertEquals(6, ojexl.createScript(src, "it").execute(null, it));
+
+        // block the iterator method: getIterator returns null and the loop body never runs
+        final JexlSandbox sandbox = new JexlSandbox();
+        sandbox.block(Iterable386.class.getName()).execute("iterator");
+        final JexlEngine sjexl = new JexlBuilder().sandbox(sandbox).strict(true).safe(false).create();
+        assertEquals(0, sjexl.createScript(src, "it").execute(null, it));
     }
 
     @Test

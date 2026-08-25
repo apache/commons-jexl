@@ -587,12 +587,52 @@ class PermissionsTest {
                 "java.lang {{ Runtime {} }",
                 "java.rmi {}}",
                 "java.io { Text File {} }",
-                "java.io { File { m.x } }"
+                "java.io { File { m.x } }",
+                // f008: mixing +/- signs on a single element is ambiguous and rejected
+                "java.io { File { + -m(); } }",
+                "java.io { File { - +f; } }"
         };
         // @formatter:on
         for (final String src : srcs) {
             assertThrows(IllegalStateException.class, () -> JexlPermissions.parse(src));
         }
+    }
+
+    @Test
+    void testInnerClassDenySign() {
+        // f008: a '-' sign on an inner class must deny it, even inside an allowing (+) outer class;
+        // previously the inner-class sign was discarded and the outer polarity leaked in
+        final String pkg = "org.apache.commons.jexl3.internal.introspection";
+        final String src = pkg + " { PermissionsTest { +Outer { -Inner {} } } }";
+        final Permissions p = (Permissions) JexlPermissions.parse(src);
+        final Method callMeNot = getMethod(Outer.Inner.class, "callMeNot");
+        assertFalse(p.allow(callMeNot), "-Inner must be denied");
+    }
+
+    @Test
+    void testPositiveMemberDoesNotLeakToInnerClass() {
+        // f008: a '+' before a member must not flip the enclosing class polarity and leak into a
+        // following inner class; Inner inherits Outer's deny polarity and stays denied
+        final String pkg = "org.apache.commons.jexl3.internal.introspection";
+        final String src = pkg + " { PermissionsTest { Outer { +hashCode(); Inner {} } } }";
+        final Permissions p = (Permissions) JexlPermissions.parse(src);
+        final Method callMeNot = getMethod(Outer.Inner.class, "callMeNot");
+        assertFalse(p.allow(callMeNot), "Inner must stay denied despite a preceding +member");
+    }
+
+    @Test
+    void testEngineCompilerDeniedUnderRestricted() {
+        // f009/f036: a live engine reachable from a script must not act as a second-stage compiler
+        assertFalse(RESTRICTED.allow(getMethod(JexlEngine.class, "createScript")));
+        assertFalse(RESTRICTED.allow(getMethod(JexlEngine.class, "createExpression")));
+        assertFalse(RESTRICTED.allow(getMethod(JexlEngine.class, "createJxltEngine")));
+        assertFalse(RESTRICTED.allow(getMethod(JexlEngine.class, "getThreadEngine")));
+
+        final JexlEngine jexl = new JexlBuilder().permissions(RESTRICTED).safe(false).strict(true).create();
+        final JexlContext ctxt = new MapContext();
+        ctxt.set("e", jexl);
+        final JexlScript script = jexl.createScript("e.createScript('1 + 1')");
+        assertThrows(JexlException.Method.class, () -> script.execute(ctxt));
     }
 
     @Test

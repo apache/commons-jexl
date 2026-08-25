@@ -94,7 +94,7 @@ public class PermissionsParser {
             final String... srcs) {
         try {
             if (srcs == null || srcs.length == 0) {
-                return Permissions.UNRESTRICTED;
+                return Permissions.Markers.UNRESTRICTED;
             }
             this.packages = packages;
             this.wildcards = wildcards;
@@ -136,7 +136,9 @@ public class PermissionsParser {
         String identifier = inner;
         boolean deny = nojexl;
         boolean classPositive = false; // the class's own polarity (set at creation, never mutated)
-        boolean memberNegative = false; // whether the pending member is prefixed with '-'
+        boolean memberNegative = false; // whether the pending member/inner class is prefixed with '-'
+        boolean memberPositive = false; // whether the pending member/inner class is prefixed with '+'
+        boolean hasNested = false; // whether this (otherwise empty) class only encloses nested classes
         int i = offset;
         int j = -1;
         boolean isMethod = false;
@@ -164,13 +166,24 @@ public class PermissionsParser {
             }
             // read an identifier, the class name
             if (identifier == null) {
-                // negative or positive set ?
+                // negative or positive set ? mixing signs on the same element is an error
                 if (c == '-') {
+                    if (memberPositive) {
+                        throw new IllegalStateException(unexpected(c, i));
+                    }
                     // a '-' before a member denies it; tracked for a possible deny-list upgrade
                     memberNegative = true;
                     i += 1;
                 } else if (c == '+') {
-                    deny = false;
+                    if (memberNegative) {
+                        throw new IllegalStateException(unexpected(c, i));
+                    }
+                    memberPositive = true;
+                    // a '+' only selects an allowing class when it prefixes the class name; once the class
+                    // exists it must not flip the class polarity (which would leak into inner classes)
+                    if (njclass == null) {
+                        deny = false;
+                    }
                     i += 1;
                 }
                 final int next = readIdentifier(temp, i);
@@ -191,16 +204,21 @@ public class PermissionsParser {
                 njclass = deny ? new Permissions.NoJexlClass() : new Permissions.JexlClass();
                 classPositive = !deny;
                 memberNegative = false; // a class-level sign does not carry to members
+                memberPositive = false;
                 njname = outer != null ? outer + "$" + identifier : identifier;
                 njpackage.addNoJexl(njname, njclass);
                 identifier = null;
             } else if (identifier != null)  {
                 // class member mode
                 if (c == '{') {
-                    // inner class
-                    i = readClass(njpackage, deny, njname, identifier, i - 1);
+                    // inner class: its own polarity comes from its explicit sign ('-' deny, '+' allow),
+                    // defaulting to the enclosing class's polarity; the sign never mutates the outer class
+                    final boolean innerDeny = memberNegative || !memberPositive && !classPositive;
+                    i = readClass(njpackage, innerDeny, njname, identifier, i - 1);
                     identifier = null;
                     memberNegative = false; // an inner-class sign does not change the outer class
+                    memberPositive = false;
+                    hasNested = true; // this class encloses at least one nested class declaration
                     continue;
                 }
                 if (c == ';') {
@@ -220,6 +238,7 @@ public class PermissionsParser {
                     }
                     identifier = null;
                     memberNegative = false;
+                    memberPositive = false;
                 } else if (c == '(' && !isMethod) {
                     // method; only one opening parenthesis allowed
                     isMethod = true;
@@ -235,8 +254,10 @@ public class PermissionsParser {
             if (njclass.isEmpty()) {
                 njpackage.addNoJexl(njname,
                     njclass.isPositive()
-                        ? Permissions.JEXL_CLASS
-                        : Permissions.NOJEXL_CLASS);
+                        ? Permissions.Markers.JEXL_CLASS
+                        : hasNested
+                            ? Permissions.Markers.NOJEXL_CONTAINER
+                            : Permissions.Markers.NOJEXL_CLASS);
             } else {
                 njpackage.addNoJexl(njname, njclass);
             }
@@ -395,8 +416,8 @@ public class PermissionsParser {
                 // type in the map (it allows itself and anchors reach-through), so nothing is added to wildcards.
                 if (njpackage.isEmpty()) {
                     packages.put(pname, negative == null || negative
-                        ? Permissions.NOJEXL_PACKAGE
-                        : Permissions.JEXL_PACKAGE);
+                        ? Permissions.Markers.NOJEXL_PACKAGE
+                        : Permissions.Markers.JEXL_PACKAGE);
                 } else {
                     packages.put(pname, njpackage);
                 }
