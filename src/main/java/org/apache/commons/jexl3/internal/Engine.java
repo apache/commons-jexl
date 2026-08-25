@@ -404,6 +404,10 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
         }
         this.expressionFeatures = new JexlFeatures(features).script(false).namespaceTest(nsTest);
         this.scriptFeatures = new JexlFeatures(features).script(true).namespaceTest(nsTest);
+        // a parse-time feature that gates a run-time behavior: bridge it into the base options
+        if (!features.supportsNamespaceInstantiation()) {
+            options.setNamespaceInstantiation(false);
+        }
         this.charset = conf.charset();
         // caching:
         final IntFunction<JexlCache<?, ?>> factory = conf.cacheFactory();
@@ -532,6 +536,10 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
         if (script != null) {
            // process script pragmas if any
            processPragmas(script, context, opts);
+        }
+        // reapply after pragmas: a feature restriction must not be overridable by a pragma
+        if (opts != options && !scriptFeatures.supportsNamespaceInstantiation()) {
+            opts.setNamespaceInstantiation(false);
         }
         return opts;
     }

@@ -16,7 +16,7 @@
  */
 package org.apache.commons.jexl3;
 
-import static org.apache.commons.jexl3.JexlFeatures.IGNORE_TEMPLATE_PREFIX;
+import static org.apache.commons.jexl3.JexlFeatures.NAMESPACE_INSTANTIATE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -72,8 +72,8 @@ class FeaturesTest extends JexlTestCase {
     @Test
     void test410a() {
         final long x = JexlFeatures.createAll().getFlags();
-        assertEquals(IGNORE_TEMPLATE_PREFIX + 1, Long.bitCount(x));
-        assertTrue((x & 1L << IGNORE_TEMPLATE_PREFIX) != 0);
+        assertEquals(NAMESPACE_INSTANTIATE + 1, Long.bitCount(x));
+        assertTrue((x & 1L << NAMESPACE_INSTANTIATE) != 0);
 
         final JexlFeatures all = JexlFeatures.createAll();
         final JexlEngine jexl = new JexlBuilder().features(all).create();
