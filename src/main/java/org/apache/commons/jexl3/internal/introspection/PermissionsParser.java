@@ -404,9 +404,18 @@ public class PermissionsParser {
                             // keep the existing specification if any, otherwise default to deny
                             final boolean deny = specified == null ? !(p instanceof Permissions.JexlPackage) : specified;
                             final Map<String, Permissions.NoJexlClass> pkgMap = p == null ? null : p.nojexl;
-                            return deny
-                                ? new Permissions.NoJexlPackage(pkgMap)
-                                : new Permissions.JexlPackage(pkgMap);
+                            if (deny) {
+                                // when no explicit sign was given and the existing entry denies all
+                                // unlisted classes (NOJEXL_PACKAGE or DenyAllPackage), preserve that
+                                // deny-all-unlisted semantics for classes not covered by the new rules
+                                final boolean denyAll = specified == null
+                                    && (p == Permissions.Markers.NOJEXL_PACKAGE
+                                        || p instanceof Permissions.DenyAllPackage);
+                                return denyAll
+                                    ? new Permissions.DenyAllPackage(pkgMap)
+                                    : new Permissions.NoJexlPackage(pkgMap);
+                            }
+                            return new Permissions.JexlPackage(pkgMap);
                         }
                     );
                     i += 1;

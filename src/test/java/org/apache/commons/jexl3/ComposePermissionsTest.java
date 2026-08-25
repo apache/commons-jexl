@@ -116,6 +116,31 @@ class ComposePermissionsTest extends JexlTestCase {
     }
 
     @Test
+    void testComposePreservesPackageDenialWithException() throws Exception {
+        // When compose() adds a class-specific exception to a package previously marked NOJEXL_PACKAGE,
+        // ALL other classes in that package must remain denied (deny-all-unlisted semantics preserved).
+        final JexlPermissions base = JexlPermissions.parse("java.lang.*", "java.net {}");
+        // before: all of java.net is denied
+        assertFalse(base.allow(java.net.URI.class));
+        assertFalse(base.allow(java.net.URL.class));
+
+        // compose adds an exception for URI; URL (unlisted) must remain denied
+        final JexlPermissions withException = base.compose("java.net { +URI {} }");
+        assertTrue(withException.allow(java.net.URI.class));
+        assertFalse(withException.allow(java.net.URL.class));
+
+        // second compose() on the result must also preserve
+        final JexlPermissions withException2 = withException.compose("java.math +{}");
+        assertTrue(withException2.allow(java.net.URI.class));
+        assertFalse(withException2.allow(java.net.URL.class));
+
+        // RESTRICTED class-level deny (NOJEXL_CLASS) must survive compose that touches java.lang
+        final JexlPermissions restrictedPlus = JexlPermissions.RESTRICTED.compose("java.lang { +ProcessHandle { Info {} } }");
+        assertFalse(restrictedPlus.allow(Thread.class));
+        assertFalse(restrictedPlus.allow(Runtime.class));
+    }
+
+    @Test
     void testComposePermissions1() throws Exception {
         runComposePermissions(new JexlPermissions.Delegate(JexlPermissions.UNRESTRICTED) {
             @Override

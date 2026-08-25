@@ -252,6 +252,28 @@ public class Permissions implements JexlPermissions {
     }
 
     /**
+     * A package where ALL unlisted classes are denied.
+     * <p>The symmetric counterpart of {@link JexlPackage}: created by {@code compose()} when class-specific
+     * exceptions are added to a package previously marked as {@link Markers#NOJEXL_PACKAGE}.
+     * The deny-all-unlisted semantics of the base are preserved while allowing individually declared classes.</p>
+     */
+    static class DenyAllPackage extends NoJexlPackage {
+        DenyAllPackage(final Map<String, NoJexlClass> map) {
+            super(map);
+        }
+
+        @Override
+        NoJexlClass getNoJexl(final Class<?> clazz) {
+            final NoJexlClass njc = nojexl.get(classKey(clazz));
+            return njc != null ? njc : NOJEXL_CLASS;
+        }
+
+        @Override public NoJexlPackage copy() {
+            return new DenyAllPackage(copyMap(nojexl));
+        }
+    }
+
+    /**
      * Holder for the singleton allow/deny markers and the {@code UNRESTRICTED} permission.
      * <p>These live in their own class rather than directly in {@link Permissions} to break a
      * class-initialization cycle: {@code Permissions implements JexlPermissions}, and
