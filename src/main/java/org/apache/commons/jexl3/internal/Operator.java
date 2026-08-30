@@ -363,6 +363,9 @@ public final class Operator implements JexlOperator.Uberspect {
             // not-contains is !contains
             return JexlOperator.CONTAINS == operator == contained;
         } catch (final Exception any) {
+            if (Thread.currentThread().isInterrupted()) {
+                throw new JexlException.Cancel(node instanceof JexlNode ? (JexlNode) node : null);
+            }
             return operatorError(node, operator, any, false);
         }
     }

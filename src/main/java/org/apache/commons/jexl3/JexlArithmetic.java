@@ -218,6 +218,9 @@ public class JexlArithmetic {
      */
     public static final Pattern FLOAT_PATTERN = Pattern.compile("^[+-]?\\d*(\\.\\d*)?([eE][+-]?\\d+)?$");
 
+    /** Maximum length of a regex pattern string for the {@code =~} operator (JEXL-security f012). */
+    protected static final int REGEX_PATTERN_MAX_LENGTH = 2048;
+
     /**
      * Attempts transformation of potential array in an abstract list or leave as is.
      * <p>An array (as in int[]) is not convenient to call methods so when encountered we turn them into lists</p>
@@ -340,6 +343,7 @@ public class JexlArithmetic {
                             ? left instanceof String || right instanceof String
                             : left instanceof String && right instanceof String;
         if (!strconcat) {
+            BigInteger bigIntResult = null;
             try {
                 final boolean strictCast = isStrict(JexlOperator.ADD);
                 // if both (non-null) args fit as long
@@ -370,10 +374,13 @@ public class JexlArithmetic {
                 // otherwise treat as BigInteger
                 final BigInteger l = toBigInteger(strictCast, left);
                 final BigInteger r = toBigInteger(strictCast, right);
-                final BigInteger result = l.add(r);
-                return narrowBigInteger(left, right, result);
+                bigIntResult = l.add(r);
             } catch (final ArithmeticException nfe) {
                 // ignore and continue in sequence
+            }
+            // precision check is outside the catch so it is not silently swallowed (f013)
+            if (bigIntResult != null) {
+                return narrowBigInteger(left, right, checkBigIntegerPrecision(bigIntResult));
             }
         }
         return (left == null ? "" : toString(left)).concat(right == null ? "" : toString(right));
@@ -591,10 +598,14 @@ public class JexlArithmetic {
         }
         // use arithmetic / pattern matching ?
         if (container instanceof java.util.regex.Pattern) {
-            return ((java.util.regex.Pattern) container).matcher(value.toString()).matches();
+            return ((java.util.regex.Pattern) container).matcher(new InterruptibleCharSequence(value.toString())).matches();
         }
         if (container instanceof CharSequence) {
-            return value.toString().matches(container.toString());
+            final String regex = container.toString();
+            if (regex.length() > REGEX_PATTERN_MAX_LENGTH) {
+                throw new ArithmeticException("regular expression too long: " + regex.length() + " > " + REGEX_PATTERN_MAX_LENGTH);
+            }
+            return Pattern.compile(regex).matcher(new InterruptibleCharSequence(value.toString())).matches();
         }
         // try contains on map key
         if (container instanceof Map<?, ?>) {
@@ -906,6 +917,28 @@ public class JexlArithmetic {
             return toBoolean(left) == toBoolean(strictCast, right);
         }
         return compare(left, right, EQ) == 0;
+    }
+
+    /**
+     * Guards a BigInteger result against exceeding the arithmetic context's precision (JEXL-security f013).
+     * <p>When {@link MathContext#getPrecision()} is zero (unlimited), no limit is enforced.
+     * Otherwise, the BigInteger must fit within approximately that many significant decimal digits.</p>
+     *
+     * @param big the value to check
+     * @return big unchanged if within the limit
+     * @throws ArithmeticException when the limit is exceeded
+     */
+    protected BigInteger checkBigIntegerPrecision(final BigInteger big) {
+        final int precision = getMathContext().getPrecision();
+        if (precision > 0) {
+            // precision 0 means unlimited; otherwise, one decimal digit ≈ log2(10) ≈ 10/3 bits
+            final int maxBits = precision * 10 / 3 + 1;
+            if (big.bitLength() > maxBits) {
+                throw new ArithmeticException(
+                  "BigInteger precision exceeded: " + big.bitLength() + " bits for " + precision + "-digit context");
+            }
+        }
+        return big;
     }
 
     /**
@@ -1374,9 +1407,13 @@ public class JexlArithmetic {
             final double r = toDouble(strictCast, right);
             return l * r;
         }
-        // otherwise treat as BigInteger
+        // otherwise treat as BigInteger; pre-check bit-length sum to avoid O(n²) on huge operands
         final BigInteger l = toBigInteger(strictCast, left);
         final BigInteger r = toBigInteger(strictCast, right);
+        final int precision = getMathContext().getPrecision();
+        if (precision > 0 && l.bitLength() + r.bitLength() > precision * 10 / 3 + 1) {
+            throw new ArithmeticException("BigInteger precision exceeded");
+        }
         final BigInteger result = l.multiply(r);
         return narrowBigInteger(left, right, result);
     }
@@ -1746,9 +1783,9 @@ public class JexlArithmetic {
      */
     private BigInteger parseBigInteger(final String arg) throws ArithmeticException {
         try {
-            return arg.isEmpty()? BigInteger.ZERO : new BigInteger(arg);
+            return arg.isEmpty() ? BigInteger.ZERO : checkBigIntegerPrecision(new BigInteger(arg));
         } catch (final NumberFormatException e) {
-            throw new CoercionException("BigDecimal coercion: ("+ arg +")", e);
+            throw new CoercionException("BigInteger coercion: ("+ arg +")", e);
         }
     }
 
@@ -2065,7 +2102,7 @@ public class JexlArithmetic {
         final BigInteger l = toBigInteger(strictCast, left);
         final BigInteger r = toBigInteger(strictCast, right);
         final BigInteger result = l.subtract(r);
-        return narrowBigInteger(left, right, result);
+        return narrowBigInteger(left, right, checkBigIntegerPrecision(result));
     }
 
     /**
@@ -2434,5 +2471,43 @@ public class JexlArithmetic {
         final long l = toLong(left);
         final long r = toLong(right);
         return l ^ r;
+    }
+
+    /**
+     * A CharSequence wrapper that throws ArithmeticException if the current thread is interrupted.
+     * Used as the input to {@code Pattern.matcher()} so that catastrophic-backtracking regex matches
+     * remain responsive to JEXL cancellation (which sets the thread interrupt flag).
+     * The interrupt flag is checked every 256 {@code charAt} calls to limit overhead.
+     */
+    private static final class InterruptibleCharSequence implements CharSequence {
+        private final String seq;
+        private int count;
+
+        private InterruptibleCharSequence(final String s) {
+            this.seq = s;
+        }
+
+        @Override
+        public char charAt(final int index) {
+            if ((++count & 0xff) == 0 && Thread.currentThread().isInterrupted()) {
+                throw new ArithmeticException("Operation interrupted");
+            }
+            return seq.charAt(index);
+        }
+
+        @Override
+        public int length() {
+            return seq.length();
+        }
+
+        @Override
+        public CharSequence subSequence(final int start, final int end) {
+            return seq.subSequence(start, end);
+        }
+
+        @Override
+        public String toString() {
+            return seq;
+        }
     }
 }

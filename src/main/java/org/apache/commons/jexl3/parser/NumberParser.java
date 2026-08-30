@@ -23,6 +23,8 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Locale;
 
+import org.apache.commons.jexl3.JexlEngine;
+
 /**
  * Parses number literals.
  */
@@ -31,6 +33,30 @@ public final class NumberParser implements Serializable {
     /**
      */
     private static final long serialVersionUID = 1L;
+
+    /**
+     * Hard upper bound on BigInteger literal digits when no engine precision is configured.
+     * Acts as a parse-time DoS guard independent of any MathContext (JEXL-security f014).
+     */
+    static final int MAX_BIGINTEGER_DIGITS = 256;
+
+    /**
+     * Returns the maximum digit count allowed for a BigInteger literal.
+     * When a JEXL engine with a bounded MathContext is active on the current thread, the
+     * engine's precision (in decimal digits) is used as the limit; otherwise MAX_BIGINTEGER_DIGITS applies.
+     * At runtime, JexlArithmetic.checkBigIntegerPrecision() enforces a stricter bit-length limit
+     * based on the same precision (f014, f013).
+     */
+    private static int maxBigIntegerDigits() {
+        final JexlEngine engine = JexlEngine.getThreadEngine();
+        if (engine != null) {
+            final int precision = engine.getArithmetic().getMathContext().getPrecision();
+            if (precision > 0) {
+                return precision;
+            }
+        }
+        return MAX_BIGINTEGER_DIGITS;
+    }
 
     /** JEXL locale-neutral big decimal format. */
     static final DecimalFormat BIGDF = new DecimalFormat("0.0b", new DecimalFormatSymbols(Locale.ROOT));
@@ -77,6 +103,7 @@ public final class NumberParser implements Serializable {
         String s = natural;
         Number result;
         Class<? extends Number> rclass;
+        final int maxDigits = maxBigIntegerDigits();
         // determine the base
         final int base;
         if (s.charAt(0) == '0') {
@@ -102,6 +129,11 @@ public final class NumberParser implements Serializable {
             case 'h':
             case 'H': {
                 rclass = BigInteger.class;
+                if (last > maxDigits) {
+                    throw new NumberFormatException(
+                      "BigInteger literal too long: " + last
+                      + " > " + maxDigits);
+                }
                 final BigInteger bi = new BigInteger(s.substring(0, last), base);
                 result = negative? bi.negate() : bi;
                 break;
@@ -117,6 +149,11 @@ public final class NumberParser implements Serializable {
                         final long l = Long.parseLong(s, base);
                         result = negative? -l : l;
                     } catch (final NumberFormatException take3) {
+                        if (s.length() > maxDigits) {
+                            throw new NumberFormatException(
+                              "BigInteger literal too long: " + s.length()
+                              + " > " + maxDigits);
+                        }
                         final BigInteger bi = new BigInteger(s, base);
                         result = negative? bi.negate() : bi;
                     }

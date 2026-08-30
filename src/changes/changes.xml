@@ -38,6 +38,7 @@
             <action dev="ggregory" type="fix" due-to="Gary Gregory">Add messages when throwing NullPointerException.</action>
             <action dev="henrib" due-to="Claude" type="fix" issue="JEXL-468">Improve robustness of introspection permissions and sandbox delegation: close nested-class and interface-method denial gaps, fix class-initialization ordering, gate sandbox iteration, fix permission-parser polarity, deny second-stage compiler surface under RESTRICTED, and enforce parser feature restrictions in sub-parsers.</action>
             <action dev="henrib" due-to="Claude" type="fix" issue="JEXL-470">Fix several parser and interpreter correctness issues: Unicode escape hex-digit validation, safe-navigation array-access child indexing, regex escape preservation, empty()/size() error and cancellation propagation, and switch+continue semantics.</action>
+            <action dev="henrib" due-to="Claude" type="fix" issue="JEXL-471">Runtime hardening: make regex matching (=~ operator) interruptible, enforce MathContext precision on BigInteger arithmetic results, and prevent O(n²) DoS from huge BigInteger literals at parse time.</action>
             <!-- UPDATE -->
             <action type="update" dev="ggregory" due-to="Gary Gregory">Bump org.apache.commons:commons-parent from 102 to 104.</action>
         </release>

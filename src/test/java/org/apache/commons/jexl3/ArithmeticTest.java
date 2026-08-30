@@ -2409,4 +2409,75 @@ class ArithmeticTest extends JexlTestCase {
         assertEquals("zero", jexl.createExpression("array.0").evaluate(jc));
         assertEquals("one", jexl.createExpression("array.1").evaluate(jc));
     }
+
+    // ----- security fixes f012 / f013 / f014 -----
+
+    /**
+     * f014: BigInteger literal with more digits than MAX_BIGINTEGER_DIGITS must be rejected at parse time.
+     */
+    @Test
+    void testBigIntegerLiteralTooLong() {
+        // normal H-literal still works
+        assertNotNull(JEXL.createScript("42H"));
+        // a literal just over the cap (4096 + 1 digits + 'H') must fail to parse
+        final char[] digits = new char[4097];
+        java.util.Arrays.fill(digits, '1');
+        final String huge = new String(digits) + "H";
+        assertThrows(JexlException.Parsing.class, () -> JEXL.createScript(huge));
+    }
+
+    /**
+     * f013: BigInteger arithmetic results that exceed the MathContext precision must throw.
+     */
+    @Test
+    void testBigIntegerArithmeticPrecisionCap() {
+        // precision=3 caps at ~11 bits (formula: 3 * 10 / 3 + 1 = 11), so results > 2047 are rejected
+        final JexlArithmetic bounded = new JexlArithmetic(true, new MathContext(3), JexlArithmetic.BIGD_SCALE);
+        final JexlEngine jexl = new JexlBuilder().arithmetic(bounded).create();
+        // small values are fine
+        assertEquals(new BigInteger("3"), jexl.createScript("a + b", "a", "b")
+                .execute(null, BigInteger.ONE, BigInteger.valueOf(2L)));
+        // result > 2047 is rejected: 1500 + 1000 = 2500, bitLength=12 > 11
+        assertThrows(JexlException.class, () ->
+                jexl.createScript("a + b", "a", "b")
+                    .execute(null, BigInteger.valueOf(1500L), BigInteger.valueOf(1000L)));
+        // multiply pre-check: 64 (7 bits) * 64 (7 bits), sum of operand bits = 14 > 11
+        assertThrows(JexlException.class, () ->
+                jexl.createScript("a * b", "a", "b")
+                    .execute(null, BigInteger.valueOf(64L), BigInteger.valueOf(64L)));
+    }
+
+    /**
+     * f012: a regex pattern string longer than REGEX_PATTERN_MAX_LENGTH must throw.
+     */
+    @Test
+    void testRegexPatternTooLong() {
+        final JexlEngine jexl = new JexlBuilder().strict(true).create();
+        final JexlScript script = jexl.createScript("x =~ y", "x", "y");
+        final char[] chars = new char[JexlArithmetic.REGEX_PATTERN_MAX_LENGTH + 1];
+        java.util.Arrays.fill(chars, 'a');
+        final String longPattern = new String(chars);
+        assertThrows(JexlException.class, () -> script.execute(null, "abc", longPattern));
+    }
+
+    /**
+     * f012: regex matching must respond to thread interruption so a catastrophic-backtracking
+     * pattern does not hang a cancellable engine indefinitely.
+     */
+    @Test
+    void testRegexMatchingInterruptible() {
+        final JexlEngine jexl = new JexlBuilder().cancellable(true).create();
+        // Classic catastrophic-backtracking: (a+)+b against a non-matching string
+        final JexlScript script = jexl.createScript("x =~ y", "x", "y");
+        final String evilPattern = "(a+)+b";
+        final char[] chars = new char[20];
+        java.util.Arrays.fill(chars, 'a');
+        final String evilValue = new String(chars) + "c";
+        try {
+            Thread.currentThread().interrupt();
+            assertThrows(JexlException.Cancel.class, () -> script.execute(null, evilValue, evilPattern));
+        } finally {
+            Thread.interrupted(); // clear so it does not leak into other tests
+        }
+    }
 }
