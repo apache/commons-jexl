@@ -2523,7 +2523,7 @@ public class JexlArithmetic {
 
         @Override
         public CharSequence subSequence(final int start, final int end) {
-            return seq.subSequence(start, end);
+            return new InterruptibleCharSequence(seq.substring(start, end));
         }
 
         @Override
