@@ -1426,8 +1426,14 @@ public class JexlArithmetic {
         final BigInteger l = toBigInteger(strictCast, left);
         final BigInteger r = toBigInteger(strictCast, right);
         final int precision = getMathContext().getPrecision();
-        if (precision > 0 && l.bitLength() + r.bitLength() > precision * 10 / 3 + 1) {
-            throw new ArithmeticException("BigInteger precision exceeded");
+        final int lBitLength = l.bitLength();
+        final int rBitLength = r.bitLength();
+        final int bitLengthLimit = precision * 10 / 3 + 1;
+        if (precision > 0 && lBitLength + rBitLength > bitLengthLimit) {
+            throw new ArithmeticException("BigInteger precision exceeded: limit=" + bitLengthLimit
+                    + ", leftBitLength=" + lBitLength
+                    + ", rightBitLength=" + rBitLength
+                    + ", contextPrecision=" + precision);
         }
         final BigInteger result = l.multiply(r);
         return narrowBigInteger(left, right, result);
