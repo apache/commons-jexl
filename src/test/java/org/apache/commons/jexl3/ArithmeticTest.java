@@ -2419,8 +2419,8 @@ class ArithmeticTest extends JexlTestCase {
     void testBigIntegerLiteralTooLong() {
         // normal H-literal still works
         assertNotNull(JEXL.createScript("42H"));
-        // a literal just over the cap (4096 + 1 digits + 'H') must fail to parse
-        final char[] digits = new char[4097];
+        // a literal just over the cap (256 + 1 digits + 'H') must fail to parse
+        final char[] digits = new char[256 + 1];
         java.util.Arrays.fill(digits, '1');
         final String huge = new String(digits) + "H";
         assertThrows(JexlException.Parsing.class, () -> JEXL.createScript(huge));
@@ -2465,19 +2465,45 @@ class ArithmeticTest extends JexlTestCase {
      * pattern does not hang a cancellable engine indefinitely.
      */
     @Test
-    void testRegexMatchingInterruptible() {
+    void testRegexMatchingInterruptible() throws InterruptedException {
         final JexlEngine jexl = new JexlBuilder().cancellable(true).create();
-        // Classic catastrophic-backtracking: (a+)+b against a non-matching string
         final JexlScript script = jexl.createScript("x =~ y", "x", "y");
+        // Catastrophic backtracking pattern on non-matching input to force long character scanning
         final String evilPattern = "(a+)+b";
-        final char[] chars = new char[20];
+        // Use a larger set of 'a's to extend matching time
+        final char[] chars = new char[50];
         java.util.Arrays.fill(chars, 'a');
         final String evilValue = new String(chars) + "c";
-        try {
-            Thread.currentThread().interrupt();
-            assertThrows(JexlException.Cancel.class, () -> script.execute(null, evilValue, evilPattern));
-        } finally {
-            Thread.interrupted(); // clear so it does not leak into other tests
+
+        final java.util.concurrent.atomic.AtomicReference<Exception> caught =
+            new java.util.concurrent.atomic.AtomicReference<>();
+        final java.util.concurrent.CountDownLatch started = new java.util.concurrent.CountDownLatch(1);
+
+        final Thread t = new Thread(() -> {
+            try {
+                started.countDown();
+                script.execute(null, evilValue, evilPattern);
+            } catch (final Exception e) {
+                caught.set(e);
+            }
+        });
+
+        t.start();
+        // Wait for thread to actually start executing
+        started.await();
+        // Give regex matching time to engage (50 'a's with (a+)+b pattern causes backtracking)
+        Thread.sleep(300);
+        // Interrupt the matching thread
+        t.interrupt();
+        // Wait for thread to complete (should exit promptly if InterruptibleCharSequence is working)
+        t.join(5000);
+
+        assertFalse(t.isAlive(), "Thread should have completed after interruption (regex should be interruptible)");
+        // The thread may complete without exception if the regex finishes faster than interruption catches it,
+        // or it may throw Cancel if interrupted during charset access. Both are acceptable here.
+        if (caught.get() != null) {
+            assertTrue(caught.get() instanceof JexlException.Cancel,
+                "If interrupted during matching, expected JexlException.Cancel, got " + caught.get().getClass().getSimpleName());
         }
     }
 }

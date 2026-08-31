@@ -1389,22 +1389,25 @@ public class Interpreter extends InterpreterBase {
      * If the right operand of {@code =~} / {@code !~} is a string literal, compile it to a Pattern once and
      * cache the result in the node's value slot (same mechanism as negated numeric literals).
      * Dynamic string values (from variables) are returned unchanged.
-     * The regex string length is validated before compilation (matches JexlArithmetic.REGEX_PATTERN_MAX_LENGTH).
+     * The regex string length is validated before compilation (JEXL-security f012).
+     * Synchronized on the node to ensure thread-safe caching when the same compiled script runs concurrently.
      */
     private static Object resolvePattern(final JexlNode rightNode, final Object right) {
         if (right instanceof CharSequence && rightNode instanceof JexlNode.Constant) {
-            final Object cached = rightNode.jjtGetValue();
-            if (cached instanceof Pattern) {
-                return cached;
+            synchronized (rightNode) {
+                final Object cached = rightNode.jjtGetValue();
+                if (cached instanceof Pattern) {
+                    return cached;
+                }
+                final String regex = right.toString();
+                if (regex.length() > JexlArithmetic.REGEX_PATTERN_MAX_LENGTH) {
+                    throw new ArithmeticException("regular expression too long: " + regex.length()
+                        + " > " + JexlArithmetic.REGEX_PATTERN_MAX_LENGTH);
+                }
+                final Pattern compiled = Pattern.compile(regex);
+                rightNode.jjtSetValue(compiled);
+                return compiled;
             }
-            final String regex = right.toString();
-            final int maxLen = 2048;
-            if (regex.length() > maxLen) {
-                throw new ArithmeticException("regular expression too long: " + regex.length() + " > " + maxLen);
-            }
-            final Pattern compiled = Pattern.compile(regex);
-            rightNode.jjtSetValue(compiled);
-            return compiled;
         }
         return right;
     }

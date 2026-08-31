@@ -41,18 +41,30 @@ public final class NumberParser implements Serializable {
     static final int MAX_BIGINTEGER_DIGITS = 256;
 
     /**
-     * Returns the maximum digit count allowed for a BigInteger literal.
+     * Returns the maximum digit count allowed for a BigInteger literal in the given base.
      * When a JEXL engine with a bounded MathContext is active on the current thread, the
-     * engine's precision (in decimal digits) is used as the limit; otherwise MAX_BIGINTEGER_DIGITS applies.
-     * At runtime, JexlArithmetic.checkBigIntegerPrecision() enforces a stricter bit-length limit
-     * based on the same precision (f014, f013).
+     * engine's precision is converted to an equivalent bit limit, then to max digits for the base.
+     * Otherwise MAX_BIGINTEGER_DIGITS applies.
+     * At runtime, JexlArithmetic.checkBigIntegerPrecision() enforces the bit-length limit (f014, f013).
      */
-    private static int maxBigIntegerDigits() {
+    private static int maxBigIntegerDigits(final int base) {
         final JexlEngine engine = JexlEngine.getThreadEngine();
         if (engine != null) {
             final int precision = engine.getArithmetic().getMathContext().getPrecision();
             if (precision > 0) {
-                return precision;
+                // Use the same bit formula as checkBigIntegerPrecision: precision * 10/3 + 1 bits
+                // For a given base B with log2(B) bits per digit, max_digits = max_bits / log2(B)
+                final int maxBits = precision * 10 / 3 + 1;
+                final int bitsPerDigit;
+                if (base == 16) {
+                    bitsPerDigit = 4;  // log2(16) = 4
+                } else if (base == 8) {
+                    bitsPerDigit = 3;  // log2(8) = 3
+                } else {
+                    // base 10: log2(10) ≈ 3.32, approximate as 10/3
+                    return (maxBits * 3) / 10;
+                }
+                return maxBits / bitsPerDigit;
             }
         }
         return MAX_BIGINTEGER_DIGITS;
@@ -103,7 +115,6 @@ public final class NumberParser implements Serializable {
         String s = natural;
         Number result;
         Class<? extends Number> rclass;
-        final int maxDigits = maxBigIntegerDigits();
         // determine the base
         final int base;
         if (s.charAt(0) == '0') {
@@ -116,6 +127,7 @@ public final class NumberParser implements Serializable {
         } else {
             base = 10;
         }
+        final int maxDigits = maxBigIntegerDigits(base);
         // switch on suffix if any
         final int last = s.length() - 1;
         switch (s.charAt(last)) {

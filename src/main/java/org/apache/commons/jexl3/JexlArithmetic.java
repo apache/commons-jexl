@@ -219,7 +219,7 @@ public class JexlArithmetic {
     public static final Pattern FLOAT_PATTERN = Pattern.compile("^[+-]?\\d*(\\.\\d*)?([eE][+-]?\\d+)?$");
 
     /** Maximum length of a regex pattern string for the {@code =~} operator (JEXL-security f012). */
-    protected static final int REGEX_PATTERN_MAX_LENGTH = 2048;
+    public static final int REGEX_PATTERN_MAX_LENGTH = 2048;
 
     /**
      * Attempts transformation of potential array in an abstract list or leave as is.
@@ -597,15 +597,17 @@ public class JexlArithmetic {
             return false;
         }
         // use arithmetic / pattern matching ?
-        if (container instanceof java.util.regex.Pattern) {
-            return ((java.util.regex.Pattern) container).matcher(new InterruptibleCharSequence(value.toString())).matches();
+        Pattern pattern = null;
+        if (container instanceof Pattern) {
+            pattern = (Pattern) container;
+            controlRegexLength(pattern.pattern().length());
+        } else if (container instanceof CharSequence) {
+            String regex = container.toString();
+            controlRegexLength(regex.length());
+            pattern = Pattern.compile(regex);
         }
-        if (container instanceof CharSequence) {
-            final String regex = container.toString();
-            if (regex.length() > REGEX_PATTERN_MAX_LENGTH) {
-                throw new ArithmeticException("regular expression too long: " + regex.length() + " > " + REGEX_PATTERN_MAX_LENGTH);
-            }
-            return Pattern.compile(regex).matcher(new InterruptibleCharSequence(value.toString())).matches();
+        if (pattern != null) {
+            return pattern.matcher(new InterruptibleCharSequence(value.toString())).matches();
         }
         // try contains on map key
         if (container instanceof Map<?, ?>) {
@@ -616,6 +618,19 @@ public class JexlArithmetic {
         }
         // try contains on collection
         return collectionContains(container, value);
+    }
+
+    /**
+     * Checks the length of a regex pattern string.
+     *
+     * @param length The length of the regex pattern string
+     * @throws ArithmeticException if the length exceeds {@link #REGEX_PATTERN_MAX_LENGTH}
+     */
+    private static void controlRegexLength(int length) {
+        if (length > REGEX_PATTERN_MAX_LENGTH) {
+            throw new ArithmeticException(
+              "regular expression too long: " + length + " > " + REGEX_PATTERN_MAX_LENGTH);
+        }
     }
 
     /**
