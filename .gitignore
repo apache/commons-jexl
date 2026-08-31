@@ -11,3 +11,4 @@ target/
 # NetBeans files
 nb-configuration.xml
 nbactions.xml
+/CLAUDE.md

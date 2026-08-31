@@ -103,6 +103,13 @@ public final class Parser extends JexlParser
             JexlInfo ji = et == null ? info : info.at(et.beginLine, et.beginColumn);
             String msg = et == null ? xparse.getMessage() : et.image;
             throw new JexlException.Parsing(ji, msg).clean();
+        } catch (NumberFormatException xnfe) {
+            Token et = errorToken(jj_lastpos, jj_scanpos, token.next, token);
+            JexlInfo ji = et == null ? info : info.at(et.beginLine, et.beginColumn);
+            String msg = et != null && et.image != null && !et.image.isEmpty()
+                ? et.image
+                : "invalid number literal";
+            throw new JexlException.Parsing(ji, msg).clean();
         } finally {
             token_source.defaultLexState = DEFAULT;
             token_source.ignoredTokens = Collections.emptySet();

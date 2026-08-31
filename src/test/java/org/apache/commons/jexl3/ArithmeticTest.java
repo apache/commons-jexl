@@ -37,7 +37,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -2408,5 +2410,106 @@ class ArithmeticTest extends JexlTestCase {
         jc.set("array", array);
         assertEquals("zero", jexl.createExpression("array.0").evaluate(jc));
         assertEquals("one", jexl.createExpression("array.1").evaluate(jc));
+    }
+
+    // ----- security fixes f012 / f013 / f014 -----
+
+    /**
+     * f014: BigInteger literal with more digits than MAX_BIGINTEGER_DIGITS must be rejected at parse time.
+     */
+    @Test
+    void testBigIntegerLiteralTooLong() {
+        // normal H-literal still works
+        assertNotNull(JEXL.createScript("42H"));
+        // a literal just over the cap (256 + 1 digits + 'H') must fail to parse
+        final char[] digits = new char[JexlArithmetic.MAX_BIGINTEGER_DIGITS + 1];
+        java.util.Arrays.fill(digits, '1');
+        final String huge = new String(digits) + "H";
+        assertThrows(JexlException.Parsing.class, () -> JEXL.createScript(huge));
+    }
+
+    /**
+     * f013: BigInteger arithmetic results that exceed the MathContext precision must throw.
+     */
+    @Test
+    void testBigIntegerArithmeticPrecisionCap() {
+        // precision=3 caps at ~11 bits (formula: 3 * 10 / 3 + 1 = 11), so results > 2047 are rejected
+        final JexlArithmetic bounded = new JexlArithmetic(true, new MathContext(3), JexlArithmetic.BIGD_SCALE);
+        final JexlEngine jexl = new JexlBuilder().arithmetic(bounded).create();
+        // small values are fine
+        assertEquals(new BigInteger("3"), jexl.createScript("a + b", "a", "b")
+                .execute(null, BigInteger.ONE, BigInteger.valueOf(2L)));
+        // result > 2047 is rejected: 1500 + 1000 = 2500, bitLength=12 > 11
+        assertThrows(JexlException.class, () ->
+                jexl.createScript("a + b", "a", "b")
+                    .execute(null, BigInteger.valueOf(1500L), BigInteger.valueOf(1000L)));
+        // multiply pre-check: 64 (7 bits) * 64 (7 bits), sum of operand bits = 14 > 11
+        assertThrows(JexlException.class, () ->
+                jexl.createScript("a * b", "a", "b")
+                    .execute(null, BigInteger.valueOf(64L), BigInteger.valueOf(64L)));
+    }
+
+    /**
+     * f012: a regex pattern string longer than REGEX_PATTERN_MAX_LENGTH must throw.
+     */
+    @Test
+    void testRegexPatternTooLong() {
+        final JexlEngine jexl = new JexlBuilder().strict(true).create();
+        final JexlScript script = jexl.createScript("x =~ y", "x", "y");
+        final char[] chars = new char[JexlArithmetic.REGEX_PATTERN_MAX_LENGTH + 1];
+        java.util.Arrays.fill(chars, 'a');
+        final String longPattern = new String(chars);
+        assertThrows(JexlException.class, () -> script.execute(null, "abc", longPattern));
+    }
+
+    /**
+     * f012: regex matching must respond to thread interruption so a catastrophic-backtracking
+     * pattern does not hang a cancellable engine indefinitely.
+     */
+    @Test
+    void testRegexMatchingInterruptible() throws InterruptedException {
+        final JexlEngine jexl = new JexlBuilder().cancellable(true).create();
+        final JexlScript script = jexl.createScript("x =~ y", "x", "y");
+        final String evilPattern = "(a+)+b";
+
+        for (int size = 256; size <= 4096; size *= 2) {
+            final char[] chars = new char[size];
+            java.util.Arrays.fill(chars, 'a');
+            final String evilValue = new String(chars) + "c";
+
+            final AtomicReference<Throwable> caught = new AtomicReference<>();
+            final CountDownLatch started = new CountDownLatch(1);
+            final Thread t = new Thread(() -> {
+                try {
+                    started.countDown();
+                    script.execute(null, evilValue, evilPattern);
+                } catch (final Throwable e) {
+                    caught.set(e);
+                }
+            });
+
+            t.start();
+            started.await();
+
+            final long deadline = System.nanoTime() + java.util.concurrent.TimeUnit.SECONDS.toNanos(5);
+            while (t.isAlive() && System.nanoTime() < deadline) {
+                t.interrupt();
+                Thread.yield();
+                t.join(10L);
+            }
+
+            assertFalse(t.isAlive(), "Thread should have completed after interruption (regex should be interruptible)");
+
+            final Throwable thrown = caught.get();
+            if (thrown instanceof JexlException.Cancel) {
+                return;
+            }
+            if (thrown != null) {
+                fail("Expected JexlException.Cancel when interrupted during matching, got "
+                    + thrown.getClass().getSimpleName(), thrown);
+            }
+        }
+
+        fail("Did not observe JexlException.Cancel during interrupted regex matching");
     }
 }

@@ -24,6 +24,7 @@ import java.util.Queue;
 import java.util.concurrent.Callable;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+import java.util.regex.Pattern;
 
 import org.apache.commons.jexl3.JexlArithmetic;
 import org.apache.commons.jexl3.JexlContext;
@@ -1377,10 +1378,47 @@ public class Interpreter extends InterpreterBase {
     @Override
     protected Object visit(final ASTERNode node, final Object data) {
         final Object left = node.jjtGetChild(0).jjtAccept(this, data);
-        final Object right = node.jjtGetChild(1).jjtAccept(this, data);
+        final JexlNode rightNode = node.jjtGetChild(1);
+        final Object right = resolvePattern(rightNode, rightNode.jjtAccept(this, data));
         // note the arguments inversion between 'in'/'matches' and 'contains'
         // if x in y then y contains x
         return operators.contains(node, JexlOperator.CONTAINS, right, left);
+    }
+
+    /**
+     * If the right operand of {@code =~} / {@code !~} is a string literal, compile it to a Pattern once and
+     * cache the result in the node's value slot (same mechanism as negated numeric literals).
+     * Dynamic string values (from variables) are returned unchanged.
+     * The regex string length is validated before compilation (JEXL-security f012).
+     * Uses double-check locking: first check without lock, then synchronized recheck-and-set to avoid
+     * holding the lock during expensive Pattern.compile() when the same compiled script runs concurrently.
+     */
+    private static Object resolvePattern(final JexlNode rightNode, final Object right) {
+        if (right instanceof CharSequence && rightNode instanceof JexlNode.Constant) {
+            // First check with lock to avoid expensive Pattern.compile() if already cached
+            synchronized (rightNode) {
+                Object cached = rightNode.jjtGetValue();
+                if (cached instanceof Pattern) {
+                    return cached;
+                }
+            }
+            // Compile without holding lock
+            final String regex = right.toString();
+            if (regex.length() > JexlArithmetic.REGEX_PATTERN_MAX_LENGTH) {
+                throw new ArithmeticException("regular expression too long: " + regex.length()
+                    + " > " + JexlArithmetic.REGEX_PATTERN_MAX_LENGTH);
+            }
+            final Pattern compiled = Pattern.compile(regex);
+            // Double-check and set under lock
+            synchronized (rightNode) {
+                Object cached = rightNode.jjtGetValue();
+                if (!(cached instanceof Pattern)) {
+                    rightNode.jjtSetValue(compiled);
+                }
+                return cached instanceof Pattern ? cached : compiled;
+            }
+        }
+        return right;
     }
 
     @Override
@@ -1728,7 +1766,8 @@ public class Interpreter extends InterpreterBase {
     @Override
     protected Object visit(final ASTNRNode node, final Object data) {
         final Object left = node.jjtGetChild(0).jjtAccept(this, data);
-        final Object right = node.jjtGetChild(1).jjtAccept(this, data);
+        final JexlNode rightNode = node.jjtGetChild(1);
+        final Object right = resolvePattern(rightNode, rightNode.jjtAccept(this, data));
         // note the arguments inversion between (not) 'in'/'matches' and  (not) 'contains'
         // if x not-in y then y not-contains x
         return operators.contains(node, JexlOperator.NOT_CONTAINS, right, left);

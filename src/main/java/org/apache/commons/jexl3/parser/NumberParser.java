@@ -23,6 +23,9 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Locale;
 
+import org.apache.commons.jexl3.JexlArithmetic;
+import org.apache.commons.jexl3.JexlEngine;
+
 /**
  * Parses number literals.
  */
@@ -31,6 +34,37 @@ public final class NumberParser implements Serializable {
     /**
      */
     private static final long serialVersionUID = 1L;
+
+
+    /**
+     * Returns the maximum digit count allowed for a BigInteger literal in the given base.
+     * When a JEXL engine with a bounded MathContext is active on the current thread, the
+     * engine's precision is converted to an equivalent bit limit, then to max digits for the base.
+     * Otherwise MAX_BIGINTEGER_DIGITS applies.
+     * At runtime, JexlArithmetic.checkBigIntegerPrecision() enforces the bit-length limit (f014, f013).
+     */
+    private static int maxBigIntegerDigits(final int base) {
+        final JexlEngine engine = JexlEngine.getThreadEngine();
+        if (engine != null) {
+            final long precision = engine.getArithmetic().getMathContext().getPrecision();
+            if (precision > 0 && precision < Integer.MAX_VALUE) {
+                // Use the same bit formula as checkBigIntegerPrecision: precision * 10/3 + 1 bits
+                // For a given base B with log2(B) bits per digit, max_digits = max_bits / log2(B)
+                final int maxBits = (int) (precision * 10 / 3 + 1);
+                final int bitsPerDigit;
+                if (base == 16) {
+                    bitsPerDigit = 4;  // log2(16) = 4
+                } else if (base == 8) {
+                    bitsPerDigit = 3;  // log2(8) = 3
+                } else {
+                    // base 10: log2(10) ≈ 3.32, approximate as 10/3
+                    return (maxBits * 3) / 10;
+                }
+                return maxBits / bitsPerDigit;
+            }
+        }
+        return JexlArithmetic.MAX_BIGINTEGER_DIGITS;
+    }
 
     /** JEXL locale-neutral big decimal format. */
     static final DecimalFormat BIGDF = new DecimalFormat("0.0b", new DecimalFormatSymbols(Locale.ROOT));
@@ -89,6 +123,7 @@ public final class NumberParser implements Serializable {
         } else {
             base = 10;
         }
+        final int maxDigits = maxBigIntegerDigits(base);
         // switch on suffix if any
         final int last = s.length() - 1;
         switch (s.charAt(last)) {
@@ -102,6 +137,11 @@ public final class NumberParser implements Serializable {
             case 'h':
             case 'H': {
                 rclass = BigInteger.class;
+                if (last > maxDigits) {
+                    throw new NumberFormatException(
+                      "BigInteger literal too long: " + last
+                      + " > " + maxDigits);
+                }
                 final BigInteger bi = new BigInteger(s.substring(0, last), base);
                 result = negative? bi.negate() : bi;
                 break;
@@ -117,6 +157,11 @@ public final class NumberParser implements Serializable {
                         final long l = Long.parseLong(s, base);
                         result = negative? -l : l;
                     } catch (final NumberFormatException take3) {
+                        if (s.length() > maxDigits) {
+                            throw new NumberFormatException(
+                              "BigInteger literal too long: " + s.length()
+                              + " > " + maxDigits);
+                        }
                         final BigInteger bi = new BigInteger(s, base);
                         result = negative? bi.negate() : bi;
                     }
