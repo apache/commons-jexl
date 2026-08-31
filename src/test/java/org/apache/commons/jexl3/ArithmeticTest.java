@@ -37,7 +37,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -2420,7 +2422,7 @@ class ArithmeticTest extends JexlTestCase {
         // normal H-literal still works
         assertNotNull(JEXL.createScript("42H"));
         // a literal just over the cap (256 + 1 digits + 'H') must fail to parse
-        final char[] digits = new char[256 + 1];
+        final char[] digits = new char[JexlArithmetic.MAX_BIGINTEGER_DIGITS + 1];
         java.util.Arrays.fill(digits, '1');
         final String huge = new String(digits) + "H";
         assertThrows(JexlException.Parsing.class, () -> JEXL.createScript(huge));
@@ -2475,10 +2477,8 @@ class ArithmeticTest extends JexlTestCase {
             java.util.Arrays.fill(chars, 'a');
             final String evilValue = new String(chars) + "c";
 
-            final java.util.concurrent.atomic.AtomicReference<Throwable> caught =
-                new java.util.concurrent.atomic.AtomicReference<>();
-            final java.util.concurrent.CountDownLatch started = new java.util.concurrent.CountDownLatch(1);
-
+            final AtomicReference<Throwable> caught = new AtomicReference<>();
+            final CountDownLatch started = new CountDownLatch(1);
             final Thread t = new Thread(() -> {
                 try {
                     started.countDown();

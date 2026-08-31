@@ -222,6 +222,12 @@ public class JexlArithmetic {
     public static final int REGEX_PATTERN_MAX_LENGTH = 2048;
 
     /**
+     * Hard upper bound on BigInteger literal digits when no engine precision is configured.
+     * Acts as a parse-time DoS guard independent of any MathContext (JEXL-security f014).
+     */
+    public static final int MAX_BIGINTEGER_DIGITS = 256;
+
+    /**
      * Attempts transformation of potential array in an abstract list or leave as is.
      * <p>An array (as in int[]) is not convenient to call methods so when encountered we turn them into lists</p>
      *
@@ -944,10 +950,10 @@ public class JexlArithmetic {
      * @throws ArithmeticException when the limit is exceeded
      */
     protected BigInteger checkBigIntegerPrecision(final BigInteger big) {
-        final int precision = getMathContext().getPrecision();
+        final long precision = getMathContext().getPrecision();
         if (precision > 0) {
             // precision 0 means unlimited; otherwise, one decimal digit ≈ log2(10) ≈ 10/3 bits
-            final int maxBits = precision * 10 / 3 + 1;
+            final long maxBits = precision * 10 / 3 + 1;
             if (big.bitLength() > maxBits) {
                 throw new ArithmeticException(
                   "BigInteger precision exceeded: " + big.bitLength() + " bits for " + precision + "-digit context");
@@ -1425,10 +1431,10 @@ public class JexlArithmetic {
         // otherwise treat as BigInteger; pre-check bit-length sum to avoid O(n²) on huge operands
         final BigInteger l = toBigInteger(strictCast, left);
         final BigInteger r = toBigInteger(strictCast, right);
-        final int precision = getMathContext().getPrecision();
+        final long precision = getMathContext().getPrecision();
         final int lBitLength = l.bitLength();
         final int rBitLength = r.bitLength();
-        final int bitLengthLimit = precision * 10 / 3 + 1;
+        final long bitLengthLimit = precision * 10 / 3 + 1;
         if (precision > 0 && lBitLength + rBitLength > bitLengthLimit) {
             throw new ArithmeticException("BigInteger precision exceeded: limit=" + bitLengthLimit
                     + ", leftBitLength=" + lBitLength

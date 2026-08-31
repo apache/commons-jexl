@@ -165,7 +165,7 @@ public class JexlBuilder {
     /**
      * Builds the JEXL 3.7 hardened default feature set.
      * <p>Starting from {@link #FULL} (the pre-3.7 feature set), this disables {@code new(...)},
-     * global side-effects, pragmas, and annotations, and enables lexical scoping and lexical shade.
+     * global side-effects, pragmas, annotations, namespace instantiation, and enables lexical scoping and lexical shade.
      * Loops are left enabled so scripts can iterate; expressions never allow loops since they are
      * parsed as a single expression.</p>
      *
@@ -180,7 +180,8 @@ public class JexlBuilder {
             .annotation(false)
             .loops(true)
             .lexical(true)
-            .lexicalShade(true);
+            .lexicalShade(true)
+            .namespaceInstantiation(false);
     }
 
     /** The JexlUberspect instance. */

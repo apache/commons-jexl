@@ -23,6 +23,7 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Locale;
 
+import org.apache.commons.jexl3.JexlArithmetic;
 import org.apache.commons.jexl3.JexlEngine;
 
 /**
@@ -34,11 +35,6 @@ public final class NumberParser implements Serializable {
      */
     private static final long serialVersionUID = 1L;
 
-    /**
-     * Hard upper bound on BigInteger literal digits when no engine precision is configured.
-     * Acts as a parse-time DoS guard independent of any MathContext (JEXL-security f014).
-     */
-    static final int MAX_BIGINTEGER_DIGITS = 256;
 
     /**
      * Returns the maximum digit count allowed for a BigInteger literal in the given base.
@@ -50,11 +46,11 @@ public final class NumberParser implements Serializable {
     private static int maxBigIntegerDigits(final int base) {
         final JexlEngine engine = JexlEngine.getThreadEngine();
         if (engine != null) {
-            final int precision = engine.getArithmetic().getMathContext().getPrecision();
-            if (precision > 0) {
+            final long precision = engine.getArithmetic().getMathContext().getPrecision();
+            if (precision > 0 && precision < Integer.MAX_VALUE) {
                 // Use the same bit formula as checkBigIntegerPrecision: precision * 10/3 + 1 bits
                 // For a given base B with log2(B) bits per digit, max_digits = max_bits / log2(B)
-                final int maxBits = precision * 10 / 3 + 1;
+                final int maxBits = (int) (precision * 10 / 3 + 1);
                 final int bitsPerDigit;
                 if (base == 16) {
                     bitsPerDigit = 4;  // log2(16) = 4
@@ -67,7 +63,7 @@ public final class NumberParser implements Serializable {
                 return maxBits / bitsPerDigit;
             }
         }
-        return MAX_BIGINTEGER_DIGITS;
+        return JexlArithmetic.MAX_BIGINTEGER_DIGITS;
     }
 
     /** JEXL locale-neutral big decimal format. */

@@ -1395,10 +1395,12 @@ public class Interpreter extends InterpreterBase {
      */
     private static Object resolvePattern(final JexlNode rightNode, final Object right) {
         if (right instanceof CharSequence && rightNode instanceof JexlNode.Constant) {
-            // First check (volatile read, no lock)
-            Object cached = rightNode.jjtGetValue();
-            if (cached instanceof Pattern) {
-                return cached;
+            // First check with lock to avoid expensive Pattern.compile() if already cached
+            synchronized (rightNode) {
+                Object cached = rightNode.jjtGetValue();
+                if (cached instanceof Pattern) {
+                    return cached;
+                }
             }
             // Compile without holding lock
             final String regex = right.toString();
@@ -1409,7 +1411,7 @@ public class Interpreter extends InterpreterBase {
             final Pattern compiled = Pattern.compile(regex);
             // Double-check and set under lock
             synchronized (rightNode) {
-                cached = rightNode.jjtGetValue();
+                Object cached = rightNode.jjtGetValue();
                 if (!(cached instanceof Pattern)) {
                     rightNode.jjtSetValue(compiled);
                 }
