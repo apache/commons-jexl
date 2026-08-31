@@ -1390,23 +1390,30 @@ public class Interpreter extends InterpreterBase {
      * cache the result in the node's value slot (same mechanism as negated numeric literals).
      * Dynamic string values (from variables) are returned unchanged.
      * The regex string length is validated before compilation (JEXL-security f012).
-     * Synchronized on the node to ensure thread-safe caching when the same compiled script runs concurrently.
+     * Uses double-check locking: first check without lock, then synchronized recheck-and-set to avoid
+     * holding the lock during expensive Pattern.compile() when the same compiled script runs concurrently.
      */
     private static Object resolvePattern(final JexlNode rightNode, final Object right) {
         if (right instanceof CharSequence && rightNode instanceof JexlNode.Constant) {
+            // First check (volatile read, no lock)
+            Object cached = rightNode.jjtGetValue();
+            if (cached instanceof Pattern) {
+                return cached;
+            }
+            // Compile without holding lock
+            final String regex = right.toString();
+            if (regex.length() > JexlArithmetic.REGEX_PATTERN_MAX_LENGTH) {
+                throw new ArithmeticException("regular expression too long: " + regex.length()
+                    + " > " + JexlArithmetic.REGEX_PATTERN_MAX_LENGTH);
+            }
+            final Pattern compiled = Pattern.compile(regex);
+            // Double-check and set under lock
             synchronized (rightNode) {
-                final Object cached = rightNode.jjtGetValue();
-                if (cached instanceof Pattern) {
-                    return cached;
+                cached = rightNode.jjtGetValue();
+                if (!(cached instanceof Pattern)) {
+                    rightNode.jjtSetValue(compiled);
                 }
-                final String regex = right.toString();
-                if (regex.length() > JexlArithmetic.REGEX_PATTERN_MAX_LENGTH) {
-                    throw new ArithmeticException("regular expression too long: " + regex.length()
-                        + " > " + JexlArithmetic.REGEX_PATTERN_MAX_LENGTH);
-                }
-                final Pattern compiled = Pattern.compile(regex);
-                rightNode.jjtSetValue(compiled);
-                return compiled;
+                return cached instanceof Pattern ? cached : compiled;
             }
         }
         return right;
