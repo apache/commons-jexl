@@ -347,6 +347,10 @@ public class Uberspect implements JexlUberspect {
                         if (executor == null) {
                             executor = BooleanGetExecutor.discover(is, clazz, property);
                         }
+                        if (executor == null) {
+                            // or a record component accessor, foo() rather than getFoo()
+                            executor = RecordGetExecutor.discover(is, clazz, property);
+                        }
                         break;
                     case MAP:
                         // let's see if we are a map...

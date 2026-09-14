@@ -445,7 +445,7 @@ public final class JexlFeatures {
      *
      * @param flag true to enable, false to disable
      * @return this features instance
-     * @since 3.6
+     * @since 3.7.1
      */
     public JexlFeatures namespaceInstantiation(final boolean flag) {
         setFeature(NAMESPACE_INSTANTIATE, flag);
@@ -966,7 +966,7 @@ public final class JexlFeatures {
      * from a class or class-name binding?
      *
      * @return true if namespace auto-instantiation is allowed, false otherwise
-     * @since 3.6
+     * @since 3.7.1
      */
     public boolean supportsNamespaceInstantiation() {
         return getFeature(NAMESPACE_INSTANTIATE);
