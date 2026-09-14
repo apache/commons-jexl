@@ -25,8 +25,10 @@ import java.net.URLClassLoader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import javax.tools.JavaCompiler;
 import javax.tools.ToolProvider;
@@ -56,12 +58,22 @@ public class RecordPropertyAccessTest extends JexlTestCase {
         final JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
         Assumptions.assumeTrue(compiler != null, "no system Java compiler available");
         final Path dir = Files.createTempDirectory("jexl-record-test");
-        final Path javaFile = dir.resolve(name + ".java");
-        Files.write(javaFile, source.getBytes(StandardCharsets.UTF_8));
-        final int rc = compiler.run(null, null, null, "-d", dir.toString(), javaFile.toString());
-        assertEquals(0, rc, "failed to compile test record");
-        try (URLClassLoader loader = new URLClassLoader(new URL[] {dir.toUri().toURL()})) {
-            return Class.forName("org.apache.commons.jexl3." + name, true, loader);
+        try {
+            final Path javaFile = dir.resolve(name + ".java");
+            Files.write(javaFile, source.getBytes(StandardCharsets.UTF_8));
+            final int rc = compiler.run(null, null, null, "-d", dir.toString(), javaFile.toString());
+            assertEquals(0, rc, "failed to compile test record");
+            try (URLClassLoader loader = new URLClassLoader(new URL[] {dir.toUri().toURL()})) {
+                return Class.forName("org.apache.commons.jexl3." + name, true, loader);
+            }
+        } finally {
+            deleteRecursively(dir);
+        }
+    }
+
+    private static void deleteRecursively(final Path dir) throws IOException {
+        try (Stream<Path> paths = Files.walk(dir)) {
+            paths.sorted(Comparator.reverseOrder()).forEach(p -> p.toFile().delete());
         }
     }
 

@@ -13,6 +13,3 @@ nb-configuration.xml
 nbactions.xml
 /CLAUDE.md
 
-# local convenience scratch files, not part of the test suite
-/src/test/java/org/apache/commons/jexl3/CursorTest.java
-/src/test/java/org/apache/commons/jexl3/SmoothSort.java
