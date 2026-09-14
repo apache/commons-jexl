@@ -31,7 +31,6 @@ import java.util.Map;
 import javax.tools.JavaCompiler;
 import javax.tools.ToolProvider;
 
-import org.apache.commons.jexl3.introspection.JexlPermissions;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
 
@@ -41,7 +40,11 @@ import org.junit.jupiter.api.Test;
  * does not exist, so the test record used here cannot be a plain source declaration in this file: it is
  * compiled on the fly, and the test itself is skipped on a pre Java-16 runtime.</p>
  */
-class RecordPropertyAccessTest {
+public class RecordPropertyAccessTest extends JexlTestCase {
+
+    public RecordPropertyAccessTest() {
+        super("RecordPropertyAccessTest");
+    }
 
     private static int featureVersion() {
         final String spec = System.getProperty("java.specification.version");
@@ -55,28 +58,26 @@ class RecordPropertyAccessTest {
         final Path dir = Files.createTempDirectory("jexl-record-test");
         final Path javaFile = dir.resolve(name + ".java");
         Files.write(javaFile, source.getBytes(StandardCharsets.UTF_8));
-        final int rc = compiler.run(null, null, null, javaFile.toString());
+        final int rc = compiler.run(null, null, null, "-d", dir.toString(), javaFile.toString());
         assertEquals(0, rc, "failed to compile test record");
         try (URLClassLoader loader = new URLClassLoader(new URL[] {dir.toUri().toURL()})) {
-            return Class.forName(name, true, loader);
+            return Class.forName("org.apache.commons.jexl3." + name, true, loader);
         }
     }
 
     @Test
     void testRecordComponentIsReadableAsProperty() throws Exception {
         Assumptions.assumeTrue(featureVersion() >= 16, "records require Java 16+");
-        final Class<?> pointClass = compileRecord(
-            "JexlRecordPoint", "public record JexlRecordPoint(int x, int y) {}"
+        final Class<?> pointClass = compileRecord("JexlRecordPoint",
+          "package org.apache.commons.jexl3; public record JexlRecordPoint(int x, int y) {}"
         );
         final Object point = pointClass.getConstructor(int.class, int.class).newInstance(1, 2);
-
-        final JexlEngine jexl = new JexlBuilder().permissions(JexlPermissions.UNRESTRICTED).create();
         final Map<String, Object> vars = new HashMap<>();
         vars.put("point", point);
         final JexlContext ctx = new MapContext(vars);
 
-        assertEquals(1, jexl.createExpression("point.x").evaluate(ctx));
-        assertEquals(2, jexl.createExpression("point.y").evaluate(ctx));
+        assertEquals(1, JEXL.createExpression("point.x").evaluate(ctx));
+        assertEquals(2, JEXL.createExpression("point.y").evaluate(ctx));
     }
 
     @Test
@@ -86,17 +87,16 @@ class RecordPropertyAccessTest {
         // ordinary getFoo() convention first, RecordGetExecutor only fills the gap otherwise left open
         final Class<?> pointClass = compileRecord(
             "JexlRecordNamedPoint",
-            "public record JexlRecordNamedPoint(String name) { "
+            "package org.apache.commons.jexl3; "
+                + "public record JexlRecordNamedPoint(String name) { "
                 + "public String getName() { return name() + \"!\"; } }"
         );
         final Object point = pointClass.getConstructor(String.class).newInstance("origin");
-
-        final JexlEngine jexl = new JexlBuilder().permissions(JexlPermissions.UNRESTRICTED).create();
         final Map<String, Object> vars = new HashMap<>();
         vars.put("point", point);
         final JexlContext ctx = new MapContext(vars);
 
-        assertNotNull(jexl.createExpression("point.name").evaluate(ctx));
-        assertEquals("origin!", jexl.createExpression("point.name").evaluate(ctx));
+        assertNotNull(JEXL.createExpression("point.name").evaluate(ctx));
+        assertEquals("origin!", JEXL.createExpression("point.name").evaluate(ctx));
     }
 }

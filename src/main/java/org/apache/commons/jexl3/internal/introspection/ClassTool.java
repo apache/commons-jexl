@@ -21,30 +21,60 @@ import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 
 /**
- * Utility for Java9+ backport in Java8 of class and module related methods.
+ * Utility for Java9+ backport in Java8 of class and module related methods, and Java16+ backport of
+ * record introspection ({@code Class#isRecord()}, {@code Class#getRecordComponents()}).
  */
 final class ClassTool {
 
-    /** The Class.getModule() method. */
+    /** {@code Class#isRecord()}; null on a pre Java-16 runtime. */
+    private static final MethodHandle IS_RECORD;
+
+    /** {@code Class#getRecordComponents()}; null on a pre Java-16 runtime. */
+    private static final MethodHandle GET_RECORD_COMPONENTS;
+
+    /** {@code java.lang.reflect.RecordComponent#getName()}; null on a pre Java-16 runtime. */
+    private static final MethodHandle RECORD_COMPONENT_GET_NAME;
+
+    /** {@code Class#getModule()}; null on a pre Java-9 runtime. */
     private static final MethodHandle GET_MODULE;
 
-    /** The Class.getPackageName() method. */
+    /** {@code Class#getPackageName()}; null on a pre Java-9 runtime. */
     private static final MethodHandle GET_PKGNAME;
 
-    /** The Module.isExported(String packageName) method. */
+    /** {@code Module#isExported(String, Module)}; null on a pre Java-9 runtime. */
     private static final MethodHandle IS_EXPORTED;
 
-    /** The Module of JEXL itself. */
+    /** The {@code java.lang.Module} that declares this class; null on a pre Java-9 runtime. */
     private static final Object JEXL_MODULE;
 
     static {
         final MethodHandles.Lookup LOOKUP = MethodHandles.lookup();
+        final ClassLoader loader = ClassTool.class.getClassLoader();
+
+        // Java 16+ record introspection backport
+        MethodHandle isRecord = null;
+        MethodHandle getRecordComponents = null;
+        MethodHandle recordComponentGetName = null;
+        try {
+            final Class<?> componentc = loader.loadClass("java.lang.reflect.RecordComponent");
+            final Class<?> componentArrayc = java.lang.reflect.Array.newInstance(componentc, 0).getClass();
+            isRecord = LOOKUP.findVirtual(Class.class, "isRecord", MethodType.methodType(boolean.class));
+            getRecordComponents = LOOKUP.findVirtual(Class.class, "getRecordComponents", MethodType.methodType(componentArrayc));
+            recordComponentGetName = LOOKUP.findVirtual(componentc, "getName", MethodType.methodType(String.class));
+        } catch (final Throwable xnotfound) {
+            // ignore all; records unsupported on this runtime
+        }
+        IS_RECORD = isRecord;
+        GET_RECORD_COMPONENTS = getRecordComponents;
+        RECORD_COMPONENT_GET_NAME = recordComponentGetName;
+
+        // Java 9+ module reflection backport
         MethodHandle getModule = null;
         MethodHandle getPackageName = null;
         MethodHandle isExported = null;
         Object myModule = null;
         try {
-            final Class<?> modulec = ClassTool.class.getClassLoader().loadClass("java.lang.Module");
+            final Class<?> modulec = loader.loadClass("java.lang.Module");
             if (modulec != null) {
                 getModule = LOOKUP.findVirtual(Class.class, "getModule", MethodType.methodType(modulec));
                 if (getModule != null) {
@@ -62,6 +92,46 @@ final class ClassTool {
         GET_MODULE = getModule;
         GET_PKGNAME = getPackageName;
         IS_EXPORTED = isExported;
+    }
+
+    /**
+     * Whether the given class is a record on this runtime.
+     *
+     * @param clazz the class to check
+     * @return true if clazz is a record, false if it is not or if records are unsupported here
+     */
+    static boolean isRecord(final Class<?> clazz) {
+        try {
+            return IS_RECORD != null && (boolean) IS_RECORD.invoke(clazz);
+        } catch (final Throwable xfail) {
+            return false;
+        }
+    }
+
+    /**
+     * Whether the given class declares a record component named {@code property}.
+     * <p>Used only to confirm {@code property} is a genuine record component before the accessor is
+     * resolved through the (permission-checked) {@link Introspector}; the accessor method instances
+     * gathered here are discarded.</p>
+     *
+     * @param clazz the record class
+     * @param property the property name to match against the record's components
+     * @return true if clazz declares a record component named property
+     */
+    static boolean hasRecordComponent(final Class<?> clazz, final String property) {
+        if (GET_RECORD_COMPONENTS != null && RECORD_COMPONENT_GET_NAME != null) {
+            try {
+                final Object[] components = (Object[]) GET_RECORD_COMPONENTS.invoke(clazz);
+                for (final Object component : components) {
+                    if (property.equals(RECORD_COMPONENT_GET_NAME.invoke(component))) {
+                        return true;
+                    }
+                }
+            } catch (final Throwable xfail) {
+                // ignore and fall through to return false
+            }
+        }
+        return false;
     }
 
     /**
@@ -116,7 +186,7 @@ final class ClassTool {
      * The code performs the following sequence through reflection (since the same jar can run
      * on a Java8 or Java9+ runtime and the module features does not exist on 8).
      * {@code
-     * Module jexlModule ClassTool.getClass().getModule();
+     * Module jexlModule = ClassTool.class.getModule();
      * Module module = declarator.getModule();
      * return module.isExported(declarator.getPackageName(), jexlModule);
      * }
