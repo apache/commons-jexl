@@ -338,7 +338,7 @@
                 <configuration>
                     <configLocation>${basedir}/src/main/config/checkstyle.xml</configLocation>
                     <suppressionsLocation>${basedir}/src/main/config/checkstyle-suppressions.xml</suppressionsLocation>
-                    <excludes>org/apache/commons/jexl3/parser/*.java,org/apache/commons/jexl3/CursorTest.java,org/apache/commons/jexl3/SmoothSort.java</excludes>
+                    <excludes>org/apache/commons/jexl3/parser/*.java</excludes>
                     <headerLocation>${basedir}/src/main/config/header.txt</headerLocation>
                     <enableRulesSummary>false</enableRulesSummary>
                     <!-- Needed to define config_loc for use by Eclipse -->
