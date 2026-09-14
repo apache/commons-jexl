@@ -48,11 +48,6 @@ public class RecordPropertyAccessTest extends JexlTestCase {
         super("RecordPropertyAccessTest");
     }
 
-    private static int featureVersion() {
-        final String spec = System.getProperty("java.specification.version");
-        return spec.startsWith("1.") ? Integer.parseInt(spec.substring(2)) : Integer.parseInt(spec);
-    }
-
     private static Class<?> compileRecord(final String name, final String source) throws IOException,
         ClassNotFoundException {
         final JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();

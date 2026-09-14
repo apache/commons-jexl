@@ -169,4 +169,9 @@ public class JexlTestCase {
       processPragma(null, key, value);
     }
   }
+
+   public static int featureVersion() {
+    final String spec = System.getProperty("java.specification.version");
+    return spec.startsWith("1.") ? Integer.parseInt(spec.substring(2)) : Integer.parseInt(spec);
+  }
 }
