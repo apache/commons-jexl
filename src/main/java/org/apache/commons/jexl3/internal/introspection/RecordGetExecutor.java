@@ -30,7 +30,7 @@ import org.apache.commons.jexl3.JexlException;
  * targets; on such a runtime, {@code Class#isRecord()} and {@code Class#getRecordComponents()} simply
  * do not exist and discovery quietly reports no match instead of failing to link.</p>
  *
- * @since 3.7.2
+ * @since 3.7.1
  */
 public final class RecordGetExecutor extends AbstractExecutor.Get {
 

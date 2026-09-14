@@ -286,7 +286,7 @@ public final class JexlOptions {
      * binding allowed?
      *
      * @return true if namespace auto-instantiation is allowed, false otherwise
-     * @since 3.6
+     * @since 3.7.1
      */
     public boolean isNamespaceInstantiation() {
         return isSet(NAMESPACE_INSTANTIATE, flags);
@@ -453,7 +453,7 @@ public final class JexlOptions {
      * auto-instantiated into a functor.
      *
      * @param flag true to enable, false to disable
-     * @since 3.6
+     * @since 3.7.1
      */
     public void setNamespaceInstantiation(final boolean flag) {
         flags = set(NAMESPACE_INSTANTIATE, flags, flag);
