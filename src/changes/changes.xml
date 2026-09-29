@@ -42,6 +42,7 @@
             <action dev="ggregory" type="fix" due-to="Gary Gregory">Add messages when throwing NullPointerException.</action>
             <!-- UPDATE -->
             <action type="update" dev="ggregory" due-to="Gary Gregory">Bump org.apache.commons:commons-parent from 102 to 105.</action>
+            <action type="update" dev="ggregory" due-to="Gary Gregory">[test] Bump org.apache.commons:commons-lang3 from 3.20.0 to 3.21.0.</action>
         </release>
         <release version="3.7.0" date="2026-06-28" description="This is a feature and maintenance release. Java 8 or later is required.">
             <!-- ADD -->
