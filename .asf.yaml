@@ -16,6 +16,8 @@
 github:
   description: "Apache Commons JEXL"
   homepage: https://commons.apache.org/jexl/
+  autolink_jira:
+    - JEXL
   
   pull_requests:
     # allow auto-merge
