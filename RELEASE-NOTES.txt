@@ -1,3 +1,55 @@
+Apache Commons JEXL 3.7.1 Release Notes
+---------------------------------------
+
+The Apache Commons JEXL team is pleased to announce the release of Apache Commons JEXL 3.7.1.
+
+Introduction
+------------
+
+Apache Commons JEXL is a library that enables scripting features in Java applications and frameworks.
+
+This is a feature and maintenance release. Java 8 or later is required.
+
+New features
+------------
+
+o JEXL-473:  Add feature to restrict allowed pragmas. Thanks to henrib. 
+o JEXL-472:  Add property access support for Java record component accessors. Thanks to Aurelien Mino. 
+o JEXL-469:  Add JexlFeatures.namespaceInstantiation(boolean) to control whether a namespace bound to a Class or class-name string is reflectively auto-instantiated into a functor; string namespaces now resolve through the permission-aware uberspect. Thanks to Claude. 
+o JEXL-467:  IntelliJ and VSCode editors (TextMate bundle) support for JEXL. 
+
+Fixed Bugs
+----------
+
+o JEXL-471:  Runtime hardening: make regex matching (=~ operator) interruptible, enforce MathContext precision on BigInteger arithmetic results, and prevent O(n²) DoS from huge BigInteger literals at parse time. Thanks to Claude. 
+o JEXL-470:  Fix several parser and interpreter correctness issues: Unicode escape hex-digit validation, safe-navigation array-access child indexing, regex escape preservation, empty()/size() error and cancellation propagation, and switch+continue semantics. Thanks to Claude. 
+o JEXL-468:  Improve robustness of introspection permissions and sandbox delegation: close nested-class and interface-method denial gaps, fix class-initialization ordering, gate sandbox iteration, fix permission-parser polarity, deny second-stage compiler surface under RESTRICTED, and enforce parser feature restrictions in sub-parsers. Thanks to Claude. 
+o JEXL-466:  IllegalStateException parsing a template with string interpolation. 
+o JEXL-411:  Leading zeroes in floating point numbers should be optional. Thanks to Felix Rudolphi. 
+o          Pick up commons.jacoco.version from the parent POM. Thanks to Gary Gregory. 
+o          Add messages when throwing NullPointerException. Thanks to Gary Gregory. 
+
+Changes
+-------
+
+o          Bump org.apache.commons:commons-parent from 102 to 105. Thanks to Gary Gregory. 
+o          [test] Bump org.apache.commons:commons-lang3 from 3.20.0 to 3.21.0. Thanks to Gary Gregory. 
+
+
+Historical list of changes: https://commons.apache.org/proper/commons-jexl/changes.html
+
+For complete information on Apache Commons JEXL, including instructions on how to submit bug reports,
+patches, or suggestions for improvement, see the Apache Commons JEXL website:
+
+https://commons.apache.org/proper/commons-jexl/
+
+Download page: https://commons.apache.org/proper/commons-jexl/download_jexl.cgi
+
+Have fun!
+-Apache Commons Team
+
+------------------------------------------------------------------------------
+
 Apache Commons JEXL 3.7.0 Release Notes
 ---------------------------------------
 
