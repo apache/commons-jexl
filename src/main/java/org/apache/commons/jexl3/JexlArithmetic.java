@@ -608,7 +608,7 @@ public class JexlArithmetic {
             pattern = (Pattern) container;
             controlRegexLength(pattern.pattern().length());
         } else if (container instanceof CharSequence) {
-            String regex = container.toString();
+            final String regex = container.toString();
             controlRegexLength(regex.length());
             pattern = Pattern.compile(regex);
         }
@@ -632,7 +632,7 @@ public class JexlArithmetic {
      * @param length The length of the regex pattern string
      * @throws ArithmeticException if the length exceeds {@link #REGEX_PATTERN_MAX_LENGTH}
      */
-    private static void controlRegexLength(int length) {
+    private static void controlRegexLength(final int length) {
         if (length > REGEX_PATTERN_MAX_LENGTH) {
             throw new ArithmeticException(
               "regular expression too long: " + length + " > " + REGEX_PATTERN_MAX_LENGTH);
@@ -1086,7 +1086,7 @@ public class JexlArithmetic {
                     logger.warn(em, e.clean());
                 } else {
                     final String tm = t.getMessage();
-                    String warning = em != null ? (tm != null ? em + ", " + tm : em) : tm;
+                    final String warning = em != null ? tm != null ? em + ", " + tm : em : tm;
                     logger.warn(warning, JexlException.clean(t));
                 }
             }
