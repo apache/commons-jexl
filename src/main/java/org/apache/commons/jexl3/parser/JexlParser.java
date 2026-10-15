@@ -106,6 +106,26 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
     public static final String PRAGMA_IMPORT = "jexl.import";
 
     /**
+     * Thrown when a pragma key is not allowed by the features pragma test.
+     */
+    private static final class PragmaKeyException extends JexlException.Feature {
+        private static final long serialVersionUID = 20261015L;
+
+        /** The refused pragma key. */
+        private final String key;
+
+        PragmaKeyException(final JexlInfo info, final String key, final String expr) {
+            super(info, JexlFeatures.PRAGMA, expr);
+            this.key = key;
+        }
+
+        @Override
+        protected String detailedMessage() {
+            return parserError("pragma '" + key + "' not allowed,", getDetail());
+        }
+    }
+
+    /**
      * The set of assignment operators as classes.
      */
     private static final Set<Class<? extends JexlNode>> ASSIGN_NODES = new HashSet<>(
@@ -632,6 +652,12 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
         }
         if (PRAGMA_IMPORT.equals(key) && !features.supportsImportPragma()) {
             throwFeatureException(JexlFeatures.IMPORT_PRAGMA, getToken(0));
+        }
+        if (!features.pragmaTest().test(key)) {
+            final Token token = getToken(0);
+            final JexlInfo xinfo = token != null ? info.at(token.beginLine, token.beginColumn) : info;
+            final String line = xinfo != null ? readSourceLine(source, xinfo.getLine()) : null;
+            throw new PragmaKeyException(xinfo, key, line).clean();
         }
         if (pragmas == null) {
             pragmas = new TreeMap<>();

@@ -20,6 +20,9 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.math.MathContext;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.function.Predicate;
 
 import org.apache.commons.jexl3.introspection.JexlUberspect;
 import org.junit.jupiter.api.Assertions;
@@ -339,5 +342,168 @@ public class JexlConfigLoaderTest {
         try (InputStream in = yaml("cache: 16\n")) {
             Assertions.assertNull(JexlConfigLoader.load(in).strategy());
         }
+    }
+
+    @Test
+    void testPragmasFromYaml() throws Exception {
+        final String config = "pragmas:\n  - dlm.*   # any dlm pragma\n  - jexl.import\n";
+        try (InputStream in = yaml(config)) {
+            final JexlBuilder builder = JexlConfigLoader.load(in);
+            final Predicate<String> test = builder.features().pragmaTest();
+            Assertions.assertNotSame(JexlFeatures.TEST_STR_TRUE, test);
+            Assertions.assertTrue(test.test("dlm.foo"));
+            Assertions.assertTrue(test.test("dlm.foo.bar"));
+            Assertions.assertTrue(test.test("jexl.import"));
+            Assertions.assertFalse(test.test("dlm"));
+            Assertions.assertFalse(test.test("jexl.importer"));
+            Assertions.assertFalse(test.test("jexl.options"));
+            final JexlEngine engine = builder.create();
+            final JexlScript script = engine.createScript("#pragma dlm.foo 42\n#pragma jexl.import 'java.util'\n1");
+            Assertions.assertEquals(42, script.getPragmas().get("dlm.foo"));
+            final JexlException.Feature xfeature = Assertions.assertThrows(JexlException.Feature.class,
+                () -> engine.createScript("#pragma dlm.foo 42\n#pragma jexl.options '+strict'\n1"));
+            // the parser reports the offending pragma line and key
+            Assertions.assertEquals(2, xfeature.getInfo().getLine());
+            Assertions.assertTrue(xfeature.getMessage().contains("pragma 'jexl.options' not allowed"),
+                xfeature.getMessage());
+            Assertions.assertThrows(JexlException.Feature.class,
+                () -> engine.createExpression("#pragma other.foo 42\n1"));
+        }
+    }
+
+    @Test
+    void testInlinePragmaFromYaml() throws Exception {
+        try (InputStream in = yaml("pragmas: dlm.*   # a single pattern\nstrict: true\n")) {
+            final Predicate<String> test = JexlConfigLoader.load(in).features().pragmaTest();
+            Assertions.assertTrue(test.test("dlm.foo"));
+            Assertions.assertFalse(test.test("jexl.options"));
+        }
+        try (InputStream in = yaml("pragmas: 'jexl.import'\n")) {
+            final Predicate<String> test = JexlConfigLoader.load(in).features().pragmaTest();
+            Assertions.assertTrue(test.test("jexl.import"));
+            Assertions.assertFalse(test.test("dlm.foo"));
+        }
+    }
+
+    @Test
+    void testInvalidPragmasFromYaml() throws Exception {
+        final String[] configs = {
+            "pragmas:\n  dlm: true\n",
+            "pragmas:\n  - dlm.*\n  rules:\n    - jexl.import\n",
+            "pragmas: [dlm.*, jexl.import]\n",
+            "pragmas: dlm.*, jexl.import\n",
+            "pragmas:\n  - dlm.*, jexl.import\n"
+        };
+        for (final String config : configs) {
+            try (InputStream in = yaml(config)) {
+                Assertions.assertThrows(IllegalArgumentException.class, () -> JexlConfigLoader.load(in), config);
+            }
+        }
+    }
+
+    @Test
+    void testEmptyPragmaItemFromYaml() throws Exception {
+        // an empty item allows nothing
+        try (InputStream in = yaml("pragmas:\n  - \n")) {
+            Assertions.assertSame(JexlFeatures.TEST_STR_FALSE, JexlConfigLoader.load(in).features().pragmaTest());
+        }
+        // and is ignored among other items
+        try (InputStream in = yaml("pragmas:\n  - dlm.*\n  - \n")) {
+            final Predicate<String> test = JexlConfigLoader.load(in).features().pragmaTest();
+            Assertions.assertTrue(test.test("dlm.foo"));
+            Assertions.assertFalse(test.test(""));
+        }
+    }
+
+    @Test
+    void testPragmasAnywhereFromYaml() throws Exception {
+        final String config = "features:\n  pragmaAnywhere: true\npragmas:\n  - dlm.*\n";
+        try (InputStream in = yaml(config)) {
+            final JexlEngine engine = JexlConfigLoader.load(in).create();
+            final JexlScript script = engine.createScript("var x = 1;\n#pragma dlm.foo 42\nx");
+            Assertions.assertEquals(42, script.getPragmas().get("dlm.foo"));
+            final JexlException.Feature xfeature = Assertions.assertThrows(JexlException.Feature.class,
+                () -> engine.createScript("var x = 1;\n#pragma dlm.foo 42\nx;\n#pragma other.foo 43\nx"));
+            Assertions.assertEquals(4, xfeature.getInfo().getLine());
+            Assertions.assertTrue(xfeature.getMessage().contains("pragma 'other.foo' not allowed"),
+                xfeature.getMessage());
+        }
+    }
+
+    @Test
+    void testStarPragmaFromYamlAllowsAll() throws Exception {
+        try (InputStream in = yaml("pragmas:\n  - '*'\n")) {
+            Assertions.assertSame(JexlFeatures.TEST_STR_TRUE, JexlConfigLoader.load(in).features().pragmaTest());
+        }
+    }
+
+    @Test
+    void testEmptyPragmasFromYamlAllowsNone() throws Exception {
+        try (InputStream in = yaml("pragmas:\nstrict: true\n")) {
+            final JexlEngine engine = JexlConfigLoader.load(in).create();
+            Assertions.assertThrows(JexlException.Feature.class,
+                () -> engine.createScript("#pragma dlm.foo 42\n1"));
+            Assertions.assertEquals(1, engine.createScript("1").execute(null));
+        }
+    }
+
+    @Test
+    void testNoPragmasFromYamlAllowsAll() throws Exception {
+        try (InputStream in = yaml("strict: true\n")) {
+            final JexlBuilder builder = JexlConfigLoader.load(in);
+            Assertions.assertSame(JexlFeatures.TEST_STR_TRUE, builder.features().pragmaTest());
+            final JexlScript script = builder.create().createScript("#pragma any.thing 42\n1");
+            Assertions.assertEquals(42, script.getPragmas().get("any.thing"));
+        }
+    }
+
+    @Test
+    void testPragmasFromYamlEquality() throws Exception {
+        final String config = "pragmas:\n  - dlm.*\n  - jexl.import\n";
+        final JexlFeatures f0;
+        final JexlFeatures f1;
+        try (InputStream in = yaml(config)) {
+            f0 = JexlConfigLoader.load(in).features();
+        }
+        try (InputStream in = yaml(config)) {
+            f1 = JexlConfigLoader.load(in).features();
+        }
+        // same patterns, same features
+        Assertions.assertNotSame(f0.pragmaTest(), f1.pragmaTest());
+        Assertions.assertEquals(f0, f1);
+        Assertions.assertEquals(f0.hashCode(), f1.hashCode());
+        // pattern order and spacing do not matter, the patterns do
+        final JexlFeatures f2 = new JexlFeatures(f0)
+            .pragmaTest(JexlFeatures.pragmaPatterns(Arrays.asList(" jexl.import", "dlm.* ")));
+        Assertions.assertEquals(f0, f2);
+        final JexlFeatures f3 = new JexlFeatures(f0)
+            .pragmaTest(JexlFeatures.pragmaPatterns(Collections.singletonList("dlm.*")));
+        Assertions.assertNotEquals(f0, f3);
+    }
+
+    @Test
+    void testPragmaPatterns() {
+        Assertions.assertSame(JexlFeatures.TEST_STR_FALSE, JexlFeatures.pragmaPatterns(null));
+        Assertions.assertSame(JexlFeatures.TEST_STR_FALSE, JexlFeatures.pragmaPatterns(Collections.emptyList()));
+        Assertions.assertSame(JexlFeatures.TEST_STR_FALSE, JexlFeatures.pragmaPatterns(Arrays.asList("", " ", null)));
+        Assertions.assertSame(JexlFeatures.TEST_STR_TRUE, JexlFeatures.pragmaPatterns(Arrays.asList("dlm.*", "*")));
+        final Predicate<String> test = JexlFeatures.pragmaPatterns(Arrays.asList("dlm.*", "jexl.import"));
+        Assertions.assertTrue(test.test("dlm.foo"));
+        Assertions.assertTrue(test.test("jexl.import"));
+        Assertions.assertFalse(test.test("jexl.importer"));
+        Assertions.assertFalse(test.test(null));
+        Assertions.assertEquals("jexl.import, dlm.*", test.toString());
+    }
+
+    @Test
+    void testFeaturesPragmaTest() {
+        final JexlFeatures features = new JexlFeatures().pragmaTest(k -> k.startsWith("dlm."));
+        // copies keep the pragma test
+        Assertions.assertEquals(features, new JexlFeatures(features));
+        final JexlEngine engine = new JexlBuilder().features(features).create();
+        Assertions.assertNotNull(engine.createScript("#pragma dlm.good 1\n1"));
+        Assertions.assertThrows(JexlException.Feature.class, () -> engine.createScript("#pragma other.good 1\n1"));
+        // explicit features use their own pragma test
+        Assertions.assertNotNull(engine.createScript(new JexlFeatures(), null, "#pragma other.good 1\n1"));
     }
 }

@@ -27,9 +27,11 @@ import java.math.MathContext;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 
 import org.apache.commons.jexl3.introspection.JexlPermissions;
 import org.apache.commons.jexl3.introspection.JexlUberspect;
@@ -170,6 +172,25 @@ import org.apache.commons.jexl3.introspection.JexlUberspect;
  *   - java.lang
  *   - java.util
  *   - com.example.api
+ * </pre>
+ *
+ * <h2>{@code pragmas:} section</h2>
+ * <p>A list of allowed pragma key patterns, turned into the predicate passed to
+ * {@link JexlFeatures#pragmaTest(java.util.function.Predicate)}.  A pattern ending with {@code *}
+ * matches any key starting with what precedes it; any other pattern must match the key exactly.
+ * Scripts declaring a pragma whose key matches no pattern fail to parse with a
+ * {@link JexlException.Feature}.  The section is an allow-list: when present with no items, no pragma is
+ * allowed; when absent, all pragmas are allowed (subject to the {@code pragma}, {@code importPragma} and
+ * {@code namespacePragma} features).  The list applies to JEXL's own pragmas too: {@code jexl.options},
+ * {@code jexl.import}, {@code jexl.namespace.*} and {@code jexl.module.*} must be listed to be allowed.
+ * A single pattern may also be written inline
+ * ({@code pragmas: dlm.*}); entries that are not {@code - pattern} items, or flow-style lists, are
+ * rejected with an {@link IllegalArgumentException}.</p>
+ * <pre>
+ * pragmas:
+ *   - dlm.*              # any pragma key starting with 'dlm.'
+ *   - jexl.import        # exactly 'jexl.import'
+ *   - jexl.namespace.*
  * </pre>
  *
  * <h2>Complete annotated example</h2>
@@ -313,6 +334,9 @@ public final class JexlConfigLoader {
                 if (val.isEmpty()) {
                     section = key;
                     sectionData = new LinkedHashMap<>();
+                } else if ("pragmas".equals(key)) {
+                    // a single pattern on the same line
+                    features.pragmaTest(parsePragmaPatterns(Collections.singletonList(unquote(val))));
                 } else {
                     applyTopLevel(key, val, builder);
                 }
@@ -392,6 +416,21 @@ public final class JexlConfigLoader {
                 if (list instanceof List) {
                     builder.imports((List<String>) list);
                 }
+                break;
+            }
+            case "pragmas": {
+                // only list items are expected; anything else is a configuration mistake
+                for (final String key : data.keySet()) {
+                    if (!section.equals(key)) {
+                        throw new IllegalArgumentException(
+                            "pragmas: expects a list of '- pattern' items, found '" + key + "'");
+                    }
+                }
+                // an allow-list: a section with no items allows no pragma
+                final Object list = data.get(section);
+                features.pragmaTest(parsePragmaPatterns(list instanceof List
+                    ? (List<String>) list
+                    : Collections.emptyList()));
                 break;
             }
             default:
@@ -532,6 +571,23 @@ public final class JexlConfigLoader {
         return "MAP_STRATEGY".equals(name)
             ? JexlUberspect.MAP_STRATEGY
             : JexlUberspect.JEXL_STRATEGY;
+    }
+
+    /**
+     * Creates a pragma key predicate from a list of patterns.
+     *
+     * @see JexlFeatures#pragmaPatterns(java.util.Collection)
+     */
+    private static Predicate<String> parsePragmaPatterns(final List<String> patterns) {
+        for (final String pattern : patterns) {
+            final String trimmed = pattern.trim();
+            // flow-style lists ([a, b] or a, b) are not supported
+            if (trimmed.startsWith("[") || trimmed.indexOf(',') >= 0) {
+                throw new IllegalArgumentException(
+                    "pragmas: expects one pattern per '- pattern' item, found '" + trimmed + "'");
+            }
+        }
+        return JexlFeatures.pragmaPatterns(patterns);
     }
 
     private static boolean parseBool(final String s) {

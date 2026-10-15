@@ -70,6 +70,13 @@ public final class JexlFeatures {
     /** The false predicate. */
     public static final Predicate<String> TEST_STR_FALSE = s -> false;
 
+    /**
+     * The true predicate.
+     *
+     * @since 3.7.1
+     */
+    public static final Predicate<String> TEST_STR_TRUE = s -> true;
+
     /** The feature names (for toString()). */
     private static final String[] F_NAMES = {
         "register", "reserved variable", "local variable", "assign/modify",
@@ -322,6 +329,9 @@ public final class JexlFeatures {
     /** The namespace names. */
     private Predicate<String> nameSpaces;
 
+    /** The allowed pragma keys. */
+    private Predicate<String> pragmas = TEST_STR_TRUE;
+
     /**
      * Creates default instance, equivalent to the result of calling the preferred alternative
      * {@link JexlFeatures#createDefault()}
@@ -337,6 +347,7 @@ public final class JexlFeatures {
      */
     public JexlFeatures(final JexlFeatures features) {
         this(features.flags, features.reservedNames, features.nameSpaces);
+        this.pragmas = features.pragmas;
     }
 
     /**
@@ -470,6 +481,9 @@ public final class JexlFeatures {
         if (this.nameSpaces != other.nameSpaces) {
             return false;
         }
+        if (!this.pragmas.equals(other.pragmas)) {
+            return false;
+        }
         if (!Objects.equals(this.reservedNames, other.reservedNames)) {
             return false;
         }
@@ -525,6 +539,7 @@ public final class JexlFeatures {
         int hash = 3;
         hash = 53 * hash + Long.hashCode(this.flags);
         hash = 53 * hash + (this.reservedNames != null ? this.reservedNames.hashCode() : 0);
+        hash = 53 * hash + this.pragmas.hashCode();
         return hash;
     }
 
@@ -777,6 +792,133 @@ public final class JexlFeatures {
     public JexlFeatures pragmaAnywhere(final boolean flag) {
         setFeature(PRAGMA_ANYWHERE, flag);
         return this;
+    }
+
+    /**
+     * Gets the allowed pragma keys test.
+     *
+     * @return The allowed pragma keys test, never null.
+     * @since 3.7.1
+     */
+    public Predicate<String> pragmaTest() {
+        return pragmas;
+    }
+
+    /**
+     * Sets a test to determine which pragma keys are allowed.
+     * <p>
+     * When set, parsing a script/expression declaring a pragma (#pragma key value) whose key does not satisfy
+     * the predicate will throw a parsing exception. This applies to all pragmas, including
+     * <code>jexl.options</code>, <code>jexl.import</code>, <code>jexl.namespace.*</code> and
+     * <code>jexl.module.*</code>.
+     * </p>
+     * <p>
+     * An engine built with these features applies the test to every script, expression and template it parses.
+     * As with every other feature, scripts created with explicit (non-null) features through
+     * {@link JexlEngine#createScript(JexlFeatures, JexlInfo, String, String...)} use those features' pragma
+     * test, not the engine's.
+     * </p>
+     *
+     * @param keys The pragma key predicate; must be stateless or thread-safe; null allows all pragma keys
+     * @return this features instance
+     * @since 3.7.1
+     */
+    public JexlFeatures pragmaTest(final Predicate<String> keys) {
+        pragmas = keys == null ? TEST_STR_TRUE : keys;
+        return this;
+    }
+
+    /**
+     * Creates a pragma key test from a collection of patterns, meant for {@link #pragmaTest(Predicate)}.
+     * <p>
+     * A pattern ending with <code>*</code> matches any key starting with what precedes it, any other
+     * pattern matches the key exactly. For instance, <code>dlm.*</code> matches <code>dlm.foo</code> and
+     * <code>dlm.foo.bar</code>; <code>*</code> matches any key. Patterns are trimmed, null or empty
+     * patterns are ignored.
+     * </p>
+     * <p>Tests created from the same patterns are equal, so are the features using them.</p>
+     *
+     * @param patterns The allowed pragma key patterns; null or empty allows no pragma key
+     * @return The pragma key test
+     * @since 3.7.1
+     */
+    public static Predicate<String> pragmaPatterns(final Collection<String> patterns) {
+        final Set<String> exact = new TreeSet<>();
+        final Set<String> prefixes = new TreeSet<>();
+        if (patterns != null) {
+            for (final String pattern : patterns) {
+                final String trimmed = pattern == null ? "" : pattern.trim();
+                if ("*".equals(trimmed)) {
+                    return TEST_STR_TRUE;
+                }
+                if (trimmed.endsWith("*")) {
+                    prefixes.add(trimmed.substring(0, trimmed.length() - 1));
+                } else if (!trimmed.isEmpty()) {
+                    exact.add(trimmed);
+                }
+            }
+        }
+        return exact.isEmpty() && prefixes.isEmpty() ? TEST_STR_FALSE : new PragmaPatterns(exact, prefixes);
+    }
+
+    /**
+     * A pragma key test made of exact keys and key prefixes.
+     */
+    private static final class PragmaPatterns implements Predicate<String> {
+        /** The exactly matched keys. */
+        private final Set<String> exact;
+        /** The matched key prefixes. */
+        private final Set<String> prefixes;
+
+        PragmaPatterns(final Set<String> exact, final Set<String> prefixes) {
+            this.exact = exact;
+            this.prefixes = prefixes;
+        }
+
+        @Override
+        public boolean test(final String key) {
+            if (key == null) {
+                return false;
+            }
+            if (exact.contains(key)) {
+                return true;
+            }
+            for (final String prefix : prefixes) {
+                if (key.startsWith(prefix)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        @Override
+        public boolean equals(final Object obj) {
+            if (this == obj) {
+                return true;
+            }
+            if (!(obj instanceof PragmaPatterns)) {
+                return false;
+            }
+            final PragmaPatterns other = (PragmaPatterns) obj;
+            return exact.equals(other.exact) && prefixes.equals(other.prefixes);
+        }
+
+        @Override
+        public int hashCode() {
+            return 31 * exact.hashCode() + prefixes.hashCode(); //CSOFF: MagicNumber
+        }
+
+        @Override
+        public String toString() {
+            final StringBuilder strb = new StringBuilder();
+            for (final String key : exact) {
+                strb.append(strb.length() > 0 ? ", " : "").append(key);
+            }
+            for (final String prefix : prefixes) {
+                strb.append(strb.length() > 0 ? ", " : "").append(prefix).append('*');
+            }
+            return strb.toString();
+        }
     }
 
     /**
