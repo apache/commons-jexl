@@ -21,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
 import java.lang.ref.Reference;
@@ -36,7 +37,6 @@ import org.apache.commons.lang3.SystemProperties;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -316,8 +316,6 @@ class ClassCreatorTest extends JexlTestCase {
 
     @Test
     void testMany() throws Exception {
-        // FIXME: java 28 has a new GC that seems to prevent classes from being GCed, so this test fails
-        Assumptions.assumeTrue(featureVersion() < 28, "testMany is known to fail on Java 28+");
         // abort test if class creator cannot run
         if (!ClassCreator.canRun) {
             return;
@@ -336,17 +334,16 @@ class ClassCreatorTest extends JexlTestCase {
         options.setSilent(true);
 
         final ClassCreator cctor = new ClassCreator(jexl, base);
-        for (int i = 0; i < LOOPS && gced < 0; ++i) {
+        // pass 0 creates classes until one is GCed (at index gced),
+        // pass 1 reloads classes 0..gced through fresh class loaders
+        for (int i = 0; pass == 0 ? i < LOOPS && gced < 0 : i <= gced; ++i) {
             cctor.setSeed(i);
             Class<?> clazz;
             if (pass == 0) {
                 clazz = cctor.createClass();
             } else {
                 clazz = cctor.getClassInstance();
-                if (clazz == null) {
-                    assertEquals(i, gced);
-                    break;
-                }
+                assertNotNull(clazz, "class " + i + " could not be reloaded");
             }
             // this code verifies the assumption that holding a strong reference to a method prevents
             // its owning class from being GCed
@@ -374,8 +371,9 @@ class ClassCreatorTest extends JexlTestCase {
             if (pass == 0) {
                 // add a weak reference on the class
                 stuff.add(new ClassReference(clazz, queue));
-                // add a soft reference on an instance
-                stuff.add(new InstanceReference(clazz.getConstructor().newInstance(), queue));
+                // add a weak reference on an instance; a soft one would keep the class reachable
+                // until the GC decides to clear soft references, which depends on heap size and GC flavor
+                stuff.add(new WeakReference<>(clazz.getConstructor().newInstance(), queue));
 
                 // attempt to force GC:
                 // while we still have a MB free, create & store big objects
@@ -386,26 +384,22 @@ class ClassCreatorTest extends JexlTestCase {
                 // hint it...
                 System.gc();
                 // let's see if some weak refs got collected
-                boolean qr = false;
-                while (queue.poll() != null) {
-                    final Reference<?> ref = queue.remove(1);
+                Reference<?> ref;
+                while ((ref = queue.remove(100)) != null) {
                     if (ref instanceof ClassReference) {
                         gced = i;
-                        qr = true;
                     }
                 }
-                if (qr) {
-                    //logger.warn("may have GCed class around " + i);
+                if (gced >= 0) {
+                    // restart from 0 on pass 1 (after ++i)
                     pass = 1;
-                    i = 0;
+                    i = -1;
                 }
             }
         }
-
-        if (gced < 0) {
-            logger.warn("unable to force GC");
-            //assertTrue(gced > 0);
-        }
+        // no class got unloaded means something holds a strong reference to them
+        assertTrue(gced >= 0, "unable to GC any generated class");
+        assertEquals(1, pass);
     }
 
     @Test
