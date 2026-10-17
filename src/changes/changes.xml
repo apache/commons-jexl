@@ -27,6 +27,12 @@
         <author email="dev@commons.apache.org">Commons Developers</author>
     </properties>
     <body>
+        <release version="3.7.2" date="YYYY-MM-DD" description="This is a feature and maintenance release. Java 8 or later is required.">
+            <!-- FIX -->
+            <!-- ADD -->
+            <!-- UPDATE -->
+            <action type="update" dev="ggregory" due-to="Gary Gregory">Bump org.apache.commons:commons-parent from 105 to 106.</action>
+        </release>    
         <release version="3.7.1" date="2026-10-15" description="This is a feature and maintenance release. Java 8 or later is required.">
             <!-- ADD -->
             <action dev="henrib" due-to="henrib" type="add" issue="JEXL-473">Add feature to restrict allowed pragmas.</action>
