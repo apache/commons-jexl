@@ -17,6 +17,7 @@
 package org.apache.commons.jexl3;
 
 import static org.apache.commons.jexl3.JexlFeatures.NAMESPACE_INSTANTIATE;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -44,12 +45,9 @@ class FeaturesTest extends JexlTestCase {
     }
 
     private void assertOk(final String[] scripts) {
-        for(final String str : scripts) {
-            try {
-                final JexlScript e = jexl.createScript(str);
-            } catch (final JexlException.Feature xfeature) {
-                fail(str + " :: should not fail parse: " + xfeature.getMessage());
-            }
+        for (final String str : scripts) {
+            assertDoesNotThrow(() -> jexl.createScript(str),
+                () -> str + " :: should not fail parse");
         }
     }
 
@@ -357,12 +355,9 @@ class FeaturesTest extends JexlTestCase {
         // these should all fail with x undeclared as local, thus x as global
         checkFeature(f, scripts);
         // same ones with x as local should work
-        for(final String str : scripts) {
-            try {
-                final JexlScript e = jexl.createScript("var x = foo(); " + str);
-            } catch (final JexlException.Feature xfeature) {
-                fail(str + " :: should not fail parse: " + xfeature.getMessage());
-            }
+        for (final String str : scripts) {
+            assertDoesNotThrow(() -> jexl.createScript("var x = foo(); " + str),
+                () -> str + " :: should not fail parse");
         }
     }
 
