@@ -31,7 +31,7 @@
             <!-- FIX -->
             <!-- ADD -->
             <!-- UPDATE -->
-            <action type="update" dev="ggregory" due-to="Gary Gregory">Bump org.apache.commons:commons-parent from 105 to 106.</action>
+            <action type="update" dev="ggregory" due-to="Gary Gregory">Bump org.apache.commons:commons-parent from 105 to 107.</action>
         </release>    
         <release version="3.7.1" date="2026-10-15" description="This is a feature and maintenance release. Java 8 or later is required.">
             <!-- ADD -->
