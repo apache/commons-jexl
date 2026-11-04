@@ -1452,6 +1452,34 @@ class ArithmeticTest extends JexlTestCase {
     }
 
     /**
+     * A non-zero unbounded number is not empty, even when its magnitude is below
+     * {@link Double#MIN_VALUE} or above {@link Double#MAX_VALUE}.
+     */
+    @Test
+    void testEmptyBigNumberMagnitudes() {
+        final Number[] nonEmpty = {
+            new BigDecimal("1E-400"),
+            new BigDecimal("1E-320"),
+            new BigDecimal("-1E-400"),
+            new BigDecimal("1E400"),
+            new BigDecimal("1E5000"),
+            new BigInteger("-1"),
+        };
+        for (final Number x : nonEmpty) {
+            checkEmpty(x, false);
+        }
+        final Number[] empty = {
+            new BigDecimal("0"),
+            new BigDecimal("0E-400"),
+            new BigDecimal("0.0000"),
+            BigInteger.ZERO,
+        };
+        for (final Number x : empty) {
+            checkEmpty(x, true);
+        }
+    }
+
+    /**
      * A strict engine must surface argument-evaluation errors from {@code empty()}/{@code size()}
      * instead of masking them as {@code true}/{@code 0} (JEXL-security f028); a lenient engine keeps
      * the historical empty/0 fallback.

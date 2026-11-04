@@ -1114,6 +1114,15 @@ public class JexlArithmetic {
     public Boolean isEmpty(final Object object, final Boolean def) {
         if (object != null) {
             if (object instanceof Number) {
+                // BigDecimal and BigInteger are unbounded; a non-zero value whose magnitude is
+                // below Double.MIN_VALUE or above Double.MAX_VALUE rounds to 0.0 or to an
+                // infinity when converted to a double, so the sign is used instead.
+                if (object instanceof BigDecimal) {
+                    return ((BigDecimal) object).signum() == 0;
+                }
+                if (object instanceof BigInteger) {
+                    return ((BigInteger) object).signum() == 0;
+                }
                 final double d = ((Number) object).doubleValue();
                 return Double.isNaN(d) || d == 0.d;
             }
