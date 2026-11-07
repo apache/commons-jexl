@@ -886,7 +886,7 @@
                 Local variables must preclude antish variables handling
             </action>
             <action dev="henrib" type="fix" >
-                Depending on unkown conditions, overriden varargs method may return false to isVarArgs;
+                Depending on unkown conditions, overridden varargs method may return false to isVarArgs;
                 fix by checking method in declaring class hierarchy.
             </action>
             <action dev="henrib" type="fix" issue="JEXL-146" due-to="David Maplesden">
