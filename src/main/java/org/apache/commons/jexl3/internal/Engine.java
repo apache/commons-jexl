@@ -520,7 +520,7 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
      * @return The options
      */
     protected JexlOptions evalOptions(final ASTJexlScript script, final JexlContext context) {
-        final JexlOptions opts = evalOptions(context);
+        JexlOptions opts = evalOptions(context);
         if (opts != options) {
             // when feature lexical, try hard to run lexical
             if (scriptFeatures.isLexical()) {
@@ -534,6 +534,10 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
             }
         }
         if (script != null) {
+           // pragmas apply to the script evaluation only, never to the engine options
+           if (opts == options && script.getPragmas() != null && !script.getPragmas().isEmpty()) {
+               opts = opts.copy();
+           }
            // process script pragmas if any
            processPragmas(script, context, opts);
         }

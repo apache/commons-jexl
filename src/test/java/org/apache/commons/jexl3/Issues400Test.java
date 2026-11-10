@@ -1379,5 +1379,19 @@ public class Issues400Test {
         Object value = expression.evaluate(ctxt);
         assertEquals("forty-two: 42", value.toString());
     }
+
+    @Test
+    void test475() {
+        final JexlEngine jexl = new JexlBuilder().features(JexlFeatures.createDefault().pragma(true)).strict(true).create();
+        final JexlContext ctxt = new MapContext();
+        ctxt.set("a.b", 42);
+        assertEquals(42, jexl.createScript("a.b").execute(ctxt));
+        // the pragma applies to its script only
+        assertThrows(JexlException.Property.class, () -> jexl.createScript("#pragma jexl.options '-antish'\na.b").execute(ctxt));
+        assertEquals(42, jexl.createScript("a.b").execute(ctxt));
+        // same with a null context
+        assertNull(jexl.createScript("#pragma jexl.options '-strict'\nfoo").execute(null));
+        assertThrows(JexlException.Variable.class, () -> jexl.createScript("foo").execute(null));
+    }
 }
 
