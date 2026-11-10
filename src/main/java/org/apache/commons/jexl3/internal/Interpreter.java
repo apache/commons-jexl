@@ -37,6 +37,7 @@ import org.apache.commons.jexl3.JxltEngine;
 import org.apache.commons.jexl3.introspection.JexlMethod;
 import org.apache.commons.jexl3.introspection.JexlPropertyGet;
 import org.apache.commons.jexl3.parser.*;
+import org.apache.commons.logging.Log;
 
 /**
  * An interpreter of JEXL syntax.
@@ -97,6 +98,87 @@ public class Interpreter extends InterpreterBase {
          */
         public boolean isProcessed() {
             return processed;
+        }
+    }
+
+    /**
+     * The dotted name of an antish variable, like {@code x.y.z}, built from the children of a reference.
+     * <p>The first child of the reference is the root identifier; the following children are appended
+     * as they are traversed, as long as they are plain identifier accesses.</p>
+     */
+    private static final class AntishName {
+
+        /**
+         * Checks whether an identifier access can be part of an antish variable name.
+         *
+         * @param access The identifier access
+         * @return true if neither safe navigation nor an expression, false otherwise
+         */
+        static boolean isPlain(final ASTIdentifierAccess access) {
+            return !access.isSafe() && !access.isExpression();
+        }
+
+        /** The name. */
+        private final StringBuilder name;
+
+        /** The index of the next reference child to append. */
+        private int next = 1;
+
+        /**
+         * Creates an antish name.
+         *
+         * @param root The root identifier name
+         */
+        AntishName(final String root) {
+            name = new StringBuilder(root);
+        }
+
+        /**
+         * Appends a dot and a name segment.
+         *
+         * @param segment The name segment
+         */
+        void append(final String segment) {
+            name.append('.').append(segment);
+        }
+
+        /**
+         * Appends the names of the reference children not yet appended, up to and including an index.
+         *
+         * @param reference The reference node
+         * @param index     The index of the last child to append
+         * @return null if all children were appended, the first child that can not be part of an antish name otherwise
+         */
+        JexlNode appendUpTo(final JexlNode reference, final int index) {
+            for (; next <= index; ++next) {
+                final JexlNode child = reference.jjtGetChild(next);
+                if (!(child instanceof ASTIdentifierAccess) || !isPlain((ASTIdentifierAccess) child)) {
+                    return child;
+                }
+                append(((ASTIdentifierAccess) child).getName());
+            }
+            return null;
+        }
+
+        /**
+         * @return The name length
+         */
+        int length() {
+            return name.length();
+        }
+
+        /**
+         * Truncates the name.
+         *
+         * @param length The new name length
+         */
+        void setLength(final int length) {
+            name.setLength(length);
+        }
+
+        @Override
+        public String toString() {
+            return name.toString();
         }
     }
 
@@ -330,28 +412,25 @@ public class Interpreter extends InterpreterBase {
         final int symbol = catchVariable.getSymbol();
         final boolean lexical = catchVariable.isLexical() || options.isLexical();
         if (lexical) {
-            // create lexical frame
-            final LexicalFrame locals = new LexicalFrame(frame, block);
-            // it may be a local previously declared
-            final boolean trySymbol = symbol >= 0 && catchVariable instanceof ASTVar;
-            if (trySymbol && !defineVariable((ASTVar) catchVariable, locals)) {
-                return redefinedVariable(catchVar.jjtGetParent(), catchVariable.getName());
-            }
-            block = locals;
-        }
-        if (symbol < 0) {
-            setContextVariable(catchVar.jjtGetParent(), catchVariable.getName(), caught);
-        } else {
-            final Throwable cause  = caught.getCause();
-            frame.set(symbol, cause == null? caught : cause);
+            pushBlock();
         }
         try {
+            // it may be a local previously declared
+            final boolean trySymbol = lexical && symbol >= 0 && catchVariable instanceof ASTVar;
+            if (trySymbol && !defineVariable((ASTVar) catchVariable, block)) {
+                return redefinedVariable(catchVar.jjtGetParent(), catchVariable.getName());
+            }
+            if (symbol < 0) {
+                setContextVariable(catchVar.jjtGetParent(), catchVariable.getName(), caught);
+            } else {
+                final Throwable cause  = caught.getCause();
+                frame.set(symbol, cause == null? caught : cause);
+            }
             // evaluate body
             return catchBody.jjtAccept(this, data);
         } finally {
-            // restore lexical frame
             if (lexical) {
-                block = block.pop();
+                popBlock();
             }
         }
     }
@@ -503,8 +582,7 @@ public class Interpreter extends InterpreterBase {
         }
         // 1: follow children till penultimate, resolve dot/array
         JexlNode objectNode = null;
-        StringBuilder ant = null;
-        int v = 1;
+        AntishName ant = null;
         // start at 1 if symbol
         main: for (int c = symbol >= 0 ? 1 : 0; c < last; ++c) {
             objectNode = left.jjtGetChild(c);
@@ -524,21 +602,12 @@ public class Interpreter extends InterpreterBase {
                         antish = false;
                         break main;
                     }
-                    ant = new StringBuilder(firstId.getName());
+                    ant = new AntishName(firstId.getName());
                 }
-                // catch up to current child
-                for (; v <= c; ++v) {
-                    final JexlNode child = left.jjtGetChild(v);
-                    final ASTIdentifierAccess aid = child instanceof ASTIdentifierAccess
-                            ? (ASTIdentifierAccess) child
-                            : null;
-                    // remain antish only if unsafe navigation
-                    if (aid == null || aid.isSafe() || aid.isExpression()) {
-                        antish = false;
-                        break main;
-                    }
-                    ant.append('.');
-                    ant.append(aid.getName());
+                // catch up to current child, remain antish only if unsafe navigation
+                if (ant.appendUpTo(left, c) != null) {
+                    antish = false;
+                    break main;
                 }
                 // solve antish
                 object = context.get(ant.toString());
@@ -554,8 +623,7 @@ public class Interpreter extends InterpreterBase {
         final Object property;
         if (propertyId != null) {
             // deal with creating/assigning antish variable
-            if (antish && ant != null && object == null && !propertyId.isSafe() && !propertyId.isExpression()) {
-                ant.append('.');
+            if (antish && ant != null && object == null && AntishName.isPlain(propertyId)) {
                 ant.append(propertyId.getName());
                 final String name = ant.toString();
                 if (assignop == null) {
@@ -609,18 +677,14 @@ public class Interpreter extends InterpreterBase {
         final ASTIdentifier loopVariable = (ASTIdentifier) loopReference.jjtGetChild(0);
         final int symbol = loopVariable.getSymbol();
         final boolean lexical = loopVariable.isLexical() || options.isLexical();
-        final LexicalFrame locals = lexical? new LexicalFrame(frame, block) : null;
+        final LexicalFrame locals = lexical ? pushBlock() : null;
         final boolean loopSymbol = symbol >= 0 && loopVariable instanceof ASTVar;
-        if (lexical) {
-            // create lexical frame
-            // it may be a local previously declared
-            if (loopSymbol && !defineVariable((ASTVar) loopVariable, locals)) {
-                return redefinedVariable(node, loopVariable.getName());
-            }
-            block = locals;
-        }
         Object forEach = null;
         try {
+            // it may be a local previously declared
+            if (lexical && loopSymbol && !defineVariable((ASTVar) loopVariable, locals)) {
+                return redefinedVariable(node, loopVariable.getName());
+            }
             /* second objectNode is the variable to iterate */
             final Object iterableValue = node.jjtGetChild(1).jjtAccept(this, data);
             // make sure there is a value to iterate upon
@@ -671,9 +735,8 @@ public class Interpreter extends InterpreterBase {
         } finally {
             //  closeable iterator handling
             closeIfSupported(forEach);
-            // restore lexical frame
             if (lexical) {
-                block = block.pop();
+                popBlock();
             }
         }
         return result;
@@ -681,44 +744,34 @@ public class Interpreter extends InterpreterBase {
 
     private Object forLoop(final ASTForeachStatement node, final Object data) {
         Object result = null;
-        int nc;
+        int nc = 0;
         final int form = node.getLoopForm();
-        final LexicalFrame locals;
         /* first child node might be the loop variable */
-        if ((form & 1) != 0) {
-            nc = 1;
-            final JexlNode init = node.jjtGetChild(0);
-            ASTVar loopVariable = null;
-            if (init instanceof ASTAssignment) {
-                final JexlNode child = init.jjtGetChild(0);
-                if (child instanceof ASTVar) {
-                    loopVariable = (ASTVar) child;
-                }
-            } else if (init instanceof  ASTVar){
-                loopVariable = (ASTVar) init;
+        final JexlNode init = (form & 1) != 0 ? node.jjtGetChild(nc++) : null;
+        ASTVar loopVariable = null;
+        if (init instanceof ASTAssignment) {
+            final JexlNode child = init.jjtGetChild(0);
+            if (child instanceof ASTVar) {
+                loopVariable = (ASTVar) child;
             }
-            if (loopVariable != null) {
-                final boolean lexical = loopVariable.isLexical() || options.isLexical();
-                locals = lexical ? new LexicalFrame(frame, block) : null;
-                if (locals != null) {
-                    block = locals;
-                }
-            } else {
-                locals = null;
-            }
-            // initialize after eventual creation of local lexical frame
-            init.jjtAccept(this, data);
-            // other inits
-            for (JexlNode moreAssignment = node.jjtGetChild(nc);
-                 moreAssignment instanceof ASTAssignment;
-                 moreAssignment = node.jjtGetChild(++nc)) {
-                moreAssignment.jjtAccept(this, data);
-            }
-        } else {
-            locals = null;
-            nc = 0;
+        } else if (init instanceof  ASTVar){
+            loopVariable = (ASTVar) init;
+        }
+        final boolean lexical = loopVariable != null && (loopVariable.isLexical() || options.isLexical());
+        if (lexical) {
+            pushBlock();
         }
         try {
+            if (init != null) {
+                // initialize after eventual creation of local lexical frame
+                init.jjtAccept(this, data);
+                // other inits
+                for (JexlNode moreAssignment = node.jjtGetChild(nc);
+                     moreAssignment instanceof ASTAssignment;
+                     moreAssignment = node.jjtGetChild(++nc)) {
+                    moreAssignment.jjtAccept(this, data);
+                }
+            }
             // the loop condition
             final JexlNode predicate = (form & 2) != 0? node.jjtGetChild(nc++) : null;
             // the loop step
@@ -745,9 +798,8 @@ public class Interpreter extends InterpreterBase {
                 }
             }
         } finally {
-            // restore lexical frame
-            if (locals != null) {
-                block = block.pop();
+            if (lexical) {
+                popBlock();
             }
         }
         return result;
@@ -920,6 +972,23 @@ public class Interpreter extends InterpreterBase {
     }
 
     /**
+     * Pops the current lexical frame, restoring the enclosing one.
+     */
+    private void popBlock() {
+        block = block.pop();
+    }
+
+    /**
+     * Pushes a new lexical frame, enclosed by the current one, as the current block.
+     *
+     * @return the new current block
+     */
+    private LexicalFrame pushBlock() {
+        block = new LexicalFrame(frame, block);
+        return block;
+    }
+
+    /**
      * Swaps the current thread local interpreter.
      *
      * @param inter The interpreter or null
@@ -967,14 +1036,14 @@ public class Interpreter extends InterpreterBase {
         if (numChildren == 0) {
             return null;
         }
-        block = new LexicalFrame(frame, block).defineArgs();
+        pushBlock().defineArgs();
         try {
             final JexlNode body = script instanceof ASTJexlLambda
                     ? script.jjtGetChild(numChildren - 1)
                     : script;
             return interpret(body);
         } finally {
-            block = block.pop();
+            popBlock();
         }
     }
 
@@ -1154,11 +1223,11 @@ public class Interpreter extends InterpreterBase {
         if (cnt <= 0) {
             return visitBlock(node, data);
         }
+        pushBlock();
         try {
-            block = new LexicalFrame(frame, block);
             return visitBlock(node, data);
         } finally {
-            block = block.pop();
+            popBlock();
         }
     }
 
@@ -1562,11 +1631,11 @@ public class Interpreter extends InterpreterBase {
             }
             return closure;
         }
-        block = new LexicalFrame(frame, block).defineArgs();
+        pushBlock().defineArgs();
         try {
             return runScript(script, data);
         } finally {
-            block = block.pop();
+            popBlock();
         }
     }
 
@@ -1833,9 +1902,8 @@ public class Interpreter extends InterpreterBase {
         Object object = null;
         JexlNode objectNode = null;
         JexlNode ptyNode = null;
-        StringBuilder ant = null;
+        AntishName ant = null;
         boolean antish = !(parent instanceof ASTReference) && options.isAntish();
-        int v = 1;
         main:
         for (int c = 0; c < numChildren; c++) {
             objectNode = node.jjtGetChild(c);
@@ -1847,7 +1915,6 @@ public class Interpreter extends InterpreterBase {
                         final JexlNode child = objectNode.jjtGetChild(0);
                         if (child instanceof ASTIdentifierAccess) {
                             final int alen = ant.length();
-                            ant.append('.');
                             ant.append(((ASTIdentifierAccess) child).getName());
                             object = context.get(ant.toString());
                             if (object != null) {
@@ -1855,7 +1922,7 @@ public class Interpreter extends InterpreterBase {
                                 continue;
                             }
                             // remove method name from antish
-                            ant.delete(alen, ant.length());
+                            ant.setLength(alen);
                             ptyNode = objectNode;
                         }
                     }
@@ -1885,24 +1952,23 @@ public class Interpreter extends InterpreterBase {
                         break main;
                     }
                     final ASTIdentifier afirst = (ASTIdentifier) first;
-                    ant = new StringBuilder(afirst.getName());
+                    ant = new AntishName(afirst.getName());
+                    if (afirst.getSymbol() >= 0) {
+                        // top level is a symbol (a null local variable), cannot be an antish var; same as in executeAssign
+                        ptyNode = numChildren > 1 ? node.jjtGetChild(1) : objectNode;
+                        break main;
+                    }
                     continue;
                     // skip the first node case since it was trialed in jjtAccept above and returned null
                 }
                 // catch up to current node
-                for (; v <= c; ++v) {
-                    final JexlNode child = node.jjtGetChild(v);
-                    if (!(child instanceof ASTIdentifierAccess)) {
+                final JexlNode stop = ant.appendUpTo(node, c);
+                if (stop != null) {
+                    if (!(stop instanceof ASTIdentifierAccess)) {
                         // not an identifier, not antish
                         ptyNode = objectNode;
-                        break main;
                     }
-                    final ASTIdentifierAccess achild = (ASTIdentifierAccess) child;
-                    if (achild.isSafe() || achild.isExpression()) {
-                        break main;
-                    }
-                    ant.append('.');
-                    ant.append(achild.getName());
+                    break main;
                 }
                 // solve antish
                 object = context.get(ant.toString());
@@ -2191,13 +2257,10 @@ public class Interpreter extends InterpreterBase {
         final int bodyChild = node.jjtGetNumChildren() - 1;
         final JexlNode tryBody = node.jjtGetChild(bodyChild);
         final Queue<Object> tryResult = new ArrayDeque<>(bodyChild);
-        final LexicalFrame locals;
         // sequence of var declarations with/without assignment
-        if (node.getSymbolCount() > 0) {
-            locals = new LexicalFrame(frame, block);
-            block = locals;
-        } else {
-            locals = null;
+        final boolean lexical = node.getSymbolCount() > 0;
+        if (lexical) {
+            pushBlock();
         }
         try {
             for(int c = 0; c < bodyChild; ++c) {
@@ -2211,9 +2274,8 @@ public class Interpreter extends InterpreterBase {
             return tryBody.jjtAccept(this, data);
         } finally {
             closeIfSupported(tryResult);
-            // restore lexical frame
-            if (locals != null) {
-                block = block.pop();
+            if (lexical) {
+                popBlock();
             }
         }
     }
@@ -2408,7 +2470,7 @@ public class Interpreter extends InterpreterBase {
         try {
             return node.jjtAccept(this, data);
         } finally {
-            block = block.pop();
+            popBlock();
         }
     }
 }

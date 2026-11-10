@@ -48,9 +48,25 @@ public class FeatureController extends ScriptVisitor {
         node.jjtAccept(this, null);
     }
 
+    /**
+     * Checks whether assigning a left value is a global side effect.
+     * <p>When antish variables are declared, they are all solved at parse time; only assigning
+     * a global variable is a global side effect, assigning a property of its value is not.
+     * Otherwise, assigning any property of a global may create an antish variable.</p>
+     *
+     * @param lv the left value
+     * @return true if the assignment modifies a global variable
+     */
+    private boolean isGlobalSideEffect(final JexlNode lv) {
+        if (features.antishTest() != JexlFeatures.TEST_STR_FALSE) {
+            return lv instanceof ASTIdentifier && lv.isGlobalVar();
+        }
+        return lv.isGlobalVar();
+    }
+
     private Object controlSideEffect(final JexlNode node, final Object data) {
         final JexlNode lv = node.jjtGetChild(0);
-        if (!features.supportsSideEffectGlobal() && lv.isGlobalVar()) {
+        if (!features.supportsSideEffectGlobal() && isGlobalSideEffect(lv)) {
             throwFeatureException(JexlFeatures.SIDE_EFFECT_GLOBAL, lv);
         }
         if (features.supportsConstCapture() && lv instanceof ASTIdentifier && ((ASTIdentifier) lv).isCaptured()) {

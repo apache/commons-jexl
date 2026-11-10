@@ -59,6 +59,12 @@ public final class Parser extends JexlParser
             token.next = jj_nt = token_source.getNextToken();
         }
 
+    @Override
+    protected void jjtreeReplaceTop(JexlNode replacement) {
+        jjtree.popNode();
+        jjtree.pushNode(replacement);
+    }
+
     /**
      * Parses a JEXL source string and returns the corresponding AST.
      * @param jexlInfo the JEXL info to use, may be null

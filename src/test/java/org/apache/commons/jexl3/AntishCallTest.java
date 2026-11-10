@@ -17,6 +17,7 @@
 package org.apache.commons.jexl3;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -168,6 +169,22 @@ class AntishCallTest extends JexlTestCase {
         runTestCall(JEXL, jc);
         lmap.remove("java.math.BigInteger");
         runTestCall(JEXL, jc);
+    }
+
+    @Test
+    void testLocalRootShadowsAntish() {
+        final JexlEvalContext ctxt = new JexlEvalContext();
+        ctxt.set("x.y", 42);
+        // a global root resolves as an antish variable
+        assertEquals(42, JEXL.createScript("x.y").execute(ctxt));
+        // a local variable root shadows the antish variable, when reading...
+        final JexlException.Variable xvar = assertThrows(JexlException.Variable.class,
+                () -> JEXL.createScript("var x; x.y").execute(ctxt));
+        assertEquals("x", xvar.getVariable());
+        assertFalse(xvar.isUndefined());
+        // ...as when assigning
+        assertThrows(JexlException.Property.class, () -> JEXL.createScript("var x; x.y = 1").execute(ctxt));
+        assertEquals(42, ctxt.get("x.y"));
     }
 
     // JEXL-300

@@ -332,6 +332,9 @@ public final class JexlFeatures {
     /** The allowed pragma keys. */
     private Predicate<String> pragmas = TEST_STR_TRUE;
 
+    /** The declared antish variable names. */
+    private Predicate<String> antishNames = TEST_STR_FALSE;
+
     /**
      * Creates default instance, equivalent to the result of calling the preferred alternative
      * {@link JexlFeatures#createDefault()}
@@ -348,6 +351,7 @@ public final class JexlFeatures {
     public JexlFeatures(final JexlFeatures features) {
         this(features.flags, features.reservedNames, features.nameSpaces);
         this.pragmas = features.pragmas;
+        this.antishNames = features.antishNames;
     }
 
     /**
@@ -363,6 +367,41 @@ public final class JexlFeatures {
         this.flags = f;
         this.reservedNames = r == null? Collections.emptySet() : r;
         this.nameSpaces = n == null? TEST_STR_FALSE : n;
+    }
+
+    /**
+     * Gets the declared antish variable names test.
+     *
+     * @return The declared antish variable names test, never null.
+     * @since 3.7.2
+     */
+    public Predicate<String> antishTest() {
+        return antishNames;
+    }
+
+    /**
+     * Sets a test to declare antish variable names, resolved at parse time.
+     * <p>
+     * An antish variable is a global variable whose name contains dots, like <code>x.y</code>.
+     * When set, the parser rewrites a reference rooted on a global variable, like <code>x.y.z</code>,
+     * so that its longest dotted prefix satisfying the predicate, like <code>x.y</code>, is a single variable;
+     * the remaining segments, like <code>.z</code>, are property accesses on that variable value.
+     * A local variable root, a safe navigation segment (<code>?.</code>) or an expression segment
+     * (<code>`...`</code>) stops the rewrite.
+     * </p>
+     * <p>
+     * Declaring antish names means they are all known beforehand: a script parsed with such features
+     * does not solve antish variables at runtime, regardless of the {@link JexlOptions#setAntish(boolean)} option.
+     * </p>
+     * <p>{@link #namePatterns(Collection)} creates such a test from name patterns.</p>
+     *
+     * @param names The antish variable name predicate; must be stateless or thread-safe; null declares none
+     * @return this features instance
+     * @since 3.7.2
+     */
+    public JexlFeatures antishTest(final Predicate<String> names) {
+        antishNames = names == null ? TEST_STR_FALSE : names;
+        return this;
     }
 
     /**
@@ -484,6 +523,9 @@ public final class JexlFeatures {
         if (!this.pragmas.equals(other.pragmas)) {
             return false;
         }
+        if (!this.antishNames.equals(other.antishNames)) {
+            return false;
+        }
         if (!Objects.equals(this.reservedNames, other.reservedNames)) {
             return false;
         }
@@ -540,6 +582,7 @@ public final class JexlFeatures {
         hash = 53 * hash + Long.hashCode(this.flags);
         hash = 53 * hash + (this.reservedNames != null ? this.reservedNames.hashCode() : 0);
         hash = 53 * hash + this.pragmas.hashCode();
+        hash = 53 * hash + this.antishNames.hashCode();
         return hash;
     }
 
@@ -830,19 +873,34 @@ public final class JexlFeatures {
 
     /**
      * Creates a pragma key test from a collection of patterns, meant for {@link #pragmaTest(Predicate)}.
-     * <p>
-     * A pattern ending with <code>*</code> matches any key starting with what precedes it, any other
-     * pattern matches the key exactly. For instance, <code>dlm.*</code> matches <code>dlm.foo</code> and
-     * <code>dlm.foo.bar</code>; <code>*</code> matches any key. Patterns are trimmed, null or empty
-     * patterns are ignored.
-     * </p>
-     * <p>Tests created from the same patterns are equal, so are the features using them.</p>
+     * <p>This is equivalent to {@link #namePatterns(Collection)}.</p>
      *
      * @param patterns The allowed pragma key patterns; null or empty allows no pragma key
      * @return The pragma key test
      * @since 3.7.1
      */
     public static Predicate<String> pragmaPatterns(final Collection<String> patterns) {
+        return namePatterns(patterns);
+    }
+
+    /**
+     * Creates a dotted name test from a collection of patterns.
+     * <p>
+     * Meant for features that test names, like {@link #pragmaTest(Predicate)} or {@link #antishTest(Predicate)}.
+     * </p>
+     * <p>
+     * A pattern ending with <code>*</code> matches any name starting with what precedes it, any other
+     * pattern matches the name exactly. For instance, <code>dlm.*</code> matches <code>dlm.foo</code> and
+     * <code>dlm.foo.bar</code>; <code>*</code> matches any name. Patterns are trimmed, null or empty
+     * patterns are ignored.
+     * </p>
+     * <p>Tests created from the same patterns are equal, so are the features using them.</p>
+     *
+     * @param patterns The name patterns; null or empty matches no name
+     * @return The name test
+     * @since 3.7.2
+     */
+    public static Predicate<String> namePatterns(final Collection<String> patterns) {
         final Set<String> exact = new TreeSet<>();
         final Set<String> prefixes = new TreeSet<>();
         if (patterns != null) {
@@ -858,19 +916,19 @@ public final class JexlFeatures {
                 }
             }
         }
-        return exact.isEmpty() && prefixes.isEmpty() ? TEST_STR_FALSE : new PragmaPatterns(exact, prefixes);
+        return exact.isEmpty() && prefixes.isEmpty() ? TEST_STR_FALSE : new NamePatterns(exact, prefixes);
     }
 
     /**
-     * A pragma key test made of exact keys and key prefixes.
+     * A name test made of exact names and name prefixes.
      */
-    private static final class PragmaPatterns implements Predicate<String> {
-        /** The exactly matched keys. */
+    private static final class NamePatterns implements Predicate<String> {
+        /** The exactly matched names. */
         private final Set<String> exact;
-        /** The matched key prefixes. */
+        /** The matched name prefixes. */
         private final Set<String> prefixes;
 
-        PragmaPatterns(final Set<String> exact, final Set<String> prefixes) {
+        NamePatterns(final Set<String> exact, final Set<String> prefixes) {
             this.exact = exact;
             this.prefixes = prefixes;
         }
@@ -896,10 +954,10 @@ public final class JexlFeatures {
             if (this == obj) {
                 return true;
             }
-            if (!(obj instanceof PragmaPatterns)) {
+            if (!(obj instanceof NamePatterns)) {
                 return false;
             }
-            final PragmaPatterns other = (PragmaPatterns) obj;
+            final NamePatterns other = (NamePatterns) obj;
             return exact.equals(other.exact) && prefixes.equals(other.prefixes);
         }
 
@@ -1032,6 +1090,12 @@ public final class JexlFeatures {
      * <p>
      * When disabled, parsing a script/expression using syntactical constructs modifying variables
      * <em>including all potentially ant-ish variables</em> will throw a parsing exception.
+     * </p>
+     * <p>
+     * When antish variable names are declared ({@link #antishTest(Predicate)}), they are all solved at parse time;
+     * only assigning a global variable, like <code>x = 1</code> or <code>x.y = 1</code> when <code>x.y</code>
+     * is declared, is then a global side effect. Assigning a property of a global variable value, like
+     * <code>x.y.z = 1</code>, is not.
      * </p>
      *
      * @param flag true to enable, false to disable

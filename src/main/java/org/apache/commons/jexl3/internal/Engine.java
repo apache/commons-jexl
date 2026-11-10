@@ -408,6 +408,10 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
         if (!features.supportsNamespaceInstantiation()) {
             options.setNamespaceInstantiation(false);
         }
+        // declared antish names are all solved at parse time: no run-time solving
+        if (features.antishTest() != JexlFeatures.TEST_STR_FALSE) {
+            options.setAntish(false);
+        }
         this.charset = conf.charset();
         // caching:
         final IntFunction<JexlCache<?, ?>> factory = conf.cacheFactory();
@@ -544,6 +548,14 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
         // reapply after pragmas: a feature restriction must not be overridable by a pragma
         if (opts != options && !scriptFeatures.supportsNamespaceInstantiation()) {
             opts.setNamespaceInstantiation(false);
+        }
+        // declared antish names are all solved at parse time: no run-time solving
+        final JexlFeatures features = script != null && script.getFeatures() != null ? script.getFeatures() : scriptFeatures;
+        if (features.antishTest() != JexlFeatures.TEST_STR_FALSE && opts.isAntish()) {
+            if (opts == options) {
+                opts = opts.copy();
+            }
+            opts.setAntish(false);
         }
         return opts;
     }
