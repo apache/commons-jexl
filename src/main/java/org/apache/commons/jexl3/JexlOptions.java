@@ -39,6 +39,7 @@ import org.apache.commons.jexl3.internal.Engine;
  * <li>constCapture: whether captured variables will throw an error if an attempt is made to change their value</li>
  * <li>strictInterpolation: whether interpolation strings always return a string or attempt to parse and return integer</li>
  * <li>booleanLogical: whether logical expressions (&quot;&quot; , ||) coerce their result to boolean</li>
+ * <li>safeUndefined: whether safe navigation applies to what is undefined as it does to null</li>
  * </ul>
  * The sensible default is cancellable, strict and strictArithmetic.
  * <p>This interface replaces the now deprecated JexlEngine.Options.
@@ -46,6 +47,9 @@ import org.apache.commons.jexl3.internal.Engine;
  * @since 3.2
  */
 public final class JexlOptions {
+
+    /** The safe navigation of undefined flag. */
+    private static final int SAFE_UNDEFINED = 12;
 
     /** The namespace auto-instantiation flag. */
     private static final int NAMESPACE_INSTANTIATE = 11;
@@ -87,12 +91,12 @@ public final class JexlOptions {
     private static final String[] NAMES = {
         "cancellable", "strict", "silent", "safe", "lexical", "antish",
         "lexicalShade", "sharedInstance", "constCapture", "strictInterpolation",
-        "booleanShortCircuit", "namespaceInstantiation"
+        "booleanShortCircuit", "namespaceInstantiation", "safeUndefined"
     };
 
     /** Default mask .*/
     private static int DEFAULT = 1 /*<< CANCELLABLE*/ | 1 << STRICT | 1 << ANTISH | 1 << SAFE
-        | 1 << NAMESPACE_INSTANTIATE;
+        | 1 << NAMESPACE_INSTANTIATE | 1 << SAFE_UNDEFINED;
 
     /**
      * Checks the value of a flag in the mask.
@@ -378,6 +382,18 @@ public final class JexlOptions {
     }
 
     /**
+     * Checks whether safe navigation applies to what is undefined.
+     *
+     * @return true if safe navigation evaluates what is undefined as null,
+     * false if it only applies to null
+     * @see #setSafeUndefined(boolean)
+     * @since 3.7.2
+     */
+    public boolean isSafeUndefined() {
+        return isSet(SAFE_UNDEFINED, flags);
+    }
+
+    /**
      * Sets options from engine.
      *
      * @param jexl The engine
@@ -535,6 +551,8 @@ public final class JexlOptions {
      * <p>If safe, encountering null during a navigation expression - dereferencing a method or a field through a null
      * object or property - will <em>not</em> be considered an error but evaluated as <em>null</em>. It is recommended
      * to use <em>setSafe(false)</em> as an explicit default.</p>
+     * <p>If safe, every access behaves as a safe access, {@code x.y} as {@code x?.y}; whether this also
+     * applies to what is undefined is determined by {@link #setSafeUndefined(boolean)}.</p>
      *
      * @param flag true if safe, false otherwise
      */
@@ -594,6 +612,31 @@ public final class JexlOptions {
      */
     public void setStrictInterpolation(final boolean strict) {
         flags = set(STRICT_INTERPOLATION, flags, strict);
+    }
+
+    /**
+     * Sets whether safe navigation applies to what is undefined.
+     * <p>A variable that is neither a local nor known to the context, a property or a method an object does
+     * not have, a function that cannot be solved are <em>undefined</em>; a strict engine reports them as errors.
+     * A safe access, {@code x?.y}, {@code x?.y()}, {@code x?[y]} or any access when {@link #setSafe(boolean)}
+     * is set, evaluates as null when {@code x} is null.</p>
+     * <p>When this flag is set, which is the default, {@code x?.y}, {@code x?.y()} and {@code x?[y]} also
+     * evaluate as null when {@code x} is undefined or does not have the member {@code y}, and what is undefined
+     * evaluates as null when the access that follows it is safe, as in {@code x.y?.z}.
+     * The {@link #setSafe(boolean) safe} option excuses an undefined variable or method in the same way,
+     * with two exceptions kept for compatibility: an undefined property remains an error, as in {@code x.y}
+     * when {@code x} does not have the property {@code y}, and an undefined variable that is the value
+     * of an assignment evaluates as null, as in {@code x = y}.
+     * When this flag is not set, safe navigation only applies to null and what is undefined is an error,
+     * without exception.</p>
+     * <p>In both cases, the condition of a ternary and the left-hand side of the elvis ({@code ?:}) and
+     * null-coalescing ({@code ??}) operators tolerate what is undefined.</p>
+     *
+     * @param flag true if safe navigation applies to undefined and null, false if it only applies to null
+     * @since 3.7.2
+     */
+    public void setSafeUndefined(final boolean flag) {
+        flags = set(SAFE_UNDEFINED, flags, flag);
     }
 
     @Override public String toString() {

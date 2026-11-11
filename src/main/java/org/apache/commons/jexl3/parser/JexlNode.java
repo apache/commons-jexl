@@ -301,7 +301,7 @@ public abstract class JexlNode extends SimpleNode implements JexlCache.Reference
                 return true;
             }
             if (rsibling instanceof ASTArrayAccess) {
-                return safe;
+                return safe || ((ASTArrayAccess) rsibling).isSafeChild(0);
             }
         }
         return false;
