@@ -390,6 +390,10 @@ public final class JexlFeatures {
      * (<code>`...`</code>) stops the rewrite.
      * </p>
      * <p>
+     * When no such prefix exists and the root is not itself a declared name, a method name may complete
+     * a declared variable, like <code>f.g</code> in <code>f.g(42)</code>; that variable is then called as a functor.
+     * </p>
+     * <p>
      * Declaring antish names means they are all known beforehand: a script parsed with such features
      * does not solve antish variables at runtime, regardless of the {@link JexlOptions#setAntish(boolean)} option.
      * </p>

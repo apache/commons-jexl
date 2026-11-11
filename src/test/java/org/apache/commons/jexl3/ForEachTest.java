@@ -199,7 +199,7 @@ class ForEachTest extends JexlTestCase {
     }
 
     @Test void testForLoop0b0() {
-        final String src = "(l)->{ for (let x = 0, y = 0; x < 4; ++x) l.add(x) }";
+        final String src = "(l)->{ for (let x = 0, y = 0; x < 4; ++x) l.add(x); }";
         final JexlEngine jexl = new JexlBuilder().safe(false).create();
         final JexlScript script = jexl.createScript(src);
         final List<Integer> l = new ArrayList<>();

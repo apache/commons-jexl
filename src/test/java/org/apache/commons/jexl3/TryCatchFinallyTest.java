@@ -26,7 +26,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 class TryCatchFinallyTest extends JexlTestCase {
@@ -71,25 +70,6 @@ class TryCatchFinallyTest extends JexlTestCase {
         final Object result = script.execute(null, circuit);
         assertEquals(42, result);
         assertFalse(circuit.isOpened());
-    }
-
-    @Disabled
-    void testEdgeTry() throws Exception {
-        int i = 0;
-        while (i++ < 5) {
-            // System.out.println("i: " + i);
-            try {
-                throw new JexlException.Continue(null);
-            } finally {
-                continue;
-            }
-        }
-        // System.out.println("iii: " + i);
-
-        // int x = 0;
-        try (AutoCloseable x = new Circuit()) {
-            // empty
-        }
     }
 
     @Test

@@ -748,14 +748,16 @@ public class Interpreter extends InterpreterBase {
         final int form = node.getLoopForm();
         /* first child node might be the loop variable */
         final JexlNode init = (form & 1) != 0 ? node.jjtGetChild(nc++) : null;
+        // multiple declarations share the same kind, as in let i = 0, j = 1
+        final JexlNode declaration = init instanceof ASTDefineVars ? init.jjtGetChild(0) : init;
         ASTVar loopVariable = null;
-        if (init instanceof ASTAssignment) {
-            final JexlNode child = init.jjtGetChild(0);
+        if (declaration instanceof ASTAssignment) {
+            final JexlNode child = declaration.jjtGetChild(0);
             if (child instanceof ASTVar) {
                 loopVariable = (ASTVar) child;
             }
-        } else if (init instanceof  ASTVar){
-            loopVariable = (ASTVar) init;
+        } else if (declaration instanceof  ASTVar){
+            loopVariable = (ASTVar) declaration;
         }
         final boolean lexical = loopVariable != null && (loopVariable.isLexical() || options.isLexical());
         if (lexical) {
@@ -765,19 +767,13 @@ public class Interpreter extends InterpreterBase {
             if (init != null) {
                 // initialize after eventual creation of local lexical frame
                 init.jjtAccept(this, data);
-                // other inits
-                for (JexlNode moreAssignment = node.jjtGetChild(nc);
-                     moreAssignment instanceof ASTAssignment;
-                     moreAssignment = node.jjtGetChild(++nc)) {
-                    moreAssignment.jjtAccept(this, data);
-                }
             }
             // the loop condition
             final JexlNode predicate = (form & 2) != 0? node.jjtGetChild(nc++) : null;
             // the loop step
             final JexlNode step = (form & 4) != 0? node.jjtGetChild(nc++) : null;
-            // last child is body
-            final JexlNode statement = (form & 8) != 0 ? node.jjtGetChild(nc) : null;
+            // last child is body, if any
+            final JexlNode statement = (form & 8) != 0 && nc < node.jjtGetNumChildren() ? node.jjtGetChild(nc) : null;
             // while(predicate())...
             while (predicate == null || testPredicate(predicate, predicate.jjtAccept(this, data))) {
                 cancelCheck(node);
@@ -1136,7 +1132,7 @@ public class Interpreter extends InterpreterBase {
             final JexlNode nindex = node.jjtGetChild(i);
             if (object == null) {
                 // safe navigation access
-                return node.isSafeChild(i)
+                return isSafe() || node.isSafeChild(i)
                     ? null
                     :unsolvableProperty(nindex, stringifyProperty(nindex), false, null);
             }
@@ -1904,12 +1900,16 @@ public class Interpreter extends InterpreterBase {
         JexlNode ptyNode = null;
         AntishName ant = null;
         boolean antish = !(parent instanceof ASTReference) && options.isAntish();
+        // the index of the access to apply to the object
+        int deref = 0;
         main:
         for (int c = 0; c < numChildren; c++) {
             objectNode = node.jjtGetChild(c);
+            deref = c;
             if (objectNode instanceof ASTMethodNode) {
                 antish = false;
-                if (object == null) {
+                // a leading method node evaluates its own functor, as in (f)(x).y
+                if (object == null && c > 0) {
                     // we may be performing a method call on an antish var
                     if (ant != null) {
                         final JexlNode child = objectNode.jjtGetChild(0);
@@ -1923,9 +1923,9 @@ public class Interpreter extends InterpreterBase {
                             }
                             // remove method name from antish
                             ant.setLength(alen);
-                            ptyNode = objectNode;
                         }
                     }
+                    ptyNode = objectNode;
                     break;
                 }
             } else if (objectNode instanceof ASTArrayAccess) {
@@ -1937,6 +1937,7 @@ public class Interpreter extends InterpreterBase {
             }
             // attempt to evaluate the property within the object (visit(ASTIdentifierAccess node))
             object = objectNode.jjtAccept(this, object);
+            deref = c + 1;
             cancelCheck(node);
             if (object != null) {
                 // disallow mixing antish variable & bean with same root; avoid ambiguity
@@ -1981,12 +1982,13 @@ public class Interpreter extends InterpreterBase {
         // dealing with null
         if (object == null) {
             if (ptyNode != null) {
-                if (ptyNode.isSafeLhs(isSafe())) {
+                // the access applied to null decides, as in x?.y, x?.y() or x?[y]
+                if (isSafe() || deref < numChildren && isSafeAccess(node.jjtGetChild(deref))) {
                     return null;
                 }
                 if (ant != null) {
                     final String aname = ant.toString();
-                    final boolean defined = isVariableDefined(frame, block, aname);
+                    final boolean defined = isVariableDefined(frame, aname);
                     return unsolvableVariable(node, aname, !defined);
                 }
                 return unsolvableProperty(node,
@@ -1997,7 +1999,7 @@ public class Interpreter extends InterpreterBase {
                     return null;
                 }
                 final String aname = Objects.toString(ant, "?");
-                final boolean defined = isVariableDefined(frame, block, aname);
+                final boolean defined = isVariableDefined(frame, aname);
                 // defined but null; arg of a strict operator?
                 if (defined && !isStrictOperand(node)) {
                     return null;
@@ -2006,6 +2008,20 @@ public class Interpreter extends InterpreterBase {
             }
         }
         return object;
+    }
+
+    /**
+     * Checks whether an access in a reference is explicitly safe, as in ?.y, ?.y() or ?[y].
+     *
+     * @param access the access, a method node being checked through the member it calls
+     * @return true if the access is safe, false otherwise
+     */
+    private static boolean isSafeAccess(final JexlNode access) {
+        final JexlNode member = access instanceof ASTMethodNode ? access.jjtGetChild(0) : access;
+        if (member instanceof ASTIdentifierAccess) {
+            return ((ASTIdentifierAccess) member).isSafe();
+        }
+        return member instanceof ASTArrayAccess && ((ASTArrayAccess) member).isSafeChild(0);
     }
 
     @Override

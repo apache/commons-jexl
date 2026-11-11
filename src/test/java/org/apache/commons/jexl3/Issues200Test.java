@@ -911,13 +911,18 @@ class Issues200Test extends JexlTestCase {
         final String[] srcs = {
             "(x)->{ x?.nothing()?.toString() }",
             "(x)->{ x.toString()?.nothing() }",
-            "(x)->{ x?.nothing().nothing() }",};
+            "(x)->{ x?.nothing()?.nothing() }",};
         final JexlEngine jexl = new JexlBuilder().strict(true).create();
         for (final String src : srcs) {
             script = jexl.createScript(src);
             result = script.execute(null, "abc");
             assertNull(result);
         }
+        // a safe access does not protect the next one...
+        final JexlScript unsafe = jexl.createScript("(x)->{ x?.nothing().nothing() }");
+        assertThrows(JexlException.class, () -> unsafe.execute(null, "abc"));
+        // ...but shortcuts the whole expression when applied to null
+        assertNull(unsafe.execute(null, (Object) null));
     }
 
     @Test

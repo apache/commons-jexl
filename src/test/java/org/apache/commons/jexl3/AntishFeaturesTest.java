@@ -20,6 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -121,6 +122,45 @@ class AntishFeaturesTest extends JexlTestCase {
     }
 
     @Test
+    void testFunctor() throws Exception {
+        final JexlEngine jexl = createEngine("f.g", "f.h", "x.*");
+        final JexlContext ctxt = new MapContext();
+        ctxt.set("f.g", jexl.createScript("a + 1", "a"));
+        ctxt.set("f.h", jexl.createScript("a -> b -> a + b"));
+        ctxt.set("x.y", "abc");
+        // a declared antish variable is called as a functor
+        JexlScript script = jexl.createScript("f.g(41)");
+        assertEquals(42, script.execute(ctxt));
+        assertEquals("f.g(41)", script.getParsedText());
+        assertEquals("42", jexl.createScript("f.g(41).toString()").execute(ctxt));
+        // curried
+        script = jexl.createScript("f.h(1)(2)");
+        assertEquals(3, script.execute(ctxt));
+        assertEquals("f.h(1)(2)", script.getParsedText());
+        assertEquals("3", jexl.createScript("f.h(1)(2).toString()").execute(ctxt));
+        // a method is called on the longest declared prefix
+        assertEquals(3, jexl.createScript("x.y.length()").execute(ctxt));
+        // safe navigation is not rewritten, g is a method of f
+        assertNull(jexl.createScript("f?.g(41)").execute(ctxt));
+        // declared but undefined
+        final JexlException.Variable xvar = assertThrows(JexlException.Variable.class, () -> jexl.createScript("x.q(1)").execute(ctxt));
+        assertEquals("x.q", xvar.getVariable());
+        debuggerCheck(jexl);
+    }
+
+    @Test
+    void testFunctorDeclaredRoot() throws Exception {
+        // all names are declared, including the root: the method is called on its value
+        final JexlEngine jexl = createEngine("*");
+        final JexlContext ctxt = new MapContext();
+        ctxt.set("s", "abc");
+        ctxt.set("f.g", jexl.createScript("a + 1", "a"));
+        assertEquals(3, jexl.createScript("s.length()").execute(ctxt));
+        assertEquals(42, jexl.createScript("(f.g)(41)").execute(ctxt));
+        debuggerCheck(jexl);
+    }
+
+    @Test
     void testLocalRoot() throws Exception {
         final JexlEngine jexl = createEngine("x.y");
         final JexlContext ctxt = new MapContext();
@@ -142,6 +182,27 @@ class AntishFeaturesTest extends JexlTestCase {
         assertEquals(1, jexl.createScript("x?.y").execute(ctxt));
         assertEquals(1, jexl.createScript("x.`y`").execute(ctxt));
         debuggerCheck(jexl);
+    }
+
+    @Test
+    void testSafeNavigationNullRoot() {
+        final JexlFeatures features = JexlFeatures.createDefault().antishTest(JexlFeatures.namePatterns(Collections.singletonList("x.y")));
+        final JexlContext ctxt = new MapContext();
+        ctxt.set("a", null);
+        final JexlEngine jexl = new JexlBuilder().features(features).strict(true).safe(false).create();
+        // safe navigation protects from a null or undefined root
+        assertNull(jexl.createScript("a?.b").execute(ctxt));
+        assertNull(jexl.createScript("a?.b.c").execute(ctxt));
+        assertNull(jexl.createScript("u?.b").execute(ctxt));
+        assertNull(jexl.createScript("var v; v?.b").execute(ctxt));
+        // but only when it follows the root
+        assertThrows(JexlException.Property.class, () -> jexl.createScript("a.b").execute(ctxt));
+        assertThrows(JexlException.Property.class, () -> jexl.createScript("a.b?.c").execute(ctxt));
+        assertThrows(JexlException.Property.class, () -> jexl.createScript("var v; v.b?.c").execute(ctxt));
+        // unless the engine is safe
+        final JexlEngine safe = new JexlBuilder().features(features).strict(true).safe(true).create();
+        assertNull(safe.createScript("a.b").execute(ctxt));
+        assertNull(safe.createScript("var v; v.b").execute(ctxt));
     }
 
     @Test
