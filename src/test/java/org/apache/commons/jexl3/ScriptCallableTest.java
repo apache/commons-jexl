@@ -18,6 +18,7 @@ package org.apache.commons.jexl3;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -147,7 +148,6 @@ class ScriptCallableTest extends JexlTestCase {
         final ExecutorService executorService = Executors.newFixedThreadPool(2);
         try {
             final JexlContext ctxt = new TestContext();
-
             // run an interrupt
             final JexlScript sint = jexl.createScript("interrupt(); return 42");
             Object t = null;
@@ -231,7 +231,7 @@ class ScriptCallableTest extends JexlTestCase {
             final Future<?> kfc = executor.submit(kc);
             assertTrue((Boolean) kfc.get());
             final ExecutionException xexec = assertThrows(ExecutionException.class, future::get);
-            assertTrue(xexec.getCause() instanceof JexlException.Cancel);
+            assertInstanceOf(JexlException.Cancel.class, xexec.getCause());
         } finally {
             list = executor.shutdownNow();
         }
@@ -262,7 +262,7 @@ class ScriptCallableTest extends JexlTestCase {
             final Future<?> kfc = executor.submit(kc);
             assertTrue((Boolean) kfc.get());
             final ExecutionException xexec = assertThrows(ExecutionException.class, future::get);
-            assertTrue(xexec.getCause() instanceof JexlException.Cancel);
+            assertInstanceOf(JexlException.Cancel.class, xexec.getCause());
         } finally {
             list = executor.shutdownNow();
         }
@@ -271,7 +271,7 @@ class ScriptCallableTest extends JexlTestCase {
     }
 
     @Test
-    void testCallableClosure() throws Exception {
+    void testCallableClosure() {
         final JexlScript e = JEXL.createScript("function(t) {while(t);}");
         final Callable<Object> c = e.callable(null, Boolean.TRUE);
         final List<Runnable> list;

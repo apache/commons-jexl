@@ -31,6 +31,7 @@
             <!-- FIX -->
             <action dev="henrib" due-to="Claude" type="fix" issue="JEXL-475">A jexl.options pragma modifies the engine options when evaluated with a plain context.</action>
             <!-- ADD -->
+            <action dev="henrib" due-to="Claude" type="add" issue="JEXL-474">Declare antish variable names at parse time through JexlFeatures.antishTest(Predicate), disabling runtime antish resolution; add JexlFeatures.namePatterns(Collection).</action>
             <!-- UPDATE -->
             <action type="update" dev="ggregory" due-to="Gary Gregory">Bump org.apache.commons:commons-parent from 105 to 107.</action>
         </release>    

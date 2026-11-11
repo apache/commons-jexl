@@ -191,7 +191,7 @@ public class SimpleNode implements Node {
     public void jjtOpen() {
     }
 
-    // For use by ASTJexlScript only
+    // For use by ASTJexlScript and the parser antish variable resolution only
     void jjtSetChildren(final JexlNode[] jexlNodes) {
         children = jexlNodes;
     }

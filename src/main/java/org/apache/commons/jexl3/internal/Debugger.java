@@ -58,10 +58,14 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
         if (child instanceof ASTCaseStatement) {
             return child.jjtGetNumChildren() > 0 && isStatement(child.jjtGetChild(0));
         }
+        if (child instanceof ASTForeachStatement) {
+            // a loop whose body is not a statement needs a terminator, as in for (...) x += 1;
+            final int num = child.jjtGetNumChildren();
+            return num == 0 || isStatement(child.jjtGetChild(num - 1));
+        }
         return child instanceof ASTJexlScript
                 || child instanceof ASTBlock
                 || child instanceof ASTIfStatement
-                || child instanceof ASTForeachStatement
                 || child instanceof ASTTryStatement
                 || child instanceof ASTWhileStatement
                 || child instanceof ASTDoWhileStatement
@@ -933,7 +937,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
             // the loop step
             final JexlNode step = (form & 4) != 0 ? node.jjtGetChild(nc++) : null;
             // last child is body
-            body = (form & 8) != 0 ? node.jjtGetChild(nc) : null;
+            body = (form & 8) != 0 && nc < node.jjtGetNumChildren() ? node.jjtGetChild(nc) : null;
             if (vars != null) {
                 accept(vars, data);
             }
@@ -1110,7 +1114,8 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
         }
         // no parameters or done with them
         final int num = node.jjtGetNumChildren();
-        if (num == 1 && !(node instanceof ASTJexlLambda)) {
+        if (num == 1 && (!(node instanceof ASTJexlLambda) || isLambdaExpr((ASTJexlLambda) node))) {
+            // a lambda expression is not a statement, it may be an argument or an operand
             data = accept(node.jjtGetChild(0), data);
         } else {
             for (int i = named? 1 : 0; i < num; ++i) {
@@ -1169,12 +1174,15 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     @Override
     protected Object visit(final ASTMethodNode node, final Object data) {
         final int num = node.jjtGetNumChildren();
-        if (num == 2) {
+        if (num > 1) {
             accept(node.jjtGetChild(0), data);
-            if (depth <= 0) {
-                builder.append("(...)");
-            } else {
-                accept(node.jjtGetChild(1), data);
+            // more than one arguments node when curried
+            for (int i = 1; i < num; ++i) {
+                if (depth <= 0) {
+                    builder.append("(...)");
+                } else {
+                    accept(node.jjtGetChild(i), data);
+                }
             }
         }
         return data;

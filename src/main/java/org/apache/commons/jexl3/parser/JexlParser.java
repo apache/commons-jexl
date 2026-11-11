@@ -32,6 +32,7 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Predicate;
 
 import org.apache.commons.jexl3.JexlEngine;
 import org.apache.commons.jexl3.JexlException;
@@ -792,6 +793,13 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
     protected abstract Token getToken(int index);
 
     /**
+     * Overridden in actual parser to replace the node on top of the tree-building stack.
+     *
+     * @param replacement The node replacing the top node
+     */
+    protected abstract void jjtreeReplaceTop(JexlNode replacement);
+
+    /**
      * Gets the lexical unit used by this parser.
      *
      * @return The named register map.
@@ -1005,6 +1013,14 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
             if (script.getScope() != scope) {
                 script.setScope(scope);
             }
+        } else if (node instanceof ASTReference) {
+            final JexlNode antish = resolveAntish((ASTReference) node);
+            if (antish != node) {
+                // the whole reference is a declared antish variable
+                jjtreeReplaceTop(antish);
+                featureController.controlNode(antish);
+                return;
+            }
         } else if (ASSIGN_NODES.contains(node.getClass())) {
             final JexlNode lv = node.jjtGetChild(0);
             if (!lv.isLeftValue()) {
@@ -1024,6 +1040,106 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
         }
         // heavy check
         featureController.controlNode(node);
+    }
+
+    /**
+     * Resolves a declared antish variable in a reference.
+     * <p>When the features declare antish variable names, the longest dotted prefix satisfying the
+     * declaration test of a reference rooted on a global variable, like <code>x.y</code> in
+     * <code>x.y.z</code>, is rewritten as a single identifier.</p>
+     *
+     * @param reference The reference node
+     * @return the reference (rewritten or not) or the identifier if the whole reference is an antish variable
+     * @see JexlFeatures#antishTest(Predicate)
+     */
+    private JexlNode resolveAntish(final ASTReference reference) {
+        final Predicate<String> declared = getFeatures().antishTest();
+        if (declared == JexlFeatures.TEST_STR_FALSE) {
+            return reference;
+        }
+        final JexlNode first = reference.jjtGetChild(0);
+        // a local variable or a namespace can not be the root of an antish variable
+        if (!(first instanceof ASTIdentifier)
+            || ((ASTIdentifier) first).getSymbol() >= 0
+            || ((ASTIdentifier) first).getNamespace() != null) {
+            return reference;
+        }
+        final ASTIdentifier root = (ASTIdentifier) first;
+        final int count = reference.jjtGetNumChildren();
+        final StringBuilder name = new StringBuilder(root.getName());
+        String antish = null;
+        int last = 0;
+        int stop = 1;
+        for (; stop < count; ++stop) {
+            final JexlNode child = reference.jjtGetChild(stop);
+            // only plain identifier access, no safe navigation nor expression
+            if (child.getClass() != ASTIdentifierAccess.class) {
+                break;
+            }
+            name.append('.').append(((ASTIdentifierAccess) child).getName());
+            final String candidate = name.toString();
+            if (declared.test(candidate)) {
+                antish = candidate;
+                last = stop;
+            }
+        }
+        if (antish == null) {
+            return stop < count ? resolveAntishFunctor(reference, name, stop) : reference;
+        }
+        root.setSymbol(antish);
+        if (last == count - 1) {
+            root.jjtSetParent(null);
+            return root;
+        }
+        final JexlNode[] children = new JexlNode[count - last];
+        children[0] = root;
+        for (int c = last + 1; c < count; ++c) {
+            children[c - last] = reference.jjtGetChild(c);
+        }
+        reference.jjtSetChildren(children);
+        return reference;
+    }
+
+    /**
+     * Resolves a declared antish variable called as a functor in a reference.
+     * <p>When no prefix of the reference is a declared antish variable, the name of the method
+     * that follows may complete one, like <code>f.g</code> in <code>f.g(42)</code>; the method call
+     * is then rewritten as a call of that variable.</p>
+     *
+     * @param reference The reference node
+     * @param prefix The dotted name that precedes the method name
+     * @param at The index of the method node in the reference
+     * @return the reference (rewritten or not) or the method node if the call starts and ends the reference
+     */
+    private JexlNode resolveAntishFunctor(final ASTReference reference, final StringBuilder prefix, final int at) {
+        final Predicate<String> declared = getFeatures().antishTest();
+        final ASTIdentifier root = (ASTIdentifier) reference.jjtGetChild(0);
+        final JexlNode call = reference.jjtGetChild(at);
+        // only a plain method name; a declared root is a variable, the method is called on its value
+        if (!(call instanceof ASTMethodNode)
+            || call.jjtGetChild(0).getClass() != ASTIdentifierAccess.class
+            || declared.test(root.getName())) {
+            return reference;
+        }
+        final String functor = prefix.append('.').append(((ASTIdentifierAccess) call.jjtGetChild(0)).getName()).toString();
+        if (!declared.test(functor)) {
+            return reference;
+        }
+        // the antish variable replaces the method name
+        root.setSymbol(functor);
+        root.jjtSetParent(call);
+        call.jjtAddChild(root, 0);
+        final int count = reference.jjtGetNumChildren();
+        if (at == count - 1) {
+            call.jjtSetParent(null);
+            return call;
+        }
+        final JexlNode[] children = new JexlNode[count - at];
+        for (int c = at; c < count; ++c) {
+            children[c - at] = reference.jjtGetChild(c);
+        }
+        reference.jjtSetChildren(children);
+        return reference;
     }
 
     /**
