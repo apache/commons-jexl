@@ -934,7 +934,7 @@ public final class TemplateEngine extends JxltEngine {
         Exception xuel = null;
         TemplateExpression stmt = null;
         final JexlFeatures features = features(ftrs);
-        // do not cache interpolation expression, they are stored in AST node
+        // expressions shorter than the cache threshold are cached, keyed by features, symbols and source
         final boolean cached = cache != null && expression.length() < jexl.cacheThreshold;
         final JexlEngine je = Engine.putThreadEngine(jexl);
         try {

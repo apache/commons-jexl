@@ -1184,7 +1184,7 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
                 return ((TemplateEngine) jxlt).createExpression(info, src, scope, features);
             }
         }
-        throw new IllegalStateException("engine is not a accessible");
+        throw new IllegalStateException("engine is not accessible");
     }
 
     /**
