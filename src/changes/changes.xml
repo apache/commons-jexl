@@ -34,6 +34,7 @@
             <action dev="henrib" due-to="Claude" type="add" issue="JEXL-474">Declare antish variable names at parse time through JexlFeatures.antishTest(Predicate), disabling runtime antish resolution; add JexlFeatures.namePatterns(Collection).</action>
             <!-- UPDATE -->
             <action type="update" dev="ggregory" due-to="Gary Gregory">Bump org.apache.commons:commons-parent from 105 to 107.</action>
+            <action type="update" dev="ggregory" due-to="Gary Gregory">[test] Bump org.apache.commons:commons-lang3 from 3.21.0 to 3.22.0.</action>
         </release>    
         <release version="3.7.1" date="2026-10-15" description="This is a feature and maintenance release. Java 8 or later is required.">
             <!-- ADD -->
