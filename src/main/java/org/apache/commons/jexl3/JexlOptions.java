@@ -551,8 +551,9 @@ public final class JexlOptions {
      * <p>If safe, encountering null during a navigation expression - dereferencing a method or a field through a null
      * object or property - will <em>not</em> be considered an error but evaluated as <em>null</em>. It is recommended
      * to use <em>setSafe(false)</em> as an explicit default.</p>
-     * <p>If safe, every access behaves as a safe access, {@code x.y} as {@code x?.y}; whether this also
-     * applies to what is undefined is determined by {@link #setSafeUndefined(boolean)}.</p>
+     * <p>If safe, an access through null behaves as a safe access, {@code x.y} as {@code x?.y} when {@code x}
+     * is null; what happens when a variable, property or method is undefined is determined by
+     * {@link #setSafeUndefined(boolean)}.</p>
      *
      * @param flag true if safe, false otherwise
      */

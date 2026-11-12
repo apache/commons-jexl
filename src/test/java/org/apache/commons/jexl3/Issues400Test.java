@@ -1396,7 +1396,7 @@ public class Issues400Test {
 
     @Test
     void test476() {
-        final String err = "error";
+        final Object err = new Object();
         // an expression and its result when (safeUndefined, safe) is (true, false), (true, true), (false, false), (false, true)
         final Object[][] cases = {
             // an undefined variable
