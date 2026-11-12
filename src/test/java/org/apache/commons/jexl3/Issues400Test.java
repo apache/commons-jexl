@@ -1440,17 +1440,20 @@ public class Issues400Test {
             {"nul(1)", err, err, err, err},
             {"nul + 1", err, err, err, err},
             {"nul.y ?? 1", 1, 1, 1, 1},
+            // a call on a null result
+            {"map.get('z')(1) ?? 1", 1, 1, 1, 1},
         };
         final JexlContext ctxt = new MapContext();
         ctxt.set("nul", null);
+        ctxt.set("map", Collections.emptyMap());
         for (int m = 0; m < 4; ++m) {
-            final boolean undef = (m & 2) == 0;
+            final boolean safeUndefined = (m & 2) == 0;
             final boolean safe = (m & 1) != 0;
-            final JexlEngine jexl = new JexlBuilder().strict(true).safe(safe).safeUndefined(undef).create();
+            final JexlEngine jexl = new JexlBuilder().strict(true).safe(safe).safeUndefined(safeUndefined).create();
             for (final Object[] c : cases) {
                 final String src = (String) c[0];
                 final Object expected = c[m + 1];
-                final String msg = src + ", safeUndefined: " + undef + ", safe: " + safe;
+                final String msg = src + ", safeUndefined: " + safeUndefined + ", safe: " + safe;
                 final JexlScript script = jexl.createScript(src);
                 if (expected == err) {
                     assertThrows(JexlException.class, () -> script.execute(ctxt), msg);

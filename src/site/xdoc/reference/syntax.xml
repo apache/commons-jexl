@@ -292,7 +292,7 @@
                         Note that this can also be used in a chain as in <code>x?[y]?[z]</code>.
                         </p>
                         <p>Whether safe-access operators shortcut non-existent references - an undefined variable,
-                        property or method - as they do null is determined by the <code>safeUndefined</code> option,
+                        property, method or function - as they do null is determined by the <code>safeUndefined</code> option,
                         true by default; when false, only null is shortcut and a non-existent reference is an error.
                         </p>
                         <p>Access operators can be overloaded in <code>JexlArithmetic</code>, so that

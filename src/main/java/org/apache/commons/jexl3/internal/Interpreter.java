@@ -1721,7 +1721,7 @@ public class Interpreter extends InterpreterBase {
                 object = data;
                 if (object == null) {
                     // no object, we fail
-                    return isSafe() || ((ASTIdentifierAccess) methodNode).isSafe()
+                    return isSafe() || isSafeAccess(methodNode)
                         ? null
                         : unsolvableMethod(methodNode, "<null>.<?>(...)");
                 }
