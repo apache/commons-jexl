@@ -902,8 +902,21 @@ public class Engine extends JexlEngine implements JexlUberspect.ConstantResolver
      * @return The parsed tree
      */
     protected ASTJexlScript jxltParse(final JexlInfo info, final boolean expr, final String src, final Scope scope) {
+        return jxltParse(info, expr ? this.expressionFeatures : this.scriptFeatures, src, scope);
+    }
+
+    /**
+     * Parses a Jexl expression or script.
+     *
+     * @param info The JexlInfo
+     * @param features The features to parse with
+     * @param src The source to parse
+     * @param scope The scope, maybe null
+     * @return The parsed tree
+     */
+    protected ASTJexlScript jxltParse(final JexlInfo info, final JexlFeatures features, final String src, final Scope scope) {
         synchronized(parsing) {
-            return parser.jxltParse(info, expr ? this.expressionFeatures : this.scriptFeatures, src, scope);
+            return parser.jxltParse(info, features, src, scope);
         }
     }
 

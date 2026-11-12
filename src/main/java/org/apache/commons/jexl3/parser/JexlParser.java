@@ -1170,16 +1170,18 @@ public abstract class JexlParser extends StringParser implements JexlScriptParse
      * @param info The JexlInfo
      * @param src The source to parse
      * @param scope The scope
+     * @param features The features of the script the expression is embedded in
      * @return The expression
      */
-    static JxltEngine.Expression parseInterpolation(final JexlInfo info, final String src, final Scope scope) {
+    static JxltEngine.Expression parseInterpolation(final JexlInfo info, final String src, final Scope scope,
+                                                    final JexlFeatures features) {
         final JexlEngine jexl = JexlEngine.getThreadEngine();
         if (jexl != null) {
             // interpolation uses default $ and # as expression markers;
             // the cache size is negative to reuse the engine cache
             final JxltEngine jxlt = jexl.createJxltEngine(true, -1, '$', '#');
             if (jxlt instanceof TemplateEngine) {
-                return ((TemplateEngine) jxlt).createExpression(info, src, scope);
+                return ((TemplateEngine) jxlt).createExpression(info, src, scope, features);
             }
         }
         throw new IllegalStateException("engine is not a accessible");
