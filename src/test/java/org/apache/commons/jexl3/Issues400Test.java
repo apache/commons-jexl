@@ -1393,5 +1393,79 @@ public class Issues400Test {
         assertNull(jexl.createScript("#pragma jexl.options '-strict'\nfoo").execute(null));
         assertThrows(JexlException.Variable.class, () -> jexl.createScript("foo").execute(null));
     }
-}
 
+    @Test
+    void test476() {
+        final Object err = new Object();
+        // an expression and its result when (safeUndefined, safe) is (true, false), (true, true), (false, false), (false, true)
+        final Object[][] cases = {
+            // an undefined variable
+            {"u", err, err, err, err},
+            {"u.y", err, null, err, err},
+            {"u?.y", null, null, err, err},
+            {"u[0]", err, null, err, err},
+            {"u?[0]", null, null, err, err},
+            {"u.m()", err, null, err, err},
+            {"u?.m()", null, null, err, err},
+            {"u == null", err, err, err, err},
+            {"u ?? 1", 1, 1, 1, 1},
+            // an undefined property
+            {"'abc'.nothing", err, err, err, err},
+            {"'abc'?.nothing", null, null, err, err},
+            {"'abc'['nothing']", err, err, err, err},
+            {"'abc'?['nothing']", null, null, err, err},
+            {"'abc'.nothing.y", err, err, err, err},
+            {"'abc'.nothing?.y", null, null, err, err},
+            {"'abc'.nothing ?? 1", 1, 1, 1, 1},
+            // an undefined method
+            {"'abc'.nothing()", err, null, err, err},
+            {"'abc'?.nothing()", null, null, err, err},
+            {"'abc'.nothing().y", err, null, err, err},
+            {"'abc'.nothing()?.y", null, null, err, err},
+            {"'abc'.nothing() ?? 1", 1, 1, 1, 1},
+            // an undefined function
+            {"nothing(1)", err, err, err, err},
+            {"nothing(1).y", err, null, err, err},
+            {"nothing(1)?.y", null, null, err, err},
+            {"nothing(1) ?? 1", 1, 1, 1, 1},
+            // null is not undefined
+            {"nul", null, null, null, null},
+            {"nul.y", err, null, err, null},
+            {"nul?.y", null, null, null, null},
+            {"nul?.y.z", null, null, null, null},
+            {"nul[0]", err, null, err, null},
+            {"nul?[0]", null, null, null, null},
+            {"nul.m()", err, null, err, null},
+            {"nul?.m()", null, null, null, null},
+            {"nul(1)", err, err, err, err},
+            {"nul + 1", err, err, err, err},
+            {"nul.y ?? 1", 1, 1, 1, 1},
+            // a call on a null result
+            {"map.get('z')(1) ?? 1", 1, 1, 1, 1},
+        };
+        final JexlContext ctxt = new MapContext();
+        ctxt.set("nul", null);
+        ctxt.set("map", Collections.emptyMap());
+        for (int m = 0; m < 4; ++m) {
+            final boolean safeUndefined = (m & 2) == 0;
+            final boolean safe = (m & 1) != 0;
+            final JexlEngine jexl = new JexlBuilder().strict(true).safe(safe).safeUndefined(safeUndefined).create();
+            for (final Object[] c : cases) {
+                final String src = (String) c[0];
+                final Object expected = c[m + 1];
+                final String msg = src + ", safeUndefined: " + safeUndefined + ", safe: " + safe;
+                final JexlScript script = jexl.createScript(src);
+                if (expected == err) {
+                    assertThrows(JexlException.class, () -> script.execute(ctxt), msg);
+                } else {
+                    assertEquals(expected, script.execute(ctxt), msg);
+                }
+            }
+        }
+        // as a pragma
+        final JexlEngine jexl = new JexlBuilder().features(JexlFeatures.createDefault().pragma(true)).strict(true).create();
+        assertNull(jexl.createScript("u?.y").execute(ctxt));
+        assertThrows(JexlException.Variable.class,
+            () -> jexl.createScript("#pragma jexl.options '-safeUndefined'\nu?.y").execute(ctxt));
+    }
+}
