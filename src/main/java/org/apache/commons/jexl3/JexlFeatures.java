@@ -1010,7 +1010,13 @@ public final class JexlFeatures {
         if (names == null || names.isEmpty()) {
             reservedNames = Collections.emptySet();
         } else {
-            reservedNames = Collections.unmodifiableSet(new TreeSet<>(names));
+            final Set<String> set = new TreeSet<>();
+            for (final String name : names) {
+                if (name != null && !name.isEmpty()) {
+                    set.add(name);
+                }
+            }
+            reservedNames = set.isEmpty() ? Collections.emptySet() : Collections.unmodifiableSet(set);
         }
         return this;
     }

@@ -400,6 +400,12 @@ class FeaturesTest extends JexlTestCase {
             "var f = function(bar2) { bar2; }"
         };
         assertOk(scriptsOk);
+
+        final JexlFeatures fNullSafe = new JexlFeatures().reservedNames(Arrays.asList("foo", null, "", "bar"));
+        assertTrue(fNullSafe.isReservedName("foo"));
+        assertTrue(fNullSafe.isReservedName("bar"));
+        assertFalse(fNullSafe.isReservedName("baz"));
+        assertFalse(fNullSafe.isReservedName(null));
     }
 
     @Test
