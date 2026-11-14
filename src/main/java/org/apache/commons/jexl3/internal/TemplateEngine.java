@@ -1019,7 +1019,11 @@ public final class TemplateEngine extends JxltEngine {
         if (ftrs == null) {
             return noscript ? jexl.expressionFeatures : jexl.scriptFeatures;
         }
-        return noscript && ftrs.supportsScript() ? new JexlFeatures(ftrs).script(false) : ftrs;
+        if (!noscript || !ftrs.supportsScript()) {
+            return ftrs;
+        }
+        // the script was created with the features of the engine, no need to derive them
+        return ftrs == jexl.scriptFeatures ? jexl.expressionFeatures : new JexlFeatures(ftrs).script(false);
     }
 
     /**
