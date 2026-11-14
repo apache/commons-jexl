@@ -22,6 +22,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.io.StringWriter;
+import java.util.Arrays;
+import java.util.Collections;
 
 import org.junit.jupiter.api.Test;
 
@@ -78,5 +80,41 @@ class JxltFeatureEnforcementTest {
         final StringWriter strw = new StringWriter();
         t.evaluate(new MapContext(), strw);
         assertEquals("hello 1\nhello 2\n", strw.toString());
+    }
+
+    @Test
+    void testInterpolationHonorsScriptFeatures() {
+        final JexlFeatures permissive = new JexlFeatures();
+        final JexlFeatures restricted = new JexlFeatures().methodCall(false);
+        final JexlContext ctxt = new MapContext();
+        ctxt.set("s", "abc");
+        final String src = "`${s.length()}`";
+        // the features of the script are more restrictive than those of the engine
+        final JexlEngine jexl = new JexlBuilder().features(permissive).create();
+        assertEquals("3", jexl.createScript(src).execute(ctxt).toString());
+        assertThrows(JexlException.Feature.class, () -> jexl.createScript(restricted, null, "s.length()"));
+        for (final String istr : Arrays.asList(src, "`#{s.length()}`", "s.`${s.length()}`", "s?.`${s.length()}`")) {
+            final JxltEngine.Exception xjxlt = assertThrows(JxltEngine.Exception.class,
+                () -> jexl.createScript(restricted, null, istr),
+                "interpolation must honor the features of its script: " + istr);
+            assertInstanceOf(JexlException.Feature.class, xjxlt.getCause());
+        }
+        // the features of the script are more permissive than those of the engine
+        final JexlEngine rjexl = new JexlBuilder().features(restricted).create();
+        assertThrows(JxltEngine.Exception.class, () -> rjexl.createScript(src));
+        assertEquals("3", rjexl.createScript(permissive, null, src).execute(ctxt).toString());
+        assertThrows(JxltEngine.Exception.class, () -> rjexl.createScript(src));
+    }
+
+    @Test
+    void testInterpolationHonorsDeclaredAntish() {
+        final JexlFeatures declared = new JexlFeatures().antishTest(JexlFeatures.namePatterns(Collections.singletonList("x.y")));
+        final JexlContext ctxt = new MapContext();
+        ctxt.set("x.y", 42);
+        // the antish variable is declared by the features of the script, not by those of the engine
+        final JexlEngine jexl = new JexlBuilder().strict(true).create();
+        assertEquals(42, jexl.createScript(declared, null, "x.y").execute(ctxt));
+        assertEquals("42", jexl.createScript(declared, null, "`${x.y}`").execute(ctxt).toString());
+        assertEquals("42", jexl.createScript(declared, null, "`#{x.y}`").execute(ctxt).toString());
     }
 }

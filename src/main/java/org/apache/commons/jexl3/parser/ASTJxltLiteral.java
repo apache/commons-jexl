@@ -16,6 +16,7 @@
  */
 package org.apache.commons.jexl3.parser;
 
+import org.apache.commons.jexl3.JexlFeatures;
 import org.apache.commons.jexl3.JxltEngine;
 import org.apache.commons.jexl3.internal.Scope;
 
@@ -68,9 +69,9 @@ public final class ASTJxltLiteral extends JexlNode implements JexlNode.JxltHandl
         this.jxltExpression = e;
     }
 
-    void setLiteral(final String src, final Scope scope) {
+    void setLiteral(final String src, final Scope scope, final JexlFeatures features) {
         this.literal = src;
-        this.jxltExpression = JexlParser.parseInterpolation(jexlInfo(), src, scope);
+        this.jxltExpression = JexlParser.parseInterpolation(jexlInfo(), src, scope, features);
     }
 
     @Override

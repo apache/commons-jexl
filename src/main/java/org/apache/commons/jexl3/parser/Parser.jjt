@@ -1102,7 +1102,7 @@ void JxltLiteral() #JxltLiteral :
 }
 {
    t=<JXLT_LITERAL>
-   { jjtThis.setLiteral(src = Parser.buildString(t.image, true), getScope()); }
+   { jjtThis.setLiteral(src = Parser.buildString(t.image, true), getScope(), getFeatures()); }
 }
 
 void RegexLiteral() :
@@ -1259,7 +1259,7 @@ void IdentifierAccess() #void :
     |
         t=<STRING_LITERAL> { jjtThis.setIdentifier(Parser.buildString(t.image, true)); } #IdentifierAccess
     |
-        t=<JXLT_LITERAL> { jjtThis.setIdentifier(Parser.buildString(t.image, true), getScope()); } #IdentifierAccessJxlt
+        t=<JXLT_LITERAL> { jjtThis.setIdentifier(Parser.buildString(t.image, true), getScope(), getFeatures()); } #IdentifierAccessJxlt
     )
     |
     <QDOT> (
@@ -1267,7 +1267,7 @@ void IdentifierAccess() #void :
     |
         t=<STRING_LITERAL> { jjtThis.setIdentifier(Parser.buildString(t.image, true)); } #IdentifierAccessSafe
     |
-        t=<JXLT_LITERAL> { jjtThis.setIdentifier(Parser.buildString(t.image, true), getScope()); } #IdentifierAccessSafeJxlt
+        t=<JXLT_LITERAL> { jjtThis.setIdentifier(Parser.buildString(t.image, true), getScope(), getFeatures()); } #IdentifierAccessSafeJxlt
     )
 }
 
