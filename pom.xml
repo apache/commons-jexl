@@ -173,21 +173,44 @@
                 </configuration>
             </plugin>
             <plugin>
-                <groupId>com.helger.maven</groupId>
-                <artifactId>ph-javacc-maven-plugin</artifactId>
-                <version>4.1.5</version>
+                <!-- JJTree 8.1.0 writes the characters that the grammar declares as unicode escapes in the platform
+                     encoding, where they may be lost: .mvn/jvm.config makes that encoding UTF-8. -->
+                <groupId>org.javacc.plugin</groupId>
+                <artifactId>javacc-maven-plugin</artifactId>
+                <version>3.8.0</version>
                 <executions>
                     <execution>
                         <id>jexl-jjtree</id>
                         <configuration>
                             <sourceDirectory>${basedir}/src/main/java/org/apache/commons/jexl3/parser</sourceDirectory>
-                            <outputDirectory>${project.build.directory}/generated-sources/java</outputDirectory>
+                            <jjtreeCmdLineArgs>
+                                <arg>-CODE_GENERATOR="Java"</arg>
+                                <arg>-NODE_DIRECTORY="${basedir}/src/main/java"</arg>
+                                <arg>-NODE_PACKAGE="org.apache.commons.jexl3.parser"</arg>
+                                <arg>-JJTREE_OUTPUT_DIRECTORY="${project.build.directory}/generated-sources/jjtree"</arg>
+                            </jjtreeCmdLineArgs>
+                            <javaccCmdLineArgs>
+                                <arg>-CODE_GENERATOR="Java"</arg>
+                                <arg>-OUTPUT_DIRECTORY="${project.build.directory}/generated-sources/java"</arg>
+                            </javaccCmdLineArgs>
                         </configuration>
                         <goals>
                             <goal>jjtree-javacc</goal>
                         </goals>
                     </execution>
                 </executions>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.javacc</groupId>
+                        <artifactId>core</artifactId>
+                        <version>8.1.0</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.javacc.generator</groupId>
+                        <artifactId>java</artifactId>
+                        <version>8.1.0</version>
+                    </dependency>
+                </dependencies>
             </plugin>
             <plugin>
                 <artifactId>maven-antrun-plugin</artifactId>
