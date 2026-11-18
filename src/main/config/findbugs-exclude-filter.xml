@@ -53,6 +53,9 @@
         <Class name="org.apache.commons.jexl3.parser.TokenMgrError"/>
     </Match>
     <Match>
+        <Class name="org.apache.commons.jexl3.parser.StreamProvider"/>
+    </Match>
+    <Match>
         <Class name="org.apache.commons.jexl3.parser.SimpleNode"/>
     </Match>
     <Match>
