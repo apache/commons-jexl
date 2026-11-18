@@ -173,6 +173,8 @@
                 </configuration>
             </plugin>
             <plugin>
+                <!-- JJTree 8.1.0 writes the characters that the grammar declares as unicode escapes in the platform
+                     encoding, where they may be lost: .mvn/jvm.config makes that encoding UTF-8. -->
                 <groupId>org.javacc.plugin</groupId>
                 <artifactId>javacc-maven-plugin</artifactId>
                 <version>3.8.0</version>
