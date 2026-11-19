@@ -922,4 +922,31 @@ public class JexlBuilder {
         this.uberspect = u;
         return this;
     }
+
+    /**
+     * Does safe navigation apply to what is undefined?
+     *
+     * @return true if safe navigation applies to undefined and null, false if it only applies to null
+     * @since 3.7.2
+     */
+    public boolean safeUndefined() {
+        return options.isSafeUndefined();
+    }
+
+    /**
+     * Sets whether safe navigation applies to an undefined variable, property, method or function
+     * as it does to null.
+     * <p>{@code x?.y} if x is undefined or has no property y evaluates as null when the flag is true,
+     * which is the default, throws an exception when it is false; {@code x?.y} if x is null evaluates
+     * as null in both cases.</p>
+     *
+     * @see JexlOptions#setSafeUndefined(boolean)
+     * @param flag true means safe navigation applies to undefined and null, false means it only applies to null
+     * @return this builder
+     * @since 3.7.2
+     */
+    public JexlBuilder safeUndefined(final boolean flag) {
+        options.setSafeUndefined(flag);
+        return this;
+    }
 }

@@ -275,7 +275,7 @@ public class Interpreter extends InterpreterBase {
             // ...(x)(y)
             methodName = null;
             cacheable = false;
-        } else if (!node.isSafeLhs(isSafe())) {
+        } else if (!isSafeUndefined() || !node.isSafeLhs(isSafe())) {
             return unsolvableMethod(node, "?(...)");
         } else {
             // safe lhs
@@ -391,7 +391,7 @@ public class Interpreter extends InterpreterBase {
             throw invocationException(node, methodName, xany);
         }
         // we have either evaluated and returned or no method was found
-        return node.isSafeLhs(isSafe())
+        return isSafeUndefined() && node.isSafeLhs(isSafe())
                 ? null
                 : unsolvableMethod(node, methodName, argv);
     }
@@ -1721,7 +1721,7 @@ public class Interpreter extends InterpreterBase {
                 object = data;
                 if (object == null) {
                     // no object, we fail
-                    return node.isSafeLhs(isSafe())
+                    return isSafe() || isSafeAccess(methodNode)
                         ? null
                         : unsolvableMethod(methodNode, "<null>.<?>(...)");
                 }
@@ -1736,9 +1736,9 @@ public class Interpreter extends InterpreterBase {
         for (int a = 1; a < node.jjtGetNumChildren(); ++a) {
             if (result == null) {
                 // no method, we fail// variable unknown in context and not a local
-                return node.isSafeLhs(isSafe())
+                return isSafeUndefined() && node.isSafeLhs(isSafe())
                         ? null
-                        : unsolvableMethod(methodNode, "<?>.<null>(...)");
+                        : unsolvableMethod(node, "<?>.<null>(...)");
             }
             final ASTArguments argNode = (ASTArguments) node.jjtGetChild(a);
             result = call(node, object, result, argNode);
@@ -1902,6 +1902,8 @@ public class Interpreter extends InterpreterBase {
         boolean antish = !(parent instanceof ASTReference) && options.isAntish();
         // the index of the access to apply to the object
         int deref = 0;
+        // whether the variable the reference starts with is undefined
+        boolean undef = false;
         main:
         for (int c = 0; c < numChildren; c++) {
             objectNode = node.jjtGetChild(c);
@@ -1939,6 +1941,10 @@ public class Interpreter extends InterpreterBase {
             object = objectNode.jjtAccept(this, object);
             deref = c + 1;
             cancelCheck(node);
+            if (object == null && c == 0 && objectNode instanceof ASTIdentifier) {
+                // a null variable or an undefined one ?
+                undef = !isVariableDefined(frame, ((ASTIdentifier) objectNode).getName());
+            }
             if (object != null) {
                 // disallow mixing antish variable & bean with same root; avoid ambiguity
                 antish = false;
@@ -1972,7 +1978,10 @@ public class Interpreter extends InterpreterBase {
                     break main;
                 }
                 // solve antish
-                object = context.get(ant.toString());
+                final String aname = ant.toString();
+                object = context.get(aname);
+                // an antish variable may be defined and null
+                undef = undef && object == null && !context.has(aname);
             } else if (c != numChildren - 1) {
                 // only the last one may be null
                 ptyNode = c == 0 && numChildren > 1 ? node.jjtGetChild(1) : objectNode;
@@ -1981,9 +1990,11 @@ public class Interpreter extends InterpreterBase {
         }
         // dealing with null
         if (object == null) {
+            // safe navigation applies to null, to an undefined variable as an option
+            final boolean nullable = !undef || isSafeUndefined();
             if (ptyNode != null) {
                 // the access applied to null decides, as in x?.y, x?.y() or x?[y]
-                if (isSafe() || deref < numChildren && isSafeAccess(node.jjtGetChild(deref))) {
+                if (nullable && (isSafe() || deref < numChildren && isSafeAccess(node.jjtGetChild(deref)))) {
                     return null;
                 }
                 if (ant != null) {
@@ -1995,7 +2006,7 @@ public class Interpreter extends InterpreterBase {
                         stringifyProperty(ptyNode), ptyNode == objectNode, null);
             }
             if (antish) {
-                if (node.isSafeLhs(isSafe())) {
+                if (nullable && node.isSafeLhs(isSafe())) {
                     return null;
                 }
                 final String aname = Objects.toString(ant, "?");
@@ -2008,20 +2019,6 @@ public class Interpreter extends InterpreterBase {
             }
         }
         return object;
-    }
-
-    /**
-     * Checks whether an access in a reference is explicitly safe, as in ?.y, ?.y() or ?[y].
-     *
-     * @param access the access, a method node being checked through the member it calls
-     * @return true if the access is safe, false otherwise
-     */
-    private static boolean isSafeAccess(final JexlNode access) {
-        final JexlNode member = access instanceof ASTMethodNode ? access.jjtGetChild(0) : access;
-        if (member instanceof ASTIdentifierAccess) {
-            return ((ASTIdentifierAccess) member).isSafe();
-        }
-        return member instanceof ASTArrayAccess && ((ASTArrayAccess) member).isSafeChild(0);
     }
 
     @Override

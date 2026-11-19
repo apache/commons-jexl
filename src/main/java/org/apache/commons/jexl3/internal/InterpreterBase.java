@@ -663,8 +663,8 @@ public abstract class InterpreterBase extends ParserVisitor {
                     + ", property: " + attribute;
             throw new UnsupportedOperationException(error, xcause);
         }
-        final boolean safe = node instanceof ASTIdentifierAccess && ((ASTIdentifierAccess) node).isSafe();
-        if (safe) {
+        // safe navigation may apply to an undefined property, an access that failed remains an error
+        if (xcause == null && isSafeUndefined(node)) {
             return null;
         }
         final String attrStr = Objects.toString(attribute, null);
@@ -706,7 +706,8 @@ public abstract class InterpreterBase extends ParserVisitor {
             if (!context.has(name)) {
                 // not defined, ignore in some cases...
                 final boolean ignore = identifier.jjtGetParent() instanceof ASTReference
-                        || isSafe() && (symbol >= 0 || identifier.jjtGetParent() instanceof ASTAssignment);
+                        || isSafeUndefined() && isSafe()
+                            && (symbol >= 0 || identifier.jjtGetParent() instanceof ASTAssignment);
                 if (!ignore) {
                     return undefinedVariable(identifier, name); // undefined
                 }
@@ -768,6 +769,82 @@ public abstract class InterpreterBase extends ParserVisitor {
      */
     protected boolean isSilent() {
         return options.isSilent();
+    }
+
+    /**
+     * Whether safe navigation applies to what is undefined in this interpreter.
+     *
+     * @return true if safe navigation applies to undefined and null, false if it only applies to null
+     */
+    protected boolean isSafeUndefined() {
+        return options.isSafeUndefined();
+    }
+
+    /**
+     * Whether safe navigation excuses an undefined property.
+     * <p>The access to the property is explicitly safe, as in x?.y or x?[y], or the access that follows it is,
+     * as in x.y?.z; the safe option does not excuse an undefined property.</p>
+     *
+     * @param node the node accessing the property
+     * @return true if the property evaluates as null, false if it is an error
+     */
+    protected boolean isSafeUndefined(final JexlNode node) {
+        if (!isSafeUndefined()) {
+            return false;
+        }
+        JexlNode access = node;
+        JexlNode parent = node.jjtGetParent();
+        if (parent instanceof ASTArrayAccess) {
+            // an index, as in x?[y] or x[y]?[z]
+            final ASTArrayAccess indexed = (ASTArrayAccess) parent;
+            final int next = indexOf(indexed, node) + 1;
+            if (indexed.isSafeChild(next - 1)) {
+                return true;
+            }
+            if (next < indexed.jjtGetNumChildren()) {
+                return indexed.isSafeChild(next);
+            }
+            access = indexed;
+            parent = indexed.jjtGetParent();
+        } else if (isSafeAccess(node)) {
+            return true;
+        }
+        // the access that follows, as in x.y?.z
+        if (parent == null) {
+            return false;
+        }
+        final int next = indexOf(parent, access) + 1;
+        return next > 0 && next < parent.jjtGetNumChildren() && isSafeAccess(parent.jjtGetChild(next));
+    }
+
+    /**
+     * Seeks a node in its parent.
+     *
+     * @param parent the parent
+     * @param child the child
+     * @return the index of the child in its parent, -1 if not found
+     */
+    private static int indexOf(final JexlNode parent, final JexlNode child) {
+        for (int c = 0; c < parent.jjtGetNumChildren(); ++c) {
+            if (parent.jjtGetChild(c) == child) {
+                return c;
+            }
+        }
+        return -1;
+    }
+
+    /**
+     * Checks whether an access in a reference is explicitly safe, as in ?.y, ?.y() or ?[y].
+     *
+     * @param access the access, a method node being checked through the member it calls
+     * @return true if the access is safe, false otherwise
+     */
+    protected static boolean isSafeAccess(final JexlNode access) {
+        final JexlNode member = access instanceof ASTMethodNode ? access.jjtGetChild(0) : access;
+        if (member instanceof ASTIdentifierAccess) {
+            return ((ASTIdentifierAccess) member).isSafe();
+        }
+        return member instanceof ASTArrayAccess && ((ASTArrayAccess) member).isSafeChild(0);
     }
 
     /**
@@ -1134,7 +1211,7 @@ public abstract class InterpreterBase extends ParserVisitor {
      * @return throws JexlException if strict and not silent, null otherwise
      */
     protected Object unsolvableMethod(final JexlNode node, final String method, final Object[] args) {
-        if (isStrictEngine()) {
+        if (isStrictEngine() && !isTernaryProtected(node)) {
             throw new JexlException.Method(node, method, args);
         }
         if (logger.isDebugEnabled()) {
