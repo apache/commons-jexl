@@ -377,9 +377,19 @@ class ClassCreatorTest extends JexlTestCase {
 
                 // attempt to force GC:
                 // while we still have a MB free, create & store big objects
-                for (int b = 0; b < 1024 && Runtime.getRuntime().freeMemory() > MEGA; ++b) {
-                    final BigObject big = new BigObject(b);
-                    stuff.add(new InstanceReference(big, queue));
+                try {
+                    for (int b = 0; b < 1024 && Runtime.getRuntime().freeMemory() > MEGA; ++b) {
+                        final BigObject big = new BigObject(b);
+                        stuff.add(new InstanceReference(big, queue));
+                    }
+                } catch (final OutOfMemoryError oom) {
+                    // exhausting the heap is the intent; if the JVM fails an allocation instead of
+                    // clearing the soft references, release the big objects and carry on
+                    for (final Reference<?> soft : stuff) {
+                        if (soft instanceof InstanceReference) {
+                            soft.clear();
+                        }
+                    }
                 }
                 // hint it...
                 System.gc();

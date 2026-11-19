@@ -506,15 +506,19 @@ public final class TemplateEngine extends JxltEngine {
      */
     final class NestedExpression extends JexlBasedExpression {
         private final Scope scope;
+        private final JexlFeatures features;
         /**
          * Creates a nested unified expression.
          *
          * @param expr   The unified expression as a string
          * @param node   The unified expression as an AST
+         * @param sc     The scope
+         * @param ftrs   The features to parse the prepared expression with
          */
-        NestedExpression(final CharSequence expr, final JexlNode node, final Scope sc) {
+        NestedExpression(final CharSequence expr, final JexlNode node, final Scope sc, final JexlFeatures ftrs) {
             super(expr, node, null);
             this.scope = sc;
+            this.features = ftrs;
             if (source != this) {
                 throw new IllegalArgumentException("Nested TemplateExpression cannot have a source");
             }
@@ -544,7 +548,7 @@ public final class TemplateEngine extends JxltEngine {
         @Override
         protected TemplateExpression prepare(final Interpreter interpreter) {
             final String value = interpreter.interpret(node).toString();
-            final JexlNode dnode = jexl.jxltParse(node.jexlInfo(), noscript, value, scope);
+            final JexlNode dnode = jexl.jxltParse(node.jexlInfo(), features, value, scope);
             return new ImmediateExpression(value, dnode, this);
         }
     }
@@ -912,16 +916,30 @@ public final class TemplateEngine extends JxltEngine {
     }
 
     public JxltEngine.Expression createExpression(final JexlInfo jexlInfo, final String expression, final Scope scope) {
+        return createExpression(jexlInfo, expression, scope, null);
+    }
+
+    /**
+     * Creates an expression that is embedded in a script, an interpolation.
+     *
+     * @param jexlInfo   The source info
+     * @param expression The expression source
+     * @param scope      The scope
+     * @param ftrs       The features of the script the expression is embedded in, null for those of the engine
+     * @return The expression
+     */
+    public JxltEngine.Expression createExpression(final JexlInfo jexlInfo, final String expression, final Scope scope,
+                                                  final JexlFeatures ftrs) {
         final JexlInfo info = jexlInfo == null ?  jexl.createInfo() : jexlInfo;
         Exception xuel = null;
         TemplateExpression stmt = null;
-        final JexlFeatures features = noscript ? jexl.expressionFeatures : jexl.scriptFeatures;
-        // do not cache interpolation expression, they are stored in AST node
+        final JexlFeatures features = features(ftrs);
+        // expressions shorter than the cache threshold are cached, keyed by features, symbols and source
         final boolean cached = cache != null && expression.length() < jexl.cacheThreshold;
         final JexlEngine je = Engine.putThreadEngine(jexl);
         try {
             if (!cached) {
-                stmt = parseExpression(info, expression, scope);
+                stmt = parseExpression(info, expression, scope, features);
             } else {
                 final Source source = new Source(features, Scope.getSymbolsMap(scope), expression);
                 final Object c = cache.get(source);
@@ -929,7 +947,7 @@ public final class TemplateEngine extends JxltEngine {
                 if (stmt != null) {
                     return stmt;
                 }
-                stmt = parseExpression(info, expression, scope);
+                stmt = parseExpression(info, expression, scope, features);
                 cache.put(source, stmt);
             }
         } catch (final JexlException xjexl) {
@@ -987,7 +1005,39 @@ public final class TemplateEngine extends JxltEngine {
      * @return The unified expression instance
      * @throws JexlException if an error occurs during parsing
      */
-    TemplateExpression parseExpression(final JexlInfo info, final String expr, final Scope scope) {  // CSOFF: MethodLength
+    TemplateExpression parseExpression(final JexlInfo info, final String expr, final Scope scope) {
+        return parseExpression(info, expr, scope, features(null));
+    }
+
+    /**
+     * Gets the features used to parse the JEXL expressions of a unified expression.
+     *
+     * @param ftrs The features of the script the unified expression is embedded in, null for those of the engine
+     * @return The features
+     */
+    private JexlFeatures features(final JexlFeatures ftrs) {
+        if (ftrs == null) {
+            return noscript ? jexl.expressionFeatures : jexl.scriptFeatures;
+        }
+        if (!noscript || !ftrs.supportsScript()) {
+            return ftrs;
+        }
+        // the script was created with the features of the engine, no need to derive them
+        return ftrs == jexl.scriptFeatures ? jexl.expressionFeatures : new JexlFeatures(ftrs).script(false);
+    }
+
+    /**
+     * Parses a unified expression.
+     *
+     * @param info  The source info
+     * @param expr  The string expression
+     * @param scope The template scope
+     * @param features The features to parse the JEXL expressions with
+     * @return The unified expression instance
+     * @throws JexlException if an error occurs during parsing
+     */
+    TemplateExpression parseExpression(final JexlInfo info, final String expr, final Scope scope,
+                                       final JexlFeatures features) {  // CSOFF: MethodLength
         final int size = expr.length();
         final ExpressionBuilder builder = new ExpressionBuilder(0);
         final StringBuilder strb = new StringBuilder(size);
@@ -1058,7 +1108,7 @@ public final class TemplateEngine extends JxltEngine {
                             final String src = escapeString(strb);
                             final JexlInfo srcInfo = info.at(lineno, column);
                             final TemplateExpression iexpr = new ImmediateExpression(src,
-                                jexl.jxltParse(srcInfo, noscript, src, scope), null);
+                                jexl.jxltParse(srcInfo, features, src, scope), null);
                             builder.add(iexpr);
                             strb.delete(0, Integer.MAX_VALUE);
                             state = ParseState.CONST;
@@ -1106,12 +1156,12 @@ public final class TemplateEngine extends JxltEngine {
                                 if (nested) {
                                     dexpr = new NestedExpression(
                                             escapeString(expr.substring(inested, column + 1)),
-                                            jexl.jxltParse(srcInfo, noscript, src, scope),
-                                            scope);
+                                            jexl.jxltParse(srcInfo, features, src, scope),
+                                            scope, features);
                                 } else {
                                     dexpr = new DeferredExpression(
                                             src,
-                                            jexl.jxltParse(srcInfo, noscript, src, scope));
+                                            jexl.jxltParse(srcInfo, features, src, scope));
                                 }
                                 builder.add(dexpr);
                                 strb.delete(0, Integer.MAX_VALUE);

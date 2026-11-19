@@ -17,6 +17,7 @@
 
 package org.apache.commons.jexl3.parser;
 
+import org.apache.commons.jexl3.JexlFeatures;
 import org.apache.commons.jexl3.JxltEngine;
 import org.apache.commons.jexl3.internal.Scope;
 
@@ -50,8 +51,8 @@ public class ASTIdentifierAccessJxlt extends ASTIdentifierAccess implements Jexl
         jxltExpression = tp;
     }
 
-    public void setIdentifier(final String src, final Scope scope) {
+    public void setIdentifier(final String src, final Scope scope, final JexlFeatures features) {
         super.setIdentifier(src);
-        this.jxltExpression = JexlParser.parseInterpolation(jexlInfo(), src, scope);
+        this.jxltExpression = JexlParser.parseInterpolation(jexlInfo(), src, scope, features);
     }
 }

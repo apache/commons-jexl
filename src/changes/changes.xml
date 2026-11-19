@@ -29,6 +29,7 @@
     <body>
         <release version="3.7.2" date="YYYY-MM-DD" description="This is a feature and maintenance release. Java 8 or later is required.">
             <!-- FIX -->
+            <action dev="henrib" due-to="Claude" type="fix" issue="JEXL-477">Interpolation strings are parsed with the engine features instead of those of their script.</action>
             <action dev="henrib" due-to="Claude" type="fix" issue="JEXL-475">A jexl.options pragma modifies the engine options when evaluated with a plain context.</action>
             <!-- ADD -->
             <action dev="henrib" due-to="Claude" type="add" issue="JEXL-476">Add the safeUndefined option (JexlOptions.setSafeUndefined(boolean), JexlBuilder.safeUndefined(boolean)) to restrict safe navigation to null, undefined variables, properties and methods remaining errors; safe access operators treat properties, methods and array accesses alike.</action>
