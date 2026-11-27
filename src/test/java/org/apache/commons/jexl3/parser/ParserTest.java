@@ -73,7 +73,7 @@ class ParserTest {
 
     @Test
     void testErrorAmbiguous() throws Exception {
-        final Parser parser = new Parser(";");
+        final Parser parser = new Parser(new StringProvider(";"));
         assertThrows(JexlException.Ambiguous.class, () -> parser.parse(null, FEATURES, "x = 1 y = 5", null), "should have failed on ambiguous statement");
     }
 
@@ -81,7 +81,7 @@ class ParserTest {
     void testErrorAssign() throws Exception {
         final String[] ops = { "=", "+=", "-=", "/=", "*=", "^=", "&=", "|=" };
         for (final String op : ops) {
-            final Parser parser = new Parser(";");
+            final Parser parser = new Parser(new StringProvider(";"));
             final JexlException.Parsing xparse = assertThrows(JexlException.Parsing.class, () -> parser.parse(null, FEATURES, "foo() " + op + " 1;", null),
                     () -> "should have failed on invalid assignment " + op);
             assertNotNull(xparse.getDetail());
@@ -105,7 +105,7 @@ class ParserTest {
      */
     @Test
     void testParse() throws Exception {
-        final Parser parser = new Parser(";");
+        final Parser parser = new Parser(new StringProvider(";"));
         JexlNode sn;
         sn = parser.parse(null, FEATURES, "foo = 1;", null);
         assertNotNull(sn, "parsed node is null");

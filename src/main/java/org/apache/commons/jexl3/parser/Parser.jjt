@@ -19,6 +19,7 @@
 options
 {
    MULTI=true;
+   SINGLE_TREE_FILE=false;
    STATIC=false;
    JAVA_TEMPLATE_TYPE="modern";
    VISITOR=true;
@@ -117,7 +118,6 @@ public final class Parser extends JexlParser
                 : "invalid number literal";
             throw new JexlException.Parsing(ji, msg).clean();
         } finally {
-            token_source.defaultLexState = DEFAULT;
             token_source.ignoredTokens = Collections.emptySet();
             cleanup(previous);
             jjtree.reset();
@@ -145,7 +145,7 @@ TOKEN_MGR_DECLS : {
     | "\r"
     | "\f"
     | <"##" (~["\n","\r"])* ("\n" | "\r" | "\r\n")? >
-    | <"/*" (~["*"])* "*" ("*" | ~["*","/"] (~["*"])* "*")* "/">
+    | <"/*" (~["*"] | ("*")+ ~["*","/"])* ("*")+ "/">
     | <"//" (~["\n","\r"])* ("\n" | "\r" | "\r\n")? >
 }
 
@@ -370,12 +370,16 @@ TOKEN_MGR_DECLS : {
 <FLOAT_LITERAL:
       (["0"-"9"])+ "." (["0"-"9"])+ (<FLT_SFX>)?
     | (["0"-"9"])+ (".")? (<FLT_SFX>)
-    | "." (["0"-"9"])+ (<FLT_SFX>)
     | "#NaN"
 >
     |  <#EXPONENT: ["e","E"] (["+","-"])? (["0"-"9"])+>
     |  <#FLT_CLS : ["f","F","d","D","b","B"]>
     |  <#FLT_SFX : <EXPONENT> (<FLT_CLS>)? | <FLT_CLS> >
+}
+
+<*> TOKEN : /* A float starting with a dot: in all states as the dot token is, mapped to FLOAT_LITERAL */
+{
+  < DOT_FLOAT_LITERAL: "." (["0"-"9"])+ (<FLT_SFX>) > { matchedToken.kind = FLOAT_LITERAL; } : DEFAULT
 }
 
 <*> TOKEN :

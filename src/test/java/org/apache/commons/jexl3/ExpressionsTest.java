@@ -37,6 +37,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.jexl3.parser.Parser;
+import org.apache.commons.jexl3.parser.StringProvider;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -143,7 +144,7 @@ public final class ExpressionsTest extends JexlTestCase {
         jc.set("aString", "Hello");
         final Foo foo = new Foo();
         jc.set("foo", foo);
-        final Parser parser = new Parser(";");
+        final Parser parser = new Parser(new StringProvider(";"));
         parser.parse(null, new JexlFeatures().register(false), "aString = 'World';", null);
 
         assertExpression(jc, "hello = 'world'", "world");
